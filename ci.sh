@@ -17,7 +17,7 @@
 
 export JAVA_HOME=/usr/local/java
 export MBOOT_HOME=$HOME/mboot
-export M2_HOME=$HOME/maven
+export M2_HOME=$HOME/m2
 export PATH=$PATH:$MBOOT_HOME:$M2_HOME/bin:$JAVA_HOME/bin
 
 # ----------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ CMD=$1
 
 HOME_DIR=`pwd`
 DATE=`date`
-DIR=m2
+DIR=m2-build
 REPO=maven-repo-local
 FROM=jvanzyl@maven.org
 #TO=maven2-user@lists.codehaus.org
@@ -143,6 +143,27 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 ) >> log 2>&1
 
 BUILD_REQUIRED=`cat $HOME_DIR/build_required`
+
+## Build the verifier
+
+( 
+  cd $DIR/maven-components/maven-core-it-verifier
+  
+  mboot
+)
+
+(
+  cd $DIR/maven-components/maven-core-it
+
+  echo
+  
+  echo "Running maven-core integration tests ..."
+
+  echo ""
+  
+  ./maven-core-it.sh 
+
+) >> log 2>&1 
 
 # Only send mail to the list if a build was required.
 
