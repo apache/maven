@@ -31,7 +31,7 @@ import java.util.Iterator;
 public class GoalExecutionPhase
     extends AbstractMavenSessionPhase
 {
-    public void execute( MavenSession session ) throws Exception
+    public ExecutionResponse execute( MavenSession session ) throws Exception
     {
         MavenGoalPhaseManager lifecycleManager = (MavenGoalPhaseManager) session.lookup( MavenGoalPhaseManager.ROLE );
 
@@ -56,5 +56,7 @@ public class GoalExecutionPhase
                 break;
             }
         }
+
+        return response;
     }
 }

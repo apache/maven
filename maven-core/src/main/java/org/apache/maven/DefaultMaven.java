@@ -94,7 +94,7 @@ public class DefaultMaven
 
         try
         {
-            lifecycleManager.execute( session );
+            response = lifecycleManager.execute( session );
         }
         catch ( Exception e )
         {

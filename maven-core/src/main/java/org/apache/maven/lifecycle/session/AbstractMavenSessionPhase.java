@@ -16,6 +16,8 @@ package org.apache.maven.lifecycle.session;
  * limitations under the License.
  */
 
+import org.apache.maven.ExecutionResponse;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
@@ -26,6 +28,6 @@ public abstract class AbstractMavenSessionPhase
     extends AbstractLogEnabled
     implements MavenSessionPhase
 {
-    public abstract void execute( MavenSession context )
+    public abstract ExecutionResponse execute( MavenSession context )
         throws Exception;
 }
