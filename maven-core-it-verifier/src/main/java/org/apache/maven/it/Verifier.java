@@ -60,7 +60,7 @@ public class Verifier
             throw new VerificationException( e );
         }
 
-        System.out.println( "---------------------------> OK" );        
+        System.out.println( "-----------------------------------------------------------------------------------> OK" );        
     }
 
     private void verifyExpectedResult( String line )
