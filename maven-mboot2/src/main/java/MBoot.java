@@ -36,7 +36,6 @@ public class MBoot
         "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
         "surefire/jars/surefire-1.2-SNAPSHOT.jar",
         "xpp3/jars/xpp3-1.1.3.3.jar",
-        "xstream/jars/xstream-1.0-SNAPSHOT.jar",
         "qdox/jars/qdox-1.2.jar"
     };
 
@@ -50,8 +49,7 @@ public class MBoot
         "plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
         "plexus/jars/plexus-container-default-1.0-alpha-1-SNAPSHOT.jar",
         "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
-        "xpp3/jars/xpp3-1.1.3.3.jar",
-        "xstream/jars/xstream-1.0-SNAPSHOT.jar",
+        "xpp3/jars/xpp3-1.1.3.3.jar"
     };
 
     // ----------------------------------------------------------------------
@@ -68,8 +66,7 @@ public class MBoot
         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
-        "xpp3/jars/xpp3-1.1.3.3.jar",
-        "xstream/jars/xstream-1.0-SNAPSHOT.jar"
+        "xpp3/jars/xpp3-1.1.3.3.jar"
     };
 
     String[] builds = new String[]
