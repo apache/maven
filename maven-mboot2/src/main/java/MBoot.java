@@ -277,7 +277,7 @@ public class MBoot
         ClassLoader bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies(), null,
                                                                               localRepository );
 
-        reader = new ModelReader( downloader, true );
+        reader = new ModelReader( downloader, false );
         reader.parse( new File( basedir, "maven-plugins/maven-surefire-plugin/pom.xml" ) );
         List surefireDependencies = new ArrayList();
 
