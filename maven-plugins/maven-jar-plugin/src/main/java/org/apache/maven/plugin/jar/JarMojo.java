@@ -17,6 +17,9 @@ package org.apache.maven.plugin.jar;
  */
 
 import org.codehaus.plexus.util.FileUtils;
+import org.apache.maven.plugin.AbstractPlugin;
+import org.apache.maven.plugin.PluginExecutionRequest;
+import org.apache.maven.plugin.PluginExecutionResponse;
 
 import java.io.File;
 import java.io.FileInputStream;

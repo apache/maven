@@ -11,11 +11,4 @@
   <artifactId>maven-meeper</artifactId>
   <version>0.1-SNAPSHOT</version>
   <description></description>
-  <dependencies>
-    <dependency>
-      <groupId>maven</groupId>
-      <artifactId>maven-jar-plugin</artifactId>
-      <version>2.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 </project>
