@@ -42,6 +42,10 @@ their source trees set up in the same way as their collegues.
   other plugins depend upon (PD)
 
 - Support for transitive and group dependencies
+  * I would like to see this dependency information either encoded directly
+  into the artifacts where possible (ie META-INF/maven/dependencies.xml in
+  jar files) or accessible from repository at peer level for each artifact
+  much like signature data is accessible for each artifact. (PD)
 
 - It should be easy to create a single report without a need to (call like it has place now)
   maven:site. It will be nice if report generators can produce docs in few diffrent formats
@@ -65,7 +69,8 @@ their source trees set up in the same way as their collegues.
    (war:webapp goal in maven-old)
 
    In short:  user can be able to declare goal decorators and goals should be fine-grained
-
+   * This very similar to only resolving some dependencies depending on what goals
+   are running as specified above. (PD)
 
 - Maven is Java Build Tool. It should be well defined what does it mean to "build java project".
   It means that stages of the process should be well defined.
@@ -84,6 +89,9 @@ their source trees set up in the same way as their collegues.
 
 - Reorganization of repository layout - are we going to map groupId : "a.b.c.d"  to path "a/b/c/d"?
   Are there some better alternatives?
+  * I am not sure that is such a good idea - how can you tell when a
+  directory is an artifact container (ie jar, sar, distribution etc) and when
+  it is a group container (ie a/b/c/d). (PD)
 
 - (Michal)  I have tried to implement "platform dependend dependecies".
 
@@ -103,6 +111,10 @@ their source trees set up in the same way as their collegues.
    What other "platform depended" artifact type do we have?
    exe? shell-script?
 
+   * the problem with this approach is that most things that load native libs
+   expect the name of the lib to follow a very specific name which usually will
+   not conform to maven naming conventions (ie probably wont have -version on
+   end). No idea how to fix this. (PD)
 
  - how to declare a dependency on JDK and what are possible implications of such dependency
   (e.g javac/javadoc target jdk)
