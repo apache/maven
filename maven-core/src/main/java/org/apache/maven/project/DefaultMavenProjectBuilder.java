@@ -168,6 +168,7 @@ public class DefaultMavenProjectBuilder
                 project = new MavenProject( userModel );
                 project.setFile( parent.getFile() );
                 project.setParent( parent );
+                project.setType( previous.getType() );
             }
 
             project.setLocalRepository( localRepository );
