@@ -37,6 +37,12 @@ public class ArtifactDownloader
         setRemoteRepo( properties.getProperty( "maven.repo.remote" ) );
 
         String mavenRepoLocalProperty = properties.getProperty( "maven.repo.local" );
+        if ( mavenRepoLocalProperty == null )
+        {
+            System.err.println( "maven.repo.local not specified in ~/maven.properties" );
+
+            System.exit( 1 );
+        }
 
         mavenRepoLocal = new File( mavenRepoLocalProperty );
 
