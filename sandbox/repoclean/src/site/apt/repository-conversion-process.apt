@@ -1,0 +1,146 @@
+  ---
+  Repository Conversion Tool - Process
+  ---
+  John Casey
+  ---
+  17-Mar-2005
+  ---
+  
+*Introduction
+
+  This is currently just a copy of an email I sent out to dev@ summarizing the 
+  process and architecture created to clean up the repository and convert v3
+  POMs to v4 syntax. I was hoping to use this as a basis to start design
+  discussions for a better repository conversion tool. I realize that this tool
+  will have to be merged with the repository-tool, and the best of both somehow
+  integrated with one another.
+  
+*Email: 17-Mar-2005
+
+  M2 Devs,
+
+  Sorry for the long email, but please hear me out. I feel like I finally
+  have enough of an understanding on this problem that I can talk
+  intelligently with others. So, here is a summary of my first pass at
+  solving the problem of repository conversion...
+
+  I know that we already have two repository-massaging tools in
+  maven-components already. I looked at both when trying to address
+  MNG-197. In the case of the pre-alpha-to-v4 converter, it didn't seem
+  expandable into the world of v3 poms without a major overhaul. Which
+  leaves the repository-tool subproject. There are two reasons why I
+  didn't just enhance repository-tool:
+
+  1. I didn't feel like I had enough time before this weekend's
+  mini-deadline to understand and complete the repository-tool. This would
+  have involved quite a lot of code-reading, and double-checking against
+  v3 documentation to ensure that all bases are covered.
+
+  2. It looks like this would be better suited as a plexus application.
+  Refactoring to a plexus-based app will allow us to introduce new
+  validators and/or patching components to improve the conversion process.
+
+  I don't know if these were reason enough to justify a whole new
+  application, and I'd be happy to merge the repoclean tool with
+  repository-tool in the future when time permits.
+
+  Carlos, especially for your sake, I'd like to outline the features and
+  approach of repoclean. Once you have an idea of what I've done, perhaps
+  you can suggest some things I missed, and we can start bringing these
+  tools toward a merger.
+
+  Essentially, I was trying to follow the contents of MNG-197 as closely
+  as possible with this tool. The resulting architecture is an
+  acknowledgement of the fact that we're really doing whole-repository
+  maintenance here, not merely translating individual poms. Here is a
+  brief rundown of the design:
+
+  1. Main class which processes command-line arguments, starts an Embedder
+  instance, looks up an instance of the RepositoryCleaner component, and
+  fires the cleanRepository() method.
+
+  2. RepositoryCleaner is the controller class for the application. Using
+  plexus' dependency injection, I have access to the components that
+  execute the various operations on the repository. Some of these operate
+  on the whole repository at a go, and others operate on a per-POM basis.
+
+    A. Verify the validity of both the repository basedir and the reports
+    basedir. If either is invalid, error out.
+
+    B. Scan the repository to create a list of pom files in the
+    repository. We'll use this list multiple times later, so this is an
+    optimization step.
+
+    C. Scan the repository to create a list of artifact (non-pom, non-md5)
+    files in the repository. We'll use this list multiple times later, so
+    this is an optimization step.
+
+    D. Setup the reporter for the repo-level operations.
+
+    E. Call the ArtifactPomCorrelator which matches POMs to artifacts, and
+    spits out error messages to the reporter for any orphaned artifacts.
+    This is a repository-level operation.
+
+    F. Call the ArtifactMd5Correlator which matches artifacts to MD5
+    digest files, and spits out error messages to the reporter for any
+    artifacts that are not accompanied by MD5 digests.
+
+    If we're not executing in report-only mode, this component will
+    also create any missing md5 files.
+
+    This is also a repository-level operation.
+
+    G. Now, we move into the per-POM operations. For each POM, we first
+    setup a Reporter to record errors/warnings/etc. pertaining only to that POM.
+
+    H. Read the v3 POM from file.
+
+    I. Translate the v3 POM to a v4 POM using the PomV3ToV4Translator.
+    This will spit out warnings to the reporter for any elements that don't
+    translate (like aspectSourceDirectory), and errors where only partial
+    information is provided (as in distributionSite/distributionDirectory).
+    This is the only validation provided by the translator.
+
+    J. Call the V4ModelIndependenceValidator to verify the ability of that
+    model to provide the minimum required information set to distinguish one
+    project from another, independent of any information in a parent model
+    (via the <extend/> element, which is ignored). On this pass, only report
+    failures as warnings to the reporter.
+
+    K. If (J.) above fails, call the V4ModelPatcher to parse the path of
+    the POM in the repository in an effort to glean any information that may
+    be missing from the model. If the path is valid, fill in any missing
+    information in the model.
+
+    L. If (J.) above fails, re-call the V4ModelIndependenceValidator, this
+    time in error-reporting mode. If the model is still missing required
+    information, this time the validator will report errors instead of warnings.
+
+    M. If we're not executing in report-only mode, write the v4 POM to the
+    repository in place of the old v3 POM file.
+
+    N. Flush all reporters.
+
+  As you can see, this tool does not account for backup/restore operations
+  on the repository. It is assumed that measures will be taken outside the
+  scope of the tool to make a backup copy of the repository before execution.
+
+  If I'm missing anything in this, please let me know. I've included a
+  bash script to install the tool at a location of your choice using:
+
+  'sh ./install.sh /path/to/target/install/dir /path/to/local/repo'
+
+  and another bash script to execute the tool using:
+
+  './repoclean.sh /path/to/repository /path/to/reports/directory'
+
+  I think repoclean is a reasonable first stab at this problem, but I know
+  it needs to be much better than that. Please don't hesitate to shoot
+  holes in this thing!  :) 
+
+  Also: I will be duplicating this doco in an APT file somewhere in
+  maven-components, so that we can start recording the design discussion.
+
+  Thanks,
+
+  john
