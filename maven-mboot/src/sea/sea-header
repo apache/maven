@@ -1,15 +1,23 @@
 #!/bin/sh
+
 echo ""
 echo Maven MBoot
 echo ""
+
+if [ -z $MBOOT_HOME ]; then
 
 echo
 echo "Where would you like to install mboot? [ ~/mboot ] "
 echo
 
-read $DIR
+read MBOOT_HOME
 
-[ -z $DIR ] && DIR=~/mboot
+[ -z $MBOOT_HOME ] && MBOOT_HOME=$HOME/mboot
+
+export MBOOT_HOME
+fi
+
+DIR=$MBOOT_HOME
 
 echo "Installing mboot in $DIR ..."
 

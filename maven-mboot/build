@@ -1,5 +1,7 @@
 #!/bin/sh
 
+rm -rf target > /dev/null 2>&1
+
 . src/bash/maven.functions
 
 compile . target/classes src/main
@@ -7,8 +9,6 @@ compile . target/classes src/main
 isCommandSuccessful $? "Failed compiling Maven bootstrapper classes!"
 
 DIST=target/mboot
-
-rm -rf $DIST > /dev/null 2>&1
 
 mkdir -p $DIST
 
