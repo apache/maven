@@ -1,0 +1,19 @@
+<project>
+  <groupId>maven-test</groupId>
+  <artifactId>maven-test-a</artifactId>
+  <currentVersion>1.0</currentVersion>
+  <dependencies>
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>maven-test-b</artifactId>
+      <version>1.0</version>
+    </dependency>
+    
+    <!-- pom for this dependency is missing -->
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>maven-test-z</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+</project>

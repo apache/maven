@@ -1,0 +1,14 @@
+<project>
+
+  <extend>project.xml</extend>
+
+  <parent>
+    <groupId>maven</groupId>
+    <artifactId>maven-project-test</artifactId>
+    <version>1.0-beta-9</version>
+  </parent>
+
+  <artifactId>child-artifact</artifactId>
+  <groupId>maven</groupId>
+  <version>1.0-beta-9</version>
+</project>

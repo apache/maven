@@ -1,0 +1,47 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Super Model</name>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Maven Central Repository at ibiblio</name>
+      <url>http://www.ibiblio.org/maven</url>
+    </repository>
+  </repositories>
+
+  <!-- Default plugins
+  <plugins>
+    <plugin>
+      <id></id>
+    </plugin>
+  </plugins>
+  -->
+
+  <build>
+    <!-- This all may just fold into plugin parameters -->
+    <directory>target</directory>
+    <output>target/classes</output>
+    <testOutput>target/test-classes</testOutput>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <excludes>
+        <exclude>**/*Abstract*.java</exclude>
+      </excludes>
+      <resources>
+        <resource>
+          <directory>src/test/resources</directory>
+        </resource>
+      </resources>
+    </unitTest>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+  </build>
+</project>

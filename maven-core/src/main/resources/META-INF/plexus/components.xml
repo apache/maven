@@ -1,0 +1,83 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.Maven</role>
+      <implementation>org.apache.maven.DefaultMaven</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.PluginManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.codehaus.plexus.i18n.I18N</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.MavenLifecycleManager</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.codehaus.plexus.i18n.I18N</role>
+      <implementation>org.codehaus.plexus.i18n.DefaultI18N</implementation>
+      <configuration>
+        <default-bundle-name>org.apache.maven.messages.messages</default-bundle-name>
+      </configuration>
+    </component>
+    <component>
+      <role>org.apache.maven.lifecycle.MavenLifecycleManager</role>
+      <implementation>org.apache.maven.lifecycle.DefaultMavenLifecycleManager</implementation>
+      <configuration>
+        <lifecycle-phases>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.phase.PluginDownloadPhase"/>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.phase.GoalDecorationPhase"/>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.phase.GoalResolutionPhase"/>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.phase.DependencyResolutionPhase"/>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.phase.DependencyDownloadPhase"/>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.phase.GoalAttainmentPhase"/>
+        </lifecycle-phases>
+      </configuration>
+    </component>
+    <component>
+      <role>org.apache.maven.project.MavenProjectBuilder</role>
+      <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.validation.ModelValidator</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.path.PathTranslator</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
+      <implementation>org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler</implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.project.validation.ModelValidator</role>
+      <implementation>org.apache.maven.project.validation.DefaultModelValidator</implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.project.path.PathTranslator</role>
+      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
+    </component>
+
+    <!-- ArtifactFactory -->
+    <component>
+      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+      <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
+    </component>
+
+  </components>
+</component-set>

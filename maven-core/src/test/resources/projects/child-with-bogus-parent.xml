@@ -1,0 +1,10 @@
+<project>
+
+  <extend>${basedir}/bogus.xml</extend>
+
+  <parent>
+    <groupId>maven</groupId>
+    <artifactId>bogus</artifactId>
+    <version>1.0-beta-9</version>
+  </parent>
+</project>

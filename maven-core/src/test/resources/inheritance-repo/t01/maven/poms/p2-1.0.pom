@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>maven</groupId>
+    <artifactId>p1</artifactId>
+    <version>1.0</version>
+  </parent>
+  <groupId>maven</groupId>
+  <artifactId>p2</artifactId>
+  <name>p2</name>
+  <version>1.0</version>
+  <organization>
+    <name>p2-org</name>
+  </organization>
+</project>
+

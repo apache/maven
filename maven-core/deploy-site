@@ -1,0 +1,12 @@
+#!/bin/sh
+
+m2 apt xdoc
+
+(
+  cd target
+  tar cvzf ../docs.tgz docs
+)
+
+scp docs.tgz www.apache.org:~/public_html/m2
+
+ssh www.apache.org "cd public_html/m2; tar xvzf docs.tgz"

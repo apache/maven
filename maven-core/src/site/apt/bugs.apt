@@ -1,0 +1,11 @@
+ -----
+ Bugs
+ -----
+ Jason van Zyl
+ -----
+ 
+Bugs
+
+ * Need apt form of navigation.xml.
+ 
+ * XML doesn't render correctly in source blobs. (fixed)

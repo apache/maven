@@ -1,0 +1,37 @@
+ -----
+ Maven Java objects (Mojos)
+ -----
+ Jason van Zyl
+ ----
+
+Maven Java objects
+
+ Maven Java objects try to be the simplest form of Java object that can be 
+
+
++-----+
+public class CompilerMojo
+    extends AbstractMojo
+{
+    public void execute( MojoRequest request, MojoResponse response )
+    {
+        // Extract parameters from the request
+        
+ 	String sourceDirectory = (String) request.getParameter( "sourceDirectory" );
+        
+	String outputDirectory = (String) request.getParameter( "outputDirectory" );	
+
+	try
+        {
+            compiler.compile( sourceDirectory, outputDirectory );
+        }
+        catch( Exception e )
+        {
+            response.setException( e );
+        }        
+    }
+}
++-----+
+
+o trying to alleviate the need to log internally by gleaning information
+  from the response.

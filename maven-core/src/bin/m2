@@ -1,0 +1,78 @@
+#!/bin/sh
+
+#   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
+#   reserved.
+
+CLASSWORLDS_VERSION=1.1-SNAPSHOT
+
+if [ -z "$MAVEN_OPTS" ] ; then
+  MAVEN_OPTS="-Xmx256m"
+fi
+
+if [ -f "$HOME/.mavenrc" ] ; then
+  . $HOME/.mavenrc
+fi
+
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+darwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  Darwin*) darwin=true ;;
+esac
+
+# For Cygwin, ensure paths are in UNIX format before anything is touched
+if $cygwin ; then
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+  [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+fi
+
+if [ -z "$JAVACMD" ] ; then
+  if [ -n "$JAVA_HOME"  ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+      # IBM's JDK on AIX uses strange locations for the executables
+      JAVACMD=$JAVA_HOME/jre/sh/java
+    else
+      JAVACMD=$JAVA_HOME/bin/java
+    fi
+  else
+    JAVACMD=java
+  fi
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+  echo "Error: JAVA_HOME is not defined correctly."
+  echo "  We cannot execute $JAVACMD"
+  exit 1
+fi
+
+if [ -z "$JAVA_HOME" ] ; then
+  echo "Warning: JAVA_HOME environment variable is not set."
+  echo "  If build fails because sun.* classes could not be found"
+  echo "  you will need to set the JAVA_HOME environment variable"
+  echo "  to the installation directory of java."
+fi
+
+if [ "$cygwin" = "true" ]
+then
+  M2_HOME=`cygpath -pu "$M2_HOME"`
+fi
+
+CLASSWORLDS_CONF="${M2_HOME}/bin/classworlds.conf"
+CP=${M2_HOME}/core/classworlds-${CLASSWORLDS_VERSION}.jar
+#CP=${M2_HOME}/lib/classworlds-${CLASSWORLDS_VERSION}.jar
+
+# For Cygwin, switch paths to Windows format before running java
+if $cygwin; then
+  [ -n "$CP" ] && CP=`cygpath --path --windows "$CP"`
+  [ -n "$CLASSWORLDS_CONF" ] && CLASSWORLDS_CONF=`cygpath --path --windows "$CLASSWORLDS_CONF"`
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
+fi
+
+MAIN_CLASS=org.codehaus.classworlds.Launcher
+
+$JAVACMD \
+  $MAVEN_OPTS \
+  -classpath "$CP" \
+  "-Dclassworlds.conf=$CLASSWORLDS_CONF"  \
+  $MAIN_CLASS $@

@@ -1,0 +1,15 @@
+ -----
+ Installing maven2
+ -----
+ Jason van Zyl
+ -----
+
+Installing maven2
+
+ * Download m2 {{{http://www.apache.org/~jvanzyl/m2/m2.tgz}here}}.
+ 
+ * Unpack in your home directory. In will expand in a directory called <<<m2>>>.
+ 
+ * Put ~/m2/bin in your path.
+ 
+ * Run m2! i.e. <<<m2 jar>>>.
