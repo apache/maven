@@ -845,6 +845,40 @@
             {
                 return getProperties().getProperty( property );
             }
+
+            public boolean equals( Object o )
+            {
+                if ( o == null )
+                {
+                    return false;
+                }
+            
+                if ( getClass() != o.getClass() )
+                {
+                    return false;
+                }
+            
+                if ( getId() != null )
+                {
+                    return getId().equals( ( (Dependency) o ).getId() );
+                }
+                else
+                {
+                    return ( (Dependency) o ).getId() == null;
+                }
+            }
+            
+            public int hashCode()
+            {
+                if ( getId() != null )
+                {
+                    return getId().hashCode();
+                }
+                else
+                {
+                    return super.hashCode();
+                }
+            }
           ]]></code>
         </codeSegment>
       </codeSegments>
