@@ -103,16 +103,19 @@ public class GoalAssemblySubProcessTest
     public void testT2_ShouldFind_Prereq_MainGoal() throws Exception
     {
         String mainGoal = "resolveTest:t2-main";
+
         String prereq = "resolveTest:t2-prereq";
 
         Map messages = new TreeMap();
 
         messages.put( mainGoal, "Main goal is missing." );
+
         messages.put( prereq, "prereq is missing" );
 
         List order = new ArrayList();
 
         order.add( prereq );
+
         order.add( mainGoal );
 
         runTest( mainGoal, Collections.EMPTY_LIST, Collections.EMPTY_LIST, order, messages );
@@ -278,26 +281,30 @@ public class GoalAssemblySubProcessTest
         ArtifactRepository localRepository = new ArtifactRepository( "local", getTestRepoURL() );
 
         Model model = new Model();
+
         model.setPreGoals( preGoals );
+
         model.setPostGoals( postGoals );
 
         MavenProject project = new MavenProject( model );
 
         MavenGoalExecutionContext context = createGoalExecutionContext( project, localRepository, mainGoal );
+
         context.setGoalName( mainGoal );
 
         PluginResolutionPhase pluginPhase = new PluginResolutionPhase();
+
         GoalMappingPhase mappingPhase = new GoalMappingPhase();
+
         GoalResolutionPhase goalPhase = new GoalResolutionPhase();
 
         pluginPhase.execute( context );
+
         mappingPhase.execute( context );
+
         goalPhase.execute( context );
 
         List goals = context.getResolvedGoals();
-        
-        //System.out.println("Expected chain: " + expectedOrder);
-        //System.out.println("Actual chain: " + goals);
 
         assertNotNull( goals );
 

@@ -101,7 +101,8 @@ public class DefaultPluginManager
 
     private Set pluginsInProcess = new HashSet();
 
-    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor ) throws CycleDetectedException
+    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor )
+        throws CycleDetectedException
     {
         if ( pluginsInProcess.contains( mavenPluginDescriptor.getPluginId() ) )
         {
