@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Maven">
+  <bannerLeft>
+    <name>Maven</name>
+    <href>http://www.apache.org</href>
+  </bannerLeft>
+  <bannerRight>
+    <name>http://codehaus.org/codehaus-small.png</name>
+    <href>http://www.codehaus.org</href>
+  </bannerRight>
+  <body>
+    <links>
+      <item name="Plexus" href="http://plexus.codehaus.org"/>
+      <item name="The Codehaus" href="http://www.codehaus.org"/>
+    </links>
+    <menu name="Quick Links">
+      <item name="Examples" href="/examples.html"/>    
+      <item name="Alpha release criteria" href="/alpha-release-criteria.html"/>
+      <item name="Configuration management" href="/configuration-management.html"/>
+      <item name="Install" href="/install.html"/>
+    </menu>
+    <menu name="Plugins">
+      <item name="Plugins" href="/plugins.html"/>
+      <item name="Plugin descriptors" href="/plugin-descriptors.html"/>
+      <item name="Mojos" href="/mojos.html"/>
+    </menu>
+    <menu name="Bug holes">
+      <item name="Bugs to fix" href="/bugs.html"/>
+    </menu>
+  </body>
+</project>
