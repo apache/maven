@@ -40,11 +40,21 @@ Maven Lifecycle Phases
  
  * deploy
 
-o phases are used as join points (before/around/after)
-o mojos specify what phase they are contributing to
-o use goal names to protect from changes in the goal specifics themselves
-o the phases are really placeholders for various goals to be executed and it would be the phases that the user
-  could specify on the CLI so something like
+ Mojos only know what they need as input and what phase they contribute to perform their task.
+ They don't know anything about Maven specifically because Maven controls how they are executed in the lifecycle
+ using the lifecycle configuration which looks like the following:
+
++-----+
+
+%{snippet|id=lifecycle|url=http://cvs.apache.org/viewcvs.cgi/*checkout*/maven-components/maven-core/src/main/resources/META-INF/plexus/components.xml}
+
++-----+
+
+ You can see that we use the mojo id to indicate what mojo we want to execute at a particular place in the lifecycle
+ to protected against any package refactoring and generally protects against any changes that might occur with
+ naming.
+
+ An example of something commonly done is Maven is to compile the sources of your project:
 
 +-----+
 
@@ -54,17 +64,19 @@ m2 compile
 
  This would invoke the lifecycle up to, and including, the compile phase.
 
- This may seem a bit lengthly but I think it covers anything that could possibly be done and there is enough flexibility
- within the lifecycle to accommodate users i.e. we don't need to have a boundless set of lifecycle phases. What people
- do in a project is, in fact, pretty limited.
-
- Using the lifecycle also makes it easier to call out to the artifact handlers.
+ What about mojos that fall outside of this standard lifecycle? Things like <<<clean:clean>>>, <<<archetype:create>>>,
+ and <<<idea:idea>>>? These mojos can be executed by invoking Maven as such.
 
 +-----+
 
-%{snippet|id=lifecycle|url=http://cvs.apache.org/viewcvs.cgi/*checkout*/maven-components/maven-core/src/main/resources/META-INF/plexus/components.xml}
+m2 <pluginId>:<mojoId>
 
 +-----+
+
+ These mojos that execute can be thought of as stand-alone tools, they may require dependency resolution
+ but aside from that they do not interact with any other mojos
+
+Adding Mojos into the lifecycle
 
  Here we are using antlr and it is known to maven that this plugin contributes to the generate-sources phase. In
  m1 the antlr plugin, in fact, worked by magic i.e. if there was a grammar present antlr would try to fire. This
