@@ -35,11 +35,6 @@ public abstract class AbstractInstallMojo
     extends AbstractPlugin
 {
 
-    protected boolean isPom()
-    {
-        return false;
-    }
-
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
@@ -58,7 +53,7 @@ public abstract class AbstractInstallMojo
         artifactInstaller.install( pom, pomArtifact, localRepository );
 
         //Install artifact
-        if ( !isPom() )
+        if ( !"pom".equals( project.getPackaging() ) )
         {
             Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
                                                      project.getVersion(), project.getPackaging() );
