@@ -8,7 +8,7 @@ Maven Lifecycle Phases
 
  * generate sources [modello, antlr, javacc] 
  
- * process sources [qdox, xdoclet]
+ * process sources [qdox, xdoclet, jam]
  
  * generate resources [modello -> persistence mappings]
  
@@ -31,6 +31,8 @@ Maven Lifecycle Phases
  * test [surefire, testNG, dbunit ...]
  
  * package [jar or making a dist]
+
+ * integration tests which required the entire app/assembly to be finished
 
  * install
  
