@@ -43,7 +43,7 @@ import java.util.List;
  *  type="org.apache.maven.MavenCore"
  *  required="true"
  *  validator=""
- *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  expression="#component.org.apache.maven.MavenCore"
  *  description=""""
  *
  * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
