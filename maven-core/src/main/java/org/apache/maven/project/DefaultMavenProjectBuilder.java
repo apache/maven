@@ -56,6 +56,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
@@ -102,11 +104,10 @@ public class DefaultMavenProjectBuilder
 
             LinkedList lineage = new LinkedList();
 
-            MavenProject project = assembleLineage( projectDescriptor, localRepository, lineage );
-
-            // I think we will need to move this into the assembleLineage method in order to
-            // have access to any repositories set in any of the models. Otherwise we don't
-            // have the information required to to retrieve parent poms.
+            MavenProject project = assembleLineage( projectDescriptor,
+                                                    localRepository, 
+                                                    lineage, 
+                                                    superModel.getRepositories() );
 
             modelInheritanceAssembler.assembleModelInheritance( ( (MavenProject) lineage.get( 0 ) ).getModel(), superModel );
 
@@ -165,7 +166,10 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private MavenProject assembleLineage( File projectDescriptor, ArtifactRepository localRepository, LinkedList lineage )
+    private MavenProject assembleLineage( File projectDescriptor, 
+                                          ArtifactRepository localRepository, 
+                                          LinkedList lineage,
+                                          List remoteRepositories )
         throws Exception
     {
         Map properties = createProjectProperties( projectDescriptor.getParentFile() );
@@ -197,18 +201,20 @@ public class DefaultMavenProjectBuilder
 
             //!! (**)
             // ----------------------------------------------------------------------
-            // Do the have the necessary information to actually find the parent
+            // Do we have the necessary information to actually find the parent
             // POMs here?? I don't think so ... Say only one remote repository is
             // specified and that is ibiblio then this model that we just read doesn't
             // have any repository information ... I think we might have to inherit
             // as we go in order to do this.
             // ----------------------------------------------------------------------
 
+            remoteRepositories.addAll( model.getRepositories() );
+
             File parentPom = findParentModel( parentModel,
-                                              RepositoryUtils.mavenToWagon( model.getRepositories() ),
+                                              RepositoryUtils.mavenToWagon( remoteRepositories ),
                                               localRepository );
 
-            MavenProject parent = assembleLineage( parentPom, localRepository, lineage );
+            MavenProject parent = assembleLineage( parentPom, localRepository, lineage, remoteRepositories );
 
             project.setParent( parent );
         }

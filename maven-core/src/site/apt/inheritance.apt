@@ -1,0 +1,43 @@
+ -----
+ Inheritance in Maven
+ -----
+ Jason van Zyl
+ -----
+
+Inheritance in Maven
+
+ In order the understand how inheritance works in Maven there are a few notions that you must be familiar with:
+
+ * The maven super model
+
+ * how parent poms are processed
+
+ * the order in which elements in the POM are overridden
+
+
+Maven super model
+
+ Inheritance is recursive in Maven but there is a special model which is the implicit super parent in the lineage
+ of models you may specify:
+
+ all of the models that you specify are collected to produce a lineage and then the super model is place at
+ the top of that lineage to provide default values.
+
+ The super model is where we place all the values which we believe to be standard, values that can be shared and
+ utilized across all your maven projects.
+
+ m0 <- m1 <- m2
+
+ which is transformed into
+
+ super model <- m0 <- m1 <- m2
+
+
+<project>
+ <modelVersion></modelVersion>
+ <parent>
+   <groupId></groupId>
+   <artifactId></artifactId>
+   <version></version>
+ </parent>
+</project>
