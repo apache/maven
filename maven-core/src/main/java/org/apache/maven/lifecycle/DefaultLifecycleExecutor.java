@@ -76,6 +76,9 @@ public class DefaultLifecycleExecutor
 
         try
         {
+            // TODO: should enrich this with the type handler, but for now just use "type" as is
+            processPluginPhases( session.getProject().getType(), session );
+
             processPluginConfiguration( session.getProject(), session );
 
             processGoalChain( tasks, session );
@@ -124,20 +127,27 @@ public class DefaultLifecycleExecutor
             // TODO: should this flag be used in verifyPlugin, completely disabling the plugin?
             if ( !plugin.isDisabled() )
             {
-                if ( pluginManager.verifyPlugin( plugin.getId(), mavenSession ) )
-                {
-                    PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( plugin.getId() );
-                    for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
-                    {
-                        MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+                String pluginId = plugin.getId();
+                processPluginPhases( pluginId, mavenSession );
+            }
+        }
+    }
 
-                        // TODO: check if the goal exists in the configuration and is disabled
-                        if ( mojoDescriptor.getPhase() != null )
-                        {
-                            Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
-                            phase.getGoals().add( mojoDescriptor.getId() );
-                        }
-                    }
+    private void processPluginPhases( String pluginId, MavenSession mavenSession )
+        throws Exception
+    {
+        if ( pluginManager.verifyPlugin( pluginId, mavenSession ) )
+        {
+            PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( pluginId );
+            for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
+            {
+                MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+
+                // TODO: check if the goal exists in the configuration and is disabled
+                if ( mojoDescriptor.getPhase() != null )
+                {
+                    Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
+                    phase.getGoals().add( mojoDescriptor.getId() );
                 }
             }
         }
