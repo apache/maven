@@ -19,4 +19,13 @@ if [ $cygwin ]; then
   CP=`cygpath -pw $CP`
 fi
 
-java -classpath ${CP} org.apache.maven.tools.repoclean.Main $* | tee repoclean-log.txt
+JAVA_OPTS=""
+
+if [ "$1" == "profile" ]; then
+  JAVA_OPTS="-agentlib:yjpagent=onexit=memory"
+  # You need to customise this path for your environment
+  export PATH=$PATH:/usr/local/yourkit/bin/win32
+  shift
+fi
+
+java $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $* | tee repoclean-log.txt

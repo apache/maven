@@ -68,7 +68,7 @@ public class LegacyArtifactDiscoverer
     private Artifact buildArtifact( String path, Reporter reporter )
         throws Exception
     {
-        StringTokenizer tokens = new StringTokenizer( path, "/" );
+        StringTokenizer tokens = new StringTokenizer( path, "/\\" );
 
         int numberOfTokens = tokens.countTokens();
 
