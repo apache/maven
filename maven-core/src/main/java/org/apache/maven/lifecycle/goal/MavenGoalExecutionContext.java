@@ -89,6 +89,7 @@ public class MavenGoalExecutionContext
         return session.lookup( role, hint );
     }
 
+    // TODO: can remove when phases are gone
     public void release( Object component )
     {
         session.release( component );

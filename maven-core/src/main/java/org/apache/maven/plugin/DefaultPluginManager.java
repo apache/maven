@@ -233,15 +233,11 @@ public class DefaultPluginManager
 
         mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
-        MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver,
-                                                                      mavenProjectBuilder );
+        MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
-        ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact,
-                                                               artifactResolver,
-                                                               remotePluginRepositories,
-                                                               session.getLocalRepository(),
-                                                               metadataSource,
-                                                               artifactFilter );
+        ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact, artifactResolver,
+                                                               remotePluginRepositories, session.getLocalRepository(),
+                                                               metadataSource, artifactFilter );
     }
 
     // ----------------------------------------------------------------------
@@ -267,14 +263,21 @@ public class DefaultPluginManager
         MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );
         if ( mojoDescriptor == null )
         {
-            throw new GoalExecutionException( "Unable to find goal: " + goalName );            
+            throw new GoalExecutionException( "Unable to find goal: " + goalName );
         }
 
-        if ( mojoDescriptor.requiresDependencyResolution() )
+        try
         {
-            resolveTransitiveDependencies( session );
+            if ( mojoDescriptor.requiresDependencyResolution() )
+            {
+                resolveTransitiveDependencies( session );
 
-            downloadDependencies( session );
+                downloadDependencies( session );
+            }
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new GoalExecutionException( "Unable to resolve required dependencies for goal", e );
         }
 
         try
@@ -434,10 +437,8 @@ public class DefaultPluginManager
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The '" + parameter.getName() ).
-            append( "' parameter is required for the execution of the " ).
-            append( mojo.getId() ).
-            append( " mojo and cannot be null." );
+        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " ).append(
+            mojo.getId() ).append( " mojo and cannot be null." );
 
         return message.toString();
     }
@@ -456,17 +457,10 @@ public class DefaultPluginManager
     public void initialize()
         throws Exception
     {
-        artifactFilter = new ExclusionSetFilter( new String[]
-        {
-            "maven-core",
-            "maven-artifact",
-            "maven-model",
-            "maven-plugin",
-            "plexus-container-api",
-            "plexus-container-default",
-            "plexus-artifact-container",
-            "classworlds"
-        } );
+        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
+                                                              "maven-plugin", "plexus-container-api",
+                                                              "plexus-container-default", "plexus-artifact-container",
+                                                              "classworlds"} );
 
         // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new HashSet();
@@ -480,26 +474,18 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context )
-        throws GoalExecutionException
+        throws ArtifactResolutionException
     {
         MavenProject project = context.getProject();
 
-        try
-        {
-            MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
+        MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
-                                                                                    context.getRemoteRepositories(),
-                                                                                    context.getLocalRepository(),
-                                                                                    sourceReader );
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
+                                                                                context.getRemoteRepositories(),
+                                                                                context.getLocalRepository(),
+                                                                                sourceReader );
 
-            project.getArtifacts().addAll( result.getArtifacts().values() );
-
-        }
-        catch ( Exception e )
-        {
-            throw new GoalExecutionException( "Error resolving transitive dependencies.", e );
-        }
+        project.getArtifacts().addAll( result.getArtifacts().values() );
     }
 
     // ----------------------------------------------------------------------
@@ -515,9 +501,7 @@ public class DefaultPluginManager
             {
                 Artifact artifact = (Artifact) it.next();
 
-                artifactResolver.resolve( artifact,
-                                          context.getRemoteRepositories(),
-                                          context.getLocalRepository() );
+                artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
             }
         }
         catch ( ArtifactResolutionException e )

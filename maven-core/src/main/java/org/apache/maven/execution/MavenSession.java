@@ -143,6 +143,7 @@ public class MavenSession
         return container.lookup( role, roleHint );
     }
 
+    // TODO: can remove when phases are gone
     public void release( Object component )
     {
         if ( component != null )

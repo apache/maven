@@ -41,6 +41,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 
@@ -285,7 +286,7 @@ public class DefaultMavenProjectBuilder
      * </ul>
      */
     public List getSortedProjects( List projects )
-        throws Exception
+        throws CycleDetectedException
     {
         DAG dag = new DAG();
 

@@ -226,18 +226,4 @@ public class MojoDescriptor
     {
         this.executionStrategy = executionStrategy;
     }
-
-    public MojoDescriptor copy()
-    {
-        try
-        {
-            return (MojoDescriptor) this.clone();
-        }
-        catch ( Exception e )
-        {
-            // TODO: this needs better handling
-        }
-
-        return null;
-    }
 }

@@ -38,6 +38,7 @@ import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -320,7 +321,7 @@ public class MavenCli
         {
             mavenProperties.load( new FileInputStream( mavenPropertiesFile ) );
         }
-        catch ( Exception e )
+        catch ( IOException e )
         {
             // do nothing
         }

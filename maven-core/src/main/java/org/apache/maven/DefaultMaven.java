@@ -40,8 +40,10 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -149,7 +151,15 @@ public class DefaultMaven
 
             projects = projectBuilder.getSortedProjects( projects );
         }
-        catch ( Exception e )
+        catch ( IOException e )
+        {
+            throw new ReactorException( "Error processing projects for the reactor: ", e );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            throw new ReactorException( "Error processing projects for the reactor: ", e );
+        }
+        catch ( CycleDetectedException e )
         {
             throw new ReactorException( "Error processing projects for the reactor: ", e );
         }
