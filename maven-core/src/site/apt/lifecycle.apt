@@ -19,8 +19,10 @@ Maven Lifecycle
 
      - goal lifecycle
        
-       - goal resolution (including plugin download)
-       
+       - goal resolution (we assume here only one goal is resolved)
+
+       - plugin download
+
        - goal execution
 
  * Multiple goals
