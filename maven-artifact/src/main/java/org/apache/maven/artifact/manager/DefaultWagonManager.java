@@ -20,6 +20,8 @@ package org.apache.maven.artifact.manager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.AbstractArtifactComponent;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -47,6 +49,16 @@ public class DefaultWagonManager
     implements WagonManager, Contextualizable
 {
     private PlexusContainer container;
+
+    public Artifact createArtifact( String groupId, String artifactId, String version, String type )
+        throws ArtifactHandlerNotFoundException
+    {
+        Artifact artifact = new DefaultArtifact( groupId, artifactId, version, type );
+
+        artifact.setPath( path( artifact ) );
+
+        return artifact;
+    }
 
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
@@ -92,7 +104,6 @@ public class DefaultWagonManager
 
         releaseWagon( wagon );
     }
-
 
     /**
      * Get the requested artifact from any of the remote repositories and place in
