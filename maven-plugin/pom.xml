@@ -32,5 +32,15 @@
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <!-- Should be changed to test scope, but that requires moving the 
+        | plugin test case out to another artifact or something.
+        | -->
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 </model>
