@@ -33,10 +33,15 @@ public class ConsoleDownloadMonitor
 {
     private long complete;
 
-    public void transferStarted( TransferEvent transferEvent )
+    public void transferInitiated( TransferEvent transferEvent )
     {
         System.out.println( "Downloading: " + transferEvent.getResource().getName() );
         complete = 0;
+    }
+
+    public void transferStarted( TransferEvent transferEvent )
+    {
+        // This space left intentionally blank
     }
 
     public void transferProgress( TransferEvent transferEvent, byte[] buffer, int length )
