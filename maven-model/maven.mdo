@@ -349,11 +349,15 @@
             public String getId()
             {
                 StringBuffer id = new StringBuffer();
+
                 id.append( getGroupId() );
                 id.append( ":" );
                 id.append( getArtifactId() );
                 id.append( ":" );
                 id.append( getType() );
+                id.append( ":" );
+                id.append( getVersion() );
+
                 return id.toString();
             }
           </code>
