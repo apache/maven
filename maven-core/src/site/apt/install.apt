@@ -13,3 +13,11 @@ Installing maven2
  * Put ~/m2/bin in your path.
  
  * Run m2! i.e. <<<m2 jar>>>.
+
+* Notes
+
+ * Is M2_HOME required?
+ 
+ * Format of override needed
+ 
+ * All the m2 POMs are missing from ibiblio 
