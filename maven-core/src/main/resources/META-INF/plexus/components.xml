@@ -21,6 +21,9 @@
         <requirement>
           <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
       </requirements>
     </component>
     <!--
@@ -83,6 +86,12 @@
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.model.user.UserModelBuilder</role>
+        </requirement>
       </requirements>
     </component>
     <!--
@@ -112,16 +121,7 @@
       <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
       <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
     </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider</role>
-      <implementation>org.apache.maven.artifact.repository.authentication.MavenAuthenticationInfoProvider</implementation>
-    </component>
-
+    
     <!--
      |
      | Lifecycle executor

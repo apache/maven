@@ -1,0 +1,21 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven</groupId>
+  <artifactId>maven-core-it0018</artifactId>
+  <version>1.0</version>
+  <distributionManagement>
+    <repository>
+      <id>repo1</id>
+      <name>Maven Repository</name>
+      <url>scp://repo1.maven.org/home/projects/maven/mboot-repository</url>
+    </repository>
+  </distributionManagement>
+  
+  <dependencies>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>wagon-ssh</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</model>

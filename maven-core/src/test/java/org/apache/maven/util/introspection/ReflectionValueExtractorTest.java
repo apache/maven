@@ -42,7 +42,7 @@ public class ReflectionValueExtractorTest
 
         builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
 
-        File f = getTestFile( "src/test/resources/pom.xml" );
+        File f = getFileForClasspathResource( "pom.xml" );
 
         project = getProject( f );
     }

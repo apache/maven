@@ -23,6 +23,7 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.ArtifactEnabledPlexusTestCase;
 
 import java.io.File;
+import java.net.URL;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -52,6 +53,21 @@ public class MavenTestCase
     protected File getLocalRepositoryPath()
     {
         return getTestFile( "src/test/resources/local-repo" );
+    }
+    
+    protected File getFileForClasspathResource( String resource )
+    {
+        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
+        
+        URL resourceUrl = cloader.getResource( resource );
+        
+        File resourceFile = null;
+        if(resourceUrl != null)
+        {
+            resourceFile = new File(resourceUrl.getPath());
+        }
+        
+        return resourceFile;
     }
 
     protected ArtifactRepository getLocalRepository()

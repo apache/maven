@@ -45,6 +45,7 @@ public class MarmaladeMojoDescriptorExtractorTest
 
         project.setFile( new File( basedir, "pom.xml" ) );
 
+        System.out.println("Basedir: " + basedir);
         project.addScriptSourceRoot( basedir.getPath() );
 
         MarmaladeMojoDescriptorExtractor extractor = (MarmaladeMojoDescriptorExtractor) lookup(

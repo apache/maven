@@ -24,11 +24,25 @@
         <requirement>
           <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.model.user.UserModelBuilder</role>
+        </requirement>
       </requirements>
     </component>
     <component>
       <role>org.apache.maven.project.path.PathTranslator</role>
       <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.model.user.UserModelBuilder</role>
+      <implementation>org.apache.maven.model.user.DefaultUserModelBuilder</implementation>
     </component>
   </components>
 </plexus>

@@ -16,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * limitations under the License.
  */
 
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.repository.Repository;
 
 /**
@@ -28,13 +29,15 @@ import org.apache.maven.wagon.repository.Repository;
 public class ArtifactRepository
     extends Repository
 {
-    //    public ArtifactRepository()
-    //    {
-    //    }
-
+    
     public ArtifactRepository( String id, String url )
     {
         super( id, url );
+    }
+
+    public ArtifactRepository( String id, String url, AuthenticationInfo authInfo )
+    {
+        super( id, url, authInfo );
     }
 
     /*

@@ -21,6 +21,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -29,6 +30,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.user.UserModel;
+import org.apache.maven.model.user.UserModelBuilder;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -79,6 +82,10 @@ public class DefaultMavenProjectBuilder
     private ModelDefaultsInjector modelDefaultsInjector;
 
     private ModelInterpolator modelInterpolator;
+    
+    private UserModelBuilder userModelBuilder;
+    
+    private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     public void initialize()
     {
@@ -237,14 +244,25 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private List buildArtifactRepositories( List repositories )
+    private List buildArtifactRepositories( List repositories ) throws ProjectBuildingException
     {
+        UserModel userModel = null;
+
+        try
+        {
+            userModel = userModelBuilder.buildUserModel();
+        }
+        catch ( Exception e )
+        {
+            throw new ProjectBuildingException( "Cannot read user-model.", e );
+        }
+        
         List repos = new ArrayList();
         for ( Iterator i = repositories.iterator(); i.hasNext(); )
         {
             Repository mavenRepo = (Repository) i.next();
 
-            ArtifactRepository artifactRepo = new ArtifactRepository( mavenRepo.getId(), mavenRepo.getUrl() );
+            ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo, userModel );
 
             if ( !repos.contains( artifactRepo ) )
             {

@@ -20,8 +20,10 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.user.UserModel;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
@@ -30,6 +32,40 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 
 /**
+ * Requires the follow parameters:
+ * 
+ * @parameter
+ *  name="project"
+ *  type="org.apache.maven.project.MavenProject"
+ *  required="true"
+ *  validator=""
+ *  expression="#project"
+ *  description=""
+ *
+ * @parameter
+ *  name="deployer"
+ *  type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  required="true"
+ *  validator=""
+ *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  description=""
+ *
+ * @parameter
+ *  name="artifactRepositoryFactory"
+ *  type="org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
+ *  required="true"
+ *  validator=""
+ *  expression="#component.org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
+ *  description=""
+ *
+ * @parameter
+ *  name="userModel"
+ *  type="org.apache.maven.model.user.UserModel"
+ *  required="true"
+ *  validator=""
+ *  expression="#userModel"
+ *  description=""
+ *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse </a>
  * @version $Id$
  */
@@ -48,6 +84,10 @@ public abstract class AbstractDeployMojo
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
+        
+        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) request.getParameter( "artifactRepositoryFactory" );
+        
+        UserModel userModel = (UserModel) request.getParameter( "userModel" );
 
         DistributionManagement distributionManagement = project.getDistributionManagement();
 
@@ -66,7 +106,12 @@ public abstract class AbstractDeployMojo
             throw new Exception( msg );
         }
 
-        ArtifactRepository deploymentRepository = new ArtifactRepository( repository.getId(), repository.getUrl() );
+        ArtifactRepository deploymentRepository = artifactRepositoryFactory.createArtifactRepository( repository, userModel );
+        
+        if(deploymentRepository.getAuthenticationInfo() == null)
+        {
+            request.getLog().warn("Deployment repository {id: \'" + repository.getId() + "\'} has no associated authentication info!");
+        }
 
         // Deploy the POM
         Artifact pomArtifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),

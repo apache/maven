@@ -31,12 +31,9 @@
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider</role>
-        </requirement>
       </requirements>
     </component>
-
+    
     <!--
      |
      | ArtifactInstaller

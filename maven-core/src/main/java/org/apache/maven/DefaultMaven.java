@@ -19,14 +19,17 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.GoalNotFoundException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.user.ProxyProfile;
 import org.apache.maven.model.user.UserModel;
+import org.apache.maven.model.user.UserModelUtils;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginManager;
@@ -34,7 +37,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.ReactorException;
-import org.apache.maven.util.UserModelUtils;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -76,6 +78,8 @@ public class DefaultMaven
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
+    
+    protected ArtifactRepositoryFactory artifactRepositoryFactory;
 
     // ----------------------------------------------------------------------
     // Project execution
@@ -209,6 +213,8 @@ public class DefaultMaven
         MavenSession session = createSession( request );
 
         session.setProject( project );
+        
+        session.setRemoteRepositories( getArtifactRepositories( project, request.getUserModel() ) );
 
         resolveParameters( request );
 
@@ -253,6 +259,18 @@ public class DefaultMaven
             logSuccess( response );
         }
         return response;
+    }
+
+    private List getArtifactRepositories( MavenProject project, UserModel userModel )
+    {
+        List remoteRepos = new ArrayList();
+        for ( Iterator it = project.getRepositories().iterator(); it.hasNext(); )
+        {
+            Repository modelRepo = (Repository) it.next();
+            remoteRepos.add( artifactRepositoryFactory.createArtifactRepository( modelRepo, userModel ) );
+        }
+
+        return remoteRepos;
     }
 
     public MavenProject getProject( File pom, ArtifactRepository localRepository )

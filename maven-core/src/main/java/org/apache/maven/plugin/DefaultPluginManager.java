@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -27,6 +28,9 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.GoalExecutionException;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.user.UserModel;
+import org.apache.maven.model.user.UserModelBuilder;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -79,6 +83,10 @@ public class DefaultPluginManager
     protected ArtifactFilter artifactFilter;
 
     protected PathTranslator pathTranslator;
+    
+    protected ArtifactRepositoryFactory artifactRepositoryFactory;
+    
+    protected UserModelBuilder userModelBuilder;
 
     public DefaultPluginManager()
     {
@@ -462,6 +470,8 @@ public class DefaultPluginManager
                 String expression = parameter.getExpression();
 
                 Object value = PluginParameterExpressionEvaluator.evaluate( expression, session );
+                
+                getLogger().debug("Evaluated mojo parameter expression: \'" + expression + "\' to: " + value);
 
                 if ( value == null )
                 {
@@ -567,6 +577,7 @@ public class DefaultPluginManager
             "maven-core",
             "maven-artifact",
             "maven-model",
+            "maven-user-model",
             "maven-monitor",
             "maven-plugin",
             "plexus-container-api",
@@ -579,7 +590,25 @@ public class DefaultPluginManager
         remotePluginRepositories = new ArrayList();
 
         // TODO: needs to be configured from the POM element
-        remotePluginRepositories.add( new ArtifactRepository( "plugin-repository", "http://repo1.maven.org" ) );
+        
+        UserModel userModel = null;
+        try
+        {
+            userModel = userModelBuilder.buildUserModel();
+        }
+        catch ( Exception e )
+        {
+            // TODO: Warn about this failure.
+            userModel = new UserModel();
+        }
+        
+        Repository pluginRepo = new Repository();
+        pluginRepo.setId( "plugin-repository" );
+        pluginRepo.setUrl( "http://repo1.maven.org" );
+        
+        ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo, userModel );
+        
+        remotePluginRepositories.add( pluginRepository );
     }
 
     // ----------------------------------------------------------------------

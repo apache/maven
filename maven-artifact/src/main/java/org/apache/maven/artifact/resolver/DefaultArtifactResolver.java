@@ -10,6 +10,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation;
 import org.apache.maven.wagon.TransferFailedException;
+import org.codehaus.plexus.logging.Logger;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,6 +61,11 @@ public class DefaultArtifactResolver
 
         try
         {
+            Logger logger = getLogger();
+            logger.debug("Resolving: " + artifact.getId() + " from:\n" +
+                    "{localRepository: " + localRepository + "}\n" +
+                    "{remoteRepositories: " + remoteRepositories + "}");
+            
             setLocalRepositoryPath( artifact, localRepository );
 
             if ( artifact.exists() )

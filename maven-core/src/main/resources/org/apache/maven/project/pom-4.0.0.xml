@@ -4,7 +4,7 @@
 
   <repositories>
     <repository>
-      <artifactId>central</artifactId>
+      <id>central</id>
       <name>Maven Repository Switchboard</name>
       <url>http://repo1.maven.org</url>
     </repository>

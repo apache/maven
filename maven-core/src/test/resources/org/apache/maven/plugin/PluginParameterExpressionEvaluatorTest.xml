@@ -1,0 +1,37 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.project.MavenProjectBuilder</role>
+      <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.validation.ModelValidator</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.path.PathTranslator</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.model.user.UserModelBuilder</role>
+        </requirement>
+      </requirements>
+    </component>
+	</components>
+</component-set>

@@ -37,6 +37,22 @@ package org.apache.maven.plugin.deploy;
  *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
  *  description=""
  *
+ * @parameter
+ *  name="artifactRepositoryFactory"
+ *  type="org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
+ *  required="true"
+ *  validator=""
+ *  expression="#component.org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
+ *  description=""
+ *
+ * @parameter
+ *  name="userModel"
+ *  type="org.apache.maven.model.user.UserModel"
+ *  required="true"
+ *  validator=""
+ *  expression="#userModel"
+ *  description=""
+ *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
  */

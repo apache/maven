@@ -28,7 +28,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         super.setUp();
 
-        File f = getTestFile( "src/test/resources/pom.xml" );
+        File f = getFileForClasspathResource( "pom.xml" );
 
         project = getProject( f );
     }

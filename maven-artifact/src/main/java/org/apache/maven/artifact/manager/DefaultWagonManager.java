@@ -16,7 +16,6 @@ package org.apache.maven.artifact.manager;
 import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -51,8 +50,6 @@ public class DefaultWagonManager
 
     private TransferListener downloadMonitor;
 
-    private AuthenticationInfoProvider authenticationInfoProvider;
-
     public Wagon getWagon( String protocol ) throws UnsupportedProtocolException
     {
         Wagon wagon;
@@ -79,8 +76,6 @@ public class DefaultWagonManager
     // TODO: don't throw exception
     public void put( File source, Artifact artifact, ArtifactRepository repository ) throws Exception
     {
-        authenticationInfoProvider.configureAuthenticationInfo( repository );
-
         Wagon wagon = getWagon( repository.getProtocol() );
 
         wagon.connect( repository, getProxy( repository.getProtocol() ) );
@@ -134,8 +129,6 @@ public class DefaultWagonManager
 
             try
             {
-                authenticationInfoProvider.configureAuthenticationInfo( repository );
-
                 Wagon wagon = getWagon( repository.getProtocol() );
 
                 // ----------------------------------------------------------------------

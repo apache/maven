@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-plugin-tools</artifactId>
     <groupId>maven</groupId>
@@ -89,6 +89,13 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>maven</groupId>
+      <artifactId>maven-user-model</artifactId>
+      <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-marmalade-factory</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
@@ -103,4 +110,4 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-</model>
+</project>

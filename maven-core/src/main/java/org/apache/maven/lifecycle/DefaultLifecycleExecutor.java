@@ -32,6 +32,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
 import java.util.Date;
@@ -46,6 +48,7 @@ import java.util.Map;
  *          jdcasey Exp $
  */
 public class DefaultLifecycleExecutor
+    extends AbstractLogEnabled
     implements LifecycleExecutor, Initializable
 {
     // ----------------------------------------------------------------------
@@ -385,6 +388,11 @@ public class DefaultLifecycleExecutor
 
         try
         {
+            Logger logger = getLogger();
+            logger.debug("Resolving artifacts from:\n" +
+                    "\t{localRepository: " + session.getLocalRepository() + "}\n" +
+                    "\t{remoteRepositories: " + session.getRemoteRepositories() + "}");
+            
             return pluginManager.executeMojo( session, id );
         }
         catch ( GoalExecutionException e )

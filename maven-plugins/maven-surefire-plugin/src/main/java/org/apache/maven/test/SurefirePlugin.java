@@ -103,6 +103,9 @@ public class SurefirePlugin
 
         SurefireBooter surefireBooter = new SurefireBooter();
 
+        System.out.println("Setting reports dir: " + reportsDirectory);
+        System.out.flush();
+        
         surefireBooter.setReportsDirectory( reportsDirectory );
 
         // ----------------------------------------------------------------------

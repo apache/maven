@@ -20,7 +20,6 @@ package org.apache.maven.plugin;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.util.introspection.ReflectionValueExtractor;
-import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
@@ -90,6 +89,10 @@ public class PluginParameterExpressionEvaluator
             {
                 throw new PluginConfigurationException( "Error evaluating plugin parameter expression: " + expression, e );
             }
+        }
+        else if ( expression.startsWith( "#userModel" ) )
+        {
+            value = context.getUserModel();
         }
         else if ( expression.equals( "#basedir" ) )
         {

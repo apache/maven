@@ -18,7 +18,6 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.Log;
@@ -31,9 +30,7 @@ import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 import org.codehaus.plexus.util.dag.Vertex;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +64,8 @@ public class MavenSession
     private Log log;
 
     private final UserModel userModel;
+
+    private List remoteArtifactRepos = Collections.EMPTY_LIST;
 
     public MavenSession( PlexusContainer container, PluginManager pluginManager, UserModel userModel,
         ArtifactRepository localRepository, EventDispatcher eventDispatcher, Log log, List goals )
@@ -112,27 +111,15 @@ public class MavenSession
     {
         return localRepository;
     }
+    
+    public void setRemoteRepositories(List remoteArtifactRepos)
+    {
+        this.remoteArtifactRepos = remoteArtifactRepos;
+    }
 
     public List getRemoteRepositories()
     {
-        List result = null;
-
-        if ( project != null )
-        {
-            List repos = project.getRepositories();
-            result = new ArrayList( repos.size() );
-            for ( Iterator it = repos.iterator(); it.hasNext(); )
-            {
-                Repository repo = (Repository) it.next();
-                result.add( new ArtifactRepository( repo.getId(), repo.getUrl() ) );
-            }
-        }
-        else
-        {
-            result = Collections.EMPTY_LIST;
-        }
-
-        return result;
+        return remoteArtifactRepos;
     }
 
     public List getGoals()

@@ -35,7 +35,7 @@ public class CanonicalProjectBuilderTest
     public void testProjectBuilder()
         throws Exception
     {
-        File f = getTestFile( "src/test/resources/canonical-pom.xml" );
+        File f = getFileForClasspathResource( "canonical-pom.xml" );
 
         MavenProject project = getProject( f );
 

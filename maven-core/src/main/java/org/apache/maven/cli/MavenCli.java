@@ -28,17 +28,20 @@ import org.apache.maven.Maven;
 import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.user.MavenProfile;
 import org.apache.maven.model.user.UserModel;
+import org.apache.maven.model.user.UserModelBuilder;
+import org.apache.maven.model.user.UserModelUtils;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Plugin;
-import org.apache.maven.util.UserModelUtils;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.logging.Logger;
@@ -87,8 +90,6 @@ public class MavenCli
 
         //        Properties mavenProperties = getMavenProperties( userConfigurationDirectory );
 
-        ArtifactRepository localRepository = getLocalRepository();
-
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
@@ -122,7 +123,23 @@ public class MavenCli
 
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
 
-        UserModel userModel = UserModelUtils.getUserModel();
+        // ----------------------------------------------------------------------
+        // Now that we have everything that we need we will fire up plexus and
+        // bring the maven component to life for use.
+        // ----------------------------------------------------------------------
+
+        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
+
+        embedder.start( classWorld );
+
+        UserModelBuilder userModelBuilder = (UserModelBuilder) embedder.lookup( UserModelBuilder.ROLE );
+        
+        UserModel userModel = userModelBuilder.buildUserModel();
+        
+        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder
+                                                                                                  .lookup( ArtifactRepositoryFactory.ROLE );
+
+        ArtifactRepository localRepository = getLocalRepository( userModel, artifactRepositoryFactory );
 
         if ( commandLine.hasOption( CLIManager.REACTOR ) )
         {
@@ -145,15 +162,6 @@ public class MavenCli
             request = new DefaultMavenExecutionRequest( localRepository, userModel, eventDispatcher,
                                                         commandLine.getArgList(), files, userDir.getPath() );
         }
-
-        // ----------------------------------------------------------------------
-        // Now that we have everything that we need we will fire up plexus and
-        // bring the maven component to life for use.
-        // ----------------------------------------------------------------------
-
-        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
-
-        embedder.start( classWorld );
 
         LoggerManager manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
         if ( commandLine.hasOption( CLIManager.DEBUG ) )
@@ -331,10 +339,9 @@ public class MavenCli
         return mavenProperties;
     }
 
-    protected static ArtifactRepository getLocalRepository()
+    protected static ArtifactRepository getLocalRepository( UserModel userModel, ArtifactRepositoryFactory repoFactory )
         throws Exception
     {
-        UserModel userModel = UserModelUtils.getUserModel();
         MavenProfile mavenProfile = UserModelUtils.getActiveMavenProfile( userModel );
 
         String localRepository = null;
@@ -352,6 +359,13 @@ public class MavenCli
 
 // TODO [BP]: this should not be necessary - grep for and remove
         System.setProperty( MavenConstants.MAVEN_REPO_LOCAL, localRepository );
-        return new ArtifactRepository( "local", "file://" + localRepository );
+        
+        Repository repo = new Repository();
+
+        repo.setId( "local" );
+
+        repo.setUrl( "file://" + localRepository );
+
+        return repoFactory.createArtifactRepository( repo, userModel );
     }
 }
