@@ -121,17 +121,36 @@ public class GoalAttainmentPhase
 
                 Object value = OgnlProjectValueExtractor.evaluate( expression, context );
 
-                //@todo: mojo parameter validation
-                // This is the place where parameter validation should be performed.
-                //if ( value == null && parameter.isRequired() )
-                //{
-                //}
+                // ----------------------------------------------------------------------
+                // We will perform a basic check here for parameters values that are
+                // required. Required parameters can't be null so we throw an
+                // Exception in the case where they are. We probably want some pluggable
+                // mechanism here but this will catch the most obvious of
+                // misconfigurations.
+                // ----------------------------------------------------------------------
+
+                if ( value == null && parameter.isRequired() )
+                {
+                    throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
+                }
 
                 map.put( key, value );
             }
         }
 
         return map;
+    }
+
+    private String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter )
+    {
+        StringBuffer message = new StringBuffer();
+
+        message.append( "The " + parameter.getName() ).
+                append( " is required for the execution of the " ).
+                append( mojo.getId() ).
+                append( " mojo and cannot be null." );
+
+        return message.toString();
     }
 
     private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request, MavenGoalExecutionContext context )
