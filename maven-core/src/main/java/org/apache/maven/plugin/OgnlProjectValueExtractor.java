@@ -81,8 +81,7 @@ public class OgnlProjectValueExtractor
             }
             catch ( OgnlException e )
             {
-                throw new PluginConfigurationException(
-                    "Error evaluating plugin parameter expression: " + expression, e );
+                throw new PluginConfigurationException( "Error evaluating plugin parameter expression: " + expression, e );
             }
         }
         else if ( expression.equals( "#basedir" ) )
@@ -113,10 +112,16 @@ public class OgnlProjectValueExtractor
             value = System.getProperty( expression.substring( 1 ) );
         }
 
-        // If we strike out we'll just use the expression which allows
-        // people to use hardcoded values if they wish.
+        // ----------------------------------------------------------------------              
+        // If we strike and we are not dealing with an expression then we will
+        // will let the value pass through unaltered so that users can hardcode
+        // literal values. Expressions that evaluate to null will be passed
+        // through as null so that the validator can see the null value and
+        // act in accordance with the requirements laid out in the
+        // mojo descriptor.
+        // ----------------------------------------------------------------------
 
-        if ( value == null )
+        if ( value == null && !expression.startsWith( "#" ) )
         {
             value = expression;
         }
