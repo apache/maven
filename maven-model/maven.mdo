@@ -38,28 +38,31 @@
         </field>
         <field>
           <name>parent</name>
+          <version>4.0.0</version>
           <description>Specified which project to extend.</description>
           <type>Parent</type>
           <comment></comment>
         </field>
         <field>
           <name>modelVersion</name>
+          <version>4.0.0</version>
           <description>The version of this model you are using.</description>
           <type>String</type>
         </field>
         <field>
           <name>pomVersion</name>
+          <version>3.0.0</version>
           <delegateTo>modelVersion</delegateTo>
         </field>
         <field>
           <name>groupId</name>
-          <version>??? used post 3.0.0</version>
+          <version>3.0.0</version>
           <description>The primary grouping for your project.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
-          <version>??? used post 3.0.0</version>
+          <version>3.0.0</version>
           <description>The identifier used when generating the artifact for your project.</description>
           <type>String</type>
         </field>
@@ -72,25 +75,30 @@
         </field>
         <field>
           <name>name</name>
+          <version>3.0.0</version>
           <description>Human readable name of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>currentVersion</name>
+          <version>3.0.0</version>
           <delegateTo>version</delegateTo>
         </field>
         <field>
           <name>version</name>
+          <version>4.0.0</version>
           <description>The current version of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>shortDescription</name>
+          <version>3.0.0</version>
           <description>An abbreviated description of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>description</name>
+          <version>3.0.0</version>
           <description>
             A detailed description of the project.  This element is
             usually specified as CDATA to enable the use of HTML tags
@@ -101,29 +109,26 @@
           <type>String</type>
         </field>
         <field>
-          <name>type</name>
-          <version>??? use post 3.0.0</version>
-          <description>The type of artifact produced by the project.</description>
-          <type>String</type>
-          <defaultValue>jar</defaultValue>
-        </field>
-        <field>
           <name>url</name>
+          <version>3.0.0</version>
           <description>The URL where the project can be found.</description>
           <type>String</type>
         </field>
         <field>
           <name>logo</name>
+          <version>3.0.0</version>
           <description>The logo for the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>issueTrackingUrl</name>
+          <version>3.0.0</version>
           <description>The URL where the issue tracking system used by the project can be found.</description>
           <type>String</type>
         </field>
         <field>
           <name>inceptionYear</name>
+          <version>3.0.0</version>
           <description>The year the project started.</description>
           <type>String</type>
         </field>
