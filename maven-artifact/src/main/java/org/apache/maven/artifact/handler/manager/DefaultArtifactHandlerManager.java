@@ -68,23 +68,20 @@ public class DefaultArtifactHandlerManager
     }
 
     public String localRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
+         throws ArtifactHandlerNotFoundException
     {
         return localRepository.getBasedir() + "/" + path( artifact );
     }
 
     public String artifactUrl( Artifact artifact, ArtifactRepository remoteRepository )
+        throws ArtifactHandlerNotFoundException
     {
         return remoteRepository.getUrl() + "/" + path( artifact );
     }
 
-    public String path( Artifact artifact )
+    public String path( Artifact artifact ) throws ArtifactHandlerNotFoundException
     {
-        ArtifactHandler handler = (ArtifactHandler) artifactHandlers.get( artifact.getType() );
-
-        if ( handler == null )
-        {
-            throw new ArtifactHandlerNotFoundException( "Artifact handler for type '" + type + "' cannot be found." );
-        }
+        ArtifactHandler handler = getArtifactHandler( artifact.getType() );
 
         return interpolateLayout( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), handler
             .directory(), handler.extension() );

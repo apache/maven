@@ -18,6 +18,7 @@ package org.apache.maven.artifact;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.io.File;
@@ -89,6 +90,7 @@ public abstract class ArtifactComponentTestCase
     }
 
     protected void assertRemoteArtifactPresent( Artifact artifact )
+        throws ArtifactHandlerNotFoundException
     {
         String path = artifactHandlerManager.path( artifact );
 
@@ -101,6 +103,7 @@ public abstract class ArtifactComponentTestCase
     }
 
     protected void assertLocalArtifactPresent( Artifact artifact )
+        throws ArtifactHandlerNotFoundException
     {
         String path = artifactHandlerManager.path( artifact );
 
@@ -113,6 +116,7 @@ public abstract class ArtifactComponentTestCase
     }
 
     protected void assertRemoteArtifactNotPresent( Artifact artifact )
+        throws ArtifactHandlerNotFoundException
     {
         String path = artifactHandlerManager.path( artifact );
 
@@ -125,6 +129,7 @@ public abstract class ArtifactComponentTestCase
     }
 
     protected void assertLocalArtifactNotPresent( Artifact artifact )
+        throws ArtifactHandlerNotFoundException
     {
         String path = artifactHandlerManager.path( artifact );
 

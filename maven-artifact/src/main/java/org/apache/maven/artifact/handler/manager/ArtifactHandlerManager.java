@@ -33,9 +33,11 @@ public interface ArtifactHandlerManager
     ArtifactHandler getArtifactHandler( String type )
         throws ArtifactHandlerNotFoundException;
 
-    String localRepositoryPath( Artifact artifact, ArtifactRepository localRepository );
+    String localRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
+         throws ArtifactHandlerNotFoundException;
 
-    String path( Artifact artifact );
+    String path( Artifact artifact )
+        throws ArtifactHandlerNotFoundException;
 
     Set getHandlerTypes();
 

@@ -2,6 +2,7 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -37,16 +38,20 @@ public class DefaultArtifactResolver
         // for resolution has been satisfied.
         // ----------------------------------------------------------------------
 
-        setLocalRepositoryPath( artifact, localRepository );
-
-        if ( artifact.exists() )
-        {
-            return artifact;
-        }
-
         try
         {
+            setLocalRepositoryPath( artifact, localRepository );
+
+            if ( artifact.exists() )
+            {
+                return artifact;
+            }
+
             wagonManager.get( artifact, remoteRepositories, localRepository );
+        }
+        catch ( ArtifactHandlerNotFoundException e )
+        {
+            throw new ArtifactResolutionException( "Error resolving artifact: ", e );
         }
         catch ( TransferFailedException e )
         {
@@ -223,7 +228,14 @@ public class DefaultArtifactResolver
         {
             Artifact artifact = (Artifact) it.next();
 
-            setLocalRepositoryPath( artifact, localRepository );
+            try
+            {
+                setLocalRepositoryPath( artifact, localRepository );
+            }
+            catch ( ArtifactHandlerNotFoundException e )
+            {
+                throw new TransitiveArtifactResolutionException( "Error collecting artifact: ", e );
+            }
 
             artifactResult.put( artifact.getId(), artifact );
         }

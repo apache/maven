@@ -51,15 +51,15 @@ public class DefaultArtifactInstaller
     public void install( File source, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        setLocalRepositoryPath( artifact, localRepository );
-
-        if ( !artifact.getFile().getParentFile().exists() )
-        {
-            artifact.getFile().getParentFile().mkdirs();
-        }
-
         try
         {
+            setLocalRepositoryPath( artifact, localRepository );
+
+            if ( !artifact.getFile().getParentFile().exists() )
+            {
+                artifact.getFile().getParentFile().mkdirs();
+            }
+
             getLogger().info( "Installing " + source.getPath() + " to " + artifact.getPath() );
 
             FileUtils.copyFile( source, artifact.getFile() );

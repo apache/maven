@@ -38,11 +38,13 @@ public class AbstractArtifactComponent
     }
 
     protected String path( Artifact artifact )
+        throws ArtifactHandlerNotFoundException
     {
         return artifactHandlerManager.path( artifact );
     }
 
     protected void setLocalRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
+        throws ArtifactHandlerNotFoundException
     {
         artifact.setPath( artifactHandlerManager.localRepositoryPath( artifact, localRepository ) );
     }
