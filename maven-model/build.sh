@@ -7,7 +7,7 @@ modello --model=maven.mdo --mode=java --dir=src/main/java
 modello --model=maven.mdo --mode=xpp3 --dir=src/main/java
 
 # Build the sources
-mboot
+mboot --install
 
 # Generate XML Schema
 modello --model=maven.mdo --mode=xsd --dir=.
