@@ -64,7 +64,7 @@ public class CompilerMojo
 {
     private Compiler compiler = new JavacCompiler();
 
-    private boolean debug = true;
+    private boolean debug = false;
 
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
@@ -126,7 +126,7 @@ public class CompilerMojo
                     message = "Warning! not present in repository!";
                 }
 
-                request.getLog().info( "classpathElements[ " + i + " ] = " + classpathElement + ": " + message );
+                request.getLog().debug( "classpathElements[ " + i + " ] = " + classpathElement + ": " + message );
             }
         }
 
