@@ -40,6 +40,8 @@ it0010: Since the artifact resolution does not use the project builder, we must
         
 it0011: Test specification of dependency versions via <dependencyDefaults/>.
 
+it0012: Test simple POM interpolation
+
 -------------------------------------------------------------------------------
 
 - generated sources

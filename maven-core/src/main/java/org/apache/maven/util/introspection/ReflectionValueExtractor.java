@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.util.introspection;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -17,8 +17,6 @@ package org.apache.maven.plugin;
  * ====================================================================
  */
 
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.util.introspection.ClassMap;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.lang.reflect.Method;
@@ -35,18 +33,21 @@ import java.util.StringTokenizer;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class ReflectionProjectValueExtractor
+public class ReflectionValueExtractor
 {
     private static Class[] args = new Class[0];
 
     private static Object[] params = new Object[0];
 
     private static ClassMap classMap;
-    
+
     private static Map classMaps = new HashMap();
 
-    public static Object evaluate( String expression, MavenProject project )
-        throws Exception
+    private ReflectionValueExtractor()
+    {
+    }
+
+    public static Object evaluate( String expression, Object root ) throws Exception
     {
         // ----------------------------------------------------------------------
         // Remove the leading "project" token
@@ -54,7 +55,7 @@ public class ReflectionProjectValueExtractor
 
         expression = expression.substring( expression.indexOf( '.' ) + 1 );
 
-        Object value = project;
+        Object value = root;
 
         // ----------------------------------------------------------------------
         // Walk the dots and retrieve the ultimate value desired from the
@@ -83,7 +84,7 @@ public class ReflectionProjectValueExtractor
     {
         classMap = (ClassMap) classMaps.get( clazz );
 
-        if ( classMap == null )
+        if( classMap == null )
         {
             classMap = new ClassMap( clazz );
         }

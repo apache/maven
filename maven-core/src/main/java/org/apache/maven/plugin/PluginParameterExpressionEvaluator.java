@@ -19,6 +19,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
@@ -128,11 +129,11 @@ public class PluginParameterExpressionEvaluator
 
         return value;
     }
-
+    
     private static Object getValue( String expression, MavenProject project )
         throws Exception
     {
-        return ReflectionProjectValueExtractor.evaluate( expression, project );
+        return ReflectionValueExtractor.evaluate( expression, project );
     }
 }
 

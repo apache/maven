@@ -524,6 +524,11 @@ public class MavenProject
     {
         this.wagonLocalRepository = repository;
     }
+    
+    public ArtifactRepository getLocalRepository()
+    {
+        return wagonLocalRepository;
+    }
 
     // ----------------------------------------------------------------------
     // Decorators

@@ -140,6 +140,15 @@
      |
      -->
     <component>
+      <role>org.apache.maven.project.interpolation.ProjectInterpolator</role>
+      <implementation>org.apache.maven.project.interpolation.RegexBasedProjectInterpolator</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
       <role>org.apache.maven.project.ProjectDefaultsInjector</role>
       <implementation>org.apache.maven.project.DefaultProjectDefaultsInjector</implementation>
     </component>
@@ -154,6 +163,9 @@
       <requirements>
         <requirement>
           <role>org.apache.maven.project.ProjectDefaultsInjector</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.interpolation.ProjectInterpolator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>

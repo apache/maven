@@ -8,10 +8,9 @@ import java.util.List;
 
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.model.Build;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.util.introspection.ReflectionValueExtractor;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -43,27 +42,27 @@ public class ReflectionProjectValueExtractorTest
         // Top level values
         // ----------------------------------------------------------------------
 
-        assertEquals( "4.0.0", ReflectionProjectValueExtractor.evaluate( "project.modelVersion", project ) );
+        assertEquals( "4.0.0", ReflectionValueExtractor.evaluate( "project.modelVersion", project ) );
 
-        assertEquals( "maven", ReflectionProjectValueExtractor.evaluate( "project.groupId", project ) );
+        assertEquals( "maven", ReflectionValueExtractor.evaluate( "project.groupId", project ) );
 
-        assertEquals( "maven-core", ReflectionProjectValueExtractor.evaluate( "project.artifactId", project ) );
+        assertEquals( "maven-core", ReflectionValueExtractor.evaluate( "project.artifactId", project ) );
 
-        assertEquals( "Maven", ReflectionProjectValueExtractor.evaluate( "project.name", project ) );
+        assertEquals( "Maven", ReflectionValueExtractor.evaluate( "project.name", project ) );
 
-        assertEquals( "2.0-SNAPSHOT", ReflectionProjectValueExtractor.evaluate( "project.version", project ) );
+        assertEquals( "2.0-SNAPSHOT", ReflectionValueExtractor.evaluate( "project.version", project ) );
 
         // ----------------------------------------------------------------------
         // SCM
         // ----------------------------------------------------------------------
 
-        assertEquals( "scm-connection", ReflectionProjectValueExtractor.evaluate( "project.scm.connection", project ) );
+        assertEquals( "scm-connection", ReflectionValueExtractor.evaluate( "project.scm.connection", project ) );
 
         // ----------------------------------------------------------------------
         // Dependencies
         // ----------------------------------------------------------------------
 
-        List dependencies = (List) ReflectionProjectValueExtractor.evaluate( "project.dependencies", project );
+        List dependencies = (List) ReflectionValueExtractor.evaluate( "project.dependencies", project );
 
         assertNotNull( dependencies );
 
@@ -73,7 +72,7 @@ public class ReflectionProjectValueExtractorTest
         // Build
         // ----------------------------------------------------------------------
 
-        Build build = (Build) ReflectionProjectValueExtractor.evaluate( "project.build", project );
+        Build build = (Build) ReflectionValueExtractor.evaluate( "project.build", project );
 
         assertNotNull( build );
     }
