@@ -1,5 +1,7 @@
 #!/bin/sh
 
+rm -rf target
+
 # Generate the sources from the model
 modello --model=maven.mdo --version=4.0.0 --mode=java --dir=target/generated-sources
 
