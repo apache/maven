@@ -127,8 +127,8 @@ public class DefaultMavenProjectBuilder
                 localRepositoryValue = superModel.getLocal().getRepository();
             }
 
-            // TODO: systemProperty in modello will make this redundant
             localRepositoryValue = System.getProperty( "maven.repo.local", localRepositoryValue );
+            System.setProperty( "maven.repo.local", localRepositoryValue );
 
             ArtifactRepository localRepository = null;
             if ( localRepositoryValue != null )
