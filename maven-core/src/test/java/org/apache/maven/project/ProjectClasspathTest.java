@@ -57,8 +57,15 @@ public class ProjectClasspathTest extends MavenTestCase
         checkArtifactIdScope( project, "runtime", "runtime" );
         checkArtifactIdScope( project, "default", "compile" );
 
-        // check all transitive deps of a test dependency are test scope
-        checkGroupIdScope( project, "test", "test" );
+        // check all transitive deps of a test dependency are skipped
+        artifact = getArtifact( project, "maven-test-test", "scope-compile" );
+        assertNull( "Check no test dependencies are transitive", artifact );
+        artifact = getArtifact( project, "maven-test-test", "scope-test" );
+        assertNull( "Check no test dependencies are transitive", artifact );
+        artifact = getArtifact( project, "maven-test-test", "scope-default" );
+        assertNull( "Check no test dependencies are transitive", artifact );
+        artifact = getArtifact( project, "maven-test-test", "scope-runtime" );
+        assertNull( "Check no test dependencies are transitive", artifact );
 
         // check all transitive deps of a runtime dependency are runtime scope, except for test
         checkGroupIdScope( project, "runtime", "runtime" );
@@ -101,7 +108,6 @@ public class ProjectClasspathTest extends MavenTestCase
                 return a;
             }
         }
-        fail( "Dependency " + artifactId + " not found" );
         return null;
     }
 }

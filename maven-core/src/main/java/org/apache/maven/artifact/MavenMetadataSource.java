@@ -38,13 +38,14 @@ import java.util.Set;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class MavenMetadataSource
-    implements ArtifactMetadataSource
+public class MavenMetadataSource implements ArtifactMetadataSource
 {
     private MavenProjectBuilder mavenProjectBuilder;
     private ArtifactResolver artifactResolver;
 
-    /** @todo remove. */
+    /**
+     * @todo remove.
+     */
     private MavenXpp3Reader reader = new MavenXpp3Reader();
 
     public MavenMetadataSource( ArtifactResolver artifactResolver )
@@ -65,10 +66,8 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         Set artifacts;
-        Artifact metadataArtifact = new DefaultArtifact( artifact.getGroupId(),
-                                                         artifact.getArtifactId(),
-                                                         artifact.getVersion(),
-                                                         "pom" );
+        Artifact metadataArtifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                         artifact.getVersion(), "pom" );
         try
         {
             artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
@@ -106,33 +105,30 @@ public class MavenMetadataSource
         {
             Dependency d = (Dependency) i.next();
             Artifact artifact = createArtifact( d, scope, localRepository );
-            projectArtifacts.add( artifact );
+            if ( artifact != null )
+            {
+                projectArtifacts.add( artifact );
+            }
         }
         return projectArtifacts;
     }
 
     protected Artifact createArtifact( Dependency dependency, String scope, ArtifactRepository localRepository )
     {
-        // TODO: duplicated with the ArtifactFactory, localRepository not used (should be used here to resolve path?
-        Artifact artifact = new DefaultArtifact( dependency.getGroupId(),
-                                                 dependency.getArtifactId(),
-                                                 dependency.getVersion(),
-                                                 transitiveScope( dependency.getScope(), scope ),
-                                                 dependency.getType(),
-                                                 dependency.getType() );
-        return artifact;
-    }
+        // TODO: can refactor
+        if ( Artifact.SCOPE_TEST.equals( scope ) )
+        {
+            return null;
+        }
 
-    private String transitiveScope( String desiredScope, String artifactScope )
-    {
+        // TODO: duplicated with the ArtifactFactory, localRepository not used (should be used here to resolve path?
         // TODO: scope handler
-        if ( Artifact.SCOPE_TEST.equals( artifactScope ) || Artifact.SCOPE_TEST.equals( desiredScope ) )
+        String desiredScope = Artifact.SCOPE_RUNTIME;
+        if ( Artifact.SCOPE_TEST.equals( dependency.getScope() ) )
         {
-            return Artifact.SCOPE_TEST;
+            desiredScope = Artifact.SCOPE_TEST;
         }
-        else
-        {
-            return Artifact.SCOPE_RUNTIME;
-        }
+        return new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
+                                    desiredScope, dependency.getType(), dependency.getType() );
     }
 }
