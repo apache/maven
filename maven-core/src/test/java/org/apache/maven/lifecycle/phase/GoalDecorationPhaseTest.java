@@ -17,28 +17,20 @@ package org.apache.maven.lifecycle.phase;
  * limitations under the License.
  */
 
-import junit.framework.TestCase;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.MavenTestCase;
 import org.apache.maven.decoration.GoalDecoratorBindings;
 import org.apache.maven.lifecycle.MavenGoalExecutionContext;
-import org.apache.maven.model.Model;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.embed.Embedder;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 
 /**
  * @author jdcasey
  */
-public class GoalDecorationPhaseTest extends TestCase
+public class GoalDecorationPhaseTest
+    extends MavenTestCase
 {
-
-    private static final String BASEDIR = "./decoration-unitTest-project";
-
     private static final String DECORATOR_SCRIPT =
         "<decorators defaultGoal=\"jar:jar\">" +
         "<preGoal name=\"compiler:compile\" attain=\"compiler:init-fs\"/>" +
@@ -48,33 +40,19 @@ public class GoalDecorationPhaseTest extends TestCase
         "</decorators>";
 
     protected void setUp()
+        throws Exception
     {
-        File basedir = new File( BASEDIR );
-        if ( !basedir.exists() )
-        {
-            basedir.mkdir();
-        }
+        super.setUp();
 
-        File mavenScriptFile = new File( basedir, GoalDecorationPhase.MAVEN_SCRIPT );
-        try
-        {
-            BufferedWriter out = new BufferedWriter( new FileWriter( mavenScriptFile ) );
-            out.write( DECORATOR_SCRIPT );
-            out.flush();
-            out.close();
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
-        }
-    }
+        File mavenScriptFile = new File( basedir, "target/test-classes/" + GoalDecorationPhase.MAVEN_SCRIPT );
 
-    protected void tearDown()
-    {
-        File basedir = new File( BASEDIR );
-        File mavenScript = new File( basedir, GoalDecorationPhase.MAVEN_SCRIPT );
-        mavenScript.delete();
-        basedir.delete();
+        BufferedWriter out = new BufferedWriter( new FileWriter( mavenScriptFile ) );
+
+        out.write( DECORATOR_SCRIPT );
+
+        out.flush();
+
+        out.close();
     }
 
     public void testShouldConstructWithNoArgs()
@@ -84,21 +62,7 @@ public class GoalDecorationPhaseTest extends TestCase
 
     public void testShouldParseDecoratorsFromFile() throws Exception
     {
-        MavenProject project = new MavenProject( new Model() );
-        project.setFile( new File( new File( BASEDIR ), "project.xml" ) );
-
-        Embedder embedder = new Embedder();
-
-        embedder.start();
-
-        MojoDescriptor descriptor = new MojoDescriptor();
-
-        ArtifactRepository localRepository = new ArtifactRepository();
-
-        MavenGoalExecutionContext context = new MavenGoalExecutionContext( embedder.getContainer(),
-                                                                   project,
-                                                                   descriptor,
-                                                                   localRepository );
+        MavenGoalExecutionContext context = createGoalExecutionContext();
 
         GoalDecorationPhase phase = new GoalDecorationPhase();
 

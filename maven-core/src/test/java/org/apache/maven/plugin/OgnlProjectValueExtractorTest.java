@@ -34,7 +34,7 @@ public class OgnlProjectValueExtractorTest
 
         project.setProperty( "foo", "bar" );
 
-        context = new MavenGoalExecutionContext( getContainer(), project, null, new ArtifactRepository( "foo", "http://bar" ) );
+        context = createGoalExecutionContext();
     }
 
     public void testPropertyValueExtraction()
@@ -56,7 +56,7 @@ public class OgnlProjectValueExtractorTest
     {
         Object value = OgnlProjectValueExtractor.evaluate( "#project.build.directory/classes", context );
 
-        String expected = new File( basedir, "src/test/resources/target/classes" ).getCanonicalPath();
+        String expected = new File( basedir, "target/test-classes/target/classes" ).getCanonicalPath();
 
         String actual = new File( value.toString() ).getCanonicalPath();
 
@@ -78,6 +78,6 @@ public class OgnlProjectValueExtractorTest
     {
         Object value = OgnlProjectValueExtractor.evaluate( "#localRepository", context );
 
-        assertEquals( "foo", ((ArtifactRepository)value).getId() );
+        assertEquals( "local", ((ArtifactRepository)value).getId() );
     }
 }

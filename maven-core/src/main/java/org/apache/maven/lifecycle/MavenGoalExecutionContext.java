@@ -2,15 +2,12 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.decoration.GoalDecoratorBindings;
+import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.plugin.FailureResponse;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositoryUtils;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,98 +17,73 @@ import java.util.Set;
  */
 public class MavenGoalExecutionContext
 {
+    private MavenSession session;
+
     private String failedGoal;
 
     private FailureResponse failureResponse;
-
-    private PlexusContainer container;
-
-    private MavenProject project;
 
     private MojoDescriptor mojoDescriptor;
 
     private List resolvedGoals;
 
-    private PluginManager pluginManager;
-
-    private Set pluginDependencies;
-
     private GoalDecoratorBindings goalDecoratorBindings;
-
-    private ArtifactRepository localRepository;
-
-    private Set remoteRepositories;
 
     private String goalName;
 
-    public MavenGoalExecutionContext( PlexusContainer container,
-                                  MavenProject project,
-                                  MojoDescriptor goal,
-                                  ArtifactRepository localRepository )
-        throws Exception
+    public MavenGoalExecutionContext( MavenSession session, MojoDescriptor goal )
     {
-        this.container = container;
-
-        this.project = project;
+        this.session  = session;
 
         this.mojoDescriptor = goal;
+    }
 
-        this.localRepository = localRepository;
-
-        pluginManager = (PluginManager) lookup( PluginManager.ROLE );
-
-        pluginDependencies = new HashSet();
+    public MavenSession getSession()
+    {
+        return session;
     }
 
     // ----------------------------------------------------------------------
-    // Provide an easy way to lookup plexus components
+    // Delegation to the session
     // ----------------------------------------------------------------------
+
+    public MavenProject getProject()
+    {
+        return session.getProject();
+    }
+
+    public ArtifactRepository getLocalRepository()
+    {
+        return session.getLocalRepository();
+    }
+
+    public Set getRemoteRepositories()
+    {
+        return session.getRemoteRepositories();
+    }
+
     public Object lookup( String role )
         throws ComponentLookupException
     {
-        return container.lookup( role );
+        return session.lookup( role );
     }
 
-    public Object lookup( String role, String roleHint )
+    public Object lookup( String role, String hint )
         throws ComponentLookupException
     {
-        return container.lookup( role, roleHint );
+        return session.lookup( role, hint );
     }
 
     public void release( Object component )
     {
-        if ( component != null )
-        {
-            try
-            {
-                container.release( component );
-            }
-            catch ( Exception e )
-            {
-                //@todo what to do here?
-            }
-        }
+        session.release( component );
     }
 
     // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
+
     public boolean requiresDependencyResolution()
     {
         return mojoDescriptor.requiresDependencyResolution();
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-    public PlexusContainer getContainer()
-    {
-        return container;
-    }
-
-    public MavenProject getProject()
-    {
-        return project;
     }
 
     public MojoDescriptor getMojoDescriptor()
@@ -124,9 +96,6 @@ public class MavenGoalExecutionContext
         this.mojoDescriptor = mojoDescriptor;
     }
 
-    // ----------------------------------------------------------------------
-    // Resolved MojoDescriptors
-    // ----------------------------------------------------------------------
     public List getResolvedGoals()
     {
         return resolvedGoals;
@@ -137,12 +106,9 @@ public class MavenGoalExecutionContext
         this.resolvedGoals = resolvedGoals;
     }
 
-    // ----------------------------------------------------------------------
-    // Delegation to the plugin manager
-    // ----------------------------------------------------------------------
     public MojoDescriptor getMojoDescriptor( String mojoDescriptorName )
     {
-        return pluginManager.getMojoDescriptor( mojoDescriptorName );
+        return session.getPluginManager().getMojoDescriptor( mojoDescriptorName );
     }
 
     public String getPluginId( MojoDescriptor mojoDescriptor )
@@ -150,9 +116,6 @@ public class MavenGoalExecutionContext
         return mojoDescriptor.getId();
     }
 
-    // ----------------------------------------------------------------------
-    // Execution failure
-    // ----------------------------------------------------------------------
     public void setExecutionFailure( String failedGoal, FailureResponse response )
     {
         this.failedGoal = failedGoal;
@@ -185,16 +148,6 @@ public class MavenGoalExecutionContext
         this.failureResponse = failureResponse;
     }
 
-    public Set getPluginDependencies()
-    {
-        return pluginDependencies;
-    }
-
-    public void setPluginDependencies( Set pluginDependencies )
-    {
-        this.pluginDependencies = pluginDependencies;
-    }
-
     public GoalDecoratorBindings getGoalDecoratorBindings()
     {
         return goalDecoratorBindings;
@@ -203,25 +156,6 @@ public class MavenGoalExecutionContext
     public void setGoalDecoratorBindings( GoalDecoratorBindings goalDecoratorBindings )
     {
         this.goalDecoratorBindings = goalDecoratorBindings;
-    }
-
-    // ----------------------------------------------------------------------
-    // Local repository
-    // ----------------------------------------------------------------------
-
-    public ArtifactRepository getLocalRepository()
-    {
-        return localRepository;
-    }
-
-    public Set getRemoteRepositories()
-    {
-        if ( remoteRepositories == null )
-        {
-            remoteRepositories = RepositoryUtils.mavenToWagon( project.getRepositories() );
-        }
-
-        return remoteRepositories;
     }
 
     public String getGoalName()

@@ -45,14 +45,15 @@ public class GoalResolutionPhase extends AbstractMavenLifecyclePhase
 
         try
         {
-            pluginManager = (PluginManager) context.getContainer().lookup( PluginManager.ROLE );
+            pluginManager = (PluginManager) context.lookup( PluginManager.ROLE );
             
             // First, start by retrieving the currently-requested goal.
             MojoDescriptor goalDescriptor = context.getMojoDescriptor();
-            if(goalDescriptor == null) {
-                throw new GoalNotFoundException(context.getGoalName());
+            if ( goalDescriptor == null )
+            {
+                throw new GoalNotFoundException( context.getGoalName() );
             }
-            
+
             String goal = goalDescriptor.getId();
 
             List resolvedGoals = resolveTopLevel( goal, new HashSet(), new LinkedList(), context, pluginManager );

@@ -16,6 +16,13 @@ package org.apache.maven;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusTestCase;
@@ -24,20 +31,23 @@ import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- *
  * @version $Id$
  */
 public class MavenTestCase
     extends PlexusTestCase
-{        
+{
+    protected PluginManager pluginManager;
+
+    protected MavenProjectBuilder projectBuilder;
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
-        File pluginsDirectory = new File( getBasedir(), "target/maven.home/plugins" );
+        pluginManager = (PluginManager) lookup( PluginManager.ROLE );
 
-        pluginsDirectory.mkdirs();
+        projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
     }
 
     protected void customizeContext()
@@ -52,5 +62,61 @@ public class MavenTestCase
         getContainer().addContextValue( "maven.home", new File( getBasedir(), "target/maven.home" ).getPath() );
 
         getContainer().addContextValue( "maven.home.local", new File( getBasedir(), "target/maven.home.local" ).getPath() );
+    }
+
+    protected MavenGoalExecutionContext createGoalExecutionContext()
+        throws Exception
+    {
+        return createGoalExecutionContext( null, null );
+    }
+
+    protected MavenGoalExecutionContext createGoalExecutionContext( File pom )
+        throws Exception
+    {
+        return createGoalExecutionContext( pom, null );
+    }
+
+    protected MavenGoalExecutionContext createGoalExecutionContext( String goal )
+        throws Exception
+    {
+        return createGoalExecutionContext( null, goal );
+    }
+
+    protected MavenGoalExecutionContext createGoalExecutionContext( File pom, String goal )
+        throws Exception
+    {
+        ArtifactRepository localRepository = new ArtifactRepository( "local", "file://" );
+
+        MavenProject project;
+
+        if ( pom != null )
+        {
+            project = projectBuilder.build( pom, localRepository );
+        }
+        else
+        {
+            File f = new File( basedir, "target/test-classes/pom.xml" );
+
+            project = projectBuilder.build( f, localRepository );
+        }
+
+        project.setProperty( "foo", "bar" );
+
+        MavenSession session = new MavenSession( getContainer(), pluginManager, project, localRepository );
+
+        MojoDescriptor descriptor;
+
+        if ( goal != null )
+        {
+            descriptor = pluginManager.getMojoDescriptor( goal );
+        }
+        else
+        {
+            descriptor = new MojoDescriptor();
+        }
+
+        MavenGoalExecutionContext context = new MavenGoalExecutionContext( session, descriptor );
+
+        return context;
     }
 }

@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.lifecycle.session;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,19 +16,16 @@ package org.apache.maven;
  * limitations under the License.
  */
 
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- *
  * @version $Id$
  */
-public class MavenTest
-    extends MavenTestCase
+public abstract class AbstractMavenSessionPhase
+    extends AbstractLogEnabled
+    implements MavenSessionPhase
 {
-    public void testMaven()
-        throws Exception
-    {
-        Maven maven = (Maven) lookup( Maven.ROLE );
-
-        assertNotNull( maven );
-    }
+    public abstract void execute( MavenSession context )
+        throws Exception;
 }

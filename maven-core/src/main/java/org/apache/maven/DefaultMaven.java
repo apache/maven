@@ -19,6 +19,7 @@ package org.apache.maven;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.MavenLifecycleManager;
+import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -91,30 +92,20 @@ public class DefaultMaven
 
         ExecutionResponse response = new ExecutionResponse();
 
+        MavenSession session = new MavenSession( container,
+                                                 pluginManager,
+                                                 project,
+                                                 getLocalRepository() );
+
         for ( Iterator iterator = goals.iterator(); iterator.hasNext(); )
         {
             String goal = (String) iterator.next();
-
-            /*
-
-            //!! This needs to be thrown later because we may need to download the plugin first
-
-            if ( !getMojoDescriptors().containsKey( goal ) )
-            {
-                throw new GoalNotFoundException( goal );
-            }
-            */
 
             MavenGoalExecutionContext context;
 
             try
             {
-                //!! we may not know anything about the plugin at this point.
-
-                context = new MavenGoalExecutionContext( container,
-                                                     project,
-                                                     getMojoDescriptor( goal ),
-                                                     getLocalRepository() );
+                context = new MavenGoalExecutionContext( session, getMojoDescriptor( goal ) );
 
                 context.setGoalName( goal );
 
@@ -205,7 +196,7 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info( "Final Memory: " + ((r.totalMemory() - r.freeMemory()) / mb) + "M/" + (r.totalMemory() / mb) + "M");
+        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" + ( r.totalMemory() / mb ) + "M" );
 
     }
 

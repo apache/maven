@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.phase;
+package org.apache.maven.lifecycle.session;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,18 +16,21 @@ package org.apache.maven.lifecycle.phase;
  * limitations under the License.
  */
 
-import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
+import org.apache.maven.lifecycle.MavenLifecycleManager;
 import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class InheritanceAssemblyPhase
-    extends AbstractMavenLifecyclePhase
+public interface MavenSessionPhaseManager
 {
-    public void execute( MavenGoalExecutionContext context )
-        throws Exception
-    {
-    }
+    String ROLE = MavenSessionPhaseManager.class.getName();
+
+    void execute( MavenGoalExecutionContext context )
+        throws Exception;
+
+    List getLifecyclePhases();
 }
