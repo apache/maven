@@ -20,20 +20,20 @@ package org.apache.maven.artifact.resolver;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class ArtifactCollectionException
+public class TransitiveArtifactResolutionException
     extends Exception
 {
-    public ArtifactCollectionException( String message )
+    public TransitiveArtifactResolutionException( String message )
     {
         super( message );
     }
 
-    public ArtifactCollectionException( Throwable cause )
+    public TransitiveArtifactResolutionException( Throwable cause )
     {
         super( cause );
     }
 
-    public ArtifactCollectionException( String message, Throwable cause )
+    public TransitiveArtifactResolutionException( String message, Throwable cause )
     {
         super( message, cause );
     }
