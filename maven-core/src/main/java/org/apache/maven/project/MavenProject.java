@@ -710,6 +710,8 @@ public class MavenProject
                                                                                     existing.getVersion(),
                                                                                     a.getScope(), existing.getType() );
 
+                    artifact.setFile( existing.getFile() );
+
                     artifacts.put( id, artifact );
                 }
             }
