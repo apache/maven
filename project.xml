@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <pomVersion>3</pomVersion>
+  <name>Marvin Master</name>
+  <id>marvin:master</id>
+  <artifactId>master</artifactId>
+  
+  
+  <currentVersion>2.0-alpha-1</currentVersion>
+  <description>Marvin Master</description>
+  <shortDescription>Marvin Master</shortDescription>
+</project>
