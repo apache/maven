@@ -113,6 +113,7 @@ public class MavenMetadataSource
 
     public Artifact createArtifact( Dependency dependency, ArtifactRepository localRepository )
     {
+        // TODO: duplicated with the ArtifactFactory, localRepository not used (should be used here to resolve path?
         Artifact artifact = new DefaultArtifact( dependency.getGroupId(),
                                                  dependency.getArtifactId(),
                                                  dependency.getVersion(),

@@ -19,16 +19,15 @@ package org.apache.maven.artifact.manager;
 
 import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
-import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
+import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -54,13 +53,6 @@ public class DefaultWagonManager
     private Map proxies = new HashMap();
 
     private TransferListener downloadMonitor;
-
-    public Artifact createArtifact( String groupId, String artifactId, String version, String type )
-    {
-        Artifact artifact = new DefaultArtifact( groupId, artifactId, version, type );
-
-        return artifact;
-    }
 
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException

@@ -51,6 +51,4 @@ public interface WagonManager
     void setProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
 
     void setDownloadMonitor( TransferListener downloadMonitor );
-
-    Artifact createArtifact( String groupId, String artifactId, String version, String type );
 }
