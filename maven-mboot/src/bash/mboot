@@ -50,7 +50,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-[ -z $MBOOT_HOME ] && echo && echo "You must set MBOOT_HOME to use mboot!" && echo && exit
+export MBOOT_HOME=`dirname $0`
 
 . ${MBOOT_HOME}/maven.functions
 
