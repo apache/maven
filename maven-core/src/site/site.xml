@@ -15,6 +15,7 @@
     </links>
     <menu name="Quick Links">
       <item name="Lifecycle" href="/lifecycle.html"/>    
+      <item name="Inheritance" href="/inheritance.html"/>          
       <item name="Configuration management" href="/configuration-management.html"/>
       <item name="Install" href="/install.html"/>
     </menu>
