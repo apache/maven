@@ -431,7 +431,7 @@ public class Main
 
         org.apache.maven.model.CiManagement newCiManagement = new org.apache.maven.model.CiManagement();
 
-        newCiManagement.setSystem( ciManagement.getNagEmailAddress() );
+        newCiManagement.setSystem( ciManagement.getSystem() );
         newCiManagement.setUrl( ciManagement.getUrl() );
         if ( ciManagement.getNagEmailAddress() != null )
         {
