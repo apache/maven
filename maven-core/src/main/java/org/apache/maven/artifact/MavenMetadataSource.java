@@ -23,9 +23,12 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
+import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +43,17 @@ public class MavenMetadataSource
 {
     private MavenProjectBuilder mavenProjectBuilder;
     private ArtifactResolver artifactResolver;
+
+    /** @todo remove. */
+    private MavenXpp3Reader reader = new MavenXpp3Reader();
+
+    public MavenMetadataSource( ArtifactResolver artifactResolver )
+    {
+        // there is code in plexus that uses this (though it shouldn't) so we
+        // need to be able to not have a project builder
+        this.artifactResolver = artifactResolver;
+        this.mavenProjectBuilder = null;
+    }
 
     public MavenMetadataSource( ArtifactResolver artifactResolver, MavenProjectBuilder projectBuilder )
     {
@@ -62,10 +76,16 @@ public class MavenMetadataSource
             // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable
             // post-processing and inheritance calculation before retrieving the 
             // associated artifacts. This should improve consistency.
-            MavenProject project = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
-            //            Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
-
-            artifacts = createArtifacts( project.getDependencies(), localRepository );
+            if ( mavenProjectBuilder != null )
+            {
+                MavenProject project = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
+                artifacts = createArtifacts( project.getDependencies(), localRepository );
+            }
+            else
+            {
+                Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
+                artifacts = createArtifacts( model.getDependencies(), localRepository );
+            }
         }
         catch ( ArtifactResolutionException e )
         {
