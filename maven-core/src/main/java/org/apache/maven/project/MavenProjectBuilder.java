@@ -17,6 +17,7 @@ package org.apache.maven.project;
  * ====================================================================
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.io.File;
@@ -28,7 +29,10 @@ public interface MavenProjectBuilder
     MavenProject build( File project, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject build( File project, ArtifactRepository localRepository, boolean transitive )
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository )
+        throws ProjectBuildingException;
+
+    MavenProject buildFromRepository( Artifact artifact, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
     MavenProject buildSuperProject( ArtifactRepository localRepository )

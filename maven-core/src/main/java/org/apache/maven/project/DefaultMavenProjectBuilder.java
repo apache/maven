@@ -94,13 +94,26 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository )
+    public MavenProject buildWithDependencies( File project, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        return build( projectDescriptor, localRepository, false );
+        return build( project, localRepository, true, true );
     }
 
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, boolean resolveDependencies )
+    public MavenProject build( File project, ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+        return build( project, localRepository, false, true );
+    }
+
+    public MavenProject buildFromRepository( Artifact artifact, ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+        return build( artifact.getFile(), localRepository, false, false );
+    }
+
+    private MavenProject build( File projectDescriptor, ArtifactRepository localRepository,
+                                boolean resolveDependencies, boolean sourceProject )
         throws ProjectBuildingException
     {
         try
@@ -124,7 +137,7 @@ public class DefaultMavenProjectBuilder
                 previous = current;
             }
 
-            project = processProjectLogic( project, localRepository, resolveDependencies );
+            project = processProjectLogic( project, localRepository, resolveDependencies, sourceProject );
 
             return project;
         }
@@ -135,7 +148,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject processProjectLogic( MavenProject project, ArtifactRepository localRepository,
-                                              boolean resolveDependencies )
+                                              boolean resolveDependencies, boolean sourceProject )
         throws ProjectBuildingException, ModelInterpolationException, ArtifactResolutionException
     {
         Model model = modelInterpolator.interpolate( project.getModel() );
@@ -146,15 +159,22 @@ public class DefaultMavenProjectBuilder
         MavenProject parentProject = project.getParent();
 
         File projectDescriptor = project.getFile();
-        pathTranslator.alignToBaseDirectory( model, projectDescriptor );
+        if ( sourceProject )
+        {
+            pathTranslator.alignToBaseDirectory( model, projectDescriptor );
+        }
 
         project = new MavenProject( model );
         project.setFile( projectDescriptor );
         project.setParent( parentProject );
         project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
 
-        projectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ),
-                          project );
+        String key = createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+        MavenProject cachedProject = (MavenProject) projectCache.get( key );
+        if ( cachedProject == null || sourceProject )
+        {
+            projectCache.put( key, project );
+        }
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -351,7 +371,7 @@ public class DefaultMavenProjectBuilder
         {
             project.setFile( new File( ".", "pom.xml" ) );
 
-            project = processProjectLogic( project, localRepository, false );
+            project = processProjectLogic( project, localRepository, false, false );
 
             return project;
         }

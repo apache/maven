@@ -47,7 +47,7 @@ public class ProjectClasspathTest
         declaredField.setAccessible( acc );
         // XXX: end hack
 
-        MavenProject project = getProject( f, true );
+        MavenProject project = getProjectWithDependencies( f );
 
         Artifact artifact;
 

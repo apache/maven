@@ -54,19 +54,19 @@ public class MavenTestCase
     {
         return getTestFile( "src/test/resources/local-repo" );
     }
-    
+
     protected File getFileForClasspathResource( String resource )
     {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-        
+
         URL resourceUrl = cloader.getResource( resource );
-        
+
         File resourceFile = null;
-        if(resourceUrl != null)
+        if ( resourceUrl != null )
         {
-            resourceFile = new File(resourceUrl.getPath());
+            resourceFile = new File( resourceUrl.getPath() );
         }
-        
+
         return resourceFile;
     }
 
@@ -81,10 +81,10 @@ public class MavenTestCase
     // Project building
     // ----------------------------------------------------------------------
 
-    protected MavenProject getProject( File pom, boolean transitive )
+    protected MavenProject getProjectWithDependencies( File pom )
         throws Exception
     {
-        return projectBuilder.build( pom, getLocalRepository(), transitive );
+        return projectBuilder.buildWithDependencies( pom, getLocalRepository() );
     }
 
     protected MavenProject getProject( File pom )

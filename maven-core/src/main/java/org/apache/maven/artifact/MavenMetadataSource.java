@@ -100,7 +100,7 @@ public class MavenMetadataSource
                 {
                     if ( mavenProjectBuilder != null )
                     {
-                        MavenProject p = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
+                        MavenProject p = mavenProjectBuilder.buildFromRepository( metadataArtifact, localRepository );
                         dependencies = p.getDependencies();
                     }
                     else

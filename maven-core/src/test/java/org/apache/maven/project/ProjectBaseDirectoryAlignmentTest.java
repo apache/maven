@@ -17,7 +17,7 @@ public class ProjectBaseDirectoryAlignmentTest
     {
         File f = getTestFile( dir + "project-which-needs-directory-alignment.xml" );
 
-        MavenProject project = getProject( f, false );
+        MavenProject project = getProject( f );
 
         assertNotNull( "Test project can't be null!", project );
 
