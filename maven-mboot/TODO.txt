@@ -1,1 +1,2 @@
 o obey jar overrides
+o transitive deps 
