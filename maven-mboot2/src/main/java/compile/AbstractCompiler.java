@@ -1,3 +1,6 @@
+package compile;
+
+import util.DirectoryScanner;
 
 import java.io.File;
 import java.io.IOException;

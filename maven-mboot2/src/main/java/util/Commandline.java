@@ -1,7 +1,7 @@
+package util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -189,40 +189,7 @@ public class Commandline implements Cloneable
             }
         }
     }
-    
-    /**
-     * <p>Gets the shell or command-line interpretor for the detected operating system, 
-     * and the shell arguments.</p>
-     */
-    private String getDefaultShell()
-    {
-        if ( shell != null )
-        {
-            String args = "";
-            for (Enumeration enums = shellArgs.elements(); enums.hasMoreElements(); )
-            {
-                args += (String)enums.nextElement();
-                if (enums.hasMoreElements())
-                {
-                    args += " ";
-                }
-            }
-            
-            if (args.length() > 0)
-            {
-                return shell + " " + args;
-            }
-            else
-            {
-                return shell;
-            }
-        }
-        else
-        {
-            return "";
-        }
-    }
-    
+
     /**
      * Creates an argument object.
      *

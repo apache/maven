@@ -1,14 +1,12 @@
+package download;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.Set;
-import java.util.HashSet;
 
 public class ArtifactDownloader
 {

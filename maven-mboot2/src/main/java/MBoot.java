@@ -1,9 +1,17 @@
 
+import compile.JavacCompiler;
+import download.ArtifactDownloader;
+import jar.JarMojo;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+import test.SurefirePlugin;
+import util.Commandline;
+import util.FileUtils;
+import util.IsolatedClassLoader;
+import util.Os;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -282,7 +290,7 @@ public class MBoot
 
         FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/m2.bat" ).getAbsolutePath(), bin );
 
-        FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/classworlds.conf" ).getAbsolutePath(), bin );
+        FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/m2.conf" ).getAbsolutePath(), bin );
 
         if ( Os.isFamily( "unix" ) )
         {

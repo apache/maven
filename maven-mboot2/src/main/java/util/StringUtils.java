@@ -1,28 +1,9 @@
+package util;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-/**
- * <p>Common <code>String</code> manipulation routines.</p>
- * <p/>
- * <p>Originally from
- * <a href="http://jakarta.codehaus.org/turbine/">Turbine</a> and the
- * GenerationJavaCore library.</p>
- *
- * @author <a href="mailto:jon@latchkey.com">Jon S. Stevens</a>
- * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
- * @author <a href="mailto:gcoladonato@yahoo.com">Greg Coladonato</a>
- * @author <a href="mailto:bayard@generationjava.com">Henri Yandell</a>
- * @author <a href="mailto:ed@codehaus.org">Ed Korthof</a>
- * @author <a href="mailto:rand_mcneely@yahoo.com">Rand McNeely</a>
- * @author Stephen Colebourne
- * @author <a href="mailto:fredrik@westermarck.com">Fredrik Westermarck</a>
- * @author Holger Krauth
- * @author <a href="mailto:alex@purpletech.com">Alexander Day Chaffee</a>
- * @version $Id$
- * @since 1.0
- */
 public class StringUtils
 {
     public static String[] split( String str )
@@ -35,24 +16,6 @@ public class StringUtils
         return split( text, separator, -1 );
     }
 
-    /**
-     * <p>Splits the provided text into a array, based on a given separator.</p>
-     * <p/>
-     * <p>The separator is not included in the returned String array. The
-     * maximum number of splits to perfom can be controlled. A <code>null</code>
-     * separator will cause parsing to be on whitespace.</p>
-     * <p/>
-     * <p>This is useful for quickly splitting a String directly into
-     * an array of tokens, instead of an enumeration of tokens (as
-     * <code>StringTokenizer</code> does).</p>
-     *
-     * @param str       The string to parse.
-     * @param separator Characters used as the delimiters. If
-     *                  <code>null</code>, splits on whitespace.
-     * @param max       The maximum number of elements to include in the
-     *                  array.  A zero or negative value implies no limit.
-     * @return an array of parsed Strings
-     */
     public static String[] split( String str, String separator, int max )
     {
         StringTokenizer tok = null;
@@ -132,8 +95,6 @@ public class StringUtils
         buf.append( text.substring( start ) );
         return buf.toString();
     }
-
-
 
     public static String interpolate( String text, Map namespace )
     {

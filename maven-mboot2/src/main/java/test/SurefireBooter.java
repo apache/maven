@@ -1,3 +1,7 @@
+package test;
+
+import util.IsolatedClassLoader;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -7,7 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class SurefireBooter
+public class
+    SurefireBooter
 {
     private List batteries = new ArrayList();
 

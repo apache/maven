@@ -8,7 +8,8 @@ rm -rf ${buildDir} > /dev/null 2>&1
 
 mkdir -p ${classesDir}
 
-javac -d ${classesDir} ${srcDir}/*.java
+#javac -d ${classesDir} ${srcDir}/*.java
+javac -d ${classesDir} `find ${srcDir} -name '*.java'`
 
 ( cd ${classesDir} ; jar -cfm ../mboot.jar ../../manifest.txt * )
 

@@ -1,3 +1,4 @@
+package compile;
 
 /**
  * This class encapsulates an error message produced by a programming language

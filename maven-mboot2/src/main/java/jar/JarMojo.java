@@ -1,3 +1,7 @@
+package jar;
+
+import util.DirectoryScanner;
+import util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
