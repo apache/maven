@@ -17,6 +17,8 @@
 
 package compile;
 
+import util.IsolatedClassLoader;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-
-import util.IsolatedClassLoader;
 
 public class JavacCompiler
     extends AbstractCompiler
@@ -106,6 +106,11 @@ public class JavacCompiler
         Method compile = c.getMethod( "compile", new Class[] { String[].class } );
 
         Boolean ok = (Boolean) compile.invoke( compiler, new Object[] { args.toArray( new String[0] ) } );
+
+        if ( !ok.booleanValue() )
+        {
+            throw new Exception( "Failure executing javac: \n\t" + err.toString() );
+        }
 
         List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
 
