@@ -34,6 +34,8 @@ public class Parameter
 
     private String expression;
 
+    private String defaultValue;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -96,5 +98,15 @@ public class Parameter
     public void setExpression( String expression )
     {
         this.expression = expression;
+    }
+
+    public String getDefaultValue()
+    {
+        return defaultValue;
+    }
+
+    public void setDefaultValue( String defaultValue )
+    {
+        this.defaultValue = defaultValue;
     }
 }

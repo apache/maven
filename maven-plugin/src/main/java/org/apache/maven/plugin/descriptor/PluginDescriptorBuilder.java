@@ -12,8 +12,6 @@ import java.util.List;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
- * @todo these are all really tools for dealing with xml configurations so they
- * should be packaged as such.
  */
 public class PluginDescriptorBuilder
 {
@@ -105,26 +103,28 @@ public class PluginDescriptorBuilder
         {
             PlexusConfiguration d = parameterConfigurations[i];
 
-            Parameter cd = new Parameter();
+            Parameter parameter = new Parameter();
 
-            cd.setName( d.getChild( "name" ).getValue() );
+            parameter.setName( d.getChild( "name" ).getValue() );
 
-            cd.setType( d.getChild( "type" ).getValue() );
+            parameter.setType( d.getChild( "type" ).getValue() );
 
             String s = c.getChild( "required" ).getValue();
 
             if ( s != null )
             {
-                cd.setRequired( s.equals( "true" ) ? true : false );
+                parameter.setRequired( s.equals( "true" ) ? true : false );
             }
 
-            cd.setValidator( d.getChild( "validator" ).getValue() );
+            parameter.setValidator( d.getChild( "validator" ).getValue() );
 
-            cd.setDescription( d.getChild( "description" ).getValue() );
+            parameter.setDescription( d.getChild( "description" ).getValue() );
 
-            cd.setExpression( d.getChild( "expression" ).getValue() );
+            parameter.setExpression( d.getChild( "expression" ).getValue() );
 
-            parameters.add( cd );
+            parameter.setDefaultValue( d.getChild( "default" ).getValue() );
+
+            parameters.add( parameter );
         }
 
         mojo.setParameters( parameters );

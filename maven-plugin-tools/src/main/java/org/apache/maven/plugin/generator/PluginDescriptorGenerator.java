@@ -152,6 +152,8 @@ public class PluginDescriptorGenerator
 
             element( w, "description", parameter.getDescription() );
 
+            element( w, "defaultValue", parameter.getDescription() );
+
             w.endElement();
         }
 
@@ -199,33 +201,6 @@ public class PluginDescriptorGenerator
                 writeDependencyElement( dependencies[i], w );
             }
         }
-
-        /*
-
-        // ----------------------------------------------------------------------
-
-        Xpp3Dom parent = pomDom.getChild( "parent" );
-
-        if ( parent != null )
-        {
-            String groupId = parent.getChild( "groupId" ).getValue();
-
-            System.out.println( "groupId = " + groupId );
-
-            String artifactId = parent.getChild( "artifactId" ).getValue();
-
-            System.out.println( "artifactId = " + artifactId );
-
-            String version = parent.getChild( "version" ).getValue();
-
-            System.out.println( "version = " + version );
-
-            writeDependencyElement( parent, w );
-        }
-
-        // ----------------------------------------------------------------------
-
-        */
 
         w.endElement();
     }
