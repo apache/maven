@@ -4,9 +4,9 @@ VERSION=1.0
 
 usage () 
 {
-  echo "usage: `basename $0` --model=<model> --dir=<dir>" >&2
+  echo "usage: `basename $0` --model=<model> --version=<version> --mode=java|xsd|xpp3 --dir=<dir>" >&2
   echo "" >&2
-  echo "       (ex: `basename $0` --model=model.mdo --dir=target/src)" >&2
+  echo "       (ex: `basename $0` --model=model.mdo --version=4.0.0 --mode=java --dir=target/src)" >&2
   exit 1
 }
 
@@ -20,10 +20,6 @@ while [ $# -gt 0 ]; do
 	--help)
 	    usage
 	    ;;
-	--version)
-	    echo "mboot: version $VERSION"
-	    exit 0
-	    ;;
 	-v)
 	    verbose=-v
 	    ;;
@@ -35,14 +31,14 @@ while [ $# -gt 0 ]; do
 		shift
 	    fi		    
 	    ;;
-#	--model-version*)
-#	    if echo $1 | grep -q '=' ; then
-#	    	model_version=`echo $1 | sed 's/^--model-version=//'`
-#	    else
-#		model_version=$2
-#		shift
-#	    fi		    
-#	    ;;
+	--version*)
+	    if echo $1 | grep -q '=' ; then
+	    	model_version=`echo $1 | sed 's/^--version=//'`
+	    else
+		model_version=$2
+		shift
+	    fi		    
+	    ;;
 	--model*)
 	    if echo $1 | grep -q '=' ; then
 	    	model=`echo $1 | sed 's/^--model=//'`
@@ -80,5 +76,4 @@ if $cygwin; then
   CP=`cygpath -pw "$CP"`
 fi
 
-java -classpath "$CP" org.codehaus.modello.Modello $model $mode "$dir"
-# $model_version
+java -classpath "$CP" org.codehaus.modello.Modello $model $mode "$dir" "$model_version"
