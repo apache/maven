@@ -31,7 +31,7 @@ public class SurefirePlugin
             surefireBooter.addClassPathUrl( classpathElements[i] );
         }
 
-        surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReport" );
+        surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReporter" );
 
         return surefireBooter.run();
     }
