@@ -58,8 +58,4 @@ public class RepositoryUtils
         return retValue;
     }
 
-    public static ArtifactRepository localRepositoryToWagonRepository( String repository )
-    {
-        return new ArtifactRepository( "local", "file://" + repository );
-    }
 }

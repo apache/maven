@@ -32,7 +32,6 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.initialize.MavenInitializingExecutionRequest;
 import org.apache.maven.execution.project.MavenProjectExecutionRequest;
 import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
-import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 
@@ -303,6 +302,6 @@ public class MavenCli
 
         // TODO [BP]: this should not be necessary - grep for and remove
         System.setProperty( MavenConstants.MAVEN_REPO_LOCAL, localRepository );
-        return RepositoryUtils.localRepositoryToWagonRepository( localRepository );
+        return new ArtifactRepository( "local", "file://" + localRepository );
     }
 }
