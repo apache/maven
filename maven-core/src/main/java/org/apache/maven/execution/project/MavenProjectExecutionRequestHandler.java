@@ -20,38 +20,26 @@ public class MavenProjectExecutionRequestHandler
     public void handle( MavenExecutionRequest request, MavenExecutionResponse response )
         throws Exception
     {
-        Date start = null;
-
-        Date finish = null;
-
         try
         {
             MavenProject project = getProject( ( (MavenProjectExecutionRequest) request ).getPom(), request.getLocalRepository() );
 
-            start = new Date();
+            response.setStart( new Date() );
 
             response = lifecycleManager.execute( createSession( request, project ) );
+
+            response.setFinish( new Date() );
         }
         catch ( Exception e )
         {
-            finish = new Date();
+            response.setFinish( new Date() );
 
             response.setException( e );
-
-            response.setStart( start );
-
-            response.setFinish( finish );
 
             logError( response );
 
             return;
         }
-
-        finish = new Date();
-
-        response.setStart( start );
-
-        response.setFinish( finish );
 
         if ( response.isExecutionFailure() )
         {
