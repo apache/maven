@@ -21,3 +21,6 @@ Maven Lifecycle
     then calls surefire:test (adding classpath entries and changing the test
     classes directory parameter)
     the does the report
+    
+  * where a goal does not require a pom.xml (pom-writer, for example).
+    Here, the pom should NOT be read.
