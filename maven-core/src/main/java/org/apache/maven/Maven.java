@@ -67,13 +67,13 @@ public interface Maven
     // Maven home
     // ----------------------------------------------------------------------
 
-    void setMavenHome( String mavenHome );
+    void setMavenHome( File mavenHome );
 
-    String getMavenHome();
+    File getMavenHome();
 
-    void setMavenHomeLocal( String mavenHomeLocal );
+    void setMavenHomeLocal( File mavenHomeLocal );
 
-    String getMavenHomeLocal();
+    File getMavenHomeLocal();
 
     // ----------------------------------------------------------------------
     // Maven project handling

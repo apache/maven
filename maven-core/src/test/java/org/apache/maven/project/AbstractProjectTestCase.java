@@ -31,12 +31,12 @@ public class AbstractProjectTestCase
         return localRepository;
     }
 
-    protected MavenProject buildProject( File f, boolean followTransitiveDeps )
+    protected MavenProject buildProject( File file, boolean followTransitiveDeps )
        throws Exception
     {
         MavenProject project;
 
-        project = projectBuilder.build( f, followTransitiveDeps );
+        project = projectBuilder.build( getMavenLocalHome(), file, followTransitiveDeps );
 
         assertNotNull( "Project is null", project );
 

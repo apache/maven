@@ -16,6 +16,21 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.MavenMetadataSource;
@@ -34,26 +49,13 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositoryUtils;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
@@ -73,8 +75,6 @@ public class DefaultMavenProjectBuilder
 
     private PathTranslator pathTranslator;
 
-    private Model superModel;
-
     public void initialize()
         throws Exception
     {
@@ -83,10 +83,14 @@ public class DefaultMavenProjectBuilder
         modelReader = new MavenXpp3Reader();
     }
 
-    public MavenProject build( File projectDescriptor )
+    // ----------------------------------------------------------------------
+    // MavenProjectBuilder Implementation
+    // ----------------------------------------------------------------------
+
+    public MavenProject build( File mavenLocalHome, File projectDescriptor )
         throws ProjectBuildingException
     {
-        return build( projectDescriptor, false );
+        return build( mavenLocalHome, projectDescriptor, false );
     }
 
     /** @todo can we move the super model reading to the initialize method? what about the user/site? Is it reused?
@@ -94,51 +98,14 @@ public class DefaultMavenProjectBuilder
      *  @todo we should be passing in some more configuration here so that maven home local can be used for user properties. Then, the new stuff should be unit tested.
      *  @todo the user model bit overwriting the super model seems a bit gross, but is needed so that any repositories given take affect
      */
-    public MavenProject build( File projectDescriptor, boolean resolveDependencies )
+    public MavenProject build( File mavenLocalHome, File projectDescriptor, boolean resolveDependencies )
         throws ProjectBuildingException
     {
-        String localRepositoryValue = null;
+        ArtifactRepository localRepository = getLocalRepository( mavenLocalHome );
 
         try
         {
-            // TODO: rename to super-pom.xml so it is not used by the reactor
-            superModel = modelReader.read( new InputStreamReader( DefaultMavenProjectBuilder.class.getResourceAsStream( "pom-4.0.0.xml" ) ) );
-
-            Model userModel = null;
-            // TODO: use maven home local instead of user.home/.m2
-            File userModelFile = new File( System.getProperty( "user.home" ) + "/.m2", "override.xml" );
-            if ( userModelFile.exists() )
-            {
-                userModel = modelReader.read( new FileReader( userModelFile ) );
-                if ( userModel.getParent() != null )
-                {
-                    throw new ProjectBuildingException( "Inheritence not supported in the user override POM" );
-                }
-
-                if ( userModel.getLocal() != null && userModel.getLocal().getRepository() != null )
-                {
-                    localRepositoryValue = userModel.getLocal().getRepository();
-                }
-                superModel.getRepositories().addAll( userModel.getRepositories() );
-            }
-
-            if ( localRepositoryValue == null && superModel.getLocal() != null && superModel.getLocal().getRepository() != null )
-            {
-                localRepositoryValue = superModel.getLocal().getRepository();
-            }
-
-            localRepositoryValue = System.getProperty( "maven.repo.local", localRepositoryValue );
-            System.setProperty( "maven.repo.local", localRepositoryValue );
-
-            ArtifactRepository localRepository = null;
-            if ( localRepositoryValue != null )
-            {
-                localRepository = RepositoryUtils.localRepositoryToWagonRepository( localRepositoryValue );
-            }
-            else
-            {
-                throw new ProjectBuildingException( "A local repository must be specified" );
-            }
+            Model superModel = getSuperModel();
 
             LinkedList lineage = new LinkedList();
 
@@ -155,6 +122,8 @@ public class DefaultMavenProjectBuilder
                 modelInheritanceAssembler.assembleModelInheritance( current, previous );
                 previous = current;
             }
+
+            Model userModel = getUserOverrideModel( superModel, mavenLocalHome );
 
             if ( userModel != null )
             {
@@ -236,15 +205,15 @@ public class DefaultMavenProjectBuilder
 
         if ( parentModel != null )
         {
-            if ( isEmpty( parentModel.getGroupId() ) )
+            if ( StringUtils.isEmpty( parentModel.getGroupId() ) )
             {
                 throw new ProjectBuildingException( "Missing groupId element from parent element" );
             }
-            else if ( isEmpty( parentModel.getArtifactId() ) )
+            else if ( StringUtils.isEmpty( parentModel.getArtifactId() ) )
             {
                 throw new ProjectBuildingException( "Missing artifactId element from parent element" );
             }
-            else if ( isEmpty( parentModel.getVersion() ) )
+            else if ( StringUtils.isEmpty( parentModel.getVersion() ) )
             {
                 throw new ProjectBuildingException( "Missing version element from parent element" );
             }
@@ -281,33 +250,32 @@ public class DefaultMavenProjectBuilder
     }
 
     private Model readModel( File projectDescriptor )
-        throws Exception
+        throws ProjectBuildingException
     {
-        Reader reader = null;
-
         try
         {
-            reader = new FileReader( projectDescriptor );
+            return readModel( new FileReader( projectDescriptor ) );
+        }
+        catch( FileNotFoundException ex )
+        {
+            throw new ProjectBuildingException( "Error while building model.", ex );
+        }
+    }
 
-            Model model = modelReader.read( reader );
-
-            reader.close();
-
-            return model;
+    private Model readModel( Reader reader )
+        throws ProjectBuildingException
+    {
+        try
+        {
+            return modelReader.read( reader );
+        }
+        catch( Exception ex )
+        {
+            throw new ProjectBuildingException( "Error while building model.", ex );
         }
         finally
         {
-            if ( reader != null )
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch ( IOException e )
-                {
-                    // ignore
-                }
-            }
+            IOUtil.close( reader );
         }
     }
 
@@ -411,8 +379,82 @@ public class DefaultMavenProjectBuilder
         return sortedProjects;
     }
 
-    private boolean isEmpty( String string )
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    /**
+     * Locate the local repository.
+     * 
+     * <ol>
+     *  <li>Try ${maven.repo.local}
+     *  <li>Look in mavenHomeLocal/override.xml
+     *  <li>Set to the default value (${user.home}/.m2/repository).
+     * </ol>
+     * 
+     * @param mavenHomeLocal The maven local home directory
+     * @return Returns the local repository
+     * @throws ProjectBuildingException
+     */
+    protected ArtifactRepository getLocalRepository( File mavenHomeLocal )
+        throws ProjectBuildingException
     {
-        return string == null || string.trim().length() == 0;
+        String localRepository = System.getProperty( "maven.repo.local" );
+
+        Model superModel = getSuperModel();
+
+        if ( !StringUtils.isEmpty( localRepository ) )
+        {
+            return RepositoryUtils.localRepositoryToWagonRepository( localRepository );
+        }
+
+        if ( superModel.getLocal() != null && superModel.getLocal().getRepository() != null )
+        {
+            localRepository = superModel.getLocal().getRepository();
+        }
+
+        Model userModel = getUserOverrideModel( superModel, mavenHomeLocal );
+
+        if ( userModel != null && userModel.getLocal() != null && userModel.getLocal().getRepository() != null )
+        {
+            localRepository = userModel.getLocal().getRepository();
+        }
+
+        if ( localRepository == null )
+        {
+            String userHome = System.getProperty( "user.home" );
+
+            localRepository = new File( userHome, ".m2/repository" ).getAbsolutePath();
+        }
+
+        return RepositoryUtils.localRepositoryToWagonRepository( localRepository );
+    }
+
+    private Model getSuperModel()
+        throws ProjectBuildingException
+    {
+        return readModel( new InputStreamReader( DefaultMavenProjectBuilder.class.getResourceAsStream( "pom-4.0.0.xml" ) ) );
+    }
+
+    private Model getUserOverrideModel( Model superModel, File mavenHomeLocal )
+        throws ProjectBuildingException
+    {
+        File userModelFile = new File( mavenHomeLocal, "override.xml" );
+
+        if ( !userModelFile.exists() )
+        {
+            return null;
+        }
+
+        Model model = readModel( userModelFile );
+
+        if ( model.getParent() != null )
+        {
+            throw new ProjectBuildingException( "Inheritence not supported in the user override POM" );
+        }
+
+        superModel.getRepositories().addAll( model.getRepositories() );
+
+        return model;
     }
 }

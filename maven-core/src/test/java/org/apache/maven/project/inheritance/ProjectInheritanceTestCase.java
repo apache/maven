@@ -31,18 +31,16 @@ public abstract class ProjectInheritanceTestCase
 
         projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
 
-        System.setProperty( "maven.repo.local", getLocalRepository() );
+        System.setProperty( "maven.repo.local", getLocalRepository().getAbsolutePath() );
     }
 
-    private String getLocalRepository()
+    private File getLocalRepository()
     {
-        return new File( basedir, "src/test/resources/inheritance-repo/" + getTestSeries() ).getPath();
+        return getTestFile( "src/test/resources/inheritance-repo/" + getTestSeries() );
     }
 
     protected File projectFile( String name )
     {
-        File f = new File( "src/test/resources/inheritance-repo/" + getTestSeries() + "/maven/poms", name + "-1.0.pom" );
-
-        return new File( basedir, f.getPath() );
+        return new File( getLocalRepository(), "/maven/poms/" + name + "-1.0.pom" );
     }
 }

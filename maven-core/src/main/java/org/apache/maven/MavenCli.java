@@ -16,6 +16,10 @@ package org.apache.maven;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.util.Iterator;
+import java.util.TreeMap;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -24,16 +28,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
-import org.codehaus.plexus.embed.Embedder;
-import org.codehaus.plexus.util.StringUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.TreeMap;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -62,9 +59,9 @@ public class MavenCli
 
         Maven maven = (Maven) embedder.lookup( Maven.ROLE );
 
-        maven.setMavenHome( System.getProperty( "maven.home" ) );
+        maven.setMavenHome( new File( System.getProperty( "maven.home" ) ) );
 
-        maven.setMavenHomeLocal( System.getProperty( "maven.home.local", System.getProperty( "user.home" ) + "/.m2" ) );
+        maven.setMavenHomeLocal( new File( System.getProperty( "maven.home.local", System.getProperty( "user.home" ) + "/.m2" ) ) );
 
         //---
 
@@ -75,6 +72,14 @@ public class MavenCli
         if ( !projectFile.exists() )
         {
             projectFile = new File( System.getProperty( "user.dir" ), POMv3 );
+
+            if ( !projectFile.exists() )
+            {
+                System.err.println( "Could not find either a " + POMv4 + " nor a " + POMv3 + " project descriptor." );
+
+                // TODO: Use some constant for this value. Trygve.
+                return 1;
+            }
         }
 
         // ----------------------------------------------------------------------

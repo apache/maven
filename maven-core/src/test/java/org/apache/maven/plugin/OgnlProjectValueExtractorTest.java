@@ -1,12 +1,12 @@
 package org.apache.maven.plugin;
 
+import java.io.File;
+
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
-
-import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -28,9 +28,9 @@ public class OgnlProjectValueExtractorTest
 
         builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
 
-        File f =  new File( basedir, "src/test/resources/pom.xml" );
+        File f =  getTestFile( "src/test/resources/pom.xml" );
 
-        project = builder.build( f );
+        project = builder.build( getMavenLocalHome(), f );
 
         context = createGoalExecutionContext();
     }
@@ -40,7 +40,7 @@ public class OgnlProjectValueExtractorTest
     {
         Object value = OgnlProjectValueExtractor.evaluate( "#project.build.directory/classes", context );
 
-        String expected = new File( basedir, "target/test-classes/target/classes" ).getCanonicalPath();
+        String expected = getTestFile( "target/test-classes/target/classes" ).getCanonicalPath();
 
         String actual = new File( value.toString() ).getCanonicalPath();
 

@@ -25,10 +25,10 @@ public interface MavenProjectBuilder
 
     // ----------------------------------------------------------------------
 
-    MavenProject build( File project )
+    MavenProject build( File mavenHomeLocal, File project )
         throws ProjectBuildingException;
 
-    MavenProject build( File project, boolean followTransitiveDeps )
+    MavenProject build( File mavenHomeLocal, File project, boolean followTransitiveDeps )
         throws ProjectBuildingException;
 
     // ----------------------------------------------------------------------

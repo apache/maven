@@ -16,25 +16,14 @@ package org.apache.maven.project.canonical;
  * limitations under the License.
  */
 
-import junit.framework.TestCase;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Contributor;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Developer;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.MailingList;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.Resource;
-import org.apache.maven.model.Site;
-import org.apache.maven.model.UnitTest;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Goal;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.MavenTestCase;
-
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.maven.MavenTestCase;
+import org.apache.maven.model.Goal;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -46,9 +35,9 @@ public class CanonicalProjectBuilderTest
     public void testProjectBuilder()
         throws Exception
     {
-        File f  = new File( basedir, "src/test/resources/canonical-pom.xml" );
+        File f  = getTestFile( "src/test/resources/canonical-pom.xml" );
 
-        MavenProject project = projectBuilder.build( f );
+        MavenProject project = projectBuilder.build( getMavenLocalHome(), f );
 
         // ----------------------------------------------------------------------
         // Top-level elements

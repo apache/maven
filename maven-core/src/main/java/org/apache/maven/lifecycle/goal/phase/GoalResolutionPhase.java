@@ -16,28 +16,19 @@ package org.apache.maven.lifecycle.goal.phase;
  * limitations under the License.
  */
 
-import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
-import org.apache.maven.lifecycle.goal.GoalExecutionException;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-import org.apache.maven.lifecycle.goal.phase.PluginResolutionPhase.PluginResolutionVisitor;
-import org.apache.maven.lifecycle.session.MavenSession;
-import org.apache.maven.model.GoalDecorator;
-import org.apache.maven.model.PreGoal;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.util.AbstractGoalVisitor;
-import org.apache.maven.util.GoalWalker;
-import org.apache.maven.util.GraphTraversalException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
+
+import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.util.AbstractGoalVisitor;
+import org.apache.maven.util.GoalWalker;
+import org.apache.maven.util.GraphTraversalException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>

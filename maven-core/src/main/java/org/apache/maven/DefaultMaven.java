@@ -16,6 +16,14 @@ package org.apache.maven;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.lifecycle.session.MavenSessionPhaseManager;
@@ -24,6 +32,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
@@ -34,23 +43,15 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 public class DefaultMaven
     extends AbstractLogEnabled
     implements Maven, Contextualizable
 {
     private ArtifactEnabledContainer container;
 
-    private String mavenHome;
+    private File mavenHome;
 
-    private String mavenHomeLocal;
+    private File mavenHomeLocal;
 
     private boolean logResults = true;
 
@@ -183,9 +184,7 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info(
-            "Final Memory: " + ((r.totalMemory() - r.freeMemory()) / mb) + "M/" + (r.totalMemory() / mb) + "M" );
-
+        getLogger().info( "Final Memory: " + ((r.totalMemory() - r.freeMemory()) / mb) + "M/" + (r.totalMemory() / mb) + "M" );
     }
 
     private void line()
@@ -197,8 +196,8 @@ public class DefaultMaven
     // Reactor execution
     // ----------------------------------------------------------------------
 
-    public ExecutionResponse executeReactor( String goals, String includes, String excludes ) throws ReactorException,
-        GoalNotFoundException
+    public ExecutionResponse executeReactor( String goals, String includes, String excludes )
+        throws ReactorException, GoalNotFoundException
     {
         List projects = new ArrayList();
 
@@ -210,9 +209,9 @@ public class DefaultMaven
 
             for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
             {
-                File f = (File) iterator.next();
+                File file = (File) iterator.next();
 
-                MavenProject project = projectBuilder.build( f );
+                MavenProject project = projectBuilder.build( getMavenHomeLocal(), file );
 
                 projects.add( project );
             }
@@ -278,7 +277,8 @@ public class DefaultMaven
     // Project building
     // ----------------------------------------------------------------------
 
-    public MavenProject getProject( File project ) throws ProjectBuildingException
+    public MavenProject getProject( File project )
+        throws ProjectBuildingException
     {
         if ( project.exists() )
         {
@@ -288,7 +288,7 @@ public class DefaultMaven
             }
         }
 
-        return projectBuilder.build( project );
+        return projectBuilder.build( getMavenHomeLocal(), project );
     }
 
     // ----------------------------------------------------------------------
@@ -301,26 +301,36 @@ public class DefaultMaven
     }
 
     // ----------------------------------------------------------------------
-    // Maven home
+    // Maven Configuration
     // ----------------------------------------------------------------------
 
-    public void setMavenHome( String mavenHome )
+    public void setMavenHome( File mavenHome )
     {
         this.mavenHome = mavenHome;
     }
 
-    public String getMavenHome()
+    public File getMavenHome()
     {
+        if ( mavenHomeLocal == null )
+        {
+            throw new NullPointerException( "Maven home must be set." );
+        }
+
         return mavenHome;
     }
 
-    public void setMavenHomeLocal( String mavenHomeLocal )
+    public void setMavenHomeLocal( File mavenHomeLocal )
     {
         this.mavenHomeLocal = mavenHomeLocal;
     }
 
-    public String getMavenHomeLocal()
+    public File getMavenHomeLocal()
     {
+        if ( mavenHomeLocal == null )
+        {
+            throw new NullPointerException( "Maven home local must be set." );
+        }
+
         return mavenHomeLocal;
     }
 
