@@ -126,6 +126,9 @@ public class DefaultWagonManager
      * If we won't plug validation process here the question is what we can do afterwards?
      * We don't know from which ArtifactRepository artifact was fetched and where we should restart.
      * We should be also fetching md5 sums and such from the same exact directory then artifacts
+     * <p/>
+     * @todo probably all exceptions should just be logged and continue
+     * @todo is the exception for warnings logged at debug level correct?
      */
     public void get( Artifact artifact, File destination, Set repositories )
         throws TransferFailedException
@@ -194,6 +197,12 @@ public class DefaultWagonManager
             {
                 throw new TransferFailedException( "Authorization failed: ", e );
             }
+            catch ( TransferFailedException e )
+            {
+                getLogger().warn( "Failure getting artifact from repository '" + repository + "'" + e );
+                getLogger().debug( "Stack trace", e );
+                continue;
+            }
             catch ( Exception e )
             {
                 throw new TransferFailedException( "Release of wagon failed: ", e );
@@ -227,7 +236,7 @@ public class DefaultWagonManager
             return;
         }
 
-        throw new TransferFailedException( "Resource doesn't exist in any remote repository" );
+        throw new TransferFailedException( "Unable to download the artifact from any repository" );
     }
 
     public void contextualize( Context context )

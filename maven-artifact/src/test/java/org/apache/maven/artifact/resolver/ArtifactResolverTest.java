@@ -72,7 +72,8 @@ public class ArtifactResolverTest
     public void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
         throws Exception
     {
-        Artifact b = createLocalArtifact( "b", "1.0" );
+        Artifact b = createRemoteArtifact( "b", "1.0" );
+        deleteLocalArtifact( b );
 
         artifactResolver.resolve( b, remoteRepositories(), localRepository() );
 
@@ -110,8 +111,10 @@ public class ArtifactResolverTest
         Set artifacts = new HashSet();
 
         Artifact e = createRemoteArtifact( "e", "1.0" );
+        deleteLocalArtifact( e );
 
         Artifact f = createRemoteArtifact( "f", "1.0" );
+        deleteLocalArtifact( f );
 
         artifacts.add( e );
 
@@ -180,8 +183,10 @@ public class ArtifactResolverTest
         throws Exception
     {
         Artifact i = createRemoteArtifact( "i", "1.0" );
+        deleteLocalArtifact( i );
 
         Artifact j = createRemoteArtifact( "j", "1.0" );
+        deleteLocalArtifact( j );
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
@@ -221,4 +226,35 @@ public class ArtifactResolverTest
 
         assertLocalArtifactPresent( j );
     }
+
+    public void testResolutionFailureWhenArtifactNotPresentInRemoteRepository()
+    {
+        Artifact k = createArtifact( "k", "1.0" );
+
+        try
+        {
+            artifactResolver.resolve( k, remoteRepositories(), localRepository() );
+            fail( "Resolution succeeded when it should have failed" );
+        }
+        catch ( ArtifactResolutionException expected )
+        {
+            assertTrue( true );
+        }
+    }
+
+    public void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood()
+        throws Exception
+    {
+        Artifact l = createRemoteArtifact( "l", "1.0" );
+        deleteLocalArtifact( l );
+
+        Set repositories = new HashSet();
+        repositories.add( remoteRepository() );
+        repositories.add( badRemoteRepository() );
+
+        artifactResolver.resolve( l, repositories, localRepository() );
+
+        assertLocalArtifactPresent( l );
+    }
 }
+

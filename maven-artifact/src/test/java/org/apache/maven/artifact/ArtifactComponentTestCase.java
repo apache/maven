@@ -1,15 +1,3 @@
-package org.apache.maven.artifact;
-
-import org.codehaus.plexus.PlexusTestCase;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
-import java.io.File;
-import java.io.Writer;
-import java.io.FileWriter;
-import java.util.Set;
-import java.util.HashSet;
-
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -25,6 +13,19 @@ import java.util.HashSet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.apache.maven.artifact;
+
+import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -56,11 +57,20 @@ public abstract class ArtifactComponentTestCase
 
     protected ArtifactRepository remoteRepository()
     {
-        ArtifactRepository localRepository = new ArtifactRepository();
+        ArtifactRepository repository = new ArtifactRepository();
 
-        localRepository.setUrl( "file://" + "target/test-classes/repositories/" + component() + "/remote-repository" );
+        repository.setUrl( "file://" + "target/test-classes/repositories/" + component() + "/remote-repository" );
 
-        return localRepository;
+        return repository;
+    }
+
+    protected ArtifactRepository badRemoteRepository()
+    {
+        ArtifactRepository repository = new ArtifactRepository();
+
+        repository.setUrl( "http://foo.bar/repository" );
+
+        return repository;
     }
 
     protected void assertRemoteArtifactPresent( Artifact artifact )
@@ -71,7 +81,7 @@ public abstract class ArtifactComponentTestCase
 
         if ( !file.exists() )
         {
-            fail( "Local artifact " + file + " should be present." );
+            fail( "Remote artifact " + file + " should be present." );
         }
     }
 
@@ -83,7 +93,7 @@ public abstract class ArtifactComponentTestCase
 
         if ( !file.exists() )
         {
-            fail( "Remote artifact " + file + " should be present." );
+            fail( "Local artifact " + file + " should be present." );
         }
     }
 
@@ -95,7 +105,7 @@ public abstract class ArtifactComponentTestCase
 
         if ( file.exists() )
         {
-            fail( "Local artifact " + file + " should not be present." );
+            fail( "Remote artifact " + file + " should not be present." );
         }
     }
 
@@ -107,7 +117,7 @@ public abstract class ArtifactComponentTestCase
 
         if ( file.exists() )
         {
-            fail( "Remote artifact " + file + " should not be present." );
+            fail( "Local artifact " + file + " should not be present." );
         }
     }
 
@@ -188,4 +198,27 @@ public abstract class ArtifactComponentTestCase
     {
         return new DefaultArtifact( "maven", artifactId, version, type );
     }
+
+    protected void deleteLocalArtifact( Artifact artifact )
+        throws Exception
+    {
+        deleteArtifact( artifact, localRepository() );
+    }
+
+    protected void deleteArtifact( Artifact artifact, ArtifactRepository repository )
+        throws Exception
+    {
+        String path = artifactHandlerManager.path( artifact );
+
+        File artifactFile = new File( repository.getBasedir(), path );
+
+        if ( artifactFile.exists() )
+        {
+            if ( !artifactFile.delete() )
+            {
+                throw new IOException( "Failure while attempting to delete artifact " + artifactFile );
+            }
+        }
+    }
 }
+
