@@ -35,7 +35,7 @@ TO=maven2-user@lists.codehaus.org
 SCM_LOG=scm.log
 TIMESTAMP=`date +%Y%M%d.%H%M%S`
 DEPLOY_DIR=$HOME_DIR/public_html/m2
-DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2/
+DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2
 
 # ----------------------------------------------------------------------------------
 
