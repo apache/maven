@@ -1,6 +1,6 @@
 #!/bin/sh
 
-repoLocal=`cat $HOME/build.properties | grep "maven.repo.local" | sed 's/^.*= *//'`
+repoLocal=`cat $HOME/maven.properties | grep "maven.repo.local" | sed 's/^.*= *//'`
 
 echo "Removing maven-core-it0004-1.0.pom from the local repository so we can verify pom installation ..."
 

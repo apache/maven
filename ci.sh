@@ -11,7 +11,7 @@
 #    
 # 4. export PATH=$PATH:$MBOOT:$M2_HOME/bin
 #
-# 5. Your ~/build.properties must have: maven.repo.local = ~/path/to/repo
+# 5. Your ~/maven.properties must have: maven.repo.local = ~/path/to/repo
 #
 # ----------------------------------------------------------------------------------
 

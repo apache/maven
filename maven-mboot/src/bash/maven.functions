@@ -42,9 +42,9 @@ createMBootClasspath()
 
 findAndSetMavenRepoLocal()
 {
-  if [ -f $HOME/build.properties ]
+  if [ -f $HOME/maven.properties ]
   then
-    repoLocal=`cat $HOME/build.properties | egrep "^maven.repo.local" | sed 's/^.*= *//'`
+    repoLocal=`cat $HOME/maven.properties | egrep "^maven.repo.local" | sed 's/^.*= *//'`
   else
     repoLocal=$HOME/.maven/repository
   fi
