@@ -16,6 +16,12 @@
     <logo>/images/apache-maven-project.png</logo>
   </organization>
 
+  <repository>
+    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components/maven-core</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components/maven-core</developerConnection>
+    <url>http://cvs.apache.org/viewcvs.cgi/maven-components/${pom.artifactId}</url>
+  </repository>
+
   <developers>
     <developer>
       <name>Jason van Zyl</name>
