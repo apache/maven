@@ -43,7 +43,7 @@ public class GoalExecutionPhase
 
             MavenGoalExecutionContext context;
 
-            context = new MavenGoalExecutionContext( session, session.getPluginManager().getMojoDescriptor( goal ) );
+            context = new MavenGoalExecutionContext( session, goal );
 
             context.setGoalName( goal );
 
@@ -51,7 +51,7 @@ public class GoalExecutionPhase
 
             if ( context.isExecutionFailure() )
             {
-                response.setExecutionFailure( context.getMojoDescriptor().getId(), context.getFailureResponse() );
+                response.setExecutionFailure( context.getGoalName(), context.getFailureResponse() );
 
                 break;
             }

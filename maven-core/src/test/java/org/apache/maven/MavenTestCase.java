@@ -126,18 +126,7 @@ public class MavenTestCase
 
         pluginManager.setLocalRepository( localRepository );
 
-        MojoDescriptor descriptor;
-
-        if ( goal != null )
-        {
-            descriptor = pluginManager.getMojoDescriptor( goal );
-        }
-        else
-        {
-            descriptor = new MojoDescriptor();
-        }
-
-        MavenGoalExecutionContext context = new MavenGoalExecutionContext( session, descriptor );
+        MavenGoalExecutionContext context = new MavenGoalExecutionContext( session, goal );
 
         return context;
     }

@@ -23,19 +23,17 @@ public class MavenGoalExecutionContext
 
     private FailureResponse failureResponse;
 
-    private MojoDescriptor mojoDescriptor;
-
     private List resolvedGoals;
 
     //    private GoalDecoratorBindings goalDecoratorBindings;
 
     private String goalName;
 
-    public MavenGoalExecutionContext( MavenSession session, MojoDescriptor goal )
+    public MavenGoalExecutionContext( MavenSession session, String goalName )
     {
         this.session = session;
 
-        this.mojoDescriptor = goal;
+        this.goalName = goalName;
     }
 
     public MavenSession getSession()
@@ -78,21 +76,6 @@ public class MavenGoalExecutionContext
     }
 
     // ----------------------------------------------------------------------
-
-    public boolean requiresDependencyResolution()
-    {
-        return mojoDescriptor.requiresDependencyResolution();
-    }
-
-    public MojoDescriptor getMojoDescriptor()
-    {
-        return mojoDescriptor;
-    }
-
-    public void setMojoDescriptor( MojoDescriptor mojoDescriptor )
-    {
-        this.mojoDescriptor = mojoDescriptor;
-    }
 
     public List getResolvedGoals()
     {
