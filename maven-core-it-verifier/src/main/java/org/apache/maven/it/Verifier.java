@@ -18,10 +18,12 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.io.FileWriter;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -39,6 +41,7 @@ public class Verifier
     private final ByteArrayOutputStream errStream = new ByteArrayOutputStream();
 
     private final PrintStream originalOut;
+
     private final PrintStream originalErr;
 
     public Verifier( String basedir )
@@ -210,18 +213,13 @@ public class Verifier
         {
             try
             {
-                // parse ~/.m2/override.xml for it...
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                File mavenPropertiesFile = new File( System.getProperty( "user.home" ), ".m2/maven.properties" );
 
-                DocumentBuilder builder = factory.newDocumentBuilder();
-    
-                File pom = new File( System.getProperty( "user.home" ), ".m2/override.xml" );
+                Properties mavenProperties = new Properties();
 
-                Document dom = builder.parse( pom );
-                Element e = dom.getDocumentElement();
-                e = (Element) e.getElementsByTagName( "local" ).item( 0 );
-                Node n = (Element) e.getElementsByTagName( "repository" ).item( 0 );
-                repo = n.getFirstChild().getNodeValue();
+                mavenProperties.load( new FileInputStream( mavenPropertiesFile ) );
+
+                repo = mavenProperties.getProperty( "maven.repo.local" );
             }
             catch ( Exception e )
             {
@@ -232,6 +230,7 @@ public class Verifier
         {
             repo = System.getProperty( "user.home" ) + "/.m2/repository";
         }
+
         return repo;
     }
 

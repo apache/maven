@@ -33,6 +33,11 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.ReactorException;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestHandler;
+import org.apache.maven.execution.manager.MavenExecutionRequestHandlerManager;
+import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.manager.MavenExecutionRequestHandlerManager;
 
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
@@ -44,325 +49,36 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ *
+ * @version $Id$
+ */
 public class DefaultMaven
     extends AbstractLogEnabled
-    implements Maven, Contextualizable
+    implements Maven
 {
-    private ArtifactEnabledContainer container;
-
-    private File mavenHome;
-
-    private File mavenHomeLocal;
-
-    private boolean logResults = true;
-
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
 
-    private PluginManager pluginManager;
-
-    private MavenSessionPhaseManager lifecycleManager;
-
-    private MavenProjectBuilder projectBuilder;
-
     private I18N i18n;
+
+    private MavenExecutionRequestHandlerManager requestHandlerManager;
 
     // ----------------------------------------------------------------------
     // Project execution
     // ----------------------------------------------------------------------
-  
-    /** @todo probable need to do getProject( null ) here instead - but no project doesn't seem supported just yet, 
-        at least from the CLI. */
-    public ExecutionResponse execute( List goals ) throws GoalNotFoundException
+
+    public MavenExecutionResponse execute( MavenExecutionRequest request )
+        throws GoalNotFoundException, Exception
     {
-        return execute( (MavenProject) null, goals );
-    }
+        MavenExecutionRequestHandler handler = (MavenExecutionRequestHandler) requestHandlerManager.lookup( request.getType() );
 
-    public ExecutionResponse execute( File projectFile, List goals ) throws ProjectBuildingException,
-        GoalNotFoundException
-    {
-        return execute( getProject( projectFile ), goals );
-    }
+        MavenExecutionResponse response = new MavenExecutionResponse();
 
-    public ExecutionResponse execute( MavenProject project, List goals ) throws GoalNotFoundException
-    {
-        Date fullStop;
-
-        Date fullStart = new Date();
-
-        ExecutionResponse response = new ExecutionResponse();
-
-        pluginManager.setLocalRepository( project.getLocalRepository() );
-
-        MavenSession session = new MavenSession( container,
-                                                 pluginManager,
-                                                 project,
-                                                 project.getLocalRepository(),
-                                                 goals );
-
-        try
-        {
-            response = lifecycleManager.execute( session );
-        }
-        catch ( Exception e )
-        {
-            response.setException( e );
-
-            if ( logResults )
-            {
-                line();
-
-                getLogger().error( "BUILD ERROR" );
-
-                line();
-
-                getLogger().error( "Cause: ", e );
-
-                line();
-
-                stats( fullStart, new Date() );
-
-                line();
-            }
-
-            // An exception is a failure
-            return response;
-        }
-
-        fullStop = new Date();
-
-        if ( logResults )
-        {
-            if ( response.isExecutionFailure() )
-            {
-                line();
-
-                getLogger().info( "BUILD FAILURE" );
-
-                line();
-
-                getLogger().info( "Reason: " + response.getFailureResponse().shortMessage() );
-
-                line();
-
-                getLogger().info( response.getFailureResponse().longMessage() );
-
-                line();
-
-                stats( fullStart, fullStop );
-
-                line();
-            }
-            else
-            {
-                line();
-
-                getLogger().info( "BUILD SUCCESSFUL" );
-
-                line();
-
-                stats( fullStart, fullStop );
-
-                line();
-            }
-        }
+        handler.handle( request, response );
 
         return response;
-    }
-
-    private void stats( Date fullStart, Date fullStop )
-    {
-        long fullDiff = fullStop.getTime() - fullStart.getTime();
-
-        getLogger().info( "Total time: " + formatTime( fullDiff ) );
-
-        getLogger().info( "Finished at: " + fullStop );
-
-        final long mb = 1024 * 1024;
-
-        System.gc();
-
-        Runtime r = Runtime.getRuntime();
-
-        getLogger().info( "Final Memory: " + ((r.totalMemory() - r.freeMemory()) / mb) + "M/" + (r.totalMemory() / mb) + "M" );
-    }
-
-    private void line()
-    {
-        getLogger().info( "----------------------------------------------------------------------------" );
-    }
-
-    // ----------------------------------------------------------------------
-    // Reactor execution
-    // ----------------------------------------------------------------------
-
-    public ExecutionResponse executeReactor( String goals, String includes, String excludes )
-        throws ReactorException, GoalNotFoundException
-    {
-        List projects = new ArrayList();
-
-        getLogger().info( "Starting the reactor..." );
-
-        try
-        {
-            List files = FileUtils.getFiles( new File( System.getProperty( "user.dir" ) ), includes, excludes );
-
-            for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
-            {
-                File file = (File) iterator.next();
-
-                MavenProject project = projectBuilder.build( getMavenHomeLocal(), file );
-
-                projects.add( project );
-            }
-
-            projects = projectBuilder.getSortedProjects( projects );
-        }
-        catch ( Exception e )
-        {
-            throw new ReactorException( "Error processing projects for the reactor: ", e );
-        }
-
-        getLogger().info( "Our processing order:" );
-
-        for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
-        {
-            MavenProject project = (MavenProject) iterator.next();
-
-            getLogger().info( project.getName() );
-        }
-
-        List goalsList = Arrays.asList( StringUtils.split( goals, "," ) );
-
-        ExecutionResponse response = null;
-
-        for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
-        {
-            MavenProject project = (MavenProject) iterator.next();
-
-            System.out.println( "\n\n\n" );
-
-            line();
-
-            getLogger().info( "Building " + project.getName() );
-
-            line();
-
-            response = execute( project, goalsList );
-
-            if ( response.isExecutionFailure() )
-            {
-                break;
-            }
-        }
-
-        return response;
-    }
-
-    // ----------------------------------------------------------------------
-    // Goal descriptors
-    // ----------------------------------------------------------------------
-
-    public Map getMojoDescriptors()
-    {
-        return pluginManager.getMojoDescriptors();
-    }
-
-    public MojoDescriptor getMojoDescriptor( String goalId )
-    {
-        return pluginManager.getMojoDescriptor( goalId );
-    }
-
-    // ----------------------------------------------------------------------
-    // Project building
-    // ----------------------------------------------------------------------
-
-    public MavenProject getProject( File project )
-        throws ProjectBuildingException
-    {
-        if ( project.exists() )
-        {
-            if ( project.length() == 0 )
-            {
-                throw new ProjectBuildingException( i18n.format( "empty.descriptor.error", project.getName() ) );
-            }
-        }
-
-        return projectBuilder.build( getMavenHomeLocal(), project );
-    }
-
-    // ----------------------------------------------------------------------
-    // Reactor
-    // ----------------------------------------------------------------------
-
-    public List getSortedProjects( List projects ) throws Exception
-    {
-        return projectBuilder.getSortedProjects( projects );
-    }
-
-    // ----------------------------------------------------------------------
-    // Maven Configuration
-    // ----------------------------------------------------------------------
-
-    public void setMavenHome( File mavenHome )
-    {
-        this.mavenHome = mavenHome;
-    }
-
-    public File getMavenHome()
-    {
-        if ( mavenHomeLocal == null )
-        {
-            throw new NullPointerException( "Maven home must be set." );
-        }
-
-        return mavenHome;
-    }
-
-    public void setMavenHomeLocal( File mavenHomeLocal )
-    {
-        this.mavenHomeLocal = mavenHomeLocal;
-    }
-
-    public File getMavenHomeLocal()
-    {
-        if ( mavenHomeLocal == null )
-        {
-            throw new NullPointerException( "Maven home local must be set." );
-        }
-
-        return mavenHomeLocal;
-    }
-
-    // ----------------------------------------------------------------------
-    // Lifecylce Management
-    // ----------------------------------------------------------------------
-
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (ArtifactEnabledContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    protected static String formatTime( long ms )
-    {
-        long secs = ms / 1000;
-
-        long min = secs / 60;
-
-        secs = secs % 60;
-
-        if ( min > 0 )
-        {
-            return min + " minutes " + secs + " seconds";
-        }
-        else
-        {
-            return secs + " seconds";
-        }
     }
 }

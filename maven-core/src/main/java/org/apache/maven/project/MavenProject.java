@@ -29,7 +29,6 @@ import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
-import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -514,21 +513,6 @@ public class MavenProject
         return model.getRepositories();
     }
 
-    public String getLocalRepositoryPath()
-    {
-        return getLocalRepository().getBasedir();
-    }
-
-    public ArtifactRepository getLocalRepository()
-    {
-        if ( wagonLocalRepository == null && model.getLocal() != null && model.getLocal().getRepository() != null )
-        {
-            wagonLocalRepository = RepositoryUtils.localRepositoryToWagonRepository( model.getLocal().getRepository() );
-        }
-
-        return wagonLocalRepository;
-    }
-
     public void setLocalRepository( ArtifactRepository repository )
     {
         this.wagonLocalRepository = repository;
@@ -551,7 +535,6 @@ public class MavenProject
     // ----------------------------------------------------------------------
     // Plugins
     // ----------------------------------------------------------------------
-
     
     public List getPlugins()
     {

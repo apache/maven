@@ -52,7 +52,7 @@ public class ReflectionProjectValueExtractor
 
             String token = parser.nextToken();
 
-            String methodName = "get" + StringUtils.capitalise( token );
+            String methodName = "get" + StringUtils.capitalizeFirstLetter( token );
 
             Method method = classMap.findMethod( methodName, args );
 

@@ -33,7 +33,7 @@ public class ReflectionProjectValueExtractorTest
 
         File f =  getTestFile( "src/test/resources/pom.xml" );
 
-        project = builder.build( getMavenLocalHome(), f );
+        project = getProject( f );
     }
 
     public void testValueExtraction()

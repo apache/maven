@@ -16,7 +16,8 @@ package org.apache.maven.lifecycle.session.phase;
  * limitations under the License.
  */
 
-import org.apache.maven.ExecutionResponse;
+import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.goal.MavenGoalPhaseManager;
 import org.apache.maven.lifecycle.session.AbstractMavenSessionPhase;
@@ -31,11 +32,11 @@ import java.util.Iterator;
 public class GoalExecutionPhase
     extends AbstractMavenSessionPhase
 {
-    public ExecutionResponse execute( MavenSession session ) throws Exception
+    public MavenExecutionResponse execute( MavenSession session ) throws Exception
     {
         MavenGoalPhaseManager lifecycleManager = (MavenGoalPhaseManager) session.lookup( MavenGoalPhaseManager.ROLE );
 
-        ExecutionResponse response = new ExecutionResponse();
+        MavenExecutionResponse response = new MavenExecutionResponse();
 
         for ( Iterator iterator = session.getGoals().iterator(); iterator.hasNext(); )
         {

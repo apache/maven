@@ -16,10 +16,6 @@ package org.apache.maven.cli;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.TreeMap;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -27,12 +23,22 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.Maven;
-import org.apache.maven.ExecutionResponse;
-
+import org.apache.maven.MavenConstants;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.project.MavenProjectExecutionRequest;
+import org.apache.maven.execution.project.MavenProjectExecutionRequest;
+import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
+import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
+import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -44,45 +50,40 @@ public class MavenCli
 
     public static final String POMv4 = "pom.xml";
 
+    public static final String userHome = System.getProperty( "user.home" );
+
+    public static File userDir = new File( System.getProperty( "user.dir" ) );
+
     public static int main( String[] args, ClassWorld classWorld )
         throws Exception
     {
+        // ----------------------------------------------------------------------
+        // Setup the command line parser
+        // ----------------------------------------------------------------------
+
         CLIManager cliManager = new CLIManager();
 
         CommandLine commandLine = cliManager.parse( args );
 
+        // ----------------------------------------------------------------------
+        //
+        // 1) maven user configuration directory ( ~/.m2 )
+        // 2) maven home
+        // 3) local repository
+        //
+        // ----------------------------------------------------------------------
+
+        File userConfigurationDirectory = getUserConfigurationDirectory();
+
+        Properties mavenProperties = getMavenProperties( userConfigurationDirectory );
+
+        ArtifactRepository localRepository = getLocalRepository( mavenProperties, userConfigurationDirectory );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
         initializeSystemProperties( commandLine );
-
-        //---
-
-        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();       
-
-        embedder.start( classWorld );
-
-        Maven maven = (Maven) embedder.lookup( Maven.ROLE );
-
-        maven.setMavenHome( new File( System.getProperty( "maven.home" ) ) );
-
-        maven.setMavenHomeLocal( new File( System.getProperty( "maven.home.local", System.getProperty( "user.home" ) + "/.m2" ) ) );
-
-        //---
-
-        File projectFile;
-
-        projectFile = new File( System.getProperty( "user.dir" ), POMv4 );
-
-        if ( !projectFile.exists() )
-        {
-            projectFile = new File( System.getProperty( "user.dir" ), POMv3 );
-
-            if ( !projectFile.exists() )
-            {
-                System.err.println( "Could not find either a " + POMv4 + " nor a " + POMv3 + " project descriptor." );
-
-                // TODO: Use some constant for this value. Trygve.
-                return 1;
-            }
-        }
 
         // ----------------------------------------------------------------------
         // Process particular command line options
@@ -97,40 +98,16 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.VERSION ) )
         {
-            // TODO: create some sane output.
-            // Take this info from generated piece of meta data which uses
-            // the POM itself as the source. We don't want to get into the same
-            // bullshit of manually updating some constant in the source.
-            // [Brett] My thoughts on this (something I long ago slated for m1), is to store the pom in
-            //  META-INF or something similar for a jar, and then read that back. maven-model being so
-            //  trim makes that more of a reality. The other alternative is simply to store that info in
-            //  the manifest in plain text and read that back.
             System.out.println( "Maven version: " );
 
             return 0;
         }
 
-        if ( commandLine.hasOption( CLIManager.LIST_GOALS ) )
-        {
-            Iterator goals = new TreeMap( maven.getMojoDescriptors() ).values().iterator();
-
-            System.out.println( "Goals: " );
-
-            while ( goals.hasNext() )
-            {
-                MojoDescriptor goal = (MojoDescriptor)goals.next();
-
-                System.out.println( "    " + goal.getId() );
-            }
-
-            return 0;
-        }
-
-        ExecutionResponse response = null;
-
         // ----------------------------------------------------------------------
-        // Execute the goals
+        // Create the execution request/response
         // ----------------------------------------------------------------------
+
+        MavenExecutionRequest request = null;
 
         if ( commandLine.hasOption( CLIManager.REACTOR ) )
         {
@@ -138,29 +115,52 @@ public class MavenCli
 
             String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
-            String goals = "";
-
-            for ( Iterator i = commandLine.getArgList().iterator(); i.hasNext(); )
-            {
-                goals += (String) i.next();
-
-                if ( i.hasNext() )
-                {
-                    goals += ",";
-                }
-            }
-
-            if ( !"".equals( goals ) )
-            {
-                response = maven.executeReactor( goals, includes, excludes );
-            }
+            request = new MavenReactorExecutionRequest( localRepository,
+                                                        commandLine.getArgList(),
+                                                        includes,
+                                                        excludes,
+                                                        userDir );
         }
         else
         {
-            response = maven.execute( projectFile, commandLine.getArgList() );
+            File projectFile = new File( userDir, POMv4 );
+
+            if ( !projectFile.exists() )
+            {
+                projectFile = new File( userDir, POMv3 );
+
+                if ( !projectFile.exists() )
+                {
+                    System.err.println( "Could not find either a " + POMv4 + " nor a " + POMv3 + " project descriptor." );
+
+                    return 1;
+                }
+            }
+
+            request = new MavenProjectExecutionRequest( localRepository,
+                                                        commandLine.getArgList(),
+                                                        projectFile );
         }
 
-        // @todo we may wish for more types of error codes - perhaps letting the response define them?
+        MavenExecutionResponse response = new MavenExecutionResponse();
+
+        // ----------------------------------------------------------------------
+        // Now that we have everything that we need we will fire up plexus and
+        // bring the maven component to life for use.
+        // ----------------------------------------------------------------------
+
+        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
+
+        embedder.start( classWorld );
+
+        Maven maven = (Maven) embedder.lookup( Maven.ROLE );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        response = maven.execute( request );
+
         if ( response.isExecutionFailure() )
         {
             return 1;
@@ -177,18 +177,11 @@ public class MavenCli
 
     private static void initializeSystemProperties( CommandLine commandLine )
     {
+        // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
         // and therefore are set in the session properties. System properties
         // are most dominant.
-
-        if ( commandLine.hasOption( CLIManager.DEBUG ) )
-        {
-            System.setProperty( MavenConstants.DEBUG_ON, "true" );
-        }
-        else
-        {
-            System.setProperty( MavenConstants.DEBUG_ON, "false" );
-        }
+        // ----------------------------------------------------------------------
 
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
         {
@@ -314,5 +307,56 @@ public class MavenCli
 
             formatter.printHelp( "maven [options] [goal [goal2 [goal3] ...]]", "\nOptions:", options, "\n" );
         }
+    }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    protected static File getUserConfigurationDirectory()
+    {
+        File mavenUserConfigurationDirectory = new File( userHome, MavenConstants.MAVEN_USER_CONFIGURATION_DIRECTORY );
+
+        if ( !mavenUserConfigurationDirectory.exists() )
+        {
+            if ( !mavenUserConfigurationDirectory.mkdirs() )
+            {
+                //throw a configuration exception
+            }
+        }
+
+        return mavenUserConfigurationDirectory;
+    }
+
+    protected static Properties getMavenProperties( File mavenHomeLocal )
+    {
+        Properties mavenProperties = new Properties();
+
+        File mavenPropertiesFile = new File( mavenHomeLocal, MavenConstants.MAVEN_PROPERTIES );
+
+        try
+        {
+            mavenProperties.load( new FileInputStream( mavenPropertiesFile ) );
+        }
+        catch ( Exception e )
+        {
+            // do nothing
+        }
+
+        return mavenProperties;
+    }
+
+    protected static ArtifactRepository getLocalRepository( Properties mavenProperties, File mavenHomeLocal )
+    {
+        String localRepository = mavenProperties.getProperty( MavenConstants.MAVEN_REPO_LOCAL );
+
+        if ( localRepository == null )
+        {
+            localRepository = new File( mavenHomeLocal, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
+        }
+
+        System.setProperty( MavenConstants.MAVEN_REPO_LOCAL, localRepository );
+
+        return RepositoryUtils.localRepositoryToWagonRepository( localRepository );
     }
 }

@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 public class MBoot
 {
@@ -52,9 +53,9 @@ public class MBoot
     String[] plexusDeps = new String[]
     {
         "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
-        "plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
-        "plexus/jars/plexus-container-default-1.0-alpha-1-SNAPSHOT.jar",
-        "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar"
+        "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
+        //"plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
+        //"plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar"
     };
 
     // ----------------------------------------------------------------------
@@ -64,9 +65,9 @@ public class MBoot
     String[] modelloDeps = new String[]
     {
         "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
-        "plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
-        "plexus/jars/plexus-container-default-1.0-alpha-1-SNAPSHOT.jar",
-        "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
+        //"plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
+        "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
+        //"plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
@@ -149,27 +150,35 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
-        File userPomFile = new File( System.getProperty( "user.home" ), ".m2/override.xml" );
-
         reader = new ModelReader();
 
-        if ( userPomFile.exists() && !reader.parse( userPomFile ) )
-        {
-            System.err.println( "Error reading user POM file" );
-
-            System.exit( 1 );
-        }
-
-        String mavenRepoLocal = System.getProperty( "maven.repo.local", reader.getLocal().getRepository() );
+        String mavenRepoLocal = System.getProperty( "maven.repo.local" );
 
         if ( mavenRepoLocal == null )
         {
-            System.out.println( "You must have a ~/.m2/override.xml file and must contain the following entries:" );
-            System.out.println( "<local>" );
-            System.out.println( "  <repository>/path/to/m2/repository</repository> (required)" );
-            System.out.println( "  <online>true</online> (optional)" );
-            System.out.println( "</local>" );
+            Properties p = new Properties();
+
+            try
+            {
+                String userHome = System.getProperty( "user.home" );
+
+                p.load( new FileInputStream( new File( userHome, ".m2/maven.properties" ) ) );
+
+                mavenRepoLocal = new File( p.getProperty( "maven.repo.local" ) ).getAbsolutePath();
+            }
+            catch ( Exception e )
+            {
+            }
+        }
+
+        if ( mavenRepoLocal == null )
+        {
+            System.out.println( "You must have a ~/.m2/maven.properties file and must contain the following entries:" );
+
+            System.out.println( "maven.repo.local = /path/to/your/repository" );
+
             System.out.println();
+
             System.out.println( "Alternatively, you can specify -Dmaven.repo.local=/path/to/m2/repository" );
 
             System.exit( 1 );
@@ -199,7 +208,7 @@ public class MBoot
 
         Date fullStart = new Date();
 
-        String onlineProperty = System.getProperty( "maven.online", reader.getLocal().getOnline() );
+        String onlineProperty = System.getProperty( "maven.online" );
 
         if ( onlineProperty != null && onlineProperty.equals( "false" ) )
         {
@@ -342,9 +351,9 @@ public class MBoot
             Dependency d = (Dependency) i.next();
 
             if ( d.getArtifactId().equals( "classworlds" ) ||
-                d.artifactId.equals( "plexus-container-api" ) ||
+                //d.artifactId.equals( "plexus-container-api" ) ||
                 d.artifactId.equals( "plexus-container-default" ) ||
-                d.artifactId.equals( "plexus-utils" ) ||
+                //d.artifactId.equals( "plexus-utils" ) ||
                 d.artifactId.equals( "junit" ) )
             {
                 continue;

@@ -83,24 +83,14 @@
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus-container-api</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
-    </dependency>  
-    <dependency>
-      <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
+      <version>1.0-alpha-2-SNAPSHOT</version>
     </dependency>  
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus-artifact-container</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
+      <artifactId>plexus-container-artifact</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
-    </dependency>    
     <dependency>
       <groupId>classworlds</groupId>
       <artifactId>classworlds</artifactId>

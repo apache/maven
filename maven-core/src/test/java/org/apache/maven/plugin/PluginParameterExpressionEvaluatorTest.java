@@ -1,12 +1,12 @@
 package org.apache.maven.plugin;
 
-import java.io.File;
-
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -17,8 +17,6 @@ public class PluginParameterExpressionEvaluatorTest
 {
     private MavenProject project;
 
-    private MavenProjectBuilder builder;
-
     private MavenGoalExecutionContext context;
 
     protected void setUp()
@@ -26,11 +24,9 @@ public class PluginParameterExpressionEvaluatorTest
     {
         super.setUp();
 
-        builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-
         File f =  getTestFile( "src/test/resources/pom.xml" );
 
-        project = builder.build( getMavenLocalHome(), f );
+        project = getProject( f );
 
         context = createGoalExecutionContext();
     }

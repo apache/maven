@@ -40,27 +40,10 @@ public class MavenTestCase
 
     protected MavenProjectBuilder projectBuilder;
 
-    protected String testRepoUrl;
-
-    private File mavenHome = new File( getBasedir(), "target/maven.home" );
-
-    private File mavenLocalHome = new File( getBasedir(), "target/maven.home.local" );;
-
     protected void setUp()
         throws Exception
     {
         super.setUp();
-
-        File testRepoLocation = new File( "target/repo" );
-
-        if ( !testRepoLocation.exists() )
-        {
-            testRepoLocation.mkdirs();
-        }
-
-        testRepoUrl = testRepoLocation.toURL().toExternalForm();
-
-        testRepoUrl = testRepoUrl.substring( 0, testRepoUrl.length() - 1 );
 
         pluginManager = (PluginManager) lookup( PluginManager.ROLE );
 
@@ -68,33 +51,40 @@ public class MavenTestCase
     }
 
     // ----------------------------------------------------------------------
-    // Customizing the PlexusTestCase
+    // Local repository
     // ----------------------------------------------------------------------
 
-    protected void customizeContext()
+    protected File getLocalRepositoryPath()
+    {
+        return getTestFile( "src/test/resources/local-repo" );
+    }
+
+    protected ArtifactRepository getLocalRepository()
+    {
+        ArtifactRepository r = new ArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath() );
+
+        return r;
+    }
+
+    // ----------------------------------------------------------------------
+    // Project building
+    // ----------------------------------------------------------------------
+
+    protected MavenProject getProject( File pom, boolean transitive )
         throws Exception
     {
-        MavenTestUtils.customizeContext( getContainer(), getTestFile( "" ), mavenHome, mavenLocalHome );
+        return projectBuilder.build( pom, getLocalRepository(), transitive );
+    }
+
+    protected MavenProject getProject( File pom )
+        throws Exception
+    {
+        return projectBuilder.build( pom, getLocalRepository() );
     }
 
     // ----------------------------------------------------------------------
-    // 
+    // Execution context
     // ----------------------------------------------------------------------
-
-    protected String getTestRepoURL()
-    {
-        return testRepoUrl;
-    }
-
-    protected File getMavenHome()
-    {
-        return mavenHome;
-    }
-
-    protected File getMavenLocalHome()
-    {
-        return mavenLocalHome;
-    }
 
     protected MavenGoalExecutionContext createGoalExecutionContext()
         throws Exception
@@ -117,22 +107,20 @@ public class MavenTestCase
     protected MavenGoalExecutionContext createGoalExecutionContext( File pom, String goal )
         throws Exception
     {
-        ArtifactRepository localRepository = new ArtifactRepository( "local", testRepoUrl );
-
         MavenProject project;
 
         if ( pom != null )
         {
-            project = projectBuilder.build( mavenLocalHome, pom );
+            project = getProject( pom );
         }
         else
         {
             File f = getTestFile( "target/test-classes/pom.xml" );
 
-            project = projectBuilder.build( mavenLocalHome, f );
+            project = getProject( f );
         }
 
-        return createGoalExecutionContext( project, localRepository, goal );
+        return createGoalExecutionContext( project, getLocalRepository(), goal );
     }
 
     protected MavenGoalExecutionContext createGoalExecutionContext( MavenProject project,

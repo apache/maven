@@ -28,6 +28,7 @@ package org.apache.maven.exception;
  * o non existent goals
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * 
  * @version $Id$
  */
 public class MavenExceptionHandler

@@ -1,0 +1,8 @@
+ -----
+ Maven2
+ -----
+ Jason van Zyl
+ -----
+
+ o what do people need to build the projects, they should only need the local repository with POMs.
+ o we can only do a transitive project build with the local repository

@@ -18,6 +18,7 @@ package org.apache.maven.exception;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * 
  * @version $Id$
  */
 public class MavenHomeNotDefinedException

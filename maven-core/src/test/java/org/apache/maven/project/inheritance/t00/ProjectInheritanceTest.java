@@ -52,7 +52,7 @@ public class ProjectInheritanceTest
     public void testProjectInheritance()
         throws Exception
     {
-        MavenProject p4 = projectBuilder.build( getMavenLocalHome(), projectFile( "p4" ) );
+        MavenProject p4 = getProject( projectFile( "p4" ) );
 
         assertEquals( "p4", p4.getName() );
 

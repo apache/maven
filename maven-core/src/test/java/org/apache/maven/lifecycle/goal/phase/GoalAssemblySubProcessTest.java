@@ -278,8 +278,6 @@ public class GoalAssemblySubProcessTest
     private void runTest( String mainGoal, List preGoals, List postGoals, List expectedOrder, Map messages )
         throws Exception
     {
-        ArtifactRepository localRepository = new ArtifactRepository( "local", getTestRepoURL() );
-
         Model model = new Model();
 
         model.setPreGoals( preGoals );
@@ -288,7 +286,7 @@ public class GoalAssemblySubProcessTest
 
         MavenProject project = new MavenProject( model );
 
-        MavenGoalExecutionContext context = createGoalExecutionContext( project, localRepository, mainGoal );
+        MavenGoalExecutionContext context = createGoalExecutionContext( project, getLocalRepository(), mainGoal );
 
         context.setGoalName( mainGoal );
 

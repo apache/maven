@@ -37,7 +37,7 @@ public class CanonicalProjectBuilderTest
     {
         File f  = getTestFile( "src/test/resources/canonical-pom.xml" );
 
-        MavenProject project = projectBuilder.build( getMavenLocalHome(), f );
+        MavenProject project = getProject( f );
 
         // ----------------------------------------------------------------------
         // Top-level elements

@@ -21,8 +21,6 @@ Configuration levels in maven
 +-----+
 ${maven.home}
      |
-     +--- pom.xml
-     |
      +--- maven.properties
 +-----+
 
@@ -64,7 +62,7 @@ ${maven.home}
 
 * User configuration
 
- User configuration which is utilized site wide are controlled with the ${user.home}/maven.properties.
+ User configuration which is utilized site wide are controlled with the ${user.home}/.m2/maven.properties.
 
  User configuration which is utilized at the project level are controlled with the 
  ${project.home}/maven.properties file.
@@ -109,3 +107,16 @@ Unified source directory
  one CVS repository.. for projects from multiple SCM repositories it's harder
  to maintain the same relative links on all developer computers.
  not sure the unified source directory structure addresses this issue.
+
+ Properties
+
+ maven.user.config.dir (system,default=${user.home}/.m2)
+ maven.home            (system,user,default=${user.home}/m2)
+ maven.repo.local      (system,user,default=${maven.user.config.dir/repository)
+
+ We need to define what happens in the when things are not setup correctly
+
+ o ~/.m2 directory does not exist
+ o ~/.m2/maven.properties does not exist
+ o if they once existed but now to do not exist
+ o what the installer will take care of of what we can recover from

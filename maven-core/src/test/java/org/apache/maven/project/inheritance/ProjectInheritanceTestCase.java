@@ -28,8 +28,6 @@ import org.apache.maven.project.MavenProjectBuilder;
 public abstract class ProjectInheritanceTestCase
     extends MavenTestCase
 {
-    protected MavenProjectBuilder projectBuilder;
-
     protected String getTestSeries()
     {
         String className = getClass().getPackage().getName();
@@ -37,23 +35,17 @@ public abstract class ProjectInheritanceTestCase
         return className.substring( className.lastIndexOf( "." ) + 1 );
     }
 
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-
-        System.setProperty( "maven.repo.local", getLocalRepository().getAbsolutePath() );
-    }
-
-    private File getLocalRepository()
-    {
-        return getTestFile( "src/test/resources/inheritance-repo/" + getTestSeries() );
-    }
-
     protected File projectFile( String name )
     {
-        return new File( getLocalRepository(), "/maven/poms/" + name + "-1.0.pom" );
+        return new File( getLocalRepositoryPath(), "/maven/poms/" + name + "-1.0.pom" );
+    }
+
+    // ----------------------------------------------------------------------
+    // The local repository for this category of tests
+    // ----------------------------------------------------------------------
+
+    protected File getLocalRepositoryPath()
+    {
+        return getTestFile( "src/test/resources/inheritance-repo/" + getTestSeries() );
     }
 }

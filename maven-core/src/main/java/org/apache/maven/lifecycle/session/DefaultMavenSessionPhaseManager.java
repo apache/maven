@@ -16,7 +16,8 @@ package org.apache.maven.lifecycle.session;
  * limitations under the License.
  */
 
-import org.apache.maven.ExecutionResponse;
+import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.MavenExecutionResponse;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.Iterator;
@@ -37,7 +38,7 @@ public class DefaultMavenSessionPhaseManager
         return lifecyclePhases;
     }
 
-    public ExecutionResponse execute( MavenSession context )
+    public MavenExecutionResponse execute( MavenSession context )
         throws Exception
     {
         for ( Iterator iterator = lifecyclePhases.iterator(); iterator.hasNext(); )
@@ -46,7 +47,7 @@ public class DefaultMavenSessionPhaseManager
 
             phase.enableLogging( getLogger() );
 
-            ExecutionResponse response = phase.execute( context );
+            MavenExecutionResponse response = phase.execute( context );
 
             if ( response.isExecutionFailure() )
             {
@@ -54,6 +55,6 @@ public class DefaultMavenSessionPhaseManager
             }
         }
 
-        return new ExecutionResponse();
+        return new MavenExecutionResponse();
     }
 }

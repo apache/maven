@@ -16,6 +16,8 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
 import java.io.File;
 import java.util.List;
 
@@ -23,21 +25,13 @@ public interface MavenProjectBuilder
 {
     String ROLE = MavenProjectBuilder.class.getName();
 
-    // ----------------------------------------------------------------------
-
-    MavenProject build( File project )
+    MavenProject build( File project, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject build( File project, boolean followTransitiveDeps )
+    MavenProject build( File project, ArtifactRepository localRepository, boolean transitive )
         throws ProjectBuildingException;
 
-    MavenProject build( File mavenHomeLocal, File project )
-        throws ProjectBuildingException;
-
-    MavenProject build( File mavenHomeLocal, File project, boolean followTransitiveDeps )
-        throws ProjectBuildingException;
-
-    // ----------------------------------------------------------------------
+    // take this out
 
     List getSortedProjects( List projects )
         throws Exception;

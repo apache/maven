@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.execution;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -22,7 +22,7 @@ import org.apache.maven.plugin.FailureResponse;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class ExecutionResponse
+public class MavenExecutionResponse
 {
     private String failedGoal;
 

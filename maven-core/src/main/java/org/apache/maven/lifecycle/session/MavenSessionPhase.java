@@ -16,7 +16,7 @@ package org.apache.maven.lifecycle.session;
  * limitations under the License.
  */
 
-import org.apache.maven.ExecutionResponse;
+import org.apache.maven.execution.MavenExecutionResponse;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -27,7 +27,7 @@ public interface MavenSessionPhase
 {
     String ROLE = MavenSessionPhase.class.getName();
 
-    ExecutionResponse execute( MavenSession context )
+    MavenExecutionResponse execute( MavenSession context )
         throws Exception;
 
     void enableLogging( Logger logger );

@@ -21,9 +21,10 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.ReactorException;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResponse;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,53 +34,7 @@ import java.util.Map;
 public interface Maven
 {
     static String ROLE = Maven.class.getName();
-    
-    static String DEFAULT_MODEL_VERSION = "4.0.0";
 
-    // ----------------------------------------------------------------------
-    // Execution
-    // ----------------------------------------------------------------------
-
-    ExecutionResponse execute( List goals )
-        throws GoalNotFoundException;
-
-    ExecutionResponse execute( MavenProject project, List goals )
-        throws GoalNotFoundException;
-
-    ExecutionResponse execute( File project, List goals )
-        throws ProjectBuildingException, GoalNotFoundException;
-
-    // ----------------------------------------------------------------------
-    // Reactor execution
-    // ----------------------------------------------------------------------
-
-    ExecutionResponse executeReactor( String goal, String includes, String excludes )
-        throws ReactorException, GoalNotFoundException;
-
-    // ----------------------------------------------------------------------
-    // Goal descriptors
-    // ----------------------------------------------------------------------
-
-    Map getMojoDescriptors();
-
-    MojoDescriptor getMojoDescriptor( String goalId );
-
-    // ----------------------------------------------------------------------
-    // Maven home
-    // ----------------------------------------------------------------------
-
-    void setMavenHome( File mavenHome );
-
-    File getMavenHome();
-
-    void setMavenHomeLocal( File mavenHomeLocal );
-
-    File getMavenHomeLocal();
-
-    // ----------------------------------------------------------------------
-    // Maven project handling
-    // ----------------------------------------------------------------------
-
-    MavenProject getProject( File project )
-        throws ProjectBuildingException;
+    MavenExecutionResponse execute( MavenExecutionRequest request )
+        throws GoalNotFoundException, Exception;
 }
