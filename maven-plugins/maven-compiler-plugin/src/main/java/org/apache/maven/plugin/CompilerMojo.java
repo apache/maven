@@ -6,6 +6,7 @@ import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.javac.JavacCompiler;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -18,11 +19,11 @@ import java.util.List;
  * @description Compiles application sources
  *
  * @parameter
- *  name="sourceDirectory"
- *  type="String"
+ *  name="compileSourceRootsList"
+ *  type="java.util.List"
  *  required="true"
  *  validator=""
- *  expression="#project.build.sourceDirectory"
+ *  expression="#project.compileSourceRootsList"
  *  description=""
  *
  * @parameter
@@ -51,8 +52,6 @@ import java.util.List;
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
- * @todo use compile source roots and not the pom.build.sourceDirectory so that any
- *       sort of preprocessing and/or source generation can be taken into consideration.
  * @todo change debug parameter type to Boolean
  */
 
@@ -70,7 +69,7 @@ public class CompilerMojo
         //
         // ----------------------------------------------------------------------
 
-        String sourceDirectory = (String) request.getParameter( "sourceDirectory" );
+        List compileSourceRootsList = (List) request.getParameter( "compileSourceRootsList" );
 
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
@@ -79,17 +78,18 @@ public class CompilerMojo
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
-        
-        if ( ! new File( sourceDirectory ).exists() )
+
+        compileSourceRootsList = removeEmptyCompileSourceRoots( compileSourceRootsList );
+        if ( compileSourceRootsList.isEmpty() )
         {
             return;
         }
-        
+
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
         
         compilerConfiguration.setOutputLocation(outputDirectory);
         compilerConfiguration.setClasspathEntries(Arrays.asList(classpathElements));
-        compilerConfiguration.setSourceLocations(Arrays.asList(new String[] {sourceDirectory}));
+        compilerConfiguration.setSourceLocations( compileSourceRootsList );
         
         /* Compile with debugging info */
         String debugAsString = (String) request.getParameter( "debug" );
@@ -139,5 +139,24 @@ public class CompilerMojo
         {
             response.setExecutionFailure( new CompilationFailureResponse( messages ) );
         }
+    }
+
+    /** @todo also in ant plugin. This should be resolved at some point so that it does not need to be calculated continuously - or should the plugins accept empty source roots as is? */
+    private static List removeEmptyCompileSourceRoots( List compileSourceRootsList )
+    {
+        List newCompileSourceRootsList = new ArrayList();
+        if ( compileSourceRootsList != null )
+        {
+            // copy as I may be modifying it
+            for ( Iterator i = compileSourceRootsList.iterator(); i.hasNext(); )
+            {
+                String srcDir = (String) i.next();
+                if ( !newCompileSourceRootsList.contains( srcDir ) && new File( srcDir ).exists() )
+                {
+                    newCompileSourceRootsList.add( srcDir );
+                }
+            }
+        }
+        return newCompileSourceRootsList;
     }
 }

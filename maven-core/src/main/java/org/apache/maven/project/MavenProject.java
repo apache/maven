@@ -129,8 +129,6 @@ public class MavenProject
     //!!! Refactor, collect the list of compile source roots and create a path1:path2
     // type construct from the list instead of the other way around. jvz.
 
-    private static String PS = System.getProperty( "path.separator" );
-
     private String compileSourceRoots = "";
 
     private String testCompileSourceRoots = "";
@@ -139,25 +137,29 @@ public class MavenProject
     {
         if ( path != null || path.trim().length() != 0 )
         {
-            compileSourceRoots += path + PS;
+            if ( compileSourceRoots.length() > 0 )
+            {
+                compileSourceRoots += File.pathSeparator;
+            }
+            compileSourceRoots += path;
         }
     }
 
     public String getCompileSourceRoots()
     {
         // Get rid of any trailing path separators.
-        if ( compileSourceRoots.endsWith( PS ) )
+        if ( compileSourceRoots.endsWith( File.pathSeparator ) )
         {
             compileSourceRoots = compileSourceRoots.substring( 0, compileSourceRoots.length() - 1 );
         }
 
         // Always add the build.sourceDirectory
-        return getBuild().getSourceDirectory() + PS + compileSourceRoots;
+        return getBuild().getSourceDirectory() + File.pathSeparator + compileSourceRoots;
     }
 
     public List getCompileSourceRootsList()
     {
-        String[] s = StringUtils.split( getCompileSourceRoots(), PS );
+        String[] s = StringUtils.split( getCompileSourceRoots(), File.pathSeparator );
 
         List list = new ArrayList();
 
@@ -173,25 +175,29 @@ public class MavenProject
     {
         if ( path != null || path.trim().length() != 0 )
         {
-            testCompileSourceRoots += path + PS;
+            if ( testCompileSourceRoots.length() > 0 )
+            {
+                testCompileSourceRoots += File.pathSeparator;
+            }
+            testCompileSourceRoots += path;
         }
     }
 
     public String getTestCompileSourceRoots()
     {
         // Get rid of any trailing path separators.
-        if ( testCompileSourceRoots.endsWith( PS ) )
+        if ( testCompileSourceRoots.endsWith( File.pathSeparator ) )
         {
             testCompileSourceRoots = testCompileSourceRoots.substring( 0, testCompileSourceRoots.length() - 1 );
         }
 
         // Always add the build.unitTestSourceDirectory
-        return getBuild().getUnitTestSourceDirectory() + PS + testCompileSourceRoots;
+        return getBuild().getUnitTestSourceDirectory() + File.pathSeparator + testCompileSourceRoots;
     }
 
     public List getTestCompileSourceRootsList()
     {
-        String[] s = StringUtils.split( getTestCompileSourceRoots(), PS );
+        String[] s = StringUtils.split( getTestCompileSourceRoots(), File.pathSeparator );
 
         List list = new ArrayList();
 
