@@ -64,6 +64,7 @@ public class MBoot
 
     String[] mojoSupportDeps = new String[] {
         "marmalade/jars/marmalade-core-1.0-alpha2-SNAPSHOT.jar",
+        "xpp3/jars/xpp3-1.1.3.3.jar",
         "plexus/jars/plexus-marmalade-factory-1.0-alpha-2-SNAPSHOT.jar",
         "maven/jars/maven-script-marmalade-2.0-SNAPSHOT.jar", };
 
