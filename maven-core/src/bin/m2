@@ -54,7 +54,7 @@ if [ -z "$M2_HOME" ] ; then
   fi
 
   ## resolve links - $0 may be a link to maven's home
-  PRG=$0
+  PRG="$0"
   saveddir=`pwd`
 
   # need this for relative symlinks
@@ -124,14 +124,12 @@ if $cygwin; then
     JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
   [ -n "$HOME" ] &&
     HOME=`cygpath --path --windows "$HOME"`
-  [ -n "$CLASSWORLDS_JAR" ] && CLASSWORLDS_JAR=`cygpath --path --windows "$CLASSWORLDS_JAR"`
-  [ -n "$CLASSWORLDS_CONF" ] && CLASSWORLDS_CONF=`cygpath --path --windows "$CLASSWORLDS_CONF"`
 fi
 
 $JAVACMD \
   $MAVEN_OPTS \
-  -classpath ${CLASSWORLDS_JAR} \
-  "-Dclassworlds.conf=${CLASSWORLDS_CONF}"  \
+  -classpath "${M2_HOME}"/core/boot/classworlds-*.jar \
+  "-Dclassworlds.conf=${M2_HOME}/bin/m2.conf" \
   "-Dmaven.home=${M2_HOME}"  \
   ${CLASSWORLDS_LAUNCHER} $@
 
