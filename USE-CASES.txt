@@ -18,3 +18,73 @@ itself. This way locations of intermediary artifacts of a build would be
 in a known location.  This would also help with developer setup i.e. getting
 new developers up and running. They could run a maven command and have all
 their source trees set up in the same way as their collegues.
+
+- I would like to be able to execute some goals (like 'clean') even when  
+  not all dependencies are satisfied
+
+- Support for transitive and group dependencies
+
+- It should be easy to create a single report without a need to (call like it has place now)
+  maven:site. It will be nice if report generators can produce docs in few diffrent formats
+  (e.g pdf, html, rtf) and this format can be also choosen for group of reports.
+  
+- groupId
+ - Let's assume that there exists an artifact type "web-component" which is a zip file containg css/js/gifs/jpegs etc
+   Example of such artifact is for example distribution of tigris style.
+   
+   Say an user has declared the following dependency:
+
+   <depenedency>
+      <groupId>org.tigris</groupId>
+      <artifactId>style</artifactId>
+      <type>web-component</type>
+      <version>2.0</version>
+   </depenedency>
+   
+   A dependency of this type should be processed only when users assembles the web application
+   (war:webapp goal in maven-old)
+   
+   In short:  user can be able to declare goal decorators and goals should be fine-grained 
+   
+
+- Maven is Java Build Tool. It should be well defined what does it mean to "build java project".
+  It mean stages of the process should be well defined.
+  
+  pre-compile (this is when tools like JAXB, XDoclet)
+  compile (javac, aspectj)
+  post-compile (aspectj? ) 
+  pre-jar
+  ...
+  etc
+  
+  It should e.g be possible to use Castor, JAXB plugin, XDoclet plugin without writing a single line  
+  of build script. In the ideal case it should b ejust to plug XDoclet just by "checking the checkbox in IDE". 
+  This is someting what Vincent Massol started in maven-caller plugin. It will be nice to explore this idea. 
+   
+- Reorganization of repoistory layout - are we going to map groupId : "a.b.c.d"  to path "a/b/c/d"?
+  Are there some better alternatives?
+  
+- (Michal)  I have tried to implement "platform dependend dependecies".
+   
+   <depenedency>
+      <groupId>a</groupId>
+      <artifactId>b</artifactId>
+      <type>native</type>
+      <version>2.0</version>
+   </depenedency> 
+    
+    is resolved as 
+    
+   a/b-2.0.dll (on windows) or a/b-2.0.so (unix)
+   
+   
+   Maybe it can/should be done differently? 
+   What other "platform depended" artifact type do we have?
+   exe? shell-script?
+     
+   
+ - how to declare a dependency on JDK and what are possible implications of such dependency
+  (e.g javac/javadoc target jdk)
+   
+     
+       
