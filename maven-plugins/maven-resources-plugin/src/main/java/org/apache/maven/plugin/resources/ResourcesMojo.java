@@ -184,7 +184,11 @@ public class ResourcesMojo
 
         in.close();
 
-        return buffer.toByteArray();
+        byte[] content = buffer.toByteArray();
+
+        buffer.close();
+
+        return content;
     }
 
     public static void fileWrite( String fileName, byte[] data ) throws Exception

@@ -124,6 +124,8 @@ public class Verifier
 
                 lines.add( line );
             }
+
+            reader.close();
         }
         catch ( Exception e )
         {
@@ -245,6 +247,8 @@ public class Verifier
                 {
                     throw new VerificationException( "Expected JAR resource was not found: " + line );
                 }
+
+                is.close();
             }
             catch ( Exception e )
             {
