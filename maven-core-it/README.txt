@@ -33,6 +33,8 @@ it0003: Builds upon it0001: we add a jar installation step. We delete the JAR
   integration tests that go far beyond what the average user
   would ever setup.
   
+- project with a cyclic dependency
+
 -------------------------------------------------------------------------------
 These are a set of builds that contain known errors. The errors should be
 captured and reported in a useful manner to the user. We will start at it1000
