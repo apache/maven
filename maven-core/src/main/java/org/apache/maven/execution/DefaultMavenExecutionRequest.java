@@ -24,44 +24,57 @@ import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.monitor.logging.Log;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public abstract class AbstractMavenExecutionRequest
-implements MavenExecutionRequest
+public class DefaultMavenExecutionRequest
+    implements MavenExecutionRequest
 {
-    /** @todo [BP] is this required? This hands off to MavenSession, but could be passed through the handler.handle function (+ createSession). */
-    protected ArtifactRepository localRepository;
+    /**
+     * @todo [BP] is this required? This hands off to MavenSession, but could be passed through the handler.handle function (+ createSession).
+     */
+    private final ArtifactRepository localRepository;
 
-    protected List goals;
+    private final List goals;
 
-    protected String type;
+    private final List files;
 
     protected MavenSession session;
 
     private Log log;
-    
-    private EventDispatcher eventDispatcher;
+
+    private final EventDispatcher eventDispatcher;
 
     private final UserModel userModel;
 
-    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, UserModel userModel, EventDispatcher eventDispatcher, List goals )
+    private final String baseDirectory;
+
+    public DefaultMavenExecutionRequest( ArtifactRepository localRepository, UserModel userModel,
+                                         EventDispatcher eventDispatcher, List goals, List files, String baseDirectory )
     {
         this.localRepository = localRepository;
-        
+
         this.userModel = userModel;
 
         this.goals = goals;
-        
+
         this.eventDispatcher = eventDispatcher;
+
+        this.files = files;
+
+        this.baseDirectory = baseDirectory;
     }
-    
+
     public UserModel getUserModel()
     {
         return userModel;
+    }
+
+    public String getBaseDirectory()
+    {
+        return baseDirectory;
     }
 
     public ArtifactRepository getLocalRepository()
@@ -74,11 +87,6 @@ implements MavenExecutionRequest
         return goals;
     }
 
-    public String getType()
-    {
-        return type;
-    }
-
     // ----------------------------------------------------------------------
     // Putting the session here but it can probably be folded right in here.
     // ----------------------------------------------------------------------
@@ -88,29 +96,38 @@ implements MavenExecutionRequest
         return session;
     }
 
+    public List getProjectFiles()
+    {
+        return files;
+    }
+
     public void setSession( MavenSession session )
     {
         this.session = session;
     }
-    
-    public void setLog(Log log)
+
+    public void setLog( Log log )
     {
         this.log = log;
     }
-    
+
     public Log getLog()
     {
         return log;
     }
-    
-    public void addEventMonitor(EventMonitor monitor)
+
+    public void addEventMonitor( EventMonitor monitor )
     {
-        eventDispatcher.addEventMonitor(monitor);
+        eventDispatcher.addEventMonitor( monitor );
     }
-    
+
     public EventDispatcher getEventDispatcher()
     {
         return eventDispatcher;
     }
-    
+
+    public List getFiles()
+    {
+        return files;
+    }
 }

@@ -19,10 +19,9 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
-import org.apache.maven.execution.MavenProjectExecutionRequest;
-import org.apache.maven.execution.MavenReactorExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.GoalNotFoundException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
@@ -44,11 +43,14 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -79,35 +81,126 @@ public class DefaultMaven
     // Project execution
     // ----------------------------------------------------------------------
 
-    public MavenExecutionResponse execute( MavenExecutionRequest request ) throws GoalNotFoundException, Exception
+    public MavenExecutionResponse execute( MavenExecutionRequest request )
+        throws GoalNotFoundException, Exception
     {
-        // TODO: not happy about this:
-        if ( request instanceof MavenReactorExecutionRequest )
+        EventDispatcher dispatcher = request.getEventDispatcher();
+        String event = MavenEvents.REACTOR_EXECUTION;
+
+        // TODO: goals are outer loop
+        dispatcher.dispatchStart( event, request.getBaseDirectory() );
+        try
         {
-            return handleReactor( (MavenReactorExecutionRequest) request );
+            List projects = new ArrayList();
+
+            try
+            {
+                List files = request.getProjectFiles();
+
+                for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
+                {
+                    File file = (File) iterator.next();
+
+                    MavenProject project = getProject( file, request.getLocalRepository() );
+
+                    projects.add( project );
+                }
+
+                projects = projectBuilder.getSortedProjects( projects );
+
+                if ( projects.isEmpty() )
+                {
+                    projects.add( projectBuilder.buildSuperProject( request.getLocalRepository() ) );
+                }
+            }
+            catch ( IOException e )
+            {
+                throw new ReactorException( "Error processing projects for the reactor: ", e );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new ReactorException( "Error processing projects for the reactor: ", e );
+            }
+            catch ( CycleDetectedException e )
+            {
+                throw new ReactorException( "Error processing projects for the reactor: ", e );
+            }
+
+            for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
+            {
+                MavenProject project = (MavenProject) iterator.next();
+
+                line();
+
+                getLogger().info( "Building " + project.getName() );
+
+                line();
+
+                try
+                {
+                    boolean isPom = "pom".equals( project.getPackaging() );
+                    if ( isPom )
+                    {
+                        // TODO: not required if discovered and cached
+                        MavenExecutionResponse response = processProject( request, project, dispatcher,
+                                                                          Collections.singletonList( "pom:install" ) );
+                        if ( response.isExecutionFailure() )
+                        {
+                            return response;
+                        }
+                    }
+
+                    if ( project.getModules() != null && !project.getModules().isEmpty() )
+                    {
+                        String includes = StringUtils.join( project.getModules().iterator(), "/pom.xml," ) +
+                            "/pom.xml";
+                        File baseDir = project.getFile().getParentFile();
+                        MavenExecutionRequest reactorRequest = new DefaultMavenExecutionRequest(
+                            request.getLocalRepository(), request.getUserModel(), request.getEventDispatcher(),
+                            request.getGoals(), FileUtils.getFiles( baseDir, includes, null ), baseDir.getPath() );
+                        MavenExecutionResponse response = execute( reactorRequest );
+                        if ( response != null && response.isExecutionFailure() )
+                        {
+                            return response;
+                        }
+
+                    }
+
+                    if ( !isPom )
+                    {
+                        MavenExecutionResponse response = processProject( request, project, dispatcher,
+                                                                          request.getGoals() );
+
+                        if ( response.isExecutionFailure() )
+                        {
+                            return response;
+                        }
+                    }
+                }
+                catch ( Exception e )
+                {
+                    throw new ReactorException( "Error executing project within the reactor", e );
+                }
+            }
+
+            dispatcher.dispatchEnd( event, request.getBaseDirectory() );
+
+            // TODO: not really satisfactory
+            return null;
         }
-        else
+        catch ( ReactorException e )
         {
-            return handleProject( request );
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+            throw e;
         }
     }
 
-    // TODO: don't throw generic exception
-    public MavenExecutionResponse handleProject( MavenExecutionRequest request ) throws Exception
+    private MavenExecutionResponse processProject( MavenExecutionRequest request, MavenProject project,
+                                                   EventDispatcher dispatcher, List goals )
+        throws ComponentLookupException
     {
         MavenSession session = createSession( request );
-
-        List projectFiles = request.getProjectFiles();
-        
-        MavenProject project = null;
-        if(projectFiles != null && !projectFiles.isEmpty())
-        {
-            project = getProject( (File) request.getProjectFiles().get( 0 ), request.getLocalRepository() );
-        }
-        else
-        {
-            project = projectBuilder.buildSuperProject( request.getLocalRepository() );
-        }
 
         session.setProject( project );
 
@@ -115,7 +208,6 @@ public class DefaultMaven
 
         // !! This is ripe for refactoring to an aspect.
         // Event monitoring.
-        EventDispatcher dispatcher = request.getEventDispatcher();
         String event = MavenEvents.PROJECT_EXECUTION;
 
         dispatcher.dispatchStart( event, project.getId() );
@@ -124,7 +216,7 @@ public class DefaultMaven
         try
         {
             // Actual meat of the code.
-            response = lifecycleExecutor.execute( request.getGoals(), session );
+            response = lifecycleExecutor.execute( goals, session );
 
             dispatcher.dispatchEnd( event, project.getId() );
         }
@@ -157,104 +249,8 @@ public class DefaultMaven
         return response;
     }
 
-    // ----------------------------------------------------------------------
-    // Reactor
-    // ----------------------------------------------------------------------
-
-    public MavenExecutionResponse handleReactor( MavenReactorExecutionRequest request ) throws ReactorException
-    {
-        EventDispatcher dispatcher = request.getEventDispatcher();
-        String event = MavenEvents.REACTOR_EXECUTION;
-
-        dispatcher.dispatchStart( event, request.getBaseDirectory().getPath() );
-        try
-        {
-            List projects = new ArrayList();
-
-            getLogger().info( "Starting the reactor..." );
-
-            try
-            {
-                List files = request.getProjectFiles();
-
-                for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
-                {
-                    File file = (File) iterator.next();
-
-                    MavenProject project = getProject( file, request.getLocalRepository() );
-
-                    projects.add( project );
-                }
-
-                projects = projectBuilder.getSortedProjects( projects );
-
-            }
-            catch ( IOException e )
-            {
-                throw new ReactorException( "Error processing projects for the reactor: ", e );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new ReactorException( "Error processing projects for the reactor: ", e );
-            }
-            catch ( CycleDetectedException e )
-            {
-                throw new ReactorException( "Error processing projects for the reactor: ", e );
-            }
-
-            getLogger().info( "Our processing order:" );
-
-            for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
-            {
-                MavenProject project = (MavenProject) iterator.next();
-
-                getLogger().info( project.getName() );
-            }
-
-            for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
-            {
-                MavenProject project = (MavenProject) iterator.next();
-
-                System.out.println( "\n\n\n" );
-
-                line();
-
-                getLogger().info( "Building " + project.getName() );
-
-                line();
-
-                MavenProjectExecutionRequest projectExecutionRequest = request.createProjectExecutionRequest( project );
-
-                try
-                {
-                    MavenExecutionResponse response = handleProject( projectExecutionRequest );
-
-                    if ( response.isExecutionFailure() )
-                    {
-                        return response;
-                    }
-                }
-                catch ( Exception e )
-                {
-                    throw new ReactorException( "Error executing project within the reactor", e );
-                }
-
-            }
-
-            dispatcher.dispatchEnd( event, request.getBaseDirectory().getPath() );
-
-            // TODO: not really satisfactory
-            return null;
-        }
-        catch ( ReactorException e )
-        {
-            dispatcher.dispatchError( event, request.getBaseDirectory().getPath(), e );
-
-            throw e;
-        }
-    }
-
-    public MavenProject getProject( File pom, ArtifactRepository localRepository ) throws ProjectBuildingException
+    public MavenProject getProject( File pom, ArtifactRepository localRepository )
+        throws ProjectBuildingException
     {
         if ( pom.exists() )
         {
@@ -284,9 +280,10 @@ public class DefaultMaven
 
     /**
      * @todo [BP] this might not be required if there is a better way to pass
-     *       them in. It doesn't feel quite right.
+     * them in. It doesn't feel quite right.
      */
-    private void resolveParameters( MavenExecutionRequest request ) throws ComponentLookupException
+    private void resolveParameters( MavenExecutionRequest request )
+        throws ComponentLookupException
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
@@ -307,7 +304,8 @@ public class DefaultMaven
     // Lifecylce Management
     // ----------------------------------------------------------------------
 
-    public void contextualize( Context context ) throws ContextException
+    public void contextualize( Context context )
+        throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -381,9 +379,8 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info(
-                          "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/"
-                              + ( r.totalMemory() / mb ) + "M" );
+        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" +
+                          ( r.totalMemory() / mb ) + "M" );
     }
 
     protected void line()
@@ -417,7 +414,8 @@ public class DefaultMaven
     // Reactor
     // ----------------------------------------------------------------------
 
-    public List getSortedProjects( List projects ) throws CycleDetectedException
+    public List getSortedProjects( List projects )
+        throws CycleDetectedException
     {
         return projectBuilder.getSortedProjects( projects );
     }

@@ -119,10 +119,11 @@ public class DefaultMavenProjectBuilder
                 previous = current;
             }
 
+            pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
+
             project = processProjectLogic( project, localRepository, resolveDependencies );
 
             project.setFile( projectDescriptor );
-            pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
 
             return project;
         }
@@ -133,7 +134,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject processProjectLogic( MavenProject project, ArtifactRepository localRepository,
-                                             boolean resolveDependencies )
+                                              boolean resolveDependencies )
         throws ProjectBuildingException, ModelInterpolationException, ArtifactResolutionException
     {
         Model model = modelInterpolator.interpolate( project.getModel() );
@@ -186,7 +187,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject assembleLineage( File projectDescriptor, ArtifactRepository localRepository,
-                                         LinkedList lineage, List aggregatedRemoteWagonRepositories )
+                                          LinkedList lineage, List aggregatedRemoteWagonRepositories )
         throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
@@ -253,7 +254,8 @@ public class DefaultMavenProjectBuilder
         return repos;
     }
 
-    private Model readModel( File file ) throws ProjectBuildingException
+    private Model readModel( File file )
+        throws ProjectBuildingException
     {
         try
         {
@@ -266,12 +268,12 @@ public class DefaultMavenProjectBuilder
         catch ( Exception e )
         {
             throw new ProjectBuildingException(
-                                                "Error while reading model from file '" + file.getAbsolutePath() + "'.",
-                                                e );
+                "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
         }
     }
 
-    private Model readModel( URL url ) throws ProjectBuildingException
+    private Model readModel( URL url )
+        throws ProjectBuildingException
     {
         try
         {
@@ -300,8 +302,8 @@ public class DefaultMavenProjectBuilder
         catch ( ArtifactResolutionException e )
         {
             // @todo use parent.toString() if modello could generate it, or specify in a code segment
-            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":"
-                + parent.getArtifactId() + "-" + parent.getVersion(), e );
+            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":" +
+                                                parent.getArtifactId() + "-" + parent.getVersion(), e );
         }
 
         return artifact.getFile();
@@ -318,7 +320,8 @@ public class DefaultMavenProjectBuilder
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
      */
-    public List getSortedProjects( List projects ) throws CycleDetectedException
+    public List getSortedProjects( List projects )
+        throws CycleDetectedException
     {
         DAG dag = new DAG();
 
@@ -367,11 +370,11 @@ public class DefaultMavenProjectBuilder
     }
 
     public MavenProject buildSuperProject( ArtifactRepository localRepository )
-    throws ProjectBuildingException
+        throws ProjectBuildingException
     {
-            return buildSuperProject( localRepository, false );
+        return buildSuperProject( localRepository, false );
     }
-    
+
     public MavenProject buildSuperProject( ArtifactRepository localRepository, boolean resolveDependencies )
         throws ProjectBuildingException
     {
@@ -380,7 +383,7 @@ public class DefaultMavenProjectBuilder
         try
         {
             project = processProjectLogic( project, localRepository, resolveDependencies );
-            
+
             File projectFile = new File( ".", "pom.xml" );
             project.setFile( projectFile );
             pathTranslator.alignToBaseDirectory( project.getModel(), projectFile );
@@ -401,7 +404,8 @@ public class DefaultMavenProjectBuilder
     //
     // ----------------------------------------------------------------------
 
-    private Model getSuperModel() throws ProjectBuildingException
+    private Model getSuperModel()
+        throws ProjectBuildingException
     {
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" );
 

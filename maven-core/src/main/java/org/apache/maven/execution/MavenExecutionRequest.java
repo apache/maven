@@ -36,21 +36,22 @@ public interface MavenExecutionRequest
 
     List getGoals();
 
-    String getType();
-
     void setSession( MavenSession session );
 
     MavenSession getSession();
 
-    List getProjectFiles() throws IOException;
+    List getProjectFiles()
+        throws IOException;
 
     void setLog( Log log );
-    
+
     Log getLog();
 
     void addEventMonitor( EventMonitor monitor );
-    
+
     EventDispatcher getEventDispatcher();
-    
+
     UserModel getUserModel();
+
+    String getBaseDirectory();
 }

@@ -104,7 +104,9 @@ public class Main
 
                     org.apache.maven.model.Model newModel = new org.apache.maven.model.Model();
                     newModel.setArtifactId( model.getArtifactId() );
-                    newModel.setBuild( convertBuild( model.getBuild(), convertPlugins( model.getPlugins() ) ) );
+                    newModel.setBuild(
+                        convertBuild( model.getBuild(), convertPlugins( model.getPlugins() ),
+                                      convertPluginManagement( model.getPluginManagement() ) ) );
                     newModel.setCiManagement( convertCiManagement( model.getCiManagement() ) );
                     newModel.setContributors( convertContributors( model.getContributors() ) );
                     newModel.setDependencies( convertDependencies( model.getDependencies() ) );
@@ -124,7 +126,6 @@ public class Main
                     newModel.setOrganization( convertOrganization( model.getOrganization() ) );
                     newModel.setPackaging( model.getType() );
                     newModel.setParent( convertParent( model.getParent() ) );
-                    newModel.setPluginManagement( convertPluginManagement( model.getPluginManagement() ) );
                     newModel.setPluginRepositories( convertRepositories( model.getPluginRepositories() ) );
                     newModel.setReports( convertReports( model.getReports() ) );
                     newModel.setRepositories( convertRepositories( model.getRepositories() ) );
@@ -464,7 +465,8 @@ public class Main
         return newPlugins;
     }
 
-    private static org.apache.maven.model.Build convertBuild( Build build, Map plugins )
+    private static org.apache.maven.model.Build convertBuild( Build build, Map plugins,
+                                                              org.apache.maven.model.PluginManagement pluginManagement )
     {
         if ( build == null && plugins.isEmpty() )
         {
@@ -490,6 +492,7 @@ public class Main
         newBuild.setTestOutputDirectory( build.getTestOutput() );
         newBuild.setTestSourceDirectory( build.getUnitTestSourceDirectory() );
         newBuild.setResources( convertResources( build.getResources() ) );
+        newBuild.setPluginManagement( pluginManagement );
 
         if ( build.getUnitTest() != null )
         {

@@ -525,6 +525,11 @@ public class MavenProject
         return model.getBuild().getPlugins();
     }
 
+    public List getModules()
+    {
+        return model.getModules();
+    }
+
     public PluginManagement getPluginManagement()
     {
         PluginManagement pluginMgmt = null;

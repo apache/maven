@@ -10,9 +10,6 @@
  | o i18n: would be good to be able to have names/descriptions/specifications
  |   in as many languages as possible.
  |
- | o versioning of individual elements on the class level and the field level so that
- |   different versions of the model can be output.
- |
  | o annotation mechanism so that changes to the model can be accurately tracked.
  |
  | o need to clean up all the descriptions, matching anything to the current project-descriptor.xml file and
@@ -97,6 +94,15 @@
           <description><![CDATA[The type of artifact this project produces.]]></description>
           <type>String</type>
           <defaultValue>jar</defaultValue>
+        </field>
+        <field>
+          <name>modules</name>
+          <version>4.0.0</version>
+          <description>The modules to build in addition to the current project</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>name</name>

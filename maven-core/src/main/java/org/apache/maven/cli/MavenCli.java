@@ -28,11 +28,9 @@ import org.apache.maven.Maven;
 import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
-import org.apache.maven.execution.MavenInitializingExecutionRequest;
-import org.apache.maven.execution.MavenProjectExecutionRequest;
-import org.apache.maven.execution.MavenReactorExecutionRequest;
 import org.apache.maven.model.user.MavenProfile;
 import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
@@ -45,10 +43,13 @@ import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -63,7 +64,8 @@ public class MavenCli
 
     public static File userDir = new File( System.getProperty( "user.dir" ) );
 
-    public static int main( String[] args, ClassWorld classWorld ) throws Exception
+    public static int main( String[] args, ClassWorld classWorld )
+        throws Exception
     {
         // ----------------------------------------------------------------------
         // Setup the command line parser
@@ -122,27 +124,26 @@ public class MavenCli
 
         UserModel userModel = UserModelUtils.getUserModel();
 
-        if ( projectFile.exists() )
+        if ( commandLine.hasOption( CLIManager.REACTOR ) )
         {
-            if ( commandLine.hasOption( CLIManager.REACTOR ) )
-            {
-                String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
+            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
 
-                String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
+            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
-                request = new MavenReactorExecutionRequest( localRepository, userModel, eventDispatcher,
-                                                            commandLine.getArgList(), includes, excludes, userDir );
-            }
-            else
-            {
-                request = new MavenProjectExecutionRequest( localRepository, userModel, eventDispatcher,
-                                                            commandLine.getArgList(), projectFile );
-            }
+            request =
+                new DefaultMavenExecutionRequest( localRepository, userModel, eventDispatcher,
+                                                  commandLine.getArgList(),
+                                                  FileUtils.getFiles( userDir, includes, excludes ), userDir.getPath() );
         }
         else
         {
-            request = new MavenInitializingExecutionRequest( localRepository, userModel, eventDispatcher,
-                                                             commandLine.getArgList() );
+            List files = Collections.EMPTY_LIST;
+            if ( projectFile.exists() )
+            {
+                files = Collections.singletonList( projectFile );
+            }
+            request = new DefaultMavenExecutionRequest( localRepository, userModel, eventDispatcher,
+                                                        commandLine.getArgList(), files, userDir.getPath() );
         }
 
         // ----------------------------------------------------------------------
@@ -191,9 +192,9 @@ public class MavenCli
         }
     }
 
-    // ----------------------------------------------------------------------
-    // System properties handling
-    // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// System properties handling
+// ----------------------------------------------------------------------
 
     private static void initializeSystemProperties( CommandLine commandLine )
     {
@@ -237,9 +238,9 @@ public class MavenCli
         System.setProperty( name, value );
     }
 
-    // ----------------------------------------------------------------------
-    // Command line manager
-    // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Command line manager
+// ----------------------------------------------------------------------
 
     static class CLIManager
     {
@@ -264,30 +265,28 @@ public class MavenCli
         public CLIManager()
         {
             options = new Options();
-            options.addOption( OptionBuilder.withLongOpt( "nobanner" ).withDescription( "Suppress logo banner" )
-                                            .create( NO_BANNER ) );
-            options
-                   .addOption( OptionBuilder.withLongOpt( "define" ).hasArg()
-                                            .withDescription( "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
-            options.addOption( OptionBuilder.withLongOpt( "offline" ).hasArg().withDescription( "Work offline" )
-                                            .create( WORK_OFFLINE ) );
-            options
-                   .addOption( OptionBuilder.withLongOpt( "mojoDescriptors" )
-                                            .withDescription( "Display available mojoDescriptors" ).create( LIST_GOALS ) );
-            options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" )
-                                            .create( HELP ) );
-            options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Build is happening offline" )
-                                            .create( WORK_OFFLINE ) );
-            options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" )
-                                            .create( VERSION ) );
-            options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" )
-                                            .create( DEBUG ) );
-            options.addOption( OptionBuilder.withLongOpt( "reactor" )
-                                            .withDescription( "Execute goals for project found in the reactor" )
-                                            .create( REACTOR ) );
+            options.addOption( OptionBuilder.withLongOpt( "nobanner" ).withDescription( "Suppress logo banner" ).create(
+                NO_BANNER ) );
+            options.addOption( OptionBuilder.withLongOpt( "define" ).hasArg().withDescription(
+                "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
+            options.addOption( OptionBuilder.withLongOpt( "offline" ).hasArg().withDescription( "Work offline" ).create(
+                WORK_OFFLINE ) );
+            options.addOption( OptionBuilder.withLongOpt( "mojoDescriptors" ).withDescription(
+                "Display available mojoDescriptors" ).create( LIST_GOALS ) );
+            options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create(
+                HELP ) );
+            options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Build is happening offline" ).create(
+                WORK_OFFLINE ) );
+            options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
+                VERSION ) );
+            options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
+                DEBUG ) );
+            options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
+                "Execute goals for project found in the reactor" ).create( REACTOR ) );
         }
 
-        public CommandLine parse( String[] args ) throws ParseException
+        public CommandLine parse( String[] args )
+            throws ParseException
         {
             CommandLineParser parser = new PosixParser();
             return parser.parse( options, args );
@@ -300,9 +299,9 @@ public class MavenCli
         }
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+//
+// ----------------------------------------------------------------------
 
     protected static File getUserConfigurationDirectory()
     {
@@ -311,7 +310,7 @@ public class MavenCli
         {
             if ( !mavenUserConfigurationDirectory.mkdirs() )
             {
-                //throw a configuration exception
+//throw a configuration exception
             }
         }
         return mavenUserConfigurationDirectory;
@@ -332,7 +331,8 @@ public class MavenCli
         return mavenProperties;
     }
 
-    protected static ArtifactRepository getLocalRepository() throws Exception
+    protected static ArtifactRepository getLocalRepository()
+        throws Exception
     {
         UserModel userModel = UserModelUtils.getUserModel();
         MavenProfile mavenProfile = UserModelUtils.getActiveMavenProfile( userModel );
@@ -346,10 +346,11 @@ public class MavenCli
         if ( localRepository == null )
         {
             String userConfigurationDirectory = System.getProperty( "user.home" ) + "/.m2";
-            localRepository = new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
+            localRepository =
+                new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
         }
 
-        // TODO [BP]: this should not be necessary - grep for and remove
+// TODO [BP]: this should not be necessary - grep for and remove
         System.setProperty( MavenConstants.MAVEN_REPO_LOCAL, localRepository );
         return new ArtifactRepository( "local", "file://" + localRepository );
     }
