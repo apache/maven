@@ -8,27 +8,21 @@ Maven Lifecycle
 
  * Single goal
 
-   - session lifecycle
-     
-     - POM reading: we always attempt to read the POM but it may not be
-       present because some goals don't require the presence of a POM like
-       stub generation, project setup or whatever. So we can flag this state
-       and throw an exception down the line if a goal in fact requires a
-       project, or if there is a POM when there shouldn't be one.
+   - session lifecycle+
      
      - dep resolution (if POM present)
      
-     - dep download
+     - dep download++
        
        - each downloaded dep is registered in MavenSession to track
          snapshot downloads
 
      - goal lifecycle
        
-       - goal resolution (we assume here only one goal is resolved)
+       - goal resolution (we assume here only one goal is resolved) +++
        
          - download plugin for goal if necessary
-
+         
        - goal execution
 
  * Multiple goals
@@ -50,11 +44,26 @@ Maven Lifecycle
 
   * is there a case where a goal should in fact be executed twice in a
     session? Something like "m2 clean foo clean"
+    
+    - DAG (or DAG-like process) is used for goal resolution, which
+      should ensure that only explicit multi-calls execute multiple
+      times.
 
  Notes
  
-  * Goal Resolution: Involves resolving all implied goals (via prereqs, pre- 
-    and post-goal decorations, and resolving/downloading any associated
+  * +POM reading: we always attempt to read the POM but it may not be
+    present because some goals don't require the presence of a POM like
+    stub generation, project setup or whatever. So we can flag this state
+    and throw an exception down the line if a goal in fact requires a
+    project, or if there is a POM when there shouldn't be one.
+    
+  * ++Artifact downloading: all artifacts downloaded during session 
+    execution should be registered in a session-scope collection of id's
+    to avoid multiple download of -SNAPSHOT and other artifacts.
+     
+  * +++Goal Resolution: Involves resolving all implied goals (via prereqs, 
+    pre- and post-goal decorations, and resolving/downloading any associated
     plugins. Plugin download must be a utility used by this, to ensure that
-    any resolved goals can have their associated plugins downloaded.
+    any goals - specified or resolved - have their associated plugins 
+    downloaded.
     
