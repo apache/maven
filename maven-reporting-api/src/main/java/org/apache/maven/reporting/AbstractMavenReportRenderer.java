@@ -21,6 +21,7 @@ import org.codehaus.doxia.sink.Sink;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ * @todo Later it may be appropriate to create something like a VelocityMavenReportRenderer that could take a velocity template and pipe that through Doxia rather than coding them up like this.
  */
 public abstract class AbstractMavenReportRenderer
 {
@@ -142,7 +143,14 @@ public abstract class AbstractMavenReportRenderer
     {
         sink.tableCell();
 
-        sink.text( text );
+        if ( text != null )
+        {
+            sink.text( text );
+        }
+        else
+        {
+            sink.nonBreakingSpace();
+        }
 
         sink.tableCell_();
     }
@@ -180,5 +188,14 @@ public abstract class AbstractMavenReportRenderer
         sink.tableCaption();
         sink.text( caption );
         sink.tableCaption_();
+    }
+
+    protected void paragraph( String paragraph )
+    {
+        sink.paragraph();
+
+        sink.text( paragraph );
+
+        sink.paragraph_();
     }
 }
