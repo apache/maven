@@ -25,14 +25,13 @@ import org.apache.maven.lifecycle.session.MavenSession;
 import java.util.Iterator;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public class GoalExecutionPhase
     extends AbstractMavenSessionPhase
 {
-    public void execute( MavenSession session )
-        throws Exception
+    public void execute( MavenSession session ) throws Exception
     {
         MavenGoalPhaseManager lifecycleManager = (MavenGoalPhaseManager) session.lookup( MavenGoalPhaseManager.ROLE );
 

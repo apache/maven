@@ -1,13 +1,19 @@
 /* Created on Jul 14, 2004 */
 package org.apache.maven.lifecycle.goal.phase;
 
-import org.apache.maven.decoration.DefaultGoalDecorator;
-import org.apache.maven.decoration.GoalDecoratorBindings;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.PostGoal;
+import org.apache.maven.model.PreGoal;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.MavenTestCase;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -19,35 +25,37 @@ public class GoalResolutionPhaseTest
     extends MavenTestCase
 {
     /*
-    <!-- Test main with preGoal and postGoal -->
-    <mojo>
-      <id>t1:preGoal</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <mojo>
-      <id>t1:main</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <mojo>
-      <id>t1:postGoal</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <!-- End of test -->
-    */
-    public void testT1_ShouldFind_PreGoal_MainGoal_PostGoal()
-        throws Exception
+     * <!-- Test main with preGoal and postGoal --> <mojo>
+     * <id>resolveTest:t1-preGoal </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <mojo> <id>resolveTest:t1-main </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <mojo> <id>resolveTest:t1-postGoal </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <!-- End of test -->
+     */
+    public void testT1_ShouldFind_PreGoal_MainGoal_PostGoal() throws Exception
     {
-        String mainGoal = "t1:main";
-        String preGoal = "t1:preGoal";
-        String postGoal = "t1:postGoal";
+        String mainGoal = "resolveTest:t1-main";
+        String preGoal = "resolveTest:t1-preGoal";
+        String postGoal = "resolveTest:t1-postGoal";
 
-        GoalDecoratorBindings bindings = new GoalDecoratorBindings();
+        PreGoal pg = new PreGoal();
+        pg.setAttain( preGoal );
+        pg.setName( mainGoal );
 
-        bindings.addPreGoal( new DefaultGoalDecorator( mainGoal, preGoal ) );
-        bindings.addPostGoal( new DefaultGoalDecorator( mainGoal, postGoal ) );
+        List preGoals = new LinkedList();
+        preGoals.add( pg );
+
+        PostGoal pog = new PostGoal();
+        pog.setAttain( postGoal );
+        pog.setName( mainGoal );
+
+        List postGoals = new LinkedList();
+        postGoals.add( pog );
 
         Map messages = new TreeMap();
 
@@ -61,33 +69,23 @@ public class GoalResolutionPhaseTest
         order.add( mainGoal );
         order.add( postGoal );
 
-        runTest( mainGoal, bindings, order, messages );
+        runTest( mainGoal, preGoals, postGoals, order, messages );
     }
 
     /*
-    <!-- Test main with prereq -->
-    <mojo>
-      <id>t2:prereq</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <mojo>
-      <id>t2:main</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-      <prereqs>
-        <prereq>t2:prereq</prereq>
-      </prereqs>
-    </mojo>
-    <!-- End of test -->
-    */
-    public void testT2_ShouldFind_Prereq_MainGoal()
-        throws Exception
+     * <!-- Test main with prereq --> <mojo> <id>resolveTest:t2-prereq </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <mojo> <id>resolveTest:t2-main </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> <prereqs> <prereq>resolveTest:t2-prereq
+     * </prereq> </prereqs> </mojo> <!-- End of test -->
+     */
+    public void testT2_ShouldFind_Prereq_MainGoal() throws Exception
     {
-        String mainGoal = "t2:main";
-        String prereq = "t2:prereq";
-
-        GoalDecoratorBindings bindings = new GoalDecoratorBindings();
+        String mainGoal = "resolveTest:t2-main";
+        String prereq = "resolveTest:t2-prereq";
 
         Map messages = new TreeMap();
 
@@ -99,48 +97,46 @@ public class GoalResolutionPhaseTest
         order.add( prereq );
         order.add( mainGoal );
 
-        runTest( mainGoal, bindings, order, messages );
+        runTest( mainGoal, Collections.EMPTY_LIST, Collections.EMPTY_LIST, order, messages );
     }
 
     /*
-    <!-- Test main with prereq, preGoal and postGoal -->
-    <mojo>
-      <id>t3:preGoal</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <mojo>
-      <id>t3:prereq</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <mojo>
-      <id>t3:main</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-      <prereqs>
-        <prereq>t3:prereq</prereq>
-      </prereqs>
-    </mojo>
-    <mojo>
-      <id>t3:postGoal</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <!-- End of test -->
-    */
-    public void testT3_ShouldFind_PreGoal_Prereq_MainGoal_PostGoal()
-        throws Exception
+     * <!-- Test main with prereq, preGoal and postGoal --> <mojo>
+     * <id>resolveTest:t3-preGoal </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <mojo> <id>resolveTest:t3-prereq </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <mojo> <id>resolveTest:t3-main </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> <prereqs> <prereq>resolveTest:t3-prereq
+     * </prereq> </prereqs> </mojo> <mojo> <id>resolveTest:t3-postGoal </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <!-- End of test -->
+     */
+    public void testT3_ShouldFind_PreGoal_Prereq_MainGoal_PostGoal() throws Exception
     {
-        String mainGoal = "t3:main";
-        String prereq = "t3:prereq";
-        String preGoal = "t3:preGoal";
-        String postGoal = "t3:postGoal";
+        String mainGoal = "resolveTest:t3-main";
+        String prereq = "resolveTest:t3-prereq";
+        String preGoal = "resolveTest:t3-preGoal";
+        String postGoal = "resolveTest:t3-postGoal";
 
-        GoalDecoratorBindings bindings = new GoalDecoratorBindings();
+        PreGoal pg = new PreGoal();
+        pg.setAttain( preGoal );
+        pg.setName( mainGoal );
 
-        bindings.addPreGoal( new DefaultGoalDecorator( mainGoal, preGoal ) );
-        bindings.addPostGoal( new DefaultGoalDecorator( mainGoal, postGoal ) );
+        List preGoals = new LinkedList();
+        preGoals.add( pg );
+
+        PostGoal pog = new PostGoal();
+        pog.setAttain( postGoal );
+        pog.setName( mainGoal );
+
+        List postGoals = new LinkedList();
+        postGoals.add( pog );
 
         Map messages = new TreeMap();
 
@@ -156,48 +152,47 @@ public class GoalResolutionPhaseTest
         order.add( mainGoal );
         order.add( postGoal );
 
-        runTest( mainGoal, bindings, order, messages );
+        runTest( mainGoal, preGoals, postGoals, order, messages );
     }
 
     /*
-    <!-- Test main with prereq which has preGoal and postGoal -->
-    <mojo>
-      <id>t4:prereq-preGoal</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <mojo>
-      <id>t4:prereq</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <mojo>
-      <id>t4:main</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-      <prereqs>
-        <prereq>t4:prereq</prereq>
-      </prereqs>
-    </mojo>
-    <mojo>
-      <id>t4:prereq-postGoal</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <!-- End of test -->
-    */
-    public void testT4_ShouldFind_PreGoal_Prereq_PostGoal_MainGoal()
-        throws Exception
+     * <!-- Test main with prereq which has preGoal and postGoal --> <mojo>
+     * <id>resolveTest:t4-prereq-preGoal </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <mojo> <id>resolveTest:t4-prereq </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <mojo> <id>resolveTest:t4-main </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> <prereqs> <prereq>resolveTest:t4-prereq
+     * </prereq> </prereqs> </mojo> <mojo> <id>resolveTest:t4-prereq-postGoal
+     * </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <!-- End of test -->
+     */
+    public void testT4_ShouldFind_PreGoal_Prereq_PostGoal_MainGoal() throws Exception
     {
-        String mainGoal = "t4:main";
-        String prereq = "t4:prereq";
-        String preGoal = "t4:prereq-preGoal";
-        String postGoal = "t4:prereq-postGoal";
+        String mainGoal = "resolveTest:t4-main";
+        String prereq = "resolveTest:t4-prereq";
+        String preGoal = "resolveTest:t4-prereq-preGoal";
+        String postGoal = "resolveTest:t4-prereq-postGoal";
 
-        GoalDecoratorBindings bindings = new GoalDecoratorBindings();
+        PreGoal pg = new PreGoal();
+        pg.setAttain( preGoal );
+        pg.setName( prereq );
 
-        bindings.addPreGoal( new DefaultGoalDecorator( prereq, preGoal ) );
-        bindings.addPostGoal( new DefaultGoalDecorator( prereq, postGoal ) );
+        List preGoals = new LinkedList();
+        preGoals.add( pg );
+
+        PostGoal pog = new PostGoal();
+        pog.setAttain( postGoal );
+        pog.setName( prereq );
+
+        List postGoals = new LinkedList();
+        postGoals.add( pog );
 
         Map messages = new TreeMap();
 
@@ -213,44 +208,36 @@ public class GoalResolutionPhaseTest
         order.add( postGoal );
         order.add( mainGoal );
 
-        runTest( mainGoal, bindings, order, messages );
+        runTest( mainGoal, preGoals, postGoals, order, messages );
     }
 
     /*
-    <!-- Test main with prereq and preGoal which has the same prereq -->
-    <mojo>
-      <id>t5:prereq</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-    </mojo>
-    <mojo>
-      <id>t5:preGoal</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-      <prereqs>
-        <prereq>t5:prereq</prereq>
-      </prereqs>
-    </mojo>
-    <mojo>
-      <id>t5:main</id>
-      <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
-      <instantiationStrategy>singleton</instantiationStrategy>
-      <prereqs>
-        <prereq>t5:prereq</prereq>
-      </prereqs>
-    </mojo>
-    <!-- End of test -->
-    */
-    public void testT5_ShouldFind_Prereq_PreGoal_MainGoal()
-        throws Exception
+     * <!-- Test main with prereq and preGoal which has the same prereq -->
+     * <mojo> <id>resolveTest:t5-prereq </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> </mojo> <mojo> <id>resolveTest:t5-preGoal </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> <prereqs> <prereq>resolveTest:t5-prereq
+     * </prereq> </prereqs> </mojo> <mojo> <id>resolveTest:t5-main </id>
+     * <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin
+     * </implementation> <instantiationStrategy>singleton
+     * </instantiationStrategy> <prereqs> <prereq>resolveTest:t5-prereq
+     * </prereq> </prereqs> </mojo> <!-- End of test -->
+     */
+    public void testT5_ShouldFind_Prereq_PreGoal_MainGoal() throws Exception
     {
-        String mainGoal = "t5:main";
-        String prereq = "t5:prereq";
-        String preGoal = "t5:preGoal";
+        String mainGoal = "resolveTest:t5-main";
+        String prereq = "resolveTest:t5-prereq";
+        String preGoal = "resolveTest:t5-preGoal";
 
-        GoalDecoratorBindings bindings = new GoalDecoratorBindings();
+        PreGoal pg = new PreGoal();
+        pg.setAttain( preGoal );
+        pg.setName( mainGoal );
 
-        bindings.addPreGoal( new DefaultGoalDecorator( mainGoal, preGoal ) );
+        List preGoals = new LinkedList();
+        preGoals.add( pg );
 
         Map messages = new TreeMap();
 
@@ -264,24 +251,29 @@ public class GoalResolutionPhaseTest
         order.add( preGoal );
         order.add( mainGoal );
 
-        runTest( mainGoal, bindings, order, messages );
+        runTest( mainGoal, preGoals, Collections.EMPTY_LIST, order, messages );
     }
 
-    private void runTest( String mainGoal, GoalDecoratorBindings bindings,
-                          List expectedOrder, Map messages )
+    private void runTest( String mainGoal, List preGoals, List postGoals, List expectedOrder, Map messages )
         throws Exception
     {
-        MavenGoalExecutionContext context = createGoalExecutionContext( mainGoal );
+        ArtifactRepository localRepository = new ArtifactRepository( "local", getTestRepoURL() );
 
-        context.setGoalDecoratorBindings( bindings );
+        Model model = new Model();
+        model.setPreGoals( preGoals );
+        model.setPostGoals( postGoals );
+
+        MavenProject project = new MavenProject( model );
+        project.setProperties( new TreeMap() );
+
+        MavenGoalExecutionContext context = createGoalExecutionContext( project, localRepository, mainGoal );
+        context.setGoalName( mainGoal );
 
         GoalResolutionPhase phase = new GoalResolutionPhase();
 
         phase.execute( context );
 
         List goals = context.getResolvedGoals();
-
-        System.out.println( "Resolved goals: " + goals );
 
         assertNotNull( goals );
 

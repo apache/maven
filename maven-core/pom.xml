@@ -52,17 +52,6 @@
       <artifactId>ognl</artifactId>
       <version>2.5.1</version>
     </dependency>
-    <!-- Used to support maven.xml script and goal decorating in general. -->
-    <dependency>
-      <groupId>marmalade</groupId>
-      <artifactId>marmalade-core</artifactId>
-      <version>0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>marmalade</groupId>
-      <artifactId>marmalade-el-ognl</artifactId>
-      <version>0.1</version>
-    </dependency>
     <!-- Wagon -->
     <dependency>
       <groupId>maven</groupId>

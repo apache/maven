@@ -25,23 +25,22 @@ import java.util.Set;
  */
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: DefaultArtifactHandlerManager.java,v 1.1.1.1 2004/08/09
+ *          18:37:32 jvanzyl Exp $
  */
 public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
     private Map artifactHandlers;
 
-    public ArtifactHandler getArtifactHandler( String type )
-        throws ArtifactHandlerNotFoundException
+    public ArtifactHandler getArtifactHandler( String type ) throws ArtifactHandlerNotFoundException
     {
         ArtifactHandler handler = (ArtifactHandler) artifactHandlers.get( type );
 
         if ( handler == null )
         {
-            throw new ArtifactHandlerNotFoundException(
-                "Artifact handler for type '" + type + "' cannot be found." );
+            throw new ArtifactHandlerNotFoundException( "Artifact handler for type '" + type + "' cannot be found." );
         }
 
         return handler;
@@ -82,18 +81,12 @@ public class DefaultArtifactHandlerManager
     {
         ArtifactHandler handler = (ArtifactHandler) artifactHandlers.get( artifact.getType() );
 
-        return interpolateLayout( artifact.getGroupId(),
-                                  artifact.getArtifactId(),
-                                  artifact.getVersion(),
-                                  handler.directory(),
-                                  handler.extension() );
+        return interpolateLayout( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), handler
+            .directory(), handler.extension() );
     }
 
-    private String interpolateLayout( String groupId,
-                                      String artifactId,
-                                      String version,
-                                      String directory,
-                                      String extension )
+    private String interpolateLayout( String groupId, String artifactId, String version, String directory,
+        String extension )
     {
         String layout = getLayout();
 

@@ -14,7 +14,7 @@
           <role>org.codehaus.plexus.i18n.I18N</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.lifecycle.goal.MavenGoalPhaseManager</role>
+          <role>org.apache.maven.lifecycle.session.MavenSessionPhaseManager</role>
         </requirement>
       </requirements>
     </component>
@@ -30,12 +30,7 @@
       <implementation>org.apache.maven.lifecycle.session.DefaultMavenSessionPhaseManager</implementation>
       <configuration>
         <lifecycle-phases>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.PluginDownloadPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalDecorationPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalResolutionPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.DependencyResolutionPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.DependencyDownloadPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalAttainmentPhase"/>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.session.phase.GoalExecutionPhase"/>
         </lifecycle-phases>
       </configuration>
     </component>
@@ -44,8 +39,6 @@
       <implementation>org.apache.maven.lifecycle.goal.DefaultMavenGoalPhaseManager</implementation>
       <configuration>
         <lifecycle-phases>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.PluginDownloadPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalDecorationPhase"/>
           <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalResolutionPhase"/>
           <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.DependencyResolutionPhase"/>
           <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.DependencyDownloadPhase"/>

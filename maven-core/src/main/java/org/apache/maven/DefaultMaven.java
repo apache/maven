@@ -1,19 +1,14 @@
 package org.apache.maven;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2001-2004 The Apache Software Foundation. Licensed under the Apache
+ * License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
+ * or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -23,6 +18,7 @@ import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.goal.MavenGoalPhaseManager;
 import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.lifecycle.session.MavenSessionPhaseManager;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -65,7 +61,7 @@ public class DefaultMaven
 
     private PluginManager pluginManager;
 
-    private MavenGoalPhaseManager lifecycleManager;
+    private MavenSessionPhaseManager lifecycleManager;
 
     private MavenProjectBuilder projectBuilder;
 
@@ -75,20 +71,18 @@ public class DefaultMaven
     // Project execution
     // ----------------------------------------------------------------------
 
-    public ExecutionResponse execute( List goals )
-        throws GoalNotFoundException
+    public ExecutionResponse execute( List goals ) throws GoalNotFoundException
     {
         return execute( (MavenProject) null, goals );
     }
 
-    public ExecutionResponse execute( File projectFile, List goals )
-        throws ProjectBuildingException, GoalNotFoundException
+    public ExecutionResponse execute( File projectFile, List goals ) throws ProjectBuildingException,
+        GoalNotFoundException
     {
         return execute( getProject( projectFile ), goals );
     }
 
-    public ExecutionResponse execute( MavenProject project, List goals )
-        throws GoalNotFoundException
+    public ExecutionResponse execute( MavenProject project, List goals ) throws GoalNotFoundException
     {
         Date fullStop;
 
@@ -96,57 +90,35 @@ public class DefaultMaven
 
         ExecutionResponse response = new ExecutionResponse();
 
-        MavenSession session = new MavenSession( container,
-                                                 pluginManager,
-                                                 project,
-                                                 getLocalRepository(),
-                                                 goals );
+        MavenSession session = new MavenSession( container, pluginManager, project, getLocalRepository(), goals );
 
-        for ( Iterator iterator = goals.iterator(); iterator.hasNext(); )
+        try
         {
-            String goal = (String) iterator.next();
+            lifecycleManager.execute( session );
+        }
+        catch ( Exception e )
+        {
+            response.setException( e );
 
-            MavenGoalExecutionContext context;
-
-            try
+            if ( logResults )
             {
-                context = new MavenGoalExecutionContext( session, getMojoDescriptor( goal ) );
+                line();
 
-                context.setGoalName( goal );
+                getLogger().error( "BUILD ERROR" );
 
-                lifecycleManager.execute( context );
+                line();
 
-                if ( context.isExecutionFailure() )
-                {
-                    response.setExecutionFailure( context.getMojoDescriptor().getId(), context.getFailureResponse() );
+                getLogger().error( "Cause: ", e );
 
-                    break;
-                }
+                line();
+
+                stats( fullStart, new Date() );
+
+                line();
             }
-            catch ( Exception e )
-            {
-                response.setException( e );
 
-                if ( logResults )
-                {
-                    line();
-
-                    getLogger().error( "BUILD ERROR" );
-
-                    line();
-
-                    getLogger().error( "Cause: ", e );
-
-                    line();
-
-                    stats( fullStart, new Date() );
-
-                    line();
-                }
-
-                // An exception is a failure
-                return response;
-            }
+            // An exception is a failure
+            return response;
         }
 
         fullStop = new Date();
@@ -204,7 +176,8 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" + ( r.totalMemory() / mb ) + "M" );
+        getLogger().info(
+            "Final Memory: " + ((r.totalMemory() - r.freeMemory()) / mb) + "M/" + (r.totalMemory() / mb) + "M" );
 
     }
 
@@ -217,8 +190,8 @@ public class DefaultMaven
     // Reactor execution
     // ----------------------------------------------------------------------
 
-    public ExecutionResponse executeReactor( String goals, String includes, String excludes )
-        throws ReactorException, GoalNotFoundException
+    public ExecutionResponse executeReactor( String goals, String includes, String excludes ) throws ReactorException,
+        GoalNotFoundException
     {
         List projects = new ArrayList();
 
@@ -298,8 +271,7 @@ public class DefaultMaven
     // Project building
     // ----------------------------------------------------------------------
 
-    public MavenProject getProject( File project )
-        throws ProjectBuildingException
+    public MavenProject getProject( File project ) throws ProjectBuildingException
     {
         if ( project.exists() )
         {
@@ -316,8 +288,7 @@ public class DefaultMaven
     // Reactor
     // ----------------------------------------------------------------------
 
-    public List getSortedProjects( List projects )
-        throws Exception
+    public List getSortedProjects( List projects ) throws Exception
     {
         return projectBuilder.getSortedProjects( projects );
     }
@@ -361,8 +332,7 @@ public class DefaultMaven
     // Lifecylce Management
     // ----------------------------------------------------------------------
 
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (ArtifactEnabledContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -393,8 +363,7 @@ public class DefaultMaven
     //
     // ----------------------------------------------------------------------
 
-    public void booty()
-        throws Exception
+    public void booty() throws Exception
     {
         pluginManager.setLocalRepository( getLocalRepository() );
     }

@@ -11,4 +11,18 @@
       <type>test</type>
     </dependency>
   </dependencies>  
+  
+  <preGoals>
+    <preGoal>
+        <name>compiler:compile</name>
+        <attain>clean:clean</attain>
+    </preGoal>
+  </preGoals>
+  
+  <postGoals>
+    <postGoal>
+        <name>compiler:compile</name>
+        <attain>jar:jar</attain>
+    </postGoal>
+  </postGoals>
 </project>

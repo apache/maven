@@ -1,7 +1,6 @@
 package org.apache.maven.lifecycle.goal;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.decoration.GoalDecoratorBindings;
 import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.plugin.FailureResponse;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -12,8 +11,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: MavenGoalExecutionContext.java,v 1.1 2004/08/15 15:01:50
+ *          jvanzyl Exp $
  */
 public class MavenGoalExecutionContext
 {
@@ -27,13 +27,13 @@ public class MavenGoalExecutionContext
 
     private List resolvedGoals;
 
-    private GoalDecoratorBindings goalDecoratorBindings;
+    //    private GoalDecoratorBindings goalDecoratorBindings;
 
     private String goalName;
 
     public MavenGoalExecutionContext( MavenSession session, MojoDescriptor goal )
     {
-        this.session  = session;
+        this.session = session;
 
         this.mojoDescriptor = goal;
     }
@@ -62,14 +62,12 @@ public class MavenGoalExecutionContext
         return session.getRemoteRepositories();
     }
 
-    public Object lookup( String role )
-        throws ComponentLookupException
+    public Object lookup( String role ) throws ComponentLookupException
     {
         return session.lookup( role );
     }
 
-    public Object lookup( String role, String hint )
-        throws ComponentLookupException
+    public Object lookup( String role, String hint ) throws ComponentLookupException
     {
         return session.lookup( role, hint );
     }
@@ -125,7 +123,7 @@ public class MavenGoalExecutionContext
 
     public boolean isExecutionFailure()
     {
-        return ( failedGoal != null );
+        return (failedGoal != null);
     }
 
     public String getFailedGoal()
@@ -146,16 +144,6 @@ public class MavenGoalExecutionContext
     public void setFailureResponse( FailureResponse failureResponse )
     {
         this.failureResponse = failureResponse;
-    }
-
-    public GoalDecoratorBindings getGoalDecoratorBindings()
-    {
-        return goalDecoratorBindings;
-    }
-
-    public void setGoalDecoratorBindings( GoalDecoratorBindings goalDecoratorBindings )
-    {
-        this.goalDecoratorBindings = goalDecoratorBindings;
     }
 
     public String getGoalName()

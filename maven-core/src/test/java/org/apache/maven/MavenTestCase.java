@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public class MavenTestCase
@@ -43,18 +43,32 @@ public class MavenTestCase
 
     protected MavenProjectBuilder projectBuilder;
 
-    protected void setUp()
-        throws Exception
+    protected String testRepoUrl;
+
+    protected void setUp() throws Exception
     {
         super.setUp();
+
+        File testRepoLocation = new File( "target/repo" );
+        if ( !testRepoLocation.exists() )
+        {
+            testRepoLocation.mkdirs();
+        }
+
+        testRepoUrl = testRepoLocation.toURL().toExternalForm();
+        testRepoUrl = testRepoUrl.substring( 0, testRepoUrl.length() - 1 );
 
         pluginManager = (PluginManager) lookup( PluginManager.ROLE );
 
         projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
     }
 
-    protected void customizeContext()
-        throws Exception
+    protected String getTestRepoURL()
+    {
+        return testRepoUrl;
+    }
+
+    protected void customizeContext() throws Exception
     {
         ClassWorld classWorld = new ClassWorld();
 
@@ -64,31 +78,28 @@ public class MavenTestCase
 
         getContainer().addContextValue( "maven.home", new File( getBasedir(), "target/maven.home" ).getPath() );
 
-        getContainer().addContextValue( "maven.home.local", new File( getBasedir(), "target/maven.home.local" ).getPath() );
+        getContainer().addContextValue( "maven.home.local",
+            new File( getBasedir(), "target/maven.home.local" ).getPath() );
     }
 
-    protected MavenGoalExecutionContext createGoalExecutionContext()
-        throws Exception
+    protected MavenGoalExecutionContext createGoalExecutionContext() throws Exception
     {
         return createGoalExecutionContext( null, null );
     }
 
-    protected MavenGoalExecutionContext createGoalExecutionContext( File pom )
-        throws Exception
+    protected MavenGoalExecutionContext createGoalExecutionContext( File pom ) throws Exception
     {
         return createGoalExecutionContext( pom, null );
     }
 
-    protected MavenGoalExecutionContext createGoalExecutionContext( String goal )
-        throws Exception
+    protected MavenGoalExecutionContext createGoalExecutionContext( String goal ) throws Exception
     {
         return createGoalExecutionContext( null, goal );
     }
 
-    protected MavenGoalExecutionContext createGoalExecutionContext( File pom, String goal )
-        throws Exception
+    protected MavenGoalExecutionContext createGoalExecutionContext( File pom, String goal ) throws Exception
     {
-        ArtifactRepository localRepository = new ArtifactRepository( "local", "file://" );
+        ArtifactRepository localRepository = new ArtifactRepository( "local", testRepoUrl );
 
         MavenProject project;
 
@@ -103,11 +114,19 @@ public class MavenTestCase
             project = projectBuilder.build( f, localRepository );
         }
 
+        return createGoalExecutionContext( project, localRepository, goal );
+    }
+
+    protected MavenGoalExecutionContext createGoalExecutionContext( MavenProject project,
+        ArtifactRepository localRepository, String goal )
+    {
         project.setProperty( "foo", "bar" );
 
         List goals = new ArrayList();
 
         MavenSession session = new MavenSession( getContainer(), pluginManager, project, localRepository, goals );
+
+        pluginManager.setLocalRepository( localRepository );
 
         MojoDescriptor descriptor;
 

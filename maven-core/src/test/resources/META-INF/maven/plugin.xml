@@ -1,19 +1,19 @@
 <plugin>
-  <id>decorTest</id>
+  <id>resolveTest</id>
   <mojos>
     <!-- Test main with preGoal and postGoal -->
     <mojo>
-      <id>t1:preGoal</id>
+      <id>resolveTest:t1-preGoal</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
     <mojo>
-      <id>t1:main</id>
+      <id>resolveTest:t1-main</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
     <mojo>
-      <id>t1:postGoal</id>
+      <id>resolveTest:t1-postGoal</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
@@ -21,41 +21,41 @@
     
     <!-- Test main with prereq -->
     <mojo>
-      <id>t2:prereq</id>
+      <id>resolveTest:t2-prereq</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
     <mojo>
-      <id>t2:main</id>
+      <id>resolveTest:t2-main</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
       <prereqs>
-        <prereq>t2:prereq</prereq>
+        <prereq>resolveTest:t2-prereq</prereq>
       </prereqs>
     </mojo>
     <!-- End of test -->
     
     <!-- Test main with prereq, preGoal and postGoal -->
     <mojo>
-      <id>t3:preGoal</id>
+      <id>resolveTest:t3-preGoal</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
     <mojo>
-      <id>t3:prereq</id>
+      <id>resolveTest:t3-prereq</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
     <mojo>
-      <id>t3:main</id>
+      <id>resolveTest:t3-main</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
       <prereqs>
-        <prereq>t3:prereq</prereq>
+        <prereq>resolveTest:t3-prereq</prereq>
       </prereqs>
     </mojo>
     <mojo>
-      <id>t3:postGoal</id>
+      <id>resolveTest:t3-postGoal</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
@@ -63,25 +63,25 @@
     
     <!-- Test main with prereq which has preGoal and postGoal -->
     <mojo>
-      <id>t4:prereq-preGoal</id>
+      <id>resolveTest:t4-prereq-preGoal</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
     <mojo>
-      <id>t4:prereq</id>
+      <id>resolveTest:t4-prereq</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
     <mojo>
-      <id>t4:main</id>
+      <id>resolveTest:t4-main</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
       <prereqs>
-        <prereq>t4:prereq</prereq>
+        <prereq>resolveTest:t4-prereq</prereq>
       </prereqs>
     </mojo>
     <mojo>
-      <id>t4:prereq-postGoal</id>
+      <id>resolveTest:t4-prereq-postGoal</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
@@ -90,24 +90,24 @@
 
     <!-- Test main with prereq and preGoal which has the same prereq -->
     <mojo>
-      <id>t5:prereq</id>
+      <id>resolveTest:t5-prereq</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
     </mojo>
     <mojo>
-      <id>t5:preGoal</id>
+      <id>resolveTest:t5-preGoal</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
       <prereqs>
-        <prereq>t5:prereq</prereq>
+        <prereq>resolveTest:t5-prereq</prereq>
       </prereqs>
     </mojo>
     <mojo>
-      <id>t5:main</id>
+      <id>resolveTest:t5-main</id>
       <implementation>org.apache.maven.plugin.GoalDecorationAndResolutionTestPlugin</implementation>
       <instantiationStrategy>singleton</instantiationStrategy>
       <prereqs>
-        <prereq>t5:prereq</prereq>
+        <prereq>resolveTest:t5-prereq</prereq>
       </prereqs>
     </mojo>
     <!-- End of test -->

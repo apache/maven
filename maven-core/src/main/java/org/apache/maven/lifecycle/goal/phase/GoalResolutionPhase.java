@@ -1,6 +1,5 @@
 package org.apache.maven.lifecycle.goal.phase;
 
-
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -18,12 +17,13 @@ package org.apache.maven.lifecycle.goal.phase;
  */
 
 import org.apache.maven.lifecycle.goal.GoalNotFoundException;
-import org.apache.maven.decoration.GoalDecorator;
-import org.apache.maven.decoration.GoalDecoratorBindings;
 import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.model.GoalDecorator;
+import org.apache.maven.model.PostGoal;
+import org.apache.maven.model.PreGoal;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
@@ -35,31 +35,37 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
-public class GoalResolutionPhase extends AbstractMavenGoalPhase
+public class GoalResolutionPhase
+    extends AbstractMavenGoalPhase
 {
-    public void execute( MavenGoalExecutionContext context )
-        throws GoalExecutionException
+    public void execute( MavenGoalExecutionContext context ) throws GoalExecutionException
     {
         PluginManager pluginManager = context.getSession().getPluginManager();
 
         try
         {
             // First, start by retrieving the currently-requested goal.
-            MojoDescriptor goalDescriptor = context.getMojoDescriptor();
-
-            if ( goalDescriptor == null )
-            {
-                throw new GoalNotFoundException( context.getGoalName() );
-            }
-
-            String goal = goalDescriptor.getId();
+            String goal = context.getGoalName();
 
             List resolvedGoals = resolveTopLevel( goal, new HashSet(), new LinkedList(), context, pluginManager );
 
             context.setResolvedGoals( resolvedGoals );
+
+            if ( goal.indexOf( ":" ) < 0 )
+            {
+                goal = context.getProject().getType() + ":" + goal;
+            }
+
+            MojoDescriptor md = pluginManager.getMojoDescriptor( goal );
+
+            context.setMojoDescriptor( md );
+        }
+        catch ( Exception e )
+        {
+            throw new GoalExecutionException( "Error resolving goals: ", e );
         }
         finally
         {
@@ -67,19 +73,26 @@ public class GoalResolutionPhase extends AbstractMavenGoalPhase
         }
     }
 
-    private List resolveTopLevel( String goal, Set includedGoals, List results, MavenGoalExecutionContext context, PluginManager pluginManager )
+    private List resolveTopLevel( String goal, Set includedGoals, List results, MavenGoalExecutionContext context,
+        PluginManager pluginManager ) throws Exception
     {
 
-        // Retrieve the prereqs-driven execution path for this goal, using the DAG.
+        // Ensure that the plugin for this goal is installed.
+        pluginManager.verifyPluginForGoal( goal );
+
+        // Retrieve the prereqs-driven execution path for this goal, using the
+        // DAG.
         List work = pluginManager.getGoals( goal );
 
-        // Reverse the original goals list to preserve encapsulation while decorating.
+        // Reverse the original goals list to preserve encapsulation while
+        // decorating.
         Collections.reverse( work );
 
         return resolveWithPrereqs( work, includedGoals, results, context, pluginManager );
     }
 
-    private List resolveWithPrereqs( List work, Set includedGoals, List results, MavenGoalExecutionContext context, PluginManager pluginManager )
+    private List resolveWithPrereqs( List work, Set includedGoals, List results, MavenGoalExecutionContext context,
+        PluginManager pluginManager ) throws Exception
     {
         if ( !work.isEmpty() )
         {
@@ -89,35 +102,50 @@ public class GoalResolutionPhase extends AbstractMavenGoalPhase
 
             if ( descriptor.alwaysExecute() || !includedGoals.contains( goal ) )
             {
-                GoalDecoratorBindings bindings = context.getGoalDecoratorBindings();
-                if ( bindings != null )
+                List preGoals = new LinkedList();
+                List allPreGoals = context.getProject().getModel().getPreGoals();
+                for ( Iterator it = allPreGoals.iterator(); it.hasNext(); )
                 {
-                    List preGoals = bindings.getPreGoals( goal );
-
-                    results = resolveGoalDecorators( preGoals, includedGoals, results, context, pluginManager );
+                    PreGoal preGoal = (PreGoal) it.next();
+                    if ( goal.equals( preGoal.getName() ) )
+                    {
+                        preGoals.add( preGoal.getAttain() );
+                    }
                 }
+
+                results = resolveGoalDecorators( goal, true, includedGoals, results, context, pluginManager );
 
                 results = resolveWithPrereqs( work, includedGoals, results, context, pluginManager );
                 includedGoals.add( goal );
                 results.add( goal );
 
-                if ( bindings != null )
-                {
-                    List postGoals = bindings.getPostGoals( goal );
-                    results = resolveGoalDecorators( postGoals, includedGoals, results, context, pluginManager );
-                }
+                results = resolveGoalDecorators( goal, false, includedGoals, results, context, pluginManager );
             }
         }
         return results;
     }
 
-    private List resolveGoalDecorators( List preGoals, Set includedGoals, List results, MavenGoalExecutionContext context, PluginManager pluginManager )
+    private List resolveGoalDecorators( String baseGoal, boolean usePreGoals, Set includedGoals, List results,
+        MavenGoalExecutionContext context, PluginManager pluginManager ) throws Exception
     {
-        for ( Iterator it = preGoals.iterator(); it.hasNext(); )
+        List decorators = null;
+        if ( usePreGoals )
+        {
+            decorators = context.getProject().getModel().getPreGoals();
+        }
+        else
+        {
+            decorators = context.getProject().getModel().getPostGoals();
+        }
+
+        for ( Iterator it = decorators.iterator(); it.hasNext(); )
         {
             GoalDecorator decorator = (GoalDecorator) it.next();
-            String goal = decorator.getDecoratorGoal();
-            resolveTopLevel( goal, includedGoals, results, context, pluginManager );
+            if ( baseGoal.equals( decorator.getName() ) )
+            {
+                String goal = decorator.getAttain();
+                resolveTopLevel( goal, includedGoals, results, context, pluginManager );
+            }
         }
 
         return results;
