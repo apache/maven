@@ -21,14 +21,14 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-javac</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>

@@ -12,7 +12,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-2-SNAPSHOT</version>
+      <version>1.0-alpha-2</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
@@ -31,9 +31,9 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-http-lightweight</artifactId>
-      <version>1.0-alpha-2-SNAPSHOT</version>
+      <version>1.0-alpha-2</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>

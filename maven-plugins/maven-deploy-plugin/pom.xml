@@ -40,23 +40,23 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
-      <version>1.0-alpha-2-SNAPSHOT</version>
+      <version>1.0-alpha-2</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
-      <version>1.0-alpha-2-SNAPSHOT</version>
+      <version>1.0-alpha-2</version>
       <type>jar</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-ssh</artifactId>
-      <version>1.0-alpha-2-SNAPSHOT</version>
+      <version>1.0-alpha-2</version>
       <type>jar</type>
       <scope>runtime</scope>
     </dependency>

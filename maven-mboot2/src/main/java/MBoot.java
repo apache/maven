@@ -44,7 +44,7 @@ public class MBoot
                                           "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
                                           "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
                                           "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
-                                          "plexus/jars/plexus-utils-1.0-alpha-2-SNAPSHOT.jar",
+                                          "plexus/jars/plexus-utils-1.0-alpha-2.jar",
                                           "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
                                           "surefire/jars/surefire-1.2-SNAPSHOT.jar", "qdox/jars/qdox-1.2.jar"};
 
@@ -53,9 +53,9 @@ public class MBoot
     // ----------------------------------------------------------------------
 
     String[] plexusDeps = new String[]{"classworlds/jars/classworlds-1.1-alpha-1.jar",
-                                       "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar"};
+                                       "plexus/jars/plexus-container-default-1.0-alpha-2.jar"};
 
-    String[] pluginGeneratorDeps = new String[]{"plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
+    String[] pluginGeneratorDeps = new String[]{"plexus/jars/plexus-container-default-1.0-alpha-2.jar",
                                                 "org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar",
                                                 "org.apache.maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
                                                 "org.apache.maven/jars/maven-model-2.0-SNAPSHOT.jar",
@@ -69,7 +69,7 @@ public class MBoot
     // ----------------------------------------------------------------------
 
     String[] modelloDeps = new String[]{"classworlds/jars/classworlds-1.1-alpha-1.jar",
-                                        "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
+                                        "plexus/jars/plexus-container-default-1.0-alpha-2.jar",
                                         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
                                         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
                                         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
