@@ -60,7 +60,7 @@
         </field>
         <field>
           <name>version</name>
-          <description>The currently version of the project.</description>
+          <description>The current version of the project.</description>
           <type>String</type>
         </field>
         <field>
