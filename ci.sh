@@ -1,16 +1,6 @@
 #!/bin/sh
 
 # ----------------------------------------------------------------------------------
-# To run this script on your machine you must:
-#
-# 1. export JAVA_HOME=/path/to/java
-#
-# ----------------------------------------------------------------------------------
-
-export JAVA_HOME=/usr/local/java
-export PATH=$PATH:$JAVA_HOME/bin
-
-# ----------------------------------------------------------------------------------
 
 CMD=$1
 
@@ -20,13 +10,17 @@ HOME_DIR=`pwd`
 DATE=`date`
 DIR=m2-build
 REPO=maven-repo-local
-FROM=jvanzyl@maven.org
+FROM=brett@maven.org
 #TO=maven2-user@lists.codehaus.org
 TO=m2-dev@maven.apache.org
 SCM_LOG=scm.log
 TIMESTAMP=`date +%Y%M%d.%H%M%S`
 DEPLOY_DIR=$HOME_DIR/public_html/m2
 DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2
+
+export JAVA_HOME=/usr/local/java
+export M2_HOME=$HOME_DIR/m2
+export PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin
 
 # ----------------------------------------------------------------------------------
 
@@ -107,7 +101,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
     (
       cd $DIR/maven-components
   
-      sh m2-bootstrap-all.sh -Dmaven.repo.local="$HOME_DIR/$REPO" -Dmaven.home="$HOME_DIR/m2"
+      sh m2-bootstrap-all.sh -Dmaven.repo.local="$HOME_DIR/$REPO" -Dmaven.home="$M2_HOME"
     )    
 
     DIST=m2-${TIMESTAMP}.tar.gz
