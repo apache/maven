@@ -1612,6 +1612,12 @@
           <type>String</type>
         </field>
         <field>
+          <name>disabled</name>
+          <version>4.0.0</version>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
           <name>configuration</name>
           <type>Properties</type>
           <association xml.mapStyle="inline">
@@ -1637,6 +1643,12 @@
           <name>id</name>
           <version>4.0.0</version>
           <type>String</type>
+        </field>
+        <field>
+          <name>disabled</name>
+          <version>4.0.0</version>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>configuration</name>

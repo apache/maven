@@ -121,17 +121,22 @@ public class DefaultLifecycleExecutor
         {
             Plugin plugin = (Plugin) i.next();
 
-            if ( pluginManager.verifyPlugin( plugin.getId(), mavenSession ) )
+            // TODO: should this flag be used in verifyPlugin, completely disabling the plugin?
+            if ( !plugin.isDisabled() )
             {
-                PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( plugin.getId() );
-                for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
+                if ( pluginManager.verifyPlugin( plugin.getId(), mavenSession ) )
                 {
-                    MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
-
-                    if ( mojoDescriptor.getPhase() != null )
+                    PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( plugin.getId() );
+                    for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
                     {
-                        Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
-                        phase.getGoals().add( mojoDescriptor.getId() );
+                        MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+
+                        // TODO: check if the goal exists in the configuration and is disabled
+                        if ( mojoDescriptor.getPhase() != null )
+                        {
+                            Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
+                            phase.getGoals().add( mojoDescriptor.getId() );
+                        }
                     }
                 }
             }
