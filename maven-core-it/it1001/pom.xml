@@ -1,5 +1,4 @@
 <project>
-  <groupId>maven</groupId>
   <artifactId>maven-core-it1001</artifactId>
   <version>1.0</version>
 </project>
