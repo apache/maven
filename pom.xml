@@ -83,13 +83,8 @@
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus-artifact-container</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
+      <artifactId>plexus</artifactId>
+      <version>0.17-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>xstream</groupId>
