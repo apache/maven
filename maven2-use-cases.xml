@@ -1,0 +1,331 @@
+<document>
+  <properties>
+
+  </properties>
+
+  <body>
+    <section name="Use cases">
+      <p>
+        Trying to get a large set of use cases that we can use to help drive
+        development in the right direction. I would like to collect some here and then
+        post them to the wiki as examples users can template to express what their
+        use cases are. So my first example is something I chatted about with Aslak
+        this morning. So they are brief and possibly naive but a huge collection
+        of these would help I think.
+      </p>
+
+      <subsection name="">
+        <p>
+          - Being able to write artifact handler that would operate to install an
+          xdoclet plugin correctly when an xdoclet plugin is stated as a dependency.
+          * Maybe this pattern could be generalized so you could register arbitrary
+          ArtifactInterceptors (possibly a DAG of them) that will be called to handle
+          events and operations on artifacts. They could even be used to actually
+          implement the operation (ie have a interceptor actually fetch the artifact
+          on request). This is basically an expansion of handler system as it stands
+          so you can add more context and generalize how artifact operations are
+          handled. (PD)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - With Maven installed it should be a simple command that allows you to
+          checkout the sources for a project.
+          * Maybe this could be generalized so that if you reference a remote
+          descriptor it will download the project. Something like
+
+          $ maven --project http://www.realityforge.org/daedalus-project.xml
+
+          would result in download of project either from remote location or
+          maybe from scm declarations in project descriptor.
+
+          As part of this remote downloading though the user may be asked for
+          input of particular configuration data (ie username etc). (PD)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Unified source directory structure that is analagous to the repository
+          itself. This way locations of intermediary artifacts of a build would be
+          in a known location.  This would also help with developer setup i.e. getting
+          new developers up and running. They could run a maven command and have all
+          their source trees set up in the same way as their collegues.
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - I would like to be able to execute some goals (like 'clean') even when
+          not all dependencies are satisfied.
+          * hell yes!!!! Maybe dependency resolution could be a plugin that
+          other plugins depend upon (PD)
+          * is this something that is needed at the goal level though? Maybe we need to be
+          able to specify goal properties such as this (BP).
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Support for "specification" dependencies. I would like to be able to
+          say that I depend on a "specification" dependency such as
+          "javax.jaxp.parser" with specific version. It is possible that multiple
+          artifacts exist that satisfy this specification. ie Several versions
+          of Crimson and Xerces may implement the "specification" and I want maven
+          to select one and just use it. I dont care which does it but preferrably
+          the one with the latest version. (PD)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Support for retrieval of compatible versions for objects. For example I may
+          say that I want version 1.1 of Crimson but Maven may return 1.1.1, 1.1.4 etc
+          as it knows that these are compatible. This means aadding in some versioning
+          specification or different strategies for resolution. (PD)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Support for transitive and group dependencies
+          * I would like to see this dependency information either encoded directly
+          into the artifacts where possible (ie META-INF/maven/dependencies.xml in
+          jar files) or accessible from repository at peer level for each artifact
+          much like signature data is accessible for each artifact. (PD)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - It should be easy to create a single report without a need to (call like it has place now)
+          maven:site. It will be nice if report generators can produce docs in few diffrent formats
+          (e.g pdf, html, rtf) and this format can be also choosen for group of reports.
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - groupId
+          - Let's assume that there exists an artifact type "web-component"
+          which is a zip file containg css/js/gifs/jpegs etc
+          Example of such artifact is for example distribution of tigris style.
+
+          Say an user has declared the following dependency:
+
+          <pre>
+          <depenedency>
+            <groupId>org.tigris</groupId>
+            <artifactId>style</artifactId>
+            <type>web-component</type>
+            <version>2.0</version>
+          </depenedency>
+          </pre>
+
+          A dependency of this type should be processed only when users assembles the web application
+          (war:webapp goal in maven-old)
+
+          In short:  user can be able to declare goal decorators and goals should be fine-grained
+          * This very similar to only resolving some dependencies depending on what goals
+          are running as specified above. (PD)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Maven is Java Build Tool. It should be well defined what does it mean to "build java project".
+          It means that stages of the process should be well defined.
+
+          pre-compile (this is when tools like JAXB, XDoclet)
+          compile (javac, aspectj)
+          post-compile (aspectj? )
+          pre-jar
+          ...
+          etc
+
+          It should e.g be possible to use Castor, JAXB plugin, XDoclet plugin without writing a single line
+          of build script. In the ideal case it should be just enough to plug-in XDoclet into process simply
+          by "checking the checkbox in IDE".
+          This is someting what Vincent Massol started in maven-caller plugin. It will be nice to explore this idea.
+
+          -- definitely a good idea, but I don't think we should restrict Maven as a Java build tool. I'd like to be
+          able to build C and .Net stuff with Maven at some point in the future, and the build process is similar enough
+          to be possible (BP).
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Reorganization of repository layout - are we going to map groupId : "a.b.c.d"  to path "a/b/c/d"?
+          Are there some better alternatives?
+          * I am not sure that is such a good idea - how can you tell when a
+          directory is an artifact container (ie jar, sar, distribution etc) and when
+          it is a group container (ie a/b/c/d). (PD)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - (Michal)  I have tried to implement "platform dependend dependecies".
+          <pre>
+          <depenedency>
+            <groupId>a</groupId>
+            <artifactId>b</artifactId>
+            <type>native</type>
+            <version>2.0</version>
+          </depenedency>
+          </pre>
+
+          is resolved as
+
+          a/b-2.0.dll (on windows) or a/b-2.0.so (unix)
+
+
+          Maybe it can/should be done differently?
+          What other "platform depended" artifact type do we have?
+          exe? shell-script?
+
+          * the problem with this approach is that most things that load native libs
+          expect the name of the lib to follow a very specific name which usually will
+          not conform to maven naming conventions (ie probably wont have -version on
+          end). No idea how to fix this. (PD)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - how to declare a dependency on JDK and what are possible implications of such dependency
+          (e.g javac/javadoc target jdk)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - I don't know if this will add too much complexity, but being able to generate multiple
+          and compound artifacts from a single project would be nice. If we want to have a
+          "Ant Compatibility Layer", then this would be required.
+
+          Think of a project for a web application, it will have java code as well as web resources.
+          The java code is collected into a JAR file, and then that is packaged with the web
+          resources into a WAR.
+
+          Of course, none of this is really required, as it can all be accomplished by breaking the
+          project out into multiple projects with a reactor, per the Maven 1 guidelines. But if this
+          limitation was removed, it might help Marvin adoption. (PR)
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - File inclusion in POM - project inheritance allows to factorize some common pom attributes,
+          however there are some cases where this mechanism is not enough. For instance we might want
+          to share common dependencies between projects whose ancestors union is empty. Providing poms
+          easier to read by extracting various elements into their own xml fragments is another example.
+
+          afaik the only way to obtain this behaviour today is to use xml entities. There are some really
+          bad limitations to this system :
+
+          * cannot use interpolation b/c doctype is processed before pom is interpolated
+          * if using reactor, there is no uniform way to declare the entities since it
+          depends badly on the multiproject structure (nested vs. parallel projects)
+          * being able to run maven from either parent project dir or subproject
+          dir is not straigthforward b/c we have to think about the directory structure
+          which is a low-level concern
+
+          Also i dont know what is the behaviour when running from an arbitrary folder (-d, -p options)
+
+          adding support for file inclusion in pom would provide simplification and better consistency
+          among pom base.
+
+          POM could perhaps have an
+          <inclusions> section :
+
+
+          <inclusions>
+            <inclusion>
+              <file>path_to_xml_fragment</file>
+              <alias>toBeIncluded</alias>
+            </inclusion>
+          </inclusions>
+
+          then we could reference the fragment with something like :
+
+          <include>toBeIncluded</include>
+
+          where path_to_xml_fragment would be relative to ${basedir}. another advantage is the
+          possibility to perform some filtering on the included files, for instance dependending
+          on some (build dependent) properties.
+
+          the drawback of this proposal is the complexity it adds to the POM structure, polluting it
+          with non project related elements.
+
+          -- I think it makes more sense just to use
+          <import uri="fragment.xml"/> at the point of inclusion, and avoid the
+          declaration of entity-like aliases. The only extra usefulness in the declaration is that it could be stored in
+          a parent POM, but that goes against the original use case and isn't worth the complexity -- BrettPorter.
+
+          - We should be able to allow a project to clearly specify which version of a plugin it uses and not get other versions
+          interfering. This would be done by a plugin dependency (BP).
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - How do we discover the set of plugins to use? It would be good to just use a set of plugin dependencies in the
+          default model, and override them in subprojects if you need a newer/older version. Issues with this:
+          - there needs to be a per-user default model and a installation wide default model that can be updated
+          - the model needs to be updated when a new plugin is installed
+          - this isn't flexible for discovering new goals that are not part of the project's build process. eg a plugin
+         may depend on aspectj to build correctly, but "console" won't be a dependency because it is a "user" plugin.
+         This is leads to plugin types, which I'll add later.
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Installing plugins should be a clearly defined process. When a new plugin is installed, is it installed for the user
+          only be default and for the Maven installation optionally. This ties in to the point above about discovery.
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Dependencies could support multiple versions (1.1+, for example, would get the latest release). This
+          would be helpful for the plugins above. Issues with this:
+          - do we really search the repository for later releases, or just use what's local?
+          - how is a newer release signified? How is this affected by branches and snapshots?
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - We need plugin categories that treat certain plugins in different ways. I can think of:
+          - reporting plugins
+          - user plugins (eg console) - not project specific
+          - project specific user plugins (eg cactus, idea, ...)
+          - build plugins (clean, jaxb, java, test)
+          - artifact generating plugins (jar, war, ear, plugin)
+          It may not be that we need to treat these in any particular way, but rather that for each category, define particular
+          hooks - like the reporting plugins do in maven1. One issue is that some of these categories overlap (eg cactus runs
+          build tests but also generates a report) - so it may be that plugins just have to provide an interface (and can have
+          many) rather than conform to a certain pattern.
+        </p>
+      </subsection>
+
+      <subsection>
+        <p>
+          - Maven needs to support forked codebases as part of its versioning strategy. This can integrate with CVS branches and
+          the branches element in the model. While the actual versions should not conflict across branches, snapshots will and
+          determining the latest snapshot should only find it from that branch, not everything.
+          So if a project has
+            <branch>1_0_BUGFIXES</branch> specified, snapshots would be maven-1_0_BUGFIXES-SNAPSHOT.jar, and
+          SCM operations should refer to that branch tag.
+        </p>
+      </subsection>
+
+    </section>
+  </body>
+</document>
+
+
