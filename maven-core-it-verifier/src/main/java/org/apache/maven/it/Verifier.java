@@ -3,6 +3,14 @@ package org.apache.maven.it;
 import org.apache.maven.it.cli.CommandLineUtils;
 import org.apache.maven.it.cli.Commandline;
 import org.apache.maven.it.cli.StreamConsumer;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -10,15 +18,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -48,7 +57,7 @@ public class Verifier
         originalOut = System.out;
 
         System.setOut( new PrintStream( outStream ) );
-            
+
         originalErr = System.err;
 
         System.setErr( new PrintStream( errStream ) );
@@ -92,7 +101,7 @@ public class Verifier
 
         for ( Iterator i = lines.iterator(); i.hasNext(); )
         {
-            String line = ( String ) i.next();
+            String line = (String) i.next();
 
             verifyExpectedResult( line );
         }
@@ -101,7 +110,7 @@ public class Verifier
 
         for ( Iterator i = lines.iterator(); i.hasNext(); )
         {
-            String line = ( String ) i.next();
+            String line = (String) i.next();
 
             if ( line.indexOf( "[ERROR]" ) >= 0 )
             {
@@ -125,7 +134,7 @@ public class Verifier
 
             String line = "";
 
-            while ( (line = reader.readLine()) != null )
+            while ( ( line = reader.readLine() ) != null )
             {
                 line = line.trim();
 
@@ -160,10 +169,10 @@ public class Verifier
             }
 
             List lines = loadFile( f );
- 
+
             for ( Iterator i = lines.iterator(); i.hasNext(); )
             {
-                String line = ( String ) i.next();
+                String line = (String) i.next();
 
                 executeCommand( line );
             }
@@ -220,24 +229,43 @@ public class Verifier
 
         if ( repo == null )
         {
+            UserModelReader userModelReader = new UserModelReader();
+
             try
             {
-                File mavenPropertiesFile = new File( System.getProperty( "user.home" ), ".m2/maven.properties" );
+                String userHome = System.getProperty( "user.home" );
 
-                Properties mavenProperties = new Properties();
+                File userXml = new File( userHome, ".m2/user.xml" );
 
-                mavenProperties.load( new FileInputStream( mavenPropertiesFile ) );
+                if ( userXml.exists() )
+                {
+                    userModelReader.parse( userXml );
 
-                repo = mavenProperties.getProperty( "maven.repo.local" );
+                    MavenProfile activeProfile = userModelReader.getActiveMavenProfile();
+
+                    repo = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
+                }
             }
             catch ( Exception e )
             {
-                System.err.println( "WARNING: failed to parse user pom (ignoring): " + e.getMessage() );
+                e.printStackTrace();
             }
         }
+
         if ( repo == null )
         {
-            repo = System.getProperty( "user.home" ) + "/.m2/repository";
+            String userHome = System.getProperty( "user.home" );
+            String m2LocalRepoPath = "/.m2/repository";
+
+            File repoDir = new File( userHome, m2LocalRepoPath );
+            if ( !repoDir.exists() )
+            {
+                repoDir.mkdirs();
+            }
+
+            repo = repoDir.getAbsolutePath();
+
+            System.out.println( "Using default local repository: " + repoDir.getAbsolutePath() );
         }
 
         return repo;
@@ -274,7 +302,7 @@ public class Verifier
             if ( !expectedFile.isAbsolute() && !line.startsWith( "/" ) )
             {
                 expectedFile = new File( basedir, line );
-            } 
+            }
 
             if ( !expectedFile.exists() )
             {
@@ -308,7 +336,7 @@ public class Verifier
 
         int start = 0, end = 0;
 
-        while ( (end = text.indexOf( repl, start )) != -1 )
+        while ( ( end = text.indexOf( repl, start ) ) != -1 )
         {
             buf.append( text.substring( start, end ) ).append( with );
 
@@ -439,7 +467,7 @@ public class Verifier
 
         for ( Iterator i = tests.iterator(); i.hasNext(); )
         {
-            String test = ( String ) i.next();
+            String test = (String) i.next();
 
             System.out.print( test + "... " );
 
@@ -477,5 +505,170 @@ public class Verifier
 
         System.exit( exitCode );
     }
+
+    static class UserModelReader
+        extends DefaultHandler
+    {
+
+        private SAXParserFactory saxFactory;
+
+        private Map mavenProfiles = new TreeMap();
+
+        private MavenProfile currentProfile = null;
+
+        private StringBuffer currentBody = new StringBuffer();
+
+        private String activeProfileId = null;
+
+        private MavenProfile activeMavenProfile = null;
+
+        public boolean parse( File file )
+        {
+            try
+            {
+                saxFactory = SAXParserFactory.newInstance();
+
+                SAXParser parser = saxFactory.newSAXParser();
+
+                InputSource is = new InputSource( new FileInputStream( file ) );
+
+                parser.parse( is, this );
+
+                return true;
+            }
+            catch ( Exception e )
+            {
+                e.printStackTrace();
+
+                return false;
+            }
+        }
+
+        public void warning( SAXParseException spe )
+        {
+            printParseError( "Warning", spe );
+        }
+
+        public void error( SAXParseException spe )
+        {
+            printParseError( "Error", spe );
+        }
+
+        public void fatalError( SAXParseException spe )
+        {
+            printParseError( "Fatal Error", spe );
+        }
+
+        private final void printParseError( String type, SAXParseException spe )
+        {
+            System.err.println( type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: "
+                + spe.getMessage() );
+        }
+
+        public MavenProfile getActiveMavenProfile()
+        {
+            return activeMavenProfile;
+        }
+
+        public void characters( char[] ch, int start, int length ) throws SAXException
+        {
+            currentBody.append( ch, start, length );
+        }
+
+        public void endElement( String uri, String localName, String rawName ) throws SAXException
+        {
+            if ( "mavenProfile".equals( rawName ) )
+            {
+                if ( notEmpty( currentProfile.getId() ) && notEmpty( currentProfile.getLocalRepo() ) )
+                {
+                    mavenProfiles.put( currentProfile.getId(), currentProfile );
+                    currentProfile = null;
+                }
+                else
+                {
+                    throw new SAXException( "Invalid mavenProfile entry. Missing one or more "
+                        + "fields: {id,localRepository}." );
+                }
+            }
+            else if ( currentProfile != null )
+            {
+                if ( "id".equals( rawName ) )
+                {
+                    currentProfile.setId( currentBody.toString().trim() );
+                }
+                else if ( "localRepository".equals( rawName ) )
+                {
+                    currentProfile.setLocalRepo( currentBody.toString().trim() );
+                }
+                else
+                {
+                    throw new SAXException( "Illegal element inside mavenProfile: \'" + rawName + "\'" );
+                }
+            }
+            else if ( "userModel".equals( rawName ) )
+            {
+                this.activeMavenProfile = (MavenProfile) mavenProfiles.get( activeProfileId );
+            }
+            else if ( "mavenProfileId".equals( rawName ) )
+            {
+                this.activeProfileId = currentBody.toString().trim();
+            }
+
+            currentBody = new StringBuffer();
+        }
+
+        private boolean notEmpty( String test )
+        {
+            return test != null && test.trim().length() > 0;
+        }
+
+        public void startElement( String uri, String localName, String rawName, Attributes attributes )
+            throws SAXException
+        {
+            if ( "mavenProfile".equals( rawName ) )
+            {
+                currentProfile = new MavenProfile();
+            }
+        }
+
+        public void reset()
+        {
+            this.currentBody = null;
+            this.activeMavenProfile = null;
+            this.activeProfileId = null;
+            this.currentProfile = null;
+            this.mavenProfiles.clear();
+        }
+    }
+
+    public static class MavenProfile
+    {
+
+        private String localRepository;
+
+        private String id;
+
+        public void setLocalRepo( String localRepo )
+        {
+            this.localRepository = localRepo;
+        }
+
+        public String getLocalRepo()
+        {
+            return localRepository;
+        }
+
+        public void setId( String id )
+        {
+            this.id = id;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
+
+    }
+
 }
 
