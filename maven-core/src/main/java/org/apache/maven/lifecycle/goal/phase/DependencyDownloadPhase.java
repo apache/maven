@@ -36,34 +36,37 @@ public class DependencyDownloadPhase
     public void execute( MavenGoalExecutionContext context )
         throws GoalExecutionException
     {
-        ArtifactResolver artifactResolver = null;
-
-        try
+        if(context.requiresDependencies())
         {
-            // Once this is a property component there will be an assembly phase for
-            // this and we won't have to do this.
-            artifactResolver = (ArtifactResolver) context.lookup( ArtifactResolver.ROLE );
+            ArtifactResolver artifactResolver = null;
 
-            for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
+            try
             {
-                Artifact artifact = (Artifact) it.next();
+                // Once this is a property component there will be an assembly phase for
+                // this and we won't have to do this.
+                artifactResolver = (ArtifactResolver) context.lookup( ArtifactResolver.ROLE );
 
-                artifactResolver.resolve( artifact,
-                                          context.getRemoteRepositories(),
-                                          context.getLocalRepository() );
+                for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
+                {
+                    Artifact artifact = (Artifact) it.next();
+
+                    artifactResolver.resolve( artifact,
+                                              context.getRemoteRepositories(),
+                                              context.getLocalRepository() );
+                }
             }
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new GoalExecutionException( "Can't lookup artifact resolver: ", e );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new GoalExecutionException( "Can't resolve artifact: ", e );
-        }
-        finally
-        {
-            context.release( artifactResolver );
+            catch ( ComponentLookupException e )
+            {
+                throw new GoalExecutionException( "Can't lookup artifact resolver: ", e );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new GoalExecutionException( "Can't resolve artifact: ", e );
+            }
+            finally
+            {
+                context.release( artifactResolver );
+            }
         }
     }
 }

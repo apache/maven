@@ -29,6 +29,8 @@ public class MavenGoalExecutionContext
 
     private String goalName;
 
+    private boolean requiresDependencies;
+
     public MavenGoalExecutionContext( MavenSession session, String goalName )
     {
         this.session = session;
@@ -138,4 +140,15 @@ public class MavenGoalExecutionContext
     {
         this.goalName = goalName;
     }
+
+    public void requiresDependencies( boolean requiresDependencies )
+    {
+        this.requiresDependencies = requiresDependencies;
+    }
+    
+    public boolean requiresDependencies()
+    {
+        return requiresDependencies;
+    }
+    
 }

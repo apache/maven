@@ -37,12 +37,17 @@ public class DependencyResolutionPhase
     public void execute( MavenGoalExecutionContext context )
         throws GoalExecutionException
     {
+        boolean requiresDependencies = false;
+        
         for ( Iterator iterator = context.getResolvedGoals().iterator(); iterator.hasNext(); )
         {
             String goalName = (String) iterator.next();
 
-            if ( context.getMojoDescriptor( goalName ).requiresDependencyResolution() )
+            MojoDescriptor mojoDescriptor = context.getMojoDescriptor(goalName);
+            if ( mojoDescriptor.requiresDependencyResolution() )
             {
+                requiresDependencies = true;
+                
                 try
                 {
                     resolveTransitiveDependencies( context );
@@ -55,6 +60,8 @@ public class DependencyResolutionPhase
                 break;
             }
         }
+        
+        context.requiresDependencies(requiresDependencies);
     }
 
     private void resolveTransitiveDependencies( MavenGoalExecutionContext context )
