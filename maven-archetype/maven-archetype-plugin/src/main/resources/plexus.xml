@@ -1,0 +1,39 @@
+<plexus>
+  <components>
+    <component>
+      <role>org.codehaus.plexus.builder.PlexusBuilder</role>
+      <implementation>org.codehaus.plexus.builder.DefaultPlexusBuilder</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.collector.ArtifactCollector</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.codehaus.plexus.velocity.VelocityComponent</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.codehaus.plexus.velocity.VelocityComponent</role>
+      <implementation>org.codehaus.plexus.velocity.DefaultVelocityComponent</implementation>
+      <configuration>
+        <properties>
+          <property>
+            <name>resource.loader</name>
+            <value>classpath</value>
+          </property>
+          <property>
+            <name>classpath.resource.loader.class</name>
+            <value>org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader</value>
+          </property>
+        </properties>
+      </configuration>
+    </component>
+  </components>
+</plexus>

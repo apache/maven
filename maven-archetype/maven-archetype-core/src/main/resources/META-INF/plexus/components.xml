@@ -1,0 +1,19 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.archetype.Archetype</role>
+      <implementation>org.apache.maven.archetype.DefaultArchetype</implementation>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.velocity.VelocityComponent</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>
