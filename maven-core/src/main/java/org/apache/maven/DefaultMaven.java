@@ -16,11 +16,6 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-import org.apache.maven.lifecycle.goal.MavenGoalPhaseManager;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-import org.apache.maven.lifecycle.goal.MavenGoalPhaseManager;
 import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.lifecycle.session.MavenSessionPhaseManager;
@@ -31,7 +26,6 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.i18n.I18N;
@@ -41,12 +35,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DefaultMaven
     extends AbstractLogEnabled

@@ -17,8 +17,8 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -36,28 +36,12 @@ import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.util.CollectionUtils;
-import org.codehaus.plexus.util.PropertyUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Collection;
-import java.util.Collections;
+import java.io.*;
+import java.util.*;
 
 public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled

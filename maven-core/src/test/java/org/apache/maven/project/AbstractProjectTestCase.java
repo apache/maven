@@ -2,7 +2,6 @@ package org.apache.maven.project;
 
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 

@@ -1,22 +1,15 @@
 /* Created on Jul 14, 2004 */
 package org.apache.maven.lifecycle.goal.phase;
 
+import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PostGoal;
 import org.apache.maven.model.PreGoal;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.MavenTestCase;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author jdcasey

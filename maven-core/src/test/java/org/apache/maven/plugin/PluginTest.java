@@ -18,17 +18,15 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.Maven;
 import org.apache.maven.MavenTestCase;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.MavenPluginDescriptor;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

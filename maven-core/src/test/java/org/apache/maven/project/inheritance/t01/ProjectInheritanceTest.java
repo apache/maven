@@ -3,7 +3,6 @@
  */
 package org.apache.maven.project.inheritance.t01;
 
-import org.apache.maven.model.MailingList;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.ProjectInheritanceTestCase;
 

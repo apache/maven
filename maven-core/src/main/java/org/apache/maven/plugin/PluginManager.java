@@ -18,7 +18,6 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.util.List;
 import java.util.Map;

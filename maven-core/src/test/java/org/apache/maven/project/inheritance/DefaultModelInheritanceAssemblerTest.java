@@ -18,12 +18,10 @@ package org.apache.maven.project.inheritance;
  */
 
 import junit.framework.TestCase;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.UnitTest;
-import org.apache.maven.project.MavenProject;
 
 import java.util.Arrays;
 import java.util.List;

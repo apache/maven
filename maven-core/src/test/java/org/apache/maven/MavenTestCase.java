@@ -26,7 +26,6 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.ArtifactEnabledPlexusTestCase;
-import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -17,7 +17,6 @@ package org.apache.maven.lifecycle.session;
  */
 
 import org.apache.maven.ExecutionResponse;
-
 import org.codehaus.plexus.logging.Logger;
 
 /**

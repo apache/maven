@@ -17,7 +17,6 @@ package org.apache.maven.lifecycle.goal;
  */
 
 import org.codehaus.plexus.logging.Logger;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 
 
 /**

@@ -4,7 +4,6 @@
 package org.apache.maven.project.inheritance;
 
 import org.apache.maven.MavenTestCase;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProjectBuilder;
 
 import java.io.File;

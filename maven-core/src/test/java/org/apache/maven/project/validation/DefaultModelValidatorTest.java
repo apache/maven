@@ -4,12 +4,12 @@ package org.apache.maven.project.validation;
  * LICENSE
  */
 
-import java.io.FileReader;
-import java.io.Reader;
-
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+
+import java.io.FileReader;
+import java.io.Reader;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>

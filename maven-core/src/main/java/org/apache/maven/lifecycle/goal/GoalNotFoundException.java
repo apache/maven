@@ -1,6 +1,6 @@
 package org.apache.maven.lifecycle.goal;
 
-import org.apache.maven.lifecycle.goal.GoalExecutionException;
+
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.

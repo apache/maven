@@ -16,23 +16,15 @@ package org.apache.maven.lifecycle.goal.phase;
  * limitations under the License.
  */
 
-import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.model.GoalDecorator;
-import org.apache.maven.model.PostGoal;
 import org.apache.maven.model.PreGoal;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>

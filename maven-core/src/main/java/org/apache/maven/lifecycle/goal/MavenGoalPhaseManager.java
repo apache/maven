@@ -16,8 +16,6 @@ package org.apache.maven.lifecycle.goal;
  * limitations under the License.
  */
 
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-
 import java.util.List;
 
 /**

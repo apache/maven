@@ -7,8 +7,8 @@ import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
