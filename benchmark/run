@@ -1,0 +1,13 @@
+#!/bin/sh
+
+rm -rf target
+
+time ant jar
+
+rm -rf target
+
+time m2 jar
+
+rm -rf target
+
+time maven jar
