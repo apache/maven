@@ -92,10 +92,6 @@ public class ResourcesPlugin
     public void execute()
         throws Exception
     {
-        System.out.println( "outputDirectory = " + outputDirectory );
-
-        System.out.println( "resources = " + resources );
-
         for ( Iterator i = getJarResources( resources ).iterator(); i.hasNext(); )
         {
             ResourceEntry resourceEntry = (ResourceEntry) i.next();
