@@ -192,16 +192,16 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public boolean verifyPluginForGoal( String goalName, MavenSession session )
+    public void verifyPluginForGoal( String goalName, MavenSession session )
         throws Exception
     {
         String pluginId = getPluginId( goalName );
 
-        return verifyPlugin( pluginId, session );
+        verifyPlugin( pluginId, session );
     }
 
     // TODO: don't throw Exception
-    public boolean verifyPlugin( String pluginId, MavenSession session )
+    public void verifyPlugin( String pluginId, MavenSession session )
         throws Exception
     {
         if ( !isPluginInstalled( pluginId ) )
@@ -217,12 +217,6 @@ public class DefaultPluginManager
             Artifact pluginArtifact = new DefaultArtifact( "maven", artifactId, version, "plugin", "jar" );
 
             addPlugin( pluginArtifact, session );
-
-            return true;
-        }
-        else
-        {
-            return false;
         }
     }
 

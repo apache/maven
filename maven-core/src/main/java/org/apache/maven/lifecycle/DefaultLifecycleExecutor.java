@@ -157,21 +157,20 @@ public class DefaultLifecycleExecutor
     private void processPluginPhases( String pluginId, MavenSession mavenSession )
         throws Exception
     {
-        if ( pluginManager.verifyPlugin( pluginId, mavenSession ) )
+        pluginManager.verifyPlugin( pluginId, mavenSession );
+        PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( pluginId );
+        for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
         {
-            PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( pluginId );
-            for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
-            {
-                MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+            MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
 
-                // TODO: check if the goal exists in the configuration and is disabled
-                if ( mojoDescriptor.getPhase() != null )
-                {
-                    Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
-                    phase.getGoals().add( mojoDescriptor.getId() );
-                }
+            // TODO: check if the goal exists in the configuration and is disabled
+            if ( mojoDescriptor.getPhase() != null )
+            {
+                Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
+                phase.getGoals().add( mojoDescriptor.getId() );
             }
         }
+
     }
 
     private void processGoalChain( String task, MavenSession session )

@@ -36,11 +36,11 @@ public interface PluginManager
     MojoDescriptor getMojoDescriptor( String goalId );
 
     // TODO: don't throw Exception
-    boolean verifyPluginForGoal( String goalName, MavenSession session )
+    void verifyPluginForGoal( String goalName, MavenSession session )
         throws Exception;
 
     // TODO: don't throw Exception
-    boolean verifyPlugin( String pluginId, MavenSession session )
+    void verifyPlugin( String pluginId, MavenSession session )
         throws Exception;
 
     PluginDescriptor getPluginDescriptor( String pluginId );
