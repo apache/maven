@@ -38,16 +38,16 @@ public class ArchetypeDescriptorBuilderTest
             "    <source>source1</source>" +
             "  </sources>" +
             "  <resources>" +
-            "    <source>source0</source>" +
-            "    <source>source1</source>" +
+            "    <resource>resource0</resource>" +
+            "    <resource>resource1</resource>" +
             "  </resources>" +
             "  <testSources>" +
-            "    <source>source0</source>" +
-            "    <source>source1</source>" +
+            "    <source>testSource0</source>" +
+            "    <source>testSource1</source>" +
             "  </testSources>" +
             "  <testResources>" +
-            "    <source>source0</source>" +
-            "    <source>source1</source>" +
+            "    <resource>testResource0</resource>" +
+            "    <resource>testResource1</resource>" +
             "  </testResources>" +
             "</archetype>";
 
@@ -59,10 +59,26 @@ public class ArchetypeDescriptorBuilderTest
 
         assertEquals( 2, descriptor.getSources().size() );
 
+        assertEquals( "source0", descriptor.getSources().get( 0 ) );
+
+        assertEquals( "source1", descriptor.getSources().get( 1 ) );
+
         assertEquals( 2, descriptor.getResources().size() );
+
+        assertEquals( "resource0", descriptor.getResources().get( 0 ) );
+
+        assertEquals( "resource1", descriptor.getResources().get( 1 ) );
 
         assertEquals( 2, descriptor.getTestSources().size() );
 
+        assertEquals( "testSource0", descriptor.getTestSources().get( 0 ) );
+
+        assertEquals( "testSource1", descriptor.getTestSources().get( 1 ) );
+
         assertEquals( 2, descriptor.getTestResources().size() );
+
+        assertEquals( "testResource0", descriptor.getTestResources().get( 0 ) );
+
+        assertEquals( "testResource1", descriptor.getTestResources().get( 1 ) );
     }
 }

@@ -87,7 +87,7 @@ public class DefaultArchetype
         }
 
         // ----------------------------------------------------------------------
-        //
+        // Load the descriptor
         // ----------------------------------------------------------------------
 
         String outputDirectory = (String) parameters.get( "outputDirectory" );
@@ -124,6 +124,10 @@ public class DefaultArchetype
             throw new ArchetypeDescriptorException( "Error reading the " + ARCHETYPE_DESCRIPTOR + " descriptor.", e );
         }
 
+        // ----------------------------------------------------------------------
+        // Set up the Velocity context
+        // ----------------------------------------------------------------------
+
         Context context = new VelocityContext();
 
         context.put( "package", packageName );
@@ -137,17 +141,25 @@ public class DefaultArchetype
             context.put( key, value );
         }
 
+        // ----------------------------------------------------------------------
+        // Process the templates
+        // ----------------------------------------------------------------------
+
         ClassLoader old = Thread.currentThread().getContextClassLoader();
 
         Thread.currentThread().setContextClassLoader( archetypeJarLoader );
 
         try
         {
-            processTemplate( outputDirectory, context, ARCHETYPE_POM, null );
+            processTemplate( outputDirectory, context, ARCHETYPE_POM, false, null );
 
             processSources( outputDirectory, context, descriptor.getSources(), packageName );
 
+            processResources( outputDirectory, context, descriptor.getResources(), packageName );
+
             processSources( outputDirectory, context, descriptor.getTestSources(), packageName );
+
+            processResources( outputDirectory, context, descriptor.getTestResources(), packageName );
         }
         catch ( Exception e )
         {
@@ -170,16 +182,27 @@ public class DefaultArchetype
         {
             String template = (String) i.next();
 
-            processTemplate( outputDirectory, context, template, packageName );
+            processTemplate( outputDirectory, context, template, true, packageName );
         }
     }
 
-    protected void processTemplate( String outputDirectory, Context context, String template, String packageName )
+    protected void processResources( String outputDirectory, Context context, List resources, String packageName )
+        throws Exception
+    {
+        for ( Iterator i = resources.iterator(); i.hasNext(); )
+        {
+            String template = (String) i.next();
+
+            processTemplate( outputDirectory, context, template, false, packageName );
+        }
+    }
+
+    protected void processTemplate( String outputDirectory, Context context, String template, boolean packageInFileName, String packageName )
         throws Exception
     {
         File f;
 
-        if ( packageName != null )
+        if ( packageInFileName && packageName != null )
         {
             String path = packageName.replace( '.', '/' );
 

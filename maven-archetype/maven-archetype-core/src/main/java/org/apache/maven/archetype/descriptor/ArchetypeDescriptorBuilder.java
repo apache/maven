@@ -52,7 +52,7 @@ public class ArchetypeDescriptorBuilder
 
         if ( resources != null )
         {
-            Xpp3Dom[] resourceList = resources.getChildren( "source" );
+            Xpp3Dom[] resourceList = resources.getChildren( "resource" );
 
             for ( int i = 0; i < resourceList.length; i++ )
             {
@@ -72,11 +72,11 @@ public class ArchetypeDescriptorBuilder
             }
         }
 
-        Xpp3Dom testResources = dom.getChild( "sources" );
+        Xpp3Dom testResources = dom.getChild( "testResources" );
 
         if ( testResources != null )
         {
-            Xpp3Dom[] testResourceList = sources.getChildren( "source" );
+            Xpp3Dom[] testResourceList = testResources.getChildren( "resource" );
 
             for ( int i = 0; i < testResourceList.length; i++ )
             {
