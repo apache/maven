@@ -6,5 +6,8 @@
  
 What is Archetype?
 
- Archetype is a 
+ In short, Archetype is a Maven project templating toolkit. Archetype 
+ will help authors create Maven project templates for users, and provide
+ the means to allow users to generate parameterized versions of those
+ templates.
 
