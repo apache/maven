@@ -542,7 +542,7 @@ public class DefaultPluginManager
             {
                 org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) iterator.next();
 
-// TODO: groupID not handled
+                // TODO: groupID not handled
                 if ( pluginId.equals( plugin.getArtifactId() ) )
                 {
                     return CollectionUtils.mergeMaps( plugin.getConfiguration(), map );
@@ -563,9 +563,9 @@ public class DefaultPluginManager
         return message.toString();
     }
 
-// ----------------------------------------------------------------------
-// Lifecycle
-// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Lifecycle
+    // ----------------------------------------------------------------------
 
     public void contextualize( Context context )
         throws ContextException
@@ -582,10 +582,10 @@ public class DefaultPluginManager
                                                               "plexus-artifact-container", "wagon-provider-api",
                                                               "classworlds"} );
 
-// TODO: move this to be configurable from the Maven component
+        // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new ArrayList();
 
-// TODO: needs to be configured from the POM element
+        // TODO: needs to be configured from the POM element
 
         MavenSettings settings = null;
         try
@@ -607,9 +607,9 @@ public class DefaultPluginManager
         remotePluginRepositories.add( pluginRepository );
     }
 
-// ----------------------------------------------------------------------
-// Artifact resolution
-// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Artifact resolution
+    // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
                                                 MavenProjectBuilder mavenProjectBuilder )
@@ -627,9 +627,9 @@ public class DefaultPluginManager
         project.addArtifacts( result.getArtifacts().values() );
     }
 
-// ----------------------------------------------------------------------
-// Artifact downloading
-// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Artifact downloading
+    // ----------------------------------------------------------------------
 
     private void downloadDependencies( MavenSession context, ArtifactResolver artifactResolver )
         throws GoalExecutionException
