@@ -69,7 +69,7 @@ another plugin  |                  |
                 |            |             |
                 |            v             |
 /------------/  |         foreach(prereq)  |
-each prereq is  |        (1) | (2)|        |
+each prereq is  |         (1)| (2)|        |
 a goal which    |            |    |        |
 may be in       |            |    |<-------+
 another plugin  |            |    |
@@ -89,6 +89,16 @@ may be in                        +-------->|
 another plugin                             |
 /------------/                             |
                                            v
+
+/-----------------------------------------------------------------------------/
+The general form for goal resolution is:
+
+[ main-preGoal* ] [ prereq ]* main-goal [ main-postGoal* ]
+
+where each goal (whether it be preGoal, prereq, goal, or postGoal) is subject
+to the same recursive resolution process.
+/-----------------------------------------------------------------------------/
+
 +-----+                     
 
  * Multiple goals
