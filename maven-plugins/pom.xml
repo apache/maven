@@ -4,7 +4,7 @@
   <artifactId>maven-plugin-parent</artifactId>
   <packaging>pom</packaging>
   <version>2.0-SNAPSHOT</version>
-  <name>Maven Plugin</name>
+  <name>Maven Plugins</name>
   <description>Maven plugin parent</description>
   <url>http://maven.apache.org</url>
   <issueManagement>
