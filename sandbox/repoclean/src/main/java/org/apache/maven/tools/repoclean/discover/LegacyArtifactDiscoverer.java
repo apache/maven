@@ -43,7 +43,17 @@ public class LegacyArtifactDiscoverer
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( repositoryBase );
-        scanner.setExcludes( new String[] { "**/poms/*.pom", "**/*.md5" } );
+        scanner.setExcludes( new String[] {
+            "bin/**",
+            "reports/**",
+            ".maven/**",
+            "**/poms/*.pom",
+            "**/*.md5",
+            "**/*snapshot-version",
+            "*/website/**",
+            "*/licenses/**",
+            "**/.htaccess",
+            "**/REPOSITORY-V*.txt" } );
 
         scanner.scan();
 
@@ -85,7 +95,7 @@ public class LegacyArtifactDiscoverer
             String artifactId = matcher.group( 3 );
             String version = matcher.group( 4 );
 
-            // Commenting this, since the old repo style didn't have a concept 
+            // Commenting this, since the old repo style didn't have a concept
             // of 'maven-plugin'...I've added an additional artifact handler
             // specifically for this, with just enough functionality to get the
             // pathing right.
@@ -94,8 +104,10 @@ public class LegacyArtifactDiscoverer
             //    type = "maven-plugin";
             //}
 
-            getLogger().debug( "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
-                + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n" + "version: \'" + version + "\'" );
+            getLogger().debug(
+                               "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
+                                   + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n"
+                                   + "version: \'" + version + "\'" );
 
             result = artifactConstructionSupport.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME,
                                                                  type );
