@@ -23,7 +23,7 @@
   </scm>
 
   <issueManagement>
-    <system>jira<system/>
+    <system>jira</system>
     <url>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10500</url>
   </issueManagement>
 
