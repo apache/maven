@@ -40,6 +40,8 @@ their source trees set up in the same way as their collegues.
   not all dependencies are satisfied.
   * hell yes!!!! Maybe dependency resolution could be a plugin that
   other plugins depend upon (PD)
+  * is this something that is needed at the goal level though? Maybe we need to be
+    able to specify goal properties such as this (BP).
 
 - Support for "specification" dependencies. I would like to be able to
   say that I depend on a "specification" dependency such as
@@ -99,6 +101,10 @@ their source trees set up in the same way as their collegues.
   of build script. In the ideal case it should be just enough to plug-in XDoclet into process simply
   by "checking the checkbox in IDE".
   This is someting what Vincent Massol started in maven-caller plugin. It will be nice to explore this idea.
+
+  -- definitely a good idea, but I don't think we should restrict Maven as a Java build tool. I'd like to be
+     able to build C and .Net stuff with Maven at some point in the future, and the build process is similar enough
+     to be possible (BP).
 
 - Reorganization of repository layout - are we going to map groupId : "a.b.c.d"  to path "a/b/c/d"?
   Are there some better alternatives?
@@ -183,4 +189,46 @@ their source trees set up in the same way as their collegues.
   
   the drawback of this proposal is the complexity it adds to the POM structure, polluting it 
   with non project related elements.
-  
+
+  -- I think it makes more sense just to use <import uri="fragment.xml" /> at the point of inclusion, and avoid the
+     declaration of entity-like aliases. The only extra usefulness in the declaration is that it could be stored in
+     a parent POM, but that goes against the original use case and isn't worth the complexity -- BrettPorter.
+
+- We should be able to allow a project to clearly specify which version of a plugin it uses and not get other versions
+  interfering. This would be done by a plugin dependency (BP).
+
+- How do we discover the set of plugins to use? It would be good to just use a set of plugin dependencies in the
+  default model, and override them in subprojects if you need a newer/older version. Issues with this:
+    - there needs to be a per-user default model and a installation wide default model that can be updated
+    - the model needs to be updated when a new plugin is installed
+    - this isn't flexible for discovering new goals that are not part of the project's build process. eg a plugin
+      may depend on aspectj to build correctly, but "console" won't be a dependency because it is a "user" plugin.
+      This is leads to plugin types, which I'll add later.
+
+- Installing plugins should be a clearly defined process. When a new plugin is installed, is it installed for the user 
+  only be default and for the Maven installation optionally. This ties in to the point above about discovery.
+
+- Dependencies could support multiple versions (1.1+, for example, would get the latest release). This
+  would be helpful for the plugins above. Issues with this: 
+    - do we really search the repository for later releases, or just use what's local?
+    - how is a newer release signified? How is this affected by branches and snapshots?
+
+- We need plugin categories that treat certain plugins in different ways. I can think of:
+    - reporting plugins
+    - user plugins (eg console) - not project specific
+    - project specific user plugins (eg cactus, idea, ...)
+    - build plugins (clean, jaxb, java, test)
+    - artifact generating plugins (jar, war, ear, plugin)
+  It may not be that we need to treat these in any particular way, but rather that for each category, define particular
+  hooks - like the reporting plugins do in maven1. One issue is that some of these categories overlap (eg cactus runs
+  build tests but also generates a report) - so it may be that plugins just have to provide an interface (and can have
+  many) rather than conform to a certain pattern.
+
+- Maven needs to support forked codebases as part of its versioning strategy. This can integrate with CVS branches and
+  the branches element in the model. While the actual versions should not conflict across branches, snapshots will and
+  determining the latest snapshot should only find it from that branch, not everything.
+  So if a project has <branch>1_0_BUGFIXES</branch> specified, snapshots would be maven-1_0_BUGFIXES-SNAPSHOT.jar, and
+  SCM operations should refer to that branch tag.
+
+
+
