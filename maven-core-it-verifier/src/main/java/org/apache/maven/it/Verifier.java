@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.net.URL;
@@ -370,6 +371,26 @@ public class Verifier
         }
     }
 
+    private void displayLogFile()
+    {
+        System.out.println( "Log file contents:" );
+        try
+        {
+            BufferedReader reader = new BufferedReader( new FileReader( new File( basedir, "log.txt" ) ) );
+            String line = reader.readLine();
+            while ( line != null )
+            {
+                System.out.println( line );
+                line = reader.readLine();
+            }
+            reader.close();
+        }
+        catch ( IOException e )
+        {
+            System.err.println( "Error: " + e );
+        }
+    }
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -433,6 +454,8 @@ public class Verifier
                 verifier.displayStreamBuffers();
 
                 e.printStackTrace();
+
+                verifier.displayLogFile();
 
                 exitCode = 1;
             }
