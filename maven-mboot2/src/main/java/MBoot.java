@@ -374,7 +374,7 @@ public class MBoot
 
             cli.createArgument().setValue( new File( dist, "bin/m2" ).getAbsolutePath() );
 
-            cli.execute();
+            cli.execute().waitFor();
         }
 
         // ----------------------------------------------------------------------
