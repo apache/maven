@@ -62,73 +62,7 @@ m2 compile
 
 +-----+
 
-<lifecycle>
-  <phases>
-    <phase>
-      <id>generate-sources</id>
-    </phase>
-    <phase>
-      <id>process-sources</id>
-    </phase>
-    <phase>
-      <id>generate-resources</id>
-    </phase>
-    <phase>
-      <id>process-resources</id>
-      <goal>
-        <id>resources</id>
-      </goal>
-    </phase>
-    <phase>
-      <id>compile</id>
-      <goal>
-        <id>compiler:compile</id>
-      </goal>
-    </phase>
-    <phase>
-      <id>process-classes</id>
-    </phase>
-    <phase>
-      <id>generate-test-sources</id>
-    </phase>
-    <phase>
-      <id>process-test-sources</id>
-    </phase>
-    <phase>
-      <id>process-test-resources</id>
-    </phase>
-    <phase>
-      <id>test-compile</id>
-      <goal>
-        <id>compiler:testCompile</id>
-      </goal>
-    </phase>
-    <phase>
-      <id>test</id>
-      <goal>
-        <id>surefire:test</id>
-      </goal>
-    </phase>
-    <phase>
-      <id>package</id>
-      <goal>
-        <id>jar:jar</id>
-      </goal>
-    </phase>
-    <phase>
-      <id>install</id>
-      <goal>
-        <id>${type}:install</id>
-      </goal>
-    </phase>
-    <phase>
-      <id>deploy</id>
-      <goal>
-        ${type}:deploy
-      </goal>
-    </phase>
-  </phases>
-</lifecycle>
+%{snippet|id=lifecycle|url=http://cvs.apache.org/viewcvs.cgi/*checkout*/maven-components/maven-core/src/main/resources/META-INF/plexus/components.xml}
 
 +-----+
 
