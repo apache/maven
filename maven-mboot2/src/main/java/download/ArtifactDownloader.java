@@ -79,6 +79,12 @@ public class ArtifactDownloader
                     directory.mkdirs();
                 }
 
+                if ( dep.getGroupId().equals( "org.apache.maven" ) )
+                {
+                    //skip our own
+                    continue;
+                }
+
                 if ( destinationFile.exists() && dep.getVersion().indexOf( SNAPSHOT_SIGNATURE ) < 0 )
                 {
                     continue;
