@@ -17,11 +17,9 @@ package org.apache.maven.tools.plugin.extractor.marmalade;
  */
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.script.marmalade.MarmaladeMojoExecutionDirectives;
 import org.apache.maven.script.marmalade.tags.MojoTag;
-import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
-import org.apache.maven.tools.plugin.util.PluginUtils;
+import org.apache.maven.tools.plugin.extractor.AbstractScriptedMojoDescriptorExtractor;
 import org.codehaus.marmalade.metamodel.ScriptBuilder;
 import org.codehaus.marmalade.model.MarmaladeScript;
 import org.codehaus.marmalade.model.MarmaladeTag;
@@ -35,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -43,48 +42,56 @@ import java.util.TreeMap;
  * @author jdcasey
  */
 public class MarmaladeMojoDescriptorExtractor
-    implements MojoDescriptorExtractor
+    extends AbstractScriptedMojoDescriptorExtractor
 {
+    
+    protected String getScriptFileExtension()
+    {
+        return ".mmld";
+    }
 
-    public Set execute( String sourceDir, MavenProject project ) throws Exception
+    protected Set extractMojoDescriptors( Map sourceFilesKeyedByBasedir ) throws Exception
     {
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try
         {
             Thread.currentThread().setContextClassLoader(MarmaladeMojoDescriptorExtractor.class.getClassLoader());
             
-            String[] files = PluginUtils.findSources( sourceDir, "**/*.mmld" );
-
             Set descriptors = new HashSet();
-
-            File dir = new File( sourceDir );
-            for ( int i = 0; i < files.length; i++ )
+            
+            for ( Iterator mapIterator = sourceFilesKeyedByBasedir.entrySet().iterator(); mapIterator.hasNext(); )
             {
-                String file = files[i];
-
-                File scriptFile = new File( dir, file );
+                Map.Entry entry = (Map.Entry) mapIterator.next();
                 
-                MarmaladeScript script = parse(scriptFile);
+                String basedir = (String)entry.getKey();
+                Set scriptFiles = (Set)entry.getValue();
                 
-                MarmaladeTag rootTag = script.getRoot();
-                if(rootTag instanceof MojoTag)
+                for ( Iterator it = scriptFiles.iterator(); it.hasNext(); )
                 {
-                    Map contextMap = new TreeMap();
-                    contextMap.put( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR, sourceDir );
+                    File scriptFile = (File) it.next();
                     
-                    MarmaladeExecutionContext context = new DefaultContext(contextMap);
+                    MarmaladeScript script = parse(scriptFile);
                     
-                    script.execute(context);
-                    
-                    contextMap = context.getExternalizedVariables();
-
-                    MojoDescriptor descriptor = (MojoDescriptor) contextMap.get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
-
-                    descriptors.add( descriptor );
-                }
-                else
-                {
-                    System.out.println("This script is not a mojo. Its root tag is {element: " + rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}");
+                    MarmaladeTag rootTag = script.getRoot();
+                    if(rootTag instanceof MojoTag)
+                    {
+                        Map contextMap = new TreeMap();
+                        contextMap.put( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR, basedir );
+                        
+                        MarmaladeExecutionContext context = new DefaultContext(contextMap);
+                        
+                        script.execute(context);
+                        
+                        contextMap = context.getExternalizedVariables();
+    
+                        MojoDescriptor descriptor = (MojoDescriptor) contextMap.get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
+    
+                        descriptors.add( descriptor );
+                    }
+                    else
+                    {
+                        System.out.println("This script is not a mojo. Its root tag is {element: " + rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}");
+                    }
                 }
             }
 

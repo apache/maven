@@ -16,6 +16,7 @@ package org.apache.maven.tools.plugin.extractor.java;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 
@@ -40,13 +41,20 @@ public class JavaMojoDescriptorExtractorTest
         System.out.println( "found source file: " + sourceFile );
 
         File dir = sourceFile.getParentFile();
-
+        
         Model model = new Model();
         model.setArtifactId( "maven-unitTesting-plugin" );
+        
+        Build build = new Build();
+        build.setSourceDirectory(new File(dir, "source").getPath());
+        
+        model.setBuild(build);
 
         MavenProject project = new MavenProject( model );
+        
+        project.setFile(new File(dir, "pom.xml"));
 
-        Set results = extractor.execute( dir.getAbsolutePath(), project );
+        Set results = extractor.execute( project );
         assertEquals( 2, results.size() );
     }
 

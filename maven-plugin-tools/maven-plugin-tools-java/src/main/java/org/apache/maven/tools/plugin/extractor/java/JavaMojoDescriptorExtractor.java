@@ -20,6 +20,8 @@ import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.DocletTag;
 import com.thoughtworks.qdox.model.JavaClass;
 import com.thoughtworks.qdox.model.JavaSource;
+
+import org.apache.maven.model.Build;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -241,9 +243,29 @@ public class JavaMojoDescriptorExtractor
         return javaSource.getClasses()[0];
     }
 
-    public Set execute( String sourceDir, MavenProject project ) throws Exception
+    public Set execute( MavenProject project ) throws Exception
     {
         JavaDocBuilder builder = new JavaDocBuilder();
+
+        File basedir = project.getBasedir();
+        
+        System.out.println("Project basedir: " + basedir);
+        
+        String sourceDir = null;
+        
+        Build buildSection = project.getBuild();
+        if ( buildSection != null )
+        {
+            sourceDir = buildSection.getSourceDirectory();
+        }
+
+        if ( sourceDir == null )
+        {
+            File src = new File( basedir, "src/main/java" );
+            sourceDir = src.getPath();
+        }
+        
+        System.out.println("Source directory for java mojo extraction: " + sourceDir);
 
         File sourceDirectoryFile = new File( sourceDir );
 

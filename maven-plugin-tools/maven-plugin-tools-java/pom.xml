@@ -47,4 +47,13 @@
       <version>2.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
+  <build>
+    <unitTest>
+      <resources>
+        <resource>
+          <directory>src/test/resources</directory>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
 </project>

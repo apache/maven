@@ -16,7 +16,9 @@ package org.apache.maven.tools.plugin.extractor.marmalade;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
@@ -39,12 +41,23 @@ public class MarmaladeMojoDescriptorExtractorTest
 
         Model model = new Model();
         model.setArtifactId( "testArtifactId" );
+        
+        Build build = new Build();
+        
+        Resource resource = new Resource();
+        resource.setDirectory(basedir.getPath());
+        
+        build.addResource(resource);
+        
+        model.setBuild(build);
 
         MavenProject project = new MavenProject( model );
+        
+        project.setFile(new File(basedir, "pom.xml"));
 
         MarmaladeMojoDescriptorExtractor extractor = (MarmaladeMojoDescriptorExtractor) lookup(MojoDescriptorExtractor.ROLE, "marmalade");
 
-        Set descriptors = extractor.execute( basedir.getPath(), project );
+        Set descriptors = extractor.execute( project );
 
         assertEquals( 1, descriptors.size() );
 

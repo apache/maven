@@ -50,22 +50,6 @@ public class DefaultMojoScanner
 
         System.out.println( "Using " + mojoDescriptorExtractors.size() + " extractors." );
 
-        String sourceDir = null;
-
-        File basedir = project.getBasedir();
-
-        Build buildSection = project.getBuild();
-        if ( buildSection != null )
-        {
-            sourceDir = buildSection.getSourceDirectory();
-        }
-
-        if ( sourceDir == null )
-        {
-            File src = new File( basedir, "src/main/java" );
-            sourceDir = src.getPath();
-        }
-
         for ( Iterator it = mojoDescriptorExtractors.entrySet().iterator(); it.hasNext(); )
         {
             Map.Entry entry = (Map.Entry) it.next();
@@ -74,7 +58,7 @@ public class DefaultMojoScanner
 
             System.out.println( "Applying extractor for language: " + language );
 
-            Set extractorDescriptors = extractor.execute( sourceDir, project );
+            Set extractorDescriptors = extractor.execute( project );
 
             System.out.println( "Extractor for language: " + language + " found " + extractorDescriptors.size()
                 + " mojo descriptors." );

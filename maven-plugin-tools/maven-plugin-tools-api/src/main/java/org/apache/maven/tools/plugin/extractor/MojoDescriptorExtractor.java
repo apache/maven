@@ -28,6 +28,6 @@ public interface MojoDescriptorExtractor
 
     String ROLE = MojoDescriptorExtractor.class.getName();
 
-    Set execute( String sourceDir, MavenProject project ) throws Exception;
+    Set execute( MavenProject project ) throws Exception;
 
 }

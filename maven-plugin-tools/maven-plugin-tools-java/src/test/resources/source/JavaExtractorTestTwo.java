@@ -1,5 +1,3 @@
-package source;
-
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
