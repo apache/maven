@@ -1520,6 +1520,17 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>3.0.0</version>
+          <code>
+              public String toString()
+              {
+                  return getId();
+              }
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
 
     <class>
