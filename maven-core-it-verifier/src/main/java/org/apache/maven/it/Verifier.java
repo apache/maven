@@ -190,10 +190,20 @@ public class Verifier
     // ----------------------------------------------------------------------
 
     public static void main( String args[] )
-        throws VerificationException
     {
         Verifier verifier = new Verifier( args[0] );
 
-        verifier.verify();
+        try
+        {
+            verifier.verify();
+        }
+        catch ( VerificationException e )
+        {
+            System.out.println( e.getMessage() );
+
+            System.exit( 1 );
+        }
+
+        System.exit( 0 );
     }
 }
