@@ -1,0 +1,3 @@
+#!/bin/sh
+
+export CVSROOT=:ext:jvanzyl@cvs.codehaus.org:/home/marvin/cvs
