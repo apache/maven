@@ -124,6 +124,15 @@
           <defaultValue>jar</defaultValue>
         </field>
         <field>
+          <name>modules</name>
+          <version>4.0.0</version>
+          <description>The modules to build in addition to the current project</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
           <name>name</name>
           <version>3.0.0+</version>
           <required>true</required>
