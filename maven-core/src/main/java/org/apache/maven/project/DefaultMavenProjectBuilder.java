@@ -115,7 +115,7 @@ public class DefaultMavenProjectBuilder
                     throw new ProjectBuildingException( "Inheritence not supported in the user override POM" );
                 }
 
-                if ( localRepositoryValue == null && userModel.getLocal() != null && userModel.getLocal().getRepository() != null )
+                if ( userModel.getLocal() != null && userModel.getLocal().getRepository() != null )
                 {
                     localRepositoryValue = userModel.getLocal().getRepository();
                 }
