@@ -42,7 +42,7 @@ public class PluginParameterExpressionEvaluator
             }
             catch ( ComponentLookupException e )
             {
-                // do nothing
+                throw new PluginConfigurationException( "Cannot lookup component: ", e );
             }
         }
         else if ( expression.equals( "#localRepository" ) )
