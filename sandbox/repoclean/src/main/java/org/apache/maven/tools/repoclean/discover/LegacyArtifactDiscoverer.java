@@ -211,7 +211,19 @@ public class LegacyArtifactDiscoverer
         }
 
         String artifactId = artifactIdBuffer.toString();
+        
+        int lastVersionCharIdx = versionBuffer.length() -1;
+        if(lastVersionCharIdx > -1 && versionBuffer.charAt(lastVersionCharIdx) == '-')
+        {
+            versionBuffer.setLength(lastVersionCharIdx);
+        }
+        
         String version = versionBuffer.toString();
+        
+        if(version.length() < 1)
+        {
+            version = null;
+        }
 
         getLogger().debug(
                            "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"

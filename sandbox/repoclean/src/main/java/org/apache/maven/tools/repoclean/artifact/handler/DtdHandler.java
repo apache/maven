@@ -30,8 +30,8 @@ public class DtdHandler
         return "dtds";
     }
 
-//    public String packageGoal()
-//    {
-//        return "ejb:ejb";
-//    }
+    public String extension()
+    {
+        return "dtd";
+    }
 }

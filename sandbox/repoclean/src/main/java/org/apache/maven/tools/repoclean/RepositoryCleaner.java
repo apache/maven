@@ -189,10 +189,12 @@ public class RepositoryCleaner
             {
                 Artifact artifact = (Artifact) it.next();
 
+                String artifactReportPath = buildArtifactReportPath(artifact);
+                
                 Reporter artifactReporter = null;
                 try
                 {
-                    artifactReporter = new Reporter( reportsBase, artifact.getId().replace(':', '_') + ".report.txt" );
+                    artifactReporter = new Reporter( reportsBase, artifactReportPath );
 
                     boolean errorOccurred = false;
 
@@ -298,7 +300,7 @@ public class RepositoryCleaner
                 }
                 catch(Exception e)
                 {
-                    artifactReporter.error("Error while rewriting file or POM for artifact: \'" + artifact.getId() + "\'", e);
+                    artifactReporter.error("Error while rewriting file or POM for artifact: \'" + artifact.getId() + "\'. See report at: \'" + artifactReportPath + "\'.", e);
                 }
                 finally
                 {
@@ -316,6 +318,13 @@ public class RepositoryCleaner
                 container.release( artifactPomRewriter );
             }
         }
+    }
+
+    private String buildArtifactReportPath( Artifact artifact )
+    {
+        String classifier = artifact.getClassifier();
+        
+        return artifact.getGroupId().replace('.', '/') + "/" + artifact.getArtifactId() + "/" + artifact.getType() + "/" + ((classifier != null)?(classifier + "-"):("")) + artifact.getVersion() + ".report.txt";
     }
 
     private void copyArtifact( Artifact artifact, File artifactTarget, Reporter reporter )

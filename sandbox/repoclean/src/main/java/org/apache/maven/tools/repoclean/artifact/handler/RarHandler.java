@@ -30,8 +30,8 @@ public class RarHandler
         return "rars";
     }
 
-    public String packageGoal()
+    public String extension()
     {
-        return "rar:rar";
+        return "rar";
     }
 }

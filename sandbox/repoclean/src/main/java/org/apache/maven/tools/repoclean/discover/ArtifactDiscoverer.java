@@ -37,6 +37,9 @@ public interface ArtifactDiscoverer
         "*/licenses/**",
         "*/licences/**",
         "**/.htaccess",
+        "**/*.html",
+        "**/*.asc",
+        "**/*.txt",
         "**/REPOSITORY-V*.txt"
     };
 

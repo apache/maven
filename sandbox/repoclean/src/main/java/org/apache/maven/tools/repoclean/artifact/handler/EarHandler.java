@@ -30,8 +30,8 @@ public class EarHandler
         return "ears";
     }
 
-    public String packageGoal()
+    public String extension()
     {
-        return "ear:ear";
+        return "ear";
     }
 }

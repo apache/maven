@@ -30,8 +30,8 @@ public class TldHandler
         return "tlds";
     }
 
-//    public String packageGoal()
-//    {
-//        return "ejb:ejb";
-//    }
+    public String extension()
+    {
+        return "tld";
+    }
 }

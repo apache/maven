@@ -29,5 +29,10 @@ public class SarHandler
     {
         return "sars";
     }
+    
+    public String extension()
+    {
+        return "sar";
+    }
 
 }
