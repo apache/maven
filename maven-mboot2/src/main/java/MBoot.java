@@ -190,11 +190,16 @@ public class MBoot
             {
                 String userHome = System.getProperty( "user.home" );
 
-                userModelReader.parse( new File( userHome, ".m2/user.xml" ) );
+                File userXml = new File( userHome, ".m2/user.xml" );
 
-                MavenProfile activeProfile = userModelReader.getActiveMavenProfile();
+                if ( userXml.exists() )
+                {
+                    userModelReader.parse( userXml );
 
-                mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
+                    MavenProfile activeProfile = userModelReader.getActiveMavenProfile();
+
+                    mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
+                }
             }
             catch ( Exception e )
             {
@@ -204,18 +209,24 @@ public class MBoot
 
         if ( mavenRepoLocal == null )
         {
-            System.out.println(
-                "You must have a ~/.m2/user.xml file and must contain at least the following information:\n" );
+            String userHome = System.getProperty( "user.home" );
+            String m2LocalRepoPath = "/.m2/repository";
 
-            System.out.println(
-                "<userModel>\n  " + "<mavenProfiles>\n    " + "<mavenProfile>\n      " + "<id>someId</id>\n      " +
-                "<localRepository>/path/to/your/repository</localRepository>\n    " +
-                "</mavenProfile>\n  " +
-                "</mavenProfiles>\n  " +
-                "<defaultProfiles>\n    " +
-                "<mavenProfileId>someId</mavenProfileId>\n  " +
-                "</defaultProfiles>\n" +
-                "</userModel>\n" );
+            File repoDir = new File( userHome, m2LocalRepoPath );
+            if ( !repoDir.exists() )
+            {
+                repoDir.mkdirs();
+            }
+
+            mavenRepoLocal = repoDir.getAbsolutePath();
+
+            System.out
+                      .println( "You SHOULD have a ~/.m2/user.xml file and must contain at least the following information:\n" );
+
+            System.out.println( "<userModel>\n  " + "<mavenProfiles>\n    " + "<mavenProfile>\n      "
+                + "<id>someId</id>\n      " + "<localRepository>/path/to/your/repository</localRepository>\n    "
+                + "</mavenProfile>\n  " + "</mavenProfiles>\n  " + "<defaultProfiles>\n    "
+                + "<mavenProfileId>someId</mavenProfileId>\n  " + "</defaultProfiles>\n" + "</userModel>\n" );
 
             System.out.println( "where \'someId\' is just an id for matching within the file." );
 
@@ -223,7 +234,10 @@ public class MBoot
 
             System.out.println( "Alternatively, you can specify -Dmaven.repo.local=/path/to/m2/repository" );
 
-            System.exit( 1 );
+            System.out.println();
+
+            System.out.println( "HOWEVER, since you did not specify a repository path, maven will use: "
+                + repoDir.getAbsolutePath() + " to store artifacts locally." );
         }
 
         String mavenHome = null;

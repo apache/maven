@@ -345,7 +345,7 @@ public class MavenCli
 
         if ( localRepository == null )
         {
-            String userConfigurationDirectory = System.getProperty( "user.home" );
+            String userConfigurationDirectory = System.getProperty( "user.home" ) + "/.m2";
             localRepository = new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
         }
 
