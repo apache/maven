@@ -21,9 +21,9 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Goal;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionResponse;
@@ -85,15 +85,10 @@ public class DefaultLifecycleExecutor
         {
             MavenProject project = session.getProject();
             
-            // TODO: should enrich this with the type artifactHandler, but for now just
-            // use "type" as is
             ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
 
             if ( artifactHandler != null )
             {
-                // TODO: perhaps each type should define their own lifecycle
-                // completely, using the base as a default?
-                // If so, remove both of these goals from type artifactHandler
                 if ( artifactHandler.packageGoal() != null )
                 {
                     verifyMojoPhase( artifactHandler.packageGoal(), session );

@@ -55,15 +55,13 @@ public class MavenPluginDiscoverer
     {
         PluginDescriptor pluginDescriptor;
 
-        //!! If there is a defective plugin installed should we halt everything or
-        // just not process that particular plugin
-
         try
         {
             pluginDescriptor = builder.build( componentDescriptorConfiguration );
         }
         catch ( Exception e )
         {
+            // If the plugin is not valid, we cannot continue as it may make the lifecycle ebhave differently than expected 
             throw new Exception( "Cannot process plugin descriptor: " + source, e );
         }
 

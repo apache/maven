@@ -211,9 +211,6 @@ public class DefaultPluginManager
     {
         if ( !isPluginInstalled( groupId, artifactId ) )
         {
-            //!! This is entirely crappy. We need a better naming for plugin
-            // artifact ids and
-
             ArtifactFactory artifactFactory = null;
             try
             {
@@ -247,7 +244,7 @@ public class DefaultPluginManager
                     }
                 }
 
-                // TODO: Default over to a sensible value (is 1.0-SNAPSHOT right?)
+                // TODO: Default over to a sensible value (is 1.0-SNAPSHOT right?) Hardcoging of group ID also
                 if ( StringUtils.isEmpty( version ) )
                 {
                     version = "1.0-SNAPSHOT";
@@ -337,7 +334,6 @@ public class DefaultPluginManager
                 ArtifactResolver artifactResolver = null;
                 MavenProjectBuilder mavenProjectBuilder = null;
 
-                // TODO: should these be released
                 try
                 {
                     artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
