@@ -16,7 +16,7 @@ Maven Lifecycle Phases
  
  * compile [plexus component or something else]
  
- * process classes
+ * process classes [eg JDO, coverage]
  
  * generate test sources [generating junit tests]
  
@@ -216,3 +216,24 @@ Notes for discussion:
     direction, but when you factor inheritance into the mix, this could get 
     really sticky.
 [/Added, jdcasey/2005-01-23]
+
+[Added, brett/2005-02-13: Inserting these as things left over from previous 
+mails to m2-dev that were pre-lifecycle]
+
+Multiple lifecycles will be able to be used and defined - for example "site"
+would have an additional lifecycle. This interface may even be available to
+users, though strongly discouraged as the default lifecycles should accommodate
+almost any use case.
+
+As the site runs through, it will want to ensure that parts of the lifecycle
+already complete are not run again unless the parameters change.
+
+eg. For coverage - no need to compile again, but do add an additional
+instrumentation step, then run the tests again on the new instrumented classes 
+(in a new directory, not over the top of the old ones).
+
+To simplify this, we may actually allow some steps to re-run and rely on the
+file timestamping to make it effecient.
+
+[/Added, brett/2005-02-13]
+
