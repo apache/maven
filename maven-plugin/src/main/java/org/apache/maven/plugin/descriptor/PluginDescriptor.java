@@ -41,9 +41,10 @@ public class PluginDescriptor
     {
         return mojos;
     }
-    
-    public void setMojos(List mojos) {
-        this.mojos = new LinkedList(mojos);
+
+    public void setMojos( List mojos )
+    {
+        this.mojos = new LinkedList( mojos );
     }
 
     public String getId()
@@ -64,9 +65,10 @@ public class PluginDescriptor
     {
         return dependencies;
     }
-    
-    public void setDependencies(List dependencies) {
-        this.dependencies = new LinkedList(dependencies);
+
+    public void setDependencies( List dependencies )
+    {
+        this.dependencies = new LinkedList( dependencies );
     }
 
     public boolean isIsolatedRealm()
