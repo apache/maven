@@ -41,7 +41,7 @@ import java.util.Iterator;
  * @requiresDependencyResolution test
  * @description Goal for generating IDEA files from a POM
  * @parameter name="project"
- * type="MavenProject"
+ * type="org.apache.maven.project.MavenProject"
  * required="true"
  * validator=""
  * expression="#project"
