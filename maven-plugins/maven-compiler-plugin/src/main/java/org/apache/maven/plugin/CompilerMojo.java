@@ -94,10 +94,12 @@ public class CompilerMojo
         /* Compile with debugging info */
         String debugAsString = (String) request.getParameter( "debug" );
 
-        if (debugAsString != null)
+        if ( debugAsString != null )
         {
-            if (Boolean.valueOf(debugAsString).booleanValue())
-                compilerConfiguration.addCompilerOption("-g", null);
+            if ( Boolean.valueOf( debugAsString ).booleanValue() )
+            {
+                compilerConfiguration.setDebug( true );
+            }
         }
 
         List messages = compiler.compile(compilerConfiguration);
