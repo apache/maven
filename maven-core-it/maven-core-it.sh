@@ -18,5 +18,17 @@ if [ ! -z "$M2_HOME" ]; then
   jvm_args="$jvm_args -Dmaven.home=$M2_HOME"
 fi
 
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+esac
+
+# For Cygwin, ensure paths are in UNIX format before anything is touched
+if $cygwin ; then
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath -w "$JAVA_HOME"`
+  export JAVA_HOME
+fi
+
 java $jvm_args -cp "$cp" $verifier
 
