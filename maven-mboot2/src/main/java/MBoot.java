@@ -60,9 +60,9 @@ public class MBoot
         "plexus/jars/plexus-0.17.jar",
         "xpp3/jars/xpp3-1.1.3.3.jar",
         "xstream/jars/xstream-1.0-SNAPSHOT.jar",
-        "maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
-        "maven/jars/wagon-api-1.0-alpha-1-SNAPSHOT.jar",
-        "maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar"
+        //"maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
+        //"maven/jars/wagon-api-1.0-alpha-1-SNAPSHOT.jar",
+        //"maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar"
     };
 
     String[] builds = new String[]
@@ -324,10 +324,10 @@ public class MBoot
             if ( d.getArtifactId().equals( "classworlds" ) ||
                 d.artifactId.equals( "plexus" ) ||
                 d.artifactId.equals( "xstream" ) ||
-                d.artifactId.equals( "xpp3" ) ||
-                d.artifactId.equals( "junit" ) ||
-                d.artifactId.equals( "wagon-api" ) ||
-                d.artifactId.equals( "maven-artifact" ) 
+                d.artifactId.equals( "xpp3" ) //||
+                //d.artifactId.equals( "junit" ) ||
+                //d.artifactId.equals( "wagon-api" ) ||
+                //d.artifactId.equals( "maven-artifact" ) 
 )
             {
                 continue;
