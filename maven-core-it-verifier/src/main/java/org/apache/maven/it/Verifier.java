@@ -41,6 +41,12 @@ public class Verifier
         {
             throw new VerificationException( e );
         }
+        
+        System.out.println( "-------------------------------------" );
+        
+        System.out.println( "OK" );
+        
+        System.out.println( "-------------------------------------" );
     }
 
     private void verifyExpectedResult( String line )
