@@ -17,6 +17,7 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
@@ -29,6 +30,15 @@ public interface ArtifactTransformation
     static String ROLE = ArtifactTransformation.class.getName();
 
     /**
+     * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
+     * transformation has occured the original artifact is returned.
+     *
+     * @param artifact Artifact to be transformed.
+     * @return The transformed Artifact
+     */
+    Artifact transformForResolve( Artifact artifact );
+
+    /**
      * Take in a artifact and return the transformed artifact for locating in the local repository. If no
      * transformation has occured the original artifact is returned.
      *
@@ -36,15 +46,16 @@ public interface ArtifactTransformation
      * @param localRepository the local repository it will be stored in
      * @return The transformed Artifact
      */
-    Artifact transformLocalArtifact( Artifact artifact, ArtifactRepository localRepository );
+    Artifact transformForInstall( Artifact artifact, ArtifactRepository localRepository );
 
     /**
-     * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
+     * Take in a artifact and return the transformed artifact for distributing toa remote repository. If no
      * transformation has occured the original artifact is returned.
      *
-     * @param artifact Artifact to be transformed.
+     * @param artifact         Artifact to be transformed.
+     * @param remoteRepository the repository to deploy to
      * @return The transformed Artifact
-     * @todo finish doco
      */
-    Artifact transformRemoteArtifact( Artifact artifact, ArtifactRepository remoteRepository );
+    Artifact transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException;
 }

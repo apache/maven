@@ -77,25 +77,94 @@ public class DefaultWagonManager
     }
 
     // TODO: don't throw exception
-    public void releaseWagon( Wagon wagon )
+    private void releaseWagon( Wagon wagon )
         throws Exception
     {
         container.release( wagon );
     }
 
-    // TODO: don't throw exception
     public void putArtifact( File source, Artifact artifact, ArtifactRepository repository )
-        throws Exception
+        throws TransferFailedException
     {
-        Wagon wagon = getWagon( repository.getProtocol() );
+        try
+        {
+            putRemoteFile( repository, source, repository.pathOf( artifact ) );
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            throw new TransferFailedException( "Path of artifact could not be determined: ", e );
+        }
+    }
 
-        wagon.connect( repository, getProxy( repository.getProtocol() ) );
+    public void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
+        throws TransferFailedException
+    {
+        try
+        {
+            putRemoteFile( repository, source, repository.pathOfMetadata( artifactMetadata ) );
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            throw new TransferFailedException( "Path of artifact could not be determined: ", e );
+        }
+    }
 
-        wagon.put( source, repository.pathOf( artifact ) );
+    private void putRemoteFile( ArtifactRepository repository, File source, String remotePath )
+        throws TransferFailedException
+    {
+        Wagon wagon = null;
+        try
+        {
+            wagon = getWagon( repository.getProtocol() );
+        }
+        catch ( UnsupportedProtocolException e )
+        {
+            throw new TransferFailedException( "Unsupported Protocol: ", e );
+        }
 
-        wagon.disconnect();
+        // TODO: probably don't want this on metadata...
+        // TODO: not working well on upload, commented out for now
+//        if ( downloadMonitor != null )
+//        {
+//            wagon.addTransferListener( downloadMonitor );
+//        }
 
-        releaseWagon( wagon );
+        try
+        {
+            wagon.connect( repository, getProxy( repository.getProtocol() ) );
+
+            wagon.put( source, remotePath );
+
+            // TODO [BP]: put all disconnects in finally
+            wagon.disconnect();
+        }
+        catch ( ConnectionException e )
+        {
+            throw new TransferFailedException( "Connection failed: ", e );
+        }
+        catch ( AuthenticationException e )
+        {
+            throw new TransferFailedException( "Authentication failed: ", e );
+        }
+        catch ( AuthorizationException e )
+        {
+            throw new TransferFailedException( "Authorization failed: ", e );
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            throw new TransferFailedException( "Resource to deploy not found: ", e );
+        }
+        finally
+        {
+            try
+            {
+                releaseWagon( wagon );
+            }
+            catch ( Exception e )
+            {
+                throw new TransferFailedException( "Unable to release wagon", e );
+            }
+        }
     }
 
     public void getArtifact( Artifact artifact, List remoteRepositories, File destination )
@@ -139,16 +208,13 @@ public class DefaultWagonManager
         }
     }
 
-    public void getMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
-                             ArtifactRepository localRepository )
+    public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath;
-        String localPath;
         try
         {
             remotePath = remoteRepository.pathOfMetadata( metadata );
-            localPath = localRepository.pathOfMetadata( metadata );
         }
         catch ( ArtifactPathFormatException e )
         {
@@ -156,8 +222,7 @@ public class DefaultWagonManager
             throw new TransferFailedException( "Failed to determine path for artifact", e );
         }
 
-        File metadataFile = new File( localRepository.getBasedir(), localPath );
-        getRemoteFile( remoteRepository, metadataFile, remotePath );
+        getRemoteFile( remoteRepository, destination, remotePath );
     }
 
     private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath )
@@ -184,6 +249,7 @@ public class DefaultWagonManager
 
         //wagon.addTransferListener( md5SumObserver );
 
+        // TODO: probably don't want this on metadata...
         if ( downloadMonitor != null )
         {
             wagon.addTransferListener( downloadMonitor );
@@ -229,6 +295,11 @@ public class DefaultWagonManager
             {
                 throw new TransferFailedException( "Release of wagon failed: ", e );
             }
+        }
+
+        if ( !temp.exists() )
+        {
+            throw new TransferFailedException( "Downloaded file does not exist: " + temp );
         }
 
         // The temporary file is named destination + ".tmp" and is done this

@@ -39,19 +39,16 @@ public interface WagonManager
     Wagon getWagon( String protocol )
         throws UnsupportedProtocolException;
 
-    // TODO: don't throw exception
-    void releaseWagon( Wagon wagon )
-        throws Exception;
-
     void getArtifact( Artifact artifact, List remoteRepositories, File destination )
         throws TransferFailedException;
 
-    // TODO: don't throw exception
     void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
-        throws Exception;
+        throws TransferFailedException;
 
-    void getMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
-                      ArtifactRepository localRepository )
+    public void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
+        throws TransferFailedException;
+
+    public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void setProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );

@@ -2,12 +2,32 @@
   <components>
     <!--
      |
+     | WagonManager
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.manager.WagonManager</role>
+      <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
      | Transformations
      |
      -->
     <component>
       <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
       <implementation>org.apache.maven.artifact.transform.SnapshotTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
     </component>
 
     <!--
@@ -32,21 +52,6 @@
       </requirements>
     </component>
 
-    <!--
-     |
-     | WagonManager
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.manager.WagonManager</role>
-      <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-      </requirements>
-    </component>
-    
     <!--
      |
      | ArtifactInstaller

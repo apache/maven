@@ -17,19 +17,17 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-
-import java.io.IOException;
 
 /**
  * Contains metadata about an artifact, and methods to retrieve/store it from an artifact repository.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
- * @todo naming is too close to ArtifactMetadataSource which refers to a POM. A POM is sometimes an artifact itself,
- * so that naming may no longer be appropriate.
+ * @todo merge with artifactmetadatasource
+ * @todo retrieval exception not appropriate for store
+ * @todo not happy about the store/retrieve methods - they use "this"
  */
 public interface ArtifactMetadata
 {
@@ -39,16 +37,16 @@ public interface ArtifactMetadata
      * @param localRepository the local repository
      */
     void storeInLocalRepository( ArtifactRepository localRepository )
-        throws IOException, ArtifactPathFormatException;
+        throws ArtifactMetadataRetrievalException;
 
     /**
      * Retrieve the metadata from the remote repository into the local repository.
      *
      * @param remoteRepository the remote repository
-     * @param localRepository  the local repository
+     * @param wagonManager     the wagon manager to use to retrieve the metadata
      */
-    void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, ArtifactRepository localRepository )
-        throws IOException, ArtifactResolutionException;
+    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager )
+        throws ArtifactMetadataRetrievalException;
 
     /**
      * Get the associated artifact.

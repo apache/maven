@@ -35,7 +35,11 @@ public class ConsoleDownloadMonitor
 
     public void transferInitiated( TransferEvent transferEvent )
     {
-        System.out.println( "Downloading: " + transferEvent.getResource().getName() );
+        String message = transferEvent.getRequestType() == TransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
+
+        // TODO: can't use getLogger() because this isn't currently instantiated as a component
+        System.out.println( message + ": " + transferEvent.getResource().getName() );
+
         complete = 0;
     }
 
@@ -60,12 +64,14 @@ public class ConsoleDownloadMonitor
 
     public void transferError( TransferEvent transferEvent )
     {
-        getLogger().error( transferEvent.getException().getMessage() );
+        // TODO: can't use getLogger() because this isn't currently instantiated as a component
+        transferEvent.getException().printStackTrace();
     }
 
     public void debug( String message )
     {
-        getLogger().debug( message );
+        // TODO: can't use getLogger() because this isn't currently instantiated as a component
+//        getLogger().debug( message );
     }
 }
 

@@ -81,7 +81,7 @@ public class DefaultArtifactResolver
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
         {
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
-            artifact = transform.transformLocalArtifact( artifact, localRepository );
+            artifact = transform.transformForResolve( artifact );
         }
 
         String localPath;
@@ -182,18 +182,11 @@ public class DefaultArtifactResolver
             throw new ArtifactResolutionException( "Error transitively resolving artifacts: ", e );
         }
 
-        // TODO: this is unclean, but necessary as long as resolve may return a different artifact
-        Map collectedArtifacts = artifactResolutionResult.getArtifacts();
-        Map resolvedArtifacts = new HashMap( collectedArtifacts.size() );
-        for ( Iterator i = collectedArtifacts.keySet().iterator(); i.hasNext(); )
+        for ( Iterator i = artifactResolutionResult.getArtifacts().values().iterator(); i.hasNext(); )
         {
-            Object key = i.next();
-            resolvedArtifacts.put( key, resolve( (Artifact) collectedArtifacts.get( key ), remoteRepositories,
-                                                 localRepository ) );
+            // TODO: resolve may modify artifacts, do we need to get the new list?
+            resolve( (Artifact) i.next(), remoteRepositories, localRepository );
         }
-
-        collectedArtifacts.clear();
-        collectedArtifacts.putAll( resolvedArtifacts );
 
         return artifactResolutionResult;
     }

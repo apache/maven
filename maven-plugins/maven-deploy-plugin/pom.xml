@@ -48,6 +48,13 @@
     </dependency>
     <dependency>
       <groupId>maven</groupId>
+      <artifactId>wagon-file</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>maven</groupId>
       <artifactId>wagon-ssh</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
       <type>jar</type>

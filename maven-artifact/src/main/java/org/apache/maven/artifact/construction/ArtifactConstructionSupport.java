@@ -41,7 +41,6 @@ public class ArtifactConstructionSupport
             return null;
         }
 
-        // TODO: localRepository not used (should be used here to resolve path?
         String desiredScope = Artifact.SCOPE_RUNTIME;
         if ( Artifact.SCOPE_COMPILE.equals( scope ) && inheritedScope == null )
         {

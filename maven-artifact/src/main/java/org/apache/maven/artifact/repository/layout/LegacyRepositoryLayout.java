@@ -30,7 +30,7 @@ public class LegacyRepositoryLayout
 
     protected String metadataLayoutPattern()
     {
-        return "${groupPath}/${directory}/${artifactId}-${version}-${metadataFilename}";
+        return "${groupPath}/poms/${artifactId}-${version}-${metadataFilename}";
     }
 
     protected String groupIdAsPath( String groupId )

@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.transform.ArtifactTransformation;
@@ -65,7 +66,7 @@ public class DefaultArtifactInstaller
             for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
             {
                 ArtifactTransformation transform = (ArtifactTransformation) i.next();
-                artifact = transform.transformLocalArtifact( artifact, localRepository );
+                artifact = transform.transformForInstall( artifact, localRepository );
             }
 
             String localPath = localRepository.pathOf( artifact );
@@ -93,6 +94,10 @@ public class DefaultArtifactInstaller
             throw new ArtifactInstallationException( "Error installing artifact: ", e );
         }
         catch ( ArtifactPathFormatException e )
+        {
+            throw new ArtifactInstallationException( "Error installing artifact: ", e );
+        }
+        catch ( ArtifactMetadataRetrievalException e )
         {
             throw new ArtifactInstallationException( "Error installing artifact: ", e );
         }

@@ -28,36 +28,34 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 
 /**
- * @goal deploy
- *
- * @description deploys an artifact to remote repository
- *
- * @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description=""
- *
- * @parameter
- *  name="deployer"
- *  type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- *  required="true"
- *  validator=""
- *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
- *  description=""
- *
- * @parameter
- *  name="deploymentRepository"
- *  type="org.apache.maven.artifact.repository.ArtifactRepository"
- *  required="true"
- *  validator=""
- *  expression="#project.distributionManagementArtifactRepository"
- *  description=""
- *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
+ * @goal deploy
+ * @description deploys an artifact to remote repository
+ * @parameter name="project"
+ * type="org.apache.maven.project.MavenProject"
+ * required="true"
+ * validator=""
+ * expression="#project"
+ * description=""
+ * @parameter name="deployer"
+ * type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ * required="true"
+ * validator=""
+ * expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ * description=""
+ * @parameter name="deploymentRepository"
+ * type="org.apache.maven.artifact.repository.ArtifactRepository"
+ * required="true"
+ * validator=""
+ * expression="#project.distributionManagementArtifactRepository"
+ * description=""
+ * @parameter name="localRepository"
+ * type="org.apache.maven.artifact.repository.ArtifactRepository"
+ * required="true"
+ * validator=""
+ * expression="#localRepository"
+ * description=""
  */
 public class DeployMojo
     extends AbstractPlugin
@@ -68,21 +66,22 @@ public class DeployMojo
 
     private ArtifactRepository deploymentRepository;
 
+    private ArtifactRepository localRepository;
+
     public void execute()
         throws PluginExecutionException
     {
         if ( deploymentRepository == null )
         {
-            String msg = "Deployment failed: repository element was not specified in the pom inside"
-                + " distributionManagement element";
+            String msg = "Deployment failed: repository element was not specified in the pom inside" +
+                " distributionManagement element";
             throw new PluginExecutionException( msg );
         }
 
         if ( deploymentRepository.getAuthenticationInfo() == null )
         {
-            getLog().warn(
-                           "Deployment repository {id: \'" + deploymentRepository.getId()
-                               + "\'} has no associated authentication info!" );
+            getLog().warn( "Deployment repository {id: \'" + deploymentRepository.getId() +
+                           "\'} has no associated authentication info!" );
         }
 
         // Deploy the POM
@@ -93,7 +92,7 @@ public class DeployMojo
 
         try
         {
-            deployer.deploy( pom, pomArtifact, deploymentRepository );
+            deployer.deploy( pom, pomArtifact, deploymentRepository, localRepository );
 
             //Deploy artifact
             if ( !"pom".equals( project.getPackaging() ) )
@@ -101,7 +100,7 @@ public class DeployMojo
                 Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
                                                          project.getVersion(), project.getPackaging() );
 
-                deployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository );
+                deployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository, localRepository );
             }
         }
         catch ( ArtifactDeploymentException e )

@@ -20,9 +20,15 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.apache.maven.artifact.transform.ArtifactTransformation;
+import org.apache.maven.wagon.TransferFailedException;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
 
 public class DefaultArtifactDeployer
@@ -34,7 +40,8 @@ public class DefaultArtifactDeployer
 
     private List artifactTransformations;
 
-    public void deploy( String basedir, Artifact artifact, ArtifactRepository deploymentRepository )
+    public void deploy( String basedir, Artifact artifact, ArtifactRepository deploymentRepository,
+                        ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
         File source = null;
@@ -48,19 +55,43 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
         }
 
-        deploy( source, artifact, deploymentRepository );
+        deploy( source, artifact, deploymentRepository, localRepository );
     }
 
-    public void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository )
+    public void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository,
+                        ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        // TODO: perform transformations
-
         try
         {
+            // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
+            for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
+            {
+                ArtifactTransformation transform = (ArtifactTransformation) i.next();
+                artifact = transform.transformForDeployment( artifact, deploymentRepository );
+            }
+
             wagonManager.putArtifact( source, artifact, deploymentRepository );
+
+            // must be after the artifact is installed
+            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+            {
+                ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                metadata.storeInLocalRepository( localRepository );
+                // TODO: shouldn't need to calculate this
+                File f = new File( localRepository.getBasedir(), localRepository.pathOfMetadata( metadata ) );
+                wagonManager.putArtifactMetadata( f, metadata, deploymentRepository );
+            }
         }
-        catch ( Exception e )
+        catch ( TransferFailedException e )
+        {
+            throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
+        }
+        catch ( ArtifactMetadataRetrievalException e )
+        {
+            throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
+        }
+        catch ( ArtifactPathFormatException e )
         {
             throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
         }

@@ -17,11 +17,15 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,7 +43,7 @@ public class SnapshotArtifactMetadata
 {
     private String timestamp = null;
 
-    private int buildNumber = 1;
+    private int buildNumber = 0;
 
     private static final String SNAPSHOT_VERSION_LOCAL_FILE = "version-local.txt";
 
@@ -59,40 +63,89 @@ public class SnapshotArtifactMetadata
         return new SnapshotArtifactMetadata( artifact, SNAPSHOT_VERSION_LOCAL_FILE );
     }
 
-    public static ArtifactMetadata createRemoteSnapshotMetadata( Artifact artifact )
+    public static SnapshotArtifactMetadata createRemoteSnapshotMetadata( Artifact artifact )
     {
         return new SnapshotArtifactMetadata( artifact, SNAPSHOT_VERSION_FILE );
     }
 
     public void storeInLocalRepository( ArtifactRepository localRepository )
-        throws IOException, ArtifactPathFormatException
+        throws ArtifactMetadataRetrievalException
     {
-        FileUtils.fileWrite( localRepository.getBasedir() + "/" + localRepository.pathOfMetadata( this ),
-                             getTimestamp() + "-" + buildNumber );
+        try
+        {
+            if ( timestamp == null )
+            {
+                timestamp = getUtcDateFormatter().format( new Date() );
+            }
+            String path = new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) ).getPath();
+            FileUtils.fileWrite( path, getVersion() );
+        }
+        catch ( IOException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+        }
     }
 
-    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, ArtifactRepository localRepository )
-        throws IOException, ArtifactResolutionException
+    public String getVersion()
     {
-/*
-// TODO: this is getting the artifact - needs to get the version.txt
-        resolver.resolve( artifact, Collections.singletonList( remoteRepository ), localRepository );
+        String version = artifact.getVersion();
+        if ( version != null )
+        {
+            version = StringUtils.replace( version, "SNAPSHOT", timestamp );
+        }
+        else
+        {
+            version = timestamp;
+        }
+        return version + "-" + buildNumber;
+    }
 
-        String version = FileUtils.fileRead( artifact.getPath() );
+    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager )
+        throws ArtifactMetadataRetrievalException
+    {
+        try
+        {
+            File destination = File.createTempFile( "maven-artifact", null );
+            destination.deleteOnExit();
 
-        int index = UTC_TIMESTAMP_PATTERN.length();
-        timestamp = version.substring( 0, index );
+            try
+            {
+                wagonManager.getArtifactMetadata( this, remoteRepository, destination );
+            }
+            catch ( ResourceDoesNotExistException e )
+            {
+                // this just means that there is no snapshot version file, so we keep timestamp = null, build = 0
+                return;
+            }
 
-        buildNumber = Integer.valueOf( version.substring( index + 1 ) ).intValue();
-*/
+            String version = FileUtils.fileRead( destination );
+
+            int index = version.lastIndexOf( "-" );
+            timestamp = version.substring( 0, index );
+            buildNumber = Integer.valueOf( version.substring( index + 1 ) ).intValue();
+            index = version.indexOf( "-" );
+            if ( index >= 0 )
+            {
+                // ignore starting version part, will be prepended later
+                timestamp = timestamp.substring( index + 1 );
+            }
+        }
+        catch ( TransferFailedException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+        }
+        catch ( IOException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+        }
     }
 
     public String getTimestamp()
     {
-        if ( timestamp == null )
-        {
-            timestamp = getUtcDateFormatter().format( new Date() );
-        }
         return timestamp;
     }
 
@@ -101,5 +154,11 @@ public class SnapshotArtifactMetadata
         DateFormat utcDateFormatter = new SimpleDateFormat( UTC_TIMESTAMP_PATTERN );
         utcDateFormatter.setTimeZone( UTC_TIME_ZONE );
         return utcDateFormatter;
+    }
+
+    public void update()
+    {
+        this.buildNumber++;
+        timestamp = getUtcDateFormatter().format( new Date() );
     }
 }

@@ -17,7 +17,10 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
@@ -30,6 +33,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 public class SnapshotTransformation
     implements ArtifactTransformation
 {
+    private WagonManager wagonManager;
+
 /* TODO: use and remove
     public Artifact transform( Artifact artifact, ArtifactRepository localRepository, List repositories,
                                Map parameters )
@@ -185,9 +190,15 @@ public class SnapshotTransformation
         return retValue;
     }
     */
-    public Artifact transformLocalArtifact( Artifact artifact, ArtifactRepository localRepository )
+    public Artifact transformForResolve( Artifact artifact )
     {
-        if ( shouldProcessArtifact( artifact ) )
+        // TODO: implement
+        return artifact;
+    }
+
+    public Artifact transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    {
+        if ( isSnapshot( artifact ) )
         {
             // only store the version-local.txt file for POMs as every file has an associated POM
             ArtifactMetadata metadata = SnapshotArtifactMetadata.createLocalSnapshotMetadata( artifact );
@@ -196,21 +207,22 @@ public class SnapshotTransformation
         return artifact;
     }
 
-    public Artifact transformRemoteArtifact( Artifact artifact, ArtifactRepository remoteRepository )
+    public Artifact transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException
     {
-        if ( shouldProcessArtifact( artifact ) )
+        if ( isSnapshot( artifact ) )
         {
-            ArtifactMetadata metadata = SnapshotArtifactMetadata.createRemoteSnapshotMetadata( artifact );
-//            wagonManager.getMetadata( metadata, remoteRepository, localRepository );
+            SnapshotArtifactMetadata metadata = SnapshotArtifactMetadata.createRemoteSnapshotMetadata( artifact );
+            metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
+            metadata.update();
 
-            // TODO: implement
+            // TODO: note, we could currently transform this in place, as it is only used through the deploy mojo,
+            //   which creates the artifact and then disposes of it
+            artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), metadata.getVersion(),
+                                            artifact.getScope(), artifact.getType(), artifact.getClassifier() );
+            artifact.addMetadata( metadata );
         }
         return artifact;
-    }
-
-    private static boolean shouldProcessArtifact( Artifact artifact )
-    {
-        return isSnapshot( artifact ) && "pom".equals( artifact.getType() );
     }
 
     private static boolean isSnapshot( Artifact artifact )
