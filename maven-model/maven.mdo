@@ -76,48 +76,48 @@
         </field>
         <field>
           <name>url</name>
-          <description>the description</description>
+          <description>The URL where your project can be found.</description>
           <type>String</type>
         </field>
         <field>
           <name>logo</name>
-          <description>the description</description>
+          <description>The logo for your project.</description>
           <type>String</type>
         </field>
         <field>
           <name>issueTrackingUrl</name>
-          <description>the description</description>
+          <description>The URL where the issue tracking system used by your project can be found.</description>
           <type>String</type>
         </field>
         <field>
           <name>inceptionYear</name>
-          <description>the description</description>
+          <description>The year your project started.</description>
           <type>String</type>
         </field>
         <field>
           <name>gumpRepositoryId</name>
-          <description>the description</description>
+          <description>Hint for the gump continuous integration build system.</description>
           <type>String</type>
         </field>
         <field>
           <name>siteAddress</name>
-          <description>the description</description>
+          <description>The FQDN of the host where your project's site is uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>siteDirectory</name>
-          <description>the description</description>
+          <description>The directory on your site host where site documentation is placed when the site is uploaded.</description>
           <type>String</type>
         </field>
-        <!-- This naming is inconsistent -->
+        <!-- This naming is inconsistent and distriubtion should occur from a repository structure. -->
         <field>
           <name>distributionSite</name>
-          <description>the description</description>
+          <description>The FQDN of the host where your project's artifacts are uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>distributionDirectory</name>
-          <description>the description</description>
+          <description>The directory on your distribution host where artifacts are placed when uploaded.</description>
           <type>String</type>
         </field>
         <field>
