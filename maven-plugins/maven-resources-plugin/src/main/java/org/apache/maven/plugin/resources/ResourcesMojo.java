@@ -24,6 +24,7 @@ import org.apache.maven.plugin.PluginExecutionResponse;
 
 import org.codehaus.plexus.util.FileUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -86,7 +87,7 @@ public class ResourcesMojo
             {
                 destinationFile.getParentFile().mkdirs();
             }
-
+            
             fileCopy( resourceEntry.getSource(), destinationFile.getPath() );
         }
     }
@@ -169,35 +170,34 @@ public class ResourcesMojo
         return sb.toString();
     }
 
-    public static String fileRead( String fileName ) throws IOException
+    public static byte[] fileRead( String fileName ) throws IOException
     {
-        StringBuffer buf = new StringBuffer();
-
         FileInputStream in = new FileInputStream( fileName );
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         int count;
         byte[] b = new byte[512];
         while ( ( count = in.read( b ) ) > 0 )  // blocking read
         {
-            buf.append( new String( b, 0, count ) );
+            buffer.write(b, 0, count);
         }
 
         in.close();
 
-        return buf.toString();
+        return buffer.toByteArray();
     }
 
-    public static void fileWrite( String fileName, String data ) throws Exception
+    public static void fileWrite( String fileName, byte[] data ) throws Exception
     {
         FileOutputStream out = new FileOutputStream( fileName );
-        out.write( data.getBytes() );
+        out.write( data );
         out.close();
     }
 
     public static void fileCopy( String inFileName, String outFileName ) throws
         Exception
     {
-        String content = fileRead( inFileName );
+        byte[] content = fileRead( inFileName );
         fileWrite( outFileName, content );
     }
 
