@@ -17,9 +17,9 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginExecutionException;
 
+import java.io.IOException;
 import java.io.File;
 import java.io.FileWriter;
 
@@ -60,8 +60,8 @@ public class CoreItMojo
 
     private String goalItem;
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute()
+        throws PluginExecutionException
     {
         touch( new File( outputDirectory ), "touch.txt" );
 
@@ -83,19 +83,26 @@ public class CoreItMojo
     }
 
     private static void touch( File dir, String file )
-        throws Exception
+        throws PluginExecutionException
     {
-        if ( !dir.exists() )
+        try
         {
-            dir.mkdirs();
+             if ( !dir.exists() )
+             {
+                 dir.mkdirs();
+             }
+             
+             File touch = new File( dir, file );
+     
+             FileWriter w = new FileWriter( touch );
+             
+             w.write( file );
+             
+             w.close();
         }
-        
-        File touch = new File( dir, file );
-
-        FileWriter w = new FileWriter( touch );
-        
-        w.write( file );
-        
-        w.close();
+        catch ( IOException e )
+        {
+            throw new PluginExecutionException( "Error touching file", e );
+        }
     }
 }
