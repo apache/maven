@@ -209,7 +209,7 @@ public class DefaultPluginManager
     {
         artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
 
-        MavenMetadataSource metadataSource = new MavenMetadataSource( remotePluginRepositories, 
+        MavenMetadataSource metadataSource = new MavenMetadataSource( remotePluginRepositories,
                                                                       session.getLocalRepository(),
                                                                       artifactResolver );
 
@@ -239,7 +239,6 @@ public class DefaultPluginManager
             "plexus-container-api",
             "plexus-container-default",
             "plexus-artifact-container",
-            "plexus-utils",
             "classworlds"
         } );
 
