@@ -13,6 +13,10 @@ Maven Lifecycle
      - dep resolution (if POM present)
 
      - goal lifecycle
+       
+       - goal resolution (including plugin download)
+       
+       - goal execution
 
  * Multiple goals
  
@@ -30,3 +34,11 @@ Maven Lifecycle
     
   * where a goal does not require a pom.xml (pom-writer, for example).
     Here, the pom should NOT be read.
+
+ Notes
+ 
+  * Goal Resolution: Involves resolving all implied goals (via prereqs, pre- 
+    and post-goal decorations, and resolving/downloading any associated
+    plugins. Plugin download must be a utility used by this, to ensure that
+    any resolved goals can have their associated plugins downloaded.
+    
