@@ -67,7 +67,7 @@ public class Bootstrapper
 
         if ( mavenRepoLocalProperty == null )
         {
-            mavenRepoLocalProperty = System.getProperty( "user.home" ) + "/maven/repository";
+            mavenRepoLocalProperty = System.getProperty( "user.home" ) + "/.maven/repository";
         }
 
         mavenRepoLocal = new File( mavenRepoLocalProperty );
