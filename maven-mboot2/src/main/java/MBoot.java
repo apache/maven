@@ -57,6 +57,7 @@ public class MBoot
     String[] builds = new String[]
     {
         "maven-model",
+        "maven-artifact",
         "maven-plugin",
         "maven-core",
         "maven-plugins/maven-clean-plugin",
