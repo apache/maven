@@ -31,6 +31,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Contains the information stored for a snapshot.
@@ -53,6 +55,8 @@ public class SnapshotArtifactMetadata
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
     private long lastModified = 0;
+
+    private static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
     public SnapshotArtifactMetadata( Artifact artifact )
     {
@@ -169,28 +173,16 @@ public class SnapshotArtifactMetadata
         String version = FileUtils.fileRead( file );
         lastModified = file.lastModified();
 
-/* TODO: try this
-        if( version.matches( "/^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$/" ))
+        Matcher matcher = VERSION_FILE_PATTERN.matcher( version );
+        if ( matcher.matches() )
         {
-
+            timestamp = matcher.group( 2 );
+            buildNumber = Integer.valueOf( matcher.group( 3 ) ).intValue();
         }
-*/
-
-        int index = version.lastIndexOf( "-" );
-        if ( version.indexOf( "SNAPSHOT" ) >= 0 || index < 0 )
+        else
         {
             timestamp = null;
             buildNumber = 0;
-            return;
-        }
-
-        timestamp = version.substring( 0, index );
-        buildNumber = Integer.valueOf( version.substring( index + 1 ) ).intValue();
-        index = timestamp.lastIndexOf( "-" );
-        if ( index >= 0 )
-        {
-            // ignore starting version part, will be prepended later
-            timestamp = timestamp.substring( index + 1 );
         }
     }
 
