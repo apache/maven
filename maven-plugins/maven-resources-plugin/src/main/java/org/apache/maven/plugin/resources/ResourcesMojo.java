@@ -68,6 +68,8 @@ public class ResourcesMojo
         //
         // ----------------------------------------------------------------------
 
+        System.out.println( "request.getParameter().getClass() = " + request.getParameter( "outputDirectory").getClass() );
+
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
         List resources = (List) request.getParameter( "resources" );

@@ -39,14 +39,14 @@ import java.util.List;
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.unitTest.resources"
+ *  expression="#project.build.directory/test-classes"
  *  description=""
  * @parameter
  *  name="resources"
  *  type="List"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory/test-classes"
+ *  expression="#project.build.unitTest.resources"
  *  description=""
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
