@@ -155,7 +155,7 @@ public class Bootstrapper
 
             writeFile( "bootstrap.tests.excludes", tests.toString() );
 
-            writeResources( unitTests.getResources(), "bootstrap.test.resources" );
+            writeResources( unitTests.getResources(), "bootstrap.tests.resources" );
         }
     }
 
