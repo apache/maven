@@ -46,23 +46,27 @@
         <field>
           <name>modelVersion</name>
           <version>4.0.0</version>
+          <required>true</required>
           <description>The version of this model you are using.</description>
           <type>String</type>
         </field>
         <field>
           <name>pomVersion</name>
           <version>3.0.0</version>
+          <required>true</required>
           <delegateTo>modelVersion</delegateTo>
         </field>
         <field>
           <name>groupId</name>
           <version>3.0.0</version>
+          <required>true</required>
           <description>The primary grouping for your project.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
           <version>3.0.0</version>
+          <required>true</required>
           <description>The identifier used when generating the artifact for your project.</description>
           <type>String</type>
         </field>
@@ -76,17 +80,20 @@
         <field>
           <name>name</name>
           <version>3.0.0</version>
+          <required>true</required>
           <description>Human readable name of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>currentVersion</name>
           <version>3.0.0</version>
+          <required>true</required>
           <delegateTo>version</delegateTo>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0</version>
+          <required>true</required>
           <description>The current version of the project.</description>
           <type>String</type>
         </field>
@@ -129,44 +136,52 @@
         <field>
           <name>inceptionYear</name>
           <version>3.0.0</version>
+          <required>true</required>
           <description>The year the project started.</description>
           <type>String</type>
         </field>
         <field>
           <name>gumpRepositoryId</name>
+          <version>3.0.0</version>
           <description>Hint for the gump continuous integration build system.</description>
           <type>String</type>
         </field>
         <field>
           <name>siteAddress</name>
+          <version>3.0.0</version>
           <description>The FQDN of the host where the project's site is uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>siteDirectory</name>
+          <version>3.0.0</version>
           <description>The directory on the site host where site documentation is placed when the site is uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>distributionSite</name>
+          <version>3.0.0</version>
           <description>The FQDN of the host where the project's artifacts are uploaded.</description>
           <type>String</type>
           <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
         </field>
         <field>
           <name>distributionDirectory</name>
+          <version>3.0.0</version>
           <description>The directory on the distribution host where artifacts are placed when uploaded.</description>
           <type>String</type>
           <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
         </field>
         <field>
           <name>mailingLists</name>
+          <version>3.0.0+</version>
           <description>The mailing lists for the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>developers</name>
+          <version>3.0.0+</version>
           <description>
             This element describes all of the developers associated with a
             project.  Each developer is described by a
@@ -179,6 +194,7 @@
         </field>
         <field>
           <name>contributors</name>
+          <version>3.0.0+</version>
           <description>
             This element describes all of the contributors associated with a
             project who are not developers.  Each contributor is described by a
@@ -191,6 +207,7 @@
         </field>
         <field>
           <name>dependencies</name>
+          <version>3.0.0+</version>
           <description>
             This element describes all of the dependencies associated with a
             project.  Each dependency is described by a
@@ -203,6 +220,7 @@
         </field>
         <field>
           <name>licenses</name>
+          <version>3.0.0+</version>
           <description>
             This element describes all of the licenses for this project.  Each license is described by a
             <code>license</code> element, which is then describe by additional
@@ -215,24 +233,28 @@
         </field>
         <field>
           <name>versions</name>
+          <version>3.0.0</version>
           <description>The released versions of the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>branches</name>
+          <version>3.0.0</version>
           <description>The SCM branches create for the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>packageGroups</name>
+          <version>3.0.0+</version>
           <description>Package groups required for complete javadocs.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>reports</name>
+          <version>3.0.0+</version>
           <description>
             This element includes the specification of reports to be
             included in a Maven-generated site.  These reports will be run
@@ -245,17 +267,27 @@
         </field>
         <field>
           <name>scm</name>
+          <version>4.0.0</version>
           <description>Specification for the SCM use by the project.</description>
           <type>Scm</type>
+        </field>
+        <field>
+          <name>repository</name>
+          <version>3.0.0</version>
+          <description>Specification for the SCM use by the project.</description>
+          <type>Repository</type>
           <comment>This element needs to be renamed as it conflicts with the existing notion of repositories in Maven.</comment>
         </field>
         <field>
           <name>build</name>
+          <version>3.0.0+</version>
+          <required>true</required>
           <description>Information required to build the project.</description>
           <type>Build</type>
         </field>
         <field>
           <name>organization</name>
+          <version>3.0.0+</version>
           <description>
             This element describes various attributes of the organziation to
             which the project belongs.  These attributes are utilized when
@@ -314,6 +346,7 @@
     </class>
     <class>
       <name>Branch</name>
+      <version>3.0.0</version>
       <description>
         This element describes each of the branches of the
         project. Each branch is described by a <code>tag</code>
@@ -334,6 +367,7 @@
     </class>
     <class>
       <name>Build</name>
+      <version>3.0.0+</version>
       <fields>
         <field>
           <name>nagEmailAddress</name>
@@ -350,6 +384,8 @@
         </field>
         <field>
           <name>sourceDirectory</name>
+          <version>3.0.0+</version>
+          <required>true</required>
           <description>
             This element specifies a directory containing the source
             of the project. The generated build system will compile
@@ -360,6 +396,8 @@
         </field>
         <field>
           <name>unitTestSourceDirectory</name>
+          <version>3.0.0+</version>
+          <required>true</required>
           <description>
             This element specifies a directory containing the unit test
             source of the project. The generated build system will
@@ -371,6 +409,7 @@
         </field>
         <field>
           <name>aspectSourceDirectory</name>
+          <version>3.0.0</version>
           <description>
             This element specifies a directory containing Aspect
             sources of the project.  The generated build system will
@@ -383,6 +422,8 @@
         </field>
         <field>
           <name>sourceModifications</name>
+          <version>3.0.0+</version>
+          <required>true</required>
           <description>
             This element describes all of the sourceModifications associated with a
             project.  Each source modification is described by a
@@ -396,12 +437,15 @@
         </field>
         <field>
           <name>unitTest</name>
+          <version>3.0.0+</version>
+          <required>true</required>
           <description>This element specifies unit tests associated with the project.</description>
           <type>UnitTest</type>
           <defaultValue>new UnitTest()</defaultValue>
         </field>
         <field>
           <name>resources</name>
+          <version>3.0.0+</version>
           <description>
             This element describes all of the resources associated with a project or unit tests.
             Each resource is described by a resource element, which is then described by additional
@@ -415,6 +459,7 @@
     </class>
     <class>
       <name>Contributor</name>
+      <version>3.0.0+</version>
       <fields>
         <field>
           <name>name</name>
@@ -457,9 +502,26 @@
     </class>
     <class>
       <name>Dependency</name>
+      <version>3.0.0+</version>
       <fields>
+        <!--
+
+        Need to put versions on code segments ...
+
+        <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            The id of the dependency.
+          </description>
+          <type>String</type>
+        </field>
+        -->
         <field>
           <name>groupId</name>
+          <version>4.0.0</version>
+          <required>true</required>
           <description>
             The project group that produced the dependency, e.g. <code>geronimo</code>.
           </description>
@@ -467,6 +529,8 @@
         </field>
         <field>
           <name>artifactId</name>
+          <version>4.0.0</version>
+          <required>true</required>
           <description>
             The unique id for an artifact produced by the project group, e.g.
             <code>germonimo-jms</code>
@@ -475,6 +539,8 @@
         </field>
         <field>
           <name>version</name>
+          <version>3.0.0+</version>
+          <required>true</required>
           <description>
             The version of the dependency., e.g. <code>3.2.1</code>
           </description>
@@ -482,6 +548,7 @@
         </field>
         <field>
           <name>url</name>
+          <version>3.0.+</version>
           <description>
             This url will be provided to the user if the jar file cannot be downloaded
             from the central repository.
@@ -490,12 +557,20 @@
           <comment>The URL should really be gleaned from a shared database of dependency information.</comment>
         </field>
         <field>
+          <name>jar</name>
+          <version>3.0.0</version>
+          <description>Literal name of the artifact.</description>
+          <type>String</type>
+        </field>
+        <field>
           <name>artifact</name>
-          <description>the description</description>
+          <version>4.0.0+</version>
+          <description>Literal name of the artifact</description>
           <type>String</type>
         </field>
         <field>
           <name>type</name>
+          <version>3.0.0+</version>
           <description>
             Other known and recognised dependency types are:
             <code>ejb</code> and <code>plugin</code>.
@@ -505,6 +580,7 @@
         </field>
         <field>
           <name>properties</name>
+          <version>3.0.0+</version>
           <description>
             Properties about the dependency. Various plugins allow you to
             <code>mark</code> dependencies with properties. For example the
@@ -526,6 +602,7 @@
     <class>
       <superClass>Contributor</superClass>
       <name>Developer</name>
+      <version>3.0.0+</version>
       <fields>
         <field>
           <name>id</name>
@@ -554,6 +631,7 @@
     </class>
     <class>
       <name>License</name>
+      <version>3.0.0+</version>
       <fields>
         <field>
           <name>name</name>
@@ -587,6 +665,7 @@
     </class>
     <class>
       <name>MailingList</name>
+      <version>3.0.0+</version>
       <description>
         This element describes all of the mailing lists associated with
         a project.  Each mailing list is described by a
@@ -634,6 +713,7 @@
     </class>
     <class>
       <name>Organization</name>
+      <version>3.0.0+</version>
       <fields>
         <field>
           <name>name</name>
@@ -660,6 +740,7 @@
     </class>
     <class>
       <name>PackageGroup</name>
+      <version>3.0.0+</version>
       <fields>
         <field>
           <name>title</name>
@@ -675,6 +756,7 @@
     </class>
     <class>
       <name>PatternSet</name>
+      <version>3.0.0+</version>
       <fields>
         <field>
           <name>includes</name>
@@ -692,6 +774,7 @@
     </class>
     <class>
       <name>Parent</name>
+      <version>4.0.0</version>
       <fields>
         <field>
           <name>artifactId</name>
@@ -711,7 +794,38 @@
       </fields>
     </class>
     <class>
+      <name>Repository</name>
+      <version>3.0.0</version>
+      <fields>
+        <field>
+          <name>connection</name>
+          <description>
+            The source configuration management system URL
+            that describes the repository and how to connect to the
+            repository.  This is used by Maven when <a
+            href="plugins/dist/index.html">building versions</a>
+            from specific ID.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>developerConnection</name>
+          <description>
+            Just like connection, but for developers, i.e. this scm connection
+            will not be read only.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <description>The URL to the project's browsable CVS repository.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
       <name>Scm</name>
+      <version>4.0.0</version>
       <fields>
         <field>
           <name>connection</name>
@@ -741,6 +855,7 @@
     </class>
     <class>
       <name>Resource</name>
+      <version>3.0.0+</version>
       <superClass>PatternSet</superClass>
       <fields>
         <field>
@@ -770,6 +885,7 @@
     </class>
     <class>
       <name>SourceModification</name>
+      <version>3.0.0+</version>
       <superClass>Resource</superClass>
       <fields>
         <field>
@@ -791,6 +907,7 @@
     </class>
     <class>
       <name>UnitTest</name>
+      <version>3.0.0+</version>
       <superClass>PatternSet</superClass>
       <fields>
         <field>
@@ -803,6 +920,7 @@
     </class>
     <class>
       <name>Version</name>
+      <version>3.0.0</version>
       <description>
         This element describes each of the previous versions of the
         project. Each version is described by a <code>version</code>
