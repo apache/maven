@@ -87,7 +87,7 @@ public class MavenMetadataSource
         {
             Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(),
                                                                         artifact.getArtifactId(),
-                                                                        artifact.getVersion(), artifact.getScope(),
+                                                                        artifact.getBaseVersion(), artifact.getScope(),
                                                                         "pom", null );
 
             try
