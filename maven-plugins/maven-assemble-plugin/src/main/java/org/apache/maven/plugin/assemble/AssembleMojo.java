@@ -194,7 +194,12 @@ public class AssembleMojo
                     {
                         includes = null;
                     }
-                    String[] excludes = (String[]) fileset.getExcludes().toArray( EMPTY_STRING_ARRAY );
+                    String[] excludes = null;
+                    if ( !fileset.getExcludes().isEmpty() )
+                    {
+                        excludes = (String[]) fileset.getExcludes().toArray( EMPTY_STRING_ARRAY );
+                    }
+                    // TODO: default excludes?
                     archiver.addDirectory( new File( directory ), output, includes, excludes );
                 }
 
