@@ -94,7 +94,7 @@ public class PluginDescriptorGeneratorTest
         assertEquals( "org.apache.maven.tools.plugin.generator.TestMojo", mojoDescriptor.getImplementation() );
 
         // The following should be defaults
-        assertEquals( "singleton", mojoDescriptor.getInstantiationStrategy() );
+        assertEquals( "per-lookup", mojoDescriptor.getInstantiationStrategy() );
 
         assertTrue( mojoDescriptor.requiresDependencyResolution() );
 

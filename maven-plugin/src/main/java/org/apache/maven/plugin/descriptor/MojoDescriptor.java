@@ -40,7 +40,7 @@ public class MojoDescriptor
 
     private Map parameterMap;
 
-    private String instantiationStrategy = "singleton";
+    private String instantiationStrategy = "per-lookup";
 
     private String executionStrategy = SINGLE_PASS_EXEC_STRATEGY;
 
