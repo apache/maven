@@ -28,8 +28,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.lifecycle.Phase;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -82,9 +80,6 @@ public class DefaultPluginManager
     protected ArtifactFilter artifactFilter;
 
     protected MavenProjectBuilder mavenProjectBuilder;
-
-    // TODO: remove
-    private LifecycleExecutor lifecycleExecutor;
 
     public DefaultPluginManager()
     {
@@ -140,24 +135,6 @@ public class DefaultPluginManager
             MavenMojoDescriptor mavenMojoDescriptor = (MavenMojoDescriptor) it.next();
 
             MojoDescriptor mojoDescriptor = mavenMojoDescriptor.getMojoDescriptor();
-
-            String id = mojoDescriptor.getPhase();
-
-            if ( id != null )
-            {
-                Phase phase = lifecycleExecutor.getPhase( id );
-
-                if ( phase != null )
-                {
-                    // TODO: remove debugging
-                    System.err.println( "adding " + mavenMojoDescriptor.getId() + " to phase " + phase.getId() );
-                    phase.getGoals().add( mavenMojoDescriptor.getId() );
-                }
-                else
-                {
-                    // TODO: this should fail
-                }
-            }
 
             mojoDescriptors.put( mojoDescriptor.getId(), mojoDescriptor );
 
@@ -238,8 +215,6 @@ public class DefaultPluginManager
         artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
 
         mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
-
-        lifecycleExecutor = (LifecycleExecutor) container.lookup( LifecycleExecutor.ROLE );
 
         MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver,
                                                                       mavenProjectBuilder );

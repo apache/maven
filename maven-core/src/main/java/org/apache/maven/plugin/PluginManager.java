@@ -34,15 +34,15 @@ public interface PluginManager
     PluginExecutionResponse executeMojo( MavenSession session, String goalName )
          throws GoalExecutionException;
 
+    // TODO: not used - needs to be in interface?
     void processPluginDescriptor( MavenPluginDescriptor pluginDescriptor )
         throws Exception;
 
-    // TODO: not currently used
+    // TODO: not currently used - needs to be in interface?
     Map getMojoDescriptors();
 
-    // TODO: not currently used (usages are in the phases that are no longer used)
     MojoDescriptor getMojoDescriptor( String goalId );
 
-    void verifyPluginForGoal( String pluginId, MavenSession session )
+    void verifyPluginForGoal( String goalName, MavenSession session )
         throws Exception;
 }
