@@ -20,10 +20,10 @@ import org.apache.maven.MavenTestCase;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -61,13 +61,14 @@ public class CanonicalProjectBuilderTest
 
         assertEquals( "1.0", plugin.getVersion() );
 
-        Properties properties = plugin.getConfiguration();
+        Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
 
-        assertEquals( "src/conf/plexus.conf", properties.getProperty( "plexusConfiguration" ) );
+        assertEquals( "src/conf/plexus.conf", configuration.getChild( "plexusConfiguration" ).getValue() );
 
-        assertEquals( "src/conf/plexus.properties", properties.getProperty( "plexusConfigurationPropertiesFile" ) );
+        assertEquals( "src/conf/plexus.properties",
+                      configuration.getChild( "plexusConfigurationPropertiesFile" ).getValue() );
 
-        assertEquals( "Continuum", properties.getProperty( "plexusApplicationName" ) );
+        assertEquals( "Continuum", configuration.getChild( "plexusApplicationName" ).getValue() );
 
         // ----------------------------------------------------------------------
         // Goal specific configuration
@@ -79,9 +80,9 @@ public class CanonicalProjectBuilderTest
 
         assertEquals( "plexus:runtime", g0.getId() );
 
-        Properties goalProperties = g0.getConfiguration();
+        configuration = (Xpp3Dom) g0.getConfiguration();
 
-        assertEquals( "ContinuumPro", goalProperties.getProperty( "plexusApplicationName" ) );
+        assertEquals( "ContinuumPro", configuration.getChild( "plexusApplicationName" ).getValue() );
 
         // Plugin1 [antlr]
     }

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -92,12 +91,6 @@ public class DefaultModelDefaultsInjector
             plugin.setVersion( def.getVersion() );
         }
 
-        Boolean disabled = plugin.isDisabled();
-        if ( disabled == null )
-        {
-            plugin.setDisabled( def.isDisabled() );
-        }
-
         Map goalMap = new TreeMap();
 
         List pluginGoals = plugin.getGoals();
@@ -125,22 +118,22 @@ public class DefaultModelDefaultsInjector
                 }
                 else
                 {
-                    Properties conf = defaultGoal.getConfiguration();
-
-                    conf.putAll( localGoal.getConfiguration() );
-
-                    localGoal.setConfiguration( conf );
+                    // TODO: merge
+                    if ( localGoal.getConfiguration() == null )
+                    {
+                        localGoal.setConfiguration( defaultGoal.getConfiguration() );
+                    }
                 }
             }
         }
 
         plugin.setGoals( new ArrayList( goalMap.values() ) );
 
-        Properties props = new Properties( def.getConfiguration() );
-
-        props.putAll( plugin.getConfiguration() );
-
-        plugin.setConfiguration( props );
+        // TODO: merge
+        if ( plugin.getConfiguration() == null )
+        {
+            plugin.setConfiguration( def.getConfiguration() );
+        }
     }
 
     private void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )

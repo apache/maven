@@ -40,13 +40,14 @@ import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -59,7 +60,6 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -88,6 +88,8 @@ public class DefaultPluginManager
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
 
     protected MavenSettingsBuilder mavenSettingsBuilder;
+
+    protected ComponentConfigurator configurator;
 
     public DefaultPluginManager()
     {
@@ -136,7 +138,8 @@ public class DefaultPluginManager
 
     private Set pluginsInProcess = new HashSet();
 
-    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor ) throws CycleDetectedException
+    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor )
+        throws CycleDetectedException
     {
         if ( pluginsInProcess.contains( mavenPluginDescriptor.getPluginId() ) )
         {
@@ -207,7 +210,8 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPluginForGoal( String goalName, MavenSession session ) throws Exception
+    public void verifyPluginForGoal( String goalName, MavenSession session )
+        throws Exception
     {
         String pluginId = getPluginId( goalName );
 
@@ -216,7 +220,8 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPlugin( String groupId, String artifactId, MavenSession session ) throws Exception
+    public void verifyPlugin( String groupId, String artifactId, MavenSession session )
+        throws Exception
     {
         if ( !isPluginInstalled( groupId, artifactId ) )
         {
@@ -263,7 +268,7 @@ public class DefaultPluginManager
 
                 // TODO: more hard coding here...
                 Artifact pluginArtifact = artifactFactory.createArtifact( "maven", artifactId, version, null,
-                                                                          "maven-plugin", "jar", null );
+                                                                          "maven-plugin", null );
 
                 addPlugin( pluginArtifact, session );
             }
@@ -278,7 +283,8 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    protected void addPlugin( Artifact pluginArtifact, MavenSession session ) throws Exception
+    protected void addPlugin( Artifact pluginArtifact, MavenSession session )
+        throws Exception
     {
         ArtifactResolver artifactResolver = null;
         MavenProjectBuilder mavenProjectBuilder = null;
@@ -314,7 +320,8 @@ public class DefaultPluginManager
     // Plugin execution
     // ----------------------------------------------------------------------
 
-    public void executeMojo( MavenSession session, String goalName ) throws PluginExecutionException
+    public void executeMojo( MavenSession session, String goalName )
+        throws PluginExecutionException
     {
         try
         {
@@ -388,13 +395,19 @@ public class DefaultPluginManager
                 // intentionally ignored
             }
 
+            // TODO: can probable refactor these a little when only the new plugin technique is in place
+            PlexusConfiguration configuration = getProjectDefinedPluginConfiguration( session.getProject(),
+                                                                                      mojoDescriptor.getId() );
+
+            Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session );
+
             if ( newMojoTechnique )
             {
-                populateParameters( plugin, mojoDescriptor, session );
+                populatePluginFields( plugin, configuration, map );
             }
             else
             {
-                request = new PluginExecutionRequest( createParameters( mojoDescriptor, session ) );
+                request = createPluginRequest( configuration, map );
             }
 
             // !! This is ripe for refactoring to an aspect.
@@ -449,7 +462,8 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request ) throws Exception
+    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
+        throws Exception
     {
         if ( request != null && request.getParameters() != null )
         {
@@ -475,76 +489,77 @@ public class DefaultPluginManager
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
 
-    private void populateParameters( Plugin plugin, MojoDescriptor mojoDescriptor, MavenSession session )
+    private static PluginExecutionRequest createPluginRequest( PlexusConfiguration configuration, Map map )
         throws PluginConfigurationException
     {
-        // TODO: merge eventually, just to avoid reuse
-        // TODO: probably want to use the plexus component configurator... then do the additional processing in
-        //  createParameters afterwards. Not sure how we might find files that are nested in other objects... perhaps
-        //  we add a "needs translation" to the mojo so such types can be translated (implementing some interface) and
-        //  address their own file objects
-        Map values = createParameters( mojoDescriptor, session );
-
-        List parameters = mojoDescriptor.getParameters();
-
-        Xpp3Dom dom = new Xpp3Dom( mojoDescriptor.getId() );
-
-        for ( Iterator i = parameters.iterator(); i.hasNext(); )
-        {
-            Parameter param = (Parameter) i.next();
-            String name = param.getName();
-            Object value = values.get( name );
-
-            // TODO:Still not complete robust - need to merge in the processing in createParameters
-            if ( value instanceof String )
-            {
-                Xpp3Dom d = new Xpp3Dom( name );
-                d.setValue( (String) value );
-                dom.addChild( d );
-            }
-            else
-            {
-                Class clazz = plugin.getClass();
-                try
-                {
-                    Field f = clazz.getDeclaredField( name );
-                    boolean accessible = f.isAccessible();
-                    if ( !accessible )
-                    {
-                        f.setAccessible( true );
-                    }
-
-                    f.set( plugin, value );
-
-                    if ( !accessible )
-                    {
-                        f.setAccessible( false );
-                    }
-                }
-                catch ( NoSuchFieldException e )
-                {
-                    throw new PluginConfigurationException( "Unable to set field '" + name + "' on '" + clazz + "'" );
-                }
-                catch ( IllegalAccessException e )
-                {
-                    throw new PluginConfigurationException( "Unable to set field '" + name + "' on '" + clazz + "'" );
-                }
-            }
-        }
-
-        // TODO: should be a component
-        ComponentConfigurator configurator = new BasicComponentConfigurator();
         try
         {
-            configurator.configureComponent( plugin, new XmlPlexusConfiguration( dom ) );
+            Map parameters = new HashMap();
+            PlexusConfiguration[] children = configuration.getChildren();
+            for ( int i = 0; i < children.length; i++ )
+            {
+                PlexusConfiguration child = children[i];
+                parameters.put( child.getName(), child.getValue() );
+            }
+            map = CollectionUtils.mergeMaps( map, parameters );
+        }
+        catch ( PlexusConfigurationException e )
+        {
+            throw new PluginConfigurationException( "Unable to construct map from plugin configuration", e );
+        }
+        return new PluginExecutionRequest( map );
+    }
+
+    private void populatePluginFields( Plugin plugin, PlexusConfiguration configuration, Map map )
+        throws PluginConfigurationException
+    {
+        try
+        {
+            configurator.configureComponent( plugin, configuration );
         }
         catch ( ComponentConfigurationException e )
         {
             throw new PluginConfigurationException( "Unable to parse the created DOM for plugin configuration", e );
         }
+
+        // Configuration does not store objects, so the non-String fields are configured here
+        // TODO: we don't have converters, so something things that -are- strings are not configured properly (eg String -> File from an expression)
+        for ( Iterator i = map.keySet().iterator(); i.hasNext(); )
+        {
+            String key = (String) i.next();
+            Object value = map.get( key );
+
+            Class clazz = plugin.getClass();
+            try
+            {
+                Field f = clazz.getDeclaredField( key );
+                boolean accessible = f.isAccessible();
+                if ( !accessible )
+                {
+                    f.setAccessible( true );
+                }
+
+                f.set( plugin, value );
+
+                if ( !accessible )
+                {
+                    f.setAccessible( false );
+                }
+            }
+            catch ( NoSuchFieldException e1 )
+            {
+                throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
+            }
+            catch ( IllegalAccessException e11 )
+            {
+                throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
+            }
+        }
     }
 
-    public Map createParameters( MojoDescriptor goal, MavenSession session ) throws PluginConfigurationException
+    private Map getPluginConfigurationFromExpressions( MojoDescriptor goal, PlexusConfiguration configuration,
+                                                       MavenSession session )
+        throws PluginConfigurationException
     {
         List parameters = goal.getParameters();
 
@@ -556,65 +571,57 @@ public class DefaultPluginManager
 
             String key = parameter.getName();
 
-            String expression = parameter.getExpression();
-
-            Object value = PluginParameterExpressionEvaluator.evaluate( expression, session );
-
-            getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
-
-            if ( value == null )
+            if ( configuration.getChild( key, false ) == null )
             {
-                if ( parameter.getDefaultValue() != null )
+                String expression = parameter.getExpression();
+
+                Object value = PluginParameterExpressionEvaluator.evaluate( expression, session );
+
+                getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
+
+                if ( value == null )
                 {
-                    value = PluginParameterExpressionEvaluator.evaluate( parameter.getDefaultValue(), session );
+                    if ( parameter.getDefaultValue() != null )
+                    {
+                        value = PluginParameterExpressionEvaluator.evaluate( parameter.getDefaultValue(), session );
+                    }
                 }
-            }
 
-            map.put( key, value );
-        }
+                // ----------------------------------------------------------------------
+                // We will perform a basic check here for parameters values that are
+                // required. Required parameters can't be null so we throw an
+                // Exception in the case where they are. We probably want some
+                // pluggable
+                // mechanism here but this will catch the most obvious of
+                // misconfigurations.
+                // ----------------------------------------------------------------------
 
-        if ( session.getProject() != null )
-        {
-            map = mergeProjectDefinedPluginConfiguration( session.getProject(), goal.getId(), map );
-        }
+                if ( value == null && parameter.isRequired() )
+                {
+                    throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
+                }
 
-        for ( int i = 0; i < parameters.size(); i++ )
-        {
-            Parameter parameter = (Parameter) parameters.get( i );
+                String type = parameter.getType();
 
-            String key = parameter.getName();
+                // TODO: Not sure how we might find files that are nested in other objects... perhaps
+                //  we add a "needs translation" to the mojo so such types can be translated (implementing some interface) and
+                //  address their own file objects
+                if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
+                {
+                    value = pathTranslator.alignToBaseDirectory( (String) value,
+                                                                 session.getProject().getFile().getParentFile() );
+                }
 
-            Object value = map.get( key );
-
-            // ----------------------------------------------------------------------
-            // We will perform a basic check here for parameters values that are
-            // required. Required parameters can't be null so we throw an
-            // Exception in the case where they are. We probably want some
-            // pluggable
-            // mechanism here but this will catch the most obvious of
-            // misconfigurations.
-            // ----------------------------------------------------------------------
-
-            if ( value == null && parameter.isRequired() )
-            {
-                throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
-            }
-
-            String type = parameter.getType();
-
-            if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
-            {
-                value = pathTranslator.alignToBaseDirectory( (String) value, session.getProject().getFile()
-                                                                                    .getParentFile() );
                 map.put( key, value );
             }
         }
-
         return map;
     }
 
-    public static Map mergeProjectDefinedPluginConfiguration( MavenProject project, String goalId, Map map )
+    private static PlexusConfiguration getProjectDefinedPluginConfiguration( MavenProject project, String goalId )
     {
+        Xpp3Dom dom = null;
+
         // ----------------------------------------------------------------------
         // I would like to be able to lookup the Plugin object using a key but
         // we have a limitation in modello that will be remedied shortly. So
@@ -625,14 +632,14 @@ public class DefaultPluginManager
         {
             String pluginId = getPluginId( goalId );
 
-            for ( Iterator iterator = project.getPlugins().iterator(); iterator.hasNext(); )
+            for ( Iterator iterator = project.getPlugins().iterator(); iterator.hasNext() && dom == null; )
             {
                 org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) iterator.next();
 
                 // TODO: groupID not handled
                 if ( pluginId.equals( plugin.getArtifactId() ) )
                 {
-                    map = CollectionUtils.mergeMaps( plugin.getConfiguration(), map );
+                    dom = (Xpp3Dom) plugin.getConfiguration();
 
                     // TODO: much less of this magic is needed - make the mojoDescriptor just store the first and second part
                     int index = goalId.indexOf( ':' );
@@ -644,26 +651,78 @@ public class DefaultPluginManager
                             Goal goal = (Goal) j.next();
                             if ( goal.getId().equals( goalName ) )
                             {
-                                map = CollectionUtils.mergeMaps( goal.getConfiguration(), map );
+                                Xpp3Dom goalConfiguration = copyXpp3Dom( (Xpp3Dom) goal.getConfiguration() );
+                                mergeXpp3Dom( goalConfiguration, dom );
+                                dom = goalConfiguration;
                                 break;
                             }
                         }
                     }
-
-                    return map;
                 }
             }
         }
 
-        return map;
+        PlexusConfiguration configuration;
+        if ( dom == null )
+        {
+            configuration = new XmlPlexusConfiguration( "configuration" );
+        }
+        else
+        {
+            configuration = new XmlPlexusConfiguration( dom );
+        }
+
+        return configuration;
+    }
+
+    private static void mergeXpp3Dom( Xpp3Dom dominant, Xpp3Dom recessive )
+    {
+        // TODO: how to merge lists rather than override?
+        // TODO: share this as some sort of assembler, implement a walk interface?
+        Xpp3Dom[] children = recessive.getChildren();
+        for ( int i = 0; i < children.length; i++ )
+        {
+            Xpp3Dom child = children[i];
+            Xpp3Dom childDom = dominant.getChild( child.getName() );
+            if ( childDom != null )
+            {
+                mergeXpp3Dom( childDom, child );
+            }
+            else
+            {
+                dominant.addChild( copyXpp3Dom( child ) );
+            }
+        }
+    }
+
+    private static Xpp3Dom copyXpp3Dom( Xpp3Dom src )
+    {
+        // TODO: into Xpp3Dom as a copy constructor
+        Xpp3Dom dom = new Xpp3Dom( src.getName() );
+        dom.setValue( src.getValue() );
+
+        String[] attributeNames = src.getAttributeNames();
+        for ( int i = 0; i < attributeNames.length; i++ )
+        {
+            String attributeName = attributeNames[i];
+            dom.setAttribute( attributeName, src.getAttribute( attributeName ) );
+        }
+
+        Xpp3Dom[] children = src.getChildren();
+        for ( int i = 0; i < children.length; i++ )
+        {
+            dom.addChild( copyXpp3Dom( children[i] ) );
+        }
+
+        return dom;
     }
 
     public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter )
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " )
-               .append( mojo.getId() ).append( " mojo and cannot be null." );
+        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " ).append(
+            mojo.getId() ).append( " mojo and cannot be null." );
 
         return message.toString();
     }
@@ -672,7 +731,8 @@ public class DefaultPluginManager
     // Lifecycle
     // ----------------------------------------------------------------------
 
-    public void contextualize( Context context ) throws ContextException
+    public void contextualize( Context context )
+        throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -680,18 +740,11 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[] {
-            "maven-core",
-            "maven-artifact",
-            "maven-model",
-            "maven-settings",
-            "maven-monitor",
-            "maven-plugin",
-            "plexus-container-api",
-            "plexus-container-default",
-            "plexus-artifact-container",
-            "wagon-provider-api",
-            "classworlds" } );
+        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
+                                                              "maven-settings", "maven-monitor", "maven-plugin",
+                                                              "plexus-container-api", "plexus-container-default",
+                                                              "plexus-artifact-container", "wagon-provider-api",
+                                                              "classworlds"} );
 
     }
 
@@ -700,7 +753,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
-                                               MavenProjectBuilder mavenProjectBuilder )
+                                                MavenProjectBuilder mavenProjectBuilder )
         throws ArtifactResolutionException
     {
         MavenProject project = context.getProject();

@@ -1976,18 +1976,8 @@
           <type>String</type>
         </field>
         <field>
-          <name>disabled</name>
-          <version>4.0.0</version>
-          <type>String</type>
-          <!-- defaultValue>false</defaultValue -->
-        </field>
-        <field>
           <name>configuration</name>
-          <type>Properties</type>
-          <association xml.mapStyle="inline">
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
+          <type>DOM</type>
         </field>
         <field>
           <name>goals</name>
@@ -2009,18 +1999,8 @@
           <type>String</type>
         </field>
         <field>
-          <name>disabled</name>
-          <version>4.0.0</version>
-          <type>String</type>
-          <!-- defaultValue>false</defaultValue -->
-        </field>
-        <field>
           <name>configuration</name>
-          <type>Properties</type>
-          <association xml.mapStyle="inline">
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
+          <type>DOM</type>
         </field>
       </fields>
     </class>

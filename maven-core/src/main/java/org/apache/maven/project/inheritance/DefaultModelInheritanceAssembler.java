@@ -31,7 +31,6 @@ import org.codehaus.plexus.util.StringUtils;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -265,16 +264,10 @@ public class DefaultModelInheritanceAssembler
                                 }
                                 else
                                 {
-                                    Boolean disabled = childGoal.isDisabled();
-                                    if ( disabled == null )
+                                    // TODO: configuration not currently merged
+                                    if ( childGoal.getConfiguration() == null )
                                     {
-                                        childGoal.setDisabled( parentGoal.isDisabled() );
-
-                                        Properties conf = new Properties( childGoal.getConfiguration() );
-
-                                        conf.putAll( parentGoal.getConfiguration() );
-
-                                        childGoal.setConfiguration( conf );
+                                        childGoal.setConfiguration( parentGoal.getConfiguration() );
                                     }
                                 }
                             }

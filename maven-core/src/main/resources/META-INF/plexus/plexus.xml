@@ -30,6 +30,9 @@
         <requirement>
           <role>org.apache.maven.settings.MavenSettingsBuilder</role>
         </requirement>
+        <requirement>
+          <role>org.codehaus.plexus.component.configurator.ComponentConfigurator</role>
+        </requirement>
       </requirements>
     </component>
     <component>
