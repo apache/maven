@@ -196,7 +196,7 @@ buildMavenProject()
 
       buildTestDest=target/test-classes
       
-      [ -d $buildDir ] && rm -rf $buildDir
+      ##[ -d $buildDir ] && rm -rf $buildDir
 
       echo "Building project in `pwd`"
 

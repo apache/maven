@@ -58,7 +58,7 @@ export MBOOT_HOME=`dirname $0`
 
 findAndSetMavenRepoLocal
 
-CP=$repoLocal/maven/jars/maven-plugin-2.0-SNAPSHOT.jar:$repoLocal/qdox/jars/qdox-1.2.jar:$repoLocal/xstream/jars/xstream-1.0-SNAPSHOT.jar:$repoLocal/xpp3/jars/xpp3-1.1.3.3.jar
+CP=$repoLocal/modello/jars/modello-1.0-SNAPSHOT.jar:$repoLocal/maven/jars/maven-plugin-2.0-SNAPSHOT.jar:$repoLocal/qdox/jars/qdox-1.2.jar:$repoLocal/xstream/jars/xstream-1.0-SNAPSHOT.jar:$repoLocal/xpp3/jars/xpp3-1.1.3.3.jar
 
 if $cygwin; then
   CP=`cygpath -pw "$CP"`
