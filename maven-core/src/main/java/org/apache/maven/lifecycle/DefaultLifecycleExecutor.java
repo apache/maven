@@ -26,10 +26,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
+import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.DefaultPluginManager;
-import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -77,7 +76,8 @@ public class DefaultLifecycleExecutor
      * @param tasks
      * @param session
      */
-    public MavenExecutionResponse execute( List tasks, MavenSession session ) throws LifecycleExecutionException
+    public MavenExecutionResponse execute( List tasks, MavenSession session )
+        throws LifecycleExecutionException
     {
         MavenExecutionResponse response = new MavenExecutionResponse();
 
@@ -110,7 +110,8 @@ public class DefaultLifecycleExecutor
                 {
                     String additionalPluginGroupId = AbstractPlugin.getDefaultPluginGroupId();
 
-                    String additionalPluginArtifactId = AbstractPlugin.getDefaultPluginArtifactId( artifactHandler.additionalPlugin() );
+                    String additionalPluginArtifactId = AbstractPlugin.getDefaultPluginArtifactId(
+                        artifactHandler.additionalPlugin() );
 
                     injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
 
@@ -207,7 +208,8 @@ public class DefaultLifecycleExecutor
      * @param mavenSession
      * @throws Exception
      */
-    private void processPluginPhases( Plugin plugin, MavenSession mavenSession, Map phaseMap ) throws Exception
+    private void processPluginPhases( Plugin plugin, MavenSession mavenSession, Map phaseMap )
+        throws Exception
     {
         String groupId = plugin.getGroupId();
 
@@ -243,8 +245,8 @@ public class DefaultLifecycleExecutor
 
                 if ( mojoDescriptor == null )
                 {
-                    throw new LifecycleExecutionException( "A goal '" + mojoId
-                        + "' was declared in pom.xml, but does not exist" );
+                    throw new LifecycleExecutionException( "A goal '" + mojoId +
+                                                           "' was declared in pom.xml, but does not exist" );
                 }
 
                 configureMojo( mojoDescriptor, phaseMap );
@@ -267,9 +269,8 @@ public class DefaultLifecycleExecutor
      * to execute for the stated phase.
      *
      * @param mojoDescriptor
-     * @throws Exception
      */
-    private void configureMojo( MojoDescriptor mojoDescriptor, Map phaseMap ) throws Exception
+    private void configureMojo( MojoDescriptor mojoDescriptor, Map phaseMap )
     {
         if ( mojoDescriptor.getPhase() != null )
         {
@@ -279,7 +280,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void processGoalChain( String task, MavenSession session, Map phaseMap ) throws Exception
+    private void processGoalChain( String task, MavenSession session, Map phaseMap )
+        throws Exception
     {
         if ( phaseMap.containsKey( task ) )
         {
@@ -310,7 +312,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void verifyMojoPhase( String task, MavenSession session, Map phaseMap ) throws Exception
+    private void verifyMojoPhase( String task, MavenSession session, Map phaseMap )
+        throws Exception
     {
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
 
@@ -329,7 +332,8 @@ public class DefaultLifecycleExecutor
         configureMojo( mojoDescriptor, phaseMap );
     }
 
-    private void executePhase( String phase, MavenSession session, Map phaseMap ) throws PluginExecutionException
+    private void executePhase( String phase, MavenSession session, Map phaseMap )
+        throws PluginExecutionException
     {
         // only execute up to the given phase
         int index = phases.indexOf( phaseMap.get( phase ) );
@@ -369,7 +373,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    protected void executeMojo( String id, MavenSession session ) throws PluginExecutionException
+    protected void executeMojo( String id, MavenSession session )
+        throws PluginExecutionException
     {
         // ----------------------------------------------------------------------
         // We have something of the form <pluginId>:<mojoId>, so this might be
