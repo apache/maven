@@ -1,0 +1,171 @@
+ -----
+ Maven Lifecycle Phases
+ -----
+ The Maven Team
+ -----
+
+Maven Lifecycle Phases
+
+ * generate sources [modello, antlr, javacc] 
+ 
+ * process sources [qdox, xdoclet]
+ 
+ * generate resources [modello -> persistence mappings]
+ 
+ * process resources [process persistence mappings]
+ 
+ * compile [plexus component or something else]
+ 
+ * process classes
+ 
+ * generate test sources [generating junit tests]
+ 
+ * process test sources 
+ 
+ * generate test resources [plexus component or something else]
+ 
+ * process test resources
+ 
+ * test compile
+ 
+ * test [surefire, testNG, dbunit ...]
+ 
+ * package [jar or making a dist]
+
+ * install
+ 
+ * deploy
+
+o phases are used as join points (before/around/after)
+o mojos specify what phase they are contributing to
+o use goal names to protect from changes in the goal specifics themselves
+o the phases are really placeholders for various goals to be executed and it would be the phases that the user
+  could specify on the CLI so something like
+
++-----+
+
+m2 compile
+
++-----+
+
+ This would invoke the lifecycle up to, and including, the compile phase.
+
+ This may seem a bit lengthly but I think it covers anything that could possibly be done and there is enough flexibility
+ within the lifecycle to accommodate users i.e. we don't need to have a boundless set of lifecycle phases. What people
+ do in a project is, in fact, pretty limited.
+
+ Using the lifecycle also makes it easier to call out to the artifact handlers.
+
++-----+
+
+<lifecycle>
+  <phases>
+    <phase>
+      <id>generate-sources</id>
+    </phase>
+    <phase>
+      <id>process-sources</id>
+    </phase>
+    <phase>
+      <id>generate-resources</id>
+    </phase>
+    <phase>
+      <id>process-resources</id>
+      <goal>
+        <id>resources</id>
+      </goal>
+    </phase>
+    <phase>
+      <id>compile</id>
+      <goal>
+        <id>compiler:compile</id>
+      </goal>
+    </phase>
+    <phase>
+      <id>process-classes</id>
+    </phase>
+    <phase>
+      <id>generate-test-sources</id>
+    </phase>
+    <phase>
+      <id>process-test-sources</id>
+    </phase>
+    <phase>
+      <id>process-test-resources</id>
+    </phase>
+    <phase>
+      <id>test-compile</id>
+      <goal>
+        <id>compiler:testCompile</id>
+      </goal>
+    </phase>
+    <phase>
+      <id>test</id>
+      <goal>
+        <id>surefire:test</id>
+      </goal>
+    </phase>
+    <phase>
+      <id>package</id>
+      <goal>
+        <id>jar:jar</id>
+      </goal>
+    </phase>
+    <phase>
+      <id>install</id>
+      <goal>
+        <id>${type}:install</id>
+      </goal>
+    </phase>
+    <phase>
+      <id>deploy</id>
+      <goal>
+        ${type}:deploy
+      </goal>
+    </phase>
+  </phases>
+</lifecycle>
+
++-----+
+
+ Here we are using antlr and it is known to maven that this plugin contributes to the generate-sources phase. In
+ m1 the antlr plugin, in fact, worked by magic i.e. if there was a grammar present antlr would try to fire. This
+ is a little too tricky and it would make sense to allow users to specify what they want fired as part of their
+ build process.
+
++-----+
+
+<project>
+  ...
+  <plugins>
+    <id>antlr</id>
+    <configuration>
+      <grammars>
+        <grammar>src/grammars/confluence.g</grammar>
+      </grammars>
+    </configuration>
+  </plugins>
+  ...
+</project>
+
++-----+
+
+ So here the user specifies the use of the antlr mojo that takes a grammar and generates sources and maven knows
+ that this mojo contributes to the <<<generate-sources>>> phase and so executes the antlr mojo inside the
+ the <<<generate-sources>>> phase. In cases where there is a possible domination problem we can state that the order
+ in which the the configurations are listed is the dominant order. I think in most cases there will no be any
+ domination ordering problems but when there could be you have to be able to explicity state what the order
+ would be.
+
+ notes to finish copying:
+
+ -> mojos will contain @tags for parameters and the phase they contribute to, a mojo will be limited to
+    contributing to one phase in the lifecycle.
+ -> goal resolution within phases
+ -> file dependency timestamp checking (mhw)
+ -> strict use of artifact handlers for things like package/install/deploy
+    this again would be a mapping so a handler could delegate to another utility for packaging
+ -> how users decorate or completely override the lifecycle, but most of this should be alleviated by a mojo
+    having a defined place in the lifecycle by telling maven what phase it contributes too. in this way maven
+    can probably assemble the entire execution chain by looking at the mojos the user has specified for use
+    in the build process.
