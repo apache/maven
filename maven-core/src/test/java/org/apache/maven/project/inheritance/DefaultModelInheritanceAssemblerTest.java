@@ -69,6 +69,8 @@ public class DefaultModelInheritanceAssemblerTest
         parent.setBuild( parentBuild );
 
         Model child = new Model();
+        
+        child.setType( "plugin" );
 
         Build childBuild = new Build();
 
@@ -107,5 +109,8 @@ public class DefaultModelInheritanceAssemblerTest
         assertEquals( "UT resources inherited from parent should be of size 1", 1, utResources.size() );
         assertEquals( "first UT resource should have dir == src/test/resources", "src/test/resources",
             ((Resource) utResources.get( 0 )).getDirectory() );
+
+        assertEquals( "plugin", child.getType() );
+        assertEquals( "jar", parent.getType() );
     }
 }
