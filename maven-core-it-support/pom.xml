@@ -1,0 +1,5 @@
+<project>
+  <groupId>maven</groupId>
+  <artifactId>maven-it-support</artifactId>
+  <version>1.0</version>
+</project>
