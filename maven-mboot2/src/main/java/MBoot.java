@@ -593,7 +593,7 @@ public class MBoot
         // Plugin descriptor generation
         // ----------------------------------------------------------------------
 
-        if ( reader.type != null && reader.type.equals( "plugin" ) )
+        if ( reader.type != null && reader.type.equals( "maven-plugin" ) )
         {
             System.out.println( "Generating maven plugin descriptor ..." );
 
@@ -850,7 +850,7 @@ public class MBoot
 
         String groupId = reader.groupId;
 
-        File jar = new File( repoLocal, "/" + groupId + "/plugins/" + artifactId + "-" + version + ".jar" );
+        File jar = new File( repoLocal, "/" + groupId + "/maven-plugins/" + artifactId + "-" + version + ".jar" );
 
         System.out.println( "Installing Plugin: " + jar );
 
@@ -1542,7 +1542,7 @@ public class MBoot
                 artifact = getId() + "-" + getVersion() + ".";
             }
 
-            if ( "jar".equals( getPackaging() ) || "plugin".equals( getPackaging() ) )
+            if ( "jar".equals( getPackaging() ) || "maven-plugin".equals( getPackaging() ) )
             {
                 artifact += "jar";
             }
