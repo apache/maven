@@ -258,6 +258,8 @@ buildMavenProject()
       # We only need the booter jar in the classpath, it will load everything else.
       
       runTests ".:${MBOOT_HOME}/classes:$repoLocal/surefire/jars/surefire-booter-1.1.jar" "$1" "$repoLocal" bootstrap.libs bootstrap.tests.includes bootstrap.tests.excludes
+
+      isCommandSuccessful $? "Failed running project tests!"
       
       if [ "$2" = "default" ]
       then
