@@ -233,6 +233,11 @@ public class DefaultModelInheritanceAssembler
                 child.getBuild().setTestOutput( parent.getBuild().getTestOutput() );
             }
 
+            if ( child.getBuild().getFinalName() == null )
+            {
+                child.getBuild().setFinalName( parent.getBuild().getFinalName() );
+            }
+
             List resources = child.getBuild().getResources();
             if ( resources == null || resources.isEmpty() )
             {

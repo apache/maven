@@ -22,13 +22,13 @@ package org.apache.maven.project.interpolation;
  *
  * Created on Feb 2, 2005
  */
-public class ProjectInterpolationException
+public class ModelInterpolationException
     extends Exception
 {
 
     /** Added: Feb 2, 2005 by jdcasey
      */
-    public ProjectInterpolationException( String expression, Throwable cause )
+    public ModelInterpolationException( String expression, Throwable cause )
     {
         super( "The POM expression: " + expression + " could not be evaluated.", cause );
 

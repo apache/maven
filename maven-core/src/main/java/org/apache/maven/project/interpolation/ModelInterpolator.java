@@ -17,18 +17,18 @@ package org.apache.maven.project.interpolation;
  * ====================================================================
  */
 
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.model.Model;
 
 /**
  * @author jdcasey
  *
  * Created on Feb 2, 2005
  */
-public interface ProjectInterpolator
+public interface ModelInterpolator
 {
 
-    String ROLE = ProjectInterpolator.class.getName();
+    String ROLE = ModelInterpolator.class.getName();
 
-    MavenProject interpolate( MavenProject project ) throws ProjectInterpolationException;
+    Model interpolate( Model project ) throws ModelInterpolationException;
 
 }

@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
-import org.apache.maven.project.injection.DefaultProjectDefaultsInjector;
+import org.apache.maven.project.injection.DefaultModelDefaultsInjector;
 
 import java.util.List;
 import java.util.Properties;
@@ -36,7 +36,7 @@ extends TestCase
 
     public void testShouldConstructWithNoParams()
     {
-        new DefaultProjectDefaultsInjector();
+        new DefaultModelDefaultsInjector();
     }
 
     public void testShouldSucceedInMergingDependencyWithDependency()
@@ -60,11 +60,9 @@ extends TestCase
 
         model.setDependencyManagement( depMgmt );
 
-        MavenProject project = new MavenProject( model );
+        new DefaultModelDefaultsInjector().injectDefaults( model );
 
-        new DefaultProjectDefaultsInjector().injectDefaults( project );
-
-        List deps = project.getDependencies();
+        List deps = model.getDependencies();
         assertEquals( 1, deps.size() );
 
         Dependency result = (Dependency) deps.get( 0 );
@@ -92,11 +90,9 @@ extends TestCase
 
         model.setDependencyManagement( depMgmt );
 
-        MavenProject project = new MavenProject( model );
+        new DefaultModelDefaultsInjector().injectDefaults( model );
 
-        new DefaultProjectDefaultsInjector().injectDefaults( project );
-
-        List deps = project.getDependencies();
+        List deps = model.getDependencies();
         assertEquals( 1, deps.size() );
 
         Dependency result = (Dependency) deps.get( 0 );
@@ -124,11 +120,9 @@ extends TestCase
 
         model.setDependencyManagement( depMgmt );
 
-        MavenProject project = new MavenProject( model );
+        new DefaultModelDefaultsInjector().injectDefaults( model );
 
-        new DefaultProjectDefaultsInjector().injectDefaults( project );
-
-        List deps = project.getDependencies();
+        List deps = model.getDependencies();
         assertEquals( 1, deps.size() );
 
         Dependency result = (Dependency) deps.get( 0 );
@@ -161,11 +155,9 @@ extends TestCase
 
         model.setDependencyManagement( depMgmt );
 
-        MavenProject project = new MavenProject( model );
+        new DefaultModelDefaultsInjector().injectDefaults( model );
 
-        new DefaultProjectDefaultsInjector().injectDefaults( project );
-
-        List deps = project.getDependencies();
+        List deps = model.getDependencies();
         assertEquals( 1, deps.size() );
 
         Dependency result = (Dependency) deps.get( 0 );
@@ -204,11 +196,9 @@ extends TestCase
 
         model.setDependencyManagement( depMgmt );
 
-        MavenProject project = new MavenProject( model );
+        new DefaultModelDefaultsInjector().injectDefaults( model );
 
-        new DefaultProjectDefaultsInjector().injectDefaults( project );
-
-        List deps = project.getDependencies();
+        List deps = model.getDependencies();
         assertEquals( 1, deps.size() );
 
         Dependency result = (Dependency) deps.get( 0 );
@@ -235,12 +225,10 @@ extends TestCase
 
         model.setDependencyManagement( depMgmt );
 
-        MavenProject project = new MavenProject( model );
-
 //        try
 //        {
-        new DefaultProjectDefaultsInjector().injectDefaults( project );
-        Dependency dependency = (Dependency) project.getDependencies().get( 0 );
+        new DefaultModelDefaultsInjector().injectDefaults( model );
+        Dependency dependency = (Dependency) model.getDependencies().get( 0 );
         assertNull( "check version is null", dependency.getVersion() );
 //            fail("Should fail to validate dependency without a version.");
 //        }

@@ -18,10 +18,8 @@ package org.apache.maven.project.interpolation;
  */
 
 import junit.framework.TestCase;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.project.MavenProject;
 
 /**
  * @author jdcasey
@@ -33,7 +31,7 @@ public class RegexBasedProjectInterpolatorTest
 {
 
     public void testShouldInterpolateDependencyVersionToSetSameAsProjectVersion()
-        throws ProjectInterpolationException
+        throws ModelInterpolationException
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -43,14 +41,13 @@ public class RegexBasedProjectInterpolatorTest
 
         model.addDependency( dep );
 
-        MavenProject in = new MavenProject( model );
-        MavenProject out = new RegexBasedProjectInterpolator().interpolate( in );
+        Model out = new RegexBasedModelInterpolator().interpolate( model );
 
         assertEquals( "3.8.1", ((Dependency) out.getDependencies().get( 0 )).getVersion() );
     }
 
     public void testShouldNotInterpolateDependencyVersionWithInvalidReference()
-        throws ProjectInterpolationException
+        throws ModelInterpolationException
     {
         Model model = new Model();
         model.setVersion( "3.8.1" );
@@ -60,8 +57,7 @@ public class RegexBasedProjectInterpolatorTest
 
         model.addDependency( dep );
 
-        MavenProject in = new MavenProject( model );
-        MavenProject out = new RegexBasedProjectInterpolator().interpolate( in );
+        Model out = new RegexBasedModelInterpolator().interpolate( model );
 
         assertEquals( "#something", ((Dependency) out.getDependencies().get( 0 )).getVersion() );
     }

@@ -31,8 +31,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
-import org.apache.maven.project.injection.ProjectDefaultsInjector;
-import org.apache.maven.project.interpolation.ProjectInterpolator;
+import org.apache.maven.project.injection.ModelDefaultsInjector;
+import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
@@ -73,9 +73,9 @@ public class DefaultMavenProjectBuilder
 
     private PathTranslator pathTranslator;
 
-    private ProjectDefaultsInjector projectDefaultsInjector;
+    private ModelDefaultsInjector modelDefaultsInjector;
 
-    private ProjectInterpolator projectInterpolator;
+    private ModelInterpolator modelInterpolator;
 
     public void initialize()
         throws Exception
@@ -117,14 +117,17 @@ public class DefaultMavenProjectBuilder
                 previous = current;
             }
 
-            project = projectInterpolator.interpolate( project );
+            Model model = modelInterpolator.interpolate( project.getModel() );
 
-            projectDefaultsInjector.injectDefaults( project );
+            // interpolation is before injection, because interpolation is off-limits in the injected variables
+            modelDefaultsInjector.injectDefaults( model );
 
+            MavenProject parentProject = project.getParent();
+
+            project = new MavenProject( model );
+            project.setFile( projectDescriptor );
+            project.setParent( parentProject );
             project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository ) );
-
-            // @todo this should be in the super POM when interpolation works
-            setupMavenFinalName( project );
 
             // ----------------------------------------------------------------------
             // Typically when the project builder is being used from maven proper
@@ -218,14 +221,6 @@ public class DefaultMavenProjectBuilder
         }
 
         return project;
-    }
-
-    private void setupMavenFinalName( MavenProject project )
-    {
-        if ( project.getModel().getBuild().getFinalName() == null )
-        {
-            project.getModel().getBuild().setFinalName( project.getArtifactId() + "-" + project.getVersion() );
-        }
     }
 
     private Model readModel( File projectDescriptor )

@@ -18,7 +18,7 @@ package org.apache.maven.project.injection;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.model.Model;
 
 import java.util.Iterator;
 import java.util.List;
@@ -29,13 +29,13 @@ import java.util.TreeMap;
 /**
  * @author jdcasey Created on Feb 1, 2005
  */
-public class DefaultProjectDefaultsInjector
-    implements ProjectDefaultsInjector
+public class DefaultModelDefaultsInjector
+    implements ModelDefaultsInjector
 {
 
-    public void injectDefaults( MavenProject project )
+    public void injectDefaults( Model model )
     {
-        injectDependencyDefaults( project.getDependencies(), project.getDependencyManagement() );
+        injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );
     }
 
     /**

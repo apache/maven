@@ -77,8 +77,8 @@
      |
      -->
     <component>
-      <role>org.apache.maven.project.interpolation.ProjectInterpolator</role>
-      <implementation>org.apache.maven.project.interpolation.RegexBasedProjectInterpolator</implementation>
+      <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
+      <implementation>org.apache.maven.project.interpolation.RegexBasedModelInterpolator</implementation>
     </component>
     <!--
      |
@@ -86,8 +86,8 @@
      |
      -->
     <component>
-      <role>org.apache.maven.project.injection.ProjectDefaultsInjector</role>
-      <implementation>org.apache.maven.project.injection.DefaultProjectDefaultsInjector</implementation>
+      <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
+      <implementation>org.apache.maven.project.injection.DefaultModelDefaultsInjector</implementation>
     </component>
     <!--
      |
@@ -99,10 +99,10 @@
       <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.project.injection.ProjectDefaultsInjector</role>
+          <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.interpolation.ProjectInterpolator</role>
+          <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>

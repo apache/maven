@@ -20,7 +20,6 @@ package org.apache.maven.project.interpolation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -33,20 +32,19 @@ import java.util.regex.Pattern;
 /**
  * @author jdcasey Created on Feb 3, 2005
  */
-public class RegexBasedProjectInterpolator
+public class RegexBasedModelInterpolator
     extends AbstractLogEnabled
-    implements ProjectInterpolator
+    implements ModelInterpolator
 {
 
-    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "#([.A-Za-z]+)" );
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "#([A-Za-z.]+)" );
 
     /**
      * Added: Feb 3, 2005 by jdcasey
      */
-    public MavenProject interpolate( MavenProject project ) throws ProjectInterpolationException
+    public Model interpolate( Model model ) throws ModelInterpolationException
     {
         StringWriter sWriter = new StringWriter();
-        Model model = project.getModel();
 
         MavenXpp3Writer writer = new MavenXpp3Writer();
         try
@@ -55,7 +53,7 @@ public class RegexBasedProjectInterpolator
         }
         catch( Exception e )
         {
-            throw new ProjectInterpolationException(
+            throw new ModelInterpolationException(
                 "Cannot serialize project model for interpolation.", e );
         }
 
@@ -71,22 +69,15 @@ public class RegexBasedProjectInterpolator
         }
         catch( Exception e )
         {
-            throw new ProjectInterpolationException(
+            throw new ModelInterpolationException(
                 "Cannot read project model from interpolating filter of serialized version.", e );
         }
 
-        MavenProject newProject = new MavenProject( model );
-        newProject.setParent( project.getParent() );
-        newProject.setFile( project.getFile() );
-        newProject.setArtifacts( project.getArtifacts() );
-
-        return new MavenProject( model );
+        return model;
     }
 
     /**
      * Added: Feb 3, 2005 by jdcasey
-     * 
-     * @throws Exception
      */
     private String interpolateInternal( String src, Model model )
     {

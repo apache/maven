@@ -16,14 +16,14 @@ package org.apache.maven.project.injection;
  * limitations under the License.
  */
 
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.model.Model;
 
 /**
  * @author jdcasey Created on Feb 1, 2005
  */
-public interface ProjectDefaultsInjector
+public interface ModelDefaultsInjector
 {
-    String ROLE = ProjectDefaultsInjector.class.getName();
+    String ROLE = ModelDefaultsInjector.class.getName();
 
-    void injectDefaults( MavenProject project );
+    void injectDefaults( Model model );
 }
