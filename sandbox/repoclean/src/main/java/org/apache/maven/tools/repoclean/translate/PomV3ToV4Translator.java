@@ -83,15 +83,6 @@ public class PomV3ToV4Translator
 
         PomKey pomKey = new PomKey( groupId, artifactId, version );
 
-        StringBuffer logHeader = new StringBuffer();
-        logHeader.append( "Translation of POM {" ).append( v3Model.getGroupId() ).append( ":" ).append(
-                                                                                                        v3Model.getArtifactId() ).append(
-                                                                                                                                          ":" ).append(
-                                                                                                                                                        version ).append(
-                                                                                                                                                                          "}" );
-
-        reporter.info( "[START] " + logHeader.toString() );
-
         warnOfUnsupportedMainModelElements( v3Model, reporter );
 
         Model model = null;
@@ -124,8 +115,6 @@ public class PomV3ToV4Translator
             model.setUrl( v3Model.getUrl() );
 
             model.setVersion( version );
-
-            reporter.info( "[END] " + logHeader.toString() );
         }
         catch ( PomTranslationException e )
         {
@@ -273,7 +262,7 @@ public class PomV3ToV4Translator
                                                                                                                                                                                                                                                                                                                                "\n" ).append(
                                                                                                                                                                                                                                                                                                                                               "These values were extracted using the v3 report naming convention, but may be wrong." );
 
-                reporter.info( info.toString() );
+                reporter.warn( info.toString() );
 
                 Goal reportGoal = new Goal();
 

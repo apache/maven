@@ -74,7 +74,7 @@ public class V3PomRewriter
         }
         else
         {
-            reporter.info( "POM for artifact[" + artifact.getId()
+            reporter.warn( "POM for artifact[" + artifact.getId()
                 + "] does not exist in source repository. We will create a skeletal one here." );
             
             v4Model = new Model();
@@ -104,10 +104,6 @@ public class V3PomRewriter
                     IOUtil.close( toWriter );
                 }
             }
-            else
-            {
-                reporter.info( "Skipping model write to target repository (we're in report-only mode)." );
-            }
         }
     }
 
@@ -116,31 +112,30 @@ public class V3PomRewriter
     {
         if ( StringUtils.isEmpty( model.getModelVersion() ) )
         {
-            reporter.info( "Setting modelVersion on v4 model to \'4.0.0\'" );
             model.setModelVersion( "4.0.0" );
         }
 
         if ( StringUtils.isEmpty( model.getGroupId() ) )
         {
-            reporter.info( "Setting groupId on model using artifact information." );
+            reporter.warn( "Setting groupId on model using artifact information." );
             model.setGroupId( artifact.getGroupId() );
         }
 
         if ( StringUtils.isEmpty( model.getArtifactId() ) )
         {
-            reporter.info( "Setting artifactId on model using artifact information." );
+            reporter.warn( "Setting artifactId on model using artifact information." );
             model.setArtifactId( artifact.getArtifactId() );
         }
 
         if ( StringUtils.isEmpty( model.getVersion() ) )
         {
-            reporter.info( "Setting version on model using artifact information." );
+            reporter.warn( "Setting version on model using artifact information." );
             model.setVersion( artifact.getVersion() );
         }
 
         if ( StringUtils.isEmpty( model.getPackaging() ) )
         {
-            reporter.info( "Setting packaging on model using artifact type information." );
+            reporter.warn( "Setting packaging on model using artifact type information." );
             model.setPackaging( artifact.getType() );
         }
     }

@@ -74,7 +74,7 @@ public class LegacyArtifactDiscoverer
 
         if ( numberOfTokens != 3 )
         {
-            reporter.info( "Artifact path: \'" + path
+            reporter.warn( "Artifact path: \'" + path
                 + "\' does not match naming convention. Cannot reliably extract artifact information from path." );
 
             return null;

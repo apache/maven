@@ -37,8 +37,6 @@ public class Reporter
 
     private static final String WARN_LEVEL = "[WARNING] ";
 
-    private static final String INFO_LEVEL = "[INFO] ";
-
     private static final String ERROR_LEVEL = "[ERROR] ";
 
     private File reportsFile;
@@ -50,9 +48,8 @@ public class Reporter
     private boolean hasWarning = false;
 
     private Writer writer;
-
+    
     public Reporter( File reportsBase, String reportPath )
-        throws IOException
     {
         this.reportsFile = new File( reportsBase, reportPath );
 
@@ -68,8 +65,11 @@ public class Reporter
                 + "\' refers to a file, not a directory.\n" + "Cannot write report file: \'"
                 + reportsFile.getAbsolutePath() + "\'." );
         }
-
-        open();
+    }
+    
+    public File getReportFile()
+    {
+        return reportsFile;
     }
 
     private void open()
@@ -88,8 +88,7 @@ public class Reporter
     {
         if ( writer == null )
         {
-            throw new IOException( "BufferedWriter instance in reporter: \'" + this
-                + "\' is null. Cannot write message." );
+            open();
         }
 
         if ( message instanceof List )
@@ -121,12 +120,6 @@ public class Reporter
     {
         hasWarning = true;
         write( new AppendingList( 2 ).append( WARN_LEVEL ).append( message ) );
-    }
-
-    public void info( String message )
-        throws IOException
-    {
-        write( new AppendingList( 2 ).append( INFO_LEVEL ).append( message ) );
     }
 
     public void error( String message, Throwable error )

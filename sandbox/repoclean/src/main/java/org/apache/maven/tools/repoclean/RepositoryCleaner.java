@@ -199,12 +199,14 @@ public class RepositoryCleaner
                     boolean errorOccurred = false;
 
                     File artifactSource = new File( sourceRepo.getBasedir(), sourceRepo.pathOf( artifact ) );
-                    
-                    if(artifactSource.exists())
-                    {
-                        File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
+                    File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
 
-                        artifact.setFile( artifactSource );
+                    artifact.setFile( artifactSource );
+                    
+                    boolean targetMissingOrOlder = !artifactTarget.exists() || artifactTarget.lastModified() < artifactSource.lastModified();
+                    
+                    if(artifactSource.exists() && targetMissingOrOlder)
+                    {
                         
                         try
                         {
@@ -229,10 +231,6 @@ public class RepositoryCleaner
                                 }
 
                                 copyArtifact( artifact, artifactTarget, artifactReporter );
-                            }
-                            else
-                            {
-                                artifactReporter.info( "Skipping artifact copy (we're in report-only mode)." );
                             }
                         }
                         catch ( Exception e )
@@ -339,7 +337,6 @@ public class RepositoryCleaner
             File targetParent = artifactTarget.getParentFile();
             if ( !targetParent.exists() )
             {
-                reporter.info( "Creating directory \'" + targetParent + "\'." );
                 targetParent.mkdirs();
             }
 

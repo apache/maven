@@ -52,9 +52,6 @@ public class ArtifactDigestVerifier
 
             if ( verified )
             {
-                reporter.info( "Source digest file for artifact[" + artifact.getId()
-                    + "] is okay, so we'll just copy it." );
-
                 if ( !reportOnly )
                 {
                     try
@@ -68,10 +65,6 @@ public class ArtifactDigestVerifier
 
                         throw e;
                     }
-                }
-                else
-                {
-                    reporter.info( "Skipping transfer of valid MD5 digest file (we're in report-only mode)." );
                 }
             }
             else
@@ -88,15 +81,9 @@ public class ArtifactDigestVerifier
         // in the target repo.
         if ( !verified )
         {
-            reporter.info( "Creating .md5 for artifact[" + artifact.getId() + "] in target repository." );
-
             if ( !reportOnly )
             {
                 artifactDigestor.createArtifactDigest( artifactTarget, digestTargetFile, ArtifactDigestor.MD5 );
-            }
-            else
-            {
-                reporter.info( "Skipping creation of MD5 digest for artifact (we're in report-only mode)." );
             }
         }
     }
