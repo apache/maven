@@ -58,6 +58,15 @@
           <type>String</type>
         </field>
         <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            The id of the dependency.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
           <name>groupId</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -419,32 +428,6 @@
             }
           </code>
         </codeSegment>
-        <codeSegment>
-          <version>3.0.0</version>
-          <code>
-            public void setId( String id )
-            {
-                int i = id.indexOf( "+" );
-                int j = id.indexOf( ":" );
-
-                if ( i > 0 )
-                {
-                    setGroupId( id.substring( 0, i ) );
-                    setArtifactId( id.replace( '+', '-' ) );
-                }
-                else if ( j > 0 )
-                {
-                    setGroupId( id.substring( 0, j ) );
-                    setArtifactId( id.substring( j + 1 ) );
-                }
-                else
-                {
-                    setGroupId( id );
-                    setArtifactId( id );
-                }
-            }
-          </code>
-        </codeSegment>
       </codeSegments>
     </class>
     <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
@@ -707,15 +690,6 @@
       <version>3.0.0+</version>
       <fields>
         <field>
-          <name>id</name>
-          <version>3.0.0</version>
-          <required>true</required>
-          <description>
-            The id of the dependency.
-          </description>
-          <type>String</type>
-        </field>
-        <field>
           <name>groupId</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -807,6 +781,84 @@
                 return groupId + "/" + type + "s:" + artifactId + "-" + version;
             }
           </code>
+        </codeSegment>
+        <codeSegment>
+          <version>3.0.0</version>
+          <code><![CDATA[
+            public void setId( String id )
+            {
+                int i = id.indexOf( "+" );
+                int j = id.indexOf( ":" );
+        
+                if ( i > 0 )
+                {
+                    // We have something like 'ant+optional' where the
+                    // group id is 'ant' and the artifact id is
+                    // 'ant-optional'.
+                    setGroupId( id.substring( 0, i ) );
+                    setArtifactId( id.replace( '+', '-' ) );
+                }
+                else if ( j > 0 )
+                {
+                    // We have something like 'ant:my-poorly-name.jar' where the
+                    // group id is 'ant' and the artifact id is
+                    // 'my-poorly-named.jar'.
+                    setGroupId( id.substring( 0, j ) );
+                    setArtifactId( id.substring( j + 1 ) );
+                }
+                else
+                {
+                    // We have something like 'ant' where the
+                    // the project id is 'ant' and the artifact name
+                    // is 'ant'.
+                    setGroupId( id );
+                    setArtifactId( id );
+                }
+            }
+        
+            public String getId()
+            {
+                return getGroupId() + ":" + getArtifactId();
+            }
+        
+            public String getArtifactDirectory()
+            {
+                return getGroupId();
+            }
+        
+            public String getArtifact()
+            {
+                // If the jar name has been explicty set then use that. This
+                // is when the <jar/> element is explicity used in the POM.
+                if ( getJar() != null)
+                {
+                    return getJar();
+                }
+        
+                return getArtifactId() + "-" + getVersion() + "." + getExtension();
+            }
+        
+            public String getExtension()
+            {
+                if ("ejb".equals(getType()) || "plugin".equals(getType()) || "aspect".equals(getType())) return "jar";
+                return getType();
+            }
+        
+            public boolean isAddedToClasspath()
+            {
+                return ("jar".equals(getType()) || "ejb".equals(getType()));
+            }
+        
+            public boolean isPlugin()
+            {
+                return ("plugin".equals(getType()));
+            }
+        
+            public String getProperty( String property )
+            {
+                return getProperties().getProperty( property );
+            }
+          ]]></code>
         </codeSegment>
       </codeSegments>
     </class>
