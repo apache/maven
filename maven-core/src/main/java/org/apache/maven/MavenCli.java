@@ -25,6 +25,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.classworlds.ClassWorld;
+import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -55,7 +56,7 @@ public class MavenCli
 
         //---
 
-        Embedder embedder = new Embedder();       
+        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();       
 
         embedder.start( classWorld );
 

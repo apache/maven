@@ -15,6 +15,11 @@
   <package>org.apache.maven</package>
   <logo>/images/maven.gif</logo>
   <dependencies>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-artifact-container</artifactId>
+      <version>1.0-alpha-1</version>
+    </dependency>
     <!-- maven component -->
     <dependency>
       <groupId>maven</groupId>

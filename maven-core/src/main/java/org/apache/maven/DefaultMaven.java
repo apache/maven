@@ -28,6 +28,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
@@ -50,7 +51,7 @@ public class DefaultMaven
     extends AbstractLogEnabled
     implements Maven, Contextualizable
 {
-    private PlexusContainer container;
+    private ArtifactEnabledContainer container;
 
     private String mavenHome;
 
@@ -363,7 +364,7 @@ public class DefaultMaven
     public void contextualize( Context context )
         throws ContextException
     {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (ArtifactEnabledContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     // ----------------------------------------------------------------------

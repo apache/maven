@@ -4,3 +4,4 @@ target
 .project
 bootstrap.repo
 maven-component.i*
+.settings

@@ -37,73 +37,10 @@ import java.io.IOException;
  */
 public class GoalDecorationPhase extends AbstractMavenGoalPhase
 {
-    public static final String MAVEN_XML_DEFAULT_NAMESPACE = "mavenxml";
-    public static final String MAVEN_SCRIPT = "decorators.xml";
-    private GoalDecoratorBindings decorators;
-    private boolean decoratorsInitialized = false;
-
     public void execute( MavenGoalExecutionContext context )
         throws GoalExecutionException
     {
-        synchronized ( this )
-        {
-            if ( !decoratorsInitialized )
-            {
-                try
-                {
-                    initializeDecorators( context );
-                }
-                catch ( XmlPullParserException e )
-                {
-                    throw new GoalExecutionException( "Error parsing decorators.xml: ", e );
-                }
-                catch ( IOException e )
-                {
-                    throw new GoalExecutionException( "Error reading decorators.xml file: ", e );
-                }
-            }
-        }
-
-        context.setGoalDecoratorBindings( decorators );
+        
     }
 
-    private void initializeDecorators( MavenGoalExecutionContext context )
-        throws XmlPullParserException, IOException
-    {
-        MavenProject project = context.getProject();
-
-        File pom = project.getFile();
-
-        File dir = pom.getParentFile();
-
-        File scriptFile = new File( dir, MAVEN_SCRIPT );
-
-        if ( scriptFile.exists() )
-        {
-            BufferedReader reader = null;
-
-            try
-            {
-                reader = new BufferedReader( new FileReader( scriptFile ) );
-
-                GoalDecorationParser parser = new GoalDecorationParser();
-                this.decorators = parser.parse( reader );
-            }
-            finally
-            {
-                if ( reader != null )
-                {
-                    try
-                    {
-                        reader.close();
-                    }
-                    catch ( IOException e )
-                    {
-                    }
-                }
-            }
-        }
-
-        decoratorsInitialized = true;
-    }
 }

@@ -25,6 +25,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
@@ -62,7 +63,7 @@ public class DefaultPluginManager
 
     protected ArtifactHandlerManager artifactHandlerManager;
 
-    protected PlexusContainer container;
+    protected ArtifactEnabledContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
@@ -279,7 +280,7 @@ public class DefaultPluginManager
     public void contextualize( Context context )
         throws ContextException
     {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (ArtifactEnabledContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     public void initialize()

@@ -25,6 +25,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
+import org.codehaus.plexus.ArtifactEnabledPlexusTestCase;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
@@ -36,7 +37,7 @@ import java.util.List;
  * @version $Id$
  */
 public class MavenTestCase
-    extends PlexusTestCase
+    extends ArtifactEnabledPlexusTestCase
 {
     protected PluginManager pluginManager;
 

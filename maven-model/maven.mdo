@@ -324,6 +324,20 @@
           <description>Distribution information for a project.</description>
           <type>DistributionManagement</type>
         </field>
+        <field>
+          <name>preGoals</name>
+          <version>4.0.0</version>
+          <description>Set of decorator(s) injected before the target goal(s).</description>
+          <type>java.util.List</type>
+          <defaultValue>new java.util.ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>postGoals</name>
+          <version>4.0.0</version>
+          <description>Set of decorator(s) injected after the target goal(s).</description>
+          <type>java.util.List</type>
+          <defaultValue>new java.util.ArrayList()</defaultValue>
+        </field>
       </fields>
       <!-- We need this because we can't use package as a field name. -->
       <codeSegments>
@@ -1263,6 +1277,38 @@
           <type>String</type>
         </field>
       </fields>
+    </class>
+    <class>
+      <name>GoalDecorator</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>4.0.0</version>
+          <description>The target goal which should be decorated.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>attain</name>
+          <version>4.0.0</version>
+          <description>
+            The goal which should be injected into the execution chain.
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <superClass>GoalDecorator</superClass>
+      <name>PreGoal</name>
+      <version>4.0.0</version>
+      <fields></fields>
+    </class>
+    <class>
+      <superClass>GoalDecorator</superClass>
+      <name>PostGoal</name>
+      <version>4.0.0</version>
+      <fields></fields>
     </class>
 
   </classes>
