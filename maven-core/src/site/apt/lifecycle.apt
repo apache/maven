@@ -39,35 +39,57 @@ Maven Lifecycle
                 |          |          v
                 |          |      download the plugin which
                 |          |      contains code for this goal
-   each prereq  |          |          |
-  is a goal in  |          |          |
-another plugin  |          |          v
+                |          |          |
+                |          |          |
+                |          |          v
                 |          |      process the plugin descriptor
                 |          |      and cache the results
                 |          |          |
                 |          |          |
                 |          |<---------+
                 |          |
+                |          |
+                |          |
                 |          v
-                |         do any prereqs need to be processed?
-                |           |
-                |    yes ---+------ no
-                |    |               |
-                |    |               |
-                | foreach(prereq)    |
-                |    |               |
-                +----+               |
-                                     v
-                                  are there goal decorations?
-                                     |
-                                     |
-                              yes ---+--- no
-
-
-
-
-
-+-----+
+                |         does goalX have any preGoals?
+                |          |
+                |   yes ---+----- no
+                |    |             |
+                |    v             |
+/-------------/ | foreach(pregoal) |
+each pregoal is | (1)| (2)|        |
+a goal which    +----+    |        |
+may be in       |         +------->|
+another plugin  |                  |
+/-------------/ |                  |
+                |                  v
+                |                does goalX have any prereqs?
+                |                  |
+                |           yes ---+----- no
+                |            |             |
+                |            v             |
+/------------/  |         foreach(prereq)  |
+each prereq is  |        (1) | (2)|        |
+a goal which    |            |    |        |
+may be in       |            |    |<-------+
+another plugin  |            |    |
+/------------/  |            |    |
+                +------------+    |
+                |                 |
+                |                 v
+                |               does goalX have any postGoals?
+                |                 |
+                |          yes ---+------ no
+                |           |              |
+                |           v              |
+/------------/  |        foreach(postgoal) |
+each postgoal   |        (1)| (2)|         |
+is a goal which +-----------+    |         |
+may be in                        +-------->|
+another plugin                             |
+/------------/                             |
+                                           v
++-----+                     
 
  * Multiple goals
  
