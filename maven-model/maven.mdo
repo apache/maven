@@ -1155,7 +1155,7 @@
         </field>
         <field>
           <name>post</name>
-          <version>4.0.0</version>
+          <version>3.1.0+</version>
           <description><![CDATA[
             The email address or link that can be used to post to
             the mailing list.  If this is an email address, a
@@ -1169,12 +1169,11 @@
           <version>3.0.0+</version>
           <description><![CDATA[The link to a URL where you can browse the archive.]]></description>
           <type>String</type>
-          <comment>This should probably be removed from 4.0.0 before alpha-1</comment>
         </field>
         <field>
-          <name>archives</name>
-          <version>4.0.0</version>
-          <description><![CDATA[The link to a URL where you can browse the archive.]]></description>
+          <name>otherArchives</name>
+          <version>3.1.0+</version>
+          <description><![CDATA[The link to other URLs where you can browse the archive.]]></description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
