@@ -1,0 +1,3 @@
+target/classes/org/apache/maven/it0000/Person.class
+target/test-classes/org/apache/maven/it0000/PersonTest.class
+target/maven-core-it0000-1.0.jar
