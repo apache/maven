@@ -87,21 +87,22 @@ public class DefaultLifecycleExecutor
             {
                 String task = (String) i.next();
 
-                PluginExecutionResponse pluginResponse;
-
                 if ( phaseMap.containsKey( task ) )
                 {
                     executePhase( task, session, response );
                 }
                 else
                 {
-                    pluginResponse = executeMojo( task, session );
+                    PluginExecutionResponse pluginResponse = executeMojo( task, session );
 
                     if ( pluginResponse.isExecutionFailure() )
                     {
                         response.setExecutionFailure( task, pluginResponse.getFailureResponse() );
-                        break;
                     }
+                }
+                if ( response.isExecutionFailure() )
+                {
+                    break;
                 }
             }
         }
@@ -224,7 +225,7 @@ public class DefaultLifecycleExecutor
                     if ( pluginResponse.isExecutionFailure() )
                     {
                         response.setExecutionFailure( goal, pluginResponse.getFailureResponse() );
-                        break;
+                        return;
                     }
                 }
             }
