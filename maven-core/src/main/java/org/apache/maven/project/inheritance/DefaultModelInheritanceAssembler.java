@@ -63,12 +63,6 @@ public class DefaultModelInheritanceAssembler
             child.setArtifactId( parent.getArtifactId() );
         }
 
-        // name
-        if ( child.getName() == null )
-        {
-            child.setName( parent.getName() );
-        }
-
         // currentVersion
         if ( child.getVersion() == null )
         {
