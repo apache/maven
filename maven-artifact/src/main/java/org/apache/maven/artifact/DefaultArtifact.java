@@ -46,14 +46,18 @@ public class DefaultArtifact
     /**
      * @todo this should be replaced by type handler
      */
-    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
-                            String extension )
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type, String extension )
     {
         this.groupId = groupId;
+
         this.artifactId = artifactId;
+
         this.version = version;
+
         this.type = type;
+
         this.scope = scope;
+
         this.extension = extension;
     }
 

@@ -212,7 +212,7 @@ public class DefaultArtifactResolver
                     // It's the first time we have encountered this artifact
                     // ----------------------------------------------------------------------
 
-                    if ( filter != null && !filter.include( newArtifact.getArtifactId() ) )
+                    if ( filter != null && !filter.include( newArtifact ) )
                     {
                         continue;
                     }

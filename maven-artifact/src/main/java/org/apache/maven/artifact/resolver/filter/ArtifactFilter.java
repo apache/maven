@@ -1,5 +1,7 @@
 package org.apache.maven.artifact.resolver.filter;
 
+import org.apache.maven.artifact.Artifact;
+
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -22,5 +24,7 @@ package org.apache.maven.artifact.resolver.filter;
  */
 public interface ArtifactFilter
 {
-    boolean include( String artifactId );
+    //TODO(JVZ): change the signature of this to filter(Artifact) where the meaning of filter is
+    // to exclude. I did this backward and it's confusing.
+    boolean include( Artifact artifact );
 }

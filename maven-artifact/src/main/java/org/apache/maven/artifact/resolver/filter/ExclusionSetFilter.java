@@ -16,6 +16,8 @@ package org.apache.maven.artifact.resolver.filter;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,9 +41,9 @@ public class ExclusionSetFilter
         this.excludes = excludes;
     }
 
-    public boolean include( String artifactId )
+    public boolean include( Artifact artifact )
     {
-        if ( excludes.contains( artifactId ) )
+        if ( excludes.contains( artifact.getArtifactId() ) )
         {
             return false;
         }
