@@ -51,6 +51,14 @@
           <groupId>maven</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
+          <configuration>
+            <includes>
+              <include implementation="java.lang.String">**/*Test.java</include>
+            </includes>
+            <excludes>
+              <exclude implementation="java.lang.String">**/Abstract*Test.java</exclude>
+            </excludes>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>maven</groupId>
