@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.clean;
+package org.apache.maven.plugin.install;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
