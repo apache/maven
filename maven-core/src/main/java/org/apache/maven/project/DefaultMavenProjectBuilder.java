@@ -82,10 +82,12 @@ public class DefaultMavenProjectBuilder
     private ModelDefaultsInjector modelDefaultsInjector;
 
     private ModelInterpolator modelInterpolator;
-    
+
     private UserModelBuilder userModelBuilder;
-    
+
     private ArtifactRepositoryFactory artifactRepositoryFactory;
+
+    private final Map projectCache = new HashMap();
 
     public void initialize()
     {
@@ -154,6 +156,9 @@ public class DefaultMavenProjectBuilder
         project.setFile( projectDescriptor );
         project.setParent( parentProject );
         project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
+
+        projectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ),
+                          project );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -233,18 +238,22 @@ public class DefaultMavenProjectBuilder
 
             aggregatedRemoteWagonRepositories.addAll( buildArtifactRepositories( model.getRepositories() ) );
 
-            File parentPom = findParentModel( parentModel, aggregatedRemoteWagonRepositories, localRepository );
+            MavenProject parent = getCachedProject( parentModel.getGroupId(), parentModel.getArtifactId(),
+                                                    parentModel.getVersion() );
+            if ( parent == null )
+            {
+                File parentPom = findParentModel( parentModel, aggregatedRemoteWagonRepositories, localRepository );
 
-            MavenProject parent = assembleLineage( parentPom, localRepository, lineage,
-                                                   aggregatedRemoteWagonRepositories );
-
+                parent = assembleLineage( parentPom, localRepository, lineage, aggregatedRemoteWagonRepositories );
+            }
             project.setParent( parent );
         }
 
         return project;
     }
 
-    private List buildArtifactRepositories( List repositories ) throws ProjectBuildingException
+    private List buildArtifactRepositories( List repositories )
+        throws ProjectBuildingException
     {
         UserModel userModel = null;
 
@@ -256,7 +265,7 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( "Cannot read user-model.", e );
         }
-        
+
         List repos = new ArrayList();
         for ( Iterator i = repositories.iterator(); i.hasNext(); )
         {
@@ -385,6 +394,16 @@ public class DefaultMavenProjectBuilder
         }
 
         return sortedProjects;
+    }
+
+    public MavenProject getCachedProject( String groupId, String artifactId, String version )
+    {
+        return (MavenProject) projectCache.get( createCacheKey( groupId, artifactId, version ) );
+    }
+
+    private static String createCacheKey( String groupId, String artifactId, String version )
+    {
+        return groupId + ":" + artifactId + ":" + version;
     }
 
     public MavenProject buildSuperProject( ArtifactRepository localRepository )

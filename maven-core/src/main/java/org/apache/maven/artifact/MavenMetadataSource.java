@@ -29,8 +29,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
 import java.io.FileReader;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -57,6 +55,7 @@ public class MavenMetadataSource
     {
         // there is code in plexus that uses this (though it shouldn't) so we
         // need to be able to not have a project builder
+        // TODO: remove, then remove those null checks
         this.artifactResolver = artifactResolver;
         this.mavenProjectBuilder = null;
     }
@@ -70,39 +69,57 @@ public class MavenMetadataSource
     public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        Set artifacts;
-        Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                                    artifact.getVersion(), artifact.getScope(), "pom",
-                                                                    "pom", null );
         try
         {
-            artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
+            List dependencies = null;
 
-            // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable
-            // post-processing and inheritance calculation before retrieving the 
-            // associated artifacts. This should improve consistency.
             if ( mavenProjectBuilder != null )
             {
-                MavenProject project = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
-                artifacts =
-                    artifactFactory.createArtifacts( project.getDependencies(), localRepository, artifact.getScope() );
+                MavenProject project = mavenProjectBuilder.getCachedProject( artifact.getGroupId(),
+                                                                             artifact.getArtifactId(),
+                                                                             artifact.getVersion() );
+                if ( project != null )
+                {
+                    dependencies = project.getDependencies();
+                }
             }
-            else
+
+            if ( dependencies == null )
             {
-                Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
-                artifacts =
-                    artifactFactory.createArtifacts( model.getDependencies(), localRepository, artifact.getScope() );
+                Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(),
+                                                                            artifact.getArtifactId(),
+                                                                            artifact.getVersion(), artifact.getScope(),
+                                                                            "pom", "pom", null );
+
+                artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
+
+                // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable
+                // post-processing and inheritance calculation before retrieving the
+                // associated artifacts. This should improve consistency.
+                try
+                {
+                    if ( mavenProjectBuilder != null )
+                    {
+                        MavenProject p = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
+                        dependencies = p.getDependencies();
+                    }
+                    else
+                    {
+                        Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
+                        dependencies = model.getDependencies();
+                    }
+                }
+                catch ( Exception e )
+                {
+                    throw new ArtifactMetadataRetrievalException(
+                        "Cannot read artifact source: " + metadataArtifact.getPath(), e );
+                }
             }
+            return artifactFactory.createArtifacts( dependencies, localRepository, artifact.getScope() );
         }
         catch ( ArtifactResolutionException e )
         {
             throw new ArtifactMetadataRetrievalException( "Error while resolving metadata artifact", e );
         }
-        catch ( Exception e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Cannot read artifact source: " + metadataArtifact.getPath(),
-                                                          e );
-        }
-        return artifacts;
     }
 }

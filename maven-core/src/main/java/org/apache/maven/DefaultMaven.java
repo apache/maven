@@ -130,22 +130,7 @@ public class DefaultMaven
 
                 try
                 {
-                    List goals;
-                    if ( "pom".equals( project.getPackaging() ) )
-                    {
-                        goals = new ArrayList();
-
-                        // TODO: not required if discovered and cached
-                        goals.add( "pom:install" );
-
-                        goals.addAll( request.getGoals() );
-                    }
-                    else
-                    {
-                        goals = request.getGoals();
-                    }
-
-                    MavenExecutionResponse response = processProject( request, project, dispatcher, goals );
+                    MavenExecutionResponse response = processProject( request, project, dispatcher, request.getGoals() );
                     if ( response.isExecutionFailure() )
                     {
                         return response;

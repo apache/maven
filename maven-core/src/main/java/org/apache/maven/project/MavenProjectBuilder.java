@@ -43,4 +43,6 @@ public interface MavenProjectBuilder
 
     List getSortedProjects( List projects )
         throws CycleDetectedException;
+
+    MavenProject getCachedProject( String groupId, String artifactId, String version );
 }
