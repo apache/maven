@@ -174,14 +174,14 @@
         </field>
         <field>
           <name>distributionSite</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description>The FQDN of the host where the project's artifacts are uploaded.</description>
           <type>String</type>
           <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
         </field>
         <field>
           <name>distributionDirectory</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description>The directory on the distribution host where artifacts are placed when uploaded.</description>
           <type>String</type>
           <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
