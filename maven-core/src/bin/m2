@@ -73,7 +73,7 @@ fi
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
-  [ -n "$CP" ] && CP=`cygpath --path --windows "$CP"`
+  [ -n "$CLASSWORLDS_JAR" ] && CLASSWORLDS_JAR=`cygpath --path --windows "$CLASSWORLDS_JAR"`
   [ -n "$CLASSWORLDS_CONF" ] && CLASSWORLDS_CONF=`cygpath --path --windows "$CLASSWORLDS_CONF"`
   [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
   [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --windows "$M2_HOME"`
