@@ -141,4 +141,13 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 
 ) >> log 2>&1
 
-/usr/sbin/sendmail -t < log
+BUILD_REQUIRED=`cat $HOME_DIR/build_required`
+
+# Only send mail to the list if a build was required.
+
+if [ "$BUILD_REQUIRED" = "true" ]
+then
+
+  /usr/sbin/sendmail -t < log
+  
+fi
