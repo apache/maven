@@ -50,6 +50,13 @@ public class PluginInstallMojo
 
         ArtifactRepository localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
 
+        if ( ! "plugin".equals( project.getType() ) )
+        {
+            response.setExecutionFailure( true, new PluginFailureResponse( "This project isn't a plugin." ) );
+
+            return;
+        }
+
         Artifact artifact = new DefaultArtifact( project.getGroupId(),
                                                  project.getArtifactId(),
                                                  project.getVersion(),
