@@ -1,1 +1,1 @@
-${localRepository}/org.apache.maven/poms/maven-core-it0005-1.0-SNAPSHOT.pom
+${artifact:org.apache.maven:maven-core-it0005:1.0-SNAPSHOT:pom}

@@ -11,7 +11,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -47,6 +47,9 @@ public class Verifier
     private final PrintStream originalOut;
 
     private final PrintStream originalErr;
+
+    // TODO: needs to be configurable
+    private static String localRepoLayout = "legacy";
 
     public Verifier( String basedir )
     {
@@ -141,7 +144,8 @@ public class Verifier
                     continue;
                 }
 
-                line = replace( line, "${localRepository}", localRepo );
+
+                line = replaceArtifacts( line );
 
                 lines.add( line );
             }
@@ -153,6 +157,67 @@ public class Verifier
             throw new VerificationException( e );
         }
         return lines;
+    }
+
+    private static String replaceArtifacts( String line )
+    {
+        String MARKER = "${artifact:";
+        int index = line.indexOf( MARKER );
+        if ( index >= 0 )
+        {
+            String newLine = line.substring( 0, index );
+            index = line.indexOf( "}", index );
+            if ( index < 0 )
+            {
+                throw new IllegalArgumentException( "line does not contain ending artifact marker: '" + line + "'" );
+            }
+            String artifact = line.substring( newLine.length() + MARKER.length(), index );
+
+            newLine += convertArtifact( artifact );
+            newLine += line.substring( index + 1 );
+
+            line = replaceArtifacts( newLine );
+        }
+        return line;
+    }
+
+    private static String convertArtifact( String artifact )
+    {
+        StringTokenizer tok = new StringTokenizer( artifact, ":" );
+        if ( tok.countTokens() != 4 )
+        {
+            throw new IllegalArgumentException( "Artifact must have 4 tokens: '" + artifact + "'" );
+        }
+
+        String[] a = new String[4];
+        for ( int i = 0; i < 4; i++ )
+        {
+            a[i] = tok.nextToken();
+        }
+
+        String ext = a[3];
+        if ( a[3].equals( "maven-plugin" ) )
+        {
+            ext = "jar";
+        }
+
+        String repositoryPath;
+        if ( "legacy".equals( localRepoLayout ) )
+        {
+            repositoryPath = a[0] + "/" + a[3] + "s/" + a[1] + "-" + a[2] + "." + ext;
+        }
+        else if ( "default".equals( localRepoLayout ) )
+        {
+            String pathGroup = a[0].replace( '.', '/' );
+            repositoryPath = pathGroup + "/" + a[1] + "/" + a[2];
+            repositoryPath = repositoryPath + "/" + a[1] + "-" + a[2] + "." + ext;
+        }
+        else
+        {
+            throw new IllegalStateException( "Unknown layout: " + localRepoLayout );
+        }
+
+        return localRepo + "/" + repositoryPath;
     }
 
     public void executeHook( String filename ) throws VerificationException
@@ -312,44 +377,6 @@ public class Verifier
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
-
-    public static String replaceOnce( String text, String repl, String with )
-    {
-        return replace( text, repl, with, 1 );
-    }
-
-    public static String replace( String text, String repl, String with )
-    {
-        return replace( text, repl, with, -1 );
-    }
-
-    public static String replace( String text, String repl, String with, int max )
-    {
-        if ( text == null || repl == null || with == null || repl.length() == 0 )
-        {
-            return text;
-        }
-
-        StringBuffer buf = new StringBuffer( text.length() );
-
-        int start = 0, end = 0;
-
-        while ( ( end = text.indexOf( repl, start ) ) != -1 )
-        {
-            buf.append( text.substring( start, end ) ).append( with );
-
-            start = end + repl.length();
-
-            if ( --max == 0 )
-            {
-                break;
-            }
-        }
-
-        buf.append( text.substring( start ) );
-
-        return buf.toString();
-    }
 
     public void executeGoals( String filename ) throws VerificationException
     {

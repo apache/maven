@@ -1,1 +1,1 @@
-rm ${localRepository}/org.apache.maven/jars/maven-core-it0003-1.0.jar
+rm ${artifact:org.apache.maven:maven-core-it0003:1.0:jar}

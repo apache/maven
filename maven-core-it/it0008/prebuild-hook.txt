@@ -1,1 +1,1 @@
-rm ${localRepository}/org.apache.maven/maven-plugins/maven-core-it-plugin-1.0-SNAPSHOT.jar
+rm ${artifact:org.apache.maven:maven-core-it-plugin:1.0-SNAPSHOT:maven-plugin}
