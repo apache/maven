@@ -1,7 +1,8 @@
 #!/bin/sh
 
 BUNDLEURL=$1
-VERSION=$2
+GROUPID=$2
+VERSION=$3
 
 [ "${BUNDLEURL}" = "" ] && echo && echo "You must specify a bundle URL!" && echo && exit
 
@@ -55,11 +56,16 @@ echo $BUNDLE
     artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<developers>.*</developers>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<contributors>.*</contributors>##' | grep '<id>' | sed -e 's#^.*<id>##;s#</id>.*$##'`
   fi
   
-  groupId=`cat ${POM} | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<groupId>' | sed -e 's#^.*<groupId>##;s#</groupId>.*$##'`  
-
-  if [ -z $groupId ]
+  if [ ! -z $GROUPID ]
   then
-    groupId=${artifactId}
+    groupId=${GROUPID}
+  else
+    groupId=`cat ${POM} | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<groupId>' | sed -e 's#^.*<groupId>##;s#</groupId>.*$##'`  
+
+    if [ -z $groupId ]
+    then
+      groupId=${artifactId}
+    fi
   fi
 
   version=`echo ${version} | sed -e 's/ *$//'`
