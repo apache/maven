@@ -26,18 +26,23 @@ Maven super model
  The super model is where we place all the values which we believe to be standard, values that can be shared and
  utilized across all your maven projects.
 
++-----+
  m0 <- m1 <- m2
++-----+
 
  which is transformed into
 
++-----+
  super model <- m0 <- m1 <- m2
++-----+
 
-
++-----+
 <project>
- <modelVersion></modelVersion>
+ <modelVersion>4.0.0</modelVersion>
  <parent>
    <groupId></groupId>
    <artifactId></artifactId>
    <version></version>
  </parent>
 </project>
++-----+
