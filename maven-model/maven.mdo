@@ -60,8 +60,6 @@
         </field>
         <field>
           <name>currentVersion</name>
-          <description>The current version of the project.</description>
-          <type>String</type>
           <delegateTo>version</delegateTo>
         </field>
         <field>
