@@ -40,7 +40,7 @@ public class MBoot
         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
-        "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
+        "plexus/jars/plexus-utils-1.0-alpha-2-SNAPSHOT.jar",
         "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
         "surefire/jars/surefire-1.2-SNAPSHOT.jar",
         "qdox/jars/qdox-1.2.jar" };
@@ -83,6 +83,7 @@ public class MBoot
         "maven-artifact",
         "maven-script/maven-script-marmalade",
         "maven-core",
+        "maven-archiver",
         "maven-plugin-tools/maven-plugin-tools-api",
         "maven-plugin-tools/maven-plugin-tools-java",
         "maven-plugin-tools/maven-plugin-tools-pluggy",

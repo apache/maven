@@ -16,10 +16,10 @@ package org.apache.maven.plugin.jar;
  * limitations under the License.
  */
 
+import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
 
@@ -120,45 +120,25 @@ public class JarMojo
         //
         // ----------------------------------------------------------------------
 
-        MavenProject project = (MavenProject)request.getParameter("project");
-
-        String manifest = (String) request.getParameter( "manifest" );
-
         File basedir = new File( (String) request.getParameter( "basedir" ) );
 
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
         String jarName = (String) request.getParameter( "jarName" );
 
-        boolean compress = new Boolean( (String) request.getParameter( "compress" ) ).booleanValue();
-
-        boolean index = new Boolean( (String) request.getParameter( "index" ) ).booleanValue();
-
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
-
         File jarFile = new File( basedir, jarName + ".jar" );
 
-        JarArchiver archiver = new JarArchiver();
-        archiver.addDirectory( new File( outputDirectory ), new String[] { "**/**" }, new String[] { "**/package.html" } );
-        archiver.addFile( project.getFile(), "META-INF/maven/pom.xml" );
+        MavenArchiver archiver = new MavenArchiver();
 
-        if (manifest != null && ! "".equals( manifest ) )
-        {
-            File manifestFile = new File( manifest );
-            archiver.setManifest( manifestFile );
-        }
+        archiver.setOutputFile( jarFile );
 
-        // Configure the jar
-        archiver.addConfiguredManifest( getManifest( request ) );
-
-        archiver.setCompress( compress );
-        archiver.setIndex( index );
-        archiver.setDestFile( jarFile );
+        archiver.getArchiver().addDirectory( new File( outputDirectory ), new String[] { "**/**" }, new String[] { "**/package.html" } );
 
         // create archive
-        archiver.createArchive();
+        archiver.createArchive( request );
     }
 }

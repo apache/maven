@@ -16,19 +16,30 @@ package org.apache.maven.plugin.war;
  * limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.File;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.maven.archiver.MavenArchiver;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
 
+import org.codehaus.plexus.archiver.war.WarArchiver;
+import org.codehaus.plexus.util.FileUtils;
+
 /**
  * @goal war
  * @phase package
  *
- * @description build a jar
+ * @description build a war/webapp
  *
  * @parameter
- *  name="jarName"
+ *  name="warName"
  *  type="String"
  *  required="true"
  *  validator=""
@@ -58,21 +69,6 @@ import org.apache.maven.project.MavenProject;
  *  expression="#maven.jar.manifest"
  *  description=""
  * @parameter
- *  name="mainClass"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.mainClass"
- *  description=""
- * @parameter
- *  name="addClasspath"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.addClasspath"
- *  default="false"
- *  description=""
- * @parameter
  *  name="addExtensions"
  *  type="String"
  *  required="false"
@@ -81,11 +77,58 @@ import org.apache.maven.project.MavenProject;
  *  default="false"
  *  description=""
  * @parameter
+ *  name="warSourceDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#maven.war.src"
+ *  default="#basedir/src/webapp"
+ *  description=""
+ * @parameter
+ *  name="warSourceIncludes"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.war.src.includes"
+ *  default="**"
+ *  description=""
+ * @parameter
+ *  name="warSourceIncludes"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.war.src.excludes"
+ *  description=""
+ * @parameter
+ *  name="webXml"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.war.webxml"
+ *  description=""
+ * @parameter
+ *  name="webappDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#maven.war.webapp.dir"
+ *  default="#project.build.output/#project.build.finalName"
+ *  description=""
+ * @parameter
+ *  name="mode"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#maven.war.mode"
+ *  default="war"
+ *  description=""
+ * @parameter
  *  name="outputDirectory"
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.output"
+ *  expression="#maven.war.build.dir"
+ *  default="#project.build.output"
  *  description=""
  * @parameter
  *  name="basedir"
@@ -93,6 +136,12 @@ import org.apache.maven.project.MavenProject;
  *  required="true"
  *  validator=""
  *  expression="#project.build.directory"
+ *  description=""
+ * @parameter name="localRepository"
+ *  type="org.apache.maven.artifact.repository.ArtifactRepository"
+ *  required="true"
+ *  validator=""
+ *  expression="#localRepository"
  *  description=""
  * @parameter
  *  name="project"
@@ -108,13 +157,164 @@ import org.apache.maven.project.MavenProject;
 public class WarMojo
     extends AbstractPlugin
 {
+    public static final String WEB_INF = "WEB_INF";
+
+    private PluginExecutionRequest request;
+
+    private String mode;
+
+    private MavenProject project;
+
+    private ArtifactRepository localRepository;
+
+    private String outputDirectory;
+
+    private File webappDirectory;
+
+    private File warSourceDirectory;
+
+    private String warSourceIncludes;
+
+    private String warSourceExcludes;
+
+    private String webXml;
+
+    private File warFile;
+
+    public void copyResources( File sourceDirectory, File webappDirectory, String includes, String excludes, String webXml )
+        throws IOException
+    {
+        if ( sourceDirectory != webappDirectory )
+        {
+            request.getLog().info( "Copy webapp resources to " + webappDirectory.getAbsolutePath() );
+
+            if ( warSourceDirectory.exists() )
+            {
+                FileUtils.copyDirectory( sourceDirectory, webappDirectory, includes, excludes );
+            }
+
+            if ( webXml != null && ! "".equals( webXml ) )
+            {
+                FileUtils.copyFileToDirectory( new File( webXml ), new File( webappDirectory, WEB_INF ) );
+            }
+        }
+    }
+
+    /**
+     * @todo properties 'war.bundle' and 'war.target.path'
+     * @todo copy classes to classes webapp directory
+     */
+    public void buildWebapp( MavenProject project )
+        throws IOException
+    {
+        request.getLog().info( "Assembling webapp " + project.getArtifactId() );
+
+        File libDirectory = new File( webappDirectory, WEB_INF + "/lib" );
+
+        File tldDirectory = new File( webappDirectory, WEB_INF + "/tld" );
+
+        File classesDirectory = new File( webappDirectory, WEB_INF + "/classes" );
+
+        Set artifacts = project.getArtifacts();
+
+        for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            if ( "jar".equals( artifact.getType() ) )
+            {
+                FileUtils.copyFileToDirectory( new File( localRepository.getBasedir(), artifact.toString() ) , libDirectory );
+            }
+            if ( "tld".equals( artifact.getType() ) )
+            {
+                FileUtils.copyFileToDirectory( new File( localRepository.getBasedir(), artifact.toString() ) , tldDirectory );
+            }
+        }
+    }
+
+    public void generateExplodedWebapp()
+        throws IOException
+    {
+        webappDirectory.mkdirs();
+
+        File webinfDir = new File( webappDirectory, WEB_INF );
+
+        webinfDir.mkdirs();
+
+        copyResources( warSourceDirectory, webappDirectory, warSourceIncludes, warSourceExcludes, webXml );
+
+        //buildWebapp( project );
+    }
+
+    public void generateInPlaceWebapp()
+        throws IOException
+    {
+        webappDirectory = warSourceDirectory;
+
+        generateExplodedWebapp();
+    }
+
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
-        request.getLog().info("war");
 
+        parseRequest( request );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        if ( "inplace".equals( mode ) )
+        {
+            generateInPlaceWebapp();
+        }
+        else
+        {
+            generateExplodedWebapp();
+
+            if ( ! "exploded".equals( mode ) )
+            {
+                //generate war file
+                request.getLog().info( "Generating war " + warFile.getAbsolutePath() );
+
+                MavenArchiver archiver = new MavenArchiver();
+
+                //archiver.setArchiver( new WarArchiver() );
+
+                archiver.setOutputFile( warFile );
+
+                archiver.getArchiver().addDirectory( webappDirectory, new String[] { "**/**" }, null );
+
+                // create archive
+                archiver.createArchive( request );
+            }
+        }
+    }
+
+    public void parseRequest( PluginExecutionRequest request )
+    {
+        this.request = request;
+
+        project = (MavenProject) request.getParameter( "project" );
+
+        localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
+
+        outputDirectory = (String) request.getParameter( "outputDirectory" );
+
+        webappDirectory = new File( (String) request.getParameter( "webappDirectory" ) );
+
+        warSourceDirectory = new File( (String) request.getParameter( "warSourceDirectory" ) );
+
+        warSourceIncludes = (String) request.getParameter( "warSourceIncludes" );
+
+        warSourceExcludes = (String) request.getParameter( "warSourceExcludes" );
+
+        webXml = (String) request.getParameter( "webXml" );
+
+        mode = (String) request.getParameter( "mode" );
+
+        warFile = new File( outputDirectory, (String) request.getParameter( "warName" ) + ".war" );
     }
 }
