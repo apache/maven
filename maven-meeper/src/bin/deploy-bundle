@@ -23,6 +23,8 @@ cp $BUNDLE $WORKDIR
 
   POM=project.xml
 
+  ../d2u ${POM}
+
   [ ! -f ${POM} ] && echo && echo "Cannot deploy without the project.xml file!" && echo && exit
 
   version=`cat ${POM} | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<version>' | sed -e 's#^.*<version>##;s#</version>.*$##'`
@@ -46,17 +48,25 @@ cp $BUNDLE $WORKDIR
     groupId=${artifactId}
   fi
 
-  echo "   version: ${version}"  
-  echo "   groupId: ${groupId}"  
-  echo "artifactId: ${artifactId}" 
+  version=`echo ${version} | sed -e 's/ *$//'`
+  artifactId=`echo ${artifactId} | sed -e 's/ *$//'`
+  groupId=`echo ${groupId} | sed -e 's/ *$//'`  
+
+  echo
+  echo "   version: [${version}]"
+  echo "   groupId: [${groupId}]"  
+  echo "artifactId: [${artifactId}]"
+  echo
 
   [ ! -f LICENSE.txt ] && echo && echo "Cannot deploy without the LICENSE.txt file!" && echo && exit
 
   cp project.xml ${artifactId}-${version}.pom
 
-  deploy-lic LICENSE.txt ${groupId}
+  ../d2u LICENSE.txt
+
+  ../deploy-lic LICENSE.txt ${groupId}
   
-  deploy-pom ${artifactId}-${version}.pom ${groupId}
+  ../deploy-pom ${artifactId}-${version}.pom ${groupId}
   
-  deploy-jar ${artifactId}-${version}.jar ${groupId}
+  ../deploy-jar ${artifactId}-${version}.jar ${groupId}
 )  

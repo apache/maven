@@ -1,0 +1,2 @@
+perl -p -n -i.bak -e 's/\r\n/\n/' $1
+rm $1.bak
