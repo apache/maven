@@ -70,6 +70,15 @@ public class ArtifactDownloader
 
     private Set downloadedArtifacts = new HashSet();
 
+    public void setProxy( String host, String port, String userName, String password )
+    {
+        proxyHost = host;
+        proxyPort = port;
+        proxyUserName = userName;
+        proxyPassword = password;
+        System.out.println("Using the following proxy : " + proxyHost + "/" + proxyPort );
+    }
+
     public void downloadDependencies( List files )
         throws Exception
     {

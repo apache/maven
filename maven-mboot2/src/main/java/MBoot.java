@@ -184,9 +184,11 @@ public class MBoot
 
         String mavenRepoLocal = System.getProperty( "maven.repo.local" );
 
+        SettingsReader userModelReader = null;
+
         if ( mavenRepoLocal == null )
         {
-            SettingsReader userModelReader = new SettingsReader();
+            userModelReader = new SettingsReader();
 
             try
             {
@@ -198,7 +200,7 @@ public class MBoot
                 {
                     userModelReader.parse( settingsXml );
 
-                    Profile activeProfile = userModelReader.getActiveMavenProfile();
+                    Profile activeProfile = userModelReader.getActiveProfile();
 
                     mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
                 }
@@ -222,12 +224,12 @@ public class MBoot
 
             mavenRepoLocal = repoDir.getAbsolutePath();
 
-            System.out
-                      .println( "You SHOULD have a ~/.m2/settings.xml file and must contain at least the following information:\n" );
+            System.out.println( "You SHOULD have a ~/.m2/settings.xml file and must contain at least the following information:\n" );
 
-            System.out.println( "<settings>\n  " + "<profiles>\n    " + "<profile>\n      "
-                + "<localRepository>/path/to/your/repository</localRepository>\n    "
-                + "</profile>\n  " + "</profiles>\n"
+            System.out.println( "<settings>\n" + "  <profiles>\n" + "    <profile>\n"
+                + "      <active>true</active>\n"
+                + "      <localRepository>/path/to/your/repository</localRepository>\n"
+                + "    </profile>\n" + "  </profiles>\n"
                 + "</settings>\n" );
 
             System.out.println();
@@ -272,6 +274,11 @@ public class MBoot
         }
 
         downloader = new ArtifactDownloader( mavenRepoLocal, reader.getRemoteRepositories() );
+        if ( userModelReader.getActiveProxy() != null )
+        {
+            Proxy proxy = userModelReader.getActiveProxy();
+            downloader.setProxy( proxy.getHost(), proxy.getPort(), proxy.getUserName(), proxy.getPassword() );
+        }
 
         repoLocal = downloader.getMavenRepoLocal().getPath();
 
@@ -1332,18 +1339,28 @@ public class MBoot
     class SettingsReader
         extends AbstractReader
     {
-
         private List profiles = new ArrayList();
 
         private Profile currentProfile = null;
 
+        private List proxies = new ArrayList();
+
+        private Proxy currentProxy = null;
+
         private StringBuffer currentBody = new StringBuffer();
 
-        private Profile activeMavenProfile = null;
+        private Profile activeProfile = null;
 
-        public Profile getActiveMavenProfile()
+        private Proxy activeProxy = null;
+
+        public Profile getActiveProfile()
         {
-            return activeMavenProfile;
+            return activeProfile;
+        }
+
+        public Proxy getActiveProxy()
+        {
+            return activeProxy;
         }
 
         public void characters( char[] ch, int start, int length )
@@ -1383,20 +1400,77 @@ public class MBoot
                     throw new SAXException( "Illegal element inside profile: \'" + rawName + "\'" );
                 }
             }
+            else if ( "proxy".equals( rawName ) )
+            {
+                if ( notEmpty( currentProxy.getHost() ) && notEmpty( currentProxy.getPort() ) )
+                {
+                    proxies.add( currentProxy );
+                    currentProxy = null;
+                }
+                else
+                {
+                    throw new SAXException( "Invalid proxy entry. Missing one or more " +
+                                            "fields: {host, port}." );
+                }
+            }
+            else if ( currentProxy != null )
+            {
+                if ( "active".equals( rawName ) )
+                {
+                    currentProxy.setActive( Boolean.valueOf(currentBody.toString().trim()).booleanValue() );
+                }
+                else if ( "host".equals( rawName ) )
+                {
+                    currentProxy.setHost( currentBody.toString().trim() );
+                }
+                else if ( "port".equals( rawName ) )
+                {
+                    currentProxy.setPort( currentBody.toString().trim() );
+                }
+                else if ( "username".equals( rawName ) )
+                {
+                    currentProxy.setUserName( currentBody.toString().trim() );
+                }
+                else if ( "password".equals( rawName ) )
+                {
+                    currentProxy.setPassword( currentBody.toString().trim() );
+                }
+                else if ( "protocol".equals( rawName ) )
+                {
+                }
+                else if ( "nonProxyHosts".equals( rawName ) )
+                {
+                }
+                else
+                {
+                    throw new SAXException( "Illegal element inside proxy: \'" + rawName + "\'" );
+                }
+            }
             else if ( "settings".equals( rawName ) )
             {
-                if(profiles.size() == 1)
+                if( profiles.size() == 1 )
                 {
-                    activeMavenProfile = (Profile) profiles.get(0);
+                    activeProfile = (Profile) profiles.get(0);
                 }
                 else
                 {
                     for ( Iterator it = profiles.iterator(); it.hasNext(); )
                     {
                         Profile profile = (Profile) it.next();
-                        if(profile.isActive())
+                        if( profile.isActive() )
                         {
-                            activeMavenProfile = profile;
+                            activeProfile = profile;
+                        }
+                    }
+                }
+                if ( proxies.size() != 0 )
+                {
+                    for ( Iterator it = proxies.iterator(); it.hasNext(); )
+                    {
+                        Proxy proxy = (Proxy) it.next();
+                        if( proxy.isActive() )
+                        {
+                            activeProxy = proxy;
                         }
                     }
                 }
@@ -1417,20 +1491,25 @@ public class MBoot
             {
                 currentProfile = new Profile();
             }
+            else if ( "proxy".equals( rawName ) )
+            {
+                currentProxy = new Proxy();
+            }
         }
 
         public void reset()
         {
             this.currentBody = null;
-            this.activeMavenProfile = null;
+            this.activeProfile = null;
+            this.activeProxy = null;
             this.currentProfile = null;
             this.profiles.clear();
+            this.proxies.clear();
         }
     }
 
     public static class Profile
     {
-
         private String localRepo;
 
         private boolean active = false;
@@ -1454,7 +1533,69 @@ public class MBoot
         {
             return localRepo;
         }
+    }
 
+    public class Proxy
+    {
+        private boolean active;
+
+        private String host;
+
+        private String port;
+
+        private String userName;
+
+        private String password;
+
+        public boolean isActive()
+        {
+            return active;
+        }
+
+        public void setActive( boolean active )
+        {
+            this.active = active;
+        }
+
+        public void setHost( String host )
+        {
+            this.host = host;
+        }
+
+        public String getHost()
+        {
+            return host;
+        }
+
+        public void setPort( String port )
+        {
+            this.port = port;
+        }
+
+        public String getPort()
+        {
+            return port;
+        }
+
+        public void setUserName( String userName )
+        {
+            this.userName = userName;
+        }
+
+        public String getUserName()
+        {
+            return userName;
+        }
+
+        public void setPassword( String password )
+        {
+            this.password = password;
+        }
+
+        public String getPassword()
+        {
+            return password;
+        }
     }
 
     public static class Dependency
