@@ -7,7 +7,13 @@
 Maven Lifecycle
 
  * Single goal
- 
+
+   - session lifecycle
+
+     - dep resolution (if POM present)
+
+     - goal lifecycle
+
  * Multiple goals
  
  * Reactor with a single goal
