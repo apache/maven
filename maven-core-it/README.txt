@@ -48,6 +48,8 @@ it0014: Test a JAR override by file.
 it0015: Test marmalade-driven mojo support. This will compile supporting java
         classes (mmld tag & taglib), generate plugin descriptor from mmld script,
         install the plugin, and finally use the new plugin.
+
+it0016: Test a WAR generation
 -------------------------------------------------------------------------------
 
 - generated sources
