@@ -27,6 +27,9 @@ it0008: Simple goal decoration where a plugin binds to a phase and the plugin mu
         test also checks to make sure that mojo parameters are aligned to the 
         project basedir when their type is "java.io.File".
         
+it0009: Test plugin configuration and goal configuration that overrides what the
+        mojo has specified.
+        
 it0010: Since the artifact resolution does not use the project builder, we must
         ensure that the full hierarchy of all dependencies is resolved. This
         includes the dependencies of the parent-pom's of dependencies. This test
