@@ -695,8 +695,12 @@ public class MBoot
             excludes.add( "**/*Abstract*.java" );
         }
 
-        testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes, classpath( reader.getDependencies(), null ) );
+        boolean success = testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes, classpath( reader.getDependencies(), null ) );
 
+        if ( !success )
+        {
+            throw new Exception ( "Tests error" );
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -778,6 +782,11 @@ public class MBoot
             for ( Iterator i = errors.iterator(); i.hasNext(); )
             {
                 System.out.println( i.next() );
+            }
+
+            if ( errors.size() > 0 )
+            {
+                throw new Exception( "Compilation error." );
             }
         }
     }
