@@ -339,6 +339,14 @@ public class MBoot
 
         FileUtils.copyFileToDirectory( repoLocal + "/maven/jars/maven-core-2.0-SNAPSHOT.jar", lib );
 
+        System.out.println();
+
+        System.out.println( "Maven2 is installed in " + dist.getAbsolutePath() );
+
+        System.out.println( "--------------------------------------------------------------------" );
+
+        System.out.println();
+
         fullStop = new Date();
 
         stats( fullStart, fullStop );
