@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <name>Maven Plugin</name>
   <groupId>maven</groupId>
-  <artifactId>maven-plugin</artifactId>
+  <artifactId>maven-plugin-parent</artifactId>
   <version>2.0-SNAPSHOT</version>
   <description>Maven plugin parent</description>
   <shortDescription>Maven plugin  parent</shortDescription>
