@@ -14,7 +14,7 @@ downloadMBootDependencies()
     if [ ! -f $repoLocal/$i ]
     then
       mkdir -p $repoLocal/$i > /dev/null 2>&1
-      wget http://www.ibiblio.org/maven/$i $repoLocal/$i
+      wget http://www.ibiblio.org/maven/$i $repoLocal/$i > /dev/null 2>&1
     fi
   done
 }
@@ -160,7 +160,7 @@ buildMavenProject()
     # $2 == jar name
     # $3 == flag to install
     # $4 == flag to leave mboot files
-
+    
     (
       home=`pwd`
       

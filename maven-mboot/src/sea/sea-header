@@ -42,6 +42,14 @@ tail +$SKIP $0 | tar xz -C $DIR
 #cd $PREV
 #rm -rf $WORK_DIR
 
+. ${MBOOT_HOME}/maven.functions
+
+echo "-------------------------------------------------------"
+echo "Installing MBoot dependencies ... "
+echo "-------------------------------------------------------"
+
+downloadMBootDependencies
+
 exit 0
 
 __ARCHIVE_FOLLOWS__
