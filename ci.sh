@@ -39,18 +39,6 @@ DEPLOY_DIR=$HOME_DIR/public_html/m2
 DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2
 
 # ----------------------------------------------------------------------------------
-# Check if ~/maven.properties exists
-# ----------------------------------------------------------------------------------
-if [ ! -f ~/maven.properties ]
-then
-  echo 
-  echo "maven.properties doesn't exists. I create it."
-  echo "maven.home=$M2_HOME" > ~/maven.properties
-  echo "maven.repo.local=$REPO" >> ~/maven.properties
-  echo
-fi
-
-# ----------------------------------------------------------------------------------
 
 # Wipe out the working directory and the repository and start entirely
 # from scratch.
@@ -137,14 +125,10 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
     echo
     echo "Creating m2 distribution for public consumption: ${DEPLOY_SITE}/${DIST}"
     echo
-    
-    (
-      cd $DIR/maven-components/maven-core/dist
-      
-      tar czf $DIST m2
-      
-      cp $DIST $DEPLOY_DIR
-    )
+
+    mkdir -p $DEPLOY_DIR > /dev/null 2>&1
+
+    tar czf $DEPLOY_DIR/$DIST m2
 
   else
   
@@ -162,8 +146,5 @@ host=`hostname`
 
 if [ "$BUILD_REQUIRED" = "true" ]
 then
-  if [ "$hostname" = "beaver.codehaus.org" ]
-  then
-    /usr/sbin/sendmail -t < log
-  fi  
+  /usr/sbin/sendmail -t < log
 fi
