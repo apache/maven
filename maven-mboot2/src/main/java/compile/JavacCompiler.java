@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,9 +56,22 @@ public class JavacCompiler
 
         String[] sources = getSourceFiles( config );
 
+        if ( sources.length == 0 )
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" )
+            + " to " + destinationDir.getAbsolutePath() );
+
         Map compilerOptions = config.getCompilerOptions();
 
         List args = new ArrayList( sources.length + 5 + compilerOptions.size() * 2 );
+
+        if ( config.isDebug() )
+        {
+            args.add( "-g" );
+        }
 
         args.add( "-d" );
 
@@ -68,11 +82,6 @@ public class JavacCompiler
         args.add( "-classpath" );
 
         args.add( getClasspathString( config.getClasspathEntries() ) );
-
-        if ( config.isDebug() )
-        {
-            args.add( "-g" );
-        }
 
         Iterator it = compilerOptions.entrySet().iterator();
 
@@ -109,7 +118,7 @@ public class JavacCompiler
 
         if ( !ok.booleanValue() )
         {
-            throw new Exception( "Failure executing javac: \n\t" + err.toString() );
+            throw new Exception( "Failure executing javac: \n\n'javac " + args + "'\n\n" + err.toString() );
         }
 
         List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
