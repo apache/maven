@@ -45,6 +45,7 @@ public class DependencyResolutionPhase
             String goalName = (String) iterator.next();
 
             MojoDescriptor mojoDescriptor = context.getMojoDescriptor( goalName );
+
             if ( mojoDescriptor.requiresDependencyResolution() )
             {
                 requiresDependencies = true;

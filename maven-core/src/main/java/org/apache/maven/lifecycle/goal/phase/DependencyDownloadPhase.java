@@ -37,7 +37,7 @@ public class DependencyDownloadPhase
     public void execute( MavenGoalExecutionContext context )
         throws GoalExecutionException
     {
-        if(context.requiresDependencies())
+        if ( context.requiresDependencies() )
         {
             ArtifactResolver artifactResolver = null;
 
