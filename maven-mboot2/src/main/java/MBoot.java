@@ -45,12 +45,12 @@ public class MBoot
     String[] deps = new String[]
     {
         "junit/jars/junit-3.8.1.jar",
-        "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
-        "surefire/jars/surefire-1.2-SNAPSHOT.jar",
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
-        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
+//        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
+        "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
+        "surefire/jars/surefire-1.2-SNAPSHOT.jar",
         "xpp3/jars/xpp3-1.1.3.3.jar",
         "xstream/jars/xstream-1.0-SNAPSHOT.jar",
         "qdox/jars/qdox-1.2.jar",
