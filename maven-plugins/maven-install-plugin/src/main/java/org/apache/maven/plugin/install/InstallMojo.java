@@ -42,7 +42,7 @@ package org.apache.maven.plugin.install;
  * expression="#localRepository"
  * description=""
  *
- * @prereq build
+ * @prereq package
  *
  */
 public class InstallMojo
