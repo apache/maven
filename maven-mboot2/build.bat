@@ -1,15 +1,19 @@
 @echo off
 
 set buildDir=target
+set classesDir=%buildDir%\classes
+set srcDir=src\main\java
 
+if exist %classesDir% rmdir /S/Q %buildDir%
 if exist %buildDir% rmdir /S/Q %buildDir%
 
 mkdir %buildDir%
+mkdir %classesDir%
 
-%JAVA_HOME%\bin\javac -d %buildDir% @sources.txt
+%JAVA_HOME%\bin\javac -d %classesDir% %srcDir%\*.java
 
-cd %buildDir% 
-%JAVA_HOME%\bin\jar -cfm ..\mboot.jar ..\manifest.txt *
-cd ..
+cd %classesDir% 
+%JAVA_HOME%\bin\jar -cfm ..\mboot.jar ..\..\manifest.txt *.*
+cd ..\..
 
-copy mboot.jar ..
+copy %buildDir%\mboot.jar ..

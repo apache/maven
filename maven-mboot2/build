@@ -1,13 +1,15 @@
 #!/bin/sh
 
 buildDir=target
+classesDir=${buildDir}/classes
+srcDir=src/main/java
 
 rm -rf ${buildDir} > /dev/null 2>&1
 
-mkdir ${buildDir}
+mkdir -p ${classesDir}
 
-javac -d ${buildDir} @sources.txt
+javac -d ${classesDir} ${srcDir}/*.java
 
-( cd ${buildDir} ; jar -cfm ../mboot.jar ../manifest.txt * )
+( cd ${classesDir} ; jar -cfm ../mboot.jar ../../manifest.txt * )
 
-cp mboot.jar ..
+cp ${buildDir}/mboot.jar ..
