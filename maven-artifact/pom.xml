@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-component</artifactId>
     <groupId>org.apache.maven</groupId>
@@ -6,31 +6,25 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-artifact</artifactId>
-  <packaging>jar</packaging>
   <name>Maven</name>
   <version>2.0-SNAPSHOT</version>
   <inceptionYear>2001</inceptionYear>
   <dependencies>
     <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-2</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-alpha-2</version>
-      <type>jar</type>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
       <version>1.0-alpha-2</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-http-lightweight</artifactId>
-      <version>1.0-alpha-2</version>
-      <type>jar</type>
-      <scope>compile</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
-</model>
+</project>

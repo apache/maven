@@ -589,7 +589,7 @@ public class MBoot
 
         System.out.println( "Compiling test sources ..." );
 
-        Collection testDependencies = reader.getDependencies();
+        Collection testDependencies = new ArrayList( reader.getDependencies() );
 
         compile( testDependencies, testSources, testClasses, classes, null, SCOPE_TEST, localRepository );
 
@@ -800,6 +800,7 @@ public class MBoot
         List classpath = classpath( depList, null, SCOPE_TEST, localRepository );
         classpath.add( classes );
         classpath.add( testClasses );
+
         boolean success = testRunner.execute( basedir, includes, excludes, classpath, reportsDir );
 
         if ( !success )
@@ -842,7 +843,10 @@ public class MBoot
             }
         }
 
-        classpath.add( extraClasspath );
+        if ( extraClasspath != null )
+        {
+            classpath.add( extraClasspath );
+        }
 
         return classpath;
     }
@@ -880,8 +884,8 @@ public class MBoot
         {
             CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
             compilerConfiguration.setOutputLocation( outputDirectory );
-            compilerConfiguration.setClasspathEntries(
-                classpath( dependencies, extraClasspath, scope, localRepository ) );
+            List classpathEntries = classpath( dependencies, extraClasspath, scope, localRepository );
+            compilerConfiguration.setClasspathEntries( classpathEntries );
             compilerConfiguration.setSourceLocations( Arrays.asList( sourceDirectories ) );
 
             /* Compile with debugging info */

@@ -12,13 +12,15 @@
   <dependencies>
     <dependency>
       <groupId>surefire</groupId>
-      <artifactId>surefire</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>surefire</groupId>
       <artifactId>surefire-booter</artifactId>
       <version>1.2</version>
+    </dependency>
+    <!-- Specified for mboot -->
+    <dependency>
+      <groupId>surefire</groupId>
+      <artifactId>surefire</artifactId>
+      <version>1.2</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -27,16 +29,11 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- TODO: should be able to remove -->
+    <!-- TODO: would like to remove -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>2.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-provider-api</artifactId>
-      <version>1.0-alpha-2</version>
     </dependency>
   </dependencies>
 </model>

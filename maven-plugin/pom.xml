@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-component</artifactId>
     <groupId>org.apache.maven</groupId>
@@ -6,10 +6,11 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-plugin</artifactId>
-  <packaging>jar</packaging>
   <name>Maven Plugin</name>
   <version>2.0-SNAPSHOT</version>
   <dependencies>
+    <!-- TODO: can we avoid this dependency so that it is not propogated to Mojo implementors?
+         Maybe split plugin-api from the descriptor builder? -->
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
@@ -19,32 +20,13 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-monitor</artifactId>
       <version>2.0-SNAPSHOT</version>
-      <type>jar</type>
-      <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>qdox</groupId>
-      <artifactId>qdox</artifactId>
-      <version>1.2</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>modello</groupId>
-      <artifactId>modello</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
+
+    <!-- TODO: shouldn't be needed - separate plugin test case -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
-      <type>jar</type>
-      <!-- Should be changed to test scope, but that requires moving the 
-        | plugin test case out to another artifact or something.
-        | -->
-      <scope>compile</scope>
     </dependency>
   </dependencies>
-</model>
+</project>
