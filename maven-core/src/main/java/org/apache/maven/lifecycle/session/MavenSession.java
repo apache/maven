@@ -163,6 +163,11 @@ public class MavenSession
 
     public List getPreGoals( String goal )
     {
+        if ( project == null )
+        {
+            return null;
+        }
+
         List result = (List) preGoalMappings.get( goal );
 
         return result;
@@ -170,6 +175,11 @@ public class MavenSession
 
     public List getPostGoals( String goal )
     {
+        if ( project == null )
+        {
+            return null;
+        }
+
         List result = (List) postGoalMappings.get( goal );
 
         return result;
