@@ -18,6 +18,8 @@
  | o need to clean up all the descriptions, matching anything to the current project-descriptor.xml file and
  |   improving on that
  |
+ | o use enums where appropriate (eg dependency scope)
+ |
  -->
 <model>
   <id>maven</id>
@@ -808,9 +810,9 @@
           </association>
         </field>
         <field>
-          <name>file</name>
+          <name>scope</name>
           <version>4.0.0</version>
-          <description>Override the use of a repository - retrieve it from this file</description>
+          <description>The scope of the dependency - build, compile, test, runtime</description>
           <type>String</type>
         </field>
       </fields>

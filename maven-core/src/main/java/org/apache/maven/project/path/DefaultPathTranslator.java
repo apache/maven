@@ -96,25 +96,6 @@ public class DefaultPathTranslator
                 }
             }
 
-            List dependencies = model.getDependencies();
-
-            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-            {
-                Dependency dependency = (Dependency) i.next();
-
-                s = dependency.getFile();
-
-                if ( s != null )
-                {
-                    s = stripBasedirToken( s );
-
-                    if ( requiresBaseDirectoryAlignment( s ) )
-                    {
-                        dependency.setFile( new File( projectFile.getParentFile(), s ).getPath() );
-                    }
-                }
-            }
-
             s = stripBasedirToken( build.getOutput() );
 
             if ( requiresBaseDirectoryAlignment( s ) )

@@ -50,7 +50,7 @@ public class DefaultModelDefaultsInjectorTest
         def.setGroupId( dep.getGroupId() );
         def.setArtifactId( dep.getArtifactId() );
         def.setVersion( "1.0.1" );
-        def.setFile( "file" );
+        def.setScope( "scope" );
 
         DependencyManagement depMgmt = new DependencyManagement();
 
@@ -203,7 +203,7 @@ public class DefaultModelDefaultsInjectorTest
         assertEquals( "value", result.getProperties().getProperty( "test" ) );
     }
 
-    public void testShouldMergeDefaultFileWhenDependencyDoesntSupplyFile()
+    public void testShouldMergeDefaultScopeWhenDependencyDoesntSupplyScope()
     {
         Model model = new Model();
 
@@ -211,7 +211,7 @@ public class DefaultModelDefaultsInjectorTest
         dep.setGroupId( "myGroup" );
         dep.setArtifactId( "myArtifact" );
         dep.setVersion( "1.0.1" );
-        dep.setFile( "file" );
+        dep.setScope( "scope" );
 
         model.addDependency( dep );
 
@@ -232,10 +232,10 @@ public class DefaultModelDefaultsInjectorTest
 
         Dependency result = (Dependency) deps.get( 0 );
 
-        assertEquals( "file", result.getFile() );
+        assertEquals( "scope", result.getScope() );
     }
 
-    public void testShouldNotMergeDefaultFileWhenDependencySuppliesFile()
+    public void testShouldNotMergeDefaultScopeWhenDependencySuppliesScope()
     {
         Model model = new Model();
 
@@ -243,14 +243,14 @@ public class DefaultModelDefaultsInjectorTest
         dep.setGroupId( "myGroup" );
         dep.setArtifactId( "myArtifact" );
         dep.setVersion( "1.0.1" );
-        dep.setFile( "file" );
+        dep.setScope( "scope" );
 
         model.addDependency( dep );
 
         Dependency def = new Dependency();
         def.setGroupId( dep.getGroupId() );
         def.setArtifactId( dep.getArtifactId() );
-        def.setFile( "default" );
+        def.setScope( "default" );
 
         DependencyManagement depMgmt = new DependencyManagement();
 
@@ -264,7 +264,7 @@ public class DefaultModelDefaultsInjectorTest
         assertEquals( 1, deps.size() );
 
         Dependency result = (Dependency) deps.get( 0 );
-        assertEquals( "file", result.getFile() );
+        assertEquals( "scope", result.getScope() );
     }
 
     public void testShouldRejectDependencyWhereNoVersionIsFoundAfterDefaultsInjection()

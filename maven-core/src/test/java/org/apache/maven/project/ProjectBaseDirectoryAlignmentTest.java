@@ -32,33 +32,5 @@ public class ProjectBaseDirectoryAlignmentTest
         Resource resource = (Resource) build.getResources().get( 0 );
 
         assertTrue( resource.getDirectory().startsWith( getBasedir() ) );
-
-        String relativeFile = null;
-        String absoluteFile = null;
-        String managedDependencyFile = null;
-        for ( Iterator i = project.getDependencies().iterator(); i.hasNext(); )
-        {
-            Dependency d = (Dependency) i.next();
-            if ( d.getGroupId().equals( "g1" ) )
-            {
-                relativeFile = d.getFile();
-            }
-            else if ( d.getGroupId().equals( "g2" ) )
-            {
-                absoluteFile = d.getFile();
-            }
-            else if ( d.getGroupId().equals( "g3" ) )
-            {
-                managedDependencyFile = d.getFile();
-            }
-        }
-
-        assertNotNull( "Required dependency missing: g1:d1", relativeFile );
-        assertNotNull( "Required dependency missing: g2:d2", absoluteFile );
-        assertNotNull( "Required dependency missing: g3:d3", managedDependencyFile );
-
-        assertTrue( "Relative file not adjusted", relativeFile.startsWith( getBasedir() ) );
-        assertEquals( "Absolute file was incorrectly modified", "/top/level/path", absoluteFile );
-        assertTrue( "Managed dependency not adjusted", managedDependencyFile.startsWith( getBasedir() ) );
     }
 }

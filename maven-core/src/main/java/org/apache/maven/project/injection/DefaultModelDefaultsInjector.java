@@ -77,14 +77,14 @@ public class DefaultModelDefaultsInjector
      */
     private void mergeWithDefaults( Dependency dep, Dependency def )
     {
+        if ( dep.getScope() == null && def.getScope() != null )
+        {
+            dep.setScope( def.getScope() );
+        }
+
         if ( dep.getVersion() == null && def.getVersion() != null )
         {
             dep.setVersion( def.getVersion() );
-        }
-
-        if ( dep.getFile() == null && def.getFile() != null )
-        {
-            dep.setFile( def.getFile() );
         }
 
         Properties props = new Properties( def.getProperties() );
