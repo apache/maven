@@ -10,4 +10,13 @@ CP=$CP:./lib/wagon-provider-api-1.0-alpha-2-SNAPSHOT.jar
 CP=$CP:./lib/wagon-file-1.0-alpha-2-SNAPSHOT.jar
 CP=$CP:./lib/wagon-http-lightweight-1.0-alpha-2-SNAPSHOT.jar
 
+cygwin=false
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+esac
+
+if [ $cygwin ]; then
+  CP=`cygpath -pw $CP`
+fi
+
 java -classpath ${CP} org.apache.maven.tools.repoclean.Main $* | tee repoclean-log.txt
