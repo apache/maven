@@ -5,6 +5,7 @@ import org.apache.maven.model.user.UserModel;
 import org.apache.maven.util.UserModelUtils;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.repository.Repository;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author jdcasey
@@ -17,18 +18,22 @@ public class MavenAuthenticationInfoProvider
     {
         UserModel userModel = UserModelUtils.getUserModel();
 
-        ServerProfile serverProfile = UserModelUtils.getServerProfile( userModel, repo.getId() );
-
-        AuthenticationInfo info = new AuthenticationInfo();
-        if ( serverProfile != null )
+        String repoId = repo.getId();
+        if ( !StringUtils.isEmpty( repoId ) )
         {
-            info.setUserName( serverProfile.getUsername() );
-            info.setPassword( serverProfile.getPassword() );
-            info.setPrivateKey( serverProfile.getPrivateKey() );
-            info.setPassphrase( serverProfile.getPassphrase() );
-        }
+            ServerProfile serverProfile = UserModelUtils.getServerProfile( userModel, repo.getId() );
 
-        repo.setAuthenticationInfo( info );
+            AuthenticationInfo info = new AuthenticationInfo();
+            if ( serverProfile != null )
+            {
+                info.setUserName( serverProfile.getUsername() );
+                info.setPassword( serverProfile.getPassword() );
+                info.setPrivateKey( serverProfile.getPrivateKey() );
+                info.setPassphrase( serverProfile.getPassphrase() );
+            }
+
+            repo.setAuthenticationInfo( info );
+        }
     }
 
 }

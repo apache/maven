@@ -4,4 +4,14 @@
   <artifactId>maven-core-it0017</artifactId>
   <packaging>ejb</packaging>
   <version>1.0</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>maven</groupId>
+        <artifactId>maven-ejb-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </plugin>
+    </plugins>
+  </build>
 </model>

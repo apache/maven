@@ -48,6 +48,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.CollectionUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.util.ArrayList;
@@ -123,8 +124,7 @@ public class DefaultPluginManager
 
     private Set pluginsInProcess = new HashSet();
 
-    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor )
-        throws CycleDetectedException
+    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor ) throws CycleDetectedException
     {
         if ( pluginsInProcess.contains( mavenPluginDescriptor.getPluginId() ) )
         {
@@ -193,8 +193,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPluginForGoal( String goalName, MavenSession session )
-        throws Exception
+    public void verifyPluginForGoal( String goalName, MavenSession session ) throws Exception
     {
         String pluginId = getPluginId( goalName );
 
@@ -203,20 +202,53 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPlugin( String groupId, String artifactId, MavenSession session )
-        throws Exception
+    public void verifyPlugin( String groupId, String artifactId, MavenSession session ) throws Exception
     {
         if ( !isPluginInstalled( groupId, artifactId ) )
         {
             //!! This is entirely crappy. We need a better naming for plugin
             // artifact ids and
-            //   we definitely need better version extraction support.
-
-            String version = "1.0-SNAPSHOT";
 
             ArtifactFactory artifactFactory = null;
             try
             {
+                MavenProject project = session.getProject();
+
+                List projectPlugins = project.getPlugins();
+
+                org.apache.maven.model.Plugin pluginConfig = null;
+
+                for ( Iterator it = project.getPlugins().iterator(); it.hasNext(); )
+                {
+                    org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
+
+                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                    {
+                        pluginConfig = plugin;
+                        break;
+                    }
+                }
+
+                String version = null;
+
+                if ( pluginConfig != null )
+                {
+                    if ( StringUtils.isEmpty( pluginConfig.getVersion() ) )
+                    {
+                        throw new PluginVersionNotConfiguredException( groupId, artifactId );
+                    }
+                    else
+                    {
+                        version = pluginConfig.getVersion();
+                    }
+                }
+
+                // TODO: Default over to a sensible value (is 1.0-SNAPSHOT right?)
+                if ( StringUtils.isEmpty( version ) )
+                {
+                    version = "1.0-SNAPSHOT";
+                }
+
                 artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
                 Artifact pluginArtifact = artifactFactory.createArtifact( "maven", artifactId, version, null, "plugin",
@@ -235,8 +267,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    protected void addPlugin( Artifact pluginArtifact, MavenSession session )
-        throws Exception
+    protected void addPlugin( Artifact pluginArtifact, MavenSession session ) throws Exception
     {
         ArtifactResolver artifactResolver = null;
         MavenProjectBuilder mavenProjectBuilder = null;
@@ -271,8 +302,7 @@ public class DefaultPluginManager
     // Plugin execution
     // ----------------------------------------------------------------------
 
-    public PluginExecutionResponse executeMojo( MavenSession session, String goalName )
-        throws GoalExecutionException
+    public PluginExecutionResponse executeMojo( MavenSession session, String goalName ) throws GoalExecutionException
     {
         try
         {
@@ -386,8 +416,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
-        throws Exception
+    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request ) throws Exception
     {
         if ( request != null && request.getParameters() != null )
         {
@@ -413,8 +442,7 @@ public class DefaultPluginManager
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
 
-    public static Map createParameters( MojoDescriptor goal, MavenSession session )
-        throws PluginConfigurationException
+    public static Map createParameters( MojoDescriptor goal, MavenSession session ) throws PluginConfigurationException
     {
         Map map = null;
 
@@ -508,8 +536,8 @@ public class DefaultPluginManager
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " ).append(
-            mojo.getId() ).append( " mojo and cannot be null." );
+        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " )
+               .append( mojo.getId() ).append( " mojo and cannot be null." );
 
         return message.toString();
     }
@@ -518,8 +546,7 @@ public class DefaultPluginManager
     // Lifecycle
     // ----------------------------------------------------------------------
 
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -527,10 +554,17 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
-                                                              "maven-monitor", "maven-plugin", "plexus-container-api",
-                                                              "plexus-container-default", "plexus-artifact-container",
-                                                              "wagon-provider-api", "classworlds"} );
+        artifactFilter = new ExclusionSetFilter( new String[] {
+            "maven-core",
+            "maven-artifact",
+            "maven-model",
+            "maven-monitor",
+            "maven-plugin",
+            "plexus-container-api",
+            "plexus-container-default",
+            "plexus-artifact-container",
+            "wagon-provider-api",
+            "classworlds" } );
 
         // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new ArrayList();
@@ -544,7 +578,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
-                                                MavenProjectBuilder mavenProjectBuilder )
+                                               MavenProjectBuilder mavenProjectBuilder )
         throws ArtifactResolutionException
     {
         MavenProject project = context.getProject();
