@@ -1,12 +1,7 @@
 package org.apache.maven.artifact.metadata;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
-import java.util.Set;
-
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +15,11 @@ import java.util.Set;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+import java.util.Set;
 
 // Currently the only thing we need from the artifact metadata source is the
 // dependency information, but i figure I'll just leave this generally as a
