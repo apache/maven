@@ -52,7 +52,7 @@ public class AbstractArtifactComponent
         return remoteRepository.pathOf( artifact );
     }
 
-    protected String getLocalRepositoryArtifactPath( ArtifactRepository localRepository, Artifact artifact )
+    protected String getLocalRepositoryArtifactPath( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactPathFormatException
     {
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )

@@ -52,7 +52,7 @@ public class DefaultArtifactInstaller
     {
         try
         {
-            artifact.setPath( getLocalRepositoryArtifactPath( localRepository, artifact ) );
+            artifact.setPath( getLocalRepositoryArtifactPath( artifact, localRepository ) );
 
             if ( !artifact.getFile().getParentFile().exists() )
             {
