@@ -1,8 +1,9 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
-  <artifactId>maven-core-it0013</artifactId>
-  <version>3.8.1</version>
+  <artifactId>maven-it0013-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <type>plugin</type>
   <dependencies>
     <dependency>
       <groupId>maven</groupId>
@@ -12,7 +13,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${version}</version>
+      <version>3.8.1</version>
     </dependency>
   </dependencies>
 </project>

@@ -16,7 +16,6 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.MavenMojoDescriptor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -40,17 +39,16 @@ import java.util.Set;
 public class BeanGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project ) throws Exception
+    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project ) throws Exception
     {
-        for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
+        for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
         {
-            MavenMojoDescriptor descriptor = (MavenMojoDescriptor) it.next();
+            MojoDescriptor descriptor = (MojoDescriptor) it.next();
             processPluginDescriptor( descriptor, destinationDirectory );
         }
     }
 
-    protected void processPluginDescriptor( MavenMojoDescriptor descriptor, String destinationDirectory )
-        throws Exception
+    protected void processPluginDescriptor( MojoDescriptor descriptor, String destinationDirectory ) throws Exception
     {
         String implementation = descriptor.getImplementation();
 
@@ -88,8 +86,7 @@ public class BeanGenerator
         //
         // ----------------------------------------------------------------------
 
-        MojoDescriptor mojoDescriptor = descriptor.getMojoDescriptor();
-        List parameters = mojoDescriptor.getParameters();
+        List parameters = descriptor.getParameters();
 
         for ( int i = 0; i < parameters.size(); i++ )
         {
@@ -147,8 +144,8 @@ public class BeanGenerator
 
         setter.addParameter( new JParameter( parameterType, parameter.getName() ) );
 
-        setter.getSourceCode().add(
-            "addParameter( " + "\"" + parameter.getName() + "\", " + parameter.getName() + " );" );
+        setter.getSourceCode().add( "addParameter( " + "\"" + parameter.getName() + "\", " + parameter.getName()
+            + " );" );
 
         return setter;
     }
@@ -160,8 +157,9 @@ public class BeanGenerator
             return str;
         }
 
-        return new StringBuffer( str.length() ).append( Character.toTitleCase( str.charAt( 0 ) ) ).append(
-            str.substring( 1 ) ).toString();
+        return new StringBuffer( str.length() ).append( Character.toTitleCase( str.charAt( 0 ) ) )
+                                               .append( str.substring( 1 ) )
+                                               .toString();
     }
 
     protected String replace( String text, String repl, String with, int max )

@@ -16,7 +16,7 @@ import junit.framework.TestCase;
 public class PluginUtilsTest
     extends TestCase
 {
-    
+
     public void testShouldTrimArtifactIdToFindPluginId()
     {
         Model model = new Model();
@@ -28,62 +28,57 @@ public class PluginUtilsTest
 
         System.out.println( pluginId );
     }
-    
+
     public void testShouldWriteDependencies() throws Exception
     {
         Dependency dependency = new Dependency();
-        dependency.setArtifactId("testArtifactId");
-        dependency.setGroupId("testGroupId");
-        dependency.setType("pom");
-        dependency.setVersion("0.0.0");
-        
+        dependency.setArtifactId( "testArtifactId" );
+        dependency.setGroupId( "testGroupId" );
+        dependency.setType( "pom" );
+        dependency.setVersion( "0.0.0" );
+
         Model model = new Model();
-        model.addDependency(dependency);
-        
-        MavenProject project = new MavenProject(model);
-        
+        model.addDependency( dependency );
+
+        MavenProject project = new MavenProject( model );
+
         StringWriter sWriter = new StringWriter();
-        XMLWriter writer = new CompactXMLWriter(sWriter);
-        
-        PluginUtils.writeDependencies(writer, project);
-        
+        XMLWriter writer = new CompactXMLWriter( sWriter );
+
+        PluginUtils.writeDependencies( writer, project );
+
         String output = sWriter.toString();
-        
-        String pattern = "<dependencies>" +
-                "<dependency>" +
-                "<groupId>testGroupId</groupId>" +
-                "<artifactId>testArtifactId</artifactId>" +
-                "<type>pom</type>" +
-                "<version>0.0.0</version>" +
-                "</dependency>" +
-                "</dependencies>";
-        
-        assertEquals(pattern, output);
+
+        String pattern = "<dependencies>" + "<dependency>" + "<groupId>testGroupId</groupId>"
+            + "<artifactId>testArtifactId</artifactId>" + "<type>pom</type>" + "<version>0.0.0</version>"
+            + "</dependency>" + "</dependencies>";
+
+        assertEquals( pattern, output );
     }
-    
+
     public void testShouldFindTwoScriptsWhenNoExcludesAreGiven()
     {
         String testScript = "test.txt";
-        
-        String basedir = TestUtils.dirname(testScript);
-        
+
+        String basedir = TestUtils.dirname( testScript );
+
         String includes = "**/*.txt";
-        
-        String[] files = PluginUtils.findSources(basedir, includes);
-        assertEquals(2, files.length);
+
+        String[] files = PluginUtils.findSources( basedir, includes );
+        assertEquals( 2, files.length );
     }
 
     public void testShouldFindOneScriptsWhenAnExcludeIsGiven()
     {
         String testScript = "test.txt";
-        
-        String basedir = TestUtils.dirname(testScript);
-        
+
+        String basedir = TestUtils.dirname( testScript );
+
         String includes = "**/*.txt";
         String excludes = "**/*Excludes.txt";
-        
-        String[] files = PluginUtils.findSources(basedir, includes, excludes);
-        assertEquals(1, files.length);
+
+        String[] files = PluginUtils.findSources( basedir, includes, excludes );
+        assertEquals( 1, files.length );
     }
-    
+
 }

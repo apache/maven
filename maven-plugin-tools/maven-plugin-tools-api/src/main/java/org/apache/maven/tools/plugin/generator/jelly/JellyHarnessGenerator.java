@@ -16,7 +16,6 @@ package org.apache.maven.tools.plugin.generator.jelly;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.MavenMojoDescriptor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -32,10 +31,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @todo use the descriptions in the descriptor for the javadoc pushed into the source code.
- * @todo write plugin.properties (as a place holder, we don't technially need it)
- * @todo convert POM or just strip out the dependencies to create a project.xml that
- * will serve as the trigger to download dependencies.
+ * @todo use the descriptions in the descriptor for the javadoc pushed into the
+ *       source code.
+ * @todo write plugin.properties (as a place holder, we don't technially need
+ *       it)
+ * @todo convert POM or just strip out the dependencies to create a project.xml
+ *       that will serve as the trigger to download dependencies.
  */
 public class JellyHarnessGenerator
     implements Generator
@@ -45,8 +46,7 @@ public class JellyHarnessGenerator
         return pluginDescriptor.getImplementation() + "Bean";
     }
 
-    public void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project)
-        throws Exception
+    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project ) throws Exception
     {
         FileWriter writer = new FileWriter( new File( destinationDirectory, "plugin.jelly" ) );
 
@@ -73,11 +73,11 @@ public class JellyHarnessGenerator
         w.startElement( "d:taglib" );
 
         w.addAttribute( "uri", pluginId );
-        
-        for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
+
+        for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
         {
-            MavenMojoDescriptor descriptor = (MavenMojoDescriptor) it.next();
-            processPluginDescriptor(descriptor, w, project);
+            MojoDescriptor descriptor = (MojoDescriptor) it.next();
+            processPluginDescriptor( descriptor, w, project );
         }
 
         w.endElement();
@@ -86,10 +86,10 @@ public class JellyHarnessGenerator
         //
         // ----------------------------------------------------------------------
 
-        for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
+        for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
         {
-            MavenMojoDescriptor descriptor = (MavenMojoDescriptor) it.next();
-            writeGoals(descriptor, w);
+            MojoDescriptor descriptor = (MojoDescriptor) it.next();
+            writeGoals( descriptor, w );
         }
 
         // ----------------------------------------------------------------------
@@ -130,11 +130,9 @@ public class JellyHarnessGenerator
 
     }
 
-    protected void processPluginDescriptor( MavenMojoDescriptor descriptor, XMLWriter w, MavenProject project)
+    protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w, MavenProject project )
         throws Exception
     {
-        MojoDescriptor mojoDescriptor = descriptor.getMojoDescriptor();
-        
         String pluginId = PluginUtils.pluginId( project );
 
         String goalName = mojoDescriptor.getGoal();
@@ -206,10 +204,8 @@ public class JellyHarnessGenerator
         w.endElement();
     }
 
-    private void writeGoals( MavenMojoDescriptor descriptor, XMLWriter w )
+    private void writeGoals( MojoDescriptor mojoDescriptor, XMLWriter w )
     {
-        MojoDescriptor mojoDescriptor = descriptor.getMojoDescriptor();
-        
         String id = mojoDescriptor.getId();
 
         w.startElement( "goal" );
@@ -279,9 +275,8 @@ public class JellyHarnessGenerator
             return str;
         }
 
-        return new StringBuffer( str.length() )
-            .append( Character.toTitleCase( str.charAt( 0 ) ) )
-            .append( str.substring( 1 ) )
-            .toString();
+        return new StringBuffer( str.length() ).append( Character.toTitleCase( str.charAt( 0 ) ) )
+                                               .append( str.substring( 1 ) )
+                                               .toString();
     }
 }

@@ -16,7 +16,6 @@ package org.apache.maven.tools.plugin.extractor.java;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.MavenMojoDescriptor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -114,6 +113,8 @@ public class JavaMojoDescriptorExtractor
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
 
         JavaClass javaClass = getJavaClass( javaSource );
+
+        mojoDescriptor.setLanguage( "java" );
 
         mojoDescriptor.setImplementation( javaClass.getFullyQualifiedName() );
 
@@ -259,14 +260,30 @@ public class JavaMojoDescriptorExtractor
                 {
                     validateParameter( (Parameter) parameters.get( j ), j );
                 }
-                
-                MavenMojoDescriptor mmDescriptor = new MavenMojoDescriptor(mojoDescriptor);
-                
-                JavaClass javaClass = getJavaClass(javaSources[i]);
-                
-                mmDescriptor.setImplementation(javaClass.getFullyQualifiedName());
-                
-                descriptors.add( mmDescriptor );
+
+                //                Commented because it causes a VerifyError:
+                //                java.lang.VerifyError:
+                //                (class:
+                // org/apache/maven/tools/plugin/extractor/java/JavaMojoDescriptorExtractor,
+                //                method: execute signature:
+                // (Ljava/lang/String;Lorg/apache/maven/project/MavenProject;)Ljava/util/Set;)
+                //                Incompatible object argument for function call
+                //                
+                //                Refactored to allow MavenMojoDescriptor.getComponentFactory()
+                //                return MavenMojoDescriptor.getMojoDescriptor().getLanguage(),
+                //                and removed all usage of MavenMojoDescriptor from extractors.
+                //                
+                //                
+                //                MavenMojoDescriptor mmDescriptor = new
+                // MavenMojoDescriptor(mojoDescriptor);
+                //                
+                //                JavaClass javaClass = getJavaClass(javaSources[i]);
+                //                
+                //                mmDescriptor.setImplementation(javaClass.getFullyQualifiedName());
+                //                
+                //                descriptors.add( mmDescriptor );
+
+                descriptors.add( mojoDescriptor );
             }
         }
 

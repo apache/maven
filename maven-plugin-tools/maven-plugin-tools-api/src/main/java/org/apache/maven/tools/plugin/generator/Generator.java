@@ -21,13 +21,12 @@ import java.util.Set;
  */
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public interface Generator
 {
-    
-    void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project)
-        throws Exception;
-    
+
+    void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project ) throws Exception;
+
 }

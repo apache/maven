@@ -21,26 +21,26 @@ public class DefaultMojoScannerTest
 
     public void testShouldFindOneDescriptorFromTestExtractor() throws Exception
     {
-        Map extractors = Collections.singletonMap("test", new TestExtractor());
-        
-        MojoScanner scanner = new DefaultMojoScanner(extractors);
-        
+        Map extractors = Collections.singletonMap( "test", new TestExtractor() );
+
+        MojoScanner scanner = new DefaultMojoScanner( extractors );
+
         Build build = new Build();
-        build.setSourceDirectory("testdir");
-        
+        build.setSourceDirectory( "testdir" );
+
         Model model = new Model();
-        model.setBuild(build);
-        
-        MavenProject project = new MavenProject(model);
-        project.setFile(new File("."));
-        
-        Set descriptors = scanner.execute(project);
-        
-        assertEquals(1, descriptors.size());
-        
-        MavenMojoDescriptor mmDesc = (MavenMojoDescriptor)descriptors.iterator().next();
-        assertEquals("testPluginId", mmDesc.getMojoDescriptor().getId());
-        assertEquals("testGoal", mmDesc.getMojoDescriptor().getGoal());
+        model.setBuild( build );
+
+        MavenProject project = new MavenProject( model );
+        project.setFile( new File( "." ) );
+
+        Set descriptors = scanner.execute( project );
+
+        assertEquals( 1, descriptors.size() );
+
+        MavenMojoDescriptor mmDesc = (MavenMojoDescriptor) descriptors.iterator().next();
+        assertEquals( "testPluginId", mmDesc.getMojoDescriptor().getId() );
+        assertEquals( "testGoal", mmDesc.getMojoDescriptor().getGoal() );
     }
-    
+
 }

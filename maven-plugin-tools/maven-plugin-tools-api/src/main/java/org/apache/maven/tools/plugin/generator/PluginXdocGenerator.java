@@ -16,7 +16,6 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.MavenMojoDescriptor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -38,20 +37,18 @@ import java.util.Set;
 public class PluginXdocGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project ) throws Exception
+    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project ) throws Exception
     {
-        for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
+        for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
         {
-            MavenMojoDescriptor descriptor = (MavenMojoDescriptor) it.next();
+            MojoDescriptor descriptor = (MojoDescriptor) it.next();
             processPluginDescriptor( descriptor, destinationDirectory );
         }
     }
 
-    protected void processPluginDescriptor( MavenMojoDescriptor descriptor, String destinationDirectory )
+    protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, String destinationDirectory )
         throws Exception
     {
-        MojoDescriptor mojoDescriptor = descriptor.getMojoDescriptor();
-
         String id = mojoDescriptor.getId();
 
         FileWriter writer = new FileWriter( new File( destinationDirectory, id + "-plugin.xml" ) );

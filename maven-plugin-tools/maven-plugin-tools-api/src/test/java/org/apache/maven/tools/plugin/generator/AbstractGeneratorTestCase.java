@@ -18,7 +18,6 @@ package org.apache.maven.tools.plugin.generator;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.plugin.MavenMojoDescriptor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -32,8 +31,9 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: AbstractGeneratorTestCase.java,v 1.1 2005/02/20 16:25:21
+ *          jdcasey Exp $
  */
 public abstract class AbstractGeneratorTestCase
     extends TestCase
@@ -42,14 +42,12 @@ public abstract class AbstractGeneratorTestCase
 
     protected String basedir;
 
-    protected void setUp()
-        throws Exception
+    protected void setUp() throws Exception
     {
         basedir = System.getProperty( "basedir" );
     }
 
-    public void testGenerator()
-        throws Exception
+    public void testGenerator() throws Exception
     {
         setupGenerator();
 
@@ -58,44 +56,42 @@ public abstract class AbstractGeneratorTestCase
         String destinationDirectory = new File( basedir, "target" ).getPath();
 
         String pom = new File( basedir, "src/test/resources/source/pom.xml" ).getPath();
-        
+
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
-        mojoDescriptor.setGoal("testGoal");
-        mojoDescriptor.setId("test");
-        mojoDescriptor.setImplementation("org.apache.maven.tools.plugin.generator.TestMojo");
-        mojoDescriptor.setRequiresDependencyResolution(true);
-        
+        mojoDescriptor.setGoal( "testGoal" );
+        mojoDescriptor.setId( "test" );
+        mojoDescriptor.setImplementation( "org.apache.maven.tools.plugin.generator.TestMojo" );
+        mojoDescriptor.setRequiresDependencyResolution( true );
+
         List params = new ArrayList();
-        
+
         Parameter param = new Parameter();
-        param.setDefaultValue("value");
-        param.setExpression("#project.build.directory");
-        param.setName("dir");
-        param.setRequired(true);
-        param.setType("String");
-        param.setDescription("Test parameter description");
-        
-        params.add(param);
-        
-        mojoDescriptor.setParameters(params);
-        
-        MavenMojoDescriptor mmDesc = new MavenMojoDescriptor(mojoDescriptor);
-        
-        Set descriptors = Collections.singleton(mmDesc);
-        
+        param.setDefaultValue( "value" );
+        param.setExpression( "#project.build.directory" );
+        param.setName( "dir" );
+        param.setRequired( true );
+        param.setType( "String" );
+        param.setDescription( "Test parameter description" );
+
+        params.add( param );
+
+        mojoDescriptor.setParameters( params );
+
+        Set descriptors = Collections.singleton( mojoDescriptor );
+
         Model model = new Model();
-        
-        model.setArtifactId("maven-unitTesting-plugin");
-        
+
+        model.setArtifactId( "maven-unitTesting-plugin" );
+
         Dependency dependency = new Dependency();
-        dependency.setGroupId("testGroup");
-        dependency.setArtifactId("testArtifact");
-        dependency.setVersion("0.0.0");
-        
-        model.addDependency(dependency);
-        
-        MavenProject project = new MavenProject(model);
-        
+        dependency.setGroupId( "testGroup" );
+        dependency.setArtifactId( "testArtifact" );
+        dependency.setVersion( "0.0.0" );
+
+        model.addDependency( dependency );
+
+        MavenProject project = new MavenProject( model );
+
         generator.execute( destinationDirectory, descriptors, project );
 
         validate();
@@ -105,8 +101,7 @@ public abstract class AbstractGeneratorTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected void setupGenerator()
-        throws Exception
+    protected void setupGenerator() throws Exception
     {
         String generatorClassName = getClass().getName();
 
@@ -120,9 +115,9 @@ public abstract class AbstractGeneratorTestCase
         }
         catch ( Exception e )
         {
-            throw new Exception(
-                "Cannot find " + generatorClassName + "! Make sure your test case is named in the form ${generatorClassName}Test " +
-                "or override the setupPlugin() method to instantiate the mojo yourself." );
+            throw new Exception( "Cannot find " + generatorClassName
+                + "! Make sure your test case is named in the form ${generatorClassName}Test "
+                + "or override the setupPlugin() method to instantiate the mojo yourself." );
         }
     }
 
@@ -130,8 +125,7 @@ public abstract class AbstractGeneratorTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected void validate()
-        throws Exception
+    protected void validate() throws Exception
     {
         // empty
     }

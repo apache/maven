@@ -36,7 +36,7 @@ import java.io.FileWriter;
  *  expression="#project.build.directory"
  *  description=""
  */
-public class CoreItMojo
+public class CoreIt0013Mojo
     extends AbstractPlugin
 {
     private static final int DELETE_RETRY_SLEEP_MILLIS = 10;

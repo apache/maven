@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<mojo xmlns="marmalade:mojo">
+  <metadata>
+    <id>testId</id>
+    <goal>testGoal</goal>
+    <description>This is a test mojo</description>
+    <parameters>
+      <parameter>
+        <name>testParam</name>
+        <default>TestValue</default>
+        <expression>#pom.file</expression>
+        <required>true</required>
+        <description>This is a test parameter</description>
+      </parameter>
+    </parameters>
+  </metadata>
+  <execute>
+    <set xmlns="marmalade:core" var="testVar" extern="true">testVal</set>
+  </execute>
+</mojo>

@@ -16,10 +16,10 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
-
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: PluginXdocGeneratorTest.java,v 1.1 2005/02/20 16:25:21 jdcasey
+ *          Exp $
  */
 public class PluginXdocGeneratorTest
     extends AbstractGeneratorTestCase

@@ -8,9 +8,9 @@
      |
      -->
     <component>
-      <role>org.apache.maven.tools.plugin.extractor.MojoDescriptorExtrator</role>
+      <role>org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor</role>
       <role-hint>marmalade</role-hint>
-      <implementation>org.apache.maven.tools.plugin.extractor.MarmaladeMojoDescriptorExtrator</implementation>
+      <implementation>org.apache.maven.tools.plugin.extractor.marmalade.MarmaladeMojoDescriptorExtractor</implementation>
     </component>
     
   </components>

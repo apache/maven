@@ -16,7 +16,6 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.MavenMojoDescriptor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -61,7 +60,7 @@ public class PluginDescriptorGenerator
 
         for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
         {
-            MavenMojoDescriptor descriptor = (MavenMojoDescriptor) it.next();
+            MojoDescriptor descriptor = (MojoDescriptor) it.next();
             processPluginDescriptor( descriptor, w, project );
         }
 
@@ -76,11 +75,9 @@ public class PluginDescriptorGenerator
         writer.close();
     }
 
-    protected void processPluginDescriptor( MavenMojoDescriptor mavenMojoDescriptor, XMLWriter w, MavenProject project )
+    protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w, MavenProject project )
         throws Exception
     {
-        MojoDescriptor mojoDescriptor = mavenMojoDescriptor.getMojoDescriptor();
-
         w.startElement( "mojo" );
 
         // ----------------------------------------------------------------------

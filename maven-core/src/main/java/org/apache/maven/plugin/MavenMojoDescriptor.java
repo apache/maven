@@ -55,6 +55,11 @@ public class MavenMojoDescriptor
     {
         return mojoDescriptor.getPrereqs();
     }
+    
+    public String getComponentFactory()
+    {
+        return mojoDescriptor.getLanguage();
+    }
 
     public String getRole()
     {
