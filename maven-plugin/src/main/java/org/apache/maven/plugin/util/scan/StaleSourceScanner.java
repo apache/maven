@@ -58,9 +58,14 @@ public class StaleSourceScanner
     public Set getIncludedSources( File sourceDir, File targetDir )
         throws InclusionScanException
     {
-        Set matchingSources = new HashSet();
-
         List srcMappings = getSourceMappings();
+
+        if ( srcMappings.isEmpty() )
+        {
+            return Collections.EMPTY_SET;
+        }
+
+        Set matchingSources = new HashSet();
 
         String[] potentialIncludes = scanForSources( sourceDir );
         for ( int i = 0; i < potentialIncludes.length; i++ )

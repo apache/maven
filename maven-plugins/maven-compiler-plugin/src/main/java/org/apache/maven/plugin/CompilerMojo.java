@@ -97,9 +97,15 @@ public class CompilerMojo
         compilerConfiguration.setClasspathEntries( classpathElements );
         compilerConfiguration.setSourceLocations( compileSourceRoots );
 
+        // TODO: have an option to always compile (without need to clean)
         Set staleSources = computeStaleSources();
 
-        if ( staleSources != null && !staleSources.isEmpty() )
+        if ( staleSources.isEmpty() )
+        {
+            getLog().info( "Nothing to compile - all classes are up to date" );
+            return;
+        }
+        else
         {
             compilerConfiguration.setSourceFiles( staleSources );
         }
@@ -169,6 +175,8 @@ public class CompilerMojo
         SuffixMapping mapping = new SuffixMapping( ".java", ".class" );
 
         SourceInclusionScanner scanner = new StaleSourceScanner( staleTime );
+
+        scanner.addSourceMapping( mapping );
 
         File outDir = new File( outputDirectory );
 
