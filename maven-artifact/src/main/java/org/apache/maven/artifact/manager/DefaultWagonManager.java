@@ -26,6 +26,7 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.proxy.ProxyInfo;
@@ -51,6 +52,8 @@ public class DefaultWagonManager
     private PlexusContainer container;
 
     private Map proxies = new HashMap();
+
+    private TransferListener downloadMonitor;
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String type )
     {
@@ -132,6 +135,7 @@ public class DefaultWagonManager
 
         try
         {
+            // TODO [BP]: do this handling in Wagon itself
             temp = new File( destination + ".tmp" );
 
             temp.deleteOnExit();
@@ -158,10 +162,16 @@ public class DefaultWagonManager
 
                 //wagon.addTransferListener( md5SumObserver );
 
+                if ( downloadMonitor != null )
+                {
+                    wagon.addTransferListener( downloadMonitor );
+                }
+
                 wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
                 wagon.get( path( artifact ), temp );
 
+                // TODO [BP]: put all disconnects in finally
                 wagon.disconnect();
 
                 releaseWagon( wagon );
@@ -271,4 +281,11 @@ public class DefaultWagonManager
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
+
+    /** @todo I'd rather not be setting this explicitly. */
+    public void setDownloadMonitor( TransferListener downloadMonitor )
+    {
+        this.downloadMonitor = downloadMonitor;
+    }
+
 }

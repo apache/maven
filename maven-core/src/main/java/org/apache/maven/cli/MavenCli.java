@@ -27,6 +27,7 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.maven.Maven;
 import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.initialize.MavenInitializingExecutionRequest;
@@ -129,6 +130,12 @@ public class MavenCli
 
         ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
         embedder.start( classWorld );
+
+        // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place.
+        WagonManager wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
+        wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
+
+
         Maven maven = (Maven) embedder.lookup( Maven.ROLE );
 
         // ----------------------------------------------------------------------

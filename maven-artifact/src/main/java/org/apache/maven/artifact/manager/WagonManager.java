@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.events.TransferListener;
 
 import java.io.File;
 import java.util.Set;
@@ -46,8 +47,10 @@ public interface WagonManager
 
     void put( File source, Artifact artifact, ArtifactRepository deploymentRepository )
         throws Exception;
-
+    
     void setProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
+
+    void setDownloadMonitor( TransferListener downloadMonitor );
 
     Artifact createArtifact( String groupId, String artifactId, String version, String type );
 }
