@@ -112,7 +112,7 @@ Unified source directory
 
  maven.user.config.dir (system,default=${user.home}/.m2)
  maven.home            (system,user,default=${user.home}/m2)
- maven.repo.local      (system,user,default=${maven.user.config.dir/repository)
+ maven.repo.local      (system,user,default=${maven.user.config.dir}/repository)
 
  We need to define what happens in the when things are not setup correctly
 
