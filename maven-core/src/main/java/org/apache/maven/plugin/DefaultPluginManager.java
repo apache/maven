@@ -261,6 +261,11 @@ public class DefaultPluginManager
             "maven-artifact",
             "maven-model",
             "maven-plugin",
+            "plexus",
+            "xstream",
+            "xpp3",
+            "classworlds",
+            "ognl"
         };
 
         container.addComponent( pluginArtifact,
