@@ -16,6 +16,20 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -36,27 +50,17 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositoryUtils;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+/**
+ * @version $Id$
+ */
 public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
     implements MavenProjectBuilder, Initializable
@@ -225,33 +229,37 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private Model readModel( File projectDescriptor )
+    private Model readModel( File file )
         throws ProjectBuildingException
     {
         try
         {
-            return readModel( new FileReader( projectDescriptor ) );
+            return modelReader.read( new FileReader( file ) );
         }
-        catch ( FileNotFoundException ex )
+        catch ( FileNotFoundException e )
         {
-            throw new ProjectBuildingException( "Error while building model.", ex );
+            throw new ProjectBuildingException( "Could not find the model file '" + file.getAbsolutePath() + "'." );
+        }
+        catch ( Exception e )
+        {
+            throw new ProjectBuildingException( "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
         }
     }
 
-    private Model readModel( Reader reader )
+    private Model readModel( URL url )
         throws ProjectBuildingException
     {
         try
         {
-            return modelReader.read( reader );
+            return modelReader.read( new InputStreamReader( url.openStream() ) );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( "Error while reading model.", e );
         }
         catch ( Exception ex )
         {
-            throw new ProjectBuildingException( "Error while building model.", ex );
-        }
-        finally
-        {
-            IOUtil.close( reader );
+            throw new ProjectBuildingException( "Error while building model from " + url.toExternalForm(), ex );
         }
     }
 
@@ -342,7 +350,8 @@ public class DefaultMavenProjectBuilder
     private Model getSuperModel()
         throws ProjectBuildingException
     {
-        return readModel( new InputStreamReader( DefaultMavenProjectBuilder.class.getResourceAsStream(
-            "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" ) ) );
+        URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" );
+
+        return readModel( url );
     }
 }
