@@ -16,21 +16,12 @@ package org.apache.maven.plugin.jar;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.util.FileUtils;
-import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @goal jar
@@ -66,7 +57,7 @@ import java.util.jar.Manifest;
  * @version $Id$
  */
 public class JarMojo
-    extends AbstractPlugin
+    extends AbstractJarMojo
 {
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
@@ -88,92 +79,10 @@ public class JarMojo
 
         File jarFile = new File( new File( outputDirectory ), jarName + ".jar" );
 
-        List files = FileUtils.getFileNames( basedir, "**/**", "**/package.html", false );
-
-        createJar( files, jarFile, basedir );
-    }
-
-    public void createJar( List files, File jarName, File basedir )
-        throws Exception
-    {
-        JarOutputStream jar = new JarOutputStream( new FileOutputStream( jarName ), createManifest() );
-
-        try
-        {
-            for ( int i = 0; i < files.size(); i++ )
-            {
-                String file = (String) files.get( i );
-
-                writeJarEntry( jar, new File( basedir, file ), file );
-            }
-        }
-        finally
-        {
-            jar.close();
-        }
-    }
-
-    private void writeJarEntry( JarOutputStream jar, File source, String entryName )
-        throws Exception
-    {
-        byte[] buffer = new byte[1024];
-
-        int bytesRead;
-
-        try
-        {
-            FileInputStream is = new FileInputStream( source );
-
-            try
-            {
-                JarEntry entry = new JarEntry( entryName );
-
-                jar.putNextEntry( entry );
-
-                while ( ( bytesRead = is.read( buffer ) ) != -1 )
-                {
-                    jar.write( buffer, 0, bytesRead );
-                }
-            }
-            catch ( Exception ex )
-            {
-            }
-            finally
-            {
-                is.close();
-            }
-        }
-        catch ( IOException ex )
-        {
-        }
-    }
-
-    private Manifest createManifest()
-    {
-        Manifest manifest = null;
+        Map includes = new LinkedHashMap();
         
-        try
-        {
-            // Construct a string version of a manifest
-            StringBuffer sbuf = new StringBuffer();
-
-            sbuf.append("Manifest-Version: 1.0\n");
-
-            sbuf.append("Created-By: Apache Maven\n");
-
-            sbuf.append("Built-By: " + System.getProperty("user.name") + "\n");
-
-            // Convert the string to a input stream
-            InputStream is = new ByteArrayInputStream(sbuf.toString().getBytes("UTF-8"));
-
-            // Create the manifest
-            manifest = new Manifest(is);
-        }
-        catch ( IOException e )
-        {
-            manifest = new Manifest();
-        }
-
-        return manifest;
+        addDirectory(includes, "**/**", "**/package.html", "", basedir);
+        
+        createJar( jarFile, includes );
     }
 }
