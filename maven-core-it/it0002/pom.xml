@@ -1,6 +1,6 @@
 <project>
   <groupId>maven</groupId>
-  <artifactId>maven-core-it0001</artifactId>
+  <artifactId>maven-core-it0002</artifactId>
   <version>1.0</version>
   <dependencies>
     <dependency>
