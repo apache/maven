@@ -47,11 +47,6 @@
           </goal>
         </goals>
       </plugin>
-      <plugin>
-        <artifactId>maven-assemble-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <configuration><descriptor>assembly.xml</descriptor></configuration>
-      </plugin>
     </plugins>
   </build>
 </model>
