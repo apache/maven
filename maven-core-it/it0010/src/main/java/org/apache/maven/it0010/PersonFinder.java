@@ -1,8 +1,11 @@
 package org.apache.maven.it0010;
 
-import org.codehaus.classworlds.ClassRealm;
-
 public class PersonFinder
 {
-    private ClassRealm classRealm;
+    public void findPerson()
+        throws Exception
+    {
+        // look it up at runtime, but do not require it at compile time
+        Class.forName( "org.codehaus.classworlds.ClassRealm" );
+    }
 }
