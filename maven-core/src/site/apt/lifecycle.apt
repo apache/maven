@@ -54,7 +54,7 @@ Maven Lifecycle
                 |    yes ---+--- no
                 |    |
                 |    |
-                | foreach(prereq)
+                | foreach(prereq = goalX in another plugin)
                 |    |
                 +----+
 +-----+
