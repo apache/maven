@@ -1,7 +1,7 @@
 package org.apache.maven.plugin;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,36 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-/** @todo: what purpose does this serve? */
 public abstract class AbstractPlugin
     implements Plugin
 {
+    /**
+     * Default behaviour to mimic old behaviour.
+     */
+    public void execute( PluginExecutionRequest request )
+        throws PluginExecutionException
+    {
+        PluginExecutionResponse response = new PluginExecutionResponse();
+        try
+        {
+            execute( request, response );
+        }
+        catch ( Exception e )
+        {
+            throw new PluginExecutionException( e.getMessage(), e );
+        }
+        if ( response.isExecutionFailure() )
+        {
+            throw new PluginExecutionException( response.getFailureResponse().getSource(),
+                                                response.getFailureResponse().shortMessage(),
+                                                response.getFailureResponse().longMessage() );
+        }
+    }
+
+    /**
+     * @deprecated
+     */
+    public abstract void execute( PluginExecutionRequest request, PluginExecutionResponse response )
+        throws Exception;
+
 }

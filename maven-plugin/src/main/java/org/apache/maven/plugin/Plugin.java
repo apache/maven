@@ -24,8 +24,7 @@ public interface Plugin
 {
     String ROLE = Plugin.class.getName();
 
-    // TODO: return response.getFailureResponse now as that is the only member of it?
     // TODO: make this throw PluginExecutionException instead of generic exception
-    void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception;
+    void execute( PluginExecutionRequest request )
+        throws PluginExecutionException;
 }

@@ -54,8 +54,8 @@ public class TestPlugin
         return foo;
     }
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute( PluginExecutionRequest request )
+        throws PluginExecutionException
     {
         name = (String) request.getParameter( "name" );
 

@@ -18,8 +18,8 @@ package org.apache.maven.plugin;
 
 import junit.framework.TestCase;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -43,9 +43,7 @@ public class TestPluginTest
 
         PluginExecutionRequest request = new PluginExecutionRequest( parameters );
 
-        PluginExecutionResponse response = new PluginExecutionResponse();
-
-        plugin.execute( request, response );
+        plugin.execute( request );
 
         assertTrue( plugin.hasExecuted() );
 

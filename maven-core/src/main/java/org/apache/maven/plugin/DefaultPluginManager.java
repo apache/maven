@@ -27,7 +27,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.GoalExecutionException;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -318,8 +317,8 @@ public class DefaultPluginManager
     // Plugin execution
     // ----------------------------------------------------------------------
 
-    public PluginExecutionResponse executeMojo( MavenSession session, String goalName )
-        throws GoalExecutionException
+    public void executeMojo( MavenSession session, String goalName )
+        throws PluginExecutionException
     {
         try
         {
@@ -327,7 +326,7 @@ public class DefaultPluginManager
         }
         catch ( Exception e )
         {
-            throw new GoalExecutionException( "Unable to execute goal: " + goalName, e );
+            throw new PluginExecutionException( "Unable to execute goal: " + goalName, e );
         }
 
         PluginExecutionRequest request;
@@ -337,7 +336,7 @@ public class DefaultPluginManager
         MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );
         if ( mojoDescriptor == null )
         {
-            throw new GoalExecutionException( "Unable to find goal: " + goalName );
+            throw new PluginExecutionException( "Unable to find goal: " + goalName );
         }
 
         try
@@ -372,7 +371,7 @@ public class DefaultPluginManager
         }
         catch ( Exception e )
         {
-            throw new GoalExecutionException( "Unable to resolve required dependencies for goal", e );
+            throw new PluginExecutionException( "Unable to resolve required dependencies for goal", e );
         }
 
         try
@@ -383,10 +382,8 @@ public class DefaultPluginManager
         }
         catch ( PluginConfigurationException e )
         {
-            throw new GoalExecutionException( "Error configuring plugin for execution.", e );
+            throw new PluginExecutionException( "Error configuring plugin for execution.", e );
         }
-
-        response = new PluginExecutionResponse();
 
         Plugin plugin = null;
 
@@ -402,31 +399,36 @@ public class DefaultPluginManager
             dispatcher.dispatchStart( event, goalName );
             try
             {
-                plugin.execute( request, response );
+                plugin.execute( request );
 
                 dispatcher.dispatchEnd( event, goalName );
             }
-            catch ( Exception e )
+            catch ( PluginExecutionException e )
             {
                 session.getEventDispatcher().dispatchError( event, goalName, e );
                 throw e;
             }
             // End event monitoring.
 
-            releaseComponents( mojoDescriptor, request );
-
-            container.release( plugin );
         }
         catch ( ComponentLookupException e )
         {
-            throw new GoalExecutionException( "Error looking up plugin: ", e );
+            throw new PluginExecutionException( "Error looking up plugin: ", e );
         }
-        catch ( Exception e )
+        finally
         {
-            throw new GoalExecutionException( "Error executing plugin: ", e );
-        }
+            try
+            {
+                releaseComponents( mojoDescriptor, request );
 
-        return response;
+                container.release( plugin );
+            }
+            catch ( Exception e )
+            {
+                // TODO: better error handling, needed!
+                e.printStackTrace();
+            }
+        }
     }
 
     // TODO: don't throw Exception
@@ -651,21 +653,14 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void downloadDependencies( MavenSession context, ArtifactResolver artifactResolver )
-        throws GoalExecutionException
+        throws ArtifactResolutionException
     {
-        try
-        {
             for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
             {
                 Artifact artifact = (Artifact) it.next();
 
                 artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
             }
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new GoalExecutionException( "Can't resolve artifact: ", e );
-        }
     }
 
 }

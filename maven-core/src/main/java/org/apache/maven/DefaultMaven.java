@@ -27,6 +27,7 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
+import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -223,17 +224,18 @@ public class DefaultMaven
         // TODO: is this perhaps more appropriate in the CLI?
         if ( response.isExecutionFailure() )
         {
-            if ( response.getException() != null )
+            // TODO: yuck! Revisit when cleaning up the exception handling from the top down
+            if ( response.getException() instanceof PluginExecutionException )
+            {
+                logFailure( response, (PluginExecutionException) response.getException() );
+            }
+            else
             {
                 // TODO: this should be a "FATAL" exception, reported to the
                 // developers - however currently a LOT of
                 // "user" errors fall through the cracks (like invalid POMs, as
                 // one example)
                 logError( response );
-            }
-            else
-            {
-                logFailure( response );
             }
         }
         else
@@ -336,7 +338,7 @@ public class DefaultMaven
         line();
     }
 
-    protected void logFailure( MavenExecutionResponse r )
+    protected void logFailure( MavenExecutionResponse r, PluginExecutionException e )
     {
         line();
 
@@ -344,11 +346,11 @@ public class DefaultMaven
 
         line();
 
-        getLogger().info( "Reason: " + r.getFailureResponse().shortMessage() );
+        getLogger().info( "Reason: " + e.getMessage() );
 
         line();
 
-        getLogger().info( r.getFailureResponse().longMessage() );
+        getLogger().info( e.getLongMessage() );
 
         line();
 

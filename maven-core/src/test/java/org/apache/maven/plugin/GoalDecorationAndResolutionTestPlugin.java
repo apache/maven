@@ -9,7 +9,7 @@ public class GoalDecorationAndResolutionTestPlugin implements Plugin
 
     private boolean executed = false;
 
-    public void execute(PluginExecutionRequest request, PluginExecutionResponse response) throws Exception {
+    public void execute(PluginExecutionRequest request) throws PluginExecutionException {
         this.executed = true;
     }
     

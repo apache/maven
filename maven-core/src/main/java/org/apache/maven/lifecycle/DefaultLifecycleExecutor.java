@@ -26,7 +26,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -76,6 +76,7 @@ public class DefaultLifecycleExecutor
      * @param session
      */
     public MavenExecutionResponse execute( List tasks, MavenSession session )
+        throws LifecycleExecutionException
     {
         MavenExecutionResponse response = new MavenExecutionResponse();
 
@@ -132,26 +133,21 @@ public class DefaultLifecycleExecutor
 
                 if ( phaseMap.containsKey( task ) )
                 {
-                    executePhase( task, session, response, phaseMap );
+                    executePhase( task, session, phaseMap );
                 }
                 else
                 {
-                    PluginExecutionResponse pluginResponse = executeMojo( task, session );
-
-                    if ( pluginResponse.isExecutionFailure() )
-                    {
-                        response.setExecutionFailure( task, pluginResponse.getFailureResponse() );
-                    }
-                }
-                if ( response.isExecutionFailure() )
-                {
-                    break;
+                    executeMojo( task, session );
                 }
             }
         }
-        catch ( Exception e )
+        catch ( PluginExecutionException e )
         {
             response.setException( e );
+        }
+        catch ( Exception e )
+        {
+            throw new LifecycleExecutionException( "Error during lifecycle execution", e );
         }
         finally
         {
@@ -210,7 +206,6 @@ public class DefaultLifecycleExecutor
      * @param mavenSession
      * @throws Exception
      */
-    // TODO: don't throw Exception
     private void processPluginPhases( Plugin plugin, MavenSession mavenSession, Map phaseMap )
         throws Exception
     {
@@ -337,8 +332,8 @@ public class DefaultLifecycleExecutor
         configureMojo( mojoDescriptor, phaseMap );
     }
 
-    private void executePhase( String phase, MavenSession session, MavenExecutionResponse response, Map phaseMap )
-        throws LifecycleExecutionException
+    private void executePhase( String phase, MavenSession session, Map phaseMap )
+        throws PluginExecutionException
     {
         // only execute up to the given phase
         int index = phases.indexOf( phaseMap.get( phase ) );
@@ -364,31 +359,22 @@ public class DefaultLifecycleExecutor
                     {
                         String goal = (String) i.next();
 
-                        PluginExecutionResponse pluginResponse = executeMojo( goal, session );
-
-                        if ( pluginResponse.isExecutionFailure() )
-                        {
-                            response.setExecutionFailure( goal, pluginResponse.getFailureResponse() );
-
-                            return;
-                        }
+                        executeMojo( goal, session );
                     }
                 }
-
-                dispatcher.dispatchEnd( event, p.getId() );
             }
-            catch ( LifecycleExecutionException e )
+            catch ( PluginExecutionException e )
             {
                 dispatcher.dispatchError( event, p.getId(), e );
-
                 throw e;
             }
-            // End event monitoring.
+
+            dispatcher.dispatchEnd( event, p.getId() );
         }
     }
 
-    protected PluginExecutionResponse executeMojo( String id, MavenSession session )
-        throws LifecycleExecutionException
+    protected void executeMojo( String id, MavenSession session )
+        throws PluginExecutionException
     {
         // ----------------------------------------------------------------------
         // We have something of the form <pluginId>:<mojoId>, so this might be
@@ -399,18 +385,12 @@ public class DefaultLifecycleExecutor
         // archetype:create
         // ----------------------------------------------------------------------
 
-        try
-        {
-            Logger logger = getLogger();
-            logger.debug( "Resolving artifacts from:\n" + "\t{localRepository: " + session.getLocalRepository() +
-                          "}\n" + "\t{remoteRepositories: " + session.getRemoteRepositories() + "}" );
+        Logger logger = getLogger();
+        logger.debug( "Resolving artifacts from:" );
+        logger.debug( "\t{localRepository: " + session.getLocalRepository() + "}" );
+        logger.debug( "\t{remoteRepositories: " + session.getRemoteRepositories() + "}" );
 
-            return pluginManager.executeMojo( session, id );
-        }
-        catch ( GoalExecutionException e )
-        {
-            throw new LifecycleExecutionException( "Problem executing " + id, e );
-        }
+        pluginManager.executeMojo( session, id );
     }
 
     // ----------------------------------------------------------------------

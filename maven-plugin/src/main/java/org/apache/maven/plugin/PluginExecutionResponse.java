@@ -17,6 +17,7 @@ package org.apache.maven.plugin;
  */
 
 /**
+ * @deprecated
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */

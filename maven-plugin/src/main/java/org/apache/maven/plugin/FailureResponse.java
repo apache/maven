@@ -32,4 +32,9 @@ public abstract class FailureResponse
     public abstract String shortMessage();
 
     public abstract String longMessage();
+
+    public Object getSource()
+    {
+        return source;
+    }
 }

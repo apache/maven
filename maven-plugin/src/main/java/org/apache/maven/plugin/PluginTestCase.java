@@ -31,8 +31,6 @@ public abstract class PluginTestCase
 
     protected PluginExecutionRequest request;
 
-    protected PluginExecutionResponse response;
-
     protected String basedir;
 
     // ----------------------------------------------------------------------
@@ -92,9 +90,7 @@ public abstract class PluginTestCase
 
         request = new PluginExecutionRequest( getTestParameters() );
 
-        response = new PluginExecutionResponse();
-
-        plugin.execute( request, response );
+        plugin.execute( request );
 
         validatePluginExecution();
     }

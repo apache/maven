@@ -17,8 +17,6 @@ package org.apache.maven.execution;
  * ====================================================================
  */
 
-import org.apache.maven.plugin.FailureResponse;
-
 import java.util.Date;
 
 /**
@@ -27,10 +25,6 @@ import java.util.Date;
  */
 public class MavenExecutionResponse
 {
-    private String failedGoal;
-
-    private FailureResponse failureResponse;
-
     private Throwable exception;
 
     private Date start;
@@ -41,36 +35,9 @@ public class MavenExecutionResponse
     // Execution failure
     // ----------------------------------------------------------------------
 
-    public void setExecutionFailure( String failedGoal, FailureResponse response )
-    {
-        this.failedGoal = failedGoal;
-
-        this.failureResponse = response;
-    }
-
     public boolean isExecutionFailure()
     {
-        return ( failedGoal != null || exception != null );
-    }
-
-    public String getFailedGoal()
-    {
-        return failedGoal;
-    }
-
-    public void setFailedGoal( String failedGoal )
-    {
-        this.failedGoal = failedGoal;
-    }
-
-    public FailureResponse getFailureResponse()
-    {
-        return failureResponse;
-    }
-
-    public void setFailureResponse( FailureResponse failureResponse )
-    {
-        this.failureResponse = failureResponse;
+        return ( exception != null );
     }
 
     // ----------------------------------------------------------------------
