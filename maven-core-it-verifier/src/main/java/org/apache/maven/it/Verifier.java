@@ -98,7 +98,14 @@ public class Verifier
             }
             else
             {
-                expectedFile = new File( basedir, line );
+                if ( line.indexOf( ":" ) > 0 ) //windows
+                {
+                    expectedFile = new File( line );
+                }
+                else
+                {
+                    expectedFile = new File( basedir, line );
+                }
             }
 
             if ( !expectedFile.exists() )
