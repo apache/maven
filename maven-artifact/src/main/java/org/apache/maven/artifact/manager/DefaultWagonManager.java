@@ -172,6 +172,11 @@ public class DefaultWagonManager
                 releaseWagon( wagon );
 
             }
+            catch ( ResourceDoesNotExistException e )
+            {
+                // This one we will eat when looking through remote repositories
+                // because we want to cycle through them all before squawking.
+            }
             catch ( UnsupportedProtocolException e )
             {
                 throw new TransferFailedException( "Unsupported Protocol: ", e );
@@ -187,10 +192,6 @@ public class DefaultWagonManager
             catch ( AuthorizationException e )
             {
                 throw new TransferFailedException( "Authorization failed: ", e );
-            }
-            catch ( ResourceDoesNotExistException e )
-            {
-                throw new TransferFailedException( "Resource doesn't exist: ", e );
             }
             catch ( Exception e )
             {
@@ -212,6 +213,8 @@ public class DefaultWagonManager
         else
         {
             temp.delete();
+
+            throw new TransferFailedException( "Resource doesn't exist in any remote repository" );
         }
     }
 
