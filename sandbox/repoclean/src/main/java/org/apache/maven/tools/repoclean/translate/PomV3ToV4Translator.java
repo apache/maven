@@ -56,6 +56,7 @@ public class PomV3ToV4Translator
     public static final String ROLE = PomV3ToV4Translator.class.getName();
 
     public Model translate( org.apache.maven.model.v3_0_0.Model v3Model, Reporter reporter )
+        throws Exception
     {
         String groupId = v3Model.getGroupId();
         String artifactId = v3Model.getArtifactId();
@@ -158,6 +159,7 @@ public class PomV3ToV4Translator
     }
 
     private void warnOfUnsupportedMainModelElements( org.apache.maven.model.v3_0_0.Model v3Model, Reporter reporter )
+        throws Exception
     {
         if ( StringUtils.isNotEmpty( v3Model.getExtend() ) )
         {
@@ -225,6 +227,7 @@ public class PomV3ToV4Translator
     }
 
     private Reports translateReports( List v3Reports, Reporter reporter )
+        throws Exception
     {
         Reports reports = null;
         if ( v3Reports != null && !v3Reports.isEmpty() )
@@ -288,6 +291,7 @@ public class PomV3ToV4Translator
     private org.apache.maven.model.Organization translateOrganization(
                                                                       org.apache.maven.model.v3_0_0.Organization v3Organization,
                                                                       Reporter reporter )
+        throws Exception
     {
         Organization organization = null;
 
@@ -534,6 +538,7 @@ public class PomV3ToV4Translator
     }
 
     private Build translateBuild( org.apache.maven.model.v3_0_0.Build v3Build, Reporter reporter )
+        throws Exception
     {
         Build build = null;
         if ( v3Build != null )
@@ -610,6 +615,7 @@ public class PomV3ToV4Translator
     }
 
     private void warnOfUnsupportedBuildElements( org.apache.maven.model.v3_0_0.Build v3Build, Reporter reporter )
+        throws Exception
     {
         if ( notEmpty( v3Build.getSourceModifications() ) )
         {
@@ -650,24 +656,24 @@ public class PomV3ToV4Translator
         return resources;
     }
 
-//    private String pathPatternsToString( List patterns )
-//    {
-//        StringBuffer result = new StringBuffer();
-//
-//        if ( notEmpty( patterns ) )
-//        {
-//            for ( Iterator it = patterns.iterator(); it.hasNext(); )
-//            {
-//                String pattern = (String) it.next();
-//
-//                result.append( "," ).append( pattern );
-//            }
-//
-//            result.setLength( result.length() - 1 );
-//        }
-//
-//        return result.toString();
-//    }
+    //    private String pathPatternsToString( List patterns )
+    //    {
+    //        StringBuffer result = new StringBuffer();
+    //
+    //        if ( notEmpty( patterns ) )
+    //        {
+    //            for ( Iterator it = patterns.iterator(); it.hasNext(); )
+    //            {
+    //                String pattern = (String) it.next();
+    //
+    //                result.append( "," ).append( pattern );
+    //            }
+    //
+    //            result.setLength( result.length() - 1 );
+    //        }
+    //
+    //        return result.toString();
+    //    }
 
     private boolean notEmpty( List test )
     {

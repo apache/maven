@@ -112,6 +112,7 @@ public class V3PomRewriter
     }
 
     private void validateV4Basics( Model model, Artifact artifact, Reporter reporter )
+        throws Exception
     {
         if ( StringUtils.isEmpty( model.getModelVersion() ) )
         {

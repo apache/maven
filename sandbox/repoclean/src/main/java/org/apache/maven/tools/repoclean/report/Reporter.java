@@ -1,17 +1,5 @@
 package org.apache.maven.tools.repoclean.report;
 
-import org.codehaus.plexus.util.IOUtil;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -28,6 +16,18 @@ import java.util.List;
  *   limitations under the License.
  * ====================================================================
  */
+
+import org.codehaus.plexus.util.IOUtil;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author jdcasey
@@ -49,7 +49,10 @@ public class Reporter
 
     private boolean hasWarning = false;
 
+    private Writer writer;
+
     public Reporter( File reportsBase, String reportPath )
+        throws IOException
     {
         this.reportsFile = new File( reportsBase, reportPath );
 
@@ -65,36 +68,42 @@ public class Reporter
                 + "\' refers to a file, not a directory.\n" + "Cannot write report file: \'"
                 + reportsFile.getAbsolutePath() + "\'." );
         }
+
+        open();
     }
 
-    public void writeReport() throws IOException
+    private void open()
+        throws IOException
     {
-        BufferedWriter writer = null;
+        this.writer = new FileWriter( reportsFile );
+    }
 
-        try
+    public void close()
+    {
+        IOUtil.close( writer );
+    }
+
+    private void write( Object message )
+        throws IOException
+    {
+        if ( writer == null )
         {
-            writer = new BufferedWriter( new FileWriter( reportsFile ) );
-
-            for ( Iterator it = messages.iterator(); it.hasNext(); )
-            {
-                Object message = it.next();
-
-                if ( message instanceof List )
-                {
-                    writer.write( format( (List) message ).toString() );
-                }
-                else
-                {
-                    writer.write( String.valueOf( message ) );
-                }
-
-                writer.newLine();
-            }
+            throw new IOException( "BufferedWriter instance in reporter: \'" + this
+                + "\' is null. Cannot write message." );
         }
-        finally
+
+        if ( message instanceof List )
         {
-            IOUtil.close( writer );
+            writer.write( format( (List) message ).toString() );
         }
+        else
+        {
+            writer.write( String.valueOf( message ) );
+        }
+
+        writer.write( '\n' );
+        
+        writer.flush();
     }
 
     public boolean hasWarning()
@@ -108,26 +117,30 @@ public class Reporter
     }
 
     public void warn( String message )
+        throws IOException
     {
         hasWarning = true;
-        messages.add( new AppendingList( 2 ).append( WARN_LEVEL ).append( message ) );
+        write( new AppendingList( 2 ).append( WARN_LEVEL ).append( message ) );
     }
 
     public void info( String message )
+        throws IOException
     {
-        messages.add( new AppendingList( 2 ).append( INFO_LEVEL ).append( message ) );
+        write( new AppendingList( 2 ).append( INFO_LEVEL ).append( message ) );
     }
 
     public void error( String message, Throwable error )
+        throws IOException
     {
         hasError = true;
-        messages.add( new AppendingList( 3 ).append( ERROR_LEVEL ).append( message ).append( error ) );
+        write( new AppendingList( 3 ).append( ERROR_LEVEL ).append( message ).append( error ) );
     }
 
     public void error( String message )
+        throws IOException
     {
         hasError = true;
-        messages.add( new AppendingList( 2 ).append( ERROR_LEVEL ).append( message ) );
+        write( new AppendingList( 2 ).append( ERROR_LEVEL ).append( message ) );
     }
 
     private CharSequence format( List messageParts )

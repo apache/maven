@@ -40,8 +40,8 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
     cp -f $2/plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar $1/lib
     cp -f $2/plexus/jars/plexus-utils-1.0-alpha-2-SNAPSHOT.jar $1/lib
     cp -f $2/classworlds/jars/classworlds-1.1-alpha-1.jar $1/lib
-    cp -f $2/maven/jars/maven-artifact-2.0-SNAPSHOT.jar $1/lib
-    cp -f $2/maven/jars/maven-model-2.0-SNAPSHOT.jar $1/lib
+    cp -f $2/org.apache.maven/jars/maven-artifact-2.0-SNAPSHOT.jar $1/lib
+    cp -f $2/org.apache.maven/jars/maven-model-2.0-SNAPSHOT.jar $1/lib
     cp -f $2/maven/jars/wagon-provider-api-1.0-alpha-2-SNAPSHOT.jar $1/lib
     cp -f $2/maven/jars/wagon-file-1.0-alpha-2-SNAPSHOT.jar $1/lib
     cp -f $2/maven/jars/wagon-http-lightweight-1.0-alpha-2-SNAPSHOT.jar $1/lib

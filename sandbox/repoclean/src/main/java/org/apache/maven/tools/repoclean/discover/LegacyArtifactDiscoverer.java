@@ -1,8 +1,7 @@
 package org.apache.maven.tools.repoclean.discover;
 
 /*
- * ==================================================================== Copyright 2001-2004 The
- * Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -12,7 +11,7 @@ package org.apache.maven.tools.repoclean.discover;
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
- * the License. ====================================================================
+ * the License.
  */
 
 import org.apache.maven.artifact.Artifact;
@@ -23,9 +22,11 @@ import org.codehaus.plexus.util.DirectoryScanner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.StringTokenizer;
 
 /**
  * @author jdcasey
@@ -38,22 +39,13 @@ public class LegacyArtifactDiscoverer
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
     public List discoverArtifacts( File repositoryBase, Reporter reporter )
+        throws Exception
     {
         List artifacts = new ArrayList();
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( repositoryBase );
-        scanner.setExcludes( new String[] {
-            "bin/**",
-            "reports/**",
-            ".maven/**",
-            "**/poms/*.pom",
-            "**/*.md5",
-            "**/*snapshot-version",
-            "*/website/**",
-            "*/licenses/**",
-            "**/.htaccess",
-            "**/REPOSITORY-V*.txt" } );
+        scanner.setExcludes( STANDARD_DISCOVERY_EXCLUDES );
 
         scanner.scan();
 
@@ -74,46 +66,167 @@ public class LegacyArtifactDiscoverer
     }
 
     private Artifact buildArtifact( String path, Reporter reporter )
+        throws Exception
     {
-        Artifact result = null;
+        StringTokenizer tokens = new StringTokenizer( path, "/" );
 
-        // TODO: Need to add more test scenarios to the unit test for this
-        // pattern.
-        // I'm not convinced that this will catch everything.
-        Pattern pathInfoPattern = Pattern.compile( "(.+)\\/(.+)s\\/([-a-zA-Z0-9]+)-([0-9]+[-.0-9a-zA-Z]+)\\..+" );
+        int numberOfTokens = tokens.countTokens();
 
-        Matcher matcher = pathInfoPattern.matcher( path );
-        if ( !matcher.matches() )
+        if ( numberOfTokens != 3 )
         {
             reporter.info( "Artifact path: \'" + path
                 + "\' does not match naming convention. Cannot reliably extract artifact information from path." );
+
+            return null;
+        }
+
+        String groupId = tokens.nextToken();
+
+        String type = tokens.nextToken();
+
+        if ( type.endsWith( "s" ) )
+        {
+            type = type.substring( 0, type.length() - 1 );
+        }
+
+        // contains artifactId, version, classifier, and extension.
+        String avceGlob = tokens.nextToken();
+
+        LinkedList avceTokenList = new LinkedList();
+
+        StringTokenizer avceTokenizer = new StringTokenizer( avceGlob, "-" );
+        while ( avceTokenizer.hasMoreTokens() )
+        {
+            avceTokenList.addLast( avceTokenizer.nextToken() );
+        }
+
+        String lastAvceToken = (String) avceTokenList.removeLast();
+
+        if ( lastAvceToken.endsWith( ".tar.gz" ) )
+        {
+            type = "distribution-tgz";
+
+            lastAvceToken = lastAvceToken.substring( 0, lastAvceToken.length() - ".tar.gz".length() );
+
+            avceTokenList.addLast( lastAvceToken );
+        }
+        else if ( lastAvceToken.endsWith( ".zip" ) )
+        {
+            type = "distribution-zip";
+
+            lastAvceToken = lastAvceToken.substring( 0, lastAvceToken.length() - ".zip".length() );
+
+            avceTokenList.addLast( lastAvceToken );
         }
         else
         {
-            String groupId = matcher.group( 1 );
-            String type = matcher.group( 2 );
-            String artifactId = matcher.group( 3 );
-            String version = matcher.group( 4 );
+            int extPos = lastAvceToken.lastIndexOf( '.' );
 
-            // Commenting this, since the old repo style didn't have a concept
-            // of 'maven-plugin'...I've added an additional artifact handler
-            // specifically for this, with just enough functionality to get the
-            // pathing right.
-            //if ( "plugin".equals( type ) )
-            //{
-            //    type = "maven-plugin";
-            //}
+            if ( extPos > 0 )
+            {
+                lastAvceToken = lastAvceToken.substring( 0, extPos );
+            }
 
-            getLogger().debug(
-                               "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
-                                   + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n"
-                                   + "version: \'" + version + "\'" );
-
-            result = artifactConstructionSupport.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME,
-                                                                 type );
+            avceTokenList.addLast( lastAvceToken );
         }
 
-        return result;
+        String validVersionParts = "([Dd][Ee][Vv][_.0-9]*)|" + "([Ss][Nn][Aa][Pp][Ss][Hh][Oo][Tt])|" + "([_.0-9ab]+)|"
+            + "([Gg]?[_.0-9ab]*([Pp][Rr][Ee]|[Rr][Cc]|[Gg]|[Mm])[_.0-9]*)|" + "([Aa][Ll][Pp][Hh][Aa][_.0-9]*)|"
+            + "([Bb][Ee][Tt][Aa][_.0-9]*)|" + "([Rr][Cc][_.0-9]*)|" + "([Tt][Ee][Ss][Tt][_.0-9]*)|"
+            + "([Dd][Ee][Bb][Uu][Gg][_.0-9]*)|" + "([Uu][Nn][Oo][Ff][Ff][Ii][Cc][Ii][Aa][Ll][_.0-9]*)|"
+            + "([Rr][Ee][Ll][Ee][Aa][Ss][Ee][_.0-9]*)|" + "([Nn][Ii][Gg][Hh][Tt][Ll][Yy])";
+
+        // let's discover the version, and whatever's leftover will be either
+        // a classifier, or part of the artifactId, depending on position.
+        // Since version is at the end, we have to move in from the back.
+        Collections.reverse( avceTokenList );
+
+        String classifier = null;
+        StringBuffer versionBuffer = new StringBuffer();
+
+        boolean inFirstToken = true;
+        for ( Iterator it = avceTokenList.iterator(); it.hasNext(); )
+        {
+            String token = (String) it.next();
+
+            boolean tokenIsVersionPart = token.matches( validVersionParts );
+            if ( inFirstToken && !tokenIsVersionPart )
+            {
+                classifier = token;
+            }
+            else if ( tokenIsVersionPart )
+            {
+                if ( !inFirstToken )
+                {
+                    versionBuffer.insert( 0, '-' );
+                }
+
+                versionBuffer.insert( 0, token );
+            }
+            else
+            {
+                // if we didn't find a version, but we did find a 'classifier', 
+                // then push that classifier back onto the list...chances are, 
+                // it doesn't have a version or a classifier if this is the case.
+                if ( versionBuffer.length() < 1 && classifier != null )
+                {
+                    avceTokenList.addFirst( classifier );
+                }
+
+                // we've discovered all the version parts. break the loop.
+                break;
+            }
+
+            if ( inFirstToken )
+            {
+                inFirstToken = false;
+            }
+
+            // pop the token off the list so it doesn't appear in the
+            // artifactId.
+            it.remove();
+        }
+
+        // Now, restore the proper ordering so we can build the artifactId.
+        Collections.reverse( avceTokenList );
+
+        StringBuffer artifactIdBuffer = new StringBuffer();
+
+        inFirstToken = true;
+        for ( Iterator it = avceTokenList.iterator(); it.hasNext(); )
+        {
+            String token = (String) it.next();
+
+            if ( inFirstToken )
+            {
+                inFirstToken = false;
+            }
+            else
+            {
+                artifactIdBuffer.append( '-' );
+            }
+
+            artifactIdBuffer.append( token );
+        }
+
+        String artifactId = artifactIdBuffer.toString();
+        String version = versionBuffer.toString();
+
+        getLogger().debug(
+                           "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
+                               + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n" + "version: \'"
+                               + version + "\'\n" + "classifier: \'" + classifier + "\'" );
+
+        if ( classifier != null )
+        {
+            return artifactConstructionSupport.createArtifactWithClassifier( groupId, artifactId, version,
+                                                                             Artifact.SCOPE_RUNTIME, type, classifier );
+        }
+        else
+        {
+            return artifactConstructionSupport.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME,
+                                                               type );
+        }
     }
 
 }

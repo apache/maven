@@ -27,11 +27,23 @@ public class ArtifactConstructionSupport
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
-        return createArtifact( groupId, artifactId, version, scope, type, null );
+        return createArtifact( groupId, artifactId, version, scope, type, null, null );
+    }
+
+    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope, String type, 
+                                    String classifier )
+    {
+        return createArtifact( groupId, artifactId, version, scope, type, classifier, null );
     }
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                                     String inheritedScope )
+    {
+        return createArtifact(groupId, artifactId, version, scope, type, null, inheritedScope);
+    }
+    
+    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
+                                    String classifier, String inheritedScope )
     {
         // TODO: can refactor, use scope handler
 

@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * ==================================================================== Copyright 2001-2004 The
- * Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -25,7 +24,7 @@ import java.util.List;
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
- * the License. ====================================================================
+ * the License.
  */
 
 /**
@@ -44,17 +43,7 @@ public class DefaultArtifactDiscoverer
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( repositoryBase );
-        scanner.setExcludes( new String[] {
-            "bin/**",
-            "reports/**",
-            ".maven/**",
-            "**/*.pom",
-            "**/*.md5",
-            "**/*snapshot-version",
-            "*/website/**",
-            "*/licenses/**",
-            "**/.htaccess",
-            "**/REPOSITORY-V*.txt" } );
+        scanner.setExcludes( STANDARD_DISCOVERY_EXCLUDES );
 
         scanner.scan();
 
