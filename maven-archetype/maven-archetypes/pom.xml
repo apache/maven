@@ -6,6 +6,6 @@
     <version>1.0-alpha-1-SNAPSHOT</version>
   </parent>
   <groupId>maven</groupId>
-  <artifactId>maven-archetype-site</artifactId>
-  <version>1.0</version>
+  <artifactId>maven-archetypes</artifactId>
+  <version>1.0-alpha-1-SNAPSHOT</version>
 </project>
