@@ -28,6 +28,7 @@ import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.initialize.MavenInitializingExecutionRequest;
 import org.apache.maven.execution.project.MavenProjectExecutionRequest;
 import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
 import org.apache.maven.repository.RepositoryUtils;
@@ -37,6 +38,7 @@ import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
+import java.util.Date;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -100,37 +102,33 @@ public class MavenCli
         }
 
         // ----------------------------------------------------------------------
-        // Create the execution request/response
+        // We will ultimately not require a flag to indicate the reactor as
+        // we should take this from the execution context i.e. what the type
+        // is stated as in the POM.
         // ----------------------------------------------------------------------
 
         MavenExecutionRequest request = null;
 
-        if ( commandLine.hasOption( CLIManager.REACTOR ) )
+        File projectFile = new File( userDir, POMv4 );
+
+        if ( projectFile.exists() )
         {
-            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
+            if ( commandLine.hasOption( CLIManager.REACTOR ) )
+            {
+                String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
 
-            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
+                String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
-            request = new MavenReactorExecutionRequest( localRepository,
-                                                        commandLine.getArgList(),
-                                                        includes,
-                                                        excludes,
-                                                        userDir );
+                request = new MavenReactorExecutionRequest( localRepository, commandLine.getArgList(), includes, excludes, userDir );
+            }
+            else
+            {
+                request = new MavenProjectExecutionRequest( localRepository, commandLine.getArgList(), projectFile );
+            }
         }
         else
         {
-            File projectFile = new File( userDir, POMv4 );
-
-            if ( !projectFile.exists() )
-            {
-                    System.err.println( "Could not find a project descriptor." );
-
-                    return 1;
-            }
-
-            request = new MavenProjectExecutionRequest( localRepository,
-                                                        commandLine.getArgList(),
-                                                        projectFile );
+            request = new MavenInitializingExecutionRequest( localRepository, commandLine.getArgList() );
         }
 
         MavenExecutionResponse response = new MavenExecutionResponse();
@@ -337,13 +335,13 @@ public class MavenCli
         return mavenProperties;
     }
 
-    protected static ArtifactRepository getLocalRepository( Properties mavenProperties, File mavenHomeLocal )
+    protected static ArtifactRepository getLocalRepository( Properties mavenProperties, File userConfigurationDirectory )
     {
         String localRepository = mavenProperties.getProperty( MavenConstants.MAVEN_REPO_LOCAL );
 
         if ( localRepository == null )
         {
-            localRepository = new File( mavenHomeLocal, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
+            localRepository = new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
         }
 
         System.setProperty( MavenConstants.MAVEN_REPO_LOCAL, localRepository );

@@ -16,11 +16,10 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import java.util.Map;
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

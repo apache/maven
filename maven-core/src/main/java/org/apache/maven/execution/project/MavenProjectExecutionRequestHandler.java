@@ -17,121 +17,49 @@ import java.util.Date;
 public class MavenProjectExecutionRequestHandler
     extends AbstractMavenExecutionRequestHandler
 {
-    private boolean logResults = true;
-
     public void handle( MavenExecutionRequest request, MavenExecutionResponse response )
         throws Exception
     {
-        MavenProject project = getProject( ((MavenProjectExecutionRequest) request).getPom(), request.getLocalRepository() );
+        Date start = null;
 
-        Date fullStop;
-
-        Date fullStart = new Date();
+        Date finish = null;
 
         try
         {
+            MavenProject project = getProject( ( (MavenProjectExecutionRequest) request ).getPom(), request.getLocalRepository() );
+
+            start = new Date();
+
             response = lifecycleManager.execute( createSession( request, project ) );
         }
         catch ( Exception e )
         {
+            finish = new Date();
+
             response.setException( e );
 
-            if ( logResults )
-            {
-                line();
+            response.setStart( start );
 
-                getLogger().error( "BUILD ERROR" );
+            response.setFinish( finish );
 
-                line();
-
-                getLogger().error( "Cause: ", e );
-
-                line();
-
-                stats( fullStart, new Date() );
-
-                line();
-            }
+            logError( response );
 
             return;
         }
 
-        fullStop = new Date();
+        finish = new Date();
 
-        if ( logResults )
+        response.setStart( start );
+
+        response.setFinish( finish );
+
+        if ( response.isExecutionFailure() )
         {
-            if ( response.isExecutionFailure() )
-            {
-                line();
-
-                getLogger().info( "BUILD FAILURE" );
-
-                line();
-
-                getLogger().info( "Reason: " + response.getFailureResponse().shortMessage() );
-
-                line();
-
-                getLogger().info( response.getFailureResponse().longMessage() );
-
-                line();
-
-                stats( fullStart, fullStop );
-
-                line();
-            }
-            else
-            {
-                line();
-
-                getLogger().info( "BUILD SUCCESSFUL" );
-
-                line();
-
-                stats( fullStart, fullStop );
-
-                line();
-            }
-        }
-    }
-
-    protected void stats( Date fullStart, Date fullStop )
-    {
-        long fullDiff = fullStop.getTime() - fullStart.getTime();
-
-        getLogger().info( "Total time: " + formatTime( fullDiff ) );
-
-        getLogger().info( "Finished at: " + fullStop );
-
-        final long mb = 1024 * 1024;
-
-        System.gc();
-
-        Runtime r = Runtime.getRuntime();
-
-        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" + ( r.totalMemory() / mb ) + "M" );
-    }
-
-    protected void line()
-    {
-        getLogger().info( "----------------------------------------------------------------------------" );
-    }
-
-    protected static String formatTime( long ms )
-    {
-        long secs = ms / 1000;
-
-        long min = secs / 60;
-
-        secs = secs % 60;
-
-        if ( min > 0 )
-        {
-            return min + " minutes " + secs + " seconds";
+            logFailure( response );
         }
         else
         {
-            return secs + " seconds";
+            logSuccess( response );
         }
     }
 

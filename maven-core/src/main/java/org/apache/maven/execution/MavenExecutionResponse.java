@@ -18,6 +18,8 @@ package org.apache.maven.execution;
 
 import org.apache.maven.plugin.FailureResponse;
 
+import java.util.Date;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -29,6 +31,10 @@ public class MavenExecutionResponse
     private FailureResponse failureResponse;
 
     private Throwable exception;
+
+    private Date start;
+
+    private Date finish;
 
     // ----------------------------------------------------------------------
     // Execution failure
@@ -78,5 +84,29 @@ public class MavenExecutionResponse
     public void setException( Throwable exception )
     {
         this.exception = exception;
+    }
+
+    // ----------------------------------------------------------------------
+    // Timing
+    // ----------------------------------------------------------------------
+
+    public Date getStart()
+    {
+        return start;
+    }
+
+    public void setStart( Date start )
+    {
+        this.start = start;
+    }
+
+    public Date getFinish()
+    {
+        return finish;
+    }
+
+    public void setFinish( Date finish )
+    {
+        this.finish = finish;
     }
 }

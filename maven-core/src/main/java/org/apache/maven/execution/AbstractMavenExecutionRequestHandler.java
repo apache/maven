@@ -13,6 +13,8 @@ import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
+import java.util.Date;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -61,5 +63,100 @@ public abstract class AbstractMavenExecutionRequestHandler
     public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    // ----------------------------------------------------------------------
+    // Reporting / Logging
+    // ----------------------------------------------------------------------
+
+    protected void logError( MavenExecutionResponse r )
+    {
+        line();
+
+        getLogger().error( "BUILD ERROR" );
+
+        line();
+
+        getLogger().error( "Cause: ", r.getException() );
+
+        line();
+
+        stats( r.getStart(), r.getFinish() );
+
+        line();
+    }
+
+    protected void logFailure( MavenExecutionResponse r )
+    {
+        line();
+
+        getLogger().info( "BUILD FAILURE" );
+
+        line();
+
+        getLogger().info( "Reason: " + r.getFailureResponse().shortMessage() );
+
+        line();
+
+        getLogger().info( r.getFailureResponse().longMessage() );
+
+        line();
+
+        stats( r.getStart(), r.getFinish() );
+
+        line();
+    }
+
+    protected void logSuccess( MavenExecutionResponse r )
+    {
+        line();
+
+        getLogger().info( "BUILD SUCCESSFUL" );
+
+        line();
+
+        stats( r.getStart(), r.getFinish() );
+
+        line();
+    }
+
+    protected void stats( Date start, Date finish )
+    {
+        long time = finish.getTime() - start.getTime();
+
+        getLogger().info( "Total time: " + formatTime( time ) );
+
+        getLogger().info( "Finished at: " + finish );
+
+        final long mb = 1024 * 1024;
+
+        System.gc();
+
+        Runtime r = Runtime.getRuntime();
+
+        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" + ( r.totalMemory() / mb ) + "M" );
+    }
+
+    protected void line()
+    {
+        getLogger().info( "----------------------------------------------------------------------------" );
+    }
+
+    protected static String formatTime( long ms )
+    {
+        long secs = ms / 1000;
+
+        long min = secs / 60;
+
+        secs = secs % 60;
+
+        if ( min > 0 )
+        {
+            return min + " minutes " + secs + " seconds";
+        }
+        else
+        {
+            return secs + " seconds";
+        }
     }
 }
