@@ -106,8 +106,11 @@ echo "" >> log
   if [ "$BUILD_REQUIRED" = "true" ]
   then
       
-    echo "Updates occured, build required ..." >> log
-      
+    echo "Updates occured, build required ..."
+    echo
+    grep ^P $HOME_DIR/$SCM_LOG
+    echo
+
     (
       cd $DIR/maven-components/maven-core
   
@@ -116,7 +119,7 @@ echo "" >> log
   
   else
   
-    echo "No updates occured, no build required. Done." >> log
+    echo "No updates occured, no build required. Done."
   
   fi
 
