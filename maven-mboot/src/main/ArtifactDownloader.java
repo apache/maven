@@ -1,9 +1,6 @@
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,10 +28,8 @@ public class ArtifactDownloader
 
     private String proxyPassword;
     
-    public ArtifactDownloader() throws Exception
+    public ArtifactDownloader( Properties properties ) throws Exception
     {
-        Properties properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
-
         setRemoteRepo( properties.getProperty( "maven.repo.remote" ) );
 
         String mavenRepoLocalProperty = properties.getProperty( "maven.repo.local" );
@@ -66,14 +61,6 @@ public class ArtifactDownloader
         writeFile( "bootstrap.repo", mavenRepoLocal.getPath() );
 
         System.out.println( "Using the following for your maven.repo.local: " + mavenRepoLocal );
-    }
-    
-    public static void main(String[] args) throws Exception
-    {
-        ArtifactDownloader dl =new ArtifactDownloader();
-        List tmp = new ArrayList();
-        tmp.add(args[0]);
-        dl.downloadDependencies(tmp);
     }
     
     private void writeFile( String name, String contents )
@@ -267,52 +254,5 @@ public class ArtifactDownloader
     private void log( String message )
     {
         System.out.println( message );
-    }
-    
-    private Properties loadProperties( File file )
-    {
-        try
-        {
-            return loadProperties( new FileInputStream( file ) );
-        }
-        catch ( Exception e )
-        {
-            // ignore
-        }
-
-        return new Properties();
-    }
-
-    private static Properties loadProperties( InputStream is )
-    {
-        Properties properties = new Properties();
-
-        try
-        {
-            if ( is != null )
-            {
-                properties.load( is );
-            }
-        }
-        catch ( IOException e )
-        {
-            // ignore
-        }
-        finally
-        {
-            try
-            {
-                if ( is != null )
-                {
-                    is.close();
-                }
-            }
-            catch ( IOException e )
-            {
-                // ignore
-            }
-        }
-
-        return properties;
     }
 }

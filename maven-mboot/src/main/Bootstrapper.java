@@ -8,11 +8,14 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 public class Bootstrapper
 {
@@ -26,6 +29,8 @@ public class Bootstrapper
 
     private List resources;
 
+    private Properties properties;
+
     public static void main( String[] args )
         throws Exception
     {
@@ -37,7 +42,9 @@ public class Bootstrapper
     public void execute( String[] args )
         throws Exception
     {
-        downloader = new ArtifactDownloader();
+        properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
+
+        downloader = new ArtifactDownloader( properties );
 
         bootstrapPomParser = new BootstrapPomParser();
 
@@ -230,6 +237,54 @@ public class Bootstrapper
     {
         return d.getArtifactDirectory() + pathSeparator + "jars" + pathSeparator + d.getArtifact();
     }
+
+    private Properties loadProperties( File file )
+    {
+        try
+        {
+            return loadProperties( new FileInputStream( file ) );
+        }
+        catch ( Exception e )
+        {
+            // ignore
+        }
+
+        return new Properties();
+    }
+
+    private static Properties loadProperties( InputStream is )
+    {
+        Properties properties = new Properties();
+
+        try
+        {
+            if ( is != null )
+            {
+                properties.load( is );
+            }
+        }
+        catch ( IOException e )
+        {
+            // ignore
+        }
+        finally
+        {
+            try
+            {
+                if ( is != null )
+                {
+                    is.close();
+                }
+            }
+            catch ( IOException e )
+            {
+                // ignore
+            }
+        }
+
+        return properties;
+    }
+
 
     static class BootstrapPomParser
         extends DefaultHandler
