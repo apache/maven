@@ -1,31 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<project>
+<model>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Plugin</name>
   <groupId>maven</groupId>
   <artifactId>maven-plugin-parent</artifactId>
-  <type>pom</type>
+  <packaging>pom</packaging>
+  <name>Maven Plugin</name>
   <version>2.0-SNAPSHOT</version>
   <description>Maven plugin parent</description>
-  <shortDescription>Maven plugin parent</shortDescription>
   <url>http://maven.apache.org</url>
-  
-  <organization>
-    <name>Apache Software Foundation</name>
-    <url>http://www.apache.org/</url>
-    <logo>/images/apache-maven-project.png</logo>
-  </organization>
-
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10500</url>
   </issueManagement>
-
   <developers>
     <developer>
-      <name>Jason van Zyl</name>
       <id>jvanzyl</id>
+      <name>Jason van Zyl</name>
       <email>jason@maven.org</email>
       <organization>Maven</organization>
       <roles>
@@ -34,8 +23,8 @@
       </roles>
     </developer>
     <developer>
-      <name>Emmanuel Venisse</name>
       <id>evenisse</id>
+      <name>Emmanuel Venisse</name>
       <email>evenisse@apache.org</email>
       <organization>Maven</organization>
       <roles>
@@ -43,22 +32,38 @@
       </roles>
     </developer>
   </developers>
-  
   <dependencies>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-monitor</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-plugin</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
-    </dependency>    
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
-</project>
+  <organization>
+    <name>Apache Software Foundation</name>
+    <url>http://www.apache.org/</url>
+  </organization>
+  <distributionManagement>
+    <repository>
+      <id>repo1</id>
+      <name>Maven Central Repository</name>
+      <url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url>
+    </repository>
+  </distributionManagement>
+</model>

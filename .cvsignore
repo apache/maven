@@ -9,3 +9,6 @@ mboot.jar
 dummy
 build.ajproperties
 .generated.lst
+*.iml
+*.iws
+*.ipr

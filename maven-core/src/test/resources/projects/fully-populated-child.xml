@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project>
+<model>
   <extend>project.xml</extend>
   <parent>
     <groupId>maven</groupId>
@@ -28,7 +28,7 @@
       <id>childSiteDistributionId</id>
       <name>childSiteDistributionName</name>
       <url>childSiteDistributionUrl</url>
-     </site>
+    </site>
   </distributionManagement>
 
   <organization>
@@ -146,4 +146,4 @@
     <report>maven-jellydoc-plugin</report>
   </reports>
 
-</project>
+</model>

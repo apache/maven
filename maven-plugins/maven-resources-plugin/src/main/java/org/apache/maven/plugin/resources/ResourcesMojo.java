@@ -21,7 +21,6 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
-
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -34,30 +33,23 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @goal resources
- *
- * @description copy application resources
- *
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.output"
- *  description=""
- * @parameter
- *  name="resources"
- *  type="List"
- *  required="true"
- *  validator=""
- *  expression="#project.build.resources"
- *  description=""
- *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- *
  * @version $Id$
- *
+ * @goal resources
+ * @description copy application resources
+ * @parameter name="outputDirectory"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.outputDirectory"
+ * description=""
+ * @parameter name="resources"
+ * type="List"
+ * required="true"
+ * validator=""
+ * expression="#project.build.resources"
+ * description=""
  */
 public class ResourcesMojo
     extends AbstractPlugin
@@ -87,7 +79,7 @@ public class ResourcesMojo
             {
                 destinationFile.getParentFile().mkdirs();
             }
-            
+
             fileCopy( resourceEntry.getSource(), destinationFile.getPath() );
         }
     }
@@ -113,25 +105,22 @@ public class ResourcesMojo
             // If we only have a directory then we want to include
             // everything we can find within that path.
 
-            String includes;
+            String includes = resource.getIncludes();
 
-            if ( resource.getIncludes().size() > 0 )
-            {
-                includes = listToString( resource.getIncludes() );
-            }
-            else
+            if ( includes == null || includes.length() == 0 )
             {
                 includes = "**/**";
             }
 
-            List excludes = resource.getExcludes();
+            String excludes = resource.getExcludes();
 
-            excludes.addAll( resource.getDefaultExcludes() );
+            if ( excludes != null && excludes.length() > 0 )
+            {
+                excludes += ",";
+            }
+            excludes += listToString( resource.getDefaultExcludes() );
 
-            List files = FileUtils.getFileNames( resourceDirectory,
-                                                 includes,
-                                                 listToString( excludes ),
-                                                 false );
+            List files = FileUtils.getFileNames( resourceDirectory, includes, excludes, false );
 
             for ( Iterator j = files.iterator(); j.hasNext(); )
             {
@@ -170,7 +159,8 @@ public class ResourcesMojo
         return sb.toString();
     }
 
-    public static byte[] fileRead( String fileName ) throws IOException
+    public static byte[] fileRead( String fileName )
+        throws IOException
     {
         FileInputStream in = new FileInputStream( fileName );
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -179,7 +169,7 @@ public class ResourcesMojo
         byte[] b = new byte[512];
         while ( ( count = in.read( b ) ) > 0 )  // blocking read
         {
-            buffer.write(b, 0, count);
+            buffer.write( b, 0, count );
         }
 
         in.close();
@@ -191,15 +181,16 @@ public class ResourcesMojo
         return content;
     }
 
-    public static void fileWrite( String fileName, byte[] data ) throws Exception
+    public static void fileWrite( String fileName, byte[] data )
+        throws Exception
     {
         FileOutputStream out = new FileOutputStream( fileName );
         out.write( data );
         out.close();
     }
 
-    public static void fileCopy( String inFileName, String outFileName ) throws
-        Exception
+    public static void fileCopy( String inFileName, String outFileName )
+        throws Exception
     {
         byte[] content = fileRead( inFileName );
         fileWrite( outFileName, content );

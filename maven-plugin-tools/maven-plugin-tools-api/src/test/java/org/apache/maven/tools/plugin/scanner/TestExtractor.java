@@ -15,7 +15,8 @@ public class TestExtractor
     implements MojoDescriptorExtractor
 {
 
-    public Set execute( MavenProject project ) throws Exception
+    public Set execute( MavenProject project )
+        throws Exception
     {
         MojoDescriptor desc = new MojoDescriptor();
         desc.setId( "testPluginId" );

@@ -23,10 +23,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.MailingList;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Site;
-import org.apache.maven.model.UnitTest;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -53,11 +53,7 @@ public class ProjectTestHelper
 
         assertEquals( "2001", project.getInceptionYear() );
 
-        //assertEquals( "org.apache.maven", project.getPackage() );
-
         assertEquals( "Description", project.getDescription() );
-
-        assertEquals( "shortDescription", project.getShortDescription() );
 
         assertEquals( "http://maven.apache.org/", project.getUrl() );
 
@@ -67,15 +63,15 @@ public class ProjectTestHelper
 
         DistributionManagement distributionManagement = project.getDistributionManagement();
 
-        assertNotNull( distributionManagement   );
+        assertNotNull( distributionManagement );
 
         Site site = distributionManagement.getSite();
 
-        assertNotNull( site  );
+        assertNotNull( site );
 
         Repository repository = distributionManagement.getRepository();
 
-        assertNotNull( repository  );
+        assertNotNull( repository );
 
 
 
@@ -86,8 +82,6 @@ public class ProjectTestHelper
         assertEquals( "Apache Software Foundation", project.getOrganization().getName() );
 
         assertEquals( "http://apache.org/", project.getOrganization().getUrl() );
-
-        assertEquals( "/images/jakarta-logo-blue.gif", project.getOrganization().getLogo() );
 
         // ----------------------------------------------------------------------
         // Repository
@@ -167,23 +161,17 @@ public class ProjectTestHelper
 
         assertEquals( "/sourceDirectory", build.getSourceDirectory() );
 
-        assertEquals( "/unitTestSourceDirectory", build.getUnitTestSourceDirectory() );
+        assertEquals( "/unitTestSourceDirectory", build.getTestSourceDirectory() );
 
-        UnitTest unitTest = build.getUnitTest();
-
-        assertEquals( "**/*Test.java", (String) unitTest.getIncludes().get( 0 ) );
-
-        assertEquals( "**/RepositoryTest.java", (String) unitTest.getExcludes().get( 0 ) );
-
-        Resource resource0 = (Resource) unitTest.getResources().get( 0 );
+        Resource resource0 = (Resource) build.getTestResources().get( 0 );
         //assertEquals( "${basedir}/src/test", resource0.getDirectory() );
-        assertEquals( "**/*.xml", (String) resource0.getIncludes().get( 0 ) );
+        assertEquals( "**/*.xml", resource0.getIncludes() );
 
         Resource resource1 = (Resource) build.getResources().get( 0 );
 
         assertEquals( "/src/conf", resource1.getDirectory() );
 
-        assertEquals( "*.xsd", (String) resource1.getIncludes().get( 0 ) );
+        assertEquals( "*.xsd", resource1.getIncludes() );
 
         Resource resource2 = (Resource) build.getResources().get( 1 );
 
@@ -191,14 +179,15 @@ public class ProjectTestHelper
 
         assertEquals( "org/apache/maven/messages", resource2.getTargetPath() );
 
-        assertEquals( "messages*.properties", (String) resource2.getIncludes().get( 0 ) );
+        assertEquals( "messages*.properties", resource2.getIncludes() );
 
         // ----------------------------------------------------------------------
         // Reports
         // ----------------------------------------------------------------------
 
-        assertEquals( "maven-jdepend-plugin", project.getReports().get( 0 ) );
+        assertEquals( "maven-jdepend-plugin", ( (Plugin) project.getReports().getPlugins().get( 0 ) ).getArtifactId() );
 
-        assertEquals( "maven-checkstyle-plugin", project.getReports().get( 1 ) );
+        assertEquals( "maven-checkstyle-plugin",
+                      ( (Plugin) project.getReports().getPlugins().get( 1 ) ).getArtifactId() );
     }
 }

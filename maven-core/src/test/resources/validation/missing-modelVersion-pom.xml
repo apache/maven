@@ -1,6 +1,6 @@
-<project>
+<model>
   <groupId>foo</groupId>
   <artifactId>foo</artifactId>
   <version>99.44</version>
-  <type>bleh</type>
-</project>
+  <packaging>bleh</packaging>
+</model>

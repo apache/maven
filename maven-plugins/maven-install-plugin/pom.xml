@@ -1,39 +1,44 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>maven</groupId>
     <artifactId>maven-plugin-parent</artifactId>
+    <groupId>maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-install-plugin</artifactId>
-  <type>plugin</type>  
+  <packaging>plugin</packaging>
   <name>Maven Install Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <inceptionYear>2004</inceptionYear>
-  <package>org.apache.maven.plugin.install</package>
   <dependencies>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
-</project>
+</model>

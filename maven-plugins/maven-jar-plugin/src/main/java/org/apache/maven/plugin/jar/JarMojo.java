@@ -19,93 +19,79 @@ package org.apache.maven.plugin.jar;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
-import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 
 /**
- * @goal jar
- * @phase package
- *
- * @description build a jar
- *
- * @parameter
- *  name="jarName"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.finalName"
- *  description=""
- * @parameter
- *  name="compress"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.compress"
- *  default="true"
- *  description=""
- * @parameter
- *  name="index"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.index"
- *  default="false"
- *  description=""
- * @parameter
- *  name="manifest"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.manifest"
- *  description=""
- * @parameter
- *  name="mainClass"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.mainClass"
- *  description=""
- * @parameter
- *  name="addClasspath"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.addClasspath"
- *  default="false"
- *  description=""
- * @parameter
- *  name="addExtensions"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.addExtensions"
- *  default="false"
- *  description=""
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.output"
- *  description=""
- * @parameter
- *  name="basedir"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.directory"
- *  description=""
- * @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description="current MavenProject instance"
- *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
+ * @goal jar
+ * @phase package
+ * @description build a jar
+ * @parameter name="jarName"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.finalName"
+ * description=""
+ * @parameter name="compress"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.compress"
+ * default="true"
+ * description=""
+ * @parameter name="index"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.index"
+ * default="false"
+ * description=""
+ * @parameter name="manifest"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.manifest"
+ * description=""
+ * @parameter name="mainClass"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.mainClass"
+ * description=""
+ * @parameter name="addClasspath"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.addClasspath"
+ * default="false"
+ * description=""
+ * @parameter name="addExtensions"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.addExtensions"
+ * default="false"
+ * description=""
+ * @parameter name="outputDirectory"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.outputDirectory"
+ * description=""
+ * @parameter name="basedir"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.directory"
+ * description=""
+ * @parameter name="project"
+ * type="org.apache.maven.project.MavenProject"
+ * required="true"
+ * validator=""
+ * expression="#project"
+ * description="current MavenProject instance"
  */
 public class JarMojo
     extends AbstractJarMojo
@@ -136,7 +122,8 @@ public class JarMojo
 
         archiver.setOutputFile( jarFile );
 
-        archiver.getArchiver().addDirectory( new File( outputDirectory ), new String[] { "**/**" }, new String[] { "**/package.html" } );
+        archiver.getArchiver().addDirectory( new File( outputDirectory ), new String[]{"**/**"},
+                                             new String[]{"**/package.html"} );
 
         // create archive
         archiver.createArchive( request );

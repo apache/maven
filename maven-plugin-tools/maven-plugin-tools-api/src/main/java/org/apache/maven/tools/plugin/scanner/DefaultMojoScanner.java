@@ -16,11 +16,9 @@ package org.apache.maven.tools.plugin.scanner;
  * limitations under the License.
  */
 
-import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,7 +42,8 @@ public class DefaultMojoScanner
     {
     }
 
-    public Set execute( MavenProject project ) throws Exception
+    public Set execute( MavenProject project )
+        throws Exception
     {
         Set descriptors = new HashSet();
 
@@ -60,8 +59,8 @@ public class DefaultMojoScanner
 
             Set extractorDescriptors = extractor.execute( project );
 
-            System.out.println( "Extractor for language: " + language + " found " + extractorDescriptors.size()
-                + " mojo descriptors." );
+            System.out.println( "Extractor for language: " + language + " found " + extractorDescriptors.size() +
+                                " mojo descriptors." );
 
             descriptors.addAll( extractorDescriptors );
         }

@@ -32,7 +32,7 @@
     </default>
   </defaults>
   <classes>
-    <class rootElement="true">
+    <class rootElement="true" xml.tagName="project">
       <name>Model</name>
       <version>3.0.0+</version>
       <fields>
@@ -92,7 +92,7 @@
           <type>String</type>
         </field>
         <field>
-          <name>type</name>
+          <name>packaging</name>
           <version>4.0.0</version>
           <description><![CDATA[The type of artifact this project produces.]]></description>
           <type>String</type>
@@ -120,7 +120,7 @@
         </field>
         <field>
           <name>shortDescription</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[An abbreviated description of the project.]]></description>
           <type>String</type>
         </field>
@@ -145,7 +145,7 @@
         </field>
         <field>
           <name>logo</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[The logo for the project.]]></description>
           <type>String</type>
         </field>
@@ -228,15 +228,6 @@
             <multiplicity>*</multiplicity>
           </association>
           <comment>This may be removed or relocated in the near future. It is undecided whether plugins really need a remote repository set of their own.</comment>
-        </field>
-        <field>
-          <name>plugins</name>
-          <version>4.0.0</version>
-          <description><![CDATA[Plugin declarations and configuration.]]></description>
-          <association>
-            <type>Plugin</type>
-            <multiplicity>*</multiplicity>
-          </association>
         </field>
         <field>
           <name>mailingLists</name>
@@ -327,7 +318,7 @@
         </field>
         <field>
           <name>packageGroups</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[Package groups required for complete javadocs.]]></description>
           <association>
             <type>PackageGroup</type>
@@ -336,7 +327,7 @@
         </field>
         <field>
           <name>reports</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[
             This element includes the specification of reports to be
             included in a Maven-generated site.  These reports will be run
@@ -348,6 +339,21 @@
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>reports</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            This element includes the specification of reports to be
+            included in a Maven-generated site.  These reports will be run
+            when a user executes
+            <code>maven site</code>.  All of the
+            reports will be included in the navigation bar for browsing in
+            the order they are specified.
+          ]]></description>
+          <association>
+            <type>Reports</type>
           </association>
         </field>
         <field>
@@ -418,11 +424,9 @@
             <type>PluginManagement</type>
           </association>
         </field>
-        <!-- @todo long run 4.0.0 may not need properties, with the parameters being specified
-          for the plugin directly -->
         <field>
           <name>properties</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[
             Properties about the project. This allows you to configure your project and the
             plugins it uses.
@@ -433,10 +437,9 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <!-- @todo is this for javadoc only? maybe make it a plugin property? -->
         <field xml.tagName="package">
           <name>packageName</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <type>String</type>
           <description>The Java package that the code resides in.</description>
         </field>
@@ -454,12 +457,8 @@
             {
                 return currentVersion;
             }
-          </code>
-        </codeSegment>
-        <!-- We need this because we can't use package as a field name. -->
-        <codeSegment>
-          <version>3.0.0+</version>
-          <code>
+
+            // We need this because we can't use package as a field name.
             public void setPackage(String packageName)
             {
                 this.packageName = packageName;
@@ -482,7 +481,7 @@
                 id.append( ":" );
                 id.append( getArtifactId() );
                 id.append( ":" );
-                id.append( getType() );
+                id.append( getPackaging() );
                 id.append( ":" );
                 id.append( getVersion() );
 
@@ -548,8 +547,31 @@
           <type>String</type>
         </field>
         <field>
+          <name>scriptSourceDirectory</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description><![CDATA[
+            This element specifies a directory containing the script sources
+            of the project.
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
           <name>unitTestSourceDirectory</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description><![CDATA[
+            This element specifies a directory containing the unit test
+            source of the project. The generated build system will
+            compile these directories when the project is being tested.
+            The unit tests must use the JUnit test framework.
+            The path given is relative to the project descriptor.
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>testSourceDirectory</name>
+          <version>4.0.0</version>
           <required>true</required>
           <description><![CDATA[
             This element specifies a directory containing the unit test
@@ -562,7 +584,7 @@
         </field>
         <field>
           <name>sourceModifications</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[
             This element describes all of the sourceModifications associated with a
@@ -579,7 +601,7 @@
         </field>
         <field>
           <name>unitTest</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[This element specifies unit tests associated with the project.]]></description>
           <defaultValue>new UnitTest()</defaultValue>
@@ -591,7 +613,22 @@
           <name>resources</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-            This element describes all of the resources associated with a project or unit tests.
+            This element describes all of the resources associated with a project.
+            Each resource is described by a resource element, which is then described by additional
+            elements (described
+            <a href="#resource">below</a>). These resources are used to
+            complete the jar file or to run unit test.
+          ]]></description>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>testResources</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            This element describes all of the resources associated with a project's unit tests.
             Each resource is described by a resource element, which is then described by additional
             elements (described
             <a href="#resource">below</a>). These resources are used to
@@ -611,7 +648,7 @@
           <type>String</type>
         </field>
         <field>
-          <name>output</name>
+          <name>outputDirectory</name>
           <version>4.0.0</version>
           <description><![CDATA[
             The directory where compiled application classes are placed.
@@ -629,12 +666,21 @@
           <type>String</type>
         </field>
         <field>
-          <name>testOutput</name>
+          <name>testOutputDirectory</name>
           <version>4.0.0</version>
           <description><![CDATA[
             The directory where compiled test classes are placed.
           ]]></description>
           <type>String</type>
+        </field>
+        <field>
+          <name>plugins</name>
+          <version>4.0.0</version>
+          <description><![CDATA[Plugin declarations and configuration.]]></description>
+          <association>
+            <type>Plugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
     </class>
@@ -655,10 +701,40 @@
           <type>String</type>
         </field>
         <field>
-          <name>nagEmailAddress</name>
+          <name>notifiers</name>
           <version>4.0.0</version>
-          <description><![CDATA[Email address for the party to be notified on unsuccessful builds.]]></description>
+          <description><![CDATA[Who to be notified on unsuccessful builds.]]></description>
+          <association>
+            <multiplicity>*</multiplicity>
+            <type>Notifier</type>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Notifier</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <defaultValue>email</defaultValue>
           <type>String</type>
+          <description>The type of notifier to use</description>
+        </field>
+        <field>
+          <name>address</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>Where to send the notification to - eg email address</description>
+        </field>
+        <field>
+          <name>configuration</name>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
     </class>
@@ -787,7 +863,7 @@
         </field>
         <field>
           <name>properties</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[
             Properties about the dependency. Various plugins allow you to
             <code>mark</code> dependencies with properties. For example the
@@ -1089,7 +1165,7 @@
         </field>
         <field>
           <name>logo</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[
             The URL to the organization's logo image.  This can be an URL relative
             to the base directory of the generated web site,
@@ -1105,17 +1181,17 @@
     </class>
     <class>
       <name>PackageGroup</name>
-      <version>3.0.0+</version>
+      <version>3.0.0</version>
       <fields>
         <field>
           <name>title</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[the description]]></description>
           <type>String</type>
         </field>
         <field>
           <name>packages</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[the description]]></description>
           <type>String</type>
         </field>
@@ -1127,7 +1203,7 @@
       <fields>
         <field>
           <name>includes</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[the description]]></description>
           <association>
             <type>String</type>
@@ -1136,12 +1212,24 @@
         </field>
         <field>
           <name>excludes</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[the description]]></description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
+        </field>
+        <field>
+          <name>includes</name>
+          <version>4.0.0</version>
+          <description><![CDATA[the description]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>excludes</name>
+          <version>4.0.0</version>
+          <description><![CDATA[the description]]></description>
+          <type>String</type>
         </field>
       </fields>
       <codeSegments>
@@ -1272,15 +1360,6 @@
           <description><![CDATA[The URL to the project's browsable CVS repository.]]></description>
           <type>String</type>
         </field>
-        <field>
-          <name>branches</name>
-          <version>4.0.0</version>
-          <description><![CDATA[The SCM branches that are currently active for the project. These should only be those forked from the current branch or trunk that are intended to be used.]]></description>
-          <association>
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
       </fields>
     </class>
     <class>
@@ -1318,7 +1397,7 @@
         </field>
         <field>
           <name>filtering</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[Describe if resources are filtered or not.]]></description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>
@@ -1327,12 +1406,12 @@
     </class>
     <class>
       <name>SourceModification</name>
-      <version>3.0.0+</version>
+      <version>3.0.0</version>
       <superClass>FileSet</superClass>
       <fields>
         <field>
           <name>className</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[
             If the class with this name can
             <strong>not</strong> be
@@ -1344,7 +1423,7 @@
         </field>
         <field>
           <name>property</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[the description]]></description>
           <type>String</type>
         </field>
@@ -1352,12 +1431,12 @@
     </class>
     <class>
       <name>UnitTest</name>
-      <version>3.0.0+</version>
+      <version>3.0.0</version>
       <superClass>PatternSet</superClass>
       <fields>
         <field>
           <name>resources</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[the description]]></description>
           <association>
             <type>Resource</type>
@@ -1455,34 +1534,6 @@
           ]]></description>
           <type>String</type>
         </field>
-        <!-- @todo this should be in the user configuration -->
-        <field>
-          <name>username</name>
-          <version>4.0.0</version>
-          <description>The username to connect to the repository with. If omitted, none is used.</description>
-          <type>String</type>
-        </field>
-        <!-- @todo this should be encrypted in some way or be a keystore lookup and m2 can provide a way to generate it -->
-        <field>
-          <name>password</name>
-          <version>4.0.0</version>
-          <description>The password to use when connecting to the repository. If omitted, none is used.</description>
-          <type>String</type>
-        </field>
-        <!-- @todo this should be in the user configuration -->
-        <field>
-          <name>privateKey</name>
-          <version>4.0.0</version>
-          <description>The private key to use when connecting to the repository (SSH only)</description>
-          <type>String</type>
-        </field>
-        <!-- @todo this should be in the user configuration -->
-        <field>
-          <name>passphrase</name>
-          <version>4.0.0</version>
-          <description>The passphrase for the private key to use when connecting to the repository (SSH only)</description>
-          <type>String</type>
-        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -1578,7 +1629,13 @@
       <version>4.0.0</version>
       <fields>
         <field>
-          <name>id</name>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <defaultValue>maven</defaultValue>
+        </field>
+        <field>
+          <name>artifactId</name>
           <version>4.0.0</version>
           <type>String</type>
           <required>true</required>
@@ -1679,6 +1736,29 @@
             dependency.
           </description>
           <association>
+            <type>Plugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Reports</name>
+      <version>4.0.0</version>
+      <description>Section for management of reports and configuration</description>
+      <fields>
+        <field>
+          <name>outputDirectory</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <description>Where to store all of the generated reports</description>
+        </field>
+        <field>
+          <name>plugins</name>
+          <version>4.0.0</version>
+          <description>The reporting plugins to use and their configuration</description>
+          <association>
+            <!-- TODO: goal stuff relevant or not? -->
             <type>Plugin</type>
             <multiplicity>*</multiplicity>
           </association>

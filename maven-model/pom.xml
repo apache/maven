@@ -1,25 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>maven</groupId>
     <artifactId>maven-component</artifactId>
+    <groupId>maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
-  <name>Maven Model</name>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-model</artifactId>
+  <packaging>jar</packaging>
+  <name>Maven Model</name>
   <version>2.0-SNAPSHOT</version>
   <description>Maven Model</description>
-  <shortDescription>Maven Model</shortDescription>
-  <plugins>
-    <plugin>
-      <id>modello</id>
-      <configuration>
-        <model>maven.mdo</model>
-        <version>4.0.0</version>
-      </configuration>
-    </plugin>
-  </plugins>
-</project>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>maven</groupId>
+        <artifactId>maven-modello-plugin</artifactId>
+        <configuration>
+          <version>4.0.0</version>
+          <model>maven.mdo</model>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

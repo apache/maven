@@ -76,7 +76,8 @@ public class MavenPluginDiscoverer
 
         ComponentSetDescriptor componentSet = new MavenPluginDescriptor( pluginDescriptor );
 
-        componentSet.setId( pluginDescriptor.getId() );
+        // TODO: no group
+        componentSet.setId( pluginDescriptor.getArtifactId() );
 
         // ----------------------------------------------------------------------
         // If the ComponentSet states any dependencies then we want to collect

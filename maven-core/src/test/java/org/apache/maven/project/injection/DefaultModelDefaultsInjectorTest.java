@@ -22,7 +22,6 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author jdcasey
@@ -142,11 +141,6 @@ public class DefaultModelDefaultsInjectorTest
         def.setGroupId( dep.getGroupId() );
         def.setArtifactId( dep.getArtifactId() );
 
-        Properties props = new Properties();
-        props.setProperty( "test", "value" );
-
-        def.setProperties( props );
-
         DependencyManagement depMgmt = new DependencyManagement();
 
         depMgmt.addDependency( def );
@@ -157,10 +151,6 @@ public class DefaultModelDefaultsInjectorTest
 
         List deps = model.getDependencies();
         assertEquals( 1, deps.size() );
-
-        Dependency result = (Dependency) deps.get( 0 );
-
-        assertEquals( "value", result.getProperties().getProperty( "test" ) );
     }
 
     public void testShouldNotMergeDefaultPropertiesWhenDependencySuppliesProperties()
@@ -172,21 +162,11 @@ public class DefaultModelDefaultsInjectorTest
         dep.setArtifactId( "myArtifact" );
         dep.setVersion( "1.0.1" );
 
-        Properties props = new Properties();
-        props.setProperty( "test", "value" );
-
-        dep.setProperties( props );
-
         model.addDependency( dep );
 
         Dependency def = new Dependency();
         def.setGroupId( dep.getGroupId() );
         def.setArtifactId( dep.getArtifactId() );
-
-        Properties props2 = new Properties();
-        props2.setProperty( "test", "value2" );
-
-        def.setProperties( props2 );
 
         DependencyManagement depMgmt = new DependencyManagement();
 
@@ -198,9 +178,6 @@ public class DefaultModelDefaultsInjectorTest
 
         List deps = model.getDependencies();
         assertEquals( 1, deps.size() );
-
-        Dependency result = (Dependency) deps.get( 0 );
-        assertEquals( "value", result.getProperties().getProperty( "test" ) );
     }
 
     public void testShouldMergeDefaultScopeWhenDependencyDoesntSupplyScope()

@@ -1,10 +1,22 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>maven</groupId>
     <artifactId>maven-component</artifactId>
+    <groupId>maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
-  
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-user-model</artifactId>
-</project>
+  <packaging>jar</packaging>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>maven</groupId>
+        <artifactId>maven-modello-plugin</artifactId>
+        <configuration>
+          <version>4.0.0</version>
+          <model>maven-user.mdo</model>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

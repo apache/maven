@@ -1,9 +1,9 @@
-<project>
+<model>
   <groupId>foo</groupId>
   <artifactId>bar</artifactId>
   <name>Babar</name>
   <version>4.5</version>
   
   <!-- Build element should be inherited from the super model -->
-  
-</project>
+
+</model>

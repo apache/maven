@@ -20,8 +20,6 @@ import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.DocletTag;
 import com.thoughtworks.qdox.model.JavaClass;
 import com.thoughtworks.qdox.model.JavaSource;
-
-import org.apache.maven.model.Build;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -32,13 +30,14 @@ import org.apache.maven.tools.plugin.util.PluginUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 /**
  * @todo add example usage tag that can be shown in the doco
  * @todo need to add validation directives so that systems embedding maven2 can
- *       get validation directives to help users in IDEs.
+ * get validation directives to help users in IDEs.
  */
 public class JavaMojoDescriptorExtractor
     implements MojoDescriptorExtractor
@@ -67,7 +66,8 @@ public class JavaMojoDescriptorExtractor
 
     public static final String GOAL_MULTI_EXECUTION_STRATEGY = "attainAlways";
 
-    protected void validateParameter( Parameter parameter, int i ) throws InvalidParameterException
+    protected void validateParameter( Parameter parameter, int i )
+        throws InvalidParameterException
     {
         String name = parameter.getName();
 
@@ -243,7 +243,8 @@ public class JavaMojoDescriptorExtractor
         return javaSource.getClasses()[0];
     }
 
-    public Set execute( MavenProject project ) throws Exception
+    public Set execute( MavenProject project )
+        throws Exception
     {
         JavaDocBuilder builder = new JavaDocBuilder();
 
@@ -251,25 +252,12 @@ public class JavaMojoDescriptorExtractor
 
         System.out.println( "Project basedir: " + basedir );
 
-        String sourceDir = null;
+        System.out.println( "Source directory for java mojo extraction: " + project.getCompileSourceRoots() );
 
-        Build buildSection = project.getBuild();
-        if ( buildSection != null )
+        for ( Iterator i = project.getCompileSourceRoots().iterator(); i.hasNext(); )
         {
-            sourceDir = buildSection.getSourceDirectory();
+            builder.addSourceTree( new File( (String) i.next() ) );
         }
-
-        if ( sourceDir == null )
-        {
-            File src = new File( basedir, "src/main/java" );
-            sourceDir = src.getPath();
-        }
-
-        System.out.println( "Source directory for java mojo extraction: " + sourceDir );
-
-        File sourceDirectoryFile = new File( sourceDir );
-
-        builder.addSourceTree( sourceDirectoryFile );
 
         JavaSource[] javaSources = builder.getSources();
 

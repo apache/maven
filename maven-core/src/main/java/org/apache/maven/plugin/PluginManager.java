@@ -30,15 +30,18 @@ public interface PluginManager
 {
     String ROLE = PluginManager.class.getName();
 
-    PluginExecutionResponse executeMojo( MavenSession session, String goalName ) throws GoalExecutionException;
+    PluginExecutionResponse executeMojo( MavenSession session, String goalName )
+        throws GoalExecutionException;
 
     MojoDescriptor getMojoDescriptor( String goalId );
 
     // TODO: don't throw Exception
-    void verifyPluginForGoal( String goalName, MavenSession session ) throws Exception;
+    void verifyPluginForGoal( String goalName, MavenSession session )
+        throws Exception;
 
     // TODO: don't throw Exception
-    void verifyPlugin( String pluginId, MavenSession session ) throws Exception;
+    void verifyPlugin( String groupId, String artifactId, MavenSession session )
+        throws Exception;
 
-    PluginDescriptor getPluginDescriptor( String pluginId );
+    PluginDescriptor getPluginDescriptor( String groupId, String artifactId );
 }

@@ -18,7 +18,6 @@ package org.apache.maven.plugin.descriptor;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -28,7 +27,9 @@ public class PluginDescriptor
 {
     private List mojos;
 
-    private String id;
+    private String groupId;
+
+    private String artifactId;
 
     private List dependencies;
 
@@ -48,14 +49,24 @@ public class PluginDescriptor
         this.mojos = new LinkedList( mojos );
     }
 
-    public String getId()
+    public String getGroupId()
     {
-        return id;
+        return groupId;
     }
 
-    public void setId( String id )
+    public void setGroupId( String groupId )
     {
-        this.id = id;
+        this.groupId = groupId;
+    }
+
+    public String getArtifactId()
+    {
+        return artifactId;
+    }
+
+    public void setArtifactId( String artifactId )
+    {
+        this.artifactId = artifactId;
     }
 
     // ----------------------------------------------------------------------

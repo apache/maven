@@ -36,9 +36,9 @@ public class DefaultModelValidatorTest
         throws Exception
     {
         ModelValidationResult result = validate( "missing-groupId-pom.xml" );
-    
+
         assertEquals( 1, result.getMessageCount() );
-    
+
         assertEquals( "'groupId' is missing.", result.getMessage( 0 ) );
     }
 
@@ -46,17 +46,17 @@ public class DefaultModelValidatorTest
         throws Exception
     {
         ModelValidationResult result = validate( "missing-type-pom.xml" );
-    
+
         assertEquals( 1, result.getMessageCount() );
-    
-        assertEquals( "'type' is empty.", result.getMessage( 0 ) );
+
+        assertEquals( "'packaging' is empty.", result.getMessage( 0 ) );
     }
 
     public void testMissingVersion()
         throws Exception
     {
         ModelValidationResult result = validate( "missing-version-pom.xml" );
-    
+
         assertEquals( 1, result.getMessageCount() );
 
         assertEquals( "'version' is missing.", result.getMessage( 0 ) );
@@ -66,7 +66,7 @@ public class DefaultModelValidatorTest
         throws Exception
     {
         ModelValidationResult result = validate( "missing-1-pom.xml" );
-    
+
         assertEquals( 3, result.getMessageCount() );
 
         assertEquals( "'groupId' is missing.", result.getMessage( 0 ) );

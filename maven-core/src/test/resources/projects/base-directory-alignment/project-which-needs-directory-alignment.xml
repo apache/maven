@@ -1,32 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project>
+<model>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>project-which-needs-directory-alignment</artifactId>
   <name>Maven</name>
   <version>1.0-beta-9</version>
   <inceptionYear>2001</inceptionYear>
-  <package>org.apache.maven</package>
   <description>Description</description>
-  <shortDescription>shortDescription</shortDescription>
   <url>http://maven.apache.org/</url>
   <issueTrackingUrl>issueTrackingUrl</issueTrackingUrl>
-  <siteAddress>maven.apache.org</siteAddress>
-  <siteDirectory>/www/maven.apache.org/</siteDirectory>
-  <distributionDirectory>/www/maven.apache.org/builds/</distributionDirectory>
 
   <organization>
     <name>Apache Software Foundation</name>
     <url>http://apache.org/</url>
-    <logo>/images/jakarta-logo-blue.gif</logo>
   </organization>
 
-  <repository>
+  <scm>
     <connection>anon-connection</connection>
     <developerConnection>developer-connection</developerConnection>
     <url>repository-url</url>
-  </repository>
+  </scm>
 
   <mailingLists>
     <mailingList>
@@ -63,14 +57,12 @@
       <groupId>g1</groupId>
       <artifactId>d1</artifactId>
       <version>1.0</version>
-      <url>d1-url</url>
     </dependency>
 
     <dependency>
       <groupId>g2</groupId>
       <artifactId>d2</artifactId>
       <version>2.0</version>
-      <url>d2-url</url>
     </dependency>
 
     <dependency>
@@ -86,65 +78,42 @@
         <groupId>g3</groupId>
         <artifactId>d3</artifactId>
         <version>3.0</version>
-        <url>d3-url</url>
-      </dependency>      
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <build>
     <nagEmailAddress>jason@maven.org</nagEmailAddress>
     <sourceDirectory>sourceDirectory</sourceDirectory>
-    <unitTestSourceDirectory>unitTestSourceDirectory</unitTestSourceDirectory>
-    <unitTest>
-      <includes>
-        <include>**/*Test.java</include>
-      </includes>
-      <excludes>
-        <exclude>**/RepositoryTest.java</exclude>
-        <exclude>**/JAXPTest.java</exclude>
-      </excludes>
-      <resources>
-        <resource>
-          <directory>src/test</directory>
-          <includes>
-            <include>**/*.xml</include>
-          </includes>
-        </resource>
-      </resources>
-    </unitTest>
+    <testSourceDirectory>unitTestSourceDirectory</testSourceDirectory>
     <resources>
       <resource>
-        <directory>src/conf</directory>
-        <includes>
-          <include>*.xsd</include>
-          <include>*.dtd</include>
-          <include>*.mod</include>
-          <include>log4j.properties</include>
-          <include>driver.jelly</include>
-          <include>driver.properties</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/messages</directory>
-        <targetPath>org/apache/maven/messages</targetPath>
-        <includes>
-          <include>messages*.properties</include>
-        </includes>
+        <directory>src/test</directory>
+        <includes>**/*.xml</includes>
       </resource>
     </resources>
+    <testResources>
+      <testResource>
+        <directory>src/conf</directory>
+        <includes>*.xsd,*.dtd,*.mod,log4j.properties,driver.jelly,driver.properties</includes>
+      </testResource>
+      <testResource>
+        <directory>src/messages</directory>
+        <targetPath>org/apache/maven/messages</targetPath>
+        <includes>messages*.properties</includes>
+      </testResource>
+    </testResources>
   </build>
 
   <reports>
-    <report>maven-jdepend-plugin</report>
-    <report>maven-checkstyle-plugin</report>
-    <report>maven-changelog-plugin</report>
-    <report>maven-file-activity-plugin</report>
-    <report>maven-developer-activity-plugin</report>
-    <report>maven-javadoc-plugin</report>
-    <report>maven-jxr-plugin</report>
-    <report>maven-junit-report-plugin</report>
-    <report>maven-tasklist-plugin</report>
-    <report>maven-jellydoc-plugin</report>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jdepend-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+    </plugins>
   </reports>
 
-</project>
+</model>

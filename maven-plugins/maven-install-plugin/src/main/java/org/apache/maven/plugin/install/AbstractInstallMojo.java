@@ -16,14 +16,14 @@ package org.apache.maven.plugin.install;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 
 import java.io.File;
 
@@ -50,22 +50,18 @@ public abstract class AbstractInstallMojo
         ArtifactRepository localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
 
         // Install the POM
-        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(),
-                                                 project.getArtifactId(),
-                                                 project.getVersion(),
-                                                 "pom" );
+        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                    project.getVersion(), "pom" );
 
         File pom = new File( project.getFile().getParentFile(), "pom.xml" );
 
         artifactInstaller.install( pom, pomArtifact, localRepository );
 
         //Install artifact
-        if ( ! isPom() )
+        if ( !isPom() )
         {
-            Artifact artifact = new DefaultArtifact( project.getGroupId(),
-                                                     project.getArtifactId(),
-                                                     project.getVersion(),
-                                                     project.getType() );
+            Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                     project.getVersion(), project.getPackaging() );
 
             artifactInstaller.install( project.getBuild().getDirectory(), artifact, localRepository );
         }

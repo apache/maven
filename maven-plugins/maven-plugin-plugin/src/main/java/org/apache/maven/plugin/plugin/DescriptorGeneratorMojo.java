@@ -6,36 +6,33 @@ import org.apache.maven.tools.plugin.generator.PluginDescriptorGenerator;
 import java.util.Set;
 
 /**
- * @goal descriptor
- *
- * @phase process-sources
- *
- * @description Goal for generating a plugin descriptor.
- *
- * @parameter
- *  name="mojoScanner"
- *  type="org.apache.maven.tools.plugin.scanner.MojoScanner"
- *  required="true"
- *  validator=""
- *  expression="#component.org.apache.maven.tools.plugin.scanner.MojoScanner"
- *  description="Scanner used to discover mojo descriptors from this project"
- * @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description=""
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true" 
- *  validator="" 
- *  expression="#project.build.directory/classes/META-INF/maven"
- *  description=""
+ * Generate a plugin descriptor.
+ * <p/>
+ * Note: Phase is after the "compilation" of any scripts
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ * @goal descriptor
+ * @phase process-classes
+ * @description Goal for generating a plugin descriptor.
+ * @parameter name="mojoScanner"
+ * type="org.apache.maven.tools.plugin.scanner.MojoScanner"
+ * required="true"
+ * validator=""
+ * expression="#component.org.apache.maven.tools.plugin.scanner.MojoScanner"
+ * description="Scanner used to discover mojo descriptors from this project"
+ * @parameter name="project"
+ * type="org.apache.maven.project.MavenProject"
+ * required="true"
+ * validator=""
+ * expression="#project"
+ * description=""
+ * @parameter name="outputDirectory"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.directory/classes/META-INF/maven"
+ * description=""
  */
 public class DescriptorGeneratorMojo
     extends AbstractGeneratorMojo

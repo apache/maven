@@ -22,13 +22,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.project.MavenProject;
-
 import org.codehaus.plexus.archiver.jar.Manifest;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -42,12 +39,13 @@ public abstract class AbstractJarMojo
 {
     /**
      * Return a pre-configured manifest
+     *
      * @todo Add user attributes list and user groups list
      */
     public Manifest getManifest( PluginExecutionRequest request )
         throws Exception
     {
-        MavenProject project = (MavenProject)request.getParameter("project");
+        MavenProject project = (MavenProject) request.getParameter( "project" );
 
         String mainClass = (String) request.getParameter( "mainClass" );
 
@@ -61,8 +59,10 @@ public abstract class AbstractJarMojo
         m.addConfiguredAttribute( buildAttr );
         Manifest.Attribute createdAttr = new Manifest.Attribute( "Created-By", "Apache Maven" );
         m.addConfiguredAttribute( createdAttr );
+/* TODO: property on plugin
         Manifest.Attribute packageAttr = new Manifest.Attribute( "Package", project.getPackage() );
         m.addConfiguredAttribute( packageAttr );
+*/
         Manifest.Attribute buildJdkAttr = new Manifest.Attribute( "Build-Jdk", System.getProperty( "java.version" ) );
         m.addConfiguredAttribute( buildJdkAttr );
 
@@ -70,10 +70,11 @@ public abstract class AbstractJarMojo
         {
             StringBuffer classpath = new StringBuffer();
             List dependencies = project.getDependencies();
-    
+
             for ( Iterator iter = dependencies.iterator(); iter.hasNext(); )
             {
                 Dependency dependency = (Dependency) iter.next();
+/* TODO: property on plugin
                 Properties properties = dependency.getProperties();
                 if ( Boolean.valueOf(properties.getProperty("jar.manifest.classpath")).booleanValue())
                 {
@@ -85,8 +86,9 @@ public abstract class AbstractJarMojo
                     // TODO replace dependency by artifact
                     classpath.append( dependency.getArtifactId() + "-" + dependency.getVersion() + ".jar");
                 }
+*/
             }
-            
+
             Manifest.Attribute classpathAttr = new Manifest.Attribute( "Class-Path", classpath.toString() );
             m.addConfiguredAttribute( classpathAttr );
         }
@@ -94,27 +96,32 @@ public abstract class AbstractJarMojo
         // Added supplementary entries
         Manifest.Attribute extensionNameAttr = new Manifest.Attribute( "Extension-Name", project.getArtifactId() );
         m.addConfiguredAttribute( extensionNameAttr );
-        
-        if ( project.getShortDescription() != null )
+
+        if ( project.getDescription() != null )
         {
-            Manifest.Attribute specificationTitleAttr = new Manifest.Attribute( "Specification-Title", project.getShortDescription() );
+            Manifest.Attribute specificationTitleAttr = new Manifest.Attribute( "Specification-Title",
+                                                                                project.getDescription() );
             m.addConfiguredAttribute( specificationTitleAttr );
         }
-        
+
         if ( project.getOrganization() != null )
         {
-            Manifest.Attribute specificationVendor = new Manifest.Attribute( "Specification-Vendor", project.getOrganization().getName() );
+            Manifest.Attribute specificationVendor = new Manifest.Attribute( "Specification-Vendor",
+                                                                             project.getOrganization().getName() );
             m.addConfiguredAttribute( specificationVendor );
-            Manifest.Attribute implementationVendorAttr = new Manifest.Attribute( "Implementation-Vendor", project.getOrganization().getName() );
+            Manifest.Attribute implementationVendorAttr = new Manifest.Attribute( "Implementation-Vendor",
+                                                                                  project.getOrganization().getName() );
             m.addConfiguredAttribute( implementationVendorAttr );
         }
 
-        Manifest.Attribute implementationTitleAttr = new Manifest.Attribute( "Implementation-Title", project.getArtifactId() );
+        Manifest.Attribute implementationTitleAttr = new Manifest.Attribute( "Implementation-Title",
+                                                                             project.getArtifactId() );
         m.addConfiguredAttribute( implementationTitleAttr );
-        Manifest.Attribute implementationVersionAttr = new Manifest.Attribute( "Implementation-Version", project.getVersion() );
+        Manifest.Attribute implementationVersionAttr = new Manifest.Attribute( "Implementation-Version",
+                                                                               project.getVersion() );
         m.addConfiguredAttribute( implementationVersionAttr );
 
-        if ( mainClass != null && ! "".equals( mainClass ) )
+        if ( mainClass != null && !"".equals( mainClass ) )
         {
             Manifest.Attribute mainClassAttr = new Manifest.Attribute( "Main-Class", mainClass );
             m.addConfiguredAttribute( mainClassAttr );
@@ -131,7 +138,7 @@ public abstract class AbstractJarMojo
                 Artifact artifact = (Artifact) iter.next();
                 if ( "jar".equals( artifact.getType() ) )
                 {
-                    if (extensionsList.length() > 0 )
+                    if ( extensionsList.length() > 0 )
                     {
                         extensionsList.append( " " );
                     }
@@ -139,25 +146,30 @@ public abstract class AbstractJarMojo
                 }
             }
 
-            if (extensionsList.length() > 0 )
+            if ( extensionsList.length() > 0 )
             {
-                Manifest.Attribute extensionsListAttr = new Manifest.Attribute( "Extension-List", extensionsList.toString() );
+                Manifest.Attribute extensionsListAttr = new Manifest.Attribute( "Extension-List",
+                                                                                extensionsList.toString() );
                 m.addConfiguredAttribute( extensionsListAttr );
             }
-            
+
             for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
             {
                 Artifact artifact = (Artifact) iter.next();
                 if ( "jar".equals( artifact.getType() ) )
                 {
-                    Manifest.Attribute archExtNameAttr = new Manifest.Attribute( artifact.getArtifactId()
-                        + "-Extension-Name", artifact.getArtifactId() );
+                    Manifest.Attribute archExtNameAttr = new Manifest.Attribute( artifact.getArtifactId() +
+                                                                                 "-Extension-Name",
+                                                                                 artifact.getArtifactId() );
                     m.addConfiguredAttribute( archExtNameAttr );
-                    Manifest.Attribute archImplVersionAttr = new Manifest.Attribute( artifact.getArtifactId()
-                        + "-Implementation-Version", artifact.getVersion() );
+                    Manifest.Attribute archImplVersionAttr = new Manifest.Attribute( artifact.getArtifactId() +
+                                                                                     "-Implementation-Version",
+                                                                                     artifact.getVersion() );
                     m.addConfiguredAttribute( archImplVersionAttr );
-                    Manifest.Attribute archImplUrlAttr = new Manifest.Attribute( artifact.getArtifactId()
-                        + "-Implementation-URL", "http://www.ibiblio.org/maven/" + artifact.toString() );
+                    Manifest.Attribute archImplUrlAttr = new Manifest.Attribute( artifact.getArtifactId() +
+                                                                                 "-Implementation-URL",
+                                                                                 "http://www.ibiblio.org/maven/" +
+                                                                                 artifact.toString() );
                     m.addConfiguredAttribute( archImplUrlAttr );
                 }
             }

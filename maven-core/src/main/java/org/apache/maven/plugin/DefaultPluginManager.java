@@ -68,8 +68,6 @@ public class DefaultPluginManager
 
     protected Map pluginDescriptors;
 
-//    protected ArtifactHandlerManager artifactHandlerManager;
-
     protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
@@ -109,9 +107,14 @@ public class DefaultPluginManager
         return (MojoDescriptor) mojoDescriptors.get( name );
     }
 
-    public PluginDescriptor getPluginDescriptor( String pluginId )
+    public PluginDescriptor getPluginDescriptor( String groupId, String artifactId )
     {
-        return (PluginDescriptor) pluginDescriptors.get( pluginId );
+        return (PluginDescriptor) pluginDescriptors.get( constructPluginKey( groupId, artifactId ) );
+    }
+
+    private static String constructPluginKey( String groupId, String artifactId )
+    {
+        return groupId + ":" + artifactId;
     }
 
     // ----------------------------------------------------------------------
@@ -140,7 +143,8 @@ public class DefaultPluginManager
 
             mojoDescriptors.put( mojoDescriptor.getId(), mojoDescriptor );
 
-            pluginDescriptors.put( pluginDescriptor.getId(), pluginDescriptor );
+            String key = constructPluginKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
+            pluginDescriptors.put( key, pluginDescriptor );
         }
     }
 
@@ -173,9 +177,9 @@ public class DefaultPluginManager
     //
     // ----------------------------------------------------------------------
 
-    public boolean isPluginInstalled( String pluginId )
+    public boolean isPluginInstalled( String groupId, String artifactId )
     {
-        return pluginDescriptors.containsKey( pluginId );
+        return pluginDescriptors.containsKey( constructPluginKey( groupId, artifactId ) );
     }
 
     private String getPluginId( String goalName )
@@ -194,20 +198,19 @@ public class DefaultPluginManager
     {
         String pluginId = getPluginId( goalName );
 
-        verifyPlugin( pluginId, session );
+        // TODO: hardcoding of group ID/artifact ID
+        verifyPlugin( "maven", "maven-" + pluginId + "-plugin", session );
     }
 
     // TODO: don't throw Exception
-    public void verifyPlugin( String pluginId, MavenSession session )
+    public void verifyPlugin( String groupId, String artifactId, MavenSession session )
         throws Exception
     {
-        if ( !isPluginInstalled( pluginId ) )
+        if ( !isPluginInstalled( groupId, artifactId ) )
         {
             //!! This is entirely crappy. We need a better naming for plugin
             // artifact ids and
             //   we definitely need better version extraction support.
-
-            String artifactId = "maven-" + pluginId + "-plugin";
 
             String version = "1.0-SNAPSHOT";
 
@@ -396,7 +399,7 @@ public class DefaultPluginManager
 
                 String expression = parameter.getExpression();
 
-                if ( expression != null & expression.startsWith( "#component" ) )
+                if ( expression != null && expression.startsWith( "#component" ) )
                 {
                     Object component = request.getParameter( key );
 
@@ -490,7 +493,8 @@ public class DefaultPluginManager
             {
                 org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) iterator.next();
 
-                if ( pluginId.equals( plugin.getId() ) )
+                // TODO: groupID not handled
+                if ( pluginId.equals( plugin.getArtifactId() ) )
                 {
                     return CollectionUtils.mergeMaps( plugin.getConfiguration(), map );
                 }

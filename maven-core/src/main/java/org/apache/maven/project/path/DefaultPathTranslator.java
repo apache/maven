@@ -1,24 +1,22 @@
 package org.apache.maven.project.path;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 
@@ -61,11 +59,11 @@ public class DefaultPathTranslator
                 build.setSourceDirectory( new File( projectFile.getParentFile(), s ).getPath() );
             }
 
-            s = stripBasedirToken( build.getUnitTestSourceDirectory() );
+            s = stripBasedirToken( build.getTestSourceDirectory() );
 
             if ( requiresBaseDirectoryAlignment( s ) )
             {
-                build.setUnitTestSourceDirectory( new File( projectFile.getParentFile(), s ).getPath() );
+                build.setTestSourceDirectory( new File( projectFile.getParentFile(), s ).getPath() );
             }
 
             List buildResources = build.getResources();
@@ -82,7 +80,7 @@ public class DefaultPathTranslator
                 }
             }
 
-            List unitTestResources = build.getUnitTest().getResources();
+            List unitTestResources = build.getTestResources();
 
             for ( Iterator i = unitTestResources.iterator(); i.hasNext(); )
             {
@@ -96,18 +94,18 @@ public class DefaultPathTranslator
                 }
             }
 
-            s = stripBasedirToken( build.getOutput() );
+            s = stripBasedirToken( build.getOutputDirectory() );
 
             if ( requiresBaseDirectoryAlignment( s ) )
             {
-                build.setOutput( new File( projectFile.getParentFile(), s ).getPath() );
+                build.setOutputDirectory( new File( projectFile.getParentFile(), s ).getPath() );
             }
 
-            s = stripBasedirToken( build.getTestOutput() );
+            s = stripBasedirToken( build.getTestOutputDirectory() );
 
             if ( requiresBaseDirectoryAlignment( s ) )
             {
-                build.setTestOutput( new File( projectFile.getParentFile(), s ).getPath() );
+                build.setTestOutputDirectory( new File( projectFile.getParentFile(), s ).getPath() );
             }
         }
     }
@@ -146,5 +144,5 @@ public class DefaultPathTranslator
 
         return false;
     }
- }
+}
 

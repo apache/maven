@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project>
+<model>
   <modelVersion>3</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-project-test</artifactId>
@@ -22,7 +22,7 @@
       <id>siteDistributionId</id>
       <name>siteDistributionName</name>
       <url>siteDistributionUrl</url>
-     </site>
+    </site>
   </distributionManagement>
 
   <organization>
@@ -140,4 +140,4 @@
     <report>maven-jellydoc-plugin</report>
   </reports>
 
-</project>
+</model>

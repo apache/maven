@@ -19,91 +19,77 @@ package org.apache.maven.plugin.war;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
-import org.apache.maven.project.MavenProject;
 
 /**
- * @goal exploded
- * @phase process-classes
- *
- * @description build a jar
- *
- * @parameter
- *  name="jarName"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.finalName"
- *  description=""
- * @parameter
- *  name="compress"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.compress"
- *  default="true"
- *  description=""
- * @parameter
- *  name="index"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.index"
- *  default="false"
- *  description=""
- * @parameter
- *  name="manifest"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.manifest"
- *  description=""
- * @parameter
- *  name="mainClass"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.mainClass"
- *  description=""
- * @parameter
- *  name="addClasspath"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.addClasspath"
- *  default="false"
- *  description=""
- * @parameter
- *  name="addExtensions"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#maven.jar.addExtensions"
- *  default="false"
- *  description=""
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.output"
- *  description=""
- * @parameter
- *  name="basedir"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.directory"
- *  description=""
- * @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description="current MavenProject instance"
- *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
+ * @goal exploded
+ * @phase process-classes
+ * @description build a jar
+ * @parameter name="jarName"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.finalName"
+ * description=""
+ * @parameter name="compress"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.compress"
+ * default="true"
+ * description=""
+ * @parameter name="index"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.index"
+ * default="false"
+ * description=""
+ * @parameter name="manifest"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.manifest"
+ * description=""
+ * @parameter name="mainClass"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.mainClass"
+ * description=""
+ * @parameter name="addClasspath"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.addClasspath"
+ * default="false"
+ * description=""
+ * @parameter name="addExtensions"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.addExtensions"
+ * default="false"
+ * description=""
+ * @parameter name="outputDirectory"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.outputDirectory"
+ * description=""
+ * @parameter name="basedir"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.directory"
+ * description=""
+ * @parameter name="project"
+ * type="org.apache.maven.project.MavenProject"
+ * required="true"
+ * validator=""
+ * expression="#project"
+ * description="current MavenProject instance"
  */
 public class ExplodedMojo
     extends AbstractPlugin
@@ -114,7 +100,7 @@ public class ExplodedMojo
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
-        request.getLog().info("webapp");
+        request.getLog().info( "webapp" );
 
     }
 }

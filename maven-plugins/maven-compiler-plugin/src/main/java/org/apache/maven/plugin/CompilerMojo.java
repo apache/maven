@@ -42,7 +42,7 @@ import java.util.List;
  * type="String"
  * required="true"
  * validator=""
- * expression="#project.build.output"
+ * expression="#project.build.outputDirectory"
  * description=""
  * @parameter name="classpathElements"
  * type="List"
@@ -59,7 +59,8 @@ import java.util.List;
  * @todo change debug parameter type to Boolean
  */
 
-public class CompilerMojo extends AbstractPlugin
+public class CompilerMojo
+    extends AbstractPlugin
 {
     private Compiler compiler = new JavacCompiler();
 

@@ -1,7 +1,7 @@
 package org.apache.maven.project.inheritance;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
-import org.apache.maven.model.UnitTest;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,7 +43,7 @@ public class DefaultModelInheritanceAssemblerTest
         Build parentBuild = new Build();
 
         parentBuild.setSourceDirectory( "src/main/java" );
-        parentBuild.setUnitTestSourceDirectory( "src/test/java" );
+        parentBuild.setTestSourceDirectory( "src/test/java" );
 
         Resource parentResource = new Resource();
 
@@ -53,63 +51,54 @@ public class DefaultModelInheritanceAssemblerTest
 
         parentBuild.addResource( parentResource );
 
-        UnitTest parentUT = new UnitTest();
-
-        parentUT.setIncludes( Arrays.asList( new String[] { "**/*Test.java" } ) );
-        parentUT.setExcludes( Arrays.asList( new String[] { "**/*Abstract*.java" } ) );
-
         Resource parentUTResource = new Resource();
 
         parentUTResource.setDirectory( "src/test/resources" );
 
-        parentUT.addResource( parentUTResource );
+        parentBuild.addTestResource( parentUTResource );
 
-        parentBuild.setUnitTest( parentUT );
         parent.setBuild( parentBuild );
-        
+
         Model child = new Model();
 
-        child.setType( "plugin" );
+        child.setPackaging( "plugin" );
 
         Build childBuild = new Build();
-
-        UnitTest childUT = new UnitTest();
-
-        parentUT.setExcludes( Arrays.asList( new String[] { "**/*Abstract*.java", "**/*AspectTest.java" } ) );
-
-        childBuild.setUnitTest( childUT );
         child.setBuild( childBuild );
-        
+
         assembler.assembleModelInheritance( child, parent );
 
         assertEquals( "source directory should be from parent", "src/main/java", child.getBuild().getSourceDirectory() );
-        assertEquals( "unit test source directory should be from parent", "src/test/java", child.getBuild()
-            .getUnitTestSourceDirectory() );
+        assertEquals( "unit test source directory should be from parent", "src/test/java",
+                      child.getBuild().getTestSourceDirectory() );
 
-        List childExcludesTest = child.getBuild().getUnitTest().getExcludes();
-
-        assertTrue( "unit test excludes should have **/*AspectTest.java", childExcludesTest
-            .contains( "**/*AspectTest.java" ) );
-        assertTrue( "unit test excludes should have **/*Abstract*.java", childExcludesTest
-            .contains( "**/*Abstract*.java" ) );
+// TODO: test inheritence/super pom?
+//        List childExcludesTest = child.getBuild().getUnitTest().getExcludes();
+//
+//        assertTrue( "unit test excludes should have **/*AspectTest.java", childExcludesTest
+//            .contains( "**/*AspectTest.java" ) );
+//        assertTrue( "unit test excludes should have **/*Abstract*.java", childExcludesTest
+//            .contains( "**/*Abstract*.java" ) );
+//
 
         List resources = child.getBuild().getResources();
 
         assertEquals( "build resources inherited from parent should be of size 1", 1, resources.size() );
         assertEquals( "first resource should have dir == src/main/resources", "src/main/resources",
-            ((Resource) resources.get( 0 )).getDirectory() );
+                      ( (Resource) resources.get( 0 ) ).getDirectory() );
 
-        List utResources = child.getBuild().getUnitTest().getResources();
+        List utResources = child.getBuild().getTestResources();
 
         assertEquals( "UT resources inherited from parent should be of size 1", 1, utResources.size() );
         assertEquals( "first UT resource should have dir == src/test/resources", "src/test/resources",
-            ((Resource) utResources.get( 0 )).getDirectory() );
+                      ( (Resource) utResources.get( 0 ) ).getDirectory() );
 
-        assertEquals( "plugin", child.getType() );
-        assertEquals( "jar", parent.getType() );
+        assertEquals( "plugin", child.getPackaging() );
+        assertEquals( "jar", parent.getPackaging() );
     }
 
     /**
+     * <pre>
      * root
      *   |--artifact1
      *   |         |
@@ -118,7 +107,7 @@ public class DefaultModelInheritanceAssemblerTest
      *   |--artifact2 (in another directory called a2 so it has it's own scm section)
      *             |
      *             |--artifact2-1
-     * 
+     * </pre>
      */
     public void testScmInheritance()
         throws Exception
@@ -130,7 +119,8 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model artifact1_1 = makeScmModel( "artifact1-1" );
 
-        Model artifact2 = makeScmModel( "artifact2", "scm:foo:/scm-root/yay-artifact2", "scm:foo:/scm-dev-root/yay-artifact2", null );
+        Model artifact2 = makeScmModel( "artifact2", "scm:foo:/scm-root/yay-artifact2",
+                                        "scm:foo:/scm-dev-root/yay-artifact2", null );
 
         Model artifact2_1 = makeScmModel( "artifact2-1" );
 
@@ -145,13 +135,15 @@ public class DefaultModelInheritanceAssemblerTest
 
         // --- -- -
 
-        assertConnection( "scm:foo:/scm-root/artifact1",  "scm:foo:/scm-dev-root/artifact1", artifact1 );
+        assertConnection( "scm:foo:/scm-root/artifact1", "scm:foo:/scm-dev-root/artifact1", artifact1 );
 
-        assertConnection( "scm:foo:/scm-root/artifact1/artifact1-1", "scm:foo:/scm-dev-root/artifact1/artifact1-1", artifact1_1 );
+        assertConnection( "scm:foo:/scm-root/artifact1/artifact1-1", "scm:foo:/scm-dev-root/artifact1/artifact1-1",
+                          artifact1_1 );
 
         assertConnection( "scm:foo:/scm-root/yay-artifact2", "scm:foo:/scm-dev-root/yay-artifact2", artifact2 );
 
-        assertConnection( "scm:foo:/scm-root/yay-artifact2/artifact2-1", "scm:foo:/scm-dev-root/yay-artifact2/artifact2-1", artifact2_1 );
+        assertConnection( "scm:foo:/scm-root/yay-artifact2/artifact2-1",
+                          "scm:foo:/scm-dev-root/yay-artifact2/artifact2-1", artifact2_1 );
     }
 
     public void testScmInheritanceWhereParentHasConnectionAndTheChildDoesnt()
@@ -248,10 +240,6 @@ public class DefaultModelInheritanceAssemblerTest
         assertEquals( developerConnection, scm.getDeveloperConnection() );
 
         assertEquals( url, scm.getUrl() );
-
-        assertNotNull( scm.getBranches() );
-
-        assertEquals( 0, scm.getBranches().size() );
     }
 
     private Model makeScmModel( String artifactId )

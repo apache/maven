@@ -1,7 +1,5 @@
 package org.apache.maven.tools.plugin.extractor;
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.DirectoryScanner;
 
@@ -19,81 +17,55 @@ import java.util.TreeMap;
 public abstract class AbstractScriptedMojoDescriptorExtractor
     implements MojoDescriptorExtractor
 {
-
-    public Set execute( MavenProject project ) throws Exception
+    public Set execute( MavenProject project )
+        throws Exception
     {
-        Build buildSection = project.getBuild();
-
-        List resources = null;
-        if ( buildSection != null )
-        {
-            resources = buildSection.getResources();
-        }
-
-        Map scriptFilesKeyedByBasedir = gatherScriptSourcesByBasedir( resources, getScriptFileExtension() );
+        Map scriptFilesKeyedByBasedir = gatherScriptSourcesByBasedir( project.getScriptSourceRoots(),
+                                                                      getScriptFileExtension() );
 
         Set mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir );
 
         return mojoDescriptors;
     }
 
-    protected abstract Set extractMojoDescriptors( Map scriptFilesKeyedByBasedir ) throws Exception;
+    protected abstract Set extractMojoDescriptors( Map scriptFilesKeyedByBasedir )
+        throws Exception;
 
     protected abstract String getScriptFileExtension();
 
-    protected Map gatherScriptSourcesByBasedir( List resources, String scriptFileExtension )
+    protected Map gatherScriptSourcesByBasedir( List directories, String scriptFileExtension )
     {
         Map sourcesByBasedir = new TreeMap();
 
-        if ( resources != null )
+        for ( Iterator it = directories.iterator(); it.hasNext(); )
         {
-            for ( Iterator it = resources.iterator(); it.hasNext(); )
+            Set sources = new HashSet();
+
+            String resourceDir = (String) it.next();
+            File dir = new File( resourceDir );
+
+            if ( dir.exists() )
             {
-                Set sources = new HashSet();
+                DirectoryScanner scanner = new DirectoryScanner();
 
-                Resource resource = (Resource) it.next();
+                scanner.setBasedir( dir );
+                scanner.addDefaultExcludes();
+                scanner.scan();
 
-                String resourceDir = resource.getDirectory();
-                File dir = new File( resourceDir );
+                String[] relativePaths = scanner.getIncludedFiles();
 
-                if ( dir.exists() )
+                for ( int i = 0; i < relativePaths.length; i++ )
                 {
-                    DirectoryScanner scanner = new DirectoryScanner();
+                    String relativePath = relativePaths[i];
+                    File scriptFile = new File( dir, relativePath );
 
-                    scanner.setBasedir( dir );
-
-                    List includes = resource.getIncludes();
-
-                    if ( includes != null && !includes.isEmpty() )
+                    if ( scriptFile.isFile() && relativePath.endsWith( scriptFileExtension ) )
                     {
-                        scanner.setIncludes( (String[]) includes.toArray( new String[includes.size()] ) );
+                        sources.add( scriptFile );
                     }
-
-                    List excludes = resource.getExcludes();
-
-                    if ( excludes != null && !excludes.isEmpty() )
-                    {
-                        scanner.setExcludes( (String[]) excludes.toArray( new String[excludes.size()] ) );
-                    }
-
-                    scanner.addDefaultExcludes();
-                    scanner.scan();
-
-                    String[] relativePaths = scanner.getIncludedFiles();
-
-                    for ( int i = 0; i < relativePaths.length; i++ )
-                    {
-                        String relativePath = relativePaths[i];
-                        File scriptFile = new File( dir, relativePath );
-
-                        if ( scriptFile.isFile() && relativePath.endsWith( scriptFileExtension ) )
-                        {
-                            sources.add( scriptFile );
-                        }
-                    }
-
-                    sourcesByBasedir.put( resourceDir, sources );
                 }
+
+                sourcesByBasedir.put( resourceDir, sources );
             }
         }
 

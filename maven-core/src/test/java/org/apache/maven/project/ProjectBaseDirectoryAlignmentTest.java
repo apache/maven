@@ -2,11 +2,9 @@ package org.apache.maven.project;
 
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Resource;
 
 import java.io.File;
-import java.util.Iterator;
 
 public class ProjectBaseDirectoryAlignmentTest
     extends MavenTestCase
@@ -25,7 +23,7 @@ public class ProjectBaseDirectoryAlignmentTest
 
         assertTrue( project.getBuild().getSourceDirectory().startsWith( getBasedir() ) );
 
-        assertTrue( project.getBuild().getUnitTestSourceDirectory().startsWith( getBasedir() ) );
+        assertTrue( project.getBuild().getTestSourceDirectory().startsWith( getBasedir() ) );
 
         Build build = project.getBuild();
 

@@ -58,27 +58,29 @@ public class Main
         String outputDirectory = args[2];
 
         String pom = args[3];
-        
+
         String localRepo = args[4];
         
         // Massage the local-repo path into an ArtifactRepository.
-        File repoPath = new File(localRepo);
-        
+        File repoPath = new File( localRepo );
+
         URL repoUrl = repoPath.toURL();
-        
+
         MavenXpp3Reader modelReader = new MavenXpp3Reader();
-        FileReader reader = new FileReader(pom);
-        
-        Model model = modelReader.read(reader);
-        
-        MavenProject project = new MavenProject(model);
-        project.setFile(new File(pom));
-        
+        FileReader reader = new FileReader( pom );
+
+        Model model = modelReader.read( reader );
+
+        MavenProject project = new MavenProject( model );
+        project.setFile( new File( pom ) );
+        project.addCompileSourceRoot( sourceDirectory );
+
         // Lookup the mojo scanner instance, and use it to scan for mojo's, and
         // extract their descriptors.
-        MojoScanner scanner = new DefaultMojoScanner(Collections.singletonMap("java", new JavaMojoDescriptorExtractor()));
-        
-        Set descriptors = scanner.execute(project);
+        MojoScanner scanner = new DefaultMojoScanner(
+            Collections.singletonMap( "java", new JavaMojoDescriptorExtractor() ) );
+
+        Set descriptors = scanner.execute( project );
         
         // Create the generator.
         Generator generator = null;

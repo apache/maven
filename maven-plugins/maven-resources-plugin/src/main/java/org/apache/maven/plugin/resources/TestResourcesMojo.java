@@ -17,42 +17,24 @@ package org.apache.maven.plugin.resources;
  * ====================================================================
  */
 
-import org.apache.maven.model.Resource;
-import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
- * @goal testResources
- *
- * @description copy test resources
- *
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.testOutput"
- *  description=""
- * @parameter
- *  name="resources"
- *  type="List"
- *  required="true"
- *  validator=""
- *  expression="#project.build.unitTest.resources"
- *  description=""
- *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- *
  * @version $Id$
- *
+ * @goal testResources
+ * @description copy test resources
+ * @parameter name="outputDirectory"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.testOutputDirectory"
+ * description=""
+ * @parameter name="resources"
+ * type="List"
+ * required="true"
+ * validator=""
+ * expression="#project.build.testResources"
+ * description=""
  */
 public class TestResourcesMojo
     extends ResourcesMojo

@@ -16,16 +16,16 @@ package org.apache.maven.plugin.deploy;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.deployer.ArtifactDeployer;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.deployer.ArtifactDeployer;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.DistributionManagement;
 
 import java.io.File;
 
@@ -42,7 +42,8 @@ public abstract class AbstractDeployMojo
         return false;
     }
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
+        throws Exception
     {
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
@@ -60,18 +61,16 @@ public abstract class AbstractDeployMojo
 
         if ( repository == null )
         {
-            String msg = "Deployment failed: repository element" + " was not specified in the pom inside"
-                + " distributionManagement element";
+            String msg = "Deployment failed: repository element" + " was not specified in the pom inside" +
+                " distributionManagement element";
             throw new Exception( msg );
         }
 
         ArtifactRepository deploymentRepository = new ArtifactRepository( repository.getId(), repository.getUrl() );
 
         // Deploy the POM
-        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(),
-                                                    project.getArtifactId(),
-                                                    project.getVersion(),
-                                                    "pom" );
+        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                    project.getVersion(), "pom" );
 
         File pom = new File( project.getFile().getParentFile(), "pom.xml" );
 
@@ -80,10 +79,8 @@ public abstract class AbstractDeployMojo
         //Deploy artifact
         if ( !isPom() )
         {
-            Artifact artifact = new DefaultArtifact( project.getGroupId(),
-                                                     project.getArtifactId(),
-                                                     project.getVersion(),
-                                                     project.getType() );
+            Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                     project.getVersion(), project.getPackaging() );
 
             artifactDeployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository );
         }

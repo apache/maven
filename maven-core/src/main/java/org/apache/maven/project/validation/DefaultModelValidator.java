@@ -40,7 +40,7 @@ public class DefaultModelValidator
 
         validateStringNotEmpty( "artifactId", result, model.getArtifactId() );
 
-        validateStringNotEmpty( "type", result, model.getType() );
+        validateStringNotEmpty( "packaging", result, model.getPackaging() );
 
         validateStringNotEmpty( "version", result, model.getVersion() );
 
@@ -65,19 +65,23 @@ public class DefaultModelValidator
 
     /**
      * Asserts:
-     *
+     * <p/>
      * <ul>
-     *  <li><code>string.length != null</code>
-     *  <li><code>string.length > 0</code>
+     * <li><code>string.length != null</code>
+     * <li><code>string.length > 0</code>
      * </ul>
      */
     private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string )
     {
         if ( !validateNotNull( fieldName, result, string ) )
+        {
             return false;
+        }
 
         if ( string.length() > 0 )
+        {
             return true;
+        }
 
         result.addMessage( "'" + fieldName + "' is empty." );
 
@@ -86,15 +90,17 @@ public class DefaultModelValidator
 
     /**
      * Asserts:
-     *
+     * <p/>
      * <ul>
-     *  <li><code>string != null</code>
+     * <li><code>string != null</code>
      * </ul>
      */
     private boolean validateNotNull( String fieldName, ModelValidationResult result, Object object )
     {
         if ( object != null )
+        {
             return true;
+        }
 
         result.addMessage( "'" + fieldName + "' is missing." );
 

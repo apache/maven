@@ -1,4 +1,4 @@
-<project>
+<model>
 
   <extend>project-which-needs-directory-alignment.xml</extend>
 
@@ -11,4 +11,4 @@
   <groupId>maven</groupId>
   <artifactId>maven-foo</artifactId>
   <version>1.0</version>
-</project>
+</model>

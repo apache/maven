@@ -36,10 +36,10 @@ import org.apache.maven.model.v4_0_0.Parent;
 import org.apache.maven.model.v4_0_0.Plugin;
 import org.apache.maven.model.v4_0_0.PluginManagement;
 import org.apache.maven.model.v4_0_0.Repository;
+import org.apache.maven.model.v4_0_0.Resource;
 import org.apache.maven.model.v4_0_0.Scm;
 import org.apache.maven.model.v4_0_0.Site;
 import org.apache.maven.model.v4_0_0.UnitTest;
-import org.apache.maven.model.v4_0_0.Resource;
 import org.apache.maven.model.v4_0_0.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -67,7 +67,7 @@ public class Main
             reverse = true;
         }
 
-        List files = FileUtils.getFiles( new File( System.getProperty( "user.dir" ) ), "**/pom.xml", "" );
+        List files = FileUtils.getFiles( new File( System.getProperty( "user.dir" ) ), "**/pom.xml,**/poms/*.pom", "" );
         for ( Iterator i = files.iterator(); i.hasNext(); )
         {
             File file = (File) i.next();
@@ -122,6 +122,7 @@ public class Main
                     newModel.setModelVersion( model.getModelVersion() );
                     newModel.setName( model.getName() );
                     newModel.setOrganization( convertOrganization( model.getOrganization() ) );
+                    newModel.setPackaging( model.getType() );
                     newModel.setParent( convertParent( model.getParent() ) );
                     newModel.setPluginManagement( convertPluginManagement( model.getPluginManagement() ) );
                     newModel.setPluginRepositories( convertRepositories( model.getPluginRepositories() ) );
@@ -465,17 +466,26 @@ public class Main
 
     private static org.apache.maven.model.Build convertBuild( Build build, Map plugins )
     {
-        if ( build == null )
+        if ( build == null && plugins.isEmpty() )
         {
             return null;
         }
 
         org.apache.maven.model.Build newBuild = new org.apache.maven.model.Build();
 
+        if ( !plugins.isEmpty() )
+        {
+            newBuild.setPlugins( new ArrayList( plugins.values() ) );
+        }
+
+        if ( build == null )
+        {
+            return newBuild;
+        }
+
         newBuild.setDirectory( build.getDirectory() );
         newBuild.setFinalName( build.getFinalName() );
         newBuild.setOutputDirectory( build.getOutput() );
-        newBuild.setPlugins( new ArrayList( plugins.values() ) );
         newBuild.setSourceDirectory( build.getSourceDirectory() );
         newBuild.setTestOutputDirectory( build.getTestOutput() );
         newBuild.setTestSourceDirectory( build.getUnitTestSourceDirectory() );
@@ -487,8 +497,16 @@ public class Main
             org.apache.maven.model.Plugin plugin = getPlugin( plugins, "maven-compiler-plugin" );
             Goal goal = getGoal( plugin, "testCompile" );
 
-            goal.getConfiguration().setProperty( "includes", convertPatternSet( unitTest.getIncludes() ) );
-            goal.getConfiguration().setProperty( "excludes", convertPatternSet( unitTest.getExcludes() ) );
+            String value = convertPatternSet( unitTest.getIncludes() );
+            if ( value != null )
+            {
+                goal.getConfiguration().setProperty( "includes", value );
+            }
+            value = convertPatternSet( unitTest.getExcludes() );
+            if ( value != null )
+            {
+                goal.getConfiguration().setProperty( "excludes", value );
+            }
 
             newBuild.setTestResources( convertResources( unitTest.getResources() ) );
         }
@@ -526,7 +544,7 @@ public class Main
                 b.append( "," );
             }
         }
-        return b.toString();
+        return b.length() > 0 ? b.toString() : null;
     }
 
     private static org.apache.maven.model.Plugin getPlugin( Map plugins, String artifactId )

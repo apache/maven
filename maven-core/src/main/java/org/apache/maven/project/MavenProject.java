@@ -29,6 +29,7 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
+import org.apache.maven.model.Reports;
 import org.apache.maven.model.Scm;
 
 import java.io.File;
@@ -128,6 +129,8 @@ public class MavenProject
 
     private List testCompileSourceRoots = new ArrayList();
 
+    private List scriptSourceRoots = new ArrayList();
+
     public void addCompileSourceRoot( String path )
     {
         if ( path != null )
@@ -138,6 +141,21 @@ public class MavenProject
                 if ( !compileSourceRoots.contains( path ) )
                 {
                     compileSourceRoots.add( path );
+                }
+            }
+        }
+    }
+
+    public void addScriptSourceRoot( String path )
+    {
+        if ( path != null )
+        {
+            path = path.trim();
+            if ( path.length() != 0 )
+            {
+                if ( !scriptSourceRoots.contains( path ) )
+                {
+                    scriptSourceRoots.add( path );
                 }
             }
         }
@@ -161,6 +179,11 @@ public class MavenProject
     public List getCompileSourceRoots()
     {
         return compileSourceRoots;
+    }
+
+    public List getScriptSourceRoots()
+    {
+        return scriptSourceRoots;
     }
 
     public List getTestCompileSourceRoots()
@@ -189,7 +212,7 @@ public class MavenProject
     {
         List list = new ArrayList( getArtifacts().size() + 1 );
 
-        list.add( getBuild().getOutput() );
+        list.add( getBuild().getOutputDirectory() );
 
         for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
@@ -212,7 +235,7 @@ public class MavenProject
     {
         List list = new ArrayList( getArtifacts().size() + 1 );
 
-        list.add( getBuild().getOutput() );
+        list.add( getBuild().getOutputDirectory() );
 
         for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
@@ -302,14 +325,14 @@ public class MavenProject
         return model.getVersion();
     }
 
-    public String getType()
+    public String getPackaging()
     {
-        return model.getType();
+        return model.getPackaging();
     }
 
-    public void setType( String type )
+    public void setPackaging( String packaging )
     {
-        model.setType( type );
+        model.setPackaging( packaging );
     }
 
     public void setInceptionYear( String inceptionYear )
@@ -322,16 +345,6 @@ public class MavenProject
         return model.getInceptionYear();
     }
 
-    public void setPackage( String packageName )
-    {
-        model.setPackage( packageName );
-    }
-
-    public String getPackage()
-    {
-        return model.getPackage();
-    }
-
     public void setUrl( String url )
     {
         model.setUrl( url );
@@ -340,16 +353,6 @@ public class MavenProject
     public String getUrl()
     {
         return model.getUrl();
-    }
-
-    public void setLogo( String logo )
-    {
-        model.setLogo( logo );
-    }
-
-    public String getLogo()
-    {
-        return model.getLogo();
     }
 
     public void setIssueManagement( IssueManagement issueManagement )
@@ -380,16 +383,6 @@ public class MavenProject
     public DistributionManagement getDistributionManagement()
     {
         return model.getDistributionManagement();
-    }
-
-    public void setShortDescription( String shortDescription )
-    {
-        model.setShortDescription( shortDescription );
-    }
-
-    public String getShortDescription()
-    {
-        return model.getShortDescription();
     }
 
     public void setDescription( String description )
@@ -477,19 +470,14 @@ public class MavenProject
         return model.getBuild();
     }
 
-    public void setReports( List reports )
+    public void setReports( Reports reports )
     {
         model.setReports( reports );
     }
 
-    public List getReports()
+    public Reports getReports()
     {
         return model.getReports();
-    }
-
-    public void addReports( String report )
-    {
-        model.addReport( report );
     }
 
     public void setLicenses( List licenses )
@@ -528,7 +516,11 @@ public class MavenProject
 
     public List getPlugins()
     {
-        return model.getPlugins();
+        if ( model.getBuild() == null )
+        {
+            return null;
+        }
+        return model.getBuild().getPlugins();
     }
 }
 

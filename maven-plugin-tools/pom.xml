@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>maven</groupId>
     <artifactId>maven-component</artifactId>
+    <groupId>maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-plugin-tools</artifactId>
+  <packaging>jar</packaging>
   <name>Maven Plugin Tools Base POM</name>
   <version>2.0-SNAPSHOT</version>
   <dependencies>
@@ -15,21 +15,29 @@
       <groupId>maven</groupId>
       <artifactId>maven-plugin</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-plugin-tools-api</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>qdox</groupId>
       <artifactId>qdox</artifactId>
       <version>1.2</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>modello</groupId>
       <artifactId>modello</artifactId>
       <version>1.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
-</project>
+</model>

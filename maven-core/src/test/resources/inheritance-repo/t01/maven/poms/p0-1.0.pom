@@ -1,12 +1,11 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<project>
+<model>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>p0</artifactId>
+  <packaging>jar</packaging>
   <name>p0</name>
   <version>1.0</version>
   <organization>
     <name>p0-org</name>
   </organization>
-</project>
-
+</model>

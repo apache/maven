@@ -46,7 +46,6 @@ import org.apache.maven.project.MavenProject;
  * validator=""
  * expression="#localRepository"
  * description=""
- * @prereq jar:jar
  */
 public class JarInstallMojo
     extends AbstractPlugin
@@ -60,10 +59,8 @@ public class JarInstallMojo
 
         ArtifactRepository localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
 
-        Artifact artifact = new DefaultArtifact( project.getGroupId(),
-                                                 project.getArtifactId(),
-                                                 project.getVersion(),
-                                                 project.getType() );
+        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
+                                                 project.getPackaging() );
 
         artifactInstaller.install( project.getBuild().getDirectory(), artifact, localRepository );
 
@@ -72,10 +69,8 @@ public class JarInstallMojo
         // tests working this is what I'm doing. jvz.
         // ----------------------------------------------------------------------
 
-        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(),
-                                                    project.getArtifactId(),
-                                                    project.getVersion(),
-                                                    "pom" );
+        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                    project.getVersion(), "pom" );
 
         artifactInstaller.install( project.getFile(), pomArtifact, localRepository );
 

@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<project>
+<model>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-core</artifactId>
   <name>Maven</name>
   <version>2.0-SNAPSHOT</version>
-  <plugins>
-    <plugin>
-      <id>plexus</id>
-      <version>1.0</version>
-      <configuration>
-        <plexusConfiguration>src/conf/plexus.conf</plexusConfiguration>
-        <plexusConfigurationPropertiesFile>src/conf/plexus.properties</plexusConfigurationPropertiesFile>
-        <plexusApplicationName>Continuum</plexusApplicationName>
-      </configuration>
-      <goals>
-        <goal>
-          <id>plexus:runtime</id>
-          <configuration>
-            <plexusApplicationName>ContinuumPro</plexusApplicationName>
-          </configuration>
-        </goal>
-      </goals>
-    </plugin>
-  </plugins>
-</project>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-plexus-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <plexusConfiguration>src/conf/plexus.conf</plexusConfiguration>
+          <plexusConfigurationPropertiesFile>src/conf/plexus.properties</plexusConfigurationPropertiesFile>
+          <plexusApplicationName>Continuum</plexusApplicationName>
+        </configuration>
+        <goals>
+          <goal>
+            <id>plexus:runtime</id>
+            <configuration>
+              <plexusApplicationName>ContinuumPro</plexusApplicationName>
+            </configuration>
+          </goal>
+        </goals>
+      </plugin>
+    </plugins>
+  </build>
+</model>

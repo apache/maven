@@ -16,14 +16,14 @@ package org.apache.maven.project.canonical;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+
+import java.io.File;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -35,7 +35,7 @@ public class CanonicalProjectBuilderTest
     public void testProjectBuilder()
         throws Exception
     {
-        File f  = getTestFile( "src/test/resources/canonical-pom.xml" );
+        File f = getTestFile( "src/test/resources/canonical-pom.xml" );
 
         MavenProject project = getProject( f );
 
@@ -55,7 +55,9 @@ public class CanonicalProjectBuilderTest
 
         Plugin plugin = (Plugin) plugins.get( 0 );
 
-        assertEquals( "plexus", plugin.getId() );
+        assertEquals( "maven", plugin.getGroupId() );
+
+        assertEquals( "maven-plexus-plugin", plugin.getArtifactId() );
 
         assertEquals( "1.0", plugin.getVersion() );
 

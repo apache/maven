@@ -40,7 +40,8 @@ public class MavenPluginDescriptor
 
     public String getPluginId()
     {
-        return pluginDescriptor.getId();
+        // TODO: groupID
+        return pluginDescriptor.getArtifactId();
     }
 
     // ----------------------------------------------------------------------

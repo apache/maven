@@ -104,9 +104,7 @@ public class DefaultMavenProjectBuilder
             LinkedList lineage = new LinkedList();
 
             List aggregatedRemoteWagonRepositories = buildArtifactRepositories( superModel.getRepositories() );
-            MavenProject project = assembleLineage( projectDescriptor,
-                                                    localRepository,
-                                                    lineage,
+            MavenProject project = assembleLineage( projectDescriptor, localRepository, lineage,
                                                     aggregatedRemoteWagonRepositories );
 
             Model previous = superModel;
@@ -168,7 +166,8 @@ public class DefaultMavenProjectBuilder
             pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
 
             project.addCompileSourceRoot( project.getBuild().getSourceDirectory() );
-            project.addTestCompileSourceRoot( project.getBuild().getUnitTestSourceDirectory() );
+            project.addScriptSourceRoot( project.getBuild().getScriptSourceDirectory() );
+            project.addTestCompileSourceRoot( project.getBuild().getTestSourceDirectory() );
 
             return project;
         }
@@ -246,7 +245,8 @@ public class DefaultMavenProjectBuilder
         return repos;
     }
 
-    private Model readModel( File file ) throws ProjectBuildingException
+    private Model readModel( File file )
+        throws ProjectBuildingException
     {
         try
         {

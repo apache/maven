@@ -1,15 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>maven</groupId>
     <artifactId>maven-component</artifactId>
+    <groupId>maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
-  <name>Maven Meper</name>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-meeper</artifactId>
+  <packaging>jar</packaging>
+  <name>Maven Meper</name>
   <version>0.1-SNAPSHOT</version>
   <description></description>
-</project>
+</model>

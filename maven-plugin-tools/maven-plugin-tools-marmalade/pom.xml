@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>maven</groupId>
     <artifactId>maven-plugin-tools</artifactId>
+    <groupId>maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-plugin-tools-marmalade</artifactId>
+  <packaging>jar</packaging>
   <name>Maven Plugin Tools for Marmalade</name>
   <version>2.0-SNAPSHOT</version>
   <dependencies>
@@ -16,69 +15,92 @@
       <groupId>maven</groupId>
       <artifactId>maven-monitor</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>marmalade</groupId>
       <artifactId>marmalade-core</artifactId>
       <version>1.0-alpha2-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-script-marmalade</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-plugin</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-plugin-tools-api</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
+      <type>jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>wagon-http-lightweight</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
+      <type>jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-marmalade-factory</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>xpp3</groupId>
       <artifactId>xpp3</artifactId>
       <version>1.1.3.3</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
-</project>
+</model>

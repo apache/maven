@@ -31,17 +31,18 @@ import org.apache.maven.project.MavenProject;
  * @goal deploy
  * @description deploys a JAR to remote repository
  * @parameter name="project" type="org.apache.maven.project.MavenProject"
- *            required="true" validator="" expression="#project" description=""
+ * required="true" validator="" expression="#project" description=""
  * @parameter name="deployer"
- *            type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- *            required="true" validator=""
- *            expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
- *            description=""
+ * type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ * required="true" validator=""
+ * expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ * description=""
  */
 public class JarDeployMojo
     extends AbstractPlugin
 {
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
+        throws Exception
     {
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
@@ -62,17 +63,15 @@ public class JarDeployMojo
 
         if ( repository == null )
         {
-            String msg = "Deployment failed: repository element" + " was not specified in the pom inside"
-                + " distributionManagement element";
+            String msg = "Deployment failed: repository element" + " was not specified in the pom inside" +
+                " distributionManagement element";
             throw new Exception( msg );
         }
 
         ArtifactRepository deploymentRepository = new ArtifactRepository( repository.getId(), repository.getUrl() );
 
-        Artifact artifact = new DefaultArtifact( project.getGroupId(),
-                                                 project.getArtifactId(),
-                                                 project.getVersion(),
-                                                 project.getType() );
+        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
+                                                 project.getPackaging() );
 
         artifactDeployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository );
     }

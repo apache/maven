@@ -1,6 +1,6 @@
-<project>
+<model>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>bar</artifactId>
   <version>99.44</version>
-  <type>bleh</type>
-</project>
+  <packaging>bleh</packaging>
+</model>

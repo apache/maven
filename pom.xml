@@ -1,45 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<project>
+<model>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Project</name>
   <groupId>maven</groupId>
   <artifactId>maven-component</artifactId>
+  <packaging>jar</packaging>
+  <name>Maven Project</name>
   <version>2.0-SNAPSHOT</version>
   <description>Maven components parent</description>
-  <shortDescription>Maven components parent</shortDescription>
   <url>http://maven.apache.org</url>
-  
-  <organization>
-    <name>Apache Software Foundation</name>
-    <url>http://www.apache.org/</url>
-    <logo>/images/apache-maven-project.png</logo>
-  </organization>
-
-  <distributionManagement>
-    <repository>
-      <id>repo1</id>
-      <name>Maven Central Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url>
-      <username>maven</username>
-    </repository>
-  </distributionManagement>
-
-  <ciManagement>
-    <nagEmailAddress>m2-dev@maven.apache.org</nagEmailAddress>
-  </ciManagement>
-    
-  <scm>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components</developerConnection>
-    <url>http://cvs.apache.org/viewcvs.cgi/maven-components/</url>
-  </scm>
-
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10500</url>
   </issueManagement>
-
+  <ciManagement>
+    <system>m2-dev@maven.apache.org</system>
+    <notifiers>
+      <notifier>
+        <type>email</type>
+        <address>m2-dev@maven.apache.org</address>
+      </notifier>
+    </notifiers>
+  </ciManagement>
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>
@@ -54,11 +34,10 @@
       <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listName=dev@maven.apache.org</archive>
     </mailingList>
   </mailingLists>
-
   <developers>
     <developer>
-      <name>Jason van Zyl</name>
       <id>jvanzyl</id>
+      <name>Jason van Zyl</name>
       <email>jason@maven.org</email>
       <organization>Maven</organization>
       <roles>
@@ -67,8 +46,8 @@
       </roles>
     </developer>
     <developer>
-      <name>Brett Porter</name>
       <id>brett</id>
+      <name>Brett Porter</name>
       <email>brett@apache.org</email>
       <organization>ASF</organization>
       <roles>
@@ -78,28 +57,50 @@
       <timezone>+10</timezone>
     </developer>
   </developers>
-
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
-    </dependency>  
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-artifact</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>classworlds</groupId>
       <artifactId>classworlds</artifactId>
       <version>1.1-alpha-1</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
+      <type>jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>
-</project>
+  <scm>
+    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components</developerConnection>
+    <url>http://cvs.apache.org/viewcvs.cgi/maven-components/</url>
+  </scm>
+  <organization>
+    <name>Apache Software Foundation</name>
+    <url>http://www.apache.org/</url>
+  </organization>
+  <distributionManagement>
+    <repository>
+      <id>repo1</id>
+      <name>Maven Central Repository</name>
+      <url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url>
+    </repository>
+  </distributionManagement>
+</model>

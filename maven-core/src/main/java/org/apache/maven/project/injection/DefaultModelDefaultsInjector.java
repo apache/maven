@@ -40,7 +40,10 @@ public class DefaultModelDefaultsInjector
     public void injectDefaults( Model model )
     {
         injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );
-        injectPluginDefaults( model.getPlugins(), model.getPluginManagement() );
+        if ( model.getBuild() != null )
+        {
+            injectPluginDefaults( model.getBuild().getPlugins(), model.getPluginManagement() );
+        }
     }
 
     private void injectPluginDefaults( List plugins, PluginManagement pluginManagement )
@@ -52,11 +55,13 @@ public class DefaultModelDefaultsInjector
             // in other words, the project's plugins will probably be a subset
             // of
             // those specified in defaults.
+
+            // TODO: share with inheritence assembler
             Map pluginMap = new TreeMap();
             for ( Iterator it = plugins.iterator(); it.hasNext(); )
             {
                 Plugin plugin = (Plugin) it.next();
-                pluginMap.put( plugin.getId(), plugin );
+                pluginMap.put( constructPluginKey( plugin ), plugin );
             }
 
             List managedPlugins = pluginManagement.getPlugins();
@@ -64,7 +69,7 @@ public class DefaultModelDefaultsInjector
             for ( Iterator it = managedPlugins.iterator(); it.hasNext(); )
             {
                 Plugin def = (Plugin) it.next();
-                String key = def.getId();
+                String key = constructPluginKey( def );
 
                 Plugin plugin = (Plugin) pluginMap.get( key );
                 if ( plugin != null )
@@ -73,6 +78,11 @@ public class DefaultModelDefaultsInjector
                 }
             }
         }
+    }
+
+    private static String constructPluginKey( Plugin plugin )
+    {
+        return plugin.getGroupId() + ":" + plugin.getArtifactId();
     }
 
     private void mergePluginWithDefaults( Plugin plugin, Plugin def )
@@ -175,10 +185,6 @@ public class DefaultModelDefaultsInjector
         {
             dep.setVersion( def.getVersion() );
         }
-
-        Properties props = new Properties( def.getProperties() );
-        props.putAll( dep.getProperties() );
-        dep.setProperties( props );
     }
 
 }

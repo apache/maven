@@ -1,20 +1,19 @@
 package org.apache.maven.project.inheritance;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import org.apache.maven.model.Build;
@@ -26,7 +25,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
-import org.apache.maven.model.UnitTest;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Iterator;
@@ -40,7 +38,7 @@ import java.util.TreeMap;
  * @version $Id: DefaultModelInheritanceAssembler.java,v 1.4 2004/08/23 20:24:54
  *          jdcasey Exp $
  * @todo generate this with modello to keep it in sync with changes in the
- *       model.
+ * model.
  */
 public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
@@ -83,12 +81,6 @@ public class DefaultModelInheritanceAssembler
             child.setInceptionYear( parent.getInceptionYear() );
         }
 
-        // Name
-        if ( child.getPackage() == null )
-        {
-            child.setPackage( parent.getPackage() );
-        }
-
         // url
         if ( child.getUrl() == null )
         {
@@ -110,13 +102,7 @@ public class DefaultModelInheritanceAssembler
             child.setIssueManagement( parent.getIssueManagement() );
         }
 
-        // Short description
-        if ( child.getShortDescription() == null )
-        {
-            child.setShortDescription( parent.getShortDescription() );
-        }
-
-        // Short description
+        // description
         if ( child.getDescription() == null )
         {
             child.setDescription( parent.getDescription() );
@@ -155,12 +141,6 @@ public class DefaultModelInheritanceAssembler
             child.setMailingLists( parent.getMailingLists() );
         }
 
-        // reports
-        if ( child.getReports().size() == 0 )
-        {
-            child.setReports( parent.getReports() );
-        }
-
         // Build
         assembleBuildInheritance( child, parent );
 
@@ -191,17 +171,43 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Plugins :: aggregate
-        List parentPlugins = parent.getPlugins();
-
-        List childPlugins = child.getPlugins();
-
-        for ( Iterator iterator = parentPlugins.iterator(); iterator.hasNext(); )
+        if ( parent.getBuild() != null && child.getBuild() != null )
         {
-            Plugin plugin = (Plugin) iterator.next();
+            List parentPlugins = parent.getBuild().getPlugins();
 
-            if ( !childPlugins.contains( plugin ) )
+            List childPlugins = child.getBuild().getPlugins();
+
+            for ( Iterator iterator = parentPlugins.iterator(); iterator.hasNext(); )
             {
-                child.addPlugin( plugin );
+                Plugin plugin = (Plugin) iterator.next();
+
+                if ( !childPlugins.contains( plugin ) )
+                {
+                    child.getBuild().addPlugin( plugin );
+                }
+            }
+        }
+
+        // Reports :: aggregate
+        if ( child.getReports() != null && parent.getReports() != null )
+        {
+            if ( child.getReports().getOutputDirectory() == null )
+            {
+                child.getReports().setOutputDirectory( parent.getReports().getOutputDirectory() );
+            }
+
+            List parentReports = parent.getReports().getPlugins();
+
+            List childReports = child.getReports().getPlugins();
+
+            for ( Iterator iterator = parentReports.iterator(); iterator.hasNext(); )
+            {
+                Plugin plugin = (Plugin) iterator.next();
+
+                if ( !childReports.contains( plugin ) )
+                {
+                    child.getReports().addPlugin( plugin );
+                }
             }
         }
 
@@ -231,19 +237,19 @@ public class DefaultModelInheritanceAssembler
                 for ( Iterator it = childPlugins.iterator(); it.hasNext(); )
                 {
                     Plugin plugin = (Plugin) it.next();
-                    mappedChildPlugins.put( plugin.getId(), plugin );
+                    mappedChildPlugins.put( constructPluginKey( plugin ), plugin );
                 }
 
                 for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
                 {
                     Plugin plugin = (Plugin) it.next();
-                    if ( !mappedChildPlugins.containsKey( plugin.getId() ) )
+                    if ( !mappedChildPlugins.containsKey( constructPluginKey( plugin ) ) )
                     {
                         childPluginMgmt.addPlugin( plugin );
                     }
                     else
                     {
-                        Plugin childPlugin = (Plugin) mappedChildPlugins.get( plugin.getId() );
+                        Plugin childPlugin = (Plugin) mappedChildPlugins.get( constructPluginKey( plugin ) );
 
                         Map mappedChildGoals = new TreeMap();
                         for ( Iterator itGoals = childPlugin.getGoals().iterator(); itGoals.hasNext(); )
@@ -280,6 +286,11 @@ public class DefaultModelInheritanceAssembler
                 }
             }
         }
+    }
+
+    private String constructPluginKey( Plugin plugin )
+    {
+        return plugin.getGroupId() + ":" + plugin.getArtifactId();
     }
 
     private void assembleDependencyManagementInheritance( Model child, Model parent )
@@ -342,19 +353,24 @@ public class DefaultModelInheritanceAssembler
                 childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
             }
 
-            if ( childBuild.getUnitTestSourceDirectory() == null )
+            if ( childBuild.getScriptSourceDirectory() == null )
             {
-                childBuild.setUnitTestSourceDirectory( parentBuild.getUnitTestSourceDirectory() );
+                childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
             }
 
-            if ( childBuild.getOutput() == null )
+            if ( childBuild.getTestSourceDirectory() == null )
             {
-                childBuild.setOutput( parentBuild.getOutput() );
+                childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
             }
 
-            if ( childBuild.getTestOutput() == null )
+            if ( childBuild.getOutputDirectory() == null )
             {
-                childBuild.setTestOutput( parentBuild.getTestOutput() );
+                childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
+            }
+
+            if ( childBuild.getTestOutputDirectory() == null )
+            {
+                childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
             }
 
             if ( childBuild.getFinalName() == null )
@@ -368,30 +384,10 @@ public class DefaultModelInheritanceAssembler
                 childBuild.setResources( parentBuild.getResources() );
             }
 
-            UnitTest childUnitTest = childBuild.getUnitTest();
-            UnitTest parentUnitTest = parentBuild.getUnitTest();
-
-            if ( childUnitTest == null )
+            resources = childBuild.getTestResources();
+            if ( resources == null || resources.isEmpty() )
             {
-                childBuild.setUnitTest( parentUnitTest );
-            }
-            else
-            {
-                if ( childUnitTest.getIncludes().size() == 0 )
-                {
-                    childUnitTest.setIncludes( parentUnitTest.getIncludes() );
-                }
-
-                if ( childUnitTest.getExcludes().size() == 0 )
-                {
-                    childUnitTest.setExcludes( parentUnitTest.getExcludes() );
-                }
-
-                List testResources = childUnitTest.getResources();
-                if ( testResources == null || testResources.isEmpty() )
-                {
-                    childUnitTest.setResources( parentUnitTest.getResources() );
-                }
+                childBuild.setTestResources( parentBuild.getTestResources() );
             }
         }
     }
@@ -416,8 +412,8 @@ public class DefaultModelInheritanceAssembler
                 childScm.setConnection( parentScm.getConnection() + "/" + child.getArtifactId() );
             }
 
-            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() )
-                && !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
+            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
+                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
                 childScm.setDeveloperConnection( parentScm.getDeveloperConnection() + "/" + child.getArtifactId() );
             }
@@ -425,11 +421,6 @@ public class DefaultModelInheritanceAssembler
             if ( StringUtils.isEmpty( childScm.getUrl() ) )
             {
                 childScm.setUrl( parentScm.getUrl() );
-            }
-
-            if ( parentScm.getBranches() != null )
-            {
-                childScm.getBranches().addAll( parentScm.getBranches() );
             }
         }
     }

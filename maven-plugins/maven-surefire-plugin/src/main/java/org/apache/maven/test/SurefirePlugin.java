@@ -12,77 +12,64 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 /**
- * @goal test
- *
- * @description Run tests using surefire
- *
- * @parameter
- *  name="mavenRepoLocal"
- *  type="String"
- *  required="true"
- *  validator="validator"
- *  expression="#maven.repo.local"
- *  description=""
- * @parameter
- *  name="basedir"
- *  type="String"
- *  required="true"
- *  validator="validator"
- *  expression="#basedir"
- *  description=""
- * @parameter
- *  name="classesDirectory"
- *  type="String"
- *  required="true"
- *  validator="validator"
- *  expression="#project.build.output"
- *  description=""
- * @parameter
- *  name="testClassesDirectory"
- *  type="String"
- *  required="true"
- *  validator="validator"
- *  expression="#project.build.testOutput"
- *  description=""
- * @parameter
- *  name="includes"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.unitTest.includes"
- *  description=""
- * @parameter
- *  name="excludes"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.unitTest.excludes"
- *  description=""
- * @parameter
- *  name="classpathElements"
- *  type="String[]"
- *  required="true"
- *  validator=""
- *  expression="#project.testClasspathElements"
- *  description=""
- * @parameter
- *  name="reportsDirectory"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#project.build.directory/surefire-reports"
- *  description="Base directory where all reports are written to."
- * @parameter
- *  name="test"
- *  type="String"
- *  required="false"
- *  validator=""
- *  expression="#test"
- *  description="Specify this parameter if you want to use the test regex notation to select tests to run."
- *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
- *
+ * @goal test
+ * @description Run tests using surefire
+ * @parameter name="mavenRepoLocal"
+ * type="String"
+ * required="true"
+ * validator="validator"
+ * expression="#maven.repo.local"
+ * description=""
+ * @parameter name="basedir"
+ * type="String"
+ * required="true"
+ * validator="validator"
+ * expression="#basedir"
+ * description=""
+ * @parameter name="classesDirectory"
+ * type="String"
+ * required="true"
+ * validator="validator"
+ * expression="#project.build.outputDirectory"
+ * description=""
+ * @parameter name="testClassesDirectory"
+ * type="String"
+ * required="true"
+ * validator="validator"
+ * expression="#project.build.testOutputDirectory"
+ * description=""
+ * @parameter name="includes"
+ * type="String"
+ * required="false"
+ * validator=""
+ * description=""
+ * expression=""
+ * @parameter name="excludes"
+ * type="String"
+ * required="false"
+ * validator=""
+ * description=""
+ * expression=""
+ * @parameter name="classpathElements"
+ * type="String[]"
+ * required="true"
+ * validator=""
+ * expression="#project.testClasspathElements"
+ * description=""
+ * @parameter name="reportsDirectory"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#project.build.directory/surefire-reports"
+ * description="Base directory where all reports are written to."
+ * @parameter name="test"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#test"
+ * description="Specify this parameter if you want to use the test regex notation to select tests to run."
  * @todo make version of junit and surefire configurable
  * @todo make report to be produced configurable
  */
@@ -138,7 +125,8 @@ public class SurefirePlugin
                 includes.add( "**/" + testRegexes[i] + ".java" );
             }
 
-            surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery", new Object[]{basedir, includes, excludes} );
+            surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
+                                       new Object[]{basedir, includes, excludes} );
         }
         else
         {
@@ -146,7 +134,20 @@ public class SurefirePlugin
 
             List excludes = (List) request.getParameter( "excludes" );
 
-            surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery", new Object[]{basedir, includes, excludes} );
+            // defaults here, qdox doesn't like the end javadoc value
+            if ( includes == null )
+            {
+                includes = new ArrayList();
+                includes.add( "**/*Test.java" );
+            }
+            if ( excludes == null )
+            {
+                excludes = new ArrayList();
+                excludes.add( "**/Abstract*Test.java" );
+            }
+
+            surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
+                                       new Object[]{basedir, includes, excludes} );
         }
 
         // ----------------------------------------------------------------------
@@ -157,7 +158,8 @@ public class SurefirePlugin
 
         surefireBooter.addClassPathUrl( new File( mavenRepoLocal, "junit/jars/junit-3.8.1.jar" ).getPath() );
 
-        surefireBooter.addClassPathUrl( new File( mavenRepoLocal, "surefire/jars/surefire-1.2-SNAPSHOT.jar" ).getPath() );
+        surefireBooter.addClassPathUrl(
+            new File( mavenRepoLocal, "surefire/jars/surefire-1.2-SNAPSHOT.jar" ).getPath() );
 
         surefireBooter.addClassPathUrl( new File( classesDirectory ).getPath() );
 

@@ -1,17 +1,14 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<project>
-  <modelVersion>4.0.0</modelVersion>
+<model>
   <parent>
-    <groupId>maven</groupId>
     <artifactId>maven-plugin-parent</artifactId>
+    <groupId>maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-core-it-plugin</artifactId>
-  <type>plugin</type>  
+  <packaging>plugin</packaging>
   <name>Maven Core Integration Test Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <inceptionYear>2001</inceptionYear>
-  <package>org.apache.maven.plugin.coreit</package>
-</project>
+</model>

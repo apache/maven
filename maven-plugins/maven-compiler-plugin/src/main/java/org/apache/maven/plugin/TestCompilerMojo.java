@@ -32,7 +32,7 @@ package org.apache.maven.plugin;
  * type="String"
  * required="true"
  * validator=""
- * expression="#project.build.testOutput"
+ * expression="#project.build.testOutputDirectory"
  * description=""
  * @parameter name="classpathElements"
  * type="List"
@@ -47,6 +47,7 @@ package org.apache.maven.plugin;
  * expression="#maven.compiler.debug"
  * description="Whether to include debugging information in the compiled class files; the default value is false"
  */
-public class TestCompilerMojo extends CompilerMojo
+public class TestCompilerMojo
+    extends CompilerMojo
 {
 }

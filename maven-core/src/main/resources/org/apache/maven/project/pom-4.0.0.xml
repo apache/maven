@@ -10,49 +10,25 @@
     </repository>
   </repositories>
 
-<!--
-  <pluginRepositories>
-    <repository>
-      <id>pluginCentral</id>
-      <name>Maven Central Repository at ibiblio</name>
-      <url>http://www.ibiblio.org/maven</url>
-    </repository>
-  </pluginRepositories>
--->
-
-  <!-- Default plugins
-  <plugins>
-    <plugin>
-      <id></id>
-    </plugin>
-  </plugins>
-  -->
-
   <build>
     <!-- This all may just fold into plugin parameters -->
     <directory>target</directory>
-    <output>target/classes</output>
+    <outputDirectory>target/classes</outputDirectory>
     <finalName>${artifactId}-${version}</finalName>
-    <testOutput>target/test-classes</testOutput>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
     <sourceDirectory>src/main/java</sourceDirectory>
-    <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
-    <unitTest>
-      <includes>
-        <include>**/*Test.java</include>
-      </includes>
-      <excludes>
-        <exclude>**/*Abstract*.java</exclude>
-      </excludes>
-      <resources>
-        <resource>
-          <directory>src/test/resources</directory>
-        </resource>
-      </resources>
-    </unitTest>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
       </resource>
     </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
   </build>
 </project>
+
