@@ -145,8 +145,8 @@ public class GoalAttainmentPhase
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The " + parameter.getName() ).
-                append( " is required for the execution of the " ).
+        message.append( "The '" + parameter.getName() ).
+                append( "' parameter is required for the execution of the " ).
                 append( mojo.getId() ).
                 append( " mojo and cannot be null." );
 
