@@ -17,6 +17,7 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
@@ -53,6 +54,12 @@ public class ArtifactRepository
         throws ArtifactPathFormatException
     {
         return layout.pathOf( artifact );
+    }
+
+    public String pathOfMetadata( ArtifactMetadata artifactMetadata )
+        throws ArtifactPathFormatException
+    {
+        return layout.pathOfMetadata( artifactMetadata );
     }
 
 }

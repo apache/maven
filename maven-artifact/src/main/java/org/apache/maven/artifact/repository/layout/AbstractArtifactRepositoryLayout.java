@@ -20,35 +20,27 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author jdcasey
  */
 public abstract class AbstractArtifactRepositoryLayout
-    extends AbstractLogEnabled
     implements ArtifactRepositoryLayout
 {
-
     private ArtifactHandlerManager artifactHandlerManager;
 
     protected abstract String layoutPattern();
+
+    protected abstract String metadataLayoutPattern();
 
     protected abstract String groupIdAsPath( String groupId );
 
     public String pathOf( Artifact artifact )
         throws ArtifactPathFormatException
     {
-        String path = layoutPattern();
-
-        String groupPath = groupIdAsPath( artifact.getGroupId() );
-
-        path = StringUtils.replace( path, "${groupPath}", groupPath );
-
-        path = StringUtils.replace( path, "${artifactId}", artifact.getArtifactId() );
-
-        path = StringUtils.replace( path, "${version}", artifact.getVersion() );
+        String path = basicPathOf( artifact, layoutPattern() );
 
         if ( artifact.hasClassifier() )
         {
@@ -58,6 +50,32 @@ public abstract class AbstractArtifactRepositoryLayout
         {
             path = StringUtils.replace( path, "-${classifier}", "" );
         }
+
+        return path;
+    }
+
+    public String pathOfMetadata( ArtifactMetadata metadata )
+        throws ArtifactPathFormatException
+    {
+        String path = basicPathOf( metadata.getArtifact(), metadataLayoutPattern() );
+
+        path = StringUtils.replace( path, "${metadataFilename}", metadata.getFilename() );
+
+        return path;
+    }
+
+    private String basicPathOf( Artifact artifact, String pattern )
+        throws ArtifactPathFormatException
+    {
+        String path = pattern;
+
+        String groupPath = groupIdAsPath( artifact.getGroupId() );
+
+        path = StringUtils.replace( path, "${groupPath}", groupPath );
+
+        path = StringUtils.replace( path, "${artifactId}", artifact.getArtifactId() );
+
+        path = StringUtils.replace( path, "${version}", artifact.getVersion() );
 
         ArtifactHandler artifactHandler = null;
         try
@@ -73,7 +91,6 @@ public abstract class AbstractArtifactRepositoryLayout
         path = StringUtils.replace( path, "${directory}", artifactHandler.directory() );
 
         path = StringUtils.replace( path, "${extension}", artifactHandler.extension() );
-
         return path;
     }
 

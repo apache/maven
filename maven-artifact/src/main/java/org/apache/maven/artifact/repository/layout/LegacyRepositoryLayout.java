@@ -28,6 +28,11 @@ public class LegacyRepositoryLayout
         return "${groupPath}/${directory}/${artifactId}-${version}-${classifier}.${extension}";
     }
 
+    protected String metadataLayoutPattern()
+    {
+        return "${groupPath}/${directory}/${artifactId}-${version}-${metadataFilename}";
+    }
+
     protected String groupIdAsPath( String groupId )
     {
         return groupId;

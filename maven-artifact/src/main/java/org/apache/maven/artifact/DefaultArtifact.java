@@ -16,9 +16,13 @@ package org.apache.maven.artifact;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -45,6 +49,8 @@ public class DefaultArtifact
     private final String scope;
 
     private String path;
+
+    private List metadataList;
 
     /**
      * @todo this should be replaced by type handler
@@ -159,6 +165,20 @@ public class DefaultArtifact
     public String getConflictId()
     {
         return getGroupId() + ":" + getArtifactId() + ":" + getType();
+    }
+
+    public void addMetadata( ArtifactMetadata metadata )
+    {
+        if ( metadataList == null )
+        {
+            metadataList = new ArrayList();
+        }
+        metadataList.add( metadata );
+    }
+
+    public List getMetadataList()
+    {
+        return metadataList == null ? Collections.EMPTY_LIST : metadataList;
     }
 
     // ----------------------------------------------------------------------

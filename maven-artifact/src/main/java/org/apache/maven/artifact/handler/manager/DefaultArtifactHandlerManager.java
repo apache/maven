@@ -82,7 +82,6 @@ public class DefaultArtifactHandlerManager
             // TODO: perform transformation
         }
 
-        String artifactPath = localRepository.getBasedir() + "/" + localRepository.pathOf( artifact );
-        return artifactPath;
+        return localRepository.getBasedir() + "/" + localRepository.pathOf( artifact );
     }
 }

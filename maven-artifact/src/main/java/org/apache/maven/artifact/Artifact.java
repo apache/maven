@@ -16,8 +16,14 @@ package org.apache.maven.artifact;
  * limitations under the License.
  */
 
-import java.io.File;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 
+import java.io.File;
+import java.util.List;
+
+/**
+ * Description of an artifact.
+ */
 public interface Artifact
 {
     // TODO: into scope handler
@@ -61,4 +67,8 @@ public interface Artifact
     String getId();
 
     String getConflictId();
+
+    void addMetadata( ArtifactMetadata metadata );
+
+    List getMetadataList();
 }

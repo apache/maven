@@ -17,6 +17,7 @@ package org.apache.maven.artifact.repository.layout;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 
 /**
  * @author jdcasey
@@ -29,4 +30,6 @@ public interface ArtifactRepositoryLayout
     String pathOf( Artifact artifact )
         throws ArtifactPathFormatException;
 
+    String pathOfMetadata( ArtifactMetadata metadata )
+        throws ArtifactPathFormatException;
 }

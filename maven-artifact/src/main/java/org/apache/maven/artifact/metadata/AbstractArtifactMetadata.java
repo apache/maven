@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.repository.layout;
+package org.apache.maven.artifact.metadata;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,26 +16,34 @@ package org.apache.maven.artifact.repository.layout;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+
 /**
- * @author jdcasey
+ * Common elements of artifact metadata.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @version $Id$
  */
-public class DefaultRepositoryLayout
-    extends AbstractArtifactRepositoryLayout
+public abstract class AbstractArtifactMetadata
+    implements ArtifactMetadata
 {
+    protected final String filename;
 
-    protected String layoutPattern()
+    protected final Artifact artifact;
+
+    protected AbstractArtifactMetadata( Artifact artifact, String filename )
     {
-        return "${groupPath}/${artifactId}/${version}/${artifactId}-${version}-${classifier}.${extension}";
+        this.artifact = artifact;
+        this.filename = filename;
     }
 
-    protected String metadataLayoutPattern()
+    public Artifact getArtifact()
     {
-        return "${groupPath}/${artifactId}/${version}/${metadataFilename}";
+        return artifact;
     }
 
-    protected String groupIdAsPath( String groupId )
+    public String getFilename()
     {
-        return groupId.replace( '.', '/' );
+        return filename;
     }
-
 }

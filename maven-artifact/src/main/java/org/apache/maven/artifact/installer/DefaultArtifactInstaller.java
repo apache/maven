@@ -19,6 +19,7 @@ package org.apache.maven.artifact.installer;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -26,6 +27,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 public class DefaultArtifactInstaller
     extends AbstractLogEnabled
@@ -65,6 +67,13 @@ public class DefaultArtifactInstaller
             getLogger().info( "Installing " + source.getPath() + " to " + artifact.getPath() );
 
             FileUtils.copyFile( source, artifact.getFile() );
+
+            // must be after the artifact is installed
+            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+            {
+                ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                metadata.storeInLocalRepository( localRepository );
+            }
         }
         catch ( IOException e )
         {

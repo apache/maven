@@ -17,6 +17,8 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
@@ -185,7 +187,17 @@ public class SnapshotTransformation
     */
     public Artifact transformLocalArtifact( Artifact artifact, ArtifactRepository localRepository )
     {
-        // TODO: implement
+        if ( isSnapshot( artifact ) && "pom".equals( artifact.getType() ) )
+        {
+            // only store the snapshot-version-local.txt file for POMs as every file has an associated POM
+            ArtifactMetadata metadata = SnapshotArtifactMetadata.createLocalSnapshotMetadata( artifact );
+            artifact.addMetadata( metadata );
+        }
         return artifact;
+    }
+
+    private static boolean isSnapshot( Artifact artifact )
+    {
+        return artifact.getVersion().endsWith( "SNAPSHOT" );
     }
 }
