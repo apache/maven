@@ -1,0 +1,62 @@
+<document>
+  <properties>
+    <title>Welcome</title>
+    <author email="brett@apache.org">Brett Porter</author>
+  </properties>
+  <body>
+    <section name="Welcome to Maven 2">
+      <div style="float: right; margin: 0 10px 20px 20px; padding: 5px; border: 1px solid #999; background-color: #eee;">
+        <h5 style="margin: 0; font-size: smaller; border-bottom: 1px solid #aaaaaa">Get Maven 2.0</h5>
+        <p style="font-size: smaller">
+          <a href="http://maven.apache.org/start/download.html">
+            <img valign="top" src="http://maven.apache.org/images/folder-open.gif" border="0" alt="" title="download" />
+            Download
+          </a> Maven 2.0 Build 1 <small>(682K)</small><br/>
+        </p>
+      </div>
+      <p>
+        Maven is a software project management and comprehension tool. Based on the concept of a project object model
+        (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
+      </p>
+      <p>
+        <b style="font-size: larger">About Maven 2.0</b>
+      </p>
+      <p>
+        Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
+        basis to take it into the future. It is currently available as a Technology Preview pre-release.
+      </p>
+      <ul style="list-style-type: square">
+        <li><i><a href="#">What is Maven?</a></i></li>
+        <li><i>What are the <a href="#">features of Maven 2.0</a>?</i></li>
+        <li><i>Tell me about the <a href="#">goals of Maven 2.0</a></i></li>
+        <li><i>What does <a href="#">pre-release Technology Preview</a> mean?</i></li>
+        <li><i>How often will Maven 2.0 be <a href="#">released</a>?</i></li>
+        <li><i>Can I <a href="#">get involved</a>?</i></li>
+      </ul>
+      <p>
+        <b style="font-size: larger">Information for Maven 1.0 Users</b>
+      </p>
+      <p>
+        Maven 1.0 users will likely have a lot of questions about Maven 2.0 and how it will impact the future of Maven
+        1.0.
+      </p>
+      <ul style="list-style-type: square">
+        <li><i><a href="#">What's changed?</a></i></li>
+        <li><i><a href="#">Should I use Maven 2.0, or Maven 1.0?</a></i></li>
+        <li><i><a href="#">What will happen</a> to Maven 1.0?</i></li>
+        <li><i>Will my <a href="#">Maven 1.0 plugins</a> be supported?</i></li>
+      </ul>
+      <p>
+        <b style="font-size: larger">User's Guide</b>
+      </p>
+      <p>
+        Maven is now simpler than ever to use!
+      </p>
+      <ul style="list-style-type: square">
+        <li><i><a href="#">Getting Started</a></i></li>
+        <li><i><a href="#">Configuring Maven</a></i></li>
+      </ul>
+    </section>
+  </body>
+</document>
+
