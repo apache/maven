@@ -59,6 +59,7 @@ public class GoalMappingPhase
             try
             {
                 session.addImpliedExecution( goal, prereq );
+                visited.add( prereq );
             }
             catch ( CycleDetectedException e )
             {
@@ -79,6 +80,7 @@ public class GoalMappingPhase
         public void visitGoal( String goal, MavenSession session ) throws GraphTraversalException
         {
             session.addSingleExecution( goal );
+            visited.add( goal );
         }
 
         public boolean shouldVisit( String goal, MavenSession session ) throws GraphTraversalException
