@@ -89,10 +89,10 @@ echo $BUNDLE
   ../d2u $LIC
 
   mkdir -p $REPODIR/${groupId}/licenses
-  cp $LIC $REPODIR/${groupId}/licenses/${artifactId}-${version}.license  
+  cp -i $LIC $REPODIR/${groupId}/licenses/${artifactId}-${version}.license  
 
   mkdir -p $REPODIR/${groupId}/poms
-  cp ${artifactId}-${version}.pom $REPODIR/${groupId}/poms
+  cp -i ${artifactId}-${version}.pom $REPODIR/${groupId}/poms
 
   artifactType=`echo ${artifactId} | sed -e 's/maven-.*-plugin//'`
   
@@ -100,10 +100,10 @@ echo $BUNDLE
   then
     echo "Deploying Plugin ..."
      mkdir -p $REPODIR/${groupId}/plugins
-     cp ${artifactId}-${version}.jar $REPODIR/${groupId}/plugins
+     cp -i ${artifactId}-${version}.jar $REPODIR/${groupId}/plugins
   else
     echo "Deploying JAR ..."
     mkdir -p $REPODIR/${groupId}/jars
-    cp ${artifactId}-${version}.jar $REPODIR/${groupId}/jars
+    cp -i ${artifactId}-${version}.jar $REPODIR/${groupId}/jars
   fi    
 )  
