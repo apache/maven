@@ -17,6 +17,7 @@ package org.apache.maven.lifecycle.phase;
  * limitations under the License.
  */
 
+import org.apache.maven.GoalNotFoundException;
 import org.apache.maven.decoration.GoalDecorator;
 import org.apache.maven.decoration.GoalDecoratorBindings;
 import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
@@ -47,7 +48,12 @@ public class GoalResolutionPhase extends AbstractMavenLifecyclePhase
             pluginManager = (PluginManager) context.getContainer().lookup( PluginManager.ROLE );
             
             // First, start by retrieving the currently-requested goal.
-            String goal = context.getMojoDescriptor().getId();
+            MojoDescriptor goalDescriptor = context.getMojoDescriptor();
+            if(goalDescriptor == null) {
+                throw new GoalNotFoundException(context.getGoalName());
+            }
+            
+            String goal = goalDescriptor.getId();
 
             List resolvedGoals = resolveTopLevel( goal, new HashSet(), new LinkedList(), context, pluginManager );
 
