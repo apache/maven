@@ -1,0 +1,170 @@
+  ---
+  Marmalade Mojo Support - Notes
+  ---
+  John Casey
+  ---
+  07-Feb-2005
+  ---
+  
+*Abstract
+
+  This document will track the design and implementation issues involved in 
+  adding support to m2 for marmalade-based mojos.
+  
+*Design Notes
+
+  [[1]] <<Marmalade mojo descriptor specification.>>
+  
+        As in all mojo specifications, it is ideal that the descriptor for
+        a marmalade-based mojo be inline with the source code. This centralizes
+        all maintenance related to a single mojo to a single point of maintenance.
+        
+        The following is what I'm thinking as of now:
+        
+        - a marmalade-based mojo should look something like:
+        
++---+
+        <mojo xmlns="m2:mojo" xmlns:doco="marmalade:doco">
+        
+          <metadata>
+            <id>mmld</id>
+            <name>mmldCompile</name>
+            <lifecyclePhase>compile</lifecyclePhase>
+            
+            <doco:description>
+              Used to compile marmalade scripts into java beans.
+            </doco:description>
+            
+            <requiresDependencyResolution/>
+            <instantiationStrategy/>
+            <executionStrategy/>
+            
+            <parameters>
+            
+              <parameter>
+                <name>classpath</name>
+                <description>The compilation classpath</description>
+                <type>java.util.List</type>
+                <expression>#pom.artifacts</expression>
+                
+                <required/>
+                <validator/>
+                <default/>
+                
+              </parameter>
+              
+            </parameters>
+            
+          </metadata>
+          
+          <execute>
+            <!-- Do some stuff. -->
+          </execute>
+          
+        </mojo>
++---+
+
+  [[2]] <<Marmalade mojo packager.>>
+  
+        The marmalade mojo packager will:
+        
+        [[a]] Locate all *.mmld files within the scripts directory of the project.
+        
+        [[b]] For each script found:
+        
+              [[i]]   Execute the script with "gatherMetadata=true" in the context.
+              
+              [[ii]]  Retrieve the mojo descriptor from the "descriptor" variable
+                      in the context.
+                     
+              [[iii]] Add the relative script path to the mojo descriptor.
+              
+              [[iv]]  Cache the mojo descriptor for later aggregation.
+              
+        [[c]] Use the project's dependencies and other info to form the plugin
+              descriptor's header (non-mojo-specific info).
+              
+        [[d]] Use the PluginGenerator from maven-plugin-tools to generate a
+              META-INF/plexus/plugin.xml to the target directory.
+              
+        [[e]] Copy all scripts to the target directory. Preserve relative paths.
+        
+        [[f]] Package into a jar and deploy to the repo.
+        
+  [[3]] <<Marmalade mojo loader.>>
+  
+        The marmalade mojo loader will:
+        
+        [[a]] Retrieve the implementation spec (this is the path of the script,
+              relative to the root of the plugin filesystem...jar, etc.) to 
+              $path.
+              
+        [[b]] Use the context classloader to retrieve a reader to $path.
+        
+        [[c]] Build the ScriptBuilder corresponding to the script.
+        
+        [[d]] Create a new MarmaladeMojo instance which adapts the mojo calling
+              semantics to the creation/execution of a marmalade script.
+              
+              Execution involves:
+              
+              [[i]]   Creating a new MarmaladeScript instance.
+              
+              [[ii]]  Creating an execution context which references all I/O
+                      from the main Maven execution thread, and embeds:
+                      
+                      - #request == MavenExecutionRequest
+                      
+                      - #response == MavenExecutionResponse
+                      
+                      - Any globally configured environmental constraints, such
+                        as a global preserve-whitespace setting
+                        
+              [[iii]] Execution of the script using the execution context.
+              
+              [[iv]]  Export of the resulting context, minus any surviving input
+                      variables, to the MavenExecutionResponse's out-params.
+
+*Implementation Issues
+
+  [[1]] How do we make Maven smart enough to switch loader implementations based
+        on some sub-type of maven-plugin? 
+        
+        This is important, since the default mojo loader will not be smart 
+        enough to do the job, and embedding this behavior in that loader is not 
+        scalable or extensible enough to accommodate future expansion into the
+        realms of jython, groovy, etc...
+        
+  [[2]] How do we make the plugin:install process smart enough to switch 
+        generator implementations based on some sub-type of maven-plugin?
+        
+        This is closely related to [1] above.
+        
+  [[3]] We should probably look into enforcing <<<org/apache/maven/plugins/$pluginId>>>
+        namespacing for plugin generation, to avoid the case where two plugins
+        are script-based, load from the context classloader, depend on one 
+        another's APIs, and have script names that collide.
+        
+        <<Example:>> An aspectWerkz plugin which provides a "/compile.mmld" and 
+        depends on an eclipseCompiler plugin, which also happens to provide a
+        "/compile.mmld". The AW plugin might require a java compiler to outsource
+        the actual java code compilation, and want to use the Eclipse compiler
+        APIs to do this. Maybe the eclipseCompiler plugin has additional 
+        convenience APIs that the AW plugin wants to use...anyway, the mojo
+        loader for marmalade scripts is based on classpath resources, so when
+        it looks up "/compile.mmld" in the classloader for the plugin's realm, 
+        will it come up with the correct script (the AW one)? This doesn't seem
+        to be deterministic. It's simple to avoid this, in the same way that
+        java source code does. Placing a naming constraint on scripts within a
+        plugin would allow us to enforce compatibility to some extent.
+        
+  [[4]] Do we want to allow mixed-bag plugin implementations? 
+  
+        These might include a mix of standard-java and marmalade mojos. It 
+        strikes me that many  marmalade-based mojos may use beans/tags that are 
+        actually adapter classes for other third-party APIs (why they wouldn't 
+        implement everything as java mojos in this cases is beyond me). If they 
+        have java source inside the plugin source directory, we should probably 
+        compile it and bundle it with the plugin scripts; but what if this source
+        also has mojo annotations? This will have implications for [1] and [2] 
+        above.
