@@ -5,6 +5,10 @@
 
 ARGS="$@"
 
+if [ ! -z "$M2_HOME" ]; then
+  ARGS="$ARGS -Dmaven.home=$M2_HOME"
+fi
+
 # Build and install mboot
 (
   echo "-----------------------------------------------------------------------"

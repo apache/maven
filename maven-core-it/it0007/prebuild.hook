@@ -1,5 +1,0 @@
-#!/bin/sh
-
-echo "Removing maven-it-support-parent-1.0.pom from the local repository so we can verify its downloading ..."
-
-rm -f $1/maven/poms/maven-it-support-parent-1.0.pom > /dev/null 2>&1

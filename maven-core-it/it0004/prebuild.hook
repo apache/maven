@@ -1,5 +1,0 @@
-#!/bin/sh
-
-echo "Removing maven-core-it0004-1.0.pom from the local repository so we can verify pom installation ..."
-
-rm -f $1/maven/poms/maven-core-it0004-1.0.pom > /dev/null 2>&1

@@ -2,67 +2,21 @@
 
 # This process assumes that maven-core-it-verifier has been built.
 
-home=`pwd`
-
-cp=../../maven-core-it-verifier/target/maven-core-it-verifier-1.0.jar
+cp=../maven-core-it-verifier/target/maven-core-it-verifier-1.0.jar
 
 verifier=org.apache.maven.it.Verifier
 
-integration_tests=`cat integration-tests.txt | egrep -v '^#'`
+# TODO: need a consistent way to discover M2_HOME across this, bootstrap and m2 itself, as well as have a sensible
+# default, and a way to override. There must be only one way.
+# I like the idea of using the one in the path, or using -Dmaven.home to override
+# The m2 shell script should not care what installation it is in - it should use the installation defined on the
+# command line
 
-#If this doesn't have a value, we'll parse $HOME/.m2/pom.xml in the Verifier.
-local_repo=
+jvm_args="$@"
 
-for i in "$@"
-do
- j=`echo $i | sed 's/^-Dmaven.repo.local=//'`
- if [ "$i" != "$j" ]; then
-  local_repo=$j
- fi
-done
+if [ ! -z "$M2_HOME" ]; then
+  jvm_args="$jvm_args -Dmaven.home=$M2_HOME"
+fi
 
-for integration_test in $integration_tests
-do
-  (
-    cd $integration_test
-    
-    if [ -f prebuild.hook ]
-    then
-      echo      
-       sh prebuild.hook "$local_repo"
-      echo
-    fi
-    
-    jvm_opts=
-    if [ "$local_repo" != "" ]
-    then
-      jvm_opts="-Dmaven.repo.local=$local_repo"
-    fi
-    
-    m2 $jvm_opts clean:clean `cat goals.txt`
-    
-    if [ -f postbuild.hook ]
-    then    
-      echo
-      sh postbuild.hook
-      echo
-    fi
-    
-    basedir=.
-    
-    java $jvm_opts -cp "$cp" $verifier "$basedir" "$HOME"
-    
-  ) > ${integration_test}-log.txt
-
-  if [ "$?" = "0" ]
-  then
-    echo "Integration test $integration_test OK"
-  else
-    echo "Integration test $integration_test FAILED!"
-    echo "Details:"
-    cat ${integration_test}-log.txt
-    echo
-  fi
-
-done
+java $jvm_args -cp "$cp" $verifier
 

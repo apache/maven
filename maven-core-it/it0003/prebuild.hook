@@ -1,5 +1,0 @@
-#!/bin/sh
-
-echo "Removing maven-core-it0003-1.0.jar from the local repository so we can verify jar installation ..."
-
-rm -f $1/maven/jars/maven-core-it0003-1.0.jar > /dev/null 2>&1

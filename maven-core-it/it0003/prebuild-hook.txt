@@ -1,0 +1,1 @@
+rm ${localRepository}/maven/jars/maven-core-it0003-1.0.jar
