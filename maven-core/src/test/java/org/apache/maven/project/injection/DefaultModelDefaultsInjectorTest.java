@@ -1,4 +1,4 @@
-package org.apache.maven.project;
+package org.apache.maven.project.injection;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -20,7 +20,6 @@ import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
-import org.apache.maven.project.injection.DefaultModelDefaultsInjector;
 
 import java.util.List;
 import java.util.Properties;
@@ -28,8 +27,8 @@ import java.util.Properties;
 /**
  * @author jdcasey
  */
-public class DefaultProjectDefaultsInjectorTest
-extends TestCase
+public class DefaultModelDefaultsInjectorTest
+    extends TestCase
 {
 
     public void testShouldConstructWithNoParams()
