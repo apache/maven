@@ -5,8 +5,8 @@
   <repositories>
     <repository>
       <id>central</id>
-      <name>Maven Central Repository at ibiblio</name>
-      <url>http://www.ibiblio.org/maven</url>
+      <name>Maven Repository Switchboard</name>
+      <url>http://repo1.maven.org</url>
     </repository>
   </repositories>
 
