@@ -63,6 +63,9 @@ public class DefaultArtifactHandlerManager
     public String getRemoteRepositoryArtifactPath( Artifact artifact, ArtifactRepository remoteRepository )
         throws ArtifactPathFormatException
     {
+        // TODO: note that these are currrently assuming only PUT operations, not GET operations
+        // TODO: note also that these add metadata to the artifacts, so it is assumed this is only called once per artifact - needs to be fixed
+
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
         {
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
