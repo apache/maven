@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project>
-  <pomVersion>3</pomVersion>
+  <pomVersion>4.0.0</pomVersion>
   <name>Maven Project</name>
   <groupId>maven</groupId>
   <id>maven-component</id>
   <artifactId>maven-component</artifactId>
-  <currentVersion>2.0-SNAPSHOT</currentVersion>
-  <gumpRepositoryId>jakarta</gumpRepositoryId>
+  <version>2.0-SNAPSHOT</version>
   <description>Maven components parent</description>
   <shortDescription>Maven components parent</shortDescription>
   <url>http://maven.apache.org</url>
