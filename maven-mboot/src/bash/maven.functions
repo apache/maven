@@ -27,15 +27,15 @@ createMBootClasspath()
 {
   findAndSetMavenRepoLocal
   
-  for i in `cat ${MBOOT_HOME}/deps`
-  do
-    MBOOT_CP=${MBOOT_CP}:$repoLocal/$i
-  done
-    
   if [ "$cygwin" = "true" ]
   then
     MBOOT_CP=`cygpath -pu "$MBOOT_CP"`
   fi
+
+  for i in `cat ${MBOOT_HOME}/deps`
+  do
+    MBOOT_CP=${MBOOT_CP}:$repoLocal/$i
+  done
 }
 
 findAndSetMavenRepoLocal()
