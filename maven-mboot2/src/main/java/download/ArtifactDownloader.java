@@ -114,8 +114,7 @@ public class ArtifactDownloader
         if ( repositories.isEmpty() )
         {
             // TODO: use super POM?
-            Repository repository = new Repository();
-            repository.setBasedir( "http://repo1.maven.org" );
+            Repository repository = new Repository( "http://repo1.maven.org", Repository.LAYOUT_LEGACY );
             remoteRepos.add( repository );
         }
     }

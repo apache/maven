@@ -240,7 +240,7 @@ public class MBoot
             online = false;
         }
 
-        Repository localRepository = new Repository( mavenRepoLocal, Repository.LAYOUT_LEGACY );
+        Repository localRepository = new Repository( mavenRepoLocal, Repository.LAYOUT_DEFAULT );
 
         ModelReader reader = new ModelReader( localRepository );
 

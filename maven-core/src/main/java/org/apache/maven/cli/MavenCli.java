@@ -149,22 +149,8 @@ public class MavenCli
             artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS );
         }
 
-        // TODO: Switch the default repository layout id to "default" when the
-        // conversion is done.
-        String repoLayoutId = "legacy";
-
-        if ( commandLine.hasOption( CLIManager.VERSION_1_REPO ) )
-        {
-            repoLayoutId = "legacy";
-        }
-
-        if ( commandLine.hasOption( CLIManager.VERSION_2_REPO ) )
-        {
-            repoLayoutId = "default";
-        }
-
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) embedder.lookup(
-            ArtifactRepositoryLayout.ROLE, repoLayoutId );
+            ArtifactRepositoryLayout.ROLE, "default" );
 
         ArtifactRepository localRepository = getLocalRepository( settings, artifactRepositoryFactory, repositoryLayout );
 
@@ -306,11 +292,6 @@ public class MavenCli
 
         public static final char NON_RECURSIVE = 'N';
 
-        public static final char VERSION_1_REPO = 'A';
-
-        // TODO: this is a hack until we can get the main repo converted...
-        public static final char VERSION_2_REPO = 'a';
-
         public static final char UPDATE_SNAPSHOTS = 'U';
 
         public CLIManager()
@@ -334,11 +315,6 @@ public class MavenCli
                 "Execute goals for project found in the reactor" ).create( REACTOR ) );
             options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(
                 "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
-            options.addOption( OptionBuilder.withLongOpt( "v1-local-repository" ).withDescription(
-                "Use legacy layout for local artifact repository" ).create( VERSION_1_REPO ) );
-
-            options.addOption( OptionBuilder.withLongOpt( "v2-local-repository" ).withDescription(
-                "Use new layout for local artifact repository" ).create( VERSION_2_REPO ) );
             options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription(
                 "Update all snapshots regardless of repository policies" ).create( UPDATE_SNAPSHOTS ) );
         }

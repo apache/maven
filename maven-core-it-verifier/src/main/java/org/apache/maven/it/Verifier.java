@@ -49,7 +49,7 @@ public class Verifier
     private final PrintStream originalErr;
 
     // TODO: needs to be configurable
-    private static String localRepoLayout = "legacy";
+    private static String localRepoLayout = "default";
 
     public Verifier( String basedir )
     {
@@ -96,7 +96,8 @@ public class Verifier
     //
     // ----------------------------------------------------------------------
 
-    public void verify() throws VerificationException
+    public void verify()
+        throws VerificationException
     {
         List lines = loadFile( basedir, "expected-results.txt" );
 
@@ -120,12 +121,14 @@ public class Verifier
         }
     }
 
-    private static List loadFile( String basedir, String filename ) throws VerificationException
+    private static List loadFile( String basedir, String filename )
+        throws VerificationException
     {
         return loadFile( new File( basedir, filename ) );
     }
 
-    private static List loadFile( File file ) throws VerificationException
+    private static List loadFile( File file )
+        throws VerificationException
     {
         List lines = new ArrayList();
 
@@ -143,7 +146,6 @@ public class Verifier
                 {
                     continue;
                 }
-
 
                 line = replaceArtifacts( line );
 
@@ -220,7 +222,8 @@ public class Verifier
         return localRepo + "/" + repositoryPath;
     }
 
-    public void executeHook( String filename ) throws VerificationException
+    public void executeHook( String filename )
+        throws VerificationException
     {
         try
         {
@@ -250,7 +253,8 @@ public class Verifier
         }
     }
 
-    private static void executeCommand( String line ) throws VerificationException
+    private static void executeCommand( String line )
+        throws VerificationException
     {
         int index = line.indexOf( " " );
 
@@ -334,7 +338,8 @@ public class Verifier
         return repo;
     }
 
-    private void verifyExpectedResult( String line ) throws VerificationException
+    private void verifyExpectedResult( String line )
+        throws VerificationException
     {
         if ( line.indexOf( "!/" ) > 0 )
         {
@@ -378,7 +383,8 @@ public class Verifier
     //
     // ----------------------------------------------------------------------
 
-    public void executeGoals( String filename ) throws VerificationException
+    public void executeGoals( String filename )
+        throws VerificationException
     {
         String mavenHome = System.getProperty( "maven.home" );
 
@@ -584,8 +590,8 @@ public class Verifier
 
         private final void printParseError( String type, SAXParseException spe )
         {
-            System.err.println( type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: "
-                + spe.getMessage() );
+            System.err.println( type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: " +
+                                spe.getMessage() );
         }
 
         public Profile getActiveMavenProfile()
@@ -593,12 +599,14 @@ public class Verifier
             return activeMavenProfile;
         }
 
-        public void characters( char[] ch, int start, int length ) throws SAXException
+        public void characters( char[] ch, int start, int length )
+            throws SAXException
         {
             currentBody.append( ch, start, length );
         }
 
-        public void endElement( String uri, String localName, String rawName ) throws SAXException
+        public void endElement( String uri, String localName, String rawName )
+            throws SAXException
         {
             if ( "profile".equals( rawName ) )
             {
@@ -609,15 +617,15 @@ public class Verifier
                 }
                 else
                 {
-                    throw new SAXException( "Invalid mavenProfile entry. Missing one or more "
-                        + "fields: {localRepository}." );
+                    throw new SAXException( "Invalid mavenProfile entry. Missing one or more " +
+                                            "fields: {localRepository}." );
                 }
             }
             else if ( currentProfile != null )
             {
                 if ( "active".equals( rawName ) )
                 {
-                    currentProfile.setActive( Boolean.valueOf(currentBody.toString().trim()).booleanValue() );
+                    currentProfile.setActive( Boolean.valueOf( currentBody.toString().trim() ).booleanValue() );
                 }
                 else if ( "localRepository".equals( rawName ) )
                 {
@@ -630,16 +638,16 @@ public class Verifier
             }
             else if ( "settings".equals( rawName ) )
             {
-                if(profiles.size() == 1)
+                if ( profiles.size() == 1 )
                 {
-                    activeMavenProfile = (Profile) profiles.get(0);
+                    activeMavenProfile = (Profile) profiles.get( 0 );
                 }
                 else
                 {
                     for ( Iterator it = profiles.iterator(); it.hasNext(); )
                     {
                         Profile profile = (Profile) it.next();
-                        if(profile.isActive())
+                        if ( profile.isActive() )
                         {
                             activeMavenProfile = profile;
                         }
@@ -677,6 +685,7 @@ public class Verifier
     {
 
         private String localRepository;
+
         private boolean active = false;
 
         public void setLocalRepo( String localRepo )
@@ -688,12 +697,12 @@ public class Verifier
         {
             return localRepository;
         }
-        
+
         public void setActive( boolean active )
         {
             this.active = active;
         }
-        
+
         public boolean isActive()
         {
             return active;

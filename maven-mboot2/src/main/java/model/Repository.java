@@ -32,7 +32,7 @@ public class Repository
 
     private String basedir;
 
-    private String layout = LAYOUT_LEGACY;
+    private String layout;
 
     public Repository()
     {
