@@ -1,98 +1,101 @@
 package org.apache.maven.settings;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
+
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  * @author jdcasey
+ * @version $Id$
  */
 public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled
-    implements MavenSettingsBuilder
+    implements MavenSettingsBuilder, Initializable
 {
+    /** @configuration */
+    private String settingsPath;
 
-    private static final String DEFAULT_SETTINGS_PATH = "${user.home}/.m2/settings.xml";
-    
-    private String settingsPath = DEFAULT_SETTINGS_PATH;
+    private File settingsFile;
+
+    // ----------------------------------------------------------------------
+    // Component Lifecycle
+    // ----------------------------------------------------------------------
+
+    public void initialize()
+        throws Exception
+    {
+        settingsFile = getSettingsFile();
+
+        getLogger().debug( "Building Maven settings from: '" + settingsFile.getAbsolutePath() + "'" );
+    }
+
+    // ----------------------------------------------------------------------
+    // MavenSettingsBuilder Implementation
+    // ----------------------------------------------------------------------
 
     // TODO: don't throw Exception.
-    public MavenSettings buildSettings() throws Exception
+    public MavenSettings buildSettings()
+        throws Exception
     {
-        MavenSettings settings = null;
-        
-        File modelFile = getSettingsFile();
-        if ( modelFile.exists() && modelFile.isFile() )
+        if ( settingsFile.exists() && settingsFile.isFile() )
         {
-            SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
             FileReader reader = null;
             try
             {
-                reader = new FileReader( modelFile );
+                reader = new FileReader( settingsFile );
+
+                SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
                 Settings model = modelReader.read( reader );
-                settings = new MavenSettings( model );
+
+                return new MavenSettings( model );
             }
             finally
             {
-                if ( reader != null )
-                {
-                    try
-                    {
-                        reader.close();
-                    }
-                    catch ( IOException e )
-                    {
-                    }
-                }
+                IOUtil.close( reader );
             }
         }
-
-        if ( settings == null )
+        else
         {
             getLogger().debug( "Settings model not found. Creating empty instance of MavenSettings." );
-            settings = new MavenSettings();
-        }
 
-        return settings;
+            return new MavenSettings();
+        }
     }
 
     private File getSettingsFile()
     {
-        String userDir = System.getProperty( "user.home" );
-        userDir = userDir.replaceAll( "\\\\", "/" );
-        
         String path = settingsPath;
-        
-        path = path.replaceAll( "\\$\\{user.home\\}", userDir );
+
+        // TODO: This replacing shouldn't be necessary as user.home should be in the
+        // context of the container and thus the value would be interpolated by Plexus
+        String userHome = System.getProperty( "user.home" );
+
+        path = path.replaceAll( "\\$\\{user.home\\}", userHome );
         path = path.replaceAll( "\\\\", "/" );
         path = path.replaceAll( "//", "/" );
 
-        File userModelFile = new File( path );
-        
-        getLogger().debug( "Using userModel configured from: " + userModelFile );
-        
-        return userModelFile;
+        return new File( path );
     }
-
 }

@@ -121,7 +121,7 @@
       <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
       <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
     </component>
-    
+
     <!--
      |
      | Lifecycle executor
@@ -233,7 +233,7 @@
       </configuration>
     </component>
     <!-- ********************* FIXME *******************************************
-     | I realize this is duplicated but allows the project builder to work by itself 
+     | I realize this is duplicated but allows the project builder to work by itself
      -->
     <component>
       <role>org.apache.maven.project.path.PathTranslator</role>
@@ -256,6 +256,9 @@
     <component>
       <role>org.apache.maven.settings.MavenSettingsBuilder</role>
       <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
+      <configuration>
+        <settingsPath>${user.home}/.m2/settings.xml</settingsPath>
+      </configuration>
     </component>
   </components>
 </component-set>

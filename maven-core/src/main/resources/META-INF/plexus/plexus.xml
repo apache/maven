@@ -46,6 +46,9 @@
     <component>
       <role>org.apache.maven.settings.MavenSettingsBuilder</role>
       <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
+      <configuration>
+        <settingsPath>${user.home}/.m2/settings.xml</settingsPath>
+      </configuration>
     </component>
   </components>
 </plexus>
