@@ -227,7 +227,7 @@ public class DefaultArtifactResolver
 
                     try
                     {
-                        referencedDependencies = source.retrieve( newArtifact, localRepository, remoteRepositories, source.localRepository );
+                        referencedDependencies = source.retrieve( newArtifact, localRepository, remoteRepositories );
                     }
                     catch ( ArtifactMetadataRetrievalException e )
                     {
