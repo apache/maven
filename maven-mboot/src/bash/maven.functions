@@ -7,9 +7,9 @@
 
 downloadMBootDependencies()
 {
-  findAndSetMavenRepoLocal()
+  findAndSetMavenRepoLocal
   
-  for i in `cat ${MBOOT_HOME}/bash/deps`
+  for i in `cat ${MBOOT_HOME}/deps`
   do
     if [ ! -f $repoLocal/$i ]
     then
@@ -21,13 +21,13 @@ downloadMBootDependencies()
 
 createMBootClasspath()
 {
-  findAndSetMavenRepoLocal()
+  findAndSetMavenRepoLocal
   
-  for i in `cat ${MBOOT_HOME}/bash/deps`
+  for i in `cat ${MBOOT_HOME}/deps`
   do
-    MBOOT_CP=${MBOOT_CP}:$i
+    MBOOT_CP=${MBOOT_CP}:$repoLocal/$i
   done
-
+    
   if [ "$cygwin" = "true" ]
   then
     MBOOT_CP=cygpath -pu "$MBOOT_CP"
