@@ -1,9 +1,9 @@
 package org.apache.maven.plugin.plugin;
 
-import org.apache.maven.plugin.generator.PluginDescriptorGenerator;
+import org.apache.maven.plugin.generator.BeanGenerator;
 
 /**
- * @goal descriptor
+ * @goal bean
  *
  * @description Goal for generating a plugin descriptor.
  *
@@ -18,8 +18,8 @@ import org.apache.maven.plugin.generator.PluginDescriptorGenerator;
  *  name="outputDirectory"
  *  type="String"
  *  required="true" 
- *  validator="" 
- *  expression="#project.build.directory/classes/META-INF/maven"
+ *  validator=""
+ *  expression="#project.build.directory/generated-sources"
  *  description=""
  * @parameter
  *  name="pom"
@@ -32,13 +32,13 @@ import org.apache.maven.plugin.generator.PluginDescriptorGenerator;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class DescriptorGenerator
+public class BeanGeneratorMojo
     extends AbstractPluginMojo
 {
     protected void generate( String sourceDirectory, String outputDirectory, String pom )
         throws Exception
     {
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator();
+        BeanGenerator generator = new BeanGenerator();
 
         generator.execute( sourceDirectory, outputDirectory, pom );
     }
