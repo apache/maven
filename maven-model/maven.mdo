@@ -54,44 +54,44 @@
         </field>
         <field>
           <name>version</name>
-          <description>The currently version of your project.</description>
+          <description>The currently version of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>shortDescription</name>
-          <description>An abbreviated description of your project.</description>
+          <description>An abbreviated description of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>description</name>
-          <description>A full description of your project.</description>
+          <description>A full description of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>type</name>
           <version>??? use post 3.0.0</version>
-          <description>The type of artifact produced by your project.</description>
+          <description>The type of artifact produced by the project.</description>
           <type>String</type>
           <defaultValue>jar</defaultValue>
         </field>
         <field>
           <name>url</name>
-          <description>The URL where your project can be found.</description>
+          <description>The URL where the project can be found.</description>
           <type>String</type>
         </field>
         <field>
           <name>logo</name>
-          <description>The logo for your project.</description>
+          <description>The logo for the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>issueTrackingUrl</name>
-          <description>The URL where the issue tracking system used by your project can be found.</description>
+          <description>The URL where the issue tracking system used by the project can be found.</description>
           <type>String</type>
         </field>
         <field>
           <name>inceptionYear</name>
-          <description>The year your project started.</description>
+          <description>The year the project started.</description>
           <type>String</type>
         </field>
         <field>
@@ -101,64 +101,64 @@
         </field>
         <field>
           <name>siteAddress</name>
-          <description>The FQDN of the host where your project's site is uploaded.</description>
+          <description>The FQDN of the host where the project's site is uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>siteDirectory</name>
-          <description>The directory on your site host where site documentation is placed when the site is uploaded.</description>
+          <description>The directory on the site host where site documentation is placed when the site is uploaded.</description>
           <type>String</type>
         </field>
         <!-- This naming is inconsistent and distriubtion should occur from a repository structure. -->
         <field>
           <name>distributionSite</name>
-          <description>The FQDN of the host where your project's artifacts are uploaded.</description>
+          <description>The FQDN of the host where the project's artifacts are uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>distributionDirectory</name>
-          <description>The directory on your distribution host where artifacts are placed when uploaded.</description>
+          <description>The directory on the distribution host where artifacts are placed when uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>mailingLists</name>
-          <description>the description</description>
+          <description>The mailing lists for the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>developers</name>
-          <description>the description</description>
+          <description>The developers working on the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>contributors</name>
-          <description>the description</description>
+          <description>People who have contributed to the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>dependencies</name>
-          <description>the description</description>
+          <description>The project's dependencies.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>licenses</name>
-          <description>the description</description>
+          <description>The project's licenses.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>versions</name>
-          <description>the description</description>
+          <description>The released versions of the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>branches</name>
-          <description>the description</description>
+          <description>The SCM branches create for the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
@@ -173,12 +173,6 @@
           <description>the description</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
-        </field>
-        <field>
-          <name>versionMap</name>
-          <description>the description</description>
-          <type>java.util.Map</type>
-          <defaultValue>new HashMap()</defaultValue>
         </field>
         <field>
           <name>repository</name>
