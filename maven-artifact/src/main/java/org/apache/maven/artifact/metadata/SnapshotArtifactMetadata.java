@@ -82,8 +82,11 @@ public class SnapshotArtifactMetadata
                 timestamp = getUtcDateFormatter().format( new Date() );
             }
             String path = getLocalRepositoryLocation( localRepository ).getPath();
+            File file = new File( path );
+            // TODO: this should be centralised before the resolution of the artifact
+            file.getParentFile().mkdirs();
             FileUtils.fileWrite( path, constructVersion() );
-            lastModified = new File( path ).lastModified();
+            lastModified = file.lastModified();
         }
         catch ( IOException e )
         {
