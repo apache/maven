@@ -269,6 +269,8 @@ sub notify()
     
     $smtp->datasend( "Subject: $subject\n" );
     
+    $smtp->datasend( "From: meeper\@maven.org\n" );
+
     $smtp->datasend( "\n" );
     
     $smtp->datasend( $text );
