@@ -42,6 +42,12 @@ Maven Lifecycle
                                  |
                                  v
                              process the plugin descriptor
+                                 |
+                                 v
+                             does goal0 have any prereqs?
+                                 |
+                          yes ---+--- no
+                                 
                      
 +-----+
 
