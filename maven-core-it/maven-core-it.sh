@@ -11,12 +11,28 @@ integration_tests=`cat integration-tests.txt`
 
 for integration_test in $integration_tests
 do
-  echo "Running integration test $integration_test ..."
   
+  echo "----------------------------------------------------------"
+  echo "Running integration test $integration_test ..."
+  echo "----------------------------------------------------------"  
   (
     cd $integration_test
-   
+    
+    if [ -f prebuild.hook ]
+    then
+      echo      
+      ./prebuild.hook
+      echo
+    fi
+    
     m2 clean:clean jar:jar
+    
+    if [ -f postbuild.hook ]
+    then    
+      echo
+      ./postbuild.hook
+      echo
+    fi
     
     java -cp $cp $verifier `pwd`
   )
