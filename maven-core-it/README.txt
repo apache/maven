@@ -27,6 +27,9 @@ it0007: We specify a parent in the POM and make sure that it is downloaded as
 
 it0008: Simple goal decoration where a preGoal belongs to a plugin that must
         be downloaded from a remote repository before it can be executed.
+        
+it0009: Simple goal decoration where a postGoal belongs to a plugin that must
+        be downloaded from a remote repository before it can be executed.        
 
 -------------------------------------------------------------------------------
 
