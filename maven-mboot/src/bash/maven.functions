@@ -168,11 +168,11 @@ buildMavenProject()
     
     (
       home=`pwd`
-      
+
       cd $1
 
       # If the user only want to install the POM skip the rest
-      if [ "$3" == "0" ] && [ "$4" == "1" ]
+      if [ "$3" = "0" ] && [ "$4" = "1" ]
       then
 
         installPom
@@ -193,13 +193,13 @@ buildMavenProject()
       unitTestSourceDirectory=`grep unitTestSourceDirectory project.xml | sed -e 's/^*//;s/<unitTestSourceDirectory>//;s/<\/unitTestSourceDirectory>//;s/\${basedir}\///'`
 
       [ -z $unitTestSourceDirectory ] && unitTestSourceDirectory=src/test/java
-      
+
       buildTestDest=target/test-classes
       
       [ -d $buildDir ] && rm -rf $buildDir
-      
+
       echo "Building project in `pwd`"
-        
+
       if $cygwin = true; then
         home=`cygpath -pw $home`
       fi
