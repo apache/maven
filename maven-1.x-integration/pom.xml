@@ -1,6 +1,6 @@
 <model>
   <parent>
-    <artifactId>maven-component</artifactId>
+    <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
