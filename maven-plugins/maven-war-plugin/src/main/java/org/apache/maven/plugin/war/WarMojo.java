@@ -190,7 +190,7 @@ public class WarMojo
     }
 
     /**
-     * @todo properties 'war.target.path'
+     *
      */
     public void buildWebapp( MavenProject project )
         throws IOException
