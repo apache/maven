@@ -155,6 +155,7 @@ public class MavenCli
     // Local repository
     // ----------------------------------------------------------------------
 
+    /** @todo shouldn't need to duplicate the code to load maven.properties. */
     private static String findLocalRepository()
         throws Exception
     {

@@ -199,7 +199,7 @@ public class DefaultModelInheritanceAssembler
 
         }
 
-        //Repositories :: aggreagte
+        // Repositories :: aggregate
         List parentRepositories = parent.getRepositories();
 
         List childRepositories = child.getRepositories();

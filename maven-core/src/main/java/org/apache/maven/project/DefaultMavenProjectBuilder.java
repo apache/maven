@@ -96,6 +96,9 @@ public class DefaultMavenProjectBuilder
         return build( projectDescriptor, localRepository, false );
     }
 
+    /** @todo can we move the super model reading to the initialize method? what about the user/site? Is it reused?
+     *  @todo we should be passing in some more configuration here so that maven.home.local can be used for user properties. Then, the new stuff should be unit tested.
+     */
     public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, boolean resolveDependencies )
         throws ProjectBuildingException
     {
@@ -110,12 +113,36 @@ public class DefaultMavenProjectBuilder
                                                     lineage, 
                                                     superModel.getRepositories() );
 
-            modelInheritanceAssembler.assembleModelInheritance( ( (MavenProject) lineage.get( 0 ) ).getModel(), superModel );
+            Model previous = superModel;
 
-            for ( int i = 1; i < lineage.size(); i++ )
+            for ( Iterator i = lineage.iterator(); i.hasNext(); )
             {
-                modelInheritanceAssembler.assembleModelInheritance( ( (MavenProject) lineage.get( i ) ).getModel(),
-                                                                    ( (MavenProject) lineage.get( i - 1 ) ).getModel() );
+                Model current = ( (MavenProject) i.next() ).getModel();
+                modelInheritanceAssembler.assembleModelInheritance( current, previous );
+                previous = current;
+            }
+
+            // TODO: use maven.home.local instead of user.home/.m2
+            File userModelFile = new File( System.getProperty( "user.home" ) + "/.m2", "pom.xml" );
+            if ( userModelFile.exists() )
+            {
+                Model userModel = modelReader.read( new FileReader( userModelFile ) );
+                modelInheritanceAssembler.assembleModelInheritance( userModel, previous );
+
+                if ( userModel.getParent() != null )
+                {
+                    throw new ProjectBuildingException( "Inheritence not supported in the user override POM" );
+                }
+
+                MavenProject parent = project;
+                project = new MavenProject( userModel );
+                project.setFile( parent.getFile() );
+                project.setParent( parent );
+
+                // Note that we don't currently support maven.properties here: this might be a better place to do
+                // the overrides though, if it is kept. If so, would need to process this regardless of the existence
+                // of pom.xml
+                project.setProperties( parent.getProperties() );
             }
 
             project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository ) );
@@ -167,6 +194,8 @@ public class DefaultMavenProjectBuilder
         }
     }
 
+    /** @todo loading of project properties could be handled much more effeciently as they are never loaded from
+        the repository. However, I believe they should be removedC anyway and use the POM -- Brett. */
     private MavenProject assembleLineage( File projectDescriptor, 
                                           ArtifactRepository localRepository, 
                                           LinkedList lineage,
@@ -221,8 +250,6 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setProperties( properties );
-
-        project.setFile( projectDescriptor );
 
         return project;
     }
