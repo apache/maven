@@ -416,22 +416,31 @@
       <fields>
         <field>
           <name>name</name>
-          <description>the description</description>
+          <description>The name of the mailing list.</description>
           <type>String</type>
         </field>
         <field>
           <name>subscribe</name>
-          <description>the description</description>
+          <description>
+            The email address or link that can be used to subscribe to the mailing list.
+            If this is an email address, a <code>mailto:</code> link will automatically be created when
+            the documentation is created.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>unsubscribe</name>
-          <description>the description</description>
+          <description>
+            The email address or link that can be used to unsubscribe to
+            the mailing list.  If this is an email address, a
+            <code>mailto:</code> link will automatically be created
+            when the documentation is created.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>archive</name>
-          <description>the description</description>
+          <description>The link to a URL where you can browse the archive.</description>
           <type>String</type>
         </field>
       </fields>
@@ -441,17 +450,23 @@
       <fields>
         <field>
           <name>name</name>
-          <description>the description</description>
+          <description>The full name of the organization.</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
-          <description>the description</description>
+          <description>The URL to the organization's home page.</description>
           <type>String</type>
         </field>
         <field>
           <name>logo</name>
-          <description>the description</description>
+          <description>
+            The URL to the organization's logo image.  This can be an URL relative
+            to the base directory of the generated web site,
+            (e.g., <code>/images/org-logo.png</code>) or an absolute URL
+            (e.g., <code>http://my.corp/logo.png</code>).  This value is used
+            when generating the project documentation.
+          </description>
           <type>String</type>
         </field>
       </fields>
