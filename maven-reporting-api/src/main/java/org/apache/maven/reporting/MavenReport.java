@@ -16,6 +16,7 @@ package org.apache.maven.reporting;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Model;
 import org.codehaus.doxia.sink.Sink;
 
 /**
@@ -28,6 +29,9 @@ public interface MavenReport
 {
     String ROLE = MavenReport.class.getName();
 
-    void execute( Sink sink )
+    /** @todo don't want the model here long term. */
+    void execute( Model model, Sink sink )
         throws MavenReportException;
+
+    String getOutputName();
 }

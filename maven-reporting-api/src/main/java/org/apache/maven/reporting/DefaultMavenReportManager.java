@@ -1,5 +1,11 @@
 package org.apache.maven.reporting;
 
+import org.apache.maven.model.Model;
+import org.codehaus.doxia.sink.Sink;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
+
+import java.util.Map;
+
 /*
  * Copyright 2005 The Apache Software Foundation.
  *
@@ -21,13 +27,23 @@ package org.apache.maven.reporting;
  *
  * @author Brett Porter
  * @version $Id$
+ * @plexus.component
  */
 public class DefaultMavenReportManager
     implements MavenReportManager
 {
-    public MavenReport getReport( String name )
+    private Map mavenReports;
+
+    /**
+     * @todo we need some type of response
+     * @todo don't want to be passing in model - use report configuration
+     */
+    public void executeReport( String name, Model model, SiteRenderer siteRenderer, String outputDirectory )
+        throws Exception
     {
-        // TODO: return the report
-        return null;
+        MavenReport report = (MavenReport) mavenReports.get( name );
+
+        Sink sink = siteRenderer.createSink( outputDirectory, report.getOutputName() );
+        report.execute( model, sink );
     }
 }

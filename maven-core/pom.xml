@@ -64,4 +64,8 @@
       <url>scp://www.apache.org//www/maven.apache.org/m2</url>
     </site>
   </distributionManagement>
+  <reports>
+    <report>mail-lists</report>
+    <report>dependencies</report>
+  </reports>
 </project>

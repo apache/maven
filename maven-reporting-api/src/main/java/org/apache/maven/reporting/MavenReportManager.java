@@ -16,6 +16,9 @@ package org.apache.maven.reporting;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Model;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
+
 /**
  * Manage the set of available reports.
  *
@@ -26,5 +29,5 @@ public interface MavenReportManager
 {
     String ROLE = MavenReportManager.class.getName();
 
-    MavenReport getReport( String name );
+    void executeReport( String name, Model model, SiteRenderer siteRenderer, String outputDirectory ) throws Exception;
 }
