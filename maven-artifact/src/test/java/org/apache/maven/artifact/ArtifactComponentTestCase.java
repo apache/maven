@@ -247,7 +247,7 @@ public abstract class ArtifactComponentTestCase
 
     protected Artifact createArtifact( String artifactId, String version, String type )
     {
-        return new DefaultArtifact( "maven", artifactId, version, type );
+        return new DefaultArtifact( "org.apache.maven", artifactId, version, type );
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )

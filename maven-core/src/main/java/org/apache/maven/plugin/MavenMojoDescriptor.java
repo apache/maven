@@ -63,7 +63,7 @@ public class MavenMojoDescriptor
 
     public String getRole()
     {
-        return "org.apache.maven.plugin.Plugin";
+        return Plugin.ROLE;
     }
 
     public String getRoleHint()
@@ -73,6 +73,6 @@ public class MavenMojoDescriptor
 
     public String getComponentType()
     {
-        return "maven-plugin";
+        return DefaultPluginManager.MAVEN_PLUGIN;
     }
 }

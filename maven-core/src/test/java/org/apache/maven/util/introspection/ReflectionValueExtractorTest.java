@@ -56,7 +56,7 @@ public class ReflectionValueExtractorTest
 
         assertEquals( "4.0.0", ReflectionValueExtractor.evaluate( "project.modelVersion", project ) );
 
-        assertEquals( "maven", ReflectionValueExtractor.evaluate( "project.groupId", project ) );
+        assertEquals( "org.apache.maven", ReflectionValueExtractor.evaluate( "project.groupId", project ) );
 
         assertEquals( "maven-core", ReflectionValueExtractor.evaluate( "project.artifactId", project ) );
 

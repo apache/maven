@@ -4,6 +4,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.apache.maven.plugin.AbstractPlugin;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -23,9 +24,8 @@ public class PluginDescriptorBuilder
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
 
-        // TODO: hardcoding
-        pluginDescriptor.setGroupId( "maven" );
-        pluginDescriptor.setArtifactId( "maven-" + c.getChild( "id" ).getValue() + "-plugin" );
+        pluginDescriptor.setGroupId( AbstractPlugin.getDefaultPluginGroupId() );
+        pluginDescriptor.setArtifactId( AbstractPlugin.getDefaultPluginArtifactId( c.getChild( "id" ).getValue() ) );
 
         // ----------------------------------------------------------------------
         // Components

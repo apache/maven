@@ -28,6 +28,8 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.DefaultPluginManager;
+import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -106,9 +108,9 @@ public class DefaultLifecycleExecutor
 
                 if ( artifactHandler.additionalPlugin() != null )
                 {
-                    String additionalPluginGroupId = "maven";
+                    String additionalPluginGroupId = AbstractPlugin.getDefaultPluginGroupId();
 
-                    String additionalPluginArtifactId = "maven-" + artifactHandler.additionalPlugin() + "-plugin";
+                    String additionalPluginArtifactId = AbstractPlugin.getDefaultPluginArtifactId( artifactHandler.additionalPlugin() );
 
                     injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
 

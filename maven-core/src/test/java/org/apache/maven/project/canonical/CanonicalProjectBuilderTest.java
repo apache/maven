@@ -55,7 +55,7 @@ public class CanonicalProjectBuilderTest
 
         Plugin plugin = (Plugin) plugins.get( 0 );
 
-        assertEquals( "maven", plugin.getGroupId() );
+        assertEquals( "org.apache.maven.plugins", plugin.getGroupId() );
 
         assertEquals( "maven-plexus-plugin", plugin.getArtifactId() );
 

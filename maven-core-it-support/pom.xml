@@ -1,7 +1,14 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
-  <artifactId>maven-it-support</artifactId>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-core-it-support</artifactId>
   <packaging>jar</packaging>
   <version>1.0</version>
+  <distributionManagement>
+    <repository>
+      <id>repo1</id>
+      <name>Maven Central Repository</name>
+      <url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url>
+    </repository>
+  </distributionManagement>
 </model>

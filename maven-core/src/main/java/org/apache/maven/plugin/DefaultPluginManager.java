@@ -72,6 +72,7 @@ public class DefaultPluginManager
     extends AbstractLogEnabled
     implements PluginManager, ComponentDiscoveryListener, Initializable, Contextualizable
 {
+    // TODO: share with type handler
     static String MAVEN_PLUGIN = "maven-plugin";
 
     protected Map mojoDescriptors;
@@ -207,7 +208,7 @@ public class DefaultPluginManager
             pluginId = pluginId.substring( 0, pluginId.indexOf( ":" ) );
         }
 
-        return "maven-" + pluginId + "-plugin";
+        return AbstractPlugin.getDefaultPluginArtifactId( pluginId );
     }
 
     // TODO: don't throw Exception
@@ -216,8 +217,7 @@ public class DefaultPluginManager
     {
         String pluginId = getPluginId( goalName );
 
-        // TODO: hardcoding of group ID/artifact ID
-        verifyPlugin( "maven", pluginId, session );
+        verifyPlugin( AbstractPlugin.getDefaultPluginGroupId(), pluginId, session );
     }
 
     // TODO: don't throw Exception
@@ -267,9 +267,8 @@ public class DefaultPluginManager
 
                 artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
-                // TODO: more hard coding here...
-                Artifact pluginArtifact = artifactFactory.createArtifact( "maven", artifactId, version, null,
-                                                                          "maven-plugin", null );
+                Artifact pluginArtifact = artifactFactory.createArtifact( AbstractPlugin.getDefaultPluginGroupId(), artifactId,
+                                                                          version, null, MAVEN_PLUGIN, null );
 
                 addPlugin( pluginArtifact, session );
             }

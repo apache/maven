@@ -1,11 +1,10 @@
 <model>
   <parent>
     <artifactId>maven-plugin-tools</artifactId>
-    <groupId>maven</groupId>
+    <groupId>org.apache.maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
   <artifactId>maven-plugin-tools-java</artifactId>
   <packaging>jar</packaging>
   <name>Maven Plugin Tools for Java</name>
@@ -26,35 +25,35 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-tools-api</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>

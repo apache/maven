@@ -1,23 +1,22 @@
 <project>
   <parent>
     <artifactId>maven-plugin-parent</artifactId>
-    <groupId>maven</groupId>
+    <groupId>org.apache.maven.plugins</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
   <artifactId>maven-assemble-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Assemble Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <dependencies>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>2.0-SNAPSHOT</version>
     </dependency>

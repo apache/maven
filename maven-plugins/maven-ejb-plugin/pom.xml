@@ -1,11 +1,10 @@
 <model>
   <parent>
     <artifactId>maven-plugin-parent</artifactId>
-    <groupId>maven</groupId>
+    <groupId>org.apache.maven.plugins</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
   <artifactId>maven-ejb-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven EJB Plugin</name>
@@ -26,28 +25,28 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-archiver</artifactId>
       <version>1.0-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>

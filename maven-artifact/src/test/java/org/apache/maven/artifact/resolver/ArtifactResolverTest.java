@@ -147,7 +147,7 @@ public class ArtifactResolverTest
 
                 if ( artifact.getArtifactId().equals( "g" ) )
                 {
-                    dependencies.add( createArtifact( "maven", "h", "1.0", "jar" ) );
+                    dependencies.add( createArtifact( "org.apache.maven", "h", "1.0", "jar" ) );
                 }
 
                 return dependencies;
@@ -184,7 +184,7 @@ public class ArtifactResolverTest
 
                 if ( artifact.getArtifactId().equals( "i" ) )
                 {
-                    dependencies.add( createArtifact( "maven", "j", "1.0", "jar" ) );
+                    dependencies.add( createArtifact( "org.apache.maven", "j", "1.0", "jar" ) );
                 }
 
                 return dependencies;

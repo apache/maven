@@ -1,1 +1,1 @@
-rm ${localRepository}/maven/poms/maven-it-support-parent-1.0.pom
+rm ${localRepository}/org.apache.maven/poms/maven-core-it-support-parent-1.0.pom

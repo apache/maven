@@ -1,20 +1,20 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
+  <groupId>org.apache.maven</groupId>
   <artifactId>maven-repository-tools</artifactId>
   <packaging>jar</packaging>
   <name>Maven Repo Reaper</name>
   <version>1.0-SNAPSHOT</version>
   <dependencies>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>
@@ -49,7 +49,7 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>maven</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>2.0-SNAPSHOT</version>
       <type>jar</type>

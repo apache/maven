@@ -85,4 +85,20 @@ public abstract class AbstractPlugin
     {
         throw new PluginExecutionException( "You must override execute() if you implement the new paradigm" );
     }
+
+    /**
+     * @todo remove - harcoding.
+     */
+    public static String getDefaultPluginArtifactId( String id )
+    {
+        return "maven-" + id + "-plugin";
+    }
+
+    /**
+     * @todo remove - harcoding.
+     */
+    public static String getDefaultPluginGroupId()
+    {
+        return "org.apache.maven.plugins";
+    }
 }

@@ -1,1 +1,1 @@
-rm ${localRepository}/maven/poms/maven-core-it0005-1.0-SNAPSHOT.pom
+rm ${localRepository}/org.apache.maven/poms/maven-core-it0005-1.0-SNAPSHOT.pom

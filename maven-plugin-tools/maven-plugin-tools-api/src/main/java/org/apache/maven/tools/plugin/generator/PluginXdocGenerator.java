@@ -73,7 +73,7 @@ public class PluginXdocGenerator
 
         w.addAttribute( "email", "dev@maven.apache.org" );
 
-        w.writeText( "Maven developement team." );
+        w.writeText( "Maven development team." );
 
         w.endElement();
 

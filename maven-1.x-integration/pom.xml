@@ -1,11 +1,10 @@
 <model>
   <parent>
     <artifactId>maven-component</artifactId>
-    <groupId>maven</groupId>
+    <groupId>org.apache.maven</groupId>
     <version>2.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
   <artifactId>maven-1.x-integration</artifactId>
   <packaging>jar</packaging>
   <name>Maven 1.x Compatibility</name>

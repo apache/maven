@@ -1948,7 +1948,7 @@
           <name>groupId</name>
           <version>4.0.0</version>
           <type>String</type>
-          <defaultValue>maven</defaultValue>
+          <defaultValue>org.apache.maven.plugins</defaultValue>
         </field>
         <field>
           <name>artifactId</name>

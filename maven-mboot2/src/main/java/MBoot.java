@@ -53,13 +53,13 @@ public class MBoot
                                        "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar"};
 
     String[] pluginGeneratorDeps = new String[]{"plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
-                                                "maven/jars/maven-core-2.0-SNAPSHOT.jar",
-                                                "maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
-                                                "maven/jars/maven-model-2.0-SNAPSHOT.jar",
-                                                "maven/jars/maven-plugin-2.0-SNAPSHOT.jar",
-                                                "maven/jars/maven-plugin-tools-api-2.0-SNAPSHOT.jar",
-                                                "maven/jars/maven-plugin-tools-java-2.0-SNAPSHOT.jar",
-                                                "maven/jars/maven-plugin-tools-pluggy-2.0-SNAPSHOT.jar"};
+                                                "org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar",
+                                                "org.apache.maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
+                                                "org.apache.maven/jars/maven-model-2.0-SNAPSHOT.jar",
+                                                "org.apache.maven/jars/maven-plugin-2.0-SNAPSHOT.jar",
+                                                "org.apache.maven/jars/maven-plugin-tools-api-2.0-SNAPSHOT.jar",
+                                                "org.apache.maven/jars/maven-plugin-tools-java-2.0-SNAPSHOT.jar",
+                                                "org.apache.maven/jars/maven-plugin-tools-pluggy-2.0-SNAPSHOT.jar"};
 
     // ----------------------------------------------------------------------
     // These are modello's runtime dependencies
@@ -135,8 +135,6 @@ public class MBoot
 
     private ArtifactDownloader downloader;
 
-    private ModelReader reader;
-
     private String repoLocal;
 
     private List mbootDependencies;
@@ -180,7 +178,7 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
-        reader = new ModelReader();
+        ModelReader reader = new ModelReader();
 
         String mavenRepoLocal = System.getProperty( "maven.repo.local" );
 
@@ -324,14 +322,12 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            buildProject( directory, builds[i] );
+            reader = buildProject( directory, builds[i] );
 
             if ( reader.artifactId.equals( "maven-core" ) )
             {
                 coreDeps = reader.getDependencies();
             }
-
-            reader.reset();
 
             System.out.println( "--------------------------------------------------------------------" );
         }
@@ -348,9 +344,7 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            buildProject( directory, pluginBuilds[i] );
-
-            reader.reset();
+            reader = buildProject( directory, pluginBuilds[i] );
 
             System.out.println( "--------------------------------------------------------------------" );
         }
@@ -434,7 +428,7 @@ public class MBoot
 
         // Copy maven itself
 
-        FileUtils.copyFileToDirectory( repoLocal + "/maven/jars/maven-core-2.0-SNAPSHOT.jar", lib );
+        FileUtils.copyFileToDirectory( repoLocal + "/org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar", lib );
 
         System.out.println();
 
@@ -475,10 +469,12 @@ public class MBoot
         System.out.println( "Finished at: " + fullStop );
     }
 
-    public void buildProject( String basedir, String projectId )
+    public ModelReader buildProject( String basedir, String projectId )
         throws Exception
     {
         System.out.println( "Building project in " + basedir );
+
+        ModelReader reader = new ModelReader();
 
         if ( !reader.parse( new File( basedir, "pom.xml" ) ) )
         {
@@ -651,24 +647,26 @@ public class MBoot
         // Run tests
         // ----------------------------------------------------------------------
 
-        runTests( basedir, classes, testClasses );
+        runTests( basedir, classes, testClasses, reader );
 
         // ----------------------------------------------------------------------
         // Create JAR
         // ----------------------------------------------------------------------
 
-        createJar( classes, buildDir );
+        createJar( classes, buildDir, reader );
 
-        installPom( basedir, repoLocal );
+        installPom( basedir, repoLocal, reader );
 
         if ( !reader.artifactId.equals( "maven-plugin" ) && reader.artifactId.endsWith( "plugin" ) )
         {
-            installPlugin( basedir, repoLocal );
+            installPlugin( basedir, repoLocal, reader );
         }
         else
         {
-            installJar( basedir, repoLocal );
+            installJar( basedir, repoLocal, reader );
         }
+
+        return reader;
     }
 
     IsolatedClassLoader cl;
@@ -779,7 +777,7 @@ public class MBoot
         downloader.downloadDependencies( Arrays.asList( modelloDeps ) );
     }
 
-    private void createJar( String classes, String buildDir )
+    private void createJar( String classes, String buildDir, ModelReader reader )
         throws Exception
     {
         JarMojo jarMojo = new JarMojo();
@@ -794,6 +792,8 @@ public class MBoot
     private void installPomFile( String repoLocal, File pomIn )
         throws Exception
     {
+        ModelReader reader = new ModelReader();
+
         if ( !reader.parse( pomIn ) )
         {
             System.err.println( "Could not parse pom.xml" );
@@ -807,16 +807,24 @@ public class MBoot
 
         String groupId = reader.groupId;
 
+        if ( groupId == null )
+        {
+            groupId = reader.parentGroupId;
+        }
+
+        if ( version == null )
+        {
+            version = reader.parentVersion;
+        }
+
         File pom = new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" );
 
         System.out.println( "Installing POM: " + pom );
 
         FileUtils.copyFile( pomIn, pom );
-
-        reader.reset();
     }
 
-    private void installPom( String basedir, String repoLocal )
+    private void installPom( String basedir, String repoLocal, ModelReader reader )
         throws Exception
     {
         String artifactId = reader.artifactId;
@@ -824,6 +832,16 @@ public class MBoot
         String version = reader.version;
 
         String groupId = reader.groupId;
+
+        if ( groupId == null )
+        {
+            groupId = reader.parentGroupId;
+        }
+
+        if ( version == null )
+        {
+            version = reader.parentVersion;
+        }
 
         File pom = new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" );
 
@@ -832,7 +850,7 @@ public class MBoot
         FileUtils.copyFile( new File( basedir, "pom.xml" ), pom );
     }
 
-    private void installJar( String basedir, String repoLocal )
+    private void installJar( String basedir, String repoLocal, ModelReader reader )
         throws Exception
     {
         String artifactId = reader.artifactId;
@@ -840,6 +858,16 @@ public class MBoot
         String version = reader.version;
 
         String groupId = reader.groupId;
+
+        if ( groupId == null )
+        {
+            groupId = reader.parentGroupId;
+        }
+
+        if ( version == null )
+        {
+            version = reader.parentVersion;
+        }
 
         File jar = new File( repoLocal, "/" + groupId + "/jars/" + artifactId + "-" + version + ".jar" );
 
@@ -848,7 +876,7 @@ public class MBoot
         FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + artifactId + "-" + version + ".jar" ), jar );
     }
 
-    private void installPlugin( String basedir, String repoLocal )
+    private void installPlugin( String basedir, String repoLocal, ModelReader reader )
         throws Exception
     {
         String artifactId = reader.artifactId;
@@ -857,6 +885,16 @@ public class MBoot
 
         String groupId = reader.groupId;
 
+        if ( groupId == null )
+        {
+            groupId = reader.parentGroupId;
+        }
+
+        if ( version == null )
+        {
+            version = reader.parentVersion;
+        }
+
         File jar = new File( repoLocal, "/" + groupId + "/maven-plugins/" + artifactId + "-" + version + ".jar" );
 
         System.out.println( "Installing Plugin: " + jar );
@@ -864,7 +902,7 @@ public class MBoot
         FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + artifactId + "-" + version + ".jar" ), jar );
     }
 
-    private void runTests( String basedir, String classes, String testClasses )
+    private void runTests( String basedir, String classes, String testClasses, ModelReader reader )
         throws Exception
     {
         SurefirePlugin testRunner = new SurefirePlugin();
@@ -881,7 +919,7 @@ public class MBoot
 
         excludes.add( "**/*Abstract*.java" );
 
-        String reportsDir = new File( basedir, "target/test-reports" ).getAbsolutePath();
+        String reportsDir = new File( basedir, "target/surefire-reports" ).getAbsolutePath();
 
         boolean success = testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes,
                                               classpath( reader.getDependencies(), null ), reportsDir );
@@ -1037,8 +1075,6 @@ public class MBoot
     {
         private SAXParserFactory saxFactory;
 
-        public abstract void reset();
-
         public boolean parse( File file )
         {
             try
@@ -1123,11 +1159,6 @@ public class MBoot
         private boolean insideRepository = false;
 
         private StringBuffer bodyText = new StringBuffer();
-
-        public void reset()
-        {
-            dependencies = new ArrayList();
-        }
 
         public List getRemoteRepositories()
         {

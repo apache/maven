@@ -27,7 +27,7 @@ public interface MavenProjectBuilder
 {
     String ROLE = MavenProjectBuilder.class.getName();
     
-    static final String STANDALONE_SUPERPOM_GROUPID = "maven";
+    static final String STANDALONE_SUPERPOM_GROUPID = "org.apache.maven";
     
     static final String STANDALONE_SUPERPOM_ARTIFACTID = "super-pom";
     

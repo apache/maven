@@ -1,11 +1,10 @@
 <model>
   <parent>
     <artifactId>maven-archetype</artifactId>
-    <groupId>maven</groupId>
+    <groupId>org.apache.maven</groupId>
     <version>1.0-alpha-1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>maven</groupId>
   <artifactId>maven-archetype-site</artifactId>
   <packaging>jar</packaging>
   <version>1.0</version>
