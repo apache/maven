@@ -17,7 +17,16 @@ package org.apache.maven.project.helpers;
  */
 
 import junit.framework.TestCase;
-import org.apache.maven.model.*;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Contributor;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.MailingList;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.Resource;
+import org.apache.maven.model.Site;
+import org.apache.maven.model.UnitTest;
 import org.apache.maven.project.MavenProject;
 
 /**
