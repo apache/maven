@@ -20,18 +20,18 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
 public class MavenSetupExecutionRequest
-    extends AbstractMavenExecutionRequest
+extends AbstractMavenExecutionRequest
 {
-    public MavenSetupExecutionRequest( ArtifactRepository localRepository, List goals )
+    public MavenSetupExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals )
     {
-        super( localRepository, goals );
-
+        super( localRepository, properties, goals );
         type = "setup";
     }
 }

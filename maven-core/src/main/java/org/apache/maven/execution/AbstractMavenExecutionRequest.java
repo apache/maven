@@ -18,29 +18,30 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.project.MavenProjectExecutionRequest;
 import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.project.MavenProject;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
 public class AbstractMavenExecutionRequest
-    implements MavenExecutionRequest
+implements MavenExecutionRequest
 {
     protected ArtifactRepository localRepository;
-
+    protected final Properties parameters;
     protected List goals;
-
     protected String type;
-
     protected MavenSession session;
 
-    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, List goals )
+    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, Properties parameters, List goals )
     {
         this.localRepository = localRepository;
-
+        this.parameters = parameters;
         this.goals = goals;
     }
 
@@ -59,6 +60,11 @@ public class AbstractMavenExecutionRequest
         return type;
     }
 
+    public String getParameter( String name )
+    {
+        return parameters.getProperty( name );
+    }
+
     // ----------------------------------------------------------------------
     // Putting the session here but it can probably be folded right in here.
     // ----------------------------------------------------------------------
@@ -71,5 +77,10 @@ public class AbstractMavenExecutionRequest
     public void setSession( MavenSession session )
     {
         this.session = session;
+    }
+
+    public MavenProjectExecutionRequest createProjectExecutionRequest( MavenProject project )
+    {
+        return new MavenProjectExecutionRequest( getLocalRepository(), parameters, getGoals(), project.getFile() );
     }
 }

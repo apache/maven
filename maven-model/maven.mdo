@@ -1565,6 +1565,19 @@
           ]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>username</name>
+          <version>4.0.0</version>
+          <description>The username to connect to the repository with. If omitted, none is used.</description>
+          <type>String</type>
+        </field>
+        <!-- @todo this should be encrypted in some way or be a keystore lookup and m2 can provide a way to generate it -->
+        <field>
+          <name>password</name>
+          <version>4.0.0</version>
+          <description>The password to use when connecting to the repository. If omitted, none is used.</description>
+          <type>String</type>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

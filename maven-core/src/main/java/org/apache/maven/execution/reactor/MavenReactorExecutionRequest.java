@@ -22,30 +22,26 @@ import org.apache.maven.execution.AbstractMavenExecutionRequest;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
 public class MavenReactorExecutionRequest
-    extends AbstractMavenExecutionRequest
+extends AbstractMavenExecutionRequest
 {
     private String includes;
-
     private String excludes;
-
     private File baseDirectory;
 
-    public MavenReactorExecutionRequest( ArtifactRepository localRepository, List goals, String includes, String excludes, File baseDirectory )
+    public MavenReactorExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals,
+                                         String includes, String excludes, File baseDirectory )
     {
-        super( localRepository, goals );
-
+        super( localRepository, properties, goals );
         this.includes = includes;
-
         this.excludes = excludes;
-
         this.baseDirectory = baseDirectory;
-
         type = "reactor";
     }
 

@@ -18,7 +18,9 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.project.MavenProjectExecutionRequest;
 import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.project.MavenProject;
 
 import java.util.List;
 
@@ -30,6 +32,8 @@ public interface MavenExecutionRequest
 {
     ArtifactRepository getLocalRepository();
 
+    String getParameter( String name );
+
     List getGoals();
 
     String getType();
@@ -37,4 +41,6 @@ public interface MavenExecutionRequest
     void setSession( MavenSession session );
 
     MavenSession getSession();
+
+    MavenProjectExecutionRequest createProjectExecutionRequest( MavenProject project );
 }

@@ -22,22 +22,22 @@ import org.apache.maven.execution.AbstractMavenExecutionRequest;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
 public class MavenProjectExecutionRequest
-    extends AbstractMavenExecutionRequest
+extends AbstractMavenExecutionRequest
 {
     private File pom;
 
-    public MavenProjectExecutionRequest( ArtifactRepository localRepository, List goals, File pom )
+    public MavenProjectExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals,
+                                         File pom )
     {
-        super( localRepository, goals );
-
+        super( localRepository, properties, goals );
         this.pom = pom;
-
         type = "project";
     }
 
