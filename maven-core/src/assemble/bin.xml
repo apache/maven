@@ -36,6 +36,10 @@
       <excludes>
         <exclude>plexus:plexus-container-default</exclude>
         <exclude>classworlds:classworlds</exclude>
+        <!-- included in default container - not needed -->
+        <exclude>plexus:plexus-utils</exclude>
+        <!-- transitively picked up via default container - not needed -->
+        <exclude>junit:junit</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
