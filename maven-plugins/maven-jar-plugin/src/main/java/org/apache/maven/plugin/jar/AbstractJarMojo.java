@@ -148,6 +148,11 @@ public abstract class AbstractJarMojo
      * @throws IOException if there is a problem writing the archive or reading the sources
      */
     protected void createJar(File jarFile, Map includes) throws IOException {
+        File parentJarFile = jarFile.getParentFile();
+        if ( !parentJarFile.exists() )
+        {
+            parentJarFile.mkdirs();
+        }
         JarOutputStream jos = createJar(jarFile, createManifest());
         try {
             addEntries(jos, includes);
