@@ -81,11 +81,11 @@ public class DefaultLifecycleExecutor
 
             processPluginConfiguration( session.getProject(), session );
 
-            processGoalChain( tasks, session );
-
             for ( Iterator i = tasks.iterator(); i.hasNext(); )
             {
                 String task = (String) i.next();
+
+                processGoalChain( task, session );
 
                 if ( phaseMap.containsKey( task ) )
                 {
@@ -154,37 +154,32 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void processGoalChain( List tasks, MavenSession session )
+    private void processGoalChain( String task, MavenSession session )
         throws Exception
     {
-        for ( Iterator i = tasks.iterator(); i.hasNext(); )
+        if ( phaseMap.containsKey( task ) )
         {
-            String task = (String) i.next();
+            // only execute up to the given phase
+            int index = phases.indexOf( phaseMap.get( task ) );
 
-            if ( phaseMap.containsKey( task ) )
+            for ( int j = 0; j <= index; j++ )
             {
-                // only execute up to the given phase
-                int index = phases.indexOf( phaseMap.get( task ) );
+                Phase p = (Phase) phases.get( j );
 
-                for ( int j = 0; j <= index; j++ )
+                if ( p.getGoals() != null )
                 {
-                    Phase p = (Phase) phases.get( j );
-
-                    if ( p.getGoals() != null )
+                    for ( Iterator k = p.getGoals().iterator(); k.hasNext(); )
                     {
-                        for ( Iterator k = p.getGoals().iterator(); k.hasNext(); )
-                        {
-                            String goal = (String) k.next();
+                        String goal = (String) k.next();
 
-                            verifyMojoPhase( goal, session );
-                        }
+                        verifyMojoPhase( goal, session );
                     }
                 }
             }
-            else
-            {
-                verifyMojoPhase( task, session );
-            }
+        }
+        else
+        {
+            verifyMojoPhase( task, session );
         }
     }
 
