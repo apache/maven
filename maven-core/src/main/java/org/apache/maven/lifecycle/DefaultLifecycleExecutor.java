@@ -211,7 +211,12 @@ public class DefaultLifecycleExecutor
         {
             pluginManager.verifyPluginForGoal( task, session );
             mojoDescriptor = pluginManager.getMojoDescriptor( task );
-            if ( mojoDescriptor != null && mojoDescriptor.getPhase() != null )
+            if ( mojoDescriptor == null )
+            {
+                throw new LifecycleExecutionException( "Required goal not found: " + task );
+            }
+
+            if ( mojoDescriptor.getPhase() != null )
             {
                 Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
                 phase.getGoals().add( task );
