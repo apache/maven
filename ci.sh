@@ -26,12 +26,15 @@ CMD=$1
 
 [ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit
 
+HOME_DIR=`pwd`
+DATE=`date`
 DIR=m2
 REPO=maven-repo-local
 FROM=jvanzyl@maven.org
 TO=maven2-user@lists.codehaus.org
 SCM_LOG=scm.log
 TIMESTAMP=`date +%Y%M%d.%H%M%S`
+DEPLOY_DIR=$HOME_DIR/public_html/m2
 
 # ----------------------------------------------------------------------------------
 
@@ -40,8 +43,6 @@ TIMESTAMP=`date +%Y%M%d.%H%M%S`
 
 # ----------------------------------------------------------------------------------
 
-HOME_DIR=`pwd`
-DATE=`date`
 echo "From: $FROM" > log
 echo "To: $TO" >> log
 echo "Subject: Maven bootstrap on beaver [$DATE]" >> log
@@ -126,7 +127,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
       
       tar czf m2-${TIMESTAMP}.tar.gz m2
       
-      cp m2-${TIMESTAMP}.tar.gz $HOME_DIR
+      cp m2-${TIMESTAMP}.tar.gz $DEPLOY_DIR
     )
 
   else
