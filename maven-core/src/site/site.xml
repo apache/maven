@@ -14,8 +14,7 @@
       <item name="The Codehaus" href="http://www.codehaus.org"/>
     </links>
     <menu name="Quick Links">
-      <item name="Examples" href="/examples.html"/>    
-      <item name="Alpha release criteria" href="/alpha-release-criteria.html"/>
+      <item name="Lifecycle" href="/lifecycle.html"/>    
       <item name="Configuration management" href="/configuration-management.html"/>
       <item name="Install" href="/install.html"/>
     </menu>
@@ -23,9 +22,6 @@
       <item name="Plugins" href="/plugins.html"/>
       <item name="Plugin descriptors" href="/plugin-descriptors.html"/>
       <item name="Mojos" href="/mojos.html"/>
-    </menu>
-    <menu name="Bug holes">
-      <item name="Bugs to fix" href="/bugs.html"/>
     </menu>
   </body>
 </project>
