@@ -428,7 +428,19 @@ public class MBoot
 
         System.out.println( "Compiling test sources ..." );
 
-        compile( reader.getDependencies(), testSources, testClasses, basedir + "/target/classes", null );
+        List testDependencies = reader.getDependencies();
+
+        Dependency junitDep = new Dependency();
+
+        junitDep.setGroupId( "junit" );
+
+        junitDep.setArtifactId( "junit" );
+
+        junitDep.setVersion( "3.8.1" );
+
+        testDependencies.add( junitDep );
+
+        compile( testDependencies, testSources, testClasses, basedir + "/target/classes", null );
 
         // ----------------------------------------------------------------------
         // Test resources
