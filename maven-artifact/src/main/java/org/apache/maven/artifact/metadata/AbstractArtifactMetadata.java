@@ -27,14 +27,14 @@ import org.apache.maven.artifact.Artifact;
 public abstract class AbstractArtifactMetadata
     implements ArtifactMetadata
 {
-    protected final String filenameSuffix;
+    protected final String filename;
 
     protected Artifact artifact;
 
     protected AbstractArtifactMetadata( Artifact artifact, String filename )
     {
         this.artifact = artifact;
-        this.filenameSuffix = filename;
+        this.filename = filename;
     }
 
     public void setArtifact( Artifact artifact )
@@ -47,8 +47,8 @@ public abstract class AbstractArtifactMetadata
         return artifact;
     }
 
-    public String getFilenameSuffix()
+    public String getFilename()
     {
-        return filenameSuffix;
+        return filename;
     }
 }

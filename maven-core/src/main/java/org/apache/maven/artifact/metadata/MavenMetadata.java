@@ -42,7 +42,7 @@ public class MavenMetadata
 
     public MavenMetadata( Artifact artifact, File file )
     {
-        super( artifact, "pom" );
+        super( artifact, artifact.getArtifactId() + "-" + artifact.getVersion() + ".pom" );
         this.file = file;
     }
 

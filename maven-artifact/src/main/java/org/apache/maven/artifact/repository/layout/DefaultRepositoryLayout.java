@@ -25,12 +25,12 @@ public class DefaultRepositoryLayout
 
     protected String layoutPattern()
     {
-        return "${groupPath}/${artifactId}/${version}/${artifactId}-${version}-${classifier}.${extension}";
+        return "${groupPath}/${artifactId}/${baseVersion}/${artifactId}-${version}-${classifier}.${extension}";
     }
 
     protected String metadataLayoutPattern()
     {
-        return "${groupPath}/${artifactId}/${version}/${artifactId}-${version}.${metadataSuffix}";
+        return "${groupPath}/${artifactId}/${baseVersion}/${metadataFilename}";
     }
 
     protected String groupIdAsPath( String groupId )

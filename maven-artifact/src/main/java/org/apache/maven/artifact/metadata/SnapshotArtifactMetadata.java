@@ -46,40 +46,28 @@ public class SnapshotArtifactMetadata
 
     private int buildNumber = 0;
 
-    private static final String SNAPSHOT_VERSION_LOCAL_FILE = "version-local.txt";
-
     private static final String SNAPSHOT_VERSION_FILE = "version.txt";
 
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
-    private SnapshotArtifactMetadata( Artifact artifact, String filename )
+    public SnapshotArtifactMetadata( Artifact artifact )
     {
-        super( artifact, filename );
+        super( artifact, artifact.getArtifactId() + "-" + artifact.getBaseVersion() + "." + SNAPSHOT_VERSION_FILE );
     }
 
-    public static SnapshotArtifactMetadata readLocalSnapshotMetadata( Artifact artifact,
-                                                                      ArtifactRepository localRepository )
+    public static SnapshotArtifactMetadata readFromLocalRepository( Artifact artifact,
+                                                                    ArtifactRepository localRepository )
         throws ArtifactPathFormatException, IOException
     {
-        SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact, SNAPSHOT_VERSION_LOCAL_FILE );
+        SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
         File f = metadata.getLocalRepositoryLocation( localRepository );
         if ( f.exists() )
         {
             metadata.readFromFile( f );
         }
         return metadata;
-    }
-
-    public static SnapshotArtifactMetadata createLocalSnapshotMetadata( Artifact artifact )
-    {
-        return new SnapshotArtifactMetadata( artifact, SNAPSHOT_VERSION_LOCAL_FILE );
-    }
-
-    public static SnapshotArtifactMetadata createRemoteSnapshotMetadata( Artifact artifact )
-    {
-        return new SnapshotArtifactMetadata( artifact, SNAPSHOT_VERSION_FILE );
     }
 
     public void storeInLocalRepository( ArtifactRepository localRepository )
@@ -92,7 +80,7 @@ public class SnapshotArtifactMetadata
                 timestamp = getUtcDateFormatter().format( new Date() );
             }
             String path = getLocalRepositoryLocation( localRepository ).getPath();
-            FileUtils.fileWrite( path, getVersion() );
+            FileUtils.fileWrite( path, constructVersion() );
         }
         catch ( IOException e )
         {
@@ -110,26 +98,37 @@ public class SnapshotArtifactMetadata
         return new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
     }
 
-    public String getVersion()
+    public String constructVersion()
     {
-        String version = artifact.getVersion();
+        String version = artifact.getBaseVersion();
         if ( timestamp != null )
         {
+            String newVersion = timestamp + "-" + buildNumber;
             if ( version != null )
             {
-                version = StringUtils.replace( version, "SNAPSHOT", timestamp ) + "-" + buildNumber;
+                version = StringUtils.replace( version, "SNAPSHOT", newVersion );
             }
             else
             {
-                version = timestamp + "-" + buildNumber;
+                version = newVersion;
             }
         }
         return version;
     }
 
-    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager )
+    /**
+     * Retrieve the metadata from the remote repository into the local repository.
+     *
+     * @param remoteRepository the remote repository
+     * @param wagonManager     the wagon manager to use to retrieve the metadata
+     */
+    public static SnapshotArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
+                                                                         ArtifactRepository remoteRepository,
+                                                                         WagonManager wagonManager )
         throws ArtifactMetadataRetrievalException
     {
+        SnapshotArtifactMetadata snapshotMetadata = new SnapshotArtifactMetadata( artifact );
+
         try
         {
             File destination = File.createTempFile( "maven-artifact", null );
@@ -137,15 +136,14 @@ public class SnapshotArtifactMetadata
 
             try
             {
-                wagonManager.getArtifactMetadata( this, remoteRepository, destination );
+                wagonManager.getArtifactMetadata( snapshotMetadata, remoteRepository, destination );
+
+                snapshotMetadata.readFromFile( destination );
             }
             catch ( ResourceDoesNotExistException e )
             {
                 // this just means that there is no snapshot version file, so we keep timestamp = null, build = 0
-                return;
             }
-
-            readFromFile( destination );
         }
         catch ( TransferFailedException e )
         {
@@ -155,6 +153,8 @@ public class SnapshotArtifactMetadata
         {
             throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
         }
+
+        return snapshotMetadata;
     }
 
     private void readFromFile( File destination )

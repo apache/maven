@@ -39,6 +39,8 @@ public class DefaultArtifact
 
     private final String version;
 
+    private String baseVersion;
+
     private final String type;
 
     private final String classifier;
@@ -129,10 +131,6 @@ public class DefaultArtifact
 
     public File getFile()
     {
-        if ( file == null )
-        {
-            throw new IllegalStateException( "Artifact's local file has not yet been assigned - not resolved" );
-        }
         return file;
     }
 
@@ -152,7 +150,7 @@ public class DefaultArtifact
 
     public String getId()
     {
-        return getConflictId() + ( hasClassifier() ? ( ":" + getClassifier() ) : "" ) + ":" + getVersion();
+        return getConflictId() + ( hasClassifier() ? ( ":" + getClassifier() ) : "" ) + ":" + getBaseVersion();
     }
 
     public String getConflictId()
@@ -230,4 +228,19 @@ public class DefaultArtifact
         }
         return true;
     }
+
+    public String getBaseVersion()
+    {
+        if ( baseVersion == null )
+        {
+            baseVersion = version;
+        }
+        return baseVersion;
+    }
+
+    public void setBaseVersion( String baseVersion )
+    {
+        this.baseVersion = baseVersion;
+    }
+
 }

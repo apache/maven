@@ -24,6 +24,8 @@ import java.util.List;
 
 /**
  * Description of an artifact.
+ *
+ * @todo do we really need an interface here?
  */
 public interface Artifact
 {
@@ -59,6 +61,10 @@ public interface Artifact
     File getFile();
 
     void setFile( File destination );
+
+    String getBaseVersion();
+
+    void setBaseVersion( String baseVersion );
 
     // ----------------------------------------------------------------------
 

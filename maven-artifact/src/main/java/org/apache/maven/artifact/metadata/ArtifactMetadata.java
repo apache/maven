@@ -17,7 +17,6 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
@@ -40,15 +39,6 @@ public interface ArtifactMetadata
         throws ArtifactMetadataRetrievalException;
 
     /**
-     * Retrieve the metadata from the remote repository into the local repository.
-     *
-     * @param remoteRepository the remote repository
-     * @param wagonManager     the wagon manager to use to retrieve the metadata
-     */
-    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager )
-        throws ArtifactMetadataRetrievalException;
-
-    /**
      * Get the associated artifact.
      *
      * @return the artifact
@@ -56,11 +46,11 @@ public interface ArtifactMetadata
     Artifact getArtifact();
 
     /**
-     * Get the filenameSuffix of this metadata.
+     * Get the filename of this metadata.
      *
-     * @return the filenameSuffix
+     * @return the filename
      */
-    String getFilenameSuffix();
+    String getFilename();
 
 
     /**
