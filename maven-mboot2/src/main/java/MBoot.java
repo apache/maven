@@ -61,7 +61,7 @@ public class MBoot
     
     String[] pluginGeneratorDeps = new String[]{
         "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
-        "classworlds/jars/classworlds-1.1-alpha-1.jar",
+        "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
         "maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
         "maven/jars/maven-core-2.0-SNAPSHOT.jar",
         "maven/jars/maven-model-2.0-SNAPSHOT.jar",
@@ -256,6 +256,9 @@ public class MBoot
 
         // Install plugin-parent POM
         installPomFile( repoLocal, new File( basedir, "maven-plugins/pom.xml" ) );
+
+        // Install plugin-parent POM
+        installPomFile( repoLocal, new File( basedir, "maven-plugin-tools/pom.xml" ) );
 
         createToolsClassLoader();
 
