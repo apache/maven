@@ -9,3 +9,12 @@ of these would help I think.
 
 - Being able to write artifact handler that would operate to install an
 xdoclet plugin correctly when an xdoclet plugin is stated as a dependency.
+
+- With Maven installed it should be a simple command that allows you to
+checkout the sources for a project.
+
+- Unified source directory structure that is analagous to the repository
+itself. This way locations of intermediary artifacts of a build would be
+in a known location.  This would also help with developer setup i.e. getting
+new developers up and running. They could run a maven command and have all
+their source trees set up in the same way as their collegues.
