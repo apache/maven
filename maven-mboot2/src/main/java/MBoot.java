@@ -60,7 +60,7 @@ public class MBoot
     String[] modelloDeps = new String[]
     {
         "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
-        "plexus/jars/plexus-0.16.jar",
+        "plexus/jars/plexus-0.17-SNAPSHOT.jar",
         "maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
 //        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
