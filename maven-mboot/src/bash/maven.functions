@@ -262,6 +262,8 @@ buildMavenProject()
 
         echo "Installing ${jarName} in ${repoLocal}/${groupId}/jars"
 
+        mkdir -p ${repoLocal}/${groupId}/jars > /dev/null 2>&1
+
         cp target/${jarName} ${repoLocal}/${groupId}/jars
         
       fi
