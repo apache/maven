@@ -108,6 +108,7 @@ public class CompilerMojo extends AbstractPlugin
 
         List messages = compiler.compile( compilerConfiguration );
 
+        // TODO: doesn't appear to be called
         if ( debug )
         {
             for ( Iterator i = classpathElements.iterator(); i.hasNext(); )

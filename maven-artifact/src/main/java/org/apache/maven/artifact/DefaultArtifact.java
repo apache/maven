@@ -57,7 +57,8 @@ public class DefaultArtifact
     /** @todo this should be replaced by type handler */
     public DefaultArtifact( String groupId, String artifactId, String version, String type, String extension )
     {
-        this( groupId, artifactId, version, SCOPE_RUNTIME, type, extension );
+        // TODO: default should be runtime, except in currently building POM where it is compile.
+        this( groupId, artifactId, version, SCOPE_COMPILE, type, extension );
     }
 
     public DefaultArtifact( String groupId, String artifactId, String version, String type )

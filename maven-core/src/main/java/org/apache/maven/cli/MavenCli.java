@@ -37,9 +37,11 @@ import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
+import org.apache.maven.plugin.Plugin;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.LoggerManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -154,18 +156,24 @@ public class MavenCli
         ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
 
         embedder.start( classWorld );
-        
-        Logger logger = embedder.getContainer().getLogger();
-        if( logger != null )
+
+        LoggerManager manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
+        if ( commandLine.hasOption( CLIManager.DEBUG ) )
+        {
+            manager.setThreshold( Logger.LEVEL_DEBUG );
+        }
+
+        // TODO [BP]: do we set one per mojo? where to do it?
+        Logger logger = manager.getLoggerForComponent( Plugin.ROLE );
+        if ( logger != null )
         {
             request.setLog( new DefaultLog( logger ) );
             
             request.addEventMonitor( new DefaultEventMonitor( logger ) );
         }
         
-        // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place.
+        // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place (likewise logger).
         WagonManager wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
-
         wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
 
         Maven maven = (Maven) embedder.lookup( Maven.ROLE );

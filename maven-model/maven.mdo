@@ -807,7 +807,9 @@
           <version>4.0.0</version>
           <description>The scope of the dependency - build, compile, test, runtime</description>
           <type>String</type>
+<!-- TODO: set default value? see DefaultArtifact first
           <defaultValue>runtime</defaultValue>
+-->
         </field>
       </fields>
       <codeSegments>
