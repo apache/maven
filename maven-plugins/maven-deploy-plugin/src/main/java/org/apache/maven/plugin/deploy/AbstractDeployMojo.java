@@ -73,11 +73,6 @@ public abstract class AbstractDeployMojo
     extends AbstractPlugin
 {
 
-    protected boolean isPom()
-    {
-        return false;
-    }
-
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
@@ -122,7 +117,7 @@ public abstract class AbstractDeployMojo
         artifactDeployer.deploy( pom, pomArtifact, deploymentRepository );
 
         //Deploy artifact
-        if ( !isPom() )
+        if ( !"pom".equals( project.getPackaging() ) )
         {
             Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
                                                      project.getVersion(), project.getPackaging() );
