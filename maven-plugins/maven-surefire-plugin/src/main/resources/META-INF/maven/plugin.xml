@@ -2,7 +2,7 @@
   <id>surefire</id>
   <implementation>org.apache.maven.test.SurefirePlugin</implementation>
   <instantiation-strategy>singleton</instantiation-strategy>
-  <mode>singleton</mode>
+  <mode>integrated</mode>
   <goals>
     <goal>
       <name>test</name>
@@ -11,31 +11,28 @@
         <prereq>resources</prereq>
         <prereq>test:resources</prereq>
       </prereqs>
-      <method>
-        <name>execute</name>
-        <parameters>
-          <parameter>
-            <name>mavenRepoLocal</name>
-            <expression>#maven.repo.local</expression>
-          </parameter>
-          <parameter>
-            <name>basedir</name>
-            <expression>#basedir</expression>
-          </parameter>
-          <parameter>
-            <name>includes</name>
-            <expression>#project.build.unitTest.includes</expression>
-          </parameter>
-          <parameter>
-            <name>excludes</name>
-            <expression>#project.build.unitTest.excludes</expression>
-          </parameter>
-          <parameter>
-            <name>classpathElements</name>
-            <expression>#project.classpathElements</expression>
-          </parameter>
-        </parameters>
-      </method>
+      <parameters>
+        <parameter>
+          <name>mavenRepoLocal</name>
+          <expression>#maven.repo.local</expression>
+        </parameter>
+        <parameter>
+          <name>basedir</name>
+          <expression>#basedir</expression>
+        </parameter>
+        <parameter>
+          <name>includes</name>
+          <expression>#project.build.unitTest.includes</expression>
+        </parameter>
+        <parameter>
+          <name>excludes</name>
+          <expression>#project.build.unitTest.excludes</expression>
+        </parameter>
+        <parameter>
+          <name>classpathElements</name>
+          <expression>#project.classpathElements</expression>
+        </parameter>
+      </parameters>
     </goal>
   </goals>
 </plugin>
