@@ -39,7 +39,7 @@ public class MBoot
     // maven-plugins
 
     // ----------------------------------------------------------------------
-    // 
+    //
     // ----------------------------------------------------------------------
     
     String[] deps = new String[]
@@ -50,16 +50,31 @@ public class MBoot
         "modello/jars/modello-1.0-SNAPSHOT.jar",
         "xpp3/jars/xpp3-1.1.3.3.jar",
         "xstream/jars/xstream-1.0-SNAPSHOT.jar",
-        "qdox/jars/qdox-1.2.jar",
-        "maven/jars/maven-plugin-2.0-SNAPSHOT.jar"
+        "qdox/jars/qdox-1.2.jar"
+    };
+
+    String[] plexusDeps = new String[]
+    {
+        "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
+        "plexus/jars/plexus-0.16-SNAPSHOT.jar",
+        "xpp3/jars/xpp3-1.1.3.3.jar",
+        "xstream/jars/xstream-1.0-SNAPSHOT.jar",
+        "maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
+        "maven/jars/wagon-api-1.0-alpha-1-SNAPSHOT.jar",
+        "maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar"
     };
 
     String[] builds = new String[]
     {
         "maven-model",
-        "maven-artifact",
         "maven-plugin",
-        "maven-core",
+        "maven-plugin-tools",
+        "maven-artifact",
+        "maven-core"
+    };
+
+    String[] pluginBuilds = new String[]
+    {
         "maven-plugins/maven-clean-plugin",
         "maven-plugins/maven-compiler-plugin",
         "maven-plugins/maven-install-plugin",
@@ -69,7 +84,8 @@ public class MBoot
         "maven-plugins/maven-resources-plugin",
         "maven-plugins/maven-surefire-plugin"
     };
-    
+
+
     // ----------------------------------------------------------------------
     // Standard locations for resources in Maven projects.
     // ----------------------------------------------------------------------
@@ -177,6 +193,8 @@ public class MBoot
         // Install plugin-parent POM
         installPomFile( repoLocal, new File( basedir, "maven-plugins/pom.xml" ) );
 
+        createToolsClassLoader();
+
         for ( int i = 0; i < builds.length; i++ )
         {
             String directory = new File( basedir, builds[i] ).getAbsolutePath();
@@ -198,6 +216,29 @@ public class MBoot
 
             System.out.println( "--------------------------------------------------------------------" );
         }
+
+        cl.addURL( new File( repoLocal, "maven/jars/maven-plugin-2.0-SNAPSHOT.jar" ).toURL() );
+
+        cl.addURL( new File( repoLocal, "maven/jars/maven-plugin-tools-2.0-SNAPSHOT.jar" ).toURL() );
+
+
+        for ( int i = 0; i < pluginBuilds.length; i++ )
+        {
+            String directory = new File( basedir, pluginBuilds[i] ).getAbsolutePath();
+
+            System.out.println( "Building project in " + directory + " ..." );
+
+            System.out.println( "--------------------------------------------------------------------" );
+
+            System.setProperty( "basedir", directory );
+
+            buildProject( directory );
+
+            reader.reset();
+
+            System.out.println( "--------------------------------------------------------------------" );
+        }
+
 
         // build the installation
 
@@ -256,13 +297,10 @@ public class MBoot
 
         FileUtils.mkdir( new File( core ).getPath() );
 
-        FileUtils.copyFileToDirectory( repoLocal + "/classworlds/jars/classworlds-1.1-SNAPSHOT.jar", core );
-
-        FileUtils.copyFileToDirectory( repoLocal + "/plexus/jars/plexus-0.14-SNAPSHOT.jar", core );
-
-        FileUtils.copyFileToDirectory( repoLocal + "/xpp3/jars/xpp3-1.1.3.3.jar", core );
-
-        FileUtils.copyFileToDirectory( repoLocal + "/xstream/jars/xstream-1.0-SNAPSHOT.jar", core );
+        for ( int i = 0; i < plexusDeps.length; i++ )
+        {
+            FileUtils.copyFileToDirectory( repoLocal + "/" + plexusDeps[i], core );
+        }
 
         // ----------------------------------------------------------------------
         // lib
@@ -279,7 +317,10 @@ public class MBoot
             if ( d.getArtifactId().equals( "classworlds" ) ||
                 d.artifactId.equals( "plexus" ) ||
                 d.artifactId.equals( "xstream" ) ||
-                d.artifactId.equals( "xpp3" ) )
+                d.artifactId.equals( "xpp3" ) ||
+                d.artifactId.equals( "junit" ) ||
+                d.artifactId.equals( "wagon-api" ) ||
+                d.artifactId.equals( "maven-artifact" ) )
             {
                 continue;
             }
@@ -290,23 +331,6 @@ public class MBoot
         // Copy maven itself
 
         FileUtils.copyFileToDirectory( repoLocal + "/maven/jars/maven-core-2.0-SNAPSHOT.jar", lib );
-
-        // ----------------------------------------------------------------------
-        // plugins
-        // ----------------------------------------------------------------------
-
-        String plugins = new File( dist, "plugins" ).getAbsolutePath();
-
-        FileUtils.mkdir( new File( plugins ).getPath() );
-
-        List libs = FileUtils.getFiles( new File( basedir, "maven-plugins" ), "**/target/*.jar", null );
-
-        for ( Iterator i = libs.iterator(); i.hasNext(); )
-        {
-            File f = (File) i.next();
-
-            FileUtils.copyFileToDirectory( f.getAbsolutePath(), plugins );
-        }
 
         fullStop = new Date();
 
@@ -482,13 +506,22 @@ public class MBoot
 
         installPom( basedir, repoLocal );
 
-        installJar( basedir, repoLocal );
+        if ( !reader.artifactId.equals( "maven-plugin" ) && reader.artifactId.endsWith( "plugin" ) )
+        {
+            installPlugin( basedir, repoLocal );
+        }
+        else
+        {
+            installJar( basedir, repoLocal );
+        }
     }
 
-    private void generatePluginDescriptor( String sourceDirectory, String outputDirectory, String pom )
+    IsolatedClassLoader cl;
+
+    private void createToolsClassLoader()
         throws Exception
     {
-        IsolatedClassLoader cl = new IsolatedClassLoader();
+        cl = new IsolatedClassLoader();
 
         for ( Iterator i = mbootDependencies.iterator(); i.hasNext(); )
         {
@@ -498,7 +531,11 @@ public class MBoot
 
             cl.addURL( f.toURL() );
         }
+    }
 
+    private void generatePluginDescriptor( String sourceDirectory, String outputDirectory, String pom )
+        throws Exception
+    {
         Class c = cl.loadClass( "org.apache.maven.plugin.generator.PluginDescriptorGenerator" );
 
         Object generator = c.newInstance();
@@ -511,17 +548,6 @@ public class MBoot
     private void generateSources( String model, String mode, String dir, String modelVersion, String packageWithVersion )
         throws Exception
     {
-        IsolatedClassLoader cl = new IsolatedClassLoader();
-
-        for ( Iterator i = mbootDependencies.iterator(); i.hasNext(); )
-        {
-            String dependency = (String) i.next();
-
-            File f = new File( repoLocal, dependency );
-
-            cl.addURL( f.toURL() );
-        }
-
         Class c = cl.loadClass( "org.codehaus.modello.Modello" );
 
         Object generator = c.newInstance();
@@ -612,6 +638,22 @@ public class MBoot
         File jar = new File( repoLocal, "/" + groupId + "/jars/" + artifactId + "-" + version + ".jar" );
 
         System.out.println( "Installing JAR: " + jar );
+
+        FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + artifactId + "-" + version + ".jar" ), jar );
+    }
+
+    private void installPlugin( String basedir, String repoLocal )
+        throws Exception
+    {
+        String artifactId = reader.artifactId;
+
+        String version = reader.version;
+
+        String groupId = reader.groupId;
+
+        File jar = new File( repoLocal, "/" + groupId + "/plugins/" + artifactId + "-" + version + ".jar" );
+
+        System.out.println( "Installing Plugin: " + jar );
 
         FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + artifactId + "-" + version + ".jar" ), jar );
     }
