@@ -20,19 +20,23 @@ import org.apache.maven.project.MavenProject;
  * validator=""
  * expression="#project"
  * description=""
+ *
  * @parameter name="installer"
  * type="org.apache.maven.artifact.installer.ArtifactInstaller"
  * required="true"
  * validator=""
  * expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
  * description=""
+ *
  * @parameter name="localRepository"
  * type="org.apache.maven.artifact.repository.ArtifactRepository"
  * required="true"
  * validator=""
  * expression="#localRepository"
  * description=""
+ *
  * @prereq jar:jar
+ * @prereq plugin:descriptor
  */
 public class PluginInstallMojo
     extends AbstractPlugin
