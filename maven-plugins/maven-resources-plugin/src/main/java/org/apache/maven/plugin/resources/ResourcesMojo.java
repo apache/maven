@@ -19,8 +19,7 @@ package org.apache.maven.plugin.resources;
 
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginExecutionException;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -54,33 +53,33 @@ import java.util.List;
 public class ResourcesMojo
     extends AbstractPlugin
 {
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    private String outputDirectory;
+
+    private List resources;
+
+    public void execute()
+        throws PluginExecutionException
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        List resources = (List) request.getParameter( "resources" );
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        for ( Iterator i = getJarResources( resources ).iterator(); i.hasNext(); )
+        try
         {
-            ResourceEntry resourceEntry = (ResourceEntry) i.next();
-
-            File destinationFile = new File( outputDirectory, resourceEntry.getDestination() );
-
-            if ( !destinationFile.getParentFile().exists() )
+            for ( Iterator i = getJarResources( resources ).iterator(); i.hasNext(); )
             {
-                destinationFile.getParentFile().mkdirs();
-            }
+                ResourceEntry resourceEntry = (ResourceEntry) i.next();
 
-            fileCopy( resourceEntry.getSource(), destinationFile.getPath() );
+                File destinationFile = new File( outputDirectory, resourceEntry.getDestination() );
+
+                if ( !destinationFile.getParentFile().exists() )
+                {
+                    destinationFile.getParentFile().mkdirs();
+                }
+
+                fileCopy( resourceEntry.getSource(), destinationFile.getPath() );
+            }
+        }
+        catch ( Exception e )
+        {
+            // TODO: handle exception
+            throw new PluginExecutionException( "Error copying resources", e );
         }
     }
 
