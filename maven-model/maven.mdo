@@ -31,7 +31,7 @@
   <classes>
     <class rootElement="true" xml.tagName="project">
       <name>Model</name>
-      <description><![<![CDATA[
+      <description><![CDATA[
       	 The <code>&lt;project&gt;</code> element specifies various attributes 
          about a project. This is the root element of the project descriptor. 
          The following table lists all of the possible child elements. Child 
@@ -570,7 +570,7 @@
           <name>packageName</name>
           <version>3.0.0</version>
           <type>String</type>
-          <description><![<![CDATA[
+          <description><![CDATA[
           	The Java package name of the project.  This value is used
             when generating <a href="plugins/javadoc/index.html">JavaDoc</a>.
           ]]></description>
