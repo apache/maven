@@ -1,4 +1,0 @@
-We need to try and stay compatible with the changes in Maven 1.x as far as
-the POM goes:
-
-- ${basedir} has been removed as a requirement for paths. It is implicit.

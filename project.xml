@@ -10,7 +10,8 @@
   <gumpRepositoryId>jakarta</gumpRepositoryId>
   <description></description>
   <shortDescription>Java Project Management Tools</shortDescription>
-
+  <url>http://maven.apache.org</url>
+  
   <organization>
     <name>Apache Software Foundation</name>
     <url>http://www.apache.org/</url>
