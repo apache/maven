@@ -96,7 +96,7 @@ public class DefaultLifecycleExecutor
                 }
                 if ( handler.additionalPlugin() != null )
                 {
-                    processPluginPhases( "maven", handler.additionalPlugin(), session );
+                    processPluginPhases( "maven", "maven-" + handler.additionalPlugin() + "-plugin", session );
                 }
             }
 
