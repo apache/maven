@@ -218,11 +218,6 @@ public class DefaultModelInheritanceAssembler
                 child.getBuild().setUnitTestSourceDirectory( parent.getBuild().getUnitTestSourceDirectory() );
             }
 
-            if ( child.getBuild().getAspectSourceDirectory() == null )
-            {
-                child.getBuild().setAspectSourceDirectory( parent.getBuild().getAspectSourceDirectory() );
-            }
-
             if ( child.getBuild().getOutput() == null )
             {
                 child.getBuild().setOutput( parent.getBuild().getOutput() );

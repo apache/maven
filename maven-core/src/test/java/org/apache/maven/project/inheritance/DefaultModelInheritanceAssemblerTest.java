@@ -16,11 +16,7 @@ package org.apache.maven.project.inheritance;
  * limitations under the License.
  */
 
-import java.util.Arrays;
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PostGoal;
@@ -28,6 +24,9 @@ import org.apache.maven.model.PreGoal;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.UnitTest;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author jdcasey
@@ -48,7 +47,6 @@ public class DefaultModelInheritanceAssemblerTest
         Build parentBuild = new Build();
 
         parentBuild.setSourceDirectory( "src/main/java" );
-        parentBuild.setAspectSourceDirectory( "src/main/aspects" );
         parentBuild.setUnitTestSourceDirectory( "src/test/java" );
 
         Resource parentResource = new Resource();
@@ -108,8 +106,6 @@ public class DefaultModelInheritanceAssemblerTest
         assertEquals( "source directory should be from parent", "src/main/java", child.getBuild().getSourceDirectory() );
         assertEquals( "unit test source directory should be from parent", "src/test/java", child.getBuild()
             .getUnitTestSourceDirectory() );
-        assertEquals( "aspect source directory should be from parent", "src/main/aspects", child.getBuild()
-            .getAspectSourceDirectory() );
 
         List childExcludesTest = child.getBuild().getUnitTest().getExcludes();
 

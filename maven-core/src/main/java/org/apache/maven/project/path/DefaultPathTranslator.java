@@ -67,13 +67,6 @@ public class DefaultPathTranslator
                 build.setUnitTestSourceDirectory( new File( projectFile.getParentFile(), s ).getPath() );
             }
 
-            s = stripBasedirToken( build.getAspectSourceDirectory() );
-
-            if ( requiresBaseDirectoryAlignment( s ) )
-            {
-                build.setAspectSourceDirectory( new File( projectFile.getParentFile(), s ).getPath() );
-            }
-
             List buildResources = build.getResources();
 
             for ( Iterator i = buildResources.iterator(); i.hasNext(); )
