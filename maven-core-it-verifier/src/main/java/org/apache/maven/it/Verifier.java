@@ -307,7 +307,7 @@ public class Verifier
             String prevUserDir = System.getProperty( "user.dir" );
             System.setProperty( "user.dir", basedir );
             System.setProperty( "classworlds.conf", mavenHome + "/bin/classworlds.conf" );
-            URL classWorldsUrl = new URL( "file:" + mavenHome + "/core/classworlds-1.1-SNAPSHOT.jar" );
+            URL classWorldsUrl = new URL( "file:" + mavenHome + "/core/boot/classworlds-1.1-SNAPSHOT.jar" );
             ClassLoader cl = URLClassLoader.newInstance( new URL[] { classWorldsUrl } );
             Class c = Class.forName( "org.codehaus.classworlds.Launcher", true, cl );
             Method m = c.getMethod( "mainWithExitCode", new Class[] { String[].class } );
