@@ -59,4 +59,10 @@
       <version>1.0-alpha-1-SNAPSHOT</version>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <site>
+      <id>website</id>
+      <url>scp://www.apache.org//www/maven.apache.org/m2</url>
+    </site>
+  </distributionManagement>
 </project>
