@@ -123,7 +123,7 @@ SET MAVEN_MAIN_CLASS=org.codehaus.classworlds.Launcher
 SET CLASSWORLDS_CONF="%M2_HOME%\bin\classworlds.conf"
 
 @REM Start MAVEN2
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %MAVEN_CLASSPATH% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" %MAVEN_MAIN_CLASS% %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %MAVEN_CLASSPATH% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%M2_HOME%" %MAVEN_MAIN_CLASS% %MAVEN_CMD_LINE_ARGS%
 goto :end
 
 :end
