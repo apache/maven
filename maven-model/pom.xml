@@ -21,6 +21,17 @@
           <version>4.0.0</version>
           <model>maven.mdo</model>
         </configuration>
+        <goals>
+          <goal>
+            <id>xpp3-writer</id>
+          </goal>
+          <goal>
+            <id>java</id>
+          </goal>
+          <goal>
+            <id>xpp3-reader</id>
+          </goal>
+        </goals>
       </plugin>
     </plugins>
   </build>
