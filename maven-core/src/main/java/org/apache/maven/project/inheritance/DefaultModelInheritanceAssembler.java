@@ -151,23 +151,7 @@ public class DefaultModelInheritanceAssembler
             }
         }
 
-        // Plugins :: aggregate
-        if ( parent.getBuild() != null && child.getBuild() != null )
-        {
-            List parentPlugins = parent.getBuild().getPlugins();
-
-            List childPlugins = child.getBuild().getPlugins();
-
-            for ( Iterator iterator = parentPlugins.iterator(); iterator.hasNext(); )
-            {
-                Plugin plugin = (Plugin) iterator.next();
-
-                if ( !childPlugins.contains( plugin ) )
-                {
-                    child.getBuild().addPlugin( plugin );
-                }
-            }
-        }
+        // Plugins are not aggregated
 
         // Reports :: aggregate
         if ( child.getReports() != null && parent.getReports() != null )
