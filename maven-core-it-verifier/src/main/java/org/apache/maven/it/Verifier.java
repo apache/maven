@@ -35,11 +35,11 @@ public class Verifier
 
         try
         {
-            mavenProperties.load( new FileInputStream( new File( System.getProperty( "user.home" ), "build.properties" ) ) );
+            mavenProperties.load( new FileInputStream( new File( System.getProperty( "user.home" ), "maven.properties" ) ) );
         }
         catch ( IOException e )
         {
-            throw new VerificationException( "Can't find the build.properties file! Verification can't proceed!" );
+            throw new VerificationException( "Can't find the maven.properties file! Verification can't proceed!" );
         }
 
         mavenRepoLocal = mavenProperties.getProperty( "maven.repo.local" );

@@ -45,7 +45,7 @@ public class Bootstrapper
     public void execute( String[] args )
         throws Exception
     {
-        properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
+        properties = loadProperties( new File( System.getProperty( "user.home" ), "maven.properties" ) );
 
         downloader = new ArtifactDownloader( properties );
 
