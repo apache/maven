@@ -350,9 +350,12 @@ public class DefaultMaven
 
         line();
 
-        getLogger().info( e.getLongMessage() );
+        if ( e.getLongMessage() != null )
+        {
+            getLogger().info( e.getLongMessage() );
 
-        line();
+            line();
+        }
 
         stats( r.getStart(), r.getFinish() );
 
