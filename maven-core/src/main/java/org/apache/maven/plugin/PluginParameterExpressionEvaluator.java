@@ -70,12 +70,12 @@ public class PluginParameterExpressionEvaluator
 
                 if ( pathSeparator > 0 )
                 {
-                    value = getValue( expression.substring( 9, pathSeparator ), context.getProject() )
+                    value = getValue( expression.substring( 1, pathSeparator ), context.getProject() )
                         + expression.substring( pathSeparator );
                 }
                 else
                 {
-                    value = getValue( expression.substring( 9 ), context.getProject() );
+                    value = getValue( expression.substring( 1 ), context.getProject() );
                 }
             }
             catch ( Exception e )
@@ -131,11 +131,6 @@ public class PluginParameterExpressionEvaluator
     private static Object getValue( String expression, MavenProject project )
         throws Exception
     {
-
-        expression = "project." + expression;
-
-        System.out.println( "expression = " + expression );
-
         return ReflectionProjectValueExtractor.evaluate( expression, project );
     }
 }
