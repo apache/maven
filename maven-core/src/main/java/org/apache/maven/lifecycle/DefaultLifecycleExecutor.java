@@ -23,6 +23,7 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Goal;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionResponse;
@@ -84,27 +85,35 @@ public class DefaultLifecycleExecutor
         {
             MavenProject project = session.getProject();
             
-            // TODO: should enrich this with the type handler, but for now just
+            // TODO: should enrich this with the type artifactHandler, but for now just
             // use "type" as is
-            ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
+            ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
 
-            if ( handler != null )
+            if ( artifactHandler != null )
             {
                 // TODO: perhaps each type should define their own lifecycle
                 // completely, using the base as a default?
-                // If so, remove both of these goals from type handler
-                if ( handler.packageGoal() != null )
+                // If so, remove both of these goals from type artifactHandler
+                if ( artifactHandler.packageGoal() != null )
                 {
-                    verifyMojoPhase( handler.packageGoal(), session );
+                    verifyMojoPhase( artifactHandler.packageGoal(), session );
                 }
-                if ( handler.additionalPlugin() != null )
+
+                if ( artifactHandler.additionalPlugin() != null )
                 {
                     String additionalPluginGroupId = "maven";
-                    String additionalPluginArtifactId = "maven-" + handler.additionalPlugin() + "-plugin";
+
+                    String additionalPluginArtifactId = "maven-" + artifactHandler.additionalPlugin() + "-plugin";
 
                     injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
 
-                    processPluginPhases( "maven", "maven-" + handler.additionalPlugin() + "-plugin", session );
+                    Plugin plugin = new Plugin();
+
+                    plugin.setGroupId( additionalPluginGroupId );
+
+                    plugin.setArtifactId( additionalPluginArtifactId );
+
+                    processPluginPhases( plugin, session );
                 }
             }
 
@@ -149,18 +158,22 @@ public class DefaultLifecycleExecutor
 
     private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId )
     {
-        PluginManagement mgmt = project.getPluginManagement();
-        if( mgmt != null )
+        PluginManagement pluginManagement = project.getPluginManagement();
+
+        if ( pluginManagement != null )
         {
-            List pluginList = mgmt.getPlugins();
+            List pluginList = pluginManagement.getPlugins();
 
             Plugin handlerPlugin = null;
+
             for ( Iterator it = pluginList.iterator(); it.hasNext(); )
             {
                 Plugin plugin = (Plugin) it.next();
+
                 if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
                 {
                     handlerPlugin = plugin;
+
                     break;
                 }
             }
@@ -180,33 +193,78 @@ public class DefaultLifecycleExecutor
         {
             Plugin plugin = (Plugin) i.next();
 
-            // TODO: should this flag be used in verifyPlugin, completely disabling the plugin?
-            if ( Boolean.TRUE != plugin.isDisabled() )
+            processPluginPhases( plugin, mavenSession );
+        }
+    }
+
+    /**
+     * Take each mojo contained with a plugin, look to see whether it contributes to a
+     * phase in the lifecycle and if it does place it at the end of the list of goals
+     * to execute for that given phase.
+     *
+     * @param mavenSession
+     * @throws Exception
+     */
+    // TODO: don't throw Exception
+    private void processPluginPhases( Plugin plugin, MavenSession mavenSession )
+        throws Exception
+    {
+        String groupId = plugin.getGroupId();
+
+        String artifactId = plugin.getArtifactId();
+
+        pluginManager.verifyPlugin( groupId, artifactId, mavenSession );
+
+        PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( groupId, artifactId );
+
+        // ----------------------------------------------------------------------
+        // Look to see if the plugin configuration specifies particular mojos
+        // within the plugin. If this is the case then simply configure the
+        // mojos the user has specified and ignore the rest.
+        // ----------------------------------------------------------------------
+
+
+        if ( plugin.getGoals().size() > 0 )
+        {
+            String pluginId = pluginDescriptor.getArtifactId();
+
+            pluginId = pluginId.substring( 6 ).substring( 0, 7 );
+
+            for ( Iterator i = plugin.getGoals().iterator(); i.hasNext(); )
             {
-                processPluginPhases( plugin.getGroupId(), plugin.getArtifactId(), mavenSession );
+                Goal goal = (Goal) i.next();
+
+                configureMojo( pluginManager.getMojoDescriptor( pluginId + ":" + goal.getId() ) );
+            }
+        }
+        else
+        {
+            for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
+            {
+                MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+
+                configureMojo( mojoDescriptor );
             }
         }
     }
 
-    // TODO: don't throw Exception
-    private void processPluginPhases( String groupId, String artifactId, MavenSession mavenSession )
+    /**
+     * Take a look at a mojo contained within a plugin, look to see whether it contributes to a
+     * phase in the lifecycle and if it does place it at the end of the list of goals
+     * to execute for the stated phase.
+     *
+     * @param mojoDescriptor
+     * @throws Exception
+     */
+    private void configureMojo( MojoDescriptor mojoDescriptor )
         throws Exception
     {
-        pluginManager.verifyPlugin( groupId, artifactId, mavenSession );
-        PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( groupId, artifactId );
-        for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
+        if ( mojoDescriptor.getPhase() != null )
         {
-            MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+            Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
 
-            // TODO: check if the goal exists in the configuration and is
-            // disabled
-            if ( mojoDescriptor.getPhase() != null )
-            {
-                Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
-                phase.getGoals().add( mojoDescriptor.getId() );
-            }
+            phase.getGoals().add( mojoDescriptor.getId() );
         }
-
     }
 
     private void processGoalChain( String task, MavenSession session )
@@ -242,10 +300,13 @@ public class DefaultLifecycleExecutor
         throws Exception
     {
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
+
         if ( mojoDescriptor == null )
         {
             pluginManager.verifyPluginForGoal( task, session );
+
             mojoDescriptor = pluginManager.getMojoDescriptor( task );
+
             if ( mojoDescriptor == null )
             {
                 throw new LifecycleExecutionException( "Required goal not found: " + task );
@@ -254,6 +315,7 @@ public class DefaultLifecycleExecutor
             if ( mojoDescriptor.getPhase() != null )
             {
                 Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
+
                 phase.getGoals().add( task );
             }
         }
@@ -289,6 +351,7 @@ public class DefaultLifecycleExecutor
                         if ( pluginResponse.isExecutionFailure() )
                         {
                             response.setExecutionFailure( goal, pluginResponse.getFailureResponse() );
+
                             return;
                         }
                     }

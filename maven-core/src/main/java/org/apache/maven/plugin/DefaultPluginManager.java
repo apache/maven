@@ -444,7 +444,8 @@ public class DefaultPluginManager
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
 
-    public static Map createParameters( MojoDescriptor goal, MavenSession session ) throws PluginConfigurationException
+    public static Map createParameters( MojoDescriptor goal, MavenSession session ) 
+        throws PluginConfigurationException
     {
         Map map = null;
 

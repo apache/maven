@@ -152,18 +152,24 @@ public class DefaultMaven
 
                     if ( project.getModules() != null && !project.getModules().isEmpty() )
                     {
-                        String includes = StringUtils.join( project.getModules().iterator(), "/pom.xml," ) +
-                            "/pom.xml";
+                        String includes = StringUtils.join( project.getModules().iterator(), "/pom.xml," ) + "/pom.xml";
+
                         File baseDir = project.getFile().getParentFile();
+
                         MavenExecutionRequest reactorRequest = new DefaultMavenExecutionRequest(
-                            request.getLocalRepository(), request.getUserModel(), request.getEventDispatcher(),
-                            request.getGoals(), FileUtils.getFiles( baseDir, includes, null ), baseDir.getPath() );
+                            request.getLocalRepository(),
+                            request.getUserModel(),
+                            request.getEventDispatcher(),
+                            request.getGoals(),
+                            FileUtils.getFiles( baseDir, includes, null ),
+                            baseDir.getPath() );
+
                         MavenExecutionResponse response = execute( reactorRequest );
+
                         if ( response != null && response.isExecutionFailure() )
                         {
                             return response;
                         }
-
                     }
 
                     if ( !isPom )
