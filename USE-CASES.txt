@@ -8,4 +8,4 @@ of these would help I think.
 ----------------------------------------------------------------------------
 
 - Being able to write artifact handler that would operate to install an
-xdoclet plugin correctly when an xdoclet plugin is state as a dependency.
+xdoclet plugin correctly when an xdoclet plugin is stated as a dependency.
