@@ -16,6 +16,7 @@ package org.apache.maven.tools.converter;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.Notifier;
 import org.apache.maven.model.Reports;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -25,18 +26,20 @@ import org.apache.maven.model.v4_0_0.Contributor;
 import org.apache.maven.model.v4_0_0.Dependency;
 import org.apache.maven.model.v4_0_0.DependencyManagement;
 import org.apache.maven.model.v4_0_0.Developer;
-import org.apache.maven.model.v4_0_0.Model;
-import org.apache.maven.model.v4_0_0.Plugin;
-import org.apache.maven.model.v4_0_0.PluginManagement;
 import org.apache.maven.model.v4_0_0.DistributionManagement;
 import org.apache.maven.model.v4_0_0.IssueManagement;
 import org.apache.maven.model.v4_0_0.License;
 import org.apache.maven.model.v4_0_0.MailingList;
+import org.apache.maven.model.v4_0_0.Model;
 import org.apache.maven.model.v4_0_0.Organization;
 import org.apache.maven.model.v4_0_0.Parent;
+import org.apache.maven.model.v4_0_0.Plugin;
+import org.apache.maven.model.v4_0_0.PluginManagement;
 import org.apache.maven.model.v4_0_0.Repository;
 import org.apache.maven.model.v4_0_0.Scm;
 import org.apache.maven.model.v4_0_0.Site;
+import org.apache.maven.model.v4_0_0.UnitTest;
+import org.apache.maven.model.v4_0_0.Resource;
 import org.apache.maven.model.v4_0_0.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -44,8 +47,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -348,7 +353,7 @@ public class Main
 
         org.apache.maven.model.PluginManagement mgmt = new org.apache.maven.model.PluginManagement();
 
-        mgmt.setPlugins( convertPlugins( pluginManagement.getPlugins() ) );
+        mgmt.setPlugins( new ArrayList( convertPlugins( pluginManagement.getPlugins() ).values() ) );
 
         return mgmt;
     }
@@ -438,27 +443,27 @@ public class Main
         return newCiManagement;
     }
 
-    private static List convertPlugins( List plugins )
+    private static Map convertPlugins( List plugins )
     {
-        List newPlugins = new ArrayList();
+        Map newPlugins = new HashMap();
 
         for ( Iterator i = plugins.iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
 
             org.apache.maven.model.Plugin newPlugin = new org.apache.maven.model.Plugin();
-            newPlugin.setArtifactId( plugin.getId() );
+            newPlugin.setArtifactId( "maven-" + plugin.getId() + "-plugin" );
             newPlugin.setConfiguration( plugin.getConfiguration() );
             newPlugin.setDisabled( plugin.isDisabled() );
             newPlugin.setGoals( plugin.getGoals() );
             // newPlugin.setGroupId( "maven" );  -- nothing needed
 
-            newPlugins.add( newPlugin );
+            newPlugins.put( newPlugin.getArtifactId(), newPlugin );
         }
         return newPlugins;
     }
 
-    private static org.apache.maven.model.Build convertBuild( Build build, List plugins )
+    private static org.apache.maven.model.Build convertBuild( Build build, Map plugins )
     {
         if ( build == null )
         {
@@ -470,11 +475,90 @@ public class Main
         newBuild.setDirectory( build.getDirectory() );
         newBuild.setFinalName( build.getFinalName() );
         newBuild.setOutputDirectory( build.getOutput() );
-        newBuild.setPlugins( plugins );
+        newBuild.setPlugins( new ArrayList( plugins.values() ) );
         newBuild.setSourceDirectory( build.getSourceDirectory() );
         newBuild.setTestOutputDirectory( build.getTestOutput() );
         newBuild.setTestSourceDirectory( build.getUnitTestSourceDirectory() );
+        newBuild.setResources( convertResources( build.getResources() ) );
+
+        if ( build.getUnitTest() != null )
+        {
+            UnitTest unitTest = build.getUnitTest();
+            org.apache.maven.model.Plugin plugin = getPlugin( plugins, "maven-compiler-plugin" );
+            Goal goal = getGoal( plugin, "testCompile" );
+
+            goal.getConfiguration().setProperty( "includes", convertPatternSet( unitTest.getIncludes() ) );
+            goal.getConfiguration().setProperty( "excludes", convertPatternSet( unitTest.getExcludes() ) );
+
+            newBuild.setTestResources( convertResources( unitTest.getResources() ) );
+        }
 
         return newBuild;
+    }
+
+    private static List convertResources( List resources )
+    {
+        List newResources = new ArrayList();
+
+        for ( Iterator i = resources.iterator(); i.hasNext(); )
+        {
+            Resource resource = (Resource) i.next();
+
+            org.apache.maven.model.Resource newResource = new org.apache.maven.model.Resource();
+            newResource.setDirectory( resource.getDirectory() );
+            newResource.setIncludes( convertPatternSet( resource.getIncludes() ) );
+            newResource.setExcludes( convertPatternSet( resource.getExcludes() ) );
+
+            newResources.add( newResource );
+        }
+        return newResources;
+    }
+
+    private static String convertPatternSet( List list )
+    {
+        StringBuffer b = new StringBuffer();
+        for ( Iterator i = list.iterator(); i.hasNext(); )
+        {
+            String pattern = (String) i.next();
+            b.append( pattern );
+            if ( i.hasNext() )
+            {
+                b.append( "," );
+            }
+        }
+        return b.toString();
+    }
+
+    private static org.apache.maven.model.Plugin getPlugin( Map plugins, String artifactId )
+    {
+        org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) plugins.get( artifactId );
+        if ( plugin == null )
+        {
+            plugin = new org.apache.maven.model.Plugin();
+            plugin.setArtifactId( artifactId );
+            plugins.put( plugin.getArtifactId(), plugin );
+        }
+        return plugin;
+    }
+
+    private static Goal getGoal( org.apache.maven.model.Plugin plugin, String name )
+    {
+        Goal goal = null;
+        for ( Iterator i = plugin.getGoals().iterator(); i.hasNext() && goal == null; )
+        {
+            Goal g = (Goal) i.next();
+            if ( g.getId().equals( name ) )
+            {
+                goal = g;
+            }
+        }
+
+        if ( goal == null )
+        {
+            goal = new Goal();
+            goal.setId( name );
+            plugin.addGoal( goal );
+        }
+        return goal;
     }
 }
