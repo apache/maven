@@ -59,7 +59,7 @@ public abstract class AbstractPlugin
         throws Exception
     {
         throw new UnsupportedOperationException(
-            "If you are using the old technioque, you must override execute(req,resp)" );
+            "If you are using the old technique, you must override execute(req,resp)" );
     }
 
     public void setLog( Log log )
