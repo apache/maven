@@ -64,8 +64,8 @@ export MBOOT_HOME=`dirname $0`
 
 . ${MBOOT_HOME}/maven.functions
 
-[ ! -d $dir ] && echo "Specified directory doesn't exist!" && exit
+[ ! -d $dir ] && echo "Specified directory doesn't exist!" && exit 1
 
-[ ! -f $dir/${POM} ] && echo "No ${POM} in specified directory!" && exit
+[ ! -f $dir/${POM} ] && echo "No ${POM} in specified directory!" && exit 1
 
 buildMavenProject $dir $jar $install $pomInstall $leaveBootFiles

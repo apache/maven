@@ -44,7 +44,7 @@ findAndSetMavenRepoLocal()
 {
   if [ -f $HOME/build.properties ]
   then
-    repoLocal=`cat $HOME/build.properties | grep "maven.repo.local" | sed 's/^.*= *//'`
+    repoLocal=`cat $HOME/build.properties | egrep "^maven.repo.local" | sed 's/^.*= *//'`
   else
     repoLocal=$HOME/.maven/repository
   fi
@@ -504,7 +504,7 @@ fi
 if [ ! -x "$JAVACMD" ] ; then
   echo "Error: JAVA_HOME is not defined correctly."
   echo "  We cannot execute $JAVACMD"
-  exit
+  exit 1
 fi
 
 # For Cygwin, switch to Windows format before running java

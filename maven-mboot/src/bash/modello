@@ -68,7 +68,7 @@ export MBOOT_HOME=`dirname $0`
 
 . ${MBOOT_HOME}/maven.functions
 
-[ ! -f $model ] && echo "Specified model doesn't exist!" && exit
+[ ! -f $model ] && echo "Specified model doesn't exist!" && exit 1
 
 [ ! -d $dir ] && mkdir -p $dir
 

@@ -24,7 +24,7 @@ export PATH=$PATH:$MBOOT_HOME:$M2_HOME/bin:$JAVA_HOME/bin
 
 CMD=$1
 
-[ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit
+[ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit 1
 
 HOME_DIR=`pwd`
 DATE=`date`
