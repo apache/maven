@@ -695,6 +695,10 @@
             {
                 return groupId + ":" + artifactId;
             }
+            public String toString()
+            {
+                return groupId + "/" + type + "s:" + artifactId + "-" + version;
+            }
           </code>
         </codeSegment>
       </codeSegments>
