@@ -1,0 +1,26 @@
+<assembly>
+  <id>bin</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>tar.bz2</format>
+    <format>zip</format>
+  </formats>
+  <filesets>
+    <fileset>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+      </includes>
+    </fileset>
+    <!-- TODO: docs? -->
+    <fileset>
+      <!-- TODO: use expresssions instead: ${project.build.directory}, ${project.build.finalName} -->
+      <directory>target</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileset>
+  </filesets>
+</assembly>
