@@ -12,7 +12,8 @@ usage ()
 
 dir="."
 jar="default"
-leaveBootFiles=""
+leaveBootFiles="0"
+install="0"
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -45,6 +46,9 @@ while [ $# -gt 0 ]; do
 	--leave-boot-files)
 	    leaveBootFiles=1;
 	    ;;
+	--install)
+	    install=1;
+	    ;;
     esac
 
     shift
@@ -58,4 +62,4 @@ export MBOOT_HOME=`dirname $0`
 
 [ ! -f $dir/project.xml ] && echo "No project.xml in specified directory!" && exit
 
-buildMavenProject $dir $jar $leaveBootFiles
+buildMavenProject $dir $jar $install $leaveBootFiles

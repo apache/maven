@@ -151,9 +151,10 @@ buildMavenProject()
     # 5. Create JAR.
     
     # $1 == directory where project lives
-    # $4 == jar name
-    # $5 == flag to leave mboot files
-    
+    # $2 == jar name
+    # $3 == flag to install
+    # $4 == flag to leave mboot files
+
     (
       home=`pwd`
       
@@ -236,8 +237,21 @@ buildMavenProject()
       echo "Building jars (${jarName}) in `pwd`/target"
         
       buildJar $buildDest target/${jarName}
-      
-      if [ -z $3 ]
+
+      if [ "$3" = "1" ]
+      then
+        
+        findAndSetMavenRepoLocal
+
+        groupId=`cat project.xml | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<groupId>' | sed -e 's#^.*<groupId>##;s#</groupId>.*$##'`
+
+        echo "Installing ${jarName} in ${repoLocal}/${groupId}/jars"
+
+        cp target/${jarName} ${repoLocal}/${groupId}/jars
+        
+      fi
+
+      if [ "$4" = "0" ]
       then
         rm -f bootstrap.classpath > /dev/null 2>&1
         rm -f bootstrap.libs > /dev/null 2>&1
@@ -247,6 +261,7 @@ buildMavenProject()
         rm -f bootstrap.tests.excludes > /dev/null 2>&1
         rm -f bootstrap.tests.resources > /dev/null 2>&1        
       fi
+      
     )
 }
 
