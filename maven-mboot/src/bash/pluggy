@@ -45,6 +45,14 @@ while [ $# -gt 0 ]; do
 		shift
 	    fi		    
 	    ;;
+	--pom*)
+	    if echo $1 | grep -q '=' ; then
+	    	pom=`echo $1 | sed 's/^--pom=//'`
+	    else
+		pom=$2
+		shift
+	    fi		    
+	    ;;
     esac
 
     shift
@@ -64,4 +72,4 @@ if $cygwin; then
   CP=`cygpath -pw "$CP"`
 fi
 
-java -classpath "$CP" org.apache.maven.plugin.generator.Main $mode "$source" "$destination"
+java -classpath "$CP" org.apache.maven.plugin.generator.Main $mode "$source" "$destination" "$pom"
