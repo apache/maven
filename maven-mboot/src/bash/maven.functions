@@ -165,7 +165,7 @@ buildMavenProject()
       home=`pwd`
       
       cd $1
-      
+
       # Look for source directory in project.xml
       sourceDirectory=`grep sourceDirectory project.xml | sed -e 's/^*//;s/<sourceDirectory>//;s/<\/sourceDirectory>//;s/\${basedir}\///'`
 
@@ -237,7 +237,7 @@ buildMavenProject()
       
       # We only need the booter jar in the classpath, it will load everything else.
       
-      runTests ".:${MBOOT_HOME}/classes:$repoLocal/surefire/jars/surefire-booter-1.0.jar" "$home" "$repoLocal" bootstrap.libs bootstrap.tests.includes bootstrap.tests.excludes
+      runTests ".:${MBOOT_HOME}/classes:$repoLocal/surefire/jars/surefire-booter-1.0.jar" "$1" "$repoLocal" bootstrap.libs bootstrap.tests.includes bootstrap.tests.excludes
       
       if [ "$2" = "default" ]
       then
