@@ -75,7 +75,7 @@ public class JarInstallMojo
         Artifact pomArtifact = new DefaultArtifact( project.getGroupId(),
                                                     project.getArtifactId(),
                                                     project.getVersion(),
-                                                    project.getType() );
+                                                    "pom" );
 
         artifactInstaller.install( project.getFile(), pomArtifact, localRepository );
 
