@@ -66,8 +66,7 @@ if [ -z "$M2_HOME" ]; then
 fi
 
 CLASSWORLDS_CONF="${M2_HOME}/bin/classworlds.conf"
-CP=${M2_HOME}/core/classworlds-${CLASSWORLDS_VERSION}.jar
-#CP=${M2_HOME}/lib/classworlds-${CLASSWORLDS_VERSION}.jar
+CP=${M2_HOME}/core/boot/classworlds-${CLASSWORLDS_VERSION}.jar
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then

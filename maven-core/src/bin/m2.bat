@@ -121,7 +121,7 @@ goto Win9xApp
 :endInit
 if "%MAVEN_OPTS%"=="" SET MAVEN_OPTS="-Xmx256m"
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
-SET MAVEN_CLASSPATH="%M2_HOME%\core\classworlds-%CLASSWORLDS_VERSION%.jar"
+SET MAVEN_CLASSPATH="%M2_HOME%\core\boot\classworlds-%CLASSWORLDS_VERSION%.jar"
 SET MAVEN_MAIN_CLASS=org.codehaus.classworlds.Launcher
 SET CLASSWORLDS_CONF="%M2_HOME%\bin\classworlds.conf"
 

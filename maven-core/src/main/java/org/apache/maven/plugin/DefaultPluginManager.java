@@ -24,6 +24,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
@@ -55,7 +56,7 @@ public class DefaultPluginManager
 
     protected ArtifactHandlerManager artifactHandlerManager;
 
-    protected ArtifactEnabledContainer container;
+    protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
@@ -201,9 +202,16 @@ public class DefaultPluginManager
     {
         artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
 
-        MavenMetadataSource sr = new MavenMetadataSource( remotePluginRepositories, localRepository, artifactResolver );
+        MavenMetadataSource metadataSource = new MavenMetadataSource( remotePluginRepositories, 
+                                                                      localRepository,
+                                                                      artifactResolver );
 
-        container.addComponent( pluginArtifact, artifactResolver, remotePluginRepositories, localRepository, sr, artifactFilter );
+        ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact,
+                                                               artifactResolver,
+                                                               remotePluginRepositories,
+                                                               localRepository,
+                                                               metadataSource,
+                                                               artifactFilter );
     }
 
     public void contextualize( Context context )
