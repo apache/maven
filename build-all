@@ -6,5 +6,4 @@
 ( cd maven-project ; maven jar:install )
 ( cd maven-artifact ; maven jar:install )
 ( cd maven ; maven jar:install )
-( cd maven-artifact ; maven jar:install )
 ( cd compiler ; maven jar:install )
