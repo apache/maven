@@ -33,4 +33,9 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <url>file://c:/home/brett/snapshot-test-repo</url>
+    </repository>
+  </distributionManagement>
 </model>
