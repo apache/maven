@@ -41,6 +41,19 @@ their source trees set up in the same way as their collegues.
   * hell yes!!!! Maybe dependency resolution could be a plugin that
   other plugins depend upon (PD)
 
+- Support for "specification" dependencies. I would like to be able to
+  say that I depend on a "specification" dependency such as
+  "javax.jaxp.parser" with specific version. It is possible that multiple
+  artifacts exist that satisfy this specification. ie Several versions
+  of Crimson and Xerces may implement the "specification" and I want maven
+  to select one and just use it. I dont care which does it but preferrably
+  the one with the latest version. (PD)
+
+- Support for retrieval of compatible versions for objects. For example I may
+  say that I want version 1.1 of Crimson but Maven may return 1.1.1, 1.1.4 etc
+  as it knows that these are compatible. This means aadding in some versioning
+  specification or different strategies for resolution. (PD)
+
 - Support for transitive and group dependencies
   * I would like to see this dependency information either encoded directly
   into the artifacts where possible (ie META-INF/maven/dependencies.xml in
