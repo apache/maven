@@ -9,7 +9,7 @@
     </default>
   </defaults>
   <classes>
-    <class rootElement="true" xml.tagName="assemblies">
+    <class rootElement="true" xml.tagName="assembly">
       <name>Assembly</name>
       <description>Describes the assembly layout and packaging.</description>
       <version>1.0.0</version>
