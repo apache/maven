@@ -499,8 +499,20 @@ public class PomV3ToV4Translator
 
                 Dependency dep = new Dependency();
 
-                dep.setArtifactId( v3Dep.getArtifactId() );
-                dep.setGroupId( v3Dep.getGroupId() );
+                String artifactId = v3Dep.getArtifactId();
+                String groupId = v3Dep.getGroupId();
+                
+                if(StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId))
+                {
+                    dep.setGroupId(groupId);
+                    dep.setArtifactId(artifactId);
+                }
+                else
+                {
+                    dep.setGroupId(v3Dep.getId());
+                    dep.setArtifactId(v3Dep.getId());
+                }
+
                 dep.setVersion( v3Dep.getVersion() );
                 dep.setType( v3Dep.getType() );
 
@@ -645,7 +657,12 @@ public class PomV3ToV4Translator
                 Resource resource = new Resource();
 
                 resource.setDirectory( v3Resource.getDirectory() );
-                resource.setExcludes( v3Resource.getExcludes() );
+                
+                List excludes = new ArrayList(v3Resource.getExcludes());
+                excludes.removeAll(v3Resource.getDefaultExcludes());
+                
+                resource.setExcludes( excludes );
+                
                 resource.setIncludes( v3Resource.getIncludes() );
                 resource.setTargetPath( v3Resource.getTargetPath() );
 

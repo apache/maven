@@ -1,14 +1,5 @@
 package org.apache.maven.tools.repoclean.digest;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
-import org.apache.maven.tools.repoclean.report.Reporter;
-import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -26,6 +17,13 @@ import java.io.IOException;
  * ====================================================================
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.tools.repoclean.report.Reporter;
+import org.codehaus.plexus.util.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+
 /**
  * @author jdcasey
  */
@@ -36,37 +34,13 @@ public class ArtifactDigestVerifier
 
     private ArtifactDigestor artifactDigestor;
 
-    public void verifyDigest( Artifact artifact, ArtifactRepository sourceRepo, ArtifactRepository targetRepo,
-                             Reporter reporter, boolean reportOnly ) throws Exception
+    public void verifyDigest( Artifact artifact, File artifactTarget, Reporter reporter, boolean reportOnly ) throws Exception
     {
-        File sourceBase = new File( sourceRepo.getBasedir() );
-        File targetBase = new File( targetRepo.getBasedir() );
-
         // create the digest source file from which to copy/verify.
-        File digestSourceFile = null;
-        try
-        {
-            digestSourceFile = new File( sourceBase, sourceRepo.pathOf( artifact ) + ".md5" );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            reporter.error( "Error creating java.io.File of digest source for artifact[" + artifact.getId() + "]", e );
-
-            throw e;
-        }
+        File digestSourceFile = new File( artifact.getFile() + ".md5" );
 
         // create the digest target file from which to copy/create.
-        File digestTargetFile = null;
-        try
-        {
-            digestTargetFile = new File( targetBase, targetRepo.pathOf( artifact ) + ".md5" );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            reporter.error( "Error creating java.io.File of digest target for artifact[" + artifact.getId() + "]", e );
-
-            throw e;
-        }
+        File digestTargetFile = new File( artifactTarget + ".md5" );
         
         if(!reportOnly)
         {
@@ -79,25 +53,12 @@ public class ArtifactDigestVerifier
             }
         }
 
-        // create the artifact file in the target repo to use for generating a new digest.
-        File artifactTargetFile = null;
-        try
-        {
-            artifactTargetFile = new File( targetBase, targetRepo.pathOf( artifact ) );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            reporter.error( "Error creating java.io.File for artifact[" + artifact.getId() + "]", e );
-
-            throw e;
-        }
-
         boolean verified = false;
 
         // if the digest source file exists, then verify it.
         if ( digestSourceFile.exists() )
         {
-            verified = artifactDigestor.verifyArtifactDigest( artifactTargetFile, digestTargetFile,
+            verified = artifactDigestor.verifyArtifactDigest( artifactTarget, digestTargetFile,
                                                               ArtifactDigestor.MD5 );
 
             if ( verified )
@@ -142,7 +103,7 @@ public class ArtifactDigestVerifier
 
             if ( !reportOnly )
             {
-                artifactDigestor.createArtifactDigest( artifactTargetFile, digestTargetFile, ArtifactDigestor.MD5 );
+                artifactDigestor.createArtifactDigest( artifactTarget, digestTargetFile, ArtifactDigestor.MD5 );
             }
             else
             {

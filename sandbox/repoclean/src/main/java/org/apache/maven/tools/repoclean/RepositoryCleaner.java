@@ -193,6 +193,11 @@ public class RepositoryCleaner
 
                     boolean errorOccurred = false;
 
+                    File artifactSource = new File( sourceRepo.getBasedir(), sourceRepo.pathOf( artifact ) );
+                    File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
+
+                    artifact.setFile( artifactSource );
+                    
                     try
                     {
                         if ( !configuration.reportOnly() )
@@ -202,9 +207,6 @@ public class RepositoryCleaner
                                 logger.debug( "sourceRepo basedir is: \'" + sourceRepo.getBasedir() + "\'" );
                                 logger.debug( "targetRepo basedir is: \'" + targetRepo.getBasedir() + "\'" );
                             }
-
-                            File artifactSource = new File( sourceRepo.getBasedir(), sourceRepo.pathOf( artifact ) );
-                            File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
 
                             File targetParent = artifactTarget.getParentFile();
                             if ( !targetParent.exists() )
@@ -244,7 +246,7 @@ public class RepositoryCleaner
 
                         try
                         {
-                            artifactDigestVerifier.verifyDigest( artifact, sourceRepo, targetRepo, artifactReporter,
+                            artifactDigestVerifier.verifyDigest( artifact, artifactTarget, artifactReporter,
                                                                  configuration.reportOnly() );
                         }
                         catch ( Exception e )

@@ -16,26 +16,76 @@ package org.apache.maven.artifact.repository.layout;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+
 /**
  * @author jdcasey
  */
 public class LegacyRepositoryLayout
-    extends AbstractArtifactRepositoryLayout
+    implements ArtifactRepositoryLayout
 {
 
-    protected String layoutPattern()
+    private ArtifactHandlerManager artifactHandlerManager;
+
+    public String pathOf( Artifact artifact )
+        throws ArtifactPathFormatException
     {
-        return "${groupPath}/${directory}/${artifactId}-${version}-${classifier}.${extension}";
+        ArtifactHandler artifactHandler = null;
+        try
+        {
+            // TODO: this is a poor excuse to have this method throwing an exception. Validate the artifact first, perhaps associate the handler with it
+            artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
+        }
+        catch ( ArtifactHandlerNotFoundException e )
+        {
+            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId()
+                + "\'.", e );
+        }
+        
+        StringBuffer path = new StringBuffer();
+        
+        path.append(artifact.getGroupId()).append('/');
+        path.append(artifactHandler.directory()).append('/');
+        path.append(artifact.getArtifactId()).append('-').append(artifact.getVersion());
+        
+        if ( artifact.hasClassifier() )
+        {
+            path.append('-').append(artifact.getClassifier());
+        }
+        
+        path.append('.').append(artifactHandler.extension());
+
+        return path.toString();
     }
 
-    protected String metadataLayoutPattern()
+    public String pathOfMetadata( ArtifactMetadata metadata )
+        throws ArtifactPathFormatException
     {
-        return "${groupPath}/poms/${metadataFilename}";
-    }
-
-    protected String groupIdAsPath( String groupId )
-    {
-        return groupId;
+        Artifact artifact = metadata.getArtifact();
+        
+        ArtifactHandler artifactHandler = null;
+        
+        try
+        {
+            // TODO: this is a poor excuse to have this method throwing an exception. Validate the artifact first, perhaps associate the handler with it
+            artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
+        }
+        catch ( ArtifactHandlerNotFoundException e )
+        {
+            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId()
+                + "\'.", e );
+        }
+        
+        StringBuffer path = new StringBuffer();
+        
+        path.append(artifact.getGroupId()).append("/poms/");
+        path.append(metadata.getFilename());
+        
+        return path.toString();
     }
 
 }
