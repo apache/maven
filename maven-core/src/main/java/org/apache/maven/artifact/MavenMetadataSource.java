@@ -39,22 +39,15 @@ public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
     private MavenProjectBuilder mavenProjectBuilder;
-
-    //    private MavenXpp3Reader reader = new MavenXpp3Reader();
-
-    private ArtifactRepository localRepository;
     private ArtifactResolver artifactResolver;
 
-    public MavenMetadataSource( ArtifactRepository localRepository,
-                                ArtifactResolver artifactResolver,
-                                MavenProjectBuilder projectBuilder )
+    public MavenMetadataSource( ArtifactResolver artifactResolver, MavenProjectBuilder projectBuilder )
     {
-        this.localRepository = localRepository;
         this.artifactResolver = artifactResolver;
         this.mavenProjectBuilder = projectBuilder;
     }
 
-    public Set retrieve( Artifact artifact, Set remoteRepositories )
+    public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         Set artifacts;
@@ -63,7 +56,7 @@ public class MavenMetadataSource
                                                          artifact.getVersion(),
                                                          "pom" );
         try
-              {
+        {
             artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
 
             // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable

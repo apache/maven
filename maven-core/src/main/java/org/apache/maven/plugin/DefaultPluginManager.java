@@ -214,8 +214,7 @@ public class DefaultPluginManager
 
         mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
-        MavenMetadataSource metadataSource = new MavenMetadataSource( session.getLocalRepository(),
-                                                                      artifactResolver,
+        MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver,
                                                                       mavenProjectBuilder );
 
         ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact,

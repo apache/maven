@@ -118,8 +118,6 @@ public class DefaultMavenProjectBuilder
 
             projectDefaultsInjector.injectDefaults( project );
 
-            project.setLocalRepository( localRepository );
-
             project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(),
                 localRepository ) );
 
@@ -142,8 +140,7 @@ public class DefaultMavenProjectBuilder
             {
                 Set repos = RepositoryUtils.mavenToWagon( project.getRepositories() );
 
-                MavenMetadataSource sourceReader = new MavenMetadataSource( localRepository,
-                    artifactResolver, this );
+                MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
 
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( project
                     .getArtifacts(), repos, localRepository, sourceReader );

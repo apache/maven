@@ -18,7 +18,6 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -63,8 +62,6 @@ public class MavenProject
     private File file;
 
     private Set artifacts;
-
-    private ArtifactRepository wagonLocalRepository;
 
     public MavenProject( Model model )
     {
@@ -518,16 +515,6 @@ public class MavenProject
     public List getRepositories()
     {
         return model.getRepositories();
-    }
-
-    public void setLocalRepository( ArtifactRepository repository )
-    {
-        this.wagonLocalRepository = repository;
-    }
-    
-    public ArtifactRepository getLocalRepository()
-    {
-        return wagonLocalRepository;
     }
 
     // ----------------------------------------------------------------------

@@ -76,7 +76,6 @@ public class RegexBasedProjectInterpolator
         }
 
         MavenProject newProject = new MavenProject( model );
-        newProject.setLocalRepository( project.getLocalRepository() );
         newProject.setParent( project.getParent() );
         newProject.setFile( project.getFile() );
         newProject.setArtifacts( project.getArtifacts() );

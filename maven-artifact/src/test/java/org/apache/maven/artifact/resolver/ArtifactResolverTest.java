@@ -21,6 +21,7 @@ import org.apache.maven.artifact.ArtifactComponentTestCase;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -137,7 +138,7 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public Set retrieve( Artifact artifact, Set remoteRepositories )
+            public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
@@ -185,7 +186,7 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public Set retrieve( Artifact artifact, Set remoteRepositories )
+            public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();

@@ -82,8 +82,7 @@ public class DependencyResolutionPhase
 
             projectBuilder = (MavenProjectBuilder) context.lookup( MavenProjectBuilder.ROLE );
 
-            MavenMetadataSource sourceReader = new MavenMetadataSource( context.getLocalRepository(),
-                                                                        artifactResolver,
+            MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver,
                                                                         projectBuilder );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
