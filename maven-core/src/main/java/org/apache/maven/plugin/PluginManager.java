@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.util.Map;
 
@@ -43,6 +44,11 @@ public interface PluginManager
 
     MojoDescriptor getMojoDescriptor( String goalId );
 
-    void verifyPluginForGoal( String goalName, MavenSession session )
+    boolean verifyPluginForGoal( String goalName, MavenSession session )
         throws Exception;
+
+    boolean verifyPlugin( String pluginId, MavenSession session )
+        throws Exception;
+
+    PluginDescriptor getPluginDescriptor( String pluginId );
 }

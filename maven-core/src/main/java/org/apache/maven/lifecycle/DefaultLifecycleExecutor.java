@@ -21,9 +21,12 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
@@ -73,7 +76,9 @@ public class DefaultLifecycleExecutor
 
         try
         {
-            preProcessPlugins( tasks, session );
+            processPluginConfiguration( session.getProject(), session );
+
+            processGoalChain( tasks, session );
 
             for ( Iterator i = tasks.iterator(); i.hasNext(); )
             {
@@ -109,14 +114,36 @@ public class DefaultLifecycleExecutor
         return response;
     }
 
-    private void preProcessPlugins( List tasks, MavenSession session )
+    private void processPluginConfiguration( MavenProject project, MavenSession mavenSession )
+        throws Exception
+    {
+        for ( Iterator i = project.getPlugins().iterator(); i.hasNext(); )
+        {
+            Plugin plugin = (Plugin) i.next();
+
+            if ( pluginManager.verifyPlugin( plugin.getId(), mavenSession ) )
+            {
+                PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( plugin.getId() );
+                for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
+                {
+                    MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+
+                    if ( mojoDescriptor.getPhase() != null )
+                    {
+                        Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
+                        phase.getGoals().add( mojoDescriptor.getId() );
+                    }
+                }
+            }
+        }
+    }
+
+    private void processGoalChain( List tasks, MavenSession session )
         throws Exception
     {
         for ( Iterator i = tasks.iterator(); i.hasNext(); )
         {
             String task = (String) i.next();
-
-            PluginExecutionResponse pluginResponse;
 
             if ( phaseMap.containsKey( task ) )
             {

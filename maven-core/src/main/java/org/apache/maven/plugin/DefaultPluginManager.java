@@ -112,6 +112,11 @@ public class DefaultPluginManager
         return (MojoDescriptor) mojoDescriptors.get( name );
     }
 
+    public PluginDescriptor getPluginDescriptor( String pluginId )
+    {
+        return (PluginDescriptor) pluginDescriptors.get( pluginId );
+    }
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -186,11 +191,17 @@ public class DefaultPluginManager
         return goalName;
     }
 
-    public void verifyPluginForGoal( String goalName, MavenSession session )
+    public boolean verifyPluginForGoal( String goalName, MavenSession session )
         throws Exception
     {
         String pluginId = getPluginId( goalName );
 
+        return verifyPlugin( pluginId, session );
+    }
+
+    public boolean verifyPlugin( String pluginId, MavenSession session )
+        throws Exception
+    {
         if ( !isPluginInstalled( pluginId ) )
         {
             //!! This is entirely crappy. We need a better naming for plugin
@@ -204,6 +215,12 @@ public class DefaultPluginManager
             Artifact pluginArtifact = new DefaultArtifact( "maven", artifactId, version, "plugin", "jar" );
 
             addPlugin( pluginArtifact, session );
+
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
