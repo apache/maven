@@ -20,7 +20,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-modello-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0-alpha-1</version>
         <configuration>
           <model>src/main/mdo/descriptor.mdo</model>
           <version>1.0.0</version>
