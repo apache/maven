@@ -32,6 +32,8 @@ import java.util.Map;
 public interface Maven
 {
     static String ROLE = Maven.class.getName();
+    
+    static String DEFAULT_MODEL_VERSION = "4.0.0";
 
     // ----------------------------------------------------------------------
     // Execution
