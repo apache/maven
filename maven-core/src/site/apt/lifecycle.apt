@@ -49,7 +49,7 @@ Maven Lifecycle
                 |          |<---------+
                 |          |
                 |          v
-                |         does goal0 have any prereqs?
+                |         do any prereqs need to be processed?
                 |           |
                 |    yes ---+--- no
                 |    |
