@@ -2,6 +2,7 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -22,7 +23,21 @@ public class DefaultArtifactResolver
     extends AbstractArtifactComponent
     implements ArtifactResolver
 {
+    // ----------------------------------------------------------------------
+    // Fields
+    // ----------------------------------------------------------------------
+
+    private List requestTransformations;
+    
+    // ----------------------------------------------------------------------
+    // Components
+    // ----------------------------------------------------------------------
+
     private WagonManager wagonManager;
+
+    // ----------------------------------------------------------------------
+    // Implementation
+    // ----------------------------------------------------------------------
 
     public Artifact resolve( Artifact artifact,
                              Set remoteRepositories,
@@ -284,16 +299,8 @@ public class DefaultArtifactResolver
         conflicts.add( newArtifact );
     }
 
-    protected boolean includeArtifact( String artifactId, String[] artifactExcludes )
+    public void addArtifactRequestTransformation( ArtifactRequestTransformation requestTransformation )
     {
-        for ( int b = 0; b < artifactExcludes.length; b++ )
-        {
-            if ( artifactId.equals( artifactExcludes[b] ) )
-            {
-                return false;
-            }
-        }
 
-        return true;
     }
 }

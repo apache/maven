@@ -1,6 +1,7 @@
 package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -49,6 +50,7 @@ public interface ArtifactResolver
                                                   ArtifactMetadataSource source,
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException;
-    
+
+    void addArtifactRequestTransformation( org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation requestTransformation );
     
 }

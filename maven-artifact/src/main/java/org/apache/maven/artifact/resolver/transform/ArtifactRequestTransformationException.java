@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.request;
+package org.apache.maven.artifact.resolver.transform;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
