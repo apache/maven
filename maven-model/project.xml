@@ -55,6 +55,11 @@
         <include>**/*Test.java</include>
       </includes>
     </unitTest>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
   </build>
 
   <reports>
