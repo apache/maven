@@ -65,28 +65,25 @@ public class MBoot
     // ----------------------------------------------------------------------
 
     String[] modelloDeps = new String[]{"classworlds/jars/classworlds-1.1-alpha-1.jar",
-                                        //"plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
                                         "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
-                                        //"plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
                                         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
                                         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
                                         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
                                         "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar"};
 
-    String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin",
-                                   "maven-artifact", "maven-script/maven-script-marmalade", "maven-core",
-                                   "maven-archiver", "maven-plugin-tools/maven-plugin-tools-api",
+    String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin", "maven-artifact",
+                                   "maven-script/maven-script-marmalade", "maven-core", "maven-archiver",
+                                   "maven-plugin-tools/maven-plugin-tools-api",
                                    "maven-plugin-tools/maven-plugin-tools-java",
                                    "maven-plugin-tools/maven-plugin-tools-pluggy",
-                                   "maven-plugin-tools/maven-plugin-tools-marmalade", 
-                                   "maven-core-it-verifier"};
+                                   "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-verifier"};
 
-    String[] pluginBuilds = new String[]{"maven-plugins/maven-clean-plugin", "maven-plugins/maven-compiler-plugin",
-                                         "maven-plugins/maven-deploy-plugin", "maven-plugins/maven-ejb-plugin",
-                                         "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin",
-                                         "maven-plugins/maven-plugin-plugin", "maven-plugins/maven-pom-plugin",
-                                         "maven-plugins/maven-resources-plugin", "maven-plugins/maven-surefire-plugin",
-                                         "maven-plugins/maven-war-plugin"};
+    String[] pluginBuilds = new String[]{"maven-plugins/maven-assemble-plugin", "maven-plugins/maven-clean-plugin",
+                                         "maven-plugins/maven-compiler-plugin", "maven-plugins/maven-deploy-plugin",
+                                         "maven-plugins/maven-ejb-plugin", "maven-plugins/maven-install-plugin",
+                                         "maven-plugins/maven-jar-plugin", "maven-plugins/maven-plugin-plugin",
+                                         "maven-plugins/maven-pom-plugin", "maven-plugins/maven-resources-plugin",
+                                         "maven-plugins/maven-surefire-plugin", "maven-plugins/maven-war-plugin"};
 
     private static final Map MODELLO_TARGET_VERSIONS;
 
@@ -97,12 +94,14 @@ public class MBoot
         Map targetVersions = new TreeMap();
         targetVersions.put( "maven-model", "4.0.0" );
         targetVersions.put( "maven-settings", "1.0.0" );
+        targetVersions.put( "maven-plugins/maven-assemble-plugin", "1.0.0" );
 
         MODELLO_TARGET_VERSIONS = Collections.unmodifiableMap( targetVersions );
 
         Map modelFiles = new TreeMap();
         modelFiles.put( "maven-model", "maven.mdo" );
         modelFiles.put( "maven-settings", "settings.mdo" );
+        modelFiles.put( "maven-plugins/maven-assemble-plugin", "src/main/mdo/descriptor.mdo" );
 
         MODELLO_MODEL_FILES = Collections.unmodifiableMap( modelFiles );
     }
@@ -222,13 +221,18 @@ public class MBoot
 
             mavenRepoLocal = repoDir.getAbsolutePath();
 
-            System.out.println( "You SHOULD have a ~/.m2/settings.xml file and must contain at least the following information:\n" );
+            System.out.println(
+                "You SHOULD have a ~/.m2/settings.xml file and must contain at least the following information:" );
+            System.out.println();
 
-            System.out.println( "<settings>\n" + "  <profiles>\n" + "    <profile>\n"
-                + "      <active>true</active>\n"
-                + "      <localRepository>/path/to/your/repository</localRepository>\n"
-                + "    </profile>\n" + "  </profiles>\n"
-                + "</settings>\n" );
+            System.out.println( "<settings>" );
+            System.out.println( "  <profiles>" );
+            System.out.println( "    <profile>" );
+            System.out.println( "      <active>true</active>" );
+            System.out.println( "      <localRepository>/path/to/your/repository</localRepository>" );
+            System.out.println( "    </profile>" );
+            System.out.println( "  </profiles>" );
+            System.out.println( "</settings>" );
 
             System.out.println();
 
@@ -236,8 +240,8 @@ public class MBoot
 
             System.out.println();
 
-            System.out.println( "HOWEVER, since you did not specify a repository path, maven will use: "
-                + repoDir.getAbsolutePath() + " to store artifacts locally." );
+            System.out.println( "HOWEVER, since you did not specify a repository path, maven will use: " +
+                                repoDir.getAbsolutePath() + " to store artifacts locally." );
         }
 
         String mavenHome = null;
@@ -680,10 +684,9 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency +
-                                                 ( !online
-                                                   ? "; run again online"
-                                                   : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException(
+                    "Missing dependency: " + dependency +
+                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -700,10 +703,9 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency +
-                                                 ( !online
-                                                   ? "; run again online"
-                                                   : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException(
+                    "Missing dependency: " + dependency +
+                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -735,10 +737,9 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency +
-                                                 ( !online
-                                                   ? "; run again online"
-                                                   : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException(
+                    "Missing dependency: " + dependency +
+                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             modelloClassLoader.addURL( f.toURL() );
@@ -878,9 +879,9 @@ public class MBoot
         excludes = new ArrayList();
 
         excludes.add( "**/*Abstract*.java" );
-        
-        String reportsDir = new File(basedir, "target/test-reports").getAbsolutePath();
-        
+
+        String reportsDir = new File( basedir, "target/test-reports" ).getAbsolutePath();
+
         boolean success = testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes,
                                               classpath( reader.getDependencies(), null ), reportsDir );
 
@@ -1387,7 +1388,7 @@ public class MBoot
             {
                 if ( "active".equals( rawName ) )
                 {
-                    currentProfile.setActive( Boolean.valueOf(currentBody.toString().trim()).booleanValue() );
+                    currentProfile.setActive( Boolean.valueOf( currentBody.toString().trim() ).booleanValue() );
                 }
                 else if ( "localRepository".equals( rawName ) )
                 {
@@ -1407,15 +1408,14 @@ public class MBoot
                 }
                 else
                 {
-                    throw new SAXException( "Invalid proxy entry. Missing one or more " +
-                                            "fields: {host, port}." );
+                    throw new SAXException( "Invalid proxy entry. Missing one or more " + "fields: {host, port}." );
                 }
             }
             else if ( currentProxy != null )
             {
                 if ( "active".equals( rawName ) )
                 {
-                    currentProxy.setActive( Boolean.valueOf(currentBody.toString().trim()).booleanValue() );
+                    currentProxy.setActive( Boolean.valueOf( currentBody.toString().trim() ).booleanValue() );
                 }
                 else if ( "host".equals( rawName ) )
                 {
@@ -1446,16 +1446,16 @@ public class MBoot
             }
             else if ( "settings".equals( rawName ) )
             {
-                if( profiles.size() == 1 )
+                if ( profiles.size() == 1 )
                 {
-                    activeProfile = (Profile) profiles.get(0);
+                    activeProfile = (Profile) profiles.get( 0 );
                 }
                 else
                 {
                     for ( Iterator it = profiles.iterator(); it.hasNext(); )
                     {
                         Profile profile = (Profile) it.next();
-                        if( profile.isActive() )
+                        if ( profile.isActive() )
                         {
                             activeProfile = profile;
                         }
@@ -1466,7 +1466,7 @@ public class MBoot
                     for ( Iterator it = proxies.iterator(); it.hasNext(); )
                     {
                         Proxy proxy = (Proxy) it.next();
-                        if( proxy.isActive() )
+                        if ( proxy.isActive() )
                         {
                             activeProxy = proxy;
                         }

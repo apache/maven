@@ -22,25 +22,18 @@ import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.plugins.assemble.model.Assembly;
 import org.apache.maven.plugins.assemble.model.FileSet;
 import org.apache.maven.plugins.assemble.model.io.xpp3.AssemblyXpp3Reader;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.archiver.Archiver;
+import org.codehaus.plexus.archiver.tar.TarArchiver;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  * @goal assemble
  * @description assemble an application bundle or distribution
- * @parameter name="buildDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.directory/assembly"
- * description=""
  * @parameter name="outputDirectory" type="String" required="true" validator="" expression="#project.build.directory" description=""
  * @parameter name="descriptor" type="String" required="true" validator="" expression="#maven.assemble.descriptor" description=""
  * @parameter name="finalName" type="String" required="true" validator="" expression="#project.build.finalName" description=""
@@ -48,41 +41,68 @@ import java.util.List;
 public class AssembleMojo
     extends AbstractPlugin
 {
+    private static final String[] EMPTY_STRING_ARRAY = {};
+
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
         // TODO: align all to basedir
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
-        String buildDirectory = (String) request.getParameter( "buildDirectory" );
         String descriptor = (String) request.getParameter( "descriptor" );
         String finalName = (String) request.getParameter( "finalName" );
 
         AssemblyXpp3Reader reader = new AssemblyXpp3Reader();
         Assembly assembly = reader.read( new FileReader( new File( descriptor ) ) );
 
-        // TODO: include in bootstrap
         // TODO: include dependencies marked for distribution under certain formats
         // TODO: have a default set of descriptors that can be used instead of the file
 
         String fullName = finalName + "-" + assembly.getId();
-        File outputBase = new File( buildDirectory, fullName );
-        outputBase.mkdirs();
 
-        for ( Iterator i = assembly.getFilesets().iterator(); i.hasNext(); )
+        for ( Iterator i = assembly.getFormats().iterator(); i.hasNext(); )
         {
-            FileSet fileset = (FileSet) i.next();
-            String directory = fileset.getDirectory();
-            String output = fileset.getOutputDirectory();
-            if ( output == null )
+            String format = (String) i.next();
+
+            String filename = fullName + "." + format;
+
+            // TODO: use component roles? Can we do that in a mojo?
+            Archiver archiver;
+            if ( format.startsWith( "tar" ) )
             {
-                output = directory;
+                TarArchiver tarArchiver = new TarArchiver();
+                archiver = tarArchiver;
+                int index = format.indexOf( '.' );
+                if ( index >= 0 )
+                {
+                    // TODO: this needs a cleanup in plexus archiver - use a real typesafe enum
+                    TarArchiver.TarCompressionMethod tarCompressionMethod = new TarArchiver.TarCompressionMethod();
+                    tarCompressionMethod.setValue( format.substring( index + 1 ) );
+                    tarArchiver.setCompression( tarCompressionMethod );
+                }
+            }
+            else
+            {
+                // TODO: better handling
+                throw new IllegalArgumentException( "Unknown format: " + format );
             }
 
-            // TODO: includes/excludes
+            for ( Iterator j = assembly.getFilesets().iterator(); j.hasNext(); )
+            {
+                FileSet fileset = (FileSet) j.next();
+                String directory = fileset.getDirectory();
+                String output = fileset.getOutputDirectory();
+                if ( output == null )
+                {
+                    output = directory;
+                }
 
-            FileUtils.copyDirectoryStructure( new File( directory ), new File( outputBase, output ));
+                String[] includes = (String[]) fileset.getIncludes().toArray( EMPTY_STRING_ARRAY );
+                String[] excludes = (String[]) fileset.getExcludes().toArray( EMPTY_STRING_ARRAY );
+                archiver.addDirectory( new File( directory ), output, includes, excludes );
+            }
+
+            archiver.setDestFile( new File( outputDirectory, filename ) );
+            archiver.createArchive();
         }
-
-        // TODO: package it up
     }
 }
