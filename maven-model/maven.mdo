@@ -142,6 +142,12 @@
           <type>IssueManagement</type>
         </field>
         <field>
+          <name>ciManagement</name>
+          <version>4.0.0</version>
+          <description>The project's continuous integration management information.</description>
+          <type>CiManagement</type>
+        </field>
+        <field>
           <name>inceptionYear</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -480,6 +486,24 @@
           </description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>CiManagement</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>system</name>
+          <version>4.0.0</version>
+          <description>The name of the continuous integration system i.e. Bugzilla</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>Url for the continuous integration system use by the project.</description>
+          <type>String</type>
         </field>
       </fields>
     </class>
