@@ -1,0 +1,34 @@
+  ---
+  Refactoring Proposal: Accommodating Generators for Multiple Plugin Types
+  ---
+  John Casey
+  ---
+  09-Feb-2005
+  ---
+  
+*Abstract
+
+  Propose changing the structure of maven-plugin-tools to accommodate multiple
+  plugin languages and their needs during the descriptor, etc. generation 
+  process. Details below.
+  
+*Refactor Details
+
+  [[1]] Move the existing project (maven-plugin-tools) to 
+        <<<maven-plugin-tools/maven-plugin-tools-java>>>. Adjust dependencies on 
+        this library accordingly within maven-components.
+        
+  [[2]] Create other plugin-tools libraries to accommodate generation needs for
+        other languages, as needed.
+        
+        The first use-case of this is the descriptor generator for 
+        marmalade-based mojos. Since we don't want the "normal" plugin tools
+        to depend on marmalade, etc. we need to make the concept of plugin-tools
+        abstract, and provide a concrete implementation for the java language, 
+        as well as marmalade.
+        
+  [[3]] Create plugin-tools root pom if needed for inheriting common values...
+  
+        I don't anticipate needing this initially, but if there is some question
+        of consistency wrt this, we can certainly provide one.
+        
