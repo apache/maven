@@ -89,6 +89,7 @@ public class MBoot
     {
         "maven-plugins/maven-clean-plugin",
         "maven-plugins/maven-compiler-plugin",
+        "maven-plugins/maven-deploy-plugin",
         "maven-plugins/maven-install-plugin",
         "maven-plugins/maven-jar-plugin",
         "maven-plugins/maven-plugin-plugin",
