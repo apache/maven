@@ -22,20 +22,29 @@ package org.apache.maven.plugin;
  */
 public class PluginExecutionResponse
 {
-    private boolean executionFailure;
-
-    private FailureResponse failureResponse;
+    private FailureResponse failureResponse = null;
 
     public boolean isExecutionFailure()
     {
-        return executionFailure;
+        return failureResponse != null;
     }
 
+    public void setExecutionFailure( FailureResponse failureResponse )
+    {
+        this.failureResponse = failureResponse;
+    }
+
+    /**
+     * @deprecated please use {@link #setExecutionFailure(FailureResponse)} as there is no need to set executionFailure to false if there is a failure response
+     */
     public void setExecutionFailure( boolean executionFailure, FailureResponse failureResponse )
     {
-        this.executionFailure = executionFailure;
+        if ( executionFailure == false )
+        {
+            throw new IllegalArgumentException( "executionFailure should be true when passing a failureResponse" );
+        }
 
-        this.failureResponse = failureResponse;
+        setExecutionFailure( failureResponse );
     }
 
     public FailureResponse getFailureResponse()

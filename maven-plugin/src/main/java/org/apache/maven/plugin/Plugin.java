@@ -24,6 +24,7 @@ public interface Plugin
 {
     String ROLE = Plugin.class.getName();
 
+    // TODO: return response.getFailureResponse now as that is the only member of it?
     void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception;
 }

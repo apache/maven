@@ -137,7 +137,7 @@ public class CompilerMojo
 
         if ( compilationError )
         {
-            response.setExecutionFailure( true, new CompilationFailureResponse( messages ) );
+            response.setExecutionFailure( new CompilationFailureResponse( messages ) );
         }
     }
 }

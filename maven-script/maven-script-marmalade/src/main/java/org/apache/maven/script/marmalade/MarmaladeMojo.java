@@ -57,7 +57,8 @@ public class MarmaladeMojo
         catch ( MarmaladeExecutionException e )
         {
             FailureResponse failure = new MarmaladeMojoFailureResponse( script.getLocation(), e );
-            response.setExecutionFailure( true, failure );
+            // TODO: specify marmalade goal name here
+            response.setExecutionFailure( failure );
         }
 
         Map externalizedVars = context.getExternalizedVariables();

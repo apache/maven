@@ -21,7 +21,6 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
-import org.apache.maven.execution.MavenProjectExecutionRequest;
 import org.apache.maven.execution.MavenReactorExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
@@ -34,12 +33,12 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.ReactorException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -89,38 +88,26 @@ public class DefaultMaven
     public void handleProject( MavenExecutionRequest request )
         throws Exception
     {
-        MavenExecutionResponse response = new MavenExecutionResponse();
-
         MavenSession session = createSession( request );
 
         MavenProject project = getProject( (File) request.getProjectFiles().get( 0 ), request.getLocalRepository() );
 
         session.setProject( project );
 
-        try
-        {
-            response.setStart( new Date() );
+        resolveParameters( request );
 
-            resolveParameters( request );
-
-            lifecycleExecutor.execute( request.getGoals(), session );
-
-            response.setFinish( new Date() );
-        }
-        catch ( Exception e )
-        {
-            response.setFinish( new Date() );
-
-            response.setException( e );
-
-            logError( response );
-
-            return;
-        }
+        MavenExecutionResponse response = lifecycleExecutor.execute( request.getGoals(), session );
 
         if ( response.isExecutionFailure() )
         {
-            logFailure( response );
+            if ( response.getException() != null )
+            {
+                logError( response );
+            }
+            else
+            {
+                logFailure( response );
+            }
         }
         else
         {
@@ -218,12 +205,7 @@ public class DefaultMaven
     protected MavenSession createSession( MavenExecutionRequest request )
         throws Exception
     {
-        MavenSession session = new MavenSession( container,
-                                                 pluginManager,
-                                                 request.getLocalRepository(),
-                                                 request.getGoals() );
-
-        return session;
+        return new MavenSession( container, pluginManager, request.getLocalRepository(), request.getGoals() );
     }
 
     /**

@@ -18,12 +18,15 @@ package org.apache.maven.lifecycle;
  */
 
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -60,27 +63,50 @@ public class DefaultLifecycleExecutor
      *
      * @param tasks
      * @param session
-     * @throws LifecycleExecutionException
      */
-    public void execute( List tasks, MavenSession session )
-        throws LifecycleExecutionException
+    public MavenExecutionResponse execute( List tasks, MavenSession session )
     {
-        for ( Iterator i = tasks.iterator(); i.hasNext(); )
-        {
-            String task = (String) i.next();
+        MavenExecutionResponse response = new MavenExecutionResponse();
 
-            if ( phaseMap.containsKey( task ) )
+        response.setStart( new Date() );
+
+        try
+        {
+            for ( Iterator i = tasks.iterator(); i.hasNext(); )
             {
-                executePhase( task, session );
-            }
-            else
-            {
-                executeMojo( task, session );
+                String task = (String) i.next();
+
+                PluginExecutionResponse pluginResponse;
+
+                if ( phaseMap.containsKey( task ) )
+                {
+                    executePhase( task, session, response );
+                }
+                else
+                {
+                    pluginResponse = executeMojo( task, session );
+
+                    if ( pluginResponse.isExecutionFailure() )
+                    {
+                        response.setExecutionFailure( task, pluginResponse.getFailureResponse() );
+                        break;
+                    }
+                }
             }
         }
+        catch ( LifecycleExecutionException e )
+        {
+            response.setException( e );
+        }
+        finally
+        {
+            response.setFinish( new Date() );
+        }
+
+        return response;
     }
 
-    protected void executePhase( String phase, MavenSession session )
+    protected void executePhase( String phase, MavenSession session, MavenExecutionResponse response )
         throws LifecycleExecutionException
     {
         int i = phases.indexOf( phaseMap.get( phase ) );
@@ -91,12 +117,18 @@ public class DefaultLifecycleExecutor
 
             if ( p.getGoal() != null )
             {
-                executeMojo( p.getGoal(), session );
+                PluginExecutionResponse pluginResponse = executeMojo( p.getGoal(), session );
+
+                if ( pluginResponse.isExecutionFailure() )
+                {
+                    response.setExecutionFailure( p.getGoal(), pluginResponse.getFailureResponse() );
+                    break;
+                }
             }
         }
     }
 
-    protected void executeMojo( String id, MavenSession session )
+    protected PluginExecutionResponse executeMojo( String id, MavenSession session )
         throws LifecycleExecutionException
     {
         // ----------------------------------------------------------------------
@@ -110,7 +142,7 @@ public class DefaultLifecycleExecutor
 
         try
         {
-            pluginManager.executeMojo( session, id );
+            return pluginManager.executeMojo( session, id );
         }
         catch ( GoalExecutionException e )
         {

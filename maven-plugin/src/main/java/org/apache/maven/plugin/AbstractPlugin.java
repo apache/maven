@@ -16,6 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+/** @todo: what purpose does this serve? */
 public abstract class AbstractPlugin
     implements Plugin
 {
