@@ -230,7 +230,10 @@ public class DefaultPluginManager
             "maven-artifact",
             "maven-model",
             "maven-plugin",
-            "plexus",
+            "plexus-container-api",
+            "plexus-container-default",
+            "plexus-artifact-container",
+            "plexus-utils",
             "xpp3",
             "classworlds",
             "ognl"
