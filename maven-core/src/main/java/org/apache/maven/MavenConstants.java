@@ -19,5 +19,5 @@ package org.apache.maven;
 public class MavenConstants
 {
     // TODO: remove? only used in CLI for now - once set, never used
-    public static final String DEBUG_ON = "maven.debugOn";
+    public static final String DEBUG_ON = "maven.debug.on";
 }
