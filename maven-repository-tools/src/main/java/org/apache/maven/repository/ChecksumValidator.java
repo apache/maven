@@ -17,23 +17,74 @@ package org.apache.maven.repository;
  */
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.manager.DefaultWagonManager;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.UnsupportedProtocolException;
+import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.observers.ChecksumObserver;
 
 /**
  * Prints all artifacts without checksum file
  * 
  * @todo generate checksums for those files without it
- * 
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez </a>
  * @version $Id$
  */
 
 public class ChecksumValidator
 {
+
+    private ChecksumObserver checksumObserver;
+
+    private ArtifactRepository tempRepository;
+
+    public ChecksumValidator()
+    {
+
+        checksumObserver = new ChecksumObserver();
+
+        tempRepository = new ArtifactRepository();
+
+        File f = new File( "target/test-classes/temp/" );
+
+        tempRepository.setUrl( "file://" + f.getPath() );
+
+    }
+
+    public boolean isValidChecksum( Artifact artifact, ArtifactRepository localRepository )
+        throws TransferFailedException, UnsupportedProtocolException
+    {
+        WagonManager wagonManager = new DefaultWagonManager();
+
+        Set set = new HashSet();
+
+        set.add( localRepository );
+
+        Wagon wagon = wagonManager.getWagon( "file://" );
+
+        wagon.addTransferListener( checksumObserver );
+
+        wagonManager.get( artifact, set, tempRepository );
+
+        // File file = artifact.getFile();
+        //
+        // TransferEvent transferEvent = new TransferEvent( wagon, new
+        // Resource(), TransferEvent.TRANSFER_COMPLETED,
+        // TransferEvent.REQUEST_GET );
+        //
+        // checksumObserver.transferStarted( transferEvent );
+        // checksumObserver.transferProgress(transferEvent, file);
+
+        return true;
+    }
 
     public static void main( String[] args )
     {
