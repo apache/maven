@@ -22,8 +22,8 @@
     <developer>
       <name>Jason van Zyl</name>
       <id>jvanzyl</id>
-      <email>jason@zenplex.com</email>
-      <organization>Zenplex</organization>
+      <email>jason@maven.org</email>
+      <organization>Maven</organization>
       <roles>
         <role>Architect</role>
         <role>Release Manager</role>

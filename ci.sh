@@ -67,7 +67,7 @@ echo "" >> log
       
       mkdir $REPO
       
-      cvs co maven-components > $SCM_LOG 2>&1
+      cvs co maven-components > $HOME_DIR/$SCM_LOG 2>&1
     
       echo "true" > $HOME_DIR/build_required
     
@@ -80,16 +80,20 @@ echo "" >> log
       (
         cd maven-components
       
-        cvs update -dP > $SCM_LOG 2>&1
+        cvs update -dP > $HOME_DIR/$SCM_LOG 2>&1
       
-        grep ^U $SCM_LOG > /dev/null 2>&1
+        grep ^P $HOME_DIR/$SCM_LOG > /dev/null 2>&1
 
         if [ "$?" = "1" ]
         then
 
 	  echo "false" > $HOME_DIR/build_required
       
-        fi
+        else
+	
+	  echo "true" > $HOME_DIR/build_required
+	  
+	fi
 
       )
 
