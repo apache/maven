@@ -17,9 +17,10 @@
  |
  -->
 <model>
+  <id>maven</id>
   <name>Maven</name>
   <version>3.0.0</version>
-  <description>the description</description>
+  <description>Maven's model for Java project.</description>
   <packageName>org.apache.maven.model</packageName>
   <classes>
     <class>
@@ -561,16 +562,26 @@
       <fields>
         <field>
           <name>name</name>
-          <description>the description</description>
+          <description>
+            The external version number under which this release was distributed. Examples include:
+            <code>1.0</code>, <code>1.1-alpha1</code>, <code>1.2-beta</code>, <code>1.3.2</code> etc.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>tag</name>
+          <description>
+            The name given in the version control system (e.g. cvs) used by the project for the source
+            code associated with this version of the project.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>id</name>
-          <description>the description</description>
+          <description>
+            A unique identifier for a version.  This ID is
+            used to specify the version that <a href="plugins/dist/index.html"><code>maven:dist</code></a> builds.
+          </description>
           <type>String</type>
         </field>
       </fields>
