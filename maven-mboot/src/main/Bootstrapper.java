@@ -7,6 +7,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,9 +16,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 public class Bootstrapper
 {
+    public static final String SNAPSHOT_SIGNATURE = "-SNAPSHOT";
+    
     private BootstrapPomParser bootstrapPomParser;
 
     private List dependencies;
@@ -30,7 +34,7 @@ public class Bootstrapper
 
     private boolean ignoreErrors = true;
 
-    private String baseUrl;
+    private List remoteRepos = new ArrayList();
 
     private String proxyHost;
 
@@ -55,12 +59,7 @@ public class Bootstrapper
 
         Properties properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
         
-        baseUrl = properties.getProperty( "maven.repo.remote" );
-
-        if ( baseUrl == null )
-        {
-            baseUrl = "http://www.ibiblio.org/maven/";
-        }
+        setRemoteRepo(properties.getProperty( "maven.repo.remote" ));
 
         String mavenRepoLocalProperty = properties.getProperty( "maven.repo.local" );
         
@@ -210,39 +209,18 @@ public class Bootstrapper
                     directory.mkdirs();
                 }
 
-                if ( destinationFile.exists() )
+                if ( destinationFile.exists() && !file.endsWith(SNAPSHOT_SIGNATURE))
                 {
                     continue;
                 }
 
-                log( "Downloading dependency: " + baseUrl + file );
-
-                int numRetries = 3;
-
-                while ( numRetries >= 0 )
-                {
-                    try
-                    {
-                        HttpUtils.getFile( baseUrl + file,
-                                           destinationFile,
-                                           ignoreErrors,
-                                           useTimestamp,
-                                           proxyHost,
-                                           proxyPort,
-                                           proxyUserName,
-                                           proxyPassword );
-                        break;
-                    }
-                    catch ( Exception e )
-                    {
-                        numRetries--;
-
-                        continue;
-                    }
-                }
+                log( "Downloading dependency: " + file );
+                
+                getRemoteArtifact(file, destinationFile);
+                
                 if ( !destinationFile.exists() )
                 {
-                    throw new Exception( "Failed to download " + baseUrl + file );
+                    throw new Exception( "Failed to download " + file );
                 }
             }
             catch ( Exception e )
@@ -251,7 +229,145 @@ public class Bootstrapper
             }
         }
     }
+    
+    private void setRemoteRepo(String repos)
+    {
+        remoteRepos = new ArrayList();
+        
+        if (repos == null)
+        {
+            remoteRepos.add("http://www.ibiblio.org/maven/");
+            return;
+        }
+        
+        StringTokenizer st = new StringTokenizer(repos, ",");
+        while (st.hasMoreTokens())
+        {
+            remoteRepos.add((String)st.nextToken().trim());
+        }
+    }
+    
+    private List getRemoteRepo()
+    {
+        return remoteRepos;
+    }
 
+    /**
+     * Retrieve a <code>remoteFile</code> from the maven remote repositories
+     * and store it at <code>localFile</code>
+     * @param artifact the artifact to retrieve from the repositories.
+     * @return true if the retrieval succeeds, false otherwise.
+     */
+    private boolean getRemoteArtifact( String file, File destinationFile )
+    {
+        boolean fileFound = false;
+
+        for ( Iterator i = getRemoteRepo().iterator(); i.hasNext();)
+        {
+            String remoteRepo = (String) i.next();
+
+            // The username and password parameters are not being
+            // used here. Those are the "" parameters you see below.
+            String url = remoteRepo + "/" + file;
+
+            if ( !url.startsWith( "file" ) )
+            {
+                url = replace( url, "//", "/" );
+                if ( url.startsWith( "https" ) )
+                {
+                    url = replace( url, "https:/", "https://" );
+                }
+                else
+                {
+                    url = replace( url, "http:/", "http://" );
+                }
+            }
+
+            // Attempt to retrieve the artifact and set the checksum if retrieval
+            // of the checksum file was successful.
+            try
+            {
+                HttpUtils.getFile( url,
+                                   destinationFile,
+                                   ignoreErrors,
+                                   useTimestamp,
+                                   proxyHost,
+                                   proxyPort,
+                                   proxyUserName,
+                                   proxyPassword,
+                                   true );
+
+                // Artifact was found, continue checking additional remote repos (if any)
+                // in case there is a newer version (i.e. snapshots) in another repo
+                fileFound = true;
+            }
+            catch (FileNotFoundException e)
+            {
+                // Ignore
+            }
+            catch ( Exception e )
+            {
+                // If there are additional remote repos, then ignore exception
+                // as artifact may be found in another remote repo. If there
+                // are no more remote repos to check and the artifact wasn't found in
+                // a previous remote repo, then artifactFound is false indicating
+                // that the artifact could not be found in any of the remote repos
+                //
+                // arguably, we need to give the user better control (another command-
+                // line switch perhaps) of what to do in this case? Maven already has
+                // a command-line switch to work in offline mode, but what about when
+                // one of two or more remote repos is unavailable? There may be multiple
+                // remote repos for redundancy, in which case you probably want the build
+                // to continue. There may however be multiple remote repos because some
+                // artifacts are on one, and some are on another. In this case, you may
+                // want the build to break.
+                //
+                // print a warning, in any case, so user catches on to mistyped
+                // hostnames, or other snafus
+                log("Error retrieving artifact from [" + url + "]: ");
+            }
+        }
+
+        return fileFound;
+    }
+    
+    /**
+     * <p>Replaces all occurrences of a String within another String.</p>
+     *
+     * This methods comes from Commons Lang
+     *
+     * <p>A <code>null</code> reference passed to this method is a no-op.</p>
+     *
+     * <pre>
+     * StringUtils.replace(null, *, *)        = null
+     * StringUtils.replace("", *, *)          = ""
+     * StringUtils.replace("any", null, *)    = "any"
+     * StringUtils.replace("any", *, null)    = "any"
+     * StringUtils.replace("any", "", *)      = "any"
+     * StringUtils.replace("aba", "a", null)  = "aba"
+     * StringUtils.replace("aba", "a", "")    = "b"
+     * StringUtils.replace("aba", "a", "z")   = "zbz"
+     * </pre>
+     *
+     * @param text  text to search and replace in, may be null
+     * @param repl  the String to search for, may be null
+     * @param with  the String to replace with, may be null
+     * @return the text with any replacements processed,
+     *  <code>null</code> if null String input
+     */
+    private String replace(String text, String repl, String with)
+    {
+        StringBuffer buf = new StringBuffer(text.length());
+        int start = 0, end = 0;
+        while ((end = text.indexOf(repl, start)) != -1)
+        {
+            buf.append(text.substring(start, end)).append(with);
+            start = end + repl.length();
+        }
+        buf.append(text.substring(start));
+        return buf.toString();
+    }
+    
     private void log( String message )
     {
         System.out.println( message );
