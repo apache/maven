@@ -30,6 +30,13 @@ it0008: Simple goal decoration where a preGoal belongs to a plugin that must
         
 it0009: Simple goal decoration where a postGoal belongs to a plugin that must
         be downloaded from a remote repository before it can be executed.        
+        
+it0010: Since the artifact resolution does not use the project builder, we must
+        ensure that the full hierarchy of all dependencies is resolved. This
+        includes the dependencies of the parent-pom's of dependencies. This test
+        will check this, by depending on classworlds, which is a dependency of
+        maven-component, which is the parent of maven-plugin, which is an
+        explicit dependency of this test.
 
 -------------------------------------------------------------------------------
 
