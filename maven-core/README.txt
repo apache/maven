@@ -15,7 +15,9 @@ or
 or
   set PATH="c:\program files\maven-2.0-SNAPSHOT\bin";%PATH%
 
-4) Run "m2" to verify that it is correctly installed. It should output a short build message, but do nothing
+4) Make sure JAVA_HOME is set to the location of your JDK
+
+5) Run "m2" to verify that it is correctly installed. It should output a short build message, but do nothing
 
 
 For more information, please see http://maven.apache.org/maven2/
