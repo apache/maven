@@ -16,3 +16,6 @@ Should do the trick to produce a working installation of Maven
 in ${maven.home}.
 
 NOTE: You must run these instructions from this directory!
+
+NOTE: If you want to run in offline mode where no downloading is done
+      then add: 'maven.online = false' to your ~/maven.properties file.
