@@ -46,61 +46,60 @@ echo "To: $TO" >> log
 echo "Subject: Maven bootstrap on beaver [$DATE]" >> log
 echo "" >> log
 
+export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
+
 (
-  (
-    cd $DIR
+  if [ "$CMD" = "checkout" ]
+  then
 
-    export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
+    rm -rf $DIR > /dev/null 2>&1
+      
+    mkdir $DIR
+      
+    rm -rf $REPO > /dev/null 2>&1
+      
+    mkdir $REPO
 
-    if [ "$CMD" = "checkout" ]
-    then
+    echo
+    echo "Performing a clean check out of maven-components ..."
+    echo
 
-      echo
-      echo "Performing a clean check out of maven-components ..."
-      echo
-      
-      rm -rf $DIR > /dev/null 2>&1
-      
-      mkdir $DIR
-      
-      rm -rf $REPO > /dev/null 2>&1
-      
-      mkdir $REPO
-      
+    (
+      cd $DIR
+        
       cvs co maven-components > $HOME_DIR/$SCM_LOG 2>&1
     
-      echo "true" > $HOME_DIR/build_required
+      echo "true" > $HOME_DIR/build_required     
+    )
     
-    else
+  else
     
-      echo
-      echo "Performing an update of maven-components ..."
-      echo
+    echo
+    echo "Performing an update of maven-components ..."
+    echo
       
-      (
-        cd maven-components
+    (
+      cd $DIR/maven-components
       
-        cvs update -dP > $HOME_DIR/$SCM_LOG 2>&1
+      cvs update -dP > $HOME_DIR/$SCM_LOG 2>&1
       
-        grep ^P $HOME_DIR/$SCM_LOG > /dev/null 2>&1
+      grep ^P $HOME_DIR/$SCM_LOG > /dev/null 2>&1
 
-        if [ "$?" = "1" ]
-        then
-
-	  echo "false" > $HOME_DIR/build_required
+      if [ "$?" = "1" ]
+      then
+        
+	echo "false" > $HOME_DIR/build_required
       
         else
 	
-	  echo "true" > $HOME_DIR/build_required
+	echo "true" > $HOME_DIR/build_required
 	  
-	fi
+      fi
 
-      )
+    )
 
-    fi
+  fi
     
-  )
-
   BUILD_REQUIRED=`cat $HOME_DIR/build_required`
 
   if [ "$BUILD_REQUIRED" = "true" ]
@@ -125,4 +124,4 @@ echo "" >> log
 
 ) >> log 2>&1
 
-/usr/sbin/sendmail -t < log
+#/usr/sbin/sendmail -t < log
