@@ -85,10 +85,13 @@
     </repository>
   </distributionManagement>
   <modules>
+    <module>maven-archiver</module>
     <module>maven-artifact</module>
     <module>maven-model</module>
     <module>maven-monitor</module>
+    <module>maven-plugin</module>
     <module>maven-core</module>
     <module>maven-settings</module>
+    <module>maven-script</module>
   </modules>
 </project>
