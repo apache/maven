@@ -1,22 +1,29 @@
 #!/bin/sh
+# ----------------------------------------------------------------------------
+#  Copyright 2001-2004 The Apache Software Foundation.
+#  
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#  
+#       http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+# ----------------------------------------------------------------------------
 
-# -----------------------------------------------------------------------------
-# Copyright (c) 2001-2005 The Apache Software Foundation.
-# All rights reserved.
-# -----------------------------------------------------------------------------
+#   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
+#   reserved.
 
-#@#
-CLASSWORLDS_JAR=${M2_HOME}/core/boot/classworlds-*.jar
-CLASSWORLDS_CONF=${M2_HOME}/bin/m2.conf
-CLASSWORLDS_LAUNCHER=org.codehaus.classworlds.Launcher
-#@#
-
-if [ -z "$MAVEN_OPTS" ] ; then
-  MAVEN_OPTS="-Xmx256m"
+if [ -f /etc/mavenrc ] ; then
+  . /etc/mavenrc
 fi
 
 if [ -f "$HOME/.mavenrc" ] ; then
-  . $HOME/.mavenrc
+  . "$HOME/.mavenrc"
 fi
 
 # OS specific support.  $var _must_ be set to either true or false.
@@ -24,22 +31,71 @@ cygwin=false;
 darwin=false;
 case "`uname`" in
   CYGWIN*) cygwin=true ;;
-  Darwin*) darwin=true ;;
+  Darwin*) darwin=true 
+           if [ -z "$JAVA_VERSION" ] ; then
+             JAVA_VERSION="CurrentJDK"
+           else
+             echo "Using Java version: $JAVA_VERSION"
+           fi
+           if [ -z "$JAVA_HOME" ] ; then
+             JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/${JAVA_VERSION}/Home
+           fi
+           ;;
 esac
+
+if [ -z "$M2_HOME" ] ; then
+  # try to find MAVEN
+  if [ -d /opt/m2 ] ; then
+    MAVEN_HOME=/opt/m2
+  fi
+
+  if [ -d "$HOME/m2" ] ; then
+    MAVEN_HOME="$HOME/m2"
+  fi
+
+  ## resolve links - $0 may be a link to maven's home
+  PRG=$0
+  saveddir=`pwd`
+
+  # need this for relative symlinks
+  PRGDIR=`dirname "$PRG"`
+  cd "$PRGDIR"
+
+  while [ -h "$PRG" ] ; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '.*/.*' > /dev/null; then
+  PRG="$link"
+    else
+  PRG="$PRGDIR/$link"
+    fi
+  done
+
+  M2_HOME="$PRGDIR/.."
+
+  # make it fully qualified
+  M2_HOME=`cd "$M2_HOME" && pwd`
+
+  cd "$saveddir"
+fi
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin ; then
-  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
-  [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+  [ -n "$M2_HOME" ] &&
+    M2_HOME=`cygpath --unix "$M2_HOME"`
+  [ -n "$JAVA_HOME" ] &&
+    JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+  [ -n "$CLASSPATH" ] &&
+    CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
 fi
 
 if [ -z "$JAVACMD" ] ; then
   if [ -n "$JAVA_HOME"  ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
       # IBM's JDK on AIX uses strange locations for the executables
-      JAVACMD=$JAVA_HOME/jre/sh/java
+      JAVACMD="$JAVA_HOME/jre/sh/java"
     else
-      JAVACMD=$JAVA_HOME/bin/java
+      JAVACMD="$JAVA_HOME/bin/java"
     fi
   else
     JAVACMD=java
@@ -54,29 +110,22 @@ fi
 
 if [ -z "$JAVA_HOME" ] ; then
   echo "Warning: JAVA_HOME environment variable is not set."
-  echo "  If build fails because sun.* classes could not be found"
-  echo "  you will need to set the JAVA_HOME environment variable"
-  echo "  to the installation directory of java."
 fi
 
-if $cygwin; then
-  [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --unix "$M2_HOME"`
-fi
-
-if [ -z "$M2_HOME" ]; then
-  #find the path of the bin directory
-  BIN_DIR=`dirname $0`
-
-  #use dirname once again to trim the /bin from the m2_home path
-  M2_HOME=`dirname $BIN_DIR`
-fi
+CLASSWORLDS_JAR=${M2_HOME}/core/boot/classworlds-*.jar
+CLASSWORLDS_CONF=${M2_HOME}/bin/m2.conf
+CLASSWORLDS_LAUNCHER=org.codehaus.classworlds.Launcher
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
+  [ -n "$M2_HOME" ] &&
+    M2_HOME=`cygpath --path --windows "$M2_HOME"`
+  [ -n "$JAVA_HOME" ] &&
+    JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
+  [ -n "$HOME" ] &&
+    HOME=`cygpath --path --windows "$HOME"`
   [ -n "$CLASSWORLDS_JAR" ] && CLASSWORLDS_JAR=`cygpath --path --windows "$CLASSWORLDS_JAR"`
   [ -n "$CLASSWORLDS_CONF" ] && CLASSWORLDS_CONF=`cygpath --path --windows "$CLASSWORLDS_CONF"`
-  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
-  [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --windows "$M2_HOME"`
 fi
 
 $JAVACMD \
