@@ -82,7 +82,7 @@ import org.codehaus.plexus.util.FileUtils;
  *  required="true"
  *  validator=""
  *  expression="#maven.war.src"
- *  default="#basedir/src/webapp"
+ *  default="#basedir/src/main/webapp"
  *  description=""
  * @parameter
  *  name="warSourceIncludes"
@@ -93,7 +93,7 @@ import org.codehaus.plexus.util.FileUtils;
  *  default="**"
  *  description=""
  * @parameter
- *  name="warSourceIncludes"
+ *  name="warSourceExcludes"
  *  type="String"
  *  required="false"
  *  validator=""
@@ -112,7 +112,7 @@ import org.codehaus.plexus.util.FileUtils;
  *  required="true"
  *  validator=""
  *  expression="#maven.war.webapp.dir"
- *  default="#project.build.output/#project.build.finalName"
+ *  default="#project.build.directory/#project.build.finalName"
  *  description=""
  * @parameter
  *  name="mode"
@@ -128,7 +128,7 @@ import org.codehaus.plexus.util.FileUtils;
  *  required="true"
  *  validator=""
  *  expression="#maven.war.build.dir"
- *  default="#project.build.output"
+ *  default="#project.build.directory"
  *  description=""
  * @parameter
  *  name="basedir"
@@ -157,7 +157,7 @@ import org.codehaus.plexus.util.FileUtils;
 public class WarMojo
     extends AbstractPlugin
 {
-    public static final String WEB_INF = "WEB_INF";
+    public static final String WEB_INF = "WEB-INF";
 
     private PluginExecutionRequest request;
 
@@ -190,7 +190,8 @@ public class WarMojo
 
             if ( warSourceDirectory.exists() )
             {
-                FileUtils.copyDirectory( sourceDirectory, webappDirectory, includes, excludes );
+                //TODO : Use includes and excludes
+                FileUtils.copyDirectoryStructure( sourceDirectory, webappDirectory );
             }
 
             if ( webXml != null && ! "".equals( webXml ) )
@@ -281,11 +282,15 @@ public class WarMojo
 
                 MavenArchiver archiver = new MavenArchiver();
 
-                //archiver.setArchiver( new WarArchiver() );
+                WarArchiver warArchiver = new WarArchiver();
+
+                archiver.setArchiver( warArchiver );
 
                 archiver.setOutputFile( warFile );
 
-                archiver.getArchiver().addDirectory( webappDirectory, new String[] { "**/**" }, null );
+                warArchiver.addDirectory( webappDirectory, new String[] { "**/**" }, new String[] { "**/WEB-INF/web.xml" } );
+
+                warArchiver.setWebxml( new File( webappDirectory, "WEB-INF/web.xml" ) );
 
                 // create archive
                 archiver.createArchive( request );
