@@ -1,3 +1,2 @@
-plugin:descriptor
 install
 it0015:it0015
