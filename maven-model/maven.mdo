@@ -1459,6 +1459,7 @@
           ]]></description>
           <type>String</type>
         </field>
+        <!-- @todo this should be in the user configuration -->
         <field>
           <name>username</name>
           <version>4.0.0</version>
@@ -1470,6 +1471,20 @@
           <name>password</name>
           <version>4.0.0</version>
           <description>The password to use when connecting to the repository. If omitted, none is used.</description>
+          <type>String</type>
+        </field>
+        <!-- @todo this should be in the user configuration -->
+        <field>
+          <name>privateKey</name>
+          <version>4.0.0</version>
+          <description>The private key to use when connecting to the repository (SSH only)</description>
+          <type>String</type>
+        </field>
+        <!-- @todo this should be in the user configuration -->
+        <field>
+          <name>passphrase</name>
+          <version>4.0.0</version>
+          <description>The passphrase for the private key to use when connecting to the repository (SSH only)</description>
           <type>String</type>
         </field>
       </fields>

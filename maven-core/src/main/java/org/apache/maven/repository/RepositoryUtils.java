@@ -56,6 +56,8 @@ public class RepositoryUtils
             AuthenticationInfo authInfo = new AuthenticationInfo();
             authInfo.setUserName( mavenRepository.getUsername() );
             authInfo.setPassword( mavenRepository.getPassword() );
+            authInfo.setPrivateKey( mavenRepository.getPrivateKey() );
+            authInfo.setPassphrase( mavenRepository.getPassphrase() );
             retValue.setAuthenticationInfo( authInfo );
         }
         retValue.setUrl( mavenRepository.getUrl() );
