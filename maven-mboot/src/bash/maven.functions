@@ -384,6 +384,11 @@ copyResources()
     
     for include in $includes
     do
+      if [ ! -d "$directory" ]
+      then
+        continue
+      fi
+
       files=`eval "find $directory -name $include"`
       
       for file in $files
