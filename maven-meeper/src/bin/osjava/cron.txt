@@ -1,8 +1,0 @@
-# use /bin/sh to run commands, no matter what /etc/passwd says
-SHELL=/bin/sh
-
-# mail any output to `jvanzyl', no matter whose crontab this is
-MAILTO=jvanzyl
- 
-# run 23 minutes after midn, 4am, 8am ..., everyday
-0 0-23/4 * * * /export/sunsite/users/jvanzyl/bin/sync-osjava
