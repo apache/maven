@@ -142,6 +142,9 @@ public class DefaultMaven
 
                     line();
                 }
+
+                // An exception is a failure
+                return response;
             }
         }
 
