@@ -4,17 +4,10 @@
 
   <repositories>
     <repository>
-      <id>codehaus</id>
-      <name>Codehaus Repository</name>
-      <url>http://repository.codehaus.org</url>
-    </repository>
-    <!--
-    <repository>
       <id>central</id>
       <name>Maven Central Repository at ibiblio</name>
       <url>http://www.ibiblio.org/maven</url>
     </repository>
-    -->
   </repositories>
 
   <!-- Default plugins
