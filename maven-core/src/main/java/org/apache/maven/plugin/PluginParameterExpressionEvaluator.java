@@ -77,8 +77,8 @@ public class PluginParameterExpressionEvaluator
 
                 if ( pathSeparator > 0 )
                 {
-                    value = getValue( expression.substring( 1, pathSeparator ), context.getProject() )
-                        + expression.substring( pathSeparator );
+                    value = getValue( expression.substring( 1, pathSeparator ), context.getProject() ) +
+                        expression.substring( pathSeparator );
                 }
                 else
                 {
@@ -87,7 +87,8 @@ public class PluginParameterExpressionEvaluator
             }
             catch ( Exception e )
             {
-                throw new PluginConfigurationException( "Error evaluating plugin parameter expression: " + expression, e );
+                throw new PluginConfigurationException( "Error evaluating plugin parameter expression: " + expression,
+                                                        e );
             }
         }
         else if ( "#settings".equals( expression ) )
@@ -104,8 +105,8 @@ public class PluginParameterExpressionEvaluator
 
             if ( pathSeparator > 0 )
             {
-                value = context.getProject().getFile().getParentFile().getAbsolutePath()
-                    + expression.substring( pathSeparator );
+                value = context.getProject().getFile().getParentFile().getAbsolutePath() +
+                    expression.substring( pathSeparator );
             }
             else
             {
@@ -147,14 +148,14 @@ public class PluginParameterExpressionEvaluator
         // mojo descriptor.
         // ----------------------------------------------------------------------
 
-        if ( value == null && !expression.startsWith( "#" ) )
+        if ( value == null && expression.length() > 0 && !expression.startsWith( "#" ) )
         {
             value = expression;
         }
 
         return value;
     }
-    
+
     private static Object getValue( String expression, MavenProject project )
         throws Exception
     {
