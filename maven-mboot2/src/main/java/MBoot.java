@@ -33,6 +33,7 @@ import java.util.TreeMap;
 public class MBoot
 {
     String[] pluginGeneratorDeps = new String[]{"plexus/jars/plexus-container-default-1.0-alpha-2.jar",
+                                                "qdox/jars/qdox-1.2.jar",
                                                 "org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar",
                                                 "org.apache.maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
                                                 "org.apache.maven/jars/maven-model-2.0-SNAPSHOT.jar",
@@ -628,10 +629,9 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency +
-                                                 ( !online
-                                                   ? "; run again online"
-                                                   : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException( "Missing dependency: " + dependency + ( !online
+                                                                                         ? "; run again online"
+                                                                                         : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );

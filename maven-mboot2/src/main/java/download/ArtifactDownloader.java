@@ -88,7 +88,7 @@ public class ArtifactDownloader
         {
             Dependency dep = (Dependency) j.next();
 
-            if ( !downloadedArtifacts.contains( dep ) )
+            if ( !downloadedArtifacts.contains( dep.getId() ) )
             {
                 String repositoryPath = dep.getRepositoryPath();
                 File destinationFile = new File( mavenRepoLocal, repositoryPath );
@@ -113,7 +113,7 @@ public class ArtifactDownloader
                     throw new Exception( "Failed to download " + dep );
                 }
 
-                downloadedArtifacts.add( dep );
+                downloadedArtifacts.add( dep.getId() );
             }
         }
     }
