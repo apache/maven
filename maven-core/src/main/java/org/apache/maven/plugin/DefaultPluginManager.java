@@ -475,10 +475,11 @@ public class DefaultPluginManager
 
     public void initialize()
     {
+        // TODO: configure this from bootstrap or scan lib
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
                                                               "maven-monitor", "maven-plugin", "plexus-container-api",
                                                               "plexus-container-default", "plexus-artifact-container",
-                                                              "classworlds"} );
+                                                              "wagon-provider-api", "classworlds"} );
 
         // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new HashSet();
