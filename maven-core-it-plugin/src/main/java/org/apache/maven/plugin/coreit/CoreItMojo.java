@@ -25,6 +25,7 @@ import java.io.FileWriter;
 
 /**
  * @goal touch
+ * 
  * @phase process-sources
  *
  * @description Goal which cleans the build
@@ -35,6 +36,14 @@ import java.io.FileWriter;
  *  required="true"
  *  validator=""
  *  expression="#project.build.directory"
+ *  description=""
+ * 
+ * @parameter
+ *  name="basedirAlignmentDirectory"
+ *  type="java.io.File"
+ *  required="true"
+ *  validator=""
+ *  expression="target/test-basedir-alignment"
  *  description=""
  */
 public class CoreItMojo
@@ -60,6 +69,26 @@ public class CoreItMojo
         
         w.write( "touch.txt" );
         
-        w.close();                
+        w.close();
+        
+        // This parameter should be aligned to the basedir as the parameter type is specified
+        // as java.io.File
+        
+        String basedirAlignmentDirectory = (String) request.getParameter( "basedirAlignmentDirectory" );
+
+        f = new File( basedirAlignmentDirectory );
+        
+        if ( !f.exists() )
+        {
+            f.mkdirs();
+        }         
+        
+        touch = new File( f, "touch.txt" );
+        
+        w = new FileWriter( touch );
+        
+        w.write( "touch.txt" );
+        
+        w.close();        
     }
 }
