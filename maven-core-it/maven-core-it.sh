@@ -6,14 +6,6 @@ home=`pwd`
 
 cp=../../maven-core-it-verifier/target/maven-core-it-verifier-1.0.jar
 
-if [ ! -f $cp ]
-then
-  echo 
-  echo "The verifier needs to be built ... "
-  echo
-  ( cd ../maven-core-it-verifier; mboot --install )  
-fi
-
 verifier=org.apache.maven.it.Verifier
 
 integration_tests=`cat integration-tests.txt`
