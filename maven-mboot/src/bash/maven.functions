@@ -46,7 +46,10 @@ runTests()
     CP=$1
   fi
   
-  "${JAVACMD}" -classpath "$CP" TestRunnerBooter "$2" "$3" $4 $5 $6
+  if [ -f $5 ]
+  then
+    "${JAVACMD}" -classpath "$CP" TestRunnerBooter "$2" "$3" $4 $5 $6
+  fi
 }
 
 compile()
