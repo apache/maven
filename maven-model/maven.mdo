@@ -59,14 +59,14 @@
         </field>
         <field>
           <name>groupId</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <required>true</required>
           <description>The primary grouping for your project.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <required>true</required>
           <description>The identifier used when generating the artifact for your project.</description>
           <type>String</type>
@@ -80,7 +80,7 @@
         </field>
         <field>
           <name>name</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <required>true</required>
           <description>Human readable name of the project.</description>
           <type>String</type>
@@ -100,13 +100,13 @@
         </field>
         <field>
           <name>shortDescription</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>An abbreviated description of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>description</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>
             A detailed description of the project.  This element is
             usually specified as CDATA to enable the use of HTML tags
@@ -119,13 +119,13 @@
         </field>
         <field>
           <name>url</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>The URL where the project can be found.</description>
           <type>String</type>
         </field>
         <field>
           <name>logo</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>The logo for the project.</description>
           <type>String</type>
         </field>
@@ -136,8 +136,14 @@
           <type>String</type>
         </field>
         <field>
+          <name>issueManagement</name>
+          <version>4.0.0</version>
+          <description>The project's issue management information.</description>
+          <type>IssueManagement</type>
+        </field>
+        <field>
           <name>inceptionYear</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <required>true</required>
           <description>The year the project started.</description>
           <type>String</type>
@@ -150,26 +156,26 @@
         </field>
         <field>
           <name>siteAddress</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>The FQDN of the host where the project's site is uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>siteDirectory</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>The directory on the site host where site documentation is placed when the site is uploaded.</description>
           <type>String</type>
         </field>
         <field>
           <name>distributionSite</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>The FQDN of the host where the project's artifacts are uploaded.</description>
           <type>String</type>
           <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
         </field>
         <field>
           <name>distributionDirectory</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>The directory on the distribution host where artifacts are placed when uploaded.</description>
           <type>String</type>
           <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
@@ -302,6 +308,7 @@
       <!-- We need this because we can't use package as a field name. -->
       <codeSegments>
         <codeSegment>
+          <version>3.0.0+</version>
           <code>
             private String packageName;
 
@@ -314,7 +321,11 @@
             {
                 return packageName;
             }
-
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
             public String getId()
             {
                 StringBuffer id = new StringBuffer();
@@ -328,6 +339,7 @@
           </code>
         </codeSegment>
         <codeSegment>
+          <version>3.0.0</version>
           <code>
             public void setId( String id )
             {
@@ -421,7 +433,7 @@
         </field>
         <field>
           <name>aspectSourceDirectory</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description>
             This element specifies a directory containing Aspect
             sources of the project.  The generated build system will
@@ -614,6 +626,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
+          <version>3.0.0+</version>
           <code>
             public String getId()
             {
@@ -1014,7 +1027,7 @@
         </field>
         <field>
           <name>id</name>
-          <version>3.0.0</version>          
+          <version>3.0.0</version>
           <description>
             A unique identifier for a version.  This ID is
             used to specify the version that
