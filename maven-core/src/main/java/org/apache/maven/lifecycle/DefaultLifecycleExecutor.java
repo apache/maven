@@ -223,18 +223,25 @@ public class DefaultLifecycleExecutor
         // mojos the user has specified and ignore the rest.
         // ----------------------------------------------------------------------
 
-
         if ( plugin.getGoals().size() > 0 )
         {
             String pluginId = pluginDescriptor.getArtifactId();
 
-            pluginId = pluginId.substring( 6 ).substring( 0, 7 );
+            // Right now this maven-foo-plugin so this is a hack right now.
+
+            pluginId = pluginId.substring( 6 );
+
+            pluginId = pluginId.substring( 0, pluginId.lastIndexOf( "-" ) );
 
             for ( Iterator i = plugin.getGoals().iterator(); i.hasNext(); )
             {
                 Goal goal = (Goal) i.next();
 
-                configureMojo( pluginManager.getMojoDescriptor( pluginId + ":" + goal.getId() ) );
+                String mojoId = pluginId + ":" + goal.getId();
+
+                MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( mojoId );
+
+                configureMojo( mojoDescriptor );
             }
         }
         else
