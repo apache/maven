@@ -4,8 +4,8 @@
   <pomVersion>3</pomVersion>
   <name>Maven Project</name>
   <groupId>maven</groupId>
-  <id>maven-project</id>
-  <artifactId>maven-project</artifactId>
+  <id>maven-component</id>
+  <artifactId>maven-component</artifactId>
   <currentVersion>2.0-SNAPSHOT</currentVersion>
   <gumpRepositoryId>jakarta</gumpRepositoryId>
   <description>Maven components parent</description>
