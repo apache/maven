@@ -22,11 +22,6 @@
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus</artifactId>
-      <version>0.17</version>
-    </dependency>
-    <dependency>
-      <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
       <version>1.2-SNAPSHOT</version>
     </dependency>
@@ -34,6 +29,11 @@
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-javac</artifactId>
       <version>1.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-1</version>
     </dependency>
   </dependencies>
 </project>
