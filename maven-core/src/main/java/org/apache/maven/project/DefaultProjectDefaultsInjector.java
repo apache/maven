@@ -72,7 +72,7 @@ public class DefaultProjectDefaultsInjector implements ProjectDefaultsInjector
         
         Properties depProps = dep.getProperties();
         Properties depdefProps = depdef.getProperties();
-        if((depProps == null || depProps.isEmpty()) && depdefProps != null)
+        if(depProps == null && depdefProps != null)
         {
             dep.setProperties(depdefProps);
         }
