@@ -25,11 +25,15 @@
       <url>scp://login.ibiblio.org//public/html/maven</url>
     </repository>
   </distributionManagement>
+
+  <ciManagement>
+    <nagEmailAddress>m2-dev@maven.apache.org</nagEmailAddress>
+  </ciManagement>
     
   <scm>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components/${pom.artifactId}</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components/${pom.artifactId}</developerConnection>
-    <url>http://cvs.apache.org/viewcvs.cgi/maven-components/${pom.artifactId}</url>
+    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components/</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components/</developerConnection>
+    <url>http://cvs.apache.org/viewcvs.cgi/maven-components/</url>
   </scm>
 
   <issueManagement>
@@ -79,8 +83,13 @@
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus</artifactId>
-      <version>0.17-SNAPSHOT</version>
+      <artifactId>plexus-artifact-container</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>xstream</groupId>
