@@ -76,7 +76,7 @@ public class ResourcesMojoTest
     {
         Embedder embedder = new Embedder();
 
-        embedder.setClassLoader( Thread.currentThread().getContextClassLoader() );
+        //embedder.setClassLoader( Thread.currentThread().getContextClassLoader() );
 
         embedder.start();
 
