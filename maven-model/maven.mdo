@@ -205,7 +205,6 @@
           <type>String</type>
           <comment>This naming is inconsistent and distribution should occur from a repository structure.</comment>
         </field>
-
         <field>
           <name>repositories</name>
           <version>4.0.0</version>
@@ -224,6 +223,15 @@
             <multiplicity>*</multiplicity>
           </association>
           <comment>This may be removed or relocated in the near future. It is undecided whether plugins really need a remote repository set of their own.</comment>
+        </field>
+        <field>
+          <name>plugins</name>
+          <version>4.0.0</version>
+          <description>Plugin declarations and configuration.</description>
+          <association>
+            <type>Plugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>mailingLists</name>
@@ -1620,6 +1628,46 @@
       <name>PostGoal</name>
       <version>4.0.0</version>
       <fields></fields>
+    </class>
+
+    <!--
+
+    <plugins>
+      <plugin>
+        <id>plexus</id>
+        <configuration>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    -->
+
+    <class>
+      <name>Plugin</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>The version of the plugin to be used.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>configuration</name>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
     </class>
 
     <!-- @todo should modello take a parameter/code segment that will forbid the
