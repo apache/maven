@@ -3,13 +3,15 @@
 # ----------------------------------------------------------------------------------
 # To run this script on your machine you must:
 #
-# 1. export MBOOT_HOME=~/mboot
+# 1. export JAVA_HOME=/path/to/java
 #
-# 2. export MAVEN_HOME=~/maven
+# 2. export MBOOT_HOME=~/mboot
+#
+# 3. export MAVEN_HOME=~/maven
 #    
-# 3. export PATH=$PATH:$MBOOT:$MAVEN_HOME/bin
+# 4. export PATH=$PATH:$MBOOT:$MAVEN_HOME/bin
 #
-# 4. Your ~/build.properties must have: maven.repo.local = ~/path/to/repo
+# 5. Your ~/build.properties must have: maven.repo.local = ~/path/to/repo
 #
 # ----------------------------------------------------------------------------------
 
@@ -20,23 +22,24 @@ export PATH=$PATH:$MBOOT_HOME:$MAVEN_HOME/bin:$JAVA_HOME/bin
 
 # ----------------------------------------------------------------------------------
 
+CMD=$1
+
+[ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit
+
 DIR=maven2
 REPO=maven-repo-local
 FROM=jvanzyl@maven.org
 TO=maven2-user@lists.codehaus.org
+SCM_LOG=scm.log
 
 # ----------------------------------------------------------------------------------
 
 # Wipe out the working directory and the repository and start entirely
 # from scratch.
 
-rm -rf $DIR > /dev/null 2>&1
-rm -rf $REPO > /dev/null 2>&1
-mkdir $DIR
-mkdir $REPO
-
 # ----------------------------------------------------------------------------------
 
+HOME_DIR=`pwd`
 DATE=`date`
 echo "From: $FROM" > log
 echo "To: $TO" >> log
@@ -49,16 +52,70 @@ echo "" >> log
 
     export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 
-    echo "Checking out maven-components ..."
+    if [ "$CMD" = "checkout" ]
+    then
 
-    cvs co maven-components > checkout.log 2>&1
+      echo
+      echo "Performing a clean check out of maven-components ..."
+      echo
+      
+      rm -rf $DIR > /dev/null 2>&1
+      
+      mkdir $DIR
+      
+      rm -rf $REPO > /dev/null 2>&1
+      
+      mkdir $REPO
+      
+      cvs co maven-components > $SCM_LOG 2>&1
+    
+      echo "true" > $HOME_DIR/build_required
+    
+    else
+    
+      echo
+      echo "Performing an update of maven-components ..."
+      echo
+      
+      (
+        cd maven-components
+      
+        cvs update -dP > $SCM_LOG 2>&1
+      
+        grep ^U $SCM_LOG > /dev/null 2>&1
+
+        if [ "$?" = "1" ]
+        then
+
+	  echo "false" > $HOME_DIR/build_required
+      
+        fi
+
+      )
+
+    fi
+    
   )
 
-  (
-    cd $DIR/maven-components/maven-core
+  BUILD_REQUIRED=`cat $HOME_DIR/build_required`
+
+  if [ "$BUILD_REQUIRED" = "true" ]
+  then
+      
+    echo "Updates occured, build required ..." >> log
+      
+    (
+      cd $DIR/maven-components/maven-core
   
-    ./bootstrap-all.sh
-  )  
+      ./bootstrap-all.sh
+    )
+  
+  else
+  
+    echo "No updates occured, no build required. Done." >> log
+  
+  fi
+
 ) >> log 2>&1
 
 /usr/sbin/sendmail -t < log
