@@ -89,16 +89,24 @@ public class DeployMojo
         // Deploy the POM
         Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
                                                  project.getPackaging() );
-        if ( !"pom".equals( project.getPackaging() ) )
+        boolean isPomArtifact = "pom".equals( project.getPackaging() );
+        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+        if ( !isPomArtifact )
         {
-            File pom = new File( project.getFile().getParentFile(), "pom.xml" );
             ArtifactMetadata metadata = new ModelMetadata( artifact, pom );
             artifact.addMetadata( metadata );
         }
 
         try
         {
-            deployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository, localRepository );
+            if ( !isPomArtifact )
+            {
+                deployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository, localRepository );
+            }
+            else
+            {
+                deployer.deploy( pom, artifact, deploymentRepository, localRepository );
+            }
         }
         catch ( ArtifactDeploymentException e )
         {

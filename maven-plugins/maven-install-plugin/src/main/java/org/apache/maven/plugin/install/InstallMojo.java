@@ -68,16 +68,24 @@ public class InstallMojo
         Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
                                                  project.getPackaging() );
 
-        if ( !"pom".equals( project.getPackaging() ) )
+        boolean isPomArtifact = "pom".equals( project.getPackaging() );
+        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+        if ( !isPomArtifact )
         {
-            File pom = new File( project.getFile().getParentFile(), "pom.xml" );
             ArtifactMetadata metadata = new ModelMetadata( artifact, pom );
             artifact.addMetadata( metadata );
         }
 
         try
         {
-            installer.install( project.getBuild().getDirectory(), artifact, localRepository );
+            if ( !isPomArtifact )
+            {
+                installer.install( project.getBuild().getDirectory(), artifact, localRepository );
+            }
+            else
+            {
+                installer.install( pom, artifact, localRepository );
+            }
         }
         catch ( ArtifactInstallationException e )
         {

@@ -71,14 +71,14 @@ public class DefaultArtifactInstaller
 
             String localPath = localRepository.pathOf( artifact );
 
-            getLogger().info( "Installing " + source.getPath() + " to " + localPath );
-
             // TODO: use a file: wagon and the wagon manager?
             File destination = new File( localRepository.getBasedir(), localPath );
             if ( !destination.getParentFile().exists() )
             {
                 destination.getParentFile().mkdirs();
             }
+
+            getLogger().info( "Installing " + source.getPath() + " to " + destination );
 
             FileUtils.copyFile( source, destination );
 
