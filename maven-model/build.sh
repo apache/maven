@@ -13,5 +13,4 @@ mboot
 modello --model=maven.mdo --mode=xsd --dir=.
 
 # Generate XDoc
-modello --model=maven.mdo --mode=xdoc --dir=.
-
+modello --model=maven.mdo --mode=xdoc --dir=./xdocs

@@ -10,4 +10,11 @@
   <gumpRepositoryId>jakarta</gumpRepositoryId>
   <description>Maven Model</description>
   <shortDescription>Maven Model</shortDescription>
+  <dependencies>
+    <dependency>
+      <artifactId>xpp3</artifactId>
+      <groupId>xpp3</groupId>
+      <version>1.1.3.3</version>
+    </dependency>
+  </dependencies>
 </project>
