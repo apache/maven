@@ -21,7 +21,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ModelMetadata;
+import org.apache.maven.artifact.metadata.MavenMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
@@ -93,7 +93,7 @@ public class DeployMojo
         File pom = new File( project.getFile().getParentFile(), "pom.xml" );
         if ( !isPomArtifact )
         {
-            ArtifactMetadata metadata = new ModelMetadata( artifact, pom );
+            ArtifactMetadata metadata = new MavenMetadata( artifact, pom );
             artifact.addMetadata( metadata );
         }
 

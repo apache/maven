@@ -20,10 +20,14 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 /**
  * Attach a POM to an artifact.
@@ -31,12 +35,12 @@ import java.io.IOException;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class ModelMetadata
+public class MavenMetadata
     extends AbstractArtifactMetadata
 {
     private final File file;
 
-    public ModelMetadata( Artifact artifact, File file )
+    public MavenMetadata( Artifact artifact, File file )
     {
         super( artifact, "pom" );
         this.file = file;
@@ -45,17 +49,38 @@ public class ModelMetadata
     public void storeInLocalRepository( ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
+        File destination;
         try
         {
-            FileUtils.copyFile( file, new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) ) );
+            destination = new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
         }
         catch ( ArtifactPathFormatException e )
         {
             throw new ArtifactMetadataRetrievalException( "Unable to install POM", e );
         }
-        catch ( IOException e )
+
+        FileReader reader = null;
+        FileWriter writer = null;
+        try
         {
-            throw new ArtifactMetadataRetrievalException( "Unable to install POM", e );
+            reader = new FileReader( file );
+            writer = new FileWriter( destination );
+
+            MavenXpp3Reader modelReader = new MavenXpp3Reader();
+            Model model = modelReader.read( reader );
+            model.setVersion( getArtifact().getVersion() );
+
+            MavenXpp3Writer modelWriter = new MavenXpp3Writer();
+            modelWriter.write( writer, model );
+        }
+        catch ( Exception e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Error rewriting POM", e );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+            IOUtil.close( writer );
         }
     }
 
