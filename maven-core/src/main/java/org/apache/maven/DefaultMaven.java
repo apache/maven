@@ -225,9 +225,18 @@ public class DefaultMaven
         if ( response.isExecutionFailure() )
         {
             // TODO: yuck! Revisit when cleaning up the exception handling from the top down
-            if ( response.getException() instanceof PluginExecutionException )
+            Throwable exception = response.getException();
+
+            if ( exception instanceof PluginExecutionException )
             {
-                logFailure( response, (PluginExecutionException) response.getException() );
+                if ( exception.getCause() == null )
+                {
+                    logFailure( response, (PluginExecutionException) exception );
+                }
+                else
+                {
+                    logError( response );
+                }
             }
             else
             {
