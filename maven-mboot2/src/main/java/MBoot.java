@@ -78,7 +78,7 @@ public class MBoot
                                    "maven-archiver", "maven-plugin-tools/maven-plugin-tools-api",
                                    "maven-plugin-tools/maven-plugin-tools-java",
                                    "maven-plugin-tools/maven-plugin-tools-pluggy",
-                                   "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-support", 
+                                   "maven-plugin-tools/maven-plugin-tools-marmalade", 
                                    "maven-core-it-verifier"};
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-clean-plugin", "maven-plugins/maven-compiler-plugin",
