@@ -30,8 +30,8 @@ public class ArtifactConstructionSupport
         return createArtifact( groupId, artifactId, version, scope, type, null, null );
     }
 
-    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope, String type, 
-                                    String classifier )
+    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope,
+                                                  String type, String classifier )
     {
         return createArtifact( groupId, artifactId, version, scope, type, classifier, null );
     }
@@ -39,16 +39,17 @@ public class ArtifactConstructionSupport
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                                     String inheritedScope )
     {
-        return createArtifact(groupId, artifactId, version, scope, type, null, inheritedScope);
+        return createArtifact( groupId, artifactId, version, scope, type, null, inheritedScope );
     }
-    
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                                     String classifier, String inheritedScope )
     {
         // TODO: can refactor, use scope handler
 
-        // if this artifact is test, and the dependency is test, don't transitively create
-        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) && Artifact.SCOPE_TEST.equals( scope ) )
+        // re-instate this if test deps are propogated
+//        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) && Artifact.SCOPE_TEST.equals( scope ) )
+        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
         {
             return null;
         }
@@ -66,7 +67,9 @@ public class ArtifactConstructionSupport
         }
         // ^^^ added to retain compile scope. Remove if you want compile inherited as runtime
 
-        if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_TEST.equals( inheritedScope ) )
+        // re-instate this if test deps are propogated
+//        if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_TEST.equals( inheritedScope ) )
+        if ( Artifact.SCOPE_TEST.equals( scope ) )
         {
             desiredScope = Artifact.SCOPE_TEST;
         }
