@@ -37,7 +37,8 @@ public class GoalMappingPhase
     extends AbstractMavenGoalPhase
 {
 
-    public void execute( MavenGoalExecutionContext context ) throws GoalExecutionException
+    public void execute( MavenGoalExecutionContext context )
+        throws GoalExecutionException
     {
         GoalMappingVisitor visitor = new GoalMappingVisitor( context.getSession().getPluginManager() );
 
@@ -64,7 +65,8 @@ public class GoalMappingPhase
             this.pluginManager = pluginManager;
         }
 
-        public void visitPrereq( String goal, String prereq, MavenSession session ) throws GraphTraversalException
+        public void visitPrereq( String goal, String prereq, MavenSession session )
+            throws GraphTraversalException
         {
             GoalWalker.walk( prereq, session, this );
             
@@ -80,29 +82,30 @@ public class GoalMappingPhase
             }
         }
 
-        public void visitPostGoal( String goal, String postGoal, MavenSession session ) throws GraphTraversalException
+        public void visitPostGoal( String goal, String postGoal, MavenSession session )
+            throws GraphTraversalException
         {
             GoalWalker.walk( postGoal, session, this );
         }
 
-        public void visitPreGoal( String goal, String preGoal, MavenSession session ) throws GraphTraversalException
+        public void visitPreGoal( String goal, String preGoal, MavenSession session )
+            throws GraphTraversalException
         {
             GoalWalker.walk( preGoal, session, this );
         }
 
-        public void visitGoal( String goal, MavenSession session ) throws GraphTraversalException
+        public void visitGoal( String goal, MavenSession session )
         {
             session.addSingleExecution( goal );
             
             visited.add( goal );
         }
 
-        public boolean shouldVisit( String goal, MavenSession session ) throws GraphTraversalException
+        public boolean shouldVisit( String goal, MavenSession session )
         {
             boolean result = !visited.contains( goal );
 
             return result;
         }
-
     }
 }

@@ -42,8 +42,6 @@ public class MavenGoalExecutionContext
 
     private List resolvedGoals;
 
-    //    private GoalDecoratorBindings goalDecoratorBindings;
-
     private String goalName;
 
     private boolean requiresDependencies;

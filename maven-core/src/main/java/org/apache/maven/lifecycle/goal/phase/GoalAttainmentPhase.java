@@ -46,9 +46,9 @@ public class GoalAttainmentPhase
     public void execute( MavenGoalExecutionContext context )
         throws GoalExecutionException
     {
-        PluginExecutionResponse response;
-
         PluginExecutionRequest request;
+
+        PluginExecutionResponse response;
 
         for ( Iterator it = context.getResolvedGoals().iterator(); it.hasNext(); )
         {
