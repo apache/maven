@@ -63,7 +63,7 @@ public class MetadataTag
         processChildren( context );
 
         MojoDescriptor descriptor = buildDescriptor( context );
-        context.setVariable( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR, descriptor );
+        context.setVariable( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR, descriptor, true );
     }
 
     private MojoDescriptor buildDescriptor( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
@@ -104,14 +104,17 @@ public class MetadataTag
         String basePath = (String) context.getVariable( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR,
                                                         getExpressionEvaluator() );
 
-        if(basePath.endsWith("/"))
+        if(basePath != null)
         {
-            basePath = basePath.substring(0, basePath.length()-2);
-        }
-        
-        String implementationPath = getTagInfo().getSourceFile().substring( basePath.length() );
+            if(basePath.endsWith("/"))
+            {
+                basePath = basePath.substring(0, basePath.length()-2);
+            }
+            
+            String implementationPath = getTagInfo().getSourceFile().substring( basePath.length() );
 
-        descriptor.setImplementation( implementationPath );
+            descriptor.setImplementation( implementationPath );
+        }
 
         return descriptor;
     }

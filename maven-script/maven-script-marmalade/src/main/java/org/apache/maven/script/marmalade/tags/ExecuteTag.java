@@ -17,6 +17,11 @@ package org.apache.maven.script.marmalade.tags;
  */
 
 import org.codehaus.marmalade.model.AbstractMarmaladeTag;
+import org.codehaus.marmalade.model.MarmaladeTag;
+import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
+import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
+
+import java.util.Iterator;
 
 /**
  * Aggregator tag for the actual meat of the mojo. Simply a pass-through
@@ -28,4 +33,13 @@ public class ExecuteTag
     extends AbstractMarmaladeTag
 {
 
+    protected void doExecute( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
+    {
+        for ( Iterator it = children().iterator(); it.hasNext(); )
+        {
+            MarmaladeTag child = (MarmaladeTag) it.next();
+            System.out.println("Will execute: " + child);
+        }
+    }
+    
 }

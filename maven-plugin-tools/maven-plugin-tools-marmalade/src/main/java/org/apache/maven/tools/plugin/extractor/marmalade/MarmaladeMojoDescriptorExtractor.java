@@ -19,12 +19,21 @@ package org.apache.maven.tools.plugin.extractor.marmalade;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.script.marmalade.MarmaladeMojoExecutionDirectives;
+import org.apache.maven.script.marmalade.tags.MojoTag;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
 import org.apache.maven.tools.plugin.util.PluginUtils;
+import org.codehaus.marmalade.metamodel.ScriptBuilder;
+import org.codehaus.marmalade.model.MarmaladeScript;
+import org.codehaus.marmalade.model.MarmaladeTag;
+import org.codehaus.marmalade.parsing.DefaultParsingContext;
+import org.codehaus.marmalade.parsing.MarmaladeParsingContext;
 import org.codehaus.marmalade.parsing.ScriptParser;
-import org.codehaus.marmalade.util.LazyMansAccess;
+import org.codehaus.marmalade.runtime.DefaultContext;
+import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -37,34 +46,90 @@ public class MarmaladeMojoDescriptorExtractor
     implements MojoDescriptorExtractor
 {
 
-    private ScriptParser scriptParser = new ScriptParser();
-
     public Set execute( String sourceDir, MavenProject project ) throws Exception
     {
-        String[] files = PluginUtils.findSources( sourceDir, "**/*.mmld" );
-
-        Set descriptors = new HashSet();
-
-        File dir = new File( sourceDir );
-        for ( int i = 0; i < files.length; i++ )
+        ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+        try
         {
-            String file = files[i];
+            Thread.currentThread().setContextClassLoader(MarmaladeMojoDescriptorExtractor.class.getClassLoader());
+            
+            String[] files = PluginUtils.findSources( sourceDir, "**/*.mmld" );
 
-            Map context = new TreeMap();
-            context.put( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR, sourceDir );
+            Set descriptors = new HashSet();
 
-            File scriptFile = new File( dir, file );
+            File dir = new File( sourceDir );
+            for ( int i = 0; i < files.length; i++ )
+            {
+                String file = files[i];
 
-            context = LazyMansAccess.executeFromFile( scriptFile, context );
+                File scriptFile = new File( dir, file );
+                
+                MarmaladeScript script = parse(scriptFile);
+                
+                MarmaladeTag rootTag = script.getRoot();
+                if(rootTag instanceof MojoTag)
+                {
+                    Map contextMap = new TreeMap();
+                    contextMap.put( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR, sourceDir );
+                    
+                    MarmaladeExecutionContext context = new DefaultContext(contextMap);
+                    
+                    script.execute(context);
+                    
+                    contextMap = context.getExternalizedVariables();
 
-            MojoDescriptor descriptor = (MojoDescriptor) context.get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
+                    MojoDescriptor descriptor = (MojoDescriptor) contextMap.get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
 
-            descriptor.setImplementation( file );
+                    descriptors.add( descriptor );
+                }
+                else
+                {
+                    System.out.println("This script is not a mojo. Its root tag is {element: " + rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}");
+                }
+            }
 
-            descriptors.add( descriptor );
+            return descriptors;
         }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(oldCl);
+        }
+    }
 
-        return descriptors;
+    private MarmaladeScript parse( File scriptFile ) throws Exception
+    {
+        BufferedReader reader = null;
+        
+        try
+        {
+            reader = new BufferedReader(new FileReader(scriptFile));
+            
+            MarmaladeParsingContext parsingContext = new DefaultParsingContext();
+            
+            parsingContext.setInputLocation(scriptFile.getPath());
+            parsingContext.setInput(reader);
+            
+            ScriptParser parser = new ScriptParser();
+            
+            ScriptBuilder builder = parser.parse(parsingContext);
+            
+            MarmaladeScript script = builder.build();
+            
+            return script;
+        }
+        finally
+        {
+            if(reader != null)
+            {
+                try
+                {
+                    reader.close();
+                }
+                catch(Exception e)
+                {
+                }
+            }
+        }
     }
 
 }

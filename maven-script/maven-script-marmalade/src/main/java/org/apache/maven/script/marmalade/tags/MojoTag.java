@@ -20,7 +20,11 @@ import org.apache.maven.script.marmalade.MarmaladeMojo;
 import org.codehaus.marmalade.model.AbstractMarmaladeTag;
 import org.codehaus.marmalade.model.MarmaladeScript;
 import org.codehaus.marmalade.model.MarmaladeTag;
+import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
+import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
 import org.codehaus.plexus.component.factory.marmalade.PlexusComponentTag;
+
+import java.util.Iterator;
 
 /**
  * Root tag for marmalade-based mojos
@@ -32,27 +36,41 @@ public class MojoTag
     implements PlexusComponentTag
 {
 
-    private MarmaladeTag realRoot;
-
-    protected boolean shouldAddChild( MarmaladeTag child )
+    protected boolean alwaysProcessChildren()
     {
-        if ( child instanceof ExecuteTag )
+        return false;
+    }
+    
+    protected void doExecute( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
+    {
+        for ( Iterator it = children().iterator(); it.hasNext(); )
         {
-            this.realRoot = child;
-
-            // we don't ever want THIS script to execute the ExecuteTag.
-            // Instead,
-            // we pull it out for later wrapping into a new script.
-            return false;
-        }
-        else
-        {
-            return true;
+            MarmaladeTag child = (MarmaladeTag) it.next();
+            if(!(child instanceof ExecuteTag))
+            {
+                child.execute(context);
+            }
         }
     }
-
+    
     public Object getComponent()
     {
+        MarmaladeTag realRoot = null;
+        for ( Iterator it = children().iterator(); it.hasNext(); )
+        {
+            MarmaladeTag child = (MarmaladeTag) it.next();
+            if(child instanceof ExecuteTag)
+            {
+                realRoot = child;
+                break;
+            }
+        }
+        
+        if(realRoot == null)
+        {
+            throw new IllegalStateException("Mojo scripts MUST have a <execute> tag.");
+        }
+        
         MarmaladeScript script = new MarmaladeScript( getTagInfo().getSourceFile(), realRoot );
         return new MarmaladeMojo( script );
     }

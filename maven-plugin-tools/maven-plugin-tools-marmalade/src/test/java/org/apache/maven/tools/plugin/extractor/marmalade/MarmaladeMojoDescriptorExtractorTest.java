@@ -19,18 +19,18 @@ package org.apache.maven.tools.plugin.extractor.marmalade;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
+import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 /**
  * @author jdcasey
  */
 public class MarmaladeMojoDescriptorExtractorTest
-    extends TestCase
+    extends PlexusTestCase
 {
 
     public void testShouldFindOneMojo() throws Exception
@@ -42,7 +42,7 @@ public class MarmaladeMojoDescriptorExtractorTest
 
         MavenProject project = new MavenProject( model );
 
-        MarmaladeMojoDescriptorExtractor extractor = new MarmaladeMojoDescriptorExtractor();
+        MarmaladeMojoDescriptorExtractor extractor = (MarmaladeMojoDescriptorExtractor) lookup(MojoDescriptorExtractor.ROLE, "marmalade");
 
         Set descriptors = extractor.execute( basedir.getPath(), project );
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
-<mojo xmlns="marmalade:mojo" xmlns:marmalade-control="marmalade-control">
-  <metadata marmalade-control:el="none">
+<mojo xmlns="marmalade:mojo">
+  <metadata>
     <id>it0015</id>
     <goal>it0015</goal>
     <description>Output a file with specified contents to [outDir]</description>
@@ -15,6 +15,6 @@
     </parameters>
   </metadata>
   <execute>
-    <writeFile xmlns="marmalade:it0015" path="${outDir}/out.txt">This is a test.</writeFile>
+    <it0015:writeFile xmlns:it0015="marmalade:it0015" path="${outDir}/out.txt">This is a test.</it0015:writeFile>
   </execute>
 </mojo>
