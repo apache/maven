@@ -81,7 +81,7 @@ buildMavenProject()
       cd $1
       
       # Look for source directory in project.xml
-      sourceDirectory=`grep sourceDirectory project.xml | sed -e 's/^*//;s/<sourceDirectory>//;s/<\/sourceDirectory>//'`
+      sourceDirectory=`grep sourceDirectory project.xml | sed -e 's/^*//;s/<sourceDirectory>//;s/<\/sourceDirectory>//;s/\${basedir}\///'`
 
       [ -z $sourceDirectory ] && sourceDirectory=src/main
 
