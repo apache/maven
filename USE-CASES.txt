@@ -132,5 +132,15 @@ their source trees set up in the same way as their collegues.
  - how to declare a dependency on JDK and what are possible implications of such dependency
   (e.g javac/javadoc target jdk)
 
-
+ - I don't know if this will add too much complexity, but being able to generate multiple
+   and compound artifacts from a single project would be nice. If we want to have a
+   "Ant Compatibility Layer", then this would be required.
+   
+   Think of a project for a web application, it will have java code as well as web resources.
+   The java code is collected into a JAR file, and then that is packaged with the web
+   resources into a WAR.
+   
+   Of course, none of this is really required, as it can all be accomplished by breaking the
+   project out into multiple projects with a reactor, per the Maven 1 guidelines. But if this
+   limitation was removed, it might help Marvin adoption. (PR)
 
