@@ -3,6 +3,8 @@
 # Check to make sure  JAVA_HOME is set
 [ -z $JAVA_HOME ] && echo && echo 'You must set $JAVA_HOME to use mboot!' && echo && exit 1
 
+ARGS="$@"
+
 # Build and install mboot
 (
   echo "-----------------------------------------------------------------------"
@@ -20,7 +22,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo " Building maven2 components ... "
   echo "-----------------------------------------------------------------------"  
 
-  $JAVA_HOME/bin/java -jar mboot.jar
+  $JAVA_HOME/bin/java $ARGS -jar mboot.jar
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -30,7 +32,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo
   echo "Running maven-core integration tests ..."
   echo 
-  ./maven-core-it.sh 
+  ./maven-core-it.sh $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi

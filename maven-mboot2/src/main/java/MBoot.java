@@ -160,10 +160,15 @@ public class MBoot
 
         properties = loadProperties( mavenPropertiesFile );
 
+        // Make the system properties override maven.properties
+        properties.putAll( System.getProperties() );
+
         for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
         {
             String key = (String) i.next();
 
+            // TODO: the namespace should be "properties" itself to support variables within the same file,
+            //       however, StringUtils would need to support recursive replacement
             properties.setProperty( key, StringUtils.interpolate( properties.getProperty( key ), System.getProperties() ) );
         }
 
