@@ -1,5 +1,14 @@
 <component-set>
   <components>
+    <!--
+     |
+     | Transformations
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <implementation>org.apache.maven.artifact.transform.SnapshotTransformation</implementation>
+    </component>
 
     <!--
      |

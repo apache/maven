@@ -21,8 +21,10 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -44,23 +46,22 @@ public class AbstractArtifactComponent
         return artifactHandlerManager.getArtifactHandler( type );
     }
 
-    protected String path( Artifact artifact, ArtifactRepository remoteRepository )
+    protected String getRemoteRepositoryArtifactPath( Artifact artifact, ArtifactRepository remoteRepository )
         throws ArtifactPathFormatException
     {
         return remoteRepository.pathOf( artifact );
     }
 
-    protected String localPath( Artifact artifact, ArtifactRepository localRepository )
+    protected String getLocalRepositoryArtifactPath( ArtifactRepository localRepository, Artifact artifact )
         throws ArtifactPathFormatException
     {
-        return localRepository.getBasedir() + "/" + localRepository.pathOf( artifact );
-    }
+        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
+        {
+            ArtifactTransformation transform = (ArtifactTransformation) i.next();
+            // TODO: perform transformation
+        }
 
-    protected void setLocalRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactPathFormatException
-    {
-        String artifactPath = localPath( artifact, localRepository );
-
-        artifact.setPath( artifactPath );
+        String artifactPath = localRepository.getBasedir() + "/" + localRepository.pathOf( artifact );
+        return artifactPath;
     }
 }

@@ -86,7 +86,7 @@ public class DefaultWagonManager
 
         wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
-        wagon.put( source, path( artifact, repository ) );
+        wagon.put( source, getRemoteRepositoryArtifactPath( artifact, repository ) );
 
         wagon.disconnect();
 
@@ -155,7 +155,7 @@ public class DefaultWagonManager
 
                 wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
-                String remotePath = path( artifact, repository );
+                String remotePath = getRemoteRepositoryArtifactPath( artifact, repository );
 
                 wagon.get( remotePath, temp );
 

@@ -77,7 +77,7 @@ public class DefaultArtifactResolver
             logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository +
                           "}\n" + "{remoteRepositories: " + remoteRepositories + "}" );
 
-            setLocalRepositoryPath( artifact, localRepository );
+            artifact.setPath( getLocalRepositoryArtifactPath( localRepository, artifact ) );
 
             if ( artifact.exists() )
             {
@@ -294,7 +294,7 @@ public class DefaultArtifactResolver
 
             try
             {
-                setLocalRepositoryPath( artifact, localRepository );
+                artifact.setPath( getLocalRepositoryArtifactPath( localRepository, artifact ) );
             }
             catch ( ArtifactPathFormatException e )
             {
