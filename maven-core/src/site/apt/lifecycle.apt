@@ -21,7 +21,7 @@ Maven Lifecycle
        
        - goal resolution (we assume here only one goal is resolved) +++
        
-         - download plugin for goal if necessary
+         - download plugin for goal if necessary++
          
        - goal execution
 
