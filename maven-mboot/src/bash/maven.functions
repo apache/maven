@@ -219,7 +219,14 @@ buildMavenProject()
       if [ ! -z $sourceDirectory ] && [ -d $sourceDirectory ]
       then
         
-        compile "$projectDependencyClassPath" $buildDest $sourceDirectory
+        generatedSourceDirectory=target/generated-sources
+        
+        if [ -d $generatedSourceDirectory ]
+        then
+          generatedSources=`find $generatedSourceDirectory -name '*.java'`
+        fi
+        
+        compile "$projectDependencyClassPath" $buildDest $sourceDirectory $generatedSources
       
         isCommandSuccessful $? "Failed compiling classes!"
       
