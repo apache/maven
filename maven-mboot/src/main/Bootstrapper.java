@@ -1,4 +1,3 @@
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -493,12 +492,12 @@ public class Bootstrapper
         public void endElement( String uri, String localName, String rawName )
             throws SAXException
         {
-            if ( rawName.equals( "parent" ) )
+            // support both v3 <extend> and v4 <parent>
+            if ( rawName.equals( "extend" ) || rawName.equals( "parent" ) )
             {
                 File f;
 
-                // support both v3 <extend> and v4 <parent>
-                if( getBodyText() == null )
+                if( rawName.equals( "extend" ) )
                 {
                     String extend = interpolate( getBodyText(), properties );
 
