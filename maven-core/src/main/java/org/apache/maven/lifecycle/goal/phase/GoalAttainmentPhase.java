@@ -19,7 +19,7 @@ package org.apache.maven.lifecycle.goal.phase;
 import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-import org.apache.maven.plugin.OgnlProjectValueExtractor;
+import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.Plugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
@@ -121,7 +121,7 @@ public class GoalAttainmentPhase
 
                 String expression = parameter.getExpression();
 
-                Object value = OgnlProjectValueExtractor.evaluate( expression, context );
+                Object value = PluginParameterExpressionEvaluator.evaluate( expression, context );
 
                 map.put( key, value );
             }

@@ -12,7 +12,7 @@ import org.apache.maven.project.MavenProjectBuilder;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class OgnlProjectValueExtractorTest
+public class PluginParameterExpressionEvaluatorTest
     extends MavenTestCase
 {
     private MavenProject project;
@@ -38,7 +38,7 @@ public class OgnlProjectValueExtractorTest
     public void testValueExtractionWithAPomValueContainingAPath()
         throws Exception
     {
-        Object value = OgnlProjectValueExtractor.evaluate( "#project.build.directory/classes", context );
+        Object value = PluginParameterExpressionEvaluator.evaluate( "#project.build.directory/classes", context );
 
         String expected = getTestFile( "target/test-classes/target/classes" ).getCanonicalPath();
 
@@ -52,7 +52,7 @@ public class OgnlProjectValueExtractorTest
     {
         String role = "#component.org.apache.maven.project.MavenProjectBuilder";
 
-        Object value = OgnlProjectValueExtractor.evaluate( role, context );
+        Object value = PluginParameterExpressionEvaluator.evaluate( role, context );
 
         assertNotNull( value );
     }
@@ -60,7 +60,7 @@ public class OgnlProjectValueExtractorTest
     public void testLocalRepositoryExtraction()
         throws Exception
     {
-        Object value = OgnlProjectValueExtractor.evaluate( "#localRepository", context );
+        Object value = PluginParameterExpressionEvaluator.evaluate( "#localRepository", context );
 
         assertEquals( "local", ((ArtifactRepository)value).getId() );
     }

@@ -234,9 +234,7 @@ public class DefaultPluginManager
             "plexus-container-default",
             "plexus-artifact-container",
             "plexus-utils",
-            "xpp3",
-            "classworlds",
-            "ognl"
+            "classworlds"
         } );
 
         // TODO: move this to be configurable from the Maven component

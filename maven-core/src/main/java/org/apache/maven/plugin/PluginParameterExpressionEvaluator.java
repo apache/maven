@@ -16,16 +16,15 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import ognl.Ognl;
-import ognl.OgnlException;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class OgnlProjectValueExtractor
+public class PluginParameterExpressionEvaluator
 {
     public static Object evaluate( String expression, MavenGoalExecutionContext context )
         throws PluginConfigurationException
@@ -71,15 +70,15 @@ public class OgnlProjectValueExtractor
 
                 if ( pathSeparator > 0 )
                 {
-                    value = Ognl.getValue( expression.substring( 9, pathSeparator ), context.getProject() )
+                    value = getValue( expression.substring( 9, pathSeparator ), context.getProject() )
                         + expression.substring( pathSeparator );
                 }
                 else
                 {
-                    value = Ognl.getValue( expression.substring( 9 ), context.getProject() );
+                    value = getValue( expression.substring( 9 ), context.getProject() );
                 }
             }
-            catch ( OgnlException e )
+            catch ( Exception e )
             {
                 throw new PluginConfigurationException( "Error evaluating plugin parameter expression: " + expression, e );
             }
@@ -127,6 +126,17 @@ public class OgnlProjectValueExtractor
         }
 
         return value;
+    }
+
+    private static Object getValue( String expression, MavenProject project )
+        throws Exception
+    {
+
+        expression = "project." + expression;
+
+        System.out.println( "expression = " + expression );
+
+        return ReflectionProjectValueExtractor.evaluate( expression, project );
     }
 }
 
