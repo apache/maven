@@ -669,7 +669,7 @@ public class DefaultPluginManager
         {
             String pluginId = getPluginId( goalId );
 
-            for ( Iterator iterator = project.getPlugins().iterator(); iterator.hasNext() && dom == null; )
+            for ( Iterator iterator = project.getPlugins().iterator(); iterator.hasNext(); )
             {
                 org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) iterator.next();
 
@@ -683,7 +683,7 @@ public class DefaultPluginManager
                     if ( index >= 0 )
                     {
                         String goalName = goalId.substring( index + 1 );
-                        for ( Iterator j = plugin.getGoals().iterator(); j.hasNext() && dom == null; )
+                        for ( Iterator j = plugin.getGoals().iterator(); j.hasNext(); )
                         {
                             Goal goal = (Goal) j.next();
                             if ( goal.getId().equals( goalName ) )
@@ -691,16 +691,14 @@ public class DefaultPluginManager
                                 Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
                                 if ( goalConfiguration != null )
                                 {
-                                    dom =
-                                        Xpp3DomUtils.mergeXpp3Dom( Xpp3DomUtils.copyXpp3Dom( goalConfiguration ), dom );
+                                    Xpp3Dom newDom = Xpp3DomUtils.copyXpp3Dom( goalConfiguration );
+                                    dom = Xpp3DomUtils.mergeXpp3Dom( newDom, dom );
                                 }
-                                else
-                                {
-                                    dom = new Xpp3Dom( "configuration" );
-                                }
+                                break;
                             }
                         }
                     }
+                    break;
                 }
             }
         }
