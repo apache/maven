@@ -16,19 +16,14 @@ package org.apache.maven.artifact.resolver;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactComponentTestCase;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 
-import java.io.File;
-import java.io.Writer;
-import java.io.FileWriter;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -142,7 +137,7 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public Set retrieve( Artifact artifact )
+            public Set retrieve( Artifact artifact, Set remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
@@ -190,7 +185,7 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public Set retrieve( Artifact artifact )
+            public Set retrieve( Artifact artifact, Set remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();

@@ -2,7 +2,6 @@ package org.apache.maven.artifact.metadata;
 
 import org.apache.maven.artifact.Artifact;
 
-import java.io.Reader;
 import java.util.Set;
 
 /*
@@ -32,6 +31,6 @@ import java.util.Set;
  */
 public interface ArtifactMetadataSource
 {
-    Set retrieve( Artifact artifact )
+    Set retrieve( Artifact artifact, Set remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 }

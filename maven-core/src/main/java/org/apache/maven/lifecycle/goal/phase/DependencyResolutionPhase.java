@@ -71,7 +71,7 @@ public class DependencyResolutionPhase
         throws Exception
     {
         ArtifactResolver artifactResolver = null;
-        
+
         MavenProjectBuilder projectBuilder = null;
 
         try
@@ -79,11 +79,10 @@ public class DependencyResolutionPhase
             MavenProject project = context.getProject();
 
             artifactResolver = (ArtifactResolver) context.lookup( ArtifactResolver.ROLE );
-            
+
             projectBuilder = (MavenProjectBuilder) context.lookup( MavenProjectBuilder.ROLE );
 
-            MavenMetadataSource sourceReader = new MavenMetadataSource( context.getRemoteRepositories(),
-                                                                        context.getLocalRepository(),
+            MavenMetadataSource sourceReader = new MavenMetadataSource( context.getLocalRepository(),
                                                                         artifactResolver,
                                                                         projectBuilder );
 
@@ -97,7 +96,7 @@ public class DependencyResolutionPhase
         finally
         {
             context.release( artifactResolver );
-            
+
             context.release( projectBuilder );
         }
     }

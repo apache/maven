@@ -71,7 +71,7 @@ public class DefaultPluginManager
     protected Set remotePluginRepositories;
 
     protected ArtifactFilter artifactFilter;
-    
+
     protected MavenProjectBuilder mavenProjectBuilder;
 
     public DefaultPluginManager()
@@ -211,11 +211,10 @@ public class DefaultPluginManager
         throws Exception
     {
         artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
-        
+
         mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
-        MavenMetadataSource metadataSource = new MavenMetadataSource( remotePluginRepositories,
-                                                                      session.getLocalRepository(),
+        MavenMetadataSource metadataSource = new MavenMetadataSource( session.getLocalRepository(),
                                                                       artifactResolver,
                                                                       mavenProjectBuilder );
 

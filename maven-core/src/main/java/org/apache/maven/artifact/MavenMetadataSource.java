@@ -1,7 +1,7 @@
 package org.apache.maven.artifact;
 
 /* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+ *   Copyright 2001-2005 The Apache Software Foundation.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -23,13 +23,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
-//import org.apache.maven.model.Model;
-//import org.apache.maven.model.Parent;
-//import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
-//import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -42,50 +38,39 @@ import java.util.Set;
 public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
-    
     private MavenProjectBuilder mavenProjectBuilder;
-    
-//    private MavenXpp3Reader reader = new MavenXpp3Reader();
+
+    //    private MavenXpp3Reader reader = new MavenXpp3Reader();
 
     private ArtifactRepository localRepository;
-
-    private Set remoteRepositories;
-
     private ArtifactResolver artifactResolver;
 
-    public MavenMetadataSource( Set remoteRepositories,
-                                ArtifactRepository localRepository,
+    public MavenMetadataSource( ArtifactRepository localRepository,
                                 ArtifactResolver artifactResolver,
                                 MavenProjectBuilder projectBuilder )
     {
         this.localRepository = localRepository;
-
         this.artifactResolver = artifactResolver;
-        
         this.mavenProjectBuilder = projectBuilder;
-
-        this.remoteRepositories = remoteRepositories;
     }
 
-    public Set retrieve( Artifact artifact )
+    public Set retrieve( Artifact artifact, Set remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         Set artifacts;
-
         Artifact metadataArtifact = new DefaultArtifact( artifact.getGroupId(),
                                                          artifact.getArtifactId(),
                                                          artifact.getVersion(),
                                                          "pom" );
-
         try
-        {
+              {
             artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
 
             // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable
             // post-processing and inheritance calculation before retrieving the 
             // associated artifacts. This should improve consistency.
             MavenProject project = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
-//            Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
+            //            Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
 
             artifacts = createArtifacts( project.getDependencies(), localRepository );
         }
@@ -95,25 +80,21 @@ public class MavenMetadataSource
         }
         catch ( Exception e )
         {
-            throw new ArtifactMetadataRetrievalException( "Cannot read artifact source: " + metadataArtifact.getFile(), e );
+            throw new ArtifactMetadataRetrievalException( "Cannot read artifact source: " + metadataArtifact.getFile(),
+                                                          e );
         }
-
         return artifacts;
     }
 
     public Set createArtifacts( List dependencies, ArtifactRepository localRepository )
     {
         Set projectArtifacts = new HashSet();
-        
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
-
             Artifact artifact = createArtifact( d, localRepository );
-
             projectArtifacts.add( artifact );
         }
-
         return projectArtifacts;
     }
 
@@ -123,8 +104,6 @@ public class MavenMetadataSource
                                                  dependency.getArtifactId(),
                                                  dependency.getVersion(),
                                                  dependency.getType() );
-
         return artifact;
     }
-
 }

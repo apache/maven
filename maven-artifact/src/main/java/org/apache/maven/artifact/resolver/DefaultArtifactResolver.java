@@ -2,12 +2,12 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.wagon.TransferFailedException;
 
 import java.util.HashMap;
@@ -227,7 +227,7 @@ public class DefaultArtifactResolver
 
                     try
                     {
-                        referencedDependencies = source.retrieve( newArtifact );
+                        referencedDependencies = source.retrieve( newArtifact, remoteRepositories );
                     }
                     catch ( ArtifactMetadataRetrievalException e )
                     {
