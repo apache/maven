@@ -566,29 +566,6 @@
           <type>String</type>
         </field>
         <field>
-          <name>aspectSourceDirectory</name>
-          <version>3.0.0+</version>
-          <description><![CDATA[
-            This element specifies a directory containing Aspect
-            sources of the project.  The generated build system will
-            compile the Aspects in this directory when the project is
-            built if Aspects have been enabled (see the
-            <a
-              href="plugins/aspectj/goals.html">Aspectj goals</a> document).
-            The path given is relative to the project descriptor.
-          ]]></description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>integrationUnitTestSourceDirectory</name>
-          <version>3.0.0+</version>
-          <description><![CDATA[
-            This element specifies a directory containing integration test
-            sources of the project.
-          ]]></description>
-          <type>String</type>
-        </field>
-        <field>
           <name>sourceModifications</name>
           <version>3.0.0+</version>
           <required>true</required>
