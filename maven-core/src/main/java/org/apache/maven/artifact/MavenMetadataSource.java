@@ -13,6 +13,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 /*
@@ -73,7 +74,7 @@ public class MavenMetadataSource
 
             Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
 
-            artifacts = createArtifacts( model.getDependencies(), localRepository );
+            artifacts = createArtifacts( model, localRepository );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -87,10 +88,20 @@ public class MavenMetadataSource
         return artifacts;
     }
 
-    public Set createArtifacts( List dependencies, ArtifactRepository localRepository )
+    public Set createArtifacts( Model model, ArtifactRepository localRepository )
     {
         Set projectArtifacts = new HashSet();
+        
+        Parent parent = model.getParent();
+        if(parent != null)
+        {
+            projectArtifacts.add( new DefaultArtifact( parent.getGroupId(), 
+                                                       parent.getArtifactId(), 
+                                                       parent.getVersion(), 
+                                                       "pom" ) );
+        }
 
+        List dependencies = model.getDependencies();
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
