@@ -1,0 +1,279 @@
+#!/usr/bin/perl
+
+use strict;
+use IniFiles;
+use Net::SMTP;
+
+my $configuration = new Config::IniFiles( -file => "syncopate.conf" );
+
+my $repoDirectory = $configuration->val( "syncopate", "repoDirectory" );
+
+my $standardOptions = $configuration->val( "syncopate", "options" );
+
+my $rsyncUser = $configuration->val( "syncopate", "rsyncUser" );
+
+my $reportDirectory = $configuration->val( "syncopate", "reportDirectory" );
+
+my $smtpServer = $configuration->val( "syncopate", "smtpServer" );
+
+my $reportUrl = $configuration->val( "syncopate", "reportUrl" );
+
+if ( defined( $ARGV[0] ) )
+{
+    my $sourceConfiguration = new Config::IniFiles( -file => "conf/$ARGV[0]" . ".conf" );
+    
+    syncSource( $sourceConfiguration );
+}
+else
+{
+    syncSources();
+}
+
+# -----------------------------------------------------------------------------
+# 
+# 
+# -----------------------------------------------------------------------------
+sub syncSources
+{
+    my @sources = glob( "conf/*.conf" );
+
+    for my $source (@sources) 
+    {
+        my $sourceConfiguration = new Config::IniFiles( -file => $source );
+ 
+        my $batchDisabled = $sourceConfiguration->val( "info", "batchDisabled" );
+    
+        if ( not defined( $batchDisabled ) )
+        {
+            syncSource( $sourceConfiguration );
+        }        
+    }
+}
+
+# -----------------------------------------------------------------------------
+# 
+# 
+# -----------------------------------------------------------------------------
+sub syncSource()
+{   
+    my $sourceConfiguration = shift;
+    
+    print "Syncing " . $sourceConfiguration->val( "info", "name" ) . "\n";
+    
+    my $address = $sourceConfiguration->val( "host", "address" );           
+  
+    my $directory = $sourceConfiguration->val( "host", "directory" );
+    
+    my $options = $sourceConfiguration->val( "host", "options" );
+
+    my $rsyncUser = $configuration->val( "syncopate", "rsyncUser" );
+    
+    if ( $sourceConfiguration->val( "host", "rsyncUser" ) )
+    {
+        $rsyncUser = $sourceConfiguration->val( "host", "rsyncUser" );
+    }
+
+    if ( $sourceConfiguration->val( "host", "repoDirectory" ) )
+    {
+        $repoDirectory = $sourceConfiguration->val( "host", "repoDirectory" );
+    }
+    
+    my $cmd = "rsync $standardOptions $options --rsh=\"ssh -l $rsyncUser\" $address:$directory/ $repoDirectory";
+    
+    runRsync( $cmd, $sourceConfiguration );
+}
+
+# -----------------------------------------------------------------------------
+# 
+# 
+# -----------------------------------------------------------------------------
+sub runRsync()
+{
+    my $cmd = shift;
+    
+    my $sourceConfiguration = shift;
+    
+    # -------------------------------------------------------------------------
+    # Now we want to run rsync and generate a small xdoc which describes the 
+    # syncronization that just occurred.
+    # -------------------------------------------------------------------------
+
+    my $id = $sourceConfiguration->val( "info", "id" );
+    
+    my $name = $sourceConfiguration->val( "info", "name" );    
+
+    my $reportName = "Synchronization report for " . $name;           
+
+    my @date = date();
+    
+    my $date = $date[0] . "-" . $date[1] . "-" . $date[2];
+
+    my $dir = $date;
+    
+    $dir =~ s/-/\//g;
+    
+    $dir = $id . "/" . $dir;
+    
+    my $rdir = $reportDirectory . "/" .  $dir;
+
+    system( "mkdir -p $rdir > /dev/null 2>&1" );
+    
+    my $base = $id . "-" . $date[0] . $date[1] . $date[2] . "-" . $date[3] . $date[4] . $date[5];
+
+    my $xmlReport = $rdir . "/" . $base . ".xml";
+    
+    my $rawReport = $rdir . "/" . $base . ".txt";
+    
+    open( REPORT, "> $xmlReport" );
+
+    open( RAW_REPORT, "> $rawReport" );
+        
+    print REPORT "<document>" . "\n";
+    
+    print REPORT "<properties>" . "\n";
+
+    print REPORT "<author>meeper</author>" . "\n";
+    
+    print REPORT "<title>$reportName</title>" . "\n";
+    
+    print REPORT "</properties>" . "\n";
+    
+    print REPORT "<body>" . "\n";
+    
+    print REPORT "<section name=\"$reportName\">" . "\n";
+    
+    print REPORT "<table>" . "\n";
+    
+    print REPORT "<tr>" . "\n";
+    
+    print REPORT "<th>Artifact</th>" . "\n";
+    
+    print REPORT "<th>Size (in bytes)</th>" . "\n";    
+    
+    print REPORT "<th>Date</th>" . "\n";        
+    
+    print REPORT "</tr>" . "\n";
+
+    open( SYNC, "$cmd 2>&1 |" );
+
+    my $rawReportText;
+    
+    while( <SYNC> ) 
+    {
+        # --------------------------------------------------------------------
+        # We have a line that tells us about an artifact that was synced. 
+        # --------------------------------------------------------------------        
+        if ( /^artifact/ )
+        {
+            my @details = split;
+            
+            print REPORT "<tr>" . "\n";
+            
+            print REPORT "<td>" . $details[1] . "</td>" . "\n";
+            
+            print REPORT "<td>" . $details[2] . "</td>" . "\n";            
+            
+            print REPORT "<td>" . $details[3] . " " . $details[4] . "</td>" . "\n";
+            
+            print REPORT "</tr>" . "\n";
+        }
+        else
+        {
+            $rawReportText = $rawReportText . $_;
+
+            print RAW_REPORT;
+        }
+    }        
+    
+    print REPORT "</table>" . "\n";    
+
+    print REPORT "<p><a href=\"$rawReport\">Raw report</a></p>";
+    
+    print REPORT "</section>" . "\n";
+    
+    print REPORT "</body>" . "\n";
+    
+    print REPORT "</document>" . "\n";    
+    
+    close( REPORT );
+    
+    close( RAW_REPORT );
+
+    $rawReportText = $rawReportText . "\n\nYou can view the syncronization reports for today here: \n\n";
+    
+    $rawReportText = $rawReportText . $reportUrl . "/" . $dir;
+    
+    notify( $sourceConfiguration, $reportName, $rawReportText );
+}
+
+sub date
+{
+    my $second;
+    my $minute;
+    my $hour;
+    my $day;
+    my $month;
+    my $year;    
+        
+    ($second, $minute,$hour,$day, $month, $year) = (localtime)[0..5];
+    
+    $year = $year + 1900; #got 2004
+    
+    $month = $month + 1;
+    
+    $second = $second + 1;
+    
+    $minute = $minute + 1;
+    
+    $hour = $hour + 1;
+    
+    if ( $second <= 9 ) 
+    {
+        $second = "0".$second;
+    }
+    if ( $minute <= 9 ) 
+    {
+        $minute = "0".$minute;
+    }
+    if ( $hour <= 9 ) 
+    {
+        $hour = "0".$hour;
+    }    
+    if ( $day <= 9 ) 
+    {
+        $day = "0".$day;
+    }
+    if ( $month <= 9) 
+    {
+        $month = "0".$month;
+    }
+    
+    return ($year,$month,$day,$hour,$minute,$second);
+}
+
+sub notify()
+{
+    my $sourceConfiguration = shift;
+
+    my $subject = shift;
+    
+    my $text = shift;
+    
+    my $smtp = new Net::SMTP( $smtpServer );
+
+    $smtp->mail( "meeper\@maven.org" );
+    
+    $smtp->to( $sourceConfiguration->val( "info", "contact" ) );
+              
+    $smtp->data();
+    
+    $smtp->datasend( "Subject: $subject\n" );
+    
+    $smtp->datasend( "\n" );
+    
+    $smtp->datasend( $text );
+    
+    $smtp->dataend();
+    
+    $smtp->quit();
+}
