@@ -19,7 +19,6 @@ package org.apache.maven.plugin;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -28,7 +27,6 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Goal;
-import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -38,7 +36,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.settings.MavenSettings;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
@@ -83,8 +80,6 @@ public class DefaultPluginManager
     protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
-
-    protected List remotePluginRepositories;
 
     protected ArtifactFilter artifactFilter;
 
@@ -141,8 +136,7 @@ public class DefaultPluginManager
 
     private Set pluginsInProcess = new HashSet();
 
-    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor )
-        throws CycleDetectedException
+    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor ) throws CycleDetectedException
     {
         if ( pluginsInProcess.contains( mavenPluginDescriptor.getPluginId() ) )
         {
@@ -213,8 +207,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPluginForGoal( String goalName, MavenSession session )
-        throws Exception
+    public void verifyPluginForGoal( String goalName, MavenSession session ) throws Exception
     {
         String pluginId = getPluginId( goalName );
 
@@ -223,8 +216,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPlugin( String groupId, String artifactId, MavenSession session )
-        throws Exception
+    public void verifyPlugin( String groupId, String artifactId, MavenSession session ) throws Exception
     {
         if ( !isPluginInstalled( groupId, artifactId ) )
         {
@@ -286,8 +278,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    protected void addPlugin( Artifact pluginArtifact, MavenSession session )
-        throws Exception
+    protected void addPlugin( Artifact pluginArtifact, MavenSession session ) throws Exception
     {
         ArtifactResolver artifactResolver = null;
         MavenProjectBuilder mavenProjectBuilder = null;
@@ -301,7 +292,7 @@ public class DefaultPluginManager
             MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
             ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact, artifactResolver,
-                                                                   remotePluginRepositories,
+                                                                   session.getPluginRepositories(),
                                                                    session.getLocalRepository(), metadataSource,
                                                                    artifactFilter );
         }
@@ -323,8 +314,7 @@ public class DefaultPluginManager
     // Plugin execution
     // ----------------------------------------------------------------------
 
-    public void executeMojo( MavenSession session, String goalName )
-        throws PluginExecutionException
+    public void executeMojo( MavenSession session, String goalName ) throws PluginExecutionException
     {
         try
         {
@@ -459,8 +449,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
-        throws Exception
+    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request ) throws Exception
     {
         if ( request != null && request.getParameters() != null )
         {
@@ -555,8 +544,7 @@ public class DefaultPluginManager
         }
     }
 
-    public Map createParameters( MojoDescriptor goal, MavenSession session )
-        throws PluginConfigurationException
+    public Map createParameters( MojoDescriptor goal, MavenSession session ) throws PluginConfigurationException
     {
         List parameters = goal.getParameters();
 
@@ -616,8 +604,8 @@ public class DefaultPluginManager
 
             if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
             {
-                value = pathTranslator.alignToBaseDirectory( (String) value,
-                                                             session.getProject().getFile().getParentFile() );
+                value = pathTranslator.alignToBaseDirectory( (String) value, session.getProject().getFile()
+                                                                                    .getParentFile() );
                 map.put( key, value );
             }
         }
@@ -674,8 +662,8 @@ public class DefaultPluginManager
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " ).append(
-            mojo.getId() ).append( " mojo and cannot be null." );
+        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " )
+               .append( mojo.getId() ).append( " mojo and cannot be null." );
 
         return message.toString();
     }
@@ -684,8 +672,7 @@ public class DefaultPluginManager
     // Lifecycle
     // ----------------------------------------------------------------------
 
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -693,35 +680,19 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
-                                                              "maven-settings", "maven-monitor", "maven-plugin",
-                                                              "plexus-container-api", "plexus-container-default",
-                                                              "plexus-artifact-container", "wagon-provider-api",
-                                                              "classworlds"} );
+        artifactFilter = new ExclusionSetFilter( new String[] {
+            "maven-core",
+            "maven-artifact",
+            "maven-model",
+            "maven-settings",
+            "maven-monitor",
+            "maven-plugin",
+            "plexus-container-api",
+            "plexus-container-default",
+            "plexus-artifact-container",
+            "wagon-provider-api",
+            "classworlds" } );
 
-        // TODO: move this to be configurable from the Maven component
-        remotePluginRepositories = new ArrayList();
-
-        // TODO: needs to be configured from the POM element
-
-        MavenSettings settings = null;
-        try
-        {
-            settings = mavenSettingsBuilder.buildSettings();
-        }
-        catch ( Exception e )
-        {
-            getLogger().error( "Failed to build MavenSettings from xml file. Using defaults.", e );
-            settings = new MavenSettings();
-        }
-
-        Repository pluginRepo = new Repository();
-        pluginRepo.setId( "plugin-repository" );
-        pluginRepo.setUrl( "http://repo1.maven.org" );
-
-        ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo, settings );
-
-        remotePluginRepositories.add( pluginRepository );
     }
 
     // ----------------------------------------------------------------------
@@ -729,7 +700,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
-                                                MavenProjectBuilder mavenProjectBuilder )
+                                               MavenProjectBuilder mavenProjectBuilder )
         throws ArtifactResolutionException
     {
         MavenProject project = context.getProject();

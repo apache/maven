@@ -16,6 +16,8 @@ package org.apache.maven.artifact;
  * limitations under the License.
  */
 
+import org.codehaus.plexus.util.StringUtils;
+
 import java.io.File;
 
 /**
@@ -25,7 +27,7 @@ import java.io.File;
 public class DefaultArtifact
     implements Artifact
 {
-    
+
     // ----------------------------------------------------------------------
     // These are the only things i need to specify
     // ----------------------------------------------------------------------
@@ -38,6 +40,8 @@ public class DefaultArtifact
 
     private String type;
 
+    private String classifier;
+
     private String scope;
 
     private String extension;
@@ -47,11 +51,22 @@ public class DefaultArtifact
     /**
      * @todo this should be replaced by type handler
      */
-    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type, String extension )
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
+                           String extension )
     {
-        if(type == null)
+        this( groupId, artifactId, version, scope, type, null, extension );
+    }
+
+    /**
+     * !!! WARNING !!! Never put <classifier/> in the POM. It is for mojo use
+     * only. Classifier is for specifying derived artifacts, like ejb-client.
+     */
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
+                           String classifier, String extension )
+    {
+        if ( type == null )
         {
-            throw new NullPointerException("Artifact type cannot be null.");
+            throw new NullPointerException( "Artifact type cannot be null." );
         }
 
         this.groupId = groupId;
@@ -64,12 +79,24 @@ public class DefaultArtifact
 
         this.scope = scope;
 
+        this.classifier = classifier;
+
         this.extension = extension;
     }
 
     public DefaultArtifact( String groupId, String artifactId, String version, String type )
     {
-        this( groupId, artifactId, version, null, type, type );
+        this( groupId, artifactId, version, null, type, null, type );
+    }
+
+    public String getClassifier()
+    {
+        return classifier;
+    }
+
+    public boolean hasClassifier()
+    {
+        return StringUtils.isNotEmpty( classifier );
     }
 
     public String getScope()
@@ -142,12 +169,13 @@ public class DefaultArtifact
 
     public String getId()
     {
-        return getGroupId() + ":" + getArtifactId() + ":" + getType() + ":" + getVersion();
+        return getConflictId() + ":" + getVersion();
     }
 
     public String getConflictId()
     {
-        return getGroupId() + ":" + getArtifactId() + ":" + getType();
+        return getGroupId() + ":" + getArtifactId() + ":" + getType()
+            + ( hasClassifier() ? ( ":" + getClassifier() ) : "" );
     }
 
     // ----------------------------------------------------------------------
@@ -168,7 +196,6 @@ public class DefaultArtifact
     {
         Artifact other = (Artifact) o;
 
-        return this.groupId.equals( other.getGroupId() ) && this.artifactId.equals( other.getArtifactId() ) && this.version.equals(
-            other.getVersion() ) && this.type.equals( other.getType() );
+        return getId().equals( other.getId() );
     }
 }

@@ -17,8 +17,8 @@
 package org.apache.maven.artifact;
 
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
@@ -47,8 +47,9 @@ public abstract class ArtifactComponentTestCase
 
     protected abstract String component();
 
-    /** Return an existing file, not a directory - causes creation to fail. */
-    protected ArtifactRepository badLocalRepository() throws IOException
+    /** Return an existing file, not a directory - causes creation to fail. 
+     * @throws Exception*/
+    protected ArtifactRepository badLocalRepository() throws Exception
     {
         String path = "target/test-classes/repositories/" + component() + "/bad-local-repository";
 
@@ -56,45 +57,59 @@ public abstract class ArtifactComponentTestCase
 
         f.createNewFile();
 
-        ArtifactRepository localRepository = new ArtifactRepository( "test", "file://" + f.getPath() );
+        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                 "legacy" );
+
+        ArtifactRepository localRepository = new ArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
 
         return localRepository;
     }
 
-    protected ArtifactRepository localRepository()
+    protected ArtifactRepository localRepository() throws Exception
     {
         String path = "target/test-classes/repositories/" + component() + "/local-repository";
 
         File f = new File( getBasedir(), path );
 
-        ArtifactRepository localRepository = new ArtifactRepository( "local", "file://" + f.getPath() );
+        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                 "legacy" );
+
+        ArtifactRepository localRepository = new ArtifactRepository( "local", "file://" + f.getPath(), repoLayout );
 
         return localRepository;
     }
 
-    protected ArtifactRepository remoteRepository()
+    protected ArtifactRepository remoteRepository() throws Exception
     {
         String path = "target/test-classes/repositories/" + component() + "/remote-repository";
 
         File f = new File( getBasedir(), path );
 
-        ArtifactRepository repository = new ArtifactRepository( "test", "file://" + f.getPath() );
+        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                 "legacy" );
+
+        ArtifactRepository repository = new ArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
 
         return repository;
     }
 
-    protected ArtifactRepository badRemoteRepository()
+    protected ArtifactRepository badRemoteRepository() throws Exception
     {
-        ArtifactRepository repository = new ArtifactRepository( "test", "http://foo.bar/repository" );
+        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                 "legacy" );
+
+        ArtifactRepository repository = new ArtifactRepository( "test", "http://foo.bar/repository", repoLayout );
 
         return repository;
     }
 
-    protected void assertRemoteArtifactPresent( Artifact artifact ) throws ArtifactHandlerNotFoundException
+    protected void assertRemoteArtifactPresent( Artifact artifact ) throws Exception
     {
-        String path = artifactHandlerManager.path( artifact );
+        ArtifactRepository remoteRepo = remoteRepository();
 
-        File file = new File( remoteRepository().getBasedir(), path );
+        String path = remoteRepo.pathOf( artifact );
+
+        File file = new File( remoteRepo.getBasedir(), path );
 
         if ( !file.exists() )
         {
@@ -102,11 +117,13 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertLocalArtifactPresent( Artifact artifact ) throws ArtifactHandlerNotFoundException
+    protected void assertLocalArtifactPresent( Artifact artifact ) throws Exception
     {
-        String path = artifactHandlerManager.path( artifact );
+        ArtifactRepository localRepo = localRepository();
 
-        File file = new File( localRepository().getBasedir(), path );
+        String path = localRepo.pathOf( artifact );
+
+        File file = new File( localRepo.getBasedir(), path );
 
         if ( !file.exists() )
         {
@@ -114,11 +131,13 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertRemoteArtifactNotPresent( Artifact artifact ) throws ArtifactHandlerNotFoundException
+    protected void assertRemoteArtifactNotPresent( Artifact artifact ) throws Exception
     {
-        String path = artifactHandlerManager.path( artifact );
+        ArtifactRepository remoteRepo = remoteRepository();
 
-        File file = new File( remoteRepository().getBasedir(), path );
+        String path = remoteRepo.pathOf( artifact );
+
+        File file = new File( remoteRepo.getBasedir(), path );
 
         if ( file.exists() )
         {
@@ -126,11 +145,13 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertLocalArtifactNotPresent( Artifact artifact ) throws ArtifactHandlerNotFoundException
+    protected void assertLocalArtifactNotPresent( Artifact artifact ) throws Exception
     {
-        String path = artifactHandlerManager.path( artifact );
+        ArtifactRepository localRepo = localRepository();
 
-        File file = new File( localRepository().getBasedir(), path );
+        String path = localRepo.pathOf( artifact );
+
+        File file = new File( localRepo.getBasedir(), path );
 
         if ( file.exists() )
         {
@@ -142,7 +163,7 @@ public abstract class ArtifactComponentTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected List remoteRepositories()
+    protected List remoteRepositories() throws Exception
     {
         List remoteRepositories = new ArrayList();
 
@@ -185,7 +206,7 @@ public abstract class ArtifactComponentTestCase
 
     protected void createArtifact( Artifact artifact, ArtifactRepository repository ) throws Exception
     {
-        String path = artifactHandlerManager.path( artifact );
+        String path = repository.pathOf( artifact );
 
         File artifactFile = new File( repository.getBasedir(), path );
 
@@ -223,7 +244,7 @@ public abstract class ArtifactComponentTestCase
 
     protected void deleteArtifact( Artifact artifact, ArtifactRepository repository ) throws Exception
     {
-        String path = artifactHandlerManager.path( artifact );
+        String path = repository.pathOf( artifact );
 
         File artifactFile = new File( repository.getBasedir(), path );
 

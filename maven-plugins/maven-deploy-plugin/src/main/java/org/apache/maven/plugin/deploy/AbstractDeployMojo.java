@@ -20,14 +20,10 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.MavenSettings;
 
 import java.io.File;
 
@@ -51,19 +47,11 @@ import java.io.File;
  *  description=""
  *
  * @parameter
- *  name="artifactRepositoryFactory"
- *  type="org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
+ *  name="deploymentRepository"
+ *  type="org.apache.maven.artifact.repository.ArtifactRepository"
  *  required="true"
  *  validator=""
- *  expression="#component.org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
- *  description=""
- *
- * @parameter
- *  name="settings"
- *  type="org.apache.maven.settings.MavenSettings"
- *  required="true"
- *  validator=""
- *  expression="#settings"
+ *  expression="#project.distributionManagementArtifactRepository"
  *  description=""
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse </a>
@@ -73,39 +61,26 @@ public abstract class AbstractDeployMojo
     extends AbstractPlugin
 {
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
     {
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
-        
-        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) request.getParameter( "artifactRepositoryFactory" );
-        
-        MavenSettings settings = (MavenSettings) request.getParameter( "settings" );
 
-        DistributionManagement distributionManagement = project.getDistributionManagement();
+        ArtifactRepository deploymentRepository = (ArtifactRepository) request.getParameter( "deploymentRepository" );
 
-        if ( distributionManagement == null )
+        if ( deploymentRepository == null )
         {
-            String msg = "Deployment failed: distributionManagement element" + " was not specified in the pom";
+            String msg = "Deployment failed: repository element" + " was not specified in the pom inside"
+                + " distributionManagement element";
             throw new Exception( msg );
         }
 
-        Repository repository = distributionManagement.getRepository();
-
-        if ( repository == null )
+        if ( deploymentRepository.getAuthenticationInfo() == null )
         {
-            String msg = "Deployment failed: repository element" + " was not specified in the pom inside" +
-                " distributionManagement element";
-            throw new Exception( msg );
-        }
-
-        ArtifactRepository deploymentRepository = artifactRepositoryFactory.createArtifactRepository( repository, settings );
-        
-        if(deploymentRepository.getAuthenticationInfo() == null)
-        {
-            getLog().warn("Deployment repository {id: \'" + repository.getId() + "\'} has no associated authentication info!");
+            getLog().warn(
+                           "Deployment repository {id: \'" + deploymentRepository.getId()
+                               + "\'} has no associated authentication info!" );
         }
 
         // Deploy the POM

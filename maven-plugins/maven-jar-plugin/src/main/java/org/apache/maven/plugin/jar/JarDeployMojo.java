@@ -30,45 +30,50 @@ import org.apache.maven.project.MavenProject;
 /**
  * @goal deploy
  * @description deploys a JAR to remote repository
- * @parameter name="project" type="org.apache.maven.project.MavenProject"
- * required="true" validator="" expression="#project" description=""
+ * @parameter name="project" 
+ *  type="org.apache.maven.project.MavenProject"
+ *  required="true" 
+ *  validator="" 
+ *  expression="#project" 
+ *  description=""
  * @parameter name="deployer"
- * type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- * required="true" validator=""
- * expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
- * description=""
+ *  type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  required="true" validator=""
+ *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  description=""
+ * @parameter
+ *  name="deploymentRepository"
+ *  type="org.apache.maven.artifact.repository.ArtifactRepository"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.distributionManagementArtifactRepository"
+ *  description=""
+ *
  */
 public class JarDeployMojo
     extends AbstractPlugin
 {
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
     {
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
 
-        //@todo this will be duplicated in case of every mojo which implements
-        // deploy goal
-        // this should be pushed into the ArtifactDeployer component
-        DistributionManagement distributionManagement = project.getDistributionManagement();
+        ArtifactRepository deploymentRepository = (ArtifactRepository) request.getParameter( "deploymentRepository" );
 
-        if ( distributionManagement == null )
+        if ( deploymentRepository == null )
         {
-            String msg = "Deployment failed: distributionManagement element" + " was not specified in the pom";
+            String msg = "Deployment failed: repository element" + " was not specified in the pom inside"
+                + " distributionManagement element";
             throw new Exception( msg );
         }
 
-        Repository repository = distributionManagement.getRepository();
-
-        if ( repository == null )
+        if ( deploymentRepository.getAuthenticationInfo() == null )
         {
-            String msg = "Deployment failed: repository element" + " was not specified in the pom inside" +
-                " distributionManagement element";
-            throw new Exception( msg );
+            getLog().warn(
+                           "Deployment repository {id: \'" + deploymentRepository.getId()
+                               + "\'} has no associated authentication info!" );
         }
-
-        ArtifactRepository deploymentRepository = new ArtifactRepository( repository.getId(), repository.getUrl() );
 
         Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
                                                  project.getPackaging() );

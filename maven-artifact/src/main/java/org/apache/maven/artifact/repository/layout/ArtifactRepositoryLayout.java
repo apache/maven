@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.repository;
+package org.apache.maven.artifact.repository.layout;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -17,19 +17,16 @@ package org.apache.maven.artifact.repository;
  * ====================================================================
  */
 
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.model.Repository;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.artifact.Artifact;
 
 /**
  * @author jdcasey
  */
-public interface ArtifactRepositoryFactory
+public interface ArtifactRepositoryLayout
 {
 
-    public static final String ROLE = ArtifactRepositoryFactory.class.getName();
+    String ROLE = ArtifactRepositoryLayout.class.getName();
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings,
-                                                       ArtifactRepositoryLayout repositoryLayout );
+    String pathOf( Artifact artifact ) throws ArtifactPathFormatException;
 
 }

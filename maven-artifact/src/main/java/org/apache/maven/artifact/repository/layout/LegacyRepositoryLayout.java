@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.repository;
+package org.apache.maven.artifact.repository.layout;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -17,19 +17,21 @@ package org.apache.maven.artifact.repository;
  * ====================================================================
  */
 
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.model.Repository;
-import org.apache.maven.settings.MavenSettings;
-
 /**
  * @author jdcasey
  */
-public interface ArtifactRepositoryFactory
+public class LegacyRepositoryLayout
+    extends AbstractArtifactRepositoryLayout
 {
 
-    public static final String ROLE = ArtifactRepositoryFactory.class.getName();
+    protected String layoutPattern()
+    {
+        return "${groupPath}/${directory}/${artifactId}-${version}-${classifier}.${extension}";
+    }
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings,
-                                                       ArtifactRepositoryLayout repositoryLayout );
+    protected String groupIdAsPath( String groupId )
+    {
+        return groupId;
+    }
 
 }

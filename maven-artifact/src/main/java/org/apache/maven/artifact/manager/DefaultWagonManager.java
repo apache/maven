@@ -80,7 +80,7 @@ public class DefaultWagonManager
 
         wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
-        wagon.put( source, path( artifact ) );
+        wagon.put( source, path( artifact, repository ) );
 
         wagon.disconnect();
 
@@ -148,7 +148,9 @@ public class DefaultWagonManager
 
                 wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
-                wagon.get( path( artifact ), temp );
+                String remotePath = path( artifact, repository );
+
+                wagon.get( remotePath, temp );
 
                 // TODO [BP]: put all disconnects in finally
                 wagon.disconnect();

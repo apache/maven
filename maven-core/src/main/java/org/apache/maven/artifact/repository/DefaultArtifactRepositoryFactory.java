@@ -17,6 +17,7 @@ package org.apache.maven.artifact.repository;
  * ====================================================================
  */
 
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Repository;
 import org.apache.maven.settings.MavenSettings;
 import org.apache.maven.settings.Server;
@@ -32,7 +33,8 @@ public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings )
+    public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings,
+                                                       ArtifactRepositoryLayout repositoryLayout )
     {
         Server repoProfile = null;
 
@@ -47,8 +49,9 @@ public class DefaultArtifactRepositoryFactory
             Logger logger = getLogger();
             if ( logger != null )
             {
-                logger.warn( "Cannot associate authentication to repository with null id. The offending repository's URL is: "
-                    + modelRepository.getUrl() );
+                logger
+                      .warn( "Cannot associate authentication to repository with null id. The offending repository's URL is: "
+                          + modelRepository.getUrl() );
             }
         }
 
@@ -66,11 +69,12 @@ public class DefaultArtifactRepositoryFactory
 
             authInfo.setPassphrase( repoProfile.getPassphrase() );
 
-            repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl(), authInfo );
+            repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl(), authInfo,
+                                           repositoryLayout );
         }
         else
         {
-            repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl() );
+            repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl(), repositoryLayout );
         }
 
         return repo;

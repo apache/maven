@@ -24,7 +24,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionException;
@@ -82,8 +81,7 @@ public class DefaultMaven
     // Project execution
     // ----------------------------------------------------------------------
 
-    public MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws ReactorException
+    public MavenExecutionResponse execute( MavenExecutionRequest request ) throws ReactorException
     {
         EventDispatcher dispatcher = request.getEventDispatcher();
         String event = MavenEvents.REACTOR_EXECUTION;
@@ -189,14 +187,9 @@ public class DefaultMaven
     }
 
     private MavenExecutionResponse processProject( MavenExecutionRequest request, MavenProject project,
-                                                   EventDispatcher dispatcher, List goals )
-        throws Exception
+                                                  EventDispatcher dispatcher, List goals ) throws Exception
     {
-        MavenSession session = createSession( request );
-
-        session.setProject( project );
-
-        session.setRemoteRepositories( getArtifactRepositories( project, request.getSettings() ) );
+        MavenSession session = createSession( request, project );
 
         resolveParameters( request );
 
@@ -254,20 +247,7 @@ public class DefaultMaven
         return response;
     }
 
-    private List getArtifactRepositories( MavenProject project, MavenSettings settings )
-    {
-        List remoteRepos = new ArrayList();
-        for ( Iterator it = project.getRepositories().iterator(); it.hasNext(); )
-        {
-            Repository modelRepo = (Repository) it.next();
-            remoteRepos.add( artifactRepositoryFactory.createArtifactRepository( modelRepo, settings ) );
-        }
-
-        return remoteRepos;
-    }
-
-    public MavenProject getProject( File pom, ArtifactRepository localRepository )
-        throws ProjectBuildingException
+    public MavenProject getProject( File pom, ArtifactRepository localRepository ) throws ProjectBuildingException
     {
         if ( pom.exists() )
         {
@@ -289,18 +269,18 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request )
+    protected MavenSession createSession( MavenExecutionRequest request, MavenProject project )
     {
-        return new MavenSession( container, pluginManager, request.getSettings(), request.getLocalRepository(),
-                                 request.getEventDispatcher(), request.getLog(), request.getGoals() );
+        return new MavenSession( project, container, pluginManager, request.getSettings(),
+                                 request.getLocalRepository(), request.getEventDispatcher(), request.getLog(),
+                                 request.getGoals() );
     }
 
     /**
      * @todo [BP] this might not be required if there is a better way to pass
      * them in. It doesn't feel quite right.
      */
-    private void resolveParameters( MavenExecutionRequest request )
-        throws ComponentLookupException
+    private void resolveParameters( MavenExecutionRequest request ) throws ComponentLookupException
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
@@ -320,8 +300,7 @@ public class DefaultMaven
     // Lifecylce Management
     // ----------------------------------------------------------------------
 
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -398,8 +377,9 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" +
-                          ( r.totalMemory() / mb ) + "M" );
+        getLogger().info(
+                          "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/"
+                              + ( r.totalMemory() / mb ) + "M" );
     }
 
     protected void line()

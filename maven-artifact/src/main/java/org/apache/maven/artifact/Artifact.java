@@ -22,7 +22,9 @@ public interface Artifact
 {
     // TODO: into scope handler
     String SCOPE_COMPILE = "compile";
+
     String SCOPE_TEST = "test";
+
     String SCOPE_RUNTIME = "runtime";
 
     String getGroupId();
@@ -34,6 +36,11 @@ public interface Artifact
     String getScope();
 
     String getType();
+
+    String getClassifier();
+
+    // only providing this since classifier is *very* optional...
+    boolean hasClassifier();
 
     String getExtension();
 

@@ -17,6 +17,7 @@ package org.apache.maven;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -36,8 +37,7 @@ public class MavenTestCase
 
     protected MavenProjectBuilder projectBuilder;
 
-    protected void setUp()
-        throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
 
@@ -70,9 +70,13 @@ public class MavenTestCase
         return resourceFile;
     }
 
-    protected ArtifactRepository getLocalRepository()
+    protected ArtifactRepository getLocalRepository() throws Exception
     {
-        ArtifactRepository r = new ArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath() );
+        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                 "legacy" );
+
+        ArtifactRepository r = new ArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath(),
+                                                       repoLayout );
 
         return r;
     }
@@ -81,14 +85,12 @@ public class MavenTestCase
     // Project building
     // ----------------------------------------------------------------------
 
-    protected MavenProject getProjectWithDependencies( File pom )
-        throws Exception
+    protected MavenProject getProjectWithDependencies( File pom ) throws Exception
     {
         return projectBuilder.buildWithDependencies( pom, getLocalRepository() );
     }
 
-    protected MavenProject getProject( File pom )
-        throws Exception
+    protected MavenProject getProject( File pom ) throws Exception
     {
         return projectBuilder.build( pom, getLocalRepository() );
     }

@@ -38,19 +38,11 @@ package org.apache.maven.plugin.deploy;
  *  description=""
  *
  * @parameter
- *  name="artifactRepositoryFactory"
- *  type="org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
+ *  name="deploymentRepository"
+ *  type="org.apache.maven.artifact.repository.ArtifactRepository"
  *  required="true"
  *  validator=""
- *  expression="#component.org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
- *  description=""
- *
- * @parameter
- *  name="settings"
- *  type="org.apache.maven.settings.MavenSettings"
- *  required="true"
- *  validator=""
- *  expression="#settings"
+ *  expression="#project.distributionManagementArtifactRepository"
  *  description=""
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>

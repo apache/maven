@@ -33,67 +33,55 @@ import java.io.File;
 /**
  * @goal deploy
  * @description deploys a pom to remote repository
- * @parameter name="project" type="org.apache.maven.project.MavenProject"
- * required="true" validator="" expression="#project" description=""
  * @parameter name="deployer"
- * type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- * required="true" validator=""
- * expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
- * description=""
+ *  type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  required="true" 
+ *  validator=""
+ *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  description=""
  * @parameter name="project"
- * type="org.apache.maven.project.MavenProject"
- * required="true"
- * validator=""
- * expression="#project"
- * description=""
+ *  type="org.apache.maven.project.MavenProject"
+ *  required="true"
+ *  validator=""
+ *  expression="#project"
+ *  description=""
  * @parameter name="deployer"
- * type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- * required="true"
- * validator=""
- * expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
- * description=""
- * @parameter name="artifactRepositoryFactory"
- * type="org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
- * required="true"
- * validator=""
- * expression="#component.org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
- * description=""
- * @parameter name="settings"
- * type="org.apache.maven.settings.MavenSettings"
- * required="true"
- * validator=""
- * expression="#settings"
- * description=""
+ *  type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  required="true"
+ *  validator=""
+ *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *  description=""
+ * @parameter
+ *  name="deploymentRepository"
+ *  type="org.apache.maven.artifact.repository.ArtifactRepository"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.distributionManagementArtifactRepository"
+ *  description=""
  */
 public class PomDeployMojo
     extends AbstractPlugin
 {
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
     {
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
 
-        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) request.getParameter(
-            "artifactRepositoryFactory" );
+        ArtifactRepository deploymentRepository = (ArtifactRepository) request.getParameter( "deploymentRepository" );
 
-        MavenSettings settings = (MavenSettings) request.getParameter( "settings" );
-
-        // TODO: validation instead
-        if ( project.getDistributionManagement() == null )
+        if ( deploymentRepository == null )
         {
-            // TODO: simple failure response
-            throw new Exception( "distributionManagement is required for deployment" );
+            String msg = "Deployment failed: repository element" + " was not specified in the pom inside"
+                + " distributionManagement element";
+            throw new Exception( msg );
         }
-        Repository repository = project.getDistributionManagement().getRepository();
-        ArtifactRepository deploymentRepository = artifactRepositoryFactory.createArtifactRepository( repository,
-                                                                                                      settings );
 
         if ( deploymentRepository.getAuthenticationInfo() == null )
         {
             getLog().warn(
-                "Deployment repository {id: \'" + repository.getId() + "\'} has no associated authentication info!" );
+                           "Deployment repository {id: \'" + deploymentRepository.getId()
+                               + "\'} has no associated authentication info!" );
         }
 
         Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),

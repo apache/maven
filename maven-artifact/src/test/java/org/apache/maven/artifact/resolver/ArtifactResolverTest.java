@@ -36,7 +36,6 @@ import java.util.Set;
 // to change them when i change the layout of the repositories. So i want to generate
 // the structure i want to test by using the artifact handler manager which dictates
 // the layout used for a particular artifact type.
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -135,15 +134,13 @@ public class ArtifactResolverTest
         return super.createArtifact( groupId, artifactId, version, type );
     }
 
-    public void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository()
-        throws Exception
+    public void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository() throws Exception
     {
         Artifact g = createLocalArtifact( "g", "1.0" );
 
         Artifact h = createLocalArtifact( "h", "1.0" );
 
-        ArtifactMetadataSource mds = new ArtifactMetadataSource()
-        {
+        ArtifactMetadataSource mds = new ArtifactMetadataSource() {
             public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             {
                 Set dependencies = new HashSet();
@@ -180,8 +177,7 @@ public class ArtifactResolverTest
         Artifact j = createRemoteArtifact( "j", "1.0" );
         deleteLocalArtifact( j );
 
-        ArtifactMetadataSource mds = new ArtifactMetadataSource()
-        {
+        ArtifactMetadataSource mds = new ArtifactMetadataSource() {
             public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             {
                 Set dependencies = new HashSet();
@@ -209,7 +205,7 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( j );
     }
 
-    public void testResolutionFailureWhenArtifactNotPresentInRemoteRepository()
+    public void testResolutionFailureWhenArtifactNotPresentInRemoteRepository() throws Exception
     {
         Artifact k = createArtifact( "k", "1.0" );
 
@@ -224,8 +220,7 @@ public class ArtifactResolverTest
         }
     }
 
-    public void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood()
-        throws Exception
+    public void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood() throws Exception
     {
         Artifact l = createRemoteArtifact( "l", "1.0" );
         deleteLocalArtifact( l );
@@ -239,17 +234,17 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( l );
     }
 
-/*
-    public void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepositoryAndLocalCannotBeCreated()
-        throws Exception
-    {
-        Artifact m = createRemoteArtifact( "m", "1.0" );
+    /*
+     public void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepositoryAndLocalCannotBeCreated()
+     throws Exception
+     {
+     Artifact m = createRemoteArtifact( "m", "1.0" );
 
-        artifactResolver.resolve( m, remoteRepositories(), badLocalRepository() );
+     artifactResolver.resolve( m, remoteRepositories(), badLocalRepository() );
 
-        // TODO [failing test case]: throw and handle a more informative exception
-    }
-*/
+     // TODO [failing test case]: throw and handle a more informative exception
+     }
+     */
 
 }
 

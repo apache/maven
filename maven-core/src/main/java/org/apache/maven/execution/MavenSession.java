@@ -30,10 +30,8 @@ import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 import org.codehaus.plexus.util.dag.Vertex;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -49,8 +47,6 @@ public class MavenSession
 
     private PluginManager pluginManager;
 
-    private Set remoteRepositories;
-
     private DAG dag;
 
     private List goals;
@@ -65,11 +61,12 @@ public class MavenSession
 
     private final MavenSettings settings;
 
-    private List remoteArtifactRepos = Collections.EMPTY_LIST;
-
-    public MavenSession( PlexusContainer container, PluginManager pluginManager, MavenSettings settings,
-        ArtifactRepository localRepository, EventDispatcher eventDispatcher, Log log, List goals )
+    public MavenSession( MavenProject project, PlexusContainer container, PluginManager pluginManager,
+                        MavenSettings settings, ArtifactRepository localRepository, EventDispatcher eventDispatcher,
+                        Log log, List goals )
     {
+        this.project = project;
+
         this.container = container;
 
         this.pluginManager = pluginManager;
@@ -102,24 +99,14 @@ public class MavenSession
         return project;
     }
 
-    public void setProject( MavenProject project )
-    {
-        this.project = project;
-    }
-
     public ArtifactRepository getLocalRepository()
     {
         return localRepository;
     }
-    
-    public void setRemoteRepositories(List remoteArtifactRepos)
-    {
-        this.remoteArtifactRepos = remoteArtifactRepos;
-    }
 
     public List getRemoteRepositories()
     {
-        return remoteArtifactRepos;
+        return project.getRemoteArtifactRepositories();
     }
 
     public List getGoals()
@@ -177,6 +164,11 @@ public class MavenSession
         List chainToHere = sorted.subList( 0, goalIndex + 1 );
 
         return chainToHere;
+    }
+
+    public List getPluginRepositories()
+    {
+        return project.getPluginArtifactRepositories();
     }
 
 }

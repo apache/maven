@@ -29,6 +29,7 @@ import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
@@ -66,8 +67,7 @@ public class MavenCli
 
     public static File userDir = new File( System.getProperty( "user.dir" ) );
 
-    public static int main( String[] args, ClassWorld classWorld )
-        throws Exception
+    public static int main( String[] args, ClassWorld classWorld ) throws Exception
     {
         // ----------------------------------------------------------------------
         // Setup the command line parser
@@ -132,12 +132,32 @@ public class MavenCli
         embedder.start( classWorld );
 
         MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
-        
-        MavenSettings settings = settingsBuilder.buildSettings();
-        
-        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup( ArtifactRepositoryFactory.ROLE );
 
-        ArtifactRepository localRepository = getLocalRepository( settings, artifactRepositoryFactory );
+        MavenSettings settings = settingsBuilder.buildSettings();
+
+        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder
+                                                                                                  .lookup( ArtifactRepositoryFactory.ROLE );
+
+        // TODO: Switch the default repository layout id to "default" when the
+        // conversion is done.
+        String repoLayoutId = "legacy";
+
+        if ( commandLine.hasOption( CLIManager.VERSION_1_REPO ) )
+        {
+            repoLayoutId = "legacy";
+        }
+
+        if ( commandLine.hasOption( CLIManager.VERSION_2_REPO ) )
+        {
+            repoLayoutId = "default";
+        }
+
+        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) embedder
+                                                                                       .lookup(
+                                                                                                ArtifactRepositoryLayout.ROLE,
+                                                                                                repoLayoutId );
+
+        ArtifactRepository localRepository = getLocalRepository( settings, artifactRepositoryFactory, repositoryLayout );
 
         if ( commandLine.hasOption( CLIManager.REACTOR ) )
         {
@@ -146,10 +166,11 @@ public class MavenCli
 
             String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
-            request =
-                new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
-                                                  commandLine.getArgList(),
-                                                  FileUtils.getFiles( userDir, includes, excludes ), userDir.getPath() );
+            request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
+                                                        commandLine.getArgList(), FileUtils.getFiles( userDir,
+                                                                                                      includes,
+                                                                                                      excludes ),
+                                                        userDir.getPath() );
         }
         else
         {
@@ -204,9 +225,9 @@ public class MavenCli
         }
     }
 
-// ----------------------------------------------------------------------
-// System properties handling
-// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // System properties handling
+    // ----------------------------------------------------------------------
 
     private static void initializeSystemProperties( CommandLine commandLine )
     {
@@ -250,9 +271,9 @@ public class MavenCli
         System.setProperty( name, value );
     }
 
-// ----------------------------------------------------------------------
-// Command line manager
-// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Command line manager
+    // ----------------------------------------------------------------------
 
     static class CLIManager
     {
@@ -276,33 +297,48 @@ public class MavenCli
 
         public static final char NON_RECURSIVE = 'N';
 
+        public static final char VERSION_1_REPO = 'A';
+
+        // TODO: this is a hack until we can get the main repo converted...
+        public static final char VERSION_2_REPO = 'a';
+
         public CLIManager()
         {
             options = new Options();
-            options.addOption( OptionBuilder.withLongOpt( "nobanner" ).withDescription( "Suppress logo banner" ).create(
-                NO_BANNER ) );
-            options.addOption( OptionBuilder.withLongOpt( "define" ).hasArg().withDescription(
-                "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
-            options.addOption( OptionBuilder.withLongOpt( "offline" ).hasArg().withDescription( "Work offline" ).create(
-                WORK_OFFLINE ) );
-            options.addOption( OptionBuilder.withLongOpt( "mojoDescriptors" ).withDescription(
-                "Display available mojoDescriptors" ).create( LIST_GOALS ) );
-            options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create(
-                HELP ) );
-            options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Build is happening offline" ).create(
-                WORK_OFFLINE ) );
-            options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
-                VERSION ) );
-            options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
-                DEBUG ) );
-            options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
-                "Execute goals for project found in the reactor" ).create( REACTOR ) );
-            options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(
-                "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
+            options.addOption( OptionBuilder.withLongOpt( "nobanner" ).withDescription( "Suppress logo banner" )
+                                            .create( NO_BANNER ) );
+            options
+                   .addOption( OptionBuilder.withLongOpt( "define" ).hasArg()
+                                            .withDescription( "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
+            options.addOption( OptionBuilder.withLongOpt( "offline" ).hasArg().withDescription( "Work offline" )
+                                            .create( WORK_OFFLINE ) );
+            options
+                   .addOption( OptionBuilder.withLongOpt( "mojoDescriptors" )
+                                            .withDescription( "Display available mojoDescriptors" ).create( LIST_GOALS ) );
+            options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" )
+                                            .create( HELP ) );
+            options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Build is happening offline" )
+                                            .create( WORK_OFFLINE ) );
+            options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" )
+                                            .create( VERSION ) );
+            options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" )
+                                            .create( DEBUG ) );
+            options.addOption( OptionBuilder.withLongOpt( "reactor" )
+                                            .withDescription( "Execute goals for project found in the reactor" )
+                                            .create( REACTOR ) );
+            options.addOption( OptionBuilder.withLongOpt( "non-recursive" )
+                                            .withDescription( "Do not recurse into sub-projects" )
+                                            .create( NON_RECURSIVE ) );
+            options.addOption( OptionBuilder.withLongOpt( "v1-local-repository" )
+                                            .withDescription( "Use legacy layout for local artifact repository" )
+                                            .create( VERSION_1_REPO ) );
+
+            options.addOption( OptionBuilder.withLongOpt( "v2-local-repository" )
+                                            .withDescription( "Use new layout for local artifact repository" )
+                                            .create( VERSION_2_REPO ) );
         }
 
-        public CommandLine parse( String[] args )
-            throws ParseException
+        public CommandLine parse( String[] args ) throws ParseException
         {
             CommandLineParser parser = new PosixParser();
             return parser.parse( options, args );
@@ -315,9 +351,9 @@ public class MavenCli
         }
     }
 
-// ----------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     protected static File getUserConfigurationDirectory()
     {
@@ -326,7 +362,7 @@ public class MavenCli
         {
             if ( !mavenUserConfigurationDirectory.mkdirs() )
             {
-//throw a configuration exception
+                //throw a configuration exception
             }
         }
         return mavenUserConfigurationDirectory;
@@ -347,8 +383,9 @@ public class MavenCli
         return mavenProperties;
     }
 
-    protected static ArtifactRepository getLocalRepository( MavenSettings settings, ArtifactRepositoryFactory repoFactory )
-        throws Exception
+    protected static ArtifactRepository getLocalRepository( MavenSettings settings,
+                                                           ArtifactRepositoryFactory repoFactory,
+                                                           ArtifactRepositoryLayout repositoryLayout ) throws Exception
     {
         Profile profile = settings.getActiveProfile();
 
@@ -361,11 +398,10 @@ public class MavenCli
         if ( localRepository == null )
         {
             String userConfigurationDirectory = System.getProperty( "user.home" ) + "/.m2";
-            localRepository =
-                new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
+            localRepository = new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
         }
 
-// TODO [BP]: this should not be necessary - grep for and remove
+        // TODO [BP]: this should not be necessary - grep for and remove
         System.setProperty( MavenConstants.MAVEN_REPO_LOCAL, localRepository );
 
         Repository repo = new Repository();
@@ -374,6 +410,6 @@ public class MavenCli
 
         repo.setUrl( "file://" + localRepository );
 
-        return repoFactory.createArtifactRepository( repo, settings );
+        return repoFactory.createArtifactRepository( repo, settings, repositoryLayout );
     }
 }

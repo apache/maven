@@ -19,6 +19,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -73,8 +74,10 @@ public class MavenProject
 
     private Set artifacts;
 
+    private List remoteArtifactRepositories;
+
     private List collectedProjects = Collections.EMPTY_LIST;
-    
+
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
     public MavenProject( Model model )
@@ -100,6 +103,16 @@ public class MavenProject
     public void setParent( MavenProject parent )
     {
         this.parent = parent;
+    }
+
+    public void setRemoteArtifactRepositories( List remoteArtifactRepositories )
+    {
+        this.remoteArtifactRepositories = remoteArtifactRepositories;
+    }
+
+    public List getRemoteArtifactRepositories()
+    {
+        return remoteArtifactRepositories;
     }
 
     public boolean hasParent()
@@ -146,6 +159,10 @@ public class MavenProject
     private List testCompileSourceRoots = new ArrayList();
 
     private List scriptSourceRoots = new ArrayList();
+
+    private List pluginArtifactRepositories;
+
+    private ArtifactRepository distMgmtArtifactRepository;
 
     public void addCompileSourceRoot( String path )
     {
@@ -237,8 +254,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals(
-                    a.getScope() ) )
+                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
                     list.add( a.getPath() );
                 }
@@ -592,8 +609,7 @@ public class MavenProject
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
      */
-    public static List getSortedProjects( List projects )
-        throws CycleDetectedException
+    public static List getSortedProjects( List projects ) throws CycleDetectedException
     {
         DAG dag = new DAG();
 
@@ -652,7 +668,7 @@ public class MavenProject
 
     public void addArtifacts( Collection newArtifacts )
     {
-//        project.getArtifacts().addAll( result.getArtifacts().values() );
+        //        project.getArtifacts().addAll( result.getArtifacts().values() );
         // We need to override the scope if one declared it higher
         // TODO: could surely be more efficient, and use the scope handler, be part of maven-artifact...
         Map artifacts = new HashMap();
@@ -669,14 +685,13 @@ public class MavenProject
             {
                 Artifact existing = (Artifact) artifacts.get( id );
                 boolean updateScope = false;
-                if ( Artifact.SCOPE_RUNTIME.equals( a.getScope() ) &&
-                    Artifact.SCOPE_TEST.equals( existing.getScope() ) )
+                if ( Artifact.SCOPE_RUNTIME.equals( a.getScope() ) && Artifact.SCOPE_TEST.equals( existing.getScope() ) )
                 {
                     updateScope = true;
                 }
 
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) &&
-                    !Artifact.SCOPE_COMPILE.equals( existing.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                    && !Artifact.SCOPE_COMPILE.equals( existing.getScope() ) )
                 {
                     updateScope = true;
                 }
@@ -685,11 +700,10 @@ public class MavenProject
                 {
                     // TODO: Artifact factory?
                     // TODO: [jc] Is this a better way to centralize artifact construction here?
-                    Artifact artifact = artifactConstructionSupport.createArtifact( existing.getGroupId(), 
-                                                                                    existing.getArtifactId(), 
-                                                                                    existing.getVersion(), 
-                                                                                    a.getScope(), 
-                                                                                    existing.getType(),
+                    Artifact artifact = artifactConstructionSupport.createArtifact( existing.getGroupId(),
+                                                                                    existing.getArtifactId(),
+                                                                                    existing.getVersion(),
+                                                                                    a.getScope(), existing.getType(),
                                                                                     existing.getExtension() );
 
                     artifacts.put( id, artifact );
@@ -702,5 +716,26 @@ public class MavenProject
         }
         setArtifacts( new HashSet( artifacts.values() ) );
     }
+
+    public void setPluginArtifactRepositories( List pluginArtifactRepositories )
+    {
+        this.pluginArtifactRepositories = pluginArtifactRepositories;
+    }
+
+    public List getPluginArtifactRepositories()
+    {
+        return pluginArtifactRepositories;
+    }
+
+    public void setDistributionManagementArtifactRepository( ArtifactRepository distMgmtArtifactRepository )
+    {
+        this.distMgmtArtifactRepository = distMgmtArtifactRepository;
+    }
+
+    public ArtifactRepository getDistributionManagementArtifactRepository()
+    {
+        return distMgmtArtifactRepository;
+    }
+
 }
 

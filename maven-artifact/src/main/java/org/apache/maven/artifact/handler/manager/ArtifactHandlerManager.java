@@ -1,8 +1,6 @@
 package org.apache.maven.artifact.handler.manager;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.Set;
 
@@ -30,14 +28,13 @@ public interface ArtifactHandlerManager
 {
     String ROLE = ArtifactHandlerManager.class.getName();
 
-    ArtifactHandler getArtifactHandler( String type )
-        throws ArtifactHandlerNotFoundException;
+    ArtifactHandler getArtifactHandler( String type ) throws ArtifactHandlerNotFoundException;
 
-    String localRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
-         throws ArtifactHandlerNotFoundException;
-
-    String path( Artifact artifact )
-        throws ArtifactHandlerNotFoundException;
+    //    String localRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
+    //         throws ArtifactHandlerNotFoundException;
+    //
+    //    String path( Artifact artifact )
+    //        throws ArtifactHandlerNotFoundException;
 
     Set getHandlerTypes();
 

@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.jar;
+package org.apache.maven.plugin.ejb;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -113,8 +113,7 @@ public class EjbMojo
     /**
      * @todo Add license files in META-INF directory.
      */
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
     {
         // ----------------------------------------------------------------------
         //
@@ -142,8 +141,8 @@ public class EjbMojo
 
         String ejbJarXmlFile = "META-INF/ejb-jar.xml";
 
-        archiver.getArchiver().addDirectory( new File( outputDirectory ), new String[]{"**/**"},
-                                             new String[]{ejbJarXmlFile, "**/package.html"} );
+        archiver.getArchiver().addDirectory( new File( outputDirectory ), new String[] { "**/**" },
+                                             new String[] { ejbJarXmlFile, "**/package.html" } );
 
         archiver.getArchiver().addFile( new File( outputDirectory, ejbJarXmlFile ), ejbJarXmlFile );
 
@@ -160,9 +159,14 @@ public class EjbMojo
 
             clientArchiver.setOutputFile( jarFile );
 
-            clientArchiver.getArchiver().addDirectory( new File( outputDirectory ), new String[]{"**/**"},
-                                                 new String[]{"**/*Bean.class", "**/*CMP.class",
-                                                              "**/*Session.class", "**/package.html"} );
+            clientArchiver.getArchiver().addDirectory(
+                                                       new File( outputDirectory ),
+                                                       new String[] { "**/**" },
+                                                       new String[] {
+                                                           "**/*Bean.class",
+                                                           "**/*CMP.class",
+                                                           "**/*Session.class",
+                                                           "**/package.html" } );
 
             // create archive
             clientArchiver.createArchive( request );

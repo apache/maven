@@ -2,6 +2,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -37,17 +38,13 @@ public class PluginParameterExpressionEvaluatorTest
     {
         String expected = getTestFile( "target/test-classes/target/classes" ).getCanonicalPath();
 
-        ArtifactRepository repo = new ArtifactRepository( "local", "here" );
+        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                 "legacy" );
+
+        ArtifactRepository repo = new ArtifactRepository( "local", "here", repoLayout );
         PluginManager mgr = (PluginManager) lookup( PluginManager.ROLE );
 
         PlexusContainer container = getContainer();
-        MavenSession session = new MavenSession( container,
-                                                 mgr,
-                                                 new MavenSettings(),
-                                                 repo,
-                                                 new DefaultEventDispatcher(),
-                                                 new DefaultLog( container.getLogger() ),
-                                                 Collections.EMPTY_LIST );
 
         Build build = new Build();
         build.setDirectory( expected.substring( 0, expected.length() - "/classes".length() ) );
@@ -58,7 +55,9 @@ public class PluginParameterExpressionEvaluatorTest
         MavenProject project = new MavenProject( model );
         project.setFile( new File( "pom.xml" ).getCanonicalFile() );
 
-        session.setProject( project );
+        MavenSession session = new MavenSession( project, container, mgr, new MavenSettings(), repo,
+                                                 new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
+                                                 Collections.EMPTY_LIST );
 
         Object value = PluginParameterExpressionEvaluator.evaluate( "#project.build.directory/classes", session );
 
@@ -74,17 +73,18 @@ public class PluginParameterExpressionEvaluatorTest
     {
         String role = "#component.org.apache.maven.project.MavenProjectBuilder";
 
-        ArtifactRepository repo = new ArtifactRepository( "test", "http://www.test.com" );
+        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                 "legacy" );
+
+        ArtifactRepository repo = new ArtifactRepository( "test", "http://www.test.com", repoLayout );
         PluginManager mgr = (PluginManager) lookup( PluginManager.ROLE );
 
         PlexusContainer container = getContainer();
-        MavenSession session = new MavenSession( container,
-                                                 mgr,
-                                                 new MavenSettings(),
-                                                 repo,
-                                                 new DefaultEventDispatcher(),
-                                                 new DefaultLog( container.getLogger() ),
+        MavenSession session = new MavenSession( null, // don't need a project for this test.
+                                                 container, mgr, new MavenSettings(), repo,
+                                                 new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
+
         Object value = PluginParameterExpressionEvaluator.evaluate( role, session );
 
         assertNotNull( value );
@@ -92,20 +92,20 @@ public class PluginParameterExpressionEvaluatorTest
 
     public void testLocalRepositoryExtraction() throws Exception
     {
-        ArtifactRepository repo = new ArtifactRepository( "local", "target/repo" );
+        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                 "legacy" );
+
+        ArtifactRepository repo = new ArtifactRepository( "local", "target/repo", repoLayout );
         PluginManager mgr = (PluginManager) lookup( PluginManager.ROLE );
 
         PlexusContainer container = getContainer();
-        MavenSession session = new MavenSession( container,
-                                                 mgr,
-                                                 new MavenSettings(),
-                                                 repo,
-                                                 new DefaultEventDispatcher(),
-                                                 new DefaultLog( container.getLogger() ),
+        MavenSession session = new MavenSession( null, // don't need a project for this test.
+                                                 container, mgr, new MavenSettings(), repo,
+                                                 new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
         Object value = PluginParameterExpressionEvaluator.evaluate( "#localRepository", session );
 
-        assertEquals( "local", ((ArtifactRepository) value).getId() );
+        assertEquals( "local", ( (ArtifactRepository) value ).getId() );
     }
 }

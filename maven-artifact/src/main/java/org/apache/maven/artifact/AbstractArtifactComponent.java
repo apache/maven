@@ -20,6 +20,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
@@ -38,15 +39,21 @@ public class AbstractArtifactComponent
         return artifactHandlerManager.getArtifactHandler( type );
     }
 
-    protected String path( Artifact artifact ) throws ArtifactHandlerNotFoundException
+    protected String path( Artifact artifact, ArtifactRepository remoteRepository ) throws ArtifactPathFormatException
     {
-        return artifactHandlerManager.path( artifact );
+        return remoteRepository.pathOf( artifact );
+    }
+
+    protected String localPath( Artifact artifact, ArtifactRepository localRepository )
+        throws ArtifactPathFormatException
+    {
+        return localRepository.getBasedir() + "/" + localRepository.pathOf( artifact );
     }
 
     protected void setLocalRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactHandlerNotFoundException
+        throws ArtifactPathFormatException
     {
-        String artifactPath = artifactHandlerManager.localRepositoryPath( artifact, localRepository );
+        String artifactPath = localPath( artifact, localRepository );
 
         artifact.setPath( artifactPath );
     }

@@ -20,6 +20,7 @@ import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -69,7 +70,7 @@ public class DefaultArtifactInstaller
         {
             throw new ArtifactInstallationException( "Error installing artifact: ", e );
         }
-        catch ( ArtifactHandlerNotFoundException e )
+        catch ( ArtifactPathFormatException e )
         {
             throw new ArtifactInstallationException( "Error installing artifact: ", e );
         }

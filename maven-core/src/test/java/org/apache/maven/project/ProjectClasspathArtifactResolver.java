@@ -20,7 +20,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.factory.DefaultArtifactFactory;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -43,7 +42,7 @@ public class ProjectClasspathArtifactResolver
         extends MavenMetadataSource
     {
         private ArtifactFactory artifactFactory = new DefaultArtifactFactory();
-        
+
         public Source( ArtifactResolver artifactResolver )
         {
             super( artifactResolver );
@@ -75,25 +74,29 @@ public class ProjectClasspathArtifactResolver
     }
 
     protected void setLocalRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactHandlerNotFoundException
     {
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-        ArtifactRepository localRepository, ArtifactMetadataSource source, ArtifactFilter filter )
+                                                        ArtifactRepository localRepository,
+                                                        ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( this ), filter );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-        ArtifactRepository localRepository, ArtifactMetadataSource source ) throws ArtifactResolutionException
+                                                        ArtifactRepository localRepository,
+                                                        ArtifactMetadataSource source )
+        throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( this ) );
     }
 
     public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-        ArtifactRepository localRepository, ArtifactMetadataSource source ) throws ArtifactResolutionException
+                                                        ArtifactRepository localRepository,
+                                                        ArtifactMetadataSource source )
+        throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifact, remoteRepositories, localRepository, new Source( this ) );
     }

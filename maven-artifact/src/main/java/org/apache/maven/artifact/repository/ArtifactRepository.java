@@ -16,6 +16,9 @@ package org.apache.maven.artifact.repository;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.repository.Repository;
 
@@ -29,14 +32,26 @@ import org.apache.maven.wagon.repository.Repository;
 public class ArtifactRepository
     extends Repository
 {
-    
-    public ArtifactRepository( String id, String url )
+
+    private final ArtifactRepositoryLayout layout;
+
+    public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
     {
         super( id, url );
+
+        this.layout = layout;
     }
 
-    public ArtifactRepository( String id, String url, AuthenticationInfo authInfo )
+    public ArtifactRepository( String id, String url, AuthenticationInfo authInfo, ArtifactRepositoryLayout layout )
     {
         super( id, url, authInfo );
+
+        this.layout = layout;
     }
+
+    public String pathOf( Artifact artifact ) throws ArtifactPathFormatException
+    {
+        return layout.pathOf( artifact );
+    }
+
 }
