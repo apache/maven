@@ -47,6 +47,7 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -199,9 +200,8 @@ public class DefaultMavenProjectBuilder
         {
             try
             {
-                project.setDistributionManagementArtifactRepository(
-                    buildDistributionManagementRepository(
-                        dm.getRepository() ) );
+                project.setDistributionManagementArtifactRepository( buildDistributionManagementRepository(
+                    dm.getRepository() ) );
             }
             catch ( Exception e )
             {
@@ -413,9 +413,11 @@ public class DefaultMavenProjectBuilder
     private Model readModel( File file )
         throws ProjectBuildingException
     {
+        FileReader reader = null;
         try
         {
-            return modelReader.read( new FileReader( file ) );
+            reader = new FileReader( file );
+            return modelReader.read( reader );
         }
         catch ( FileNotFoundException e )
         {
@@ -425,6 +427,10 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException(
                 "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
+        }
+        finally
+        {
+            IOUtil.close( reader );
         }
     }
 
