@@ -1128,21 +1128,6 @@
           <defaultValue>new ArrayList()</defaultValue>
         </field>
       </fields>
-      <codeSegments>
-        <codeSegment>
-          <version>3.0.0+</version>
-          <code>
-            public java.util.List getIncludes()
-            {
-                if ( super.getIncludes().size() == 0 )
-                {
-                    addInclude( "**/*Test.java" );
-                }
-                return super.getIncludes();
-            }
-          </code>
-        </codeSegment>
-      </codeSegments>
     </class>
     <class>
       <name>Version</name>
