@@ -88,7 +88,7 @@ public class MavenMetadataSource
                 Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(),
                                                                             artifact.getArtifactId(),
                                                                             artifact.getVersion(), artifact.getScope(),
-                                                                            "pom", "pom", null );
+                                                                            "pom", null );
 
                 artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
 

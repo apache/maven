@@ -53,7 +53,7 @@ public class DefaultArtifactFactory
     public Artifact createArtifact( Dependency dependency, ArtifactRepository localRepository, String inheritedScope )
     {
         return createArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
-                               dependency.getScope(), dependency.getType(), dependency.getType(), inheritedScope );
+                               dependency.getScope(), dependency.getType(), inheritedScope );
     }
 
 }

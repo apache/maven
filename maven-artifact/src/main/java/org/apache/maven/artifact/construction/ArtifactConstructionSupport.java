@@ -25,19 +25,14 @@ import org.apache.maven.artifact.DefaultArtifact;
  */
 public class ArtifactConstructionSupport
 {
-    
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
-        return createArtifact( groupId, artifactId, version, scope, type, type, null );
+        return createArtifact( groupId, artifactId, version, scope, type, null );
     }
-    
-    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type, String extension )
-    {
-        return createArtifact( groupId, artifactId, version, scope, type, extension, null );
-    }
-    
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
-                                    String extension, String inheritedScope )
+                                    String inheritedScope )
     {
         // TODO: can refactor, use scope handler
 
@@ -65,7 +60,7 @@ public class ArtifactConstructionSupport
         {
             desiredScope = Artifact.SCOPE_TEST;
         }
-        
-        return new DefaultArtifact( groupId, artifactId, version, desiredScope, type, extension );
+
+        return new DefaultArtifact( groupId, artifactId, version, desiredScope, type );
     }
 }

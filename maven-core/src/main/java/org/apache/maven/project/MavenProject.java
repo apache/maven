@@ -254,8 +254,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
-                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
+                    Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
                     list.add( a.getPath() );
                 }
@@ -609,7 +609,8 @@ public class MavenProject
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
      */
-    public static List getSortedProjects( List projects ) throws CycleDetectedException
+    public static List getSortedProjects( List projects )
+        throws CycleDetectedException
     {
         DAG dag = new DAG();
 
@@ -685,13 +686,14 @@ public class MavenProject
             {
                 Artifact existing = (Artifact) artifacts.get( id );
                 boolean updateScope = false;
-                if ( Artifact.SCOPE_RUNTIME.equals( a.getScope() ) && Artifact.SCOPE_TEST.equals( existing.getScope() ) )
+                if ( Artifact.SCOPE_RUNTIME.equals( a.getScope() ) &&
+                    Artifact.SCOPE_TEST.equals( existing.getScope() ) )
                 {
                     updateScope = true;
                 }
 
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() )
-                    && !Artifact.SCOPE_COMPILE.equals( existing.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) &&
+                    !Artifact.SCOPE_COMPILE.equals( existing.getScope() ) )
                 {
                     updateScope = true;
                 }
@@ -703,8 +705,7 @@ public class MavenProject
                     Artifact artifact = artifactConstructionSupport.createArtifact( existing.getGroupId(),
                                                                                     existing.getArtifactId(),
                                                                                     existing.getVersion(),
-                                                                                    a.getScope(), existing.getType(),
-                                                                                    existing.getExtension() );
+                                                                                    a.getScope(), existing.getType() );
 
                     artifacts.put( id, artifact );
                 }

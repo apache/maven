@@ -65,8 +65,8 @@ public class DefaultArtifactResolver
         try
         {
             Logger logger = getLogger();
-            logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository
-                + "}\n" + "{remoteRepositories: " + remoteRepositories + "}" );
+            logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository +
+                          "}\n" + "{remoteRepositories: " + remoteRepositories + "}" );
 
             setLocalRepositoryPath( artifact, localRepository );
 
@@ -95,9 +95,8 @@ public class DefaultArtifactResolver
     {
         StringBuffer sb = new StringBuffer();
 
-        sb.append( "The artifact is not present locally as:" ).append( LS ).append( LS ).append( artifact.getPath() )
-          .append( LS ).append( LS ).append( "or in any of the specified remote repositories:" ).append( LS )
-          .append( LS );
+        sb.append( "The artifact is not present locally as:" ).append( LS ).append( LS ).append( artifact.getPath() ).append(
+            LS ).append( LS ).append( "or in any of the specified remote repositories:" ).append( LS ).append( LS );
 
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
@@ -135,8 +134,8 @@ public class DefaultArtifactResolver
     // ----------------------------------------------------------------------
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-                                                        ArtifactRepository localRepository,
-                                                        ArtifactMetadataSource source, ArtifactFilter filter )
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         ArtifactResolutionResult artifactResolutionResult;
@@ -159,16 +158,16 @@ public class DefaultArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-                                                        ArtifactRepository localRepository,
-                                                        ArtifactMetadataSource source )
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
         return resolveTransitively( artifacts, remoteRepositories, localRepository, source, null );
     }
 
     public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-                                                        ArtifactRepository localRepository,
-                                                        ArtifactMetadataSource source )
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
         return resolveTransitively( Collections.singleton( artifact ), remoteRepositories, localRepository, source );
@@ -179,8 +178,9 @@ public class DefaultArtifactResolver
     // ----------------------------------------------------------------------
 
     private ArtifactResolutionResult collect( Set artifacts, ArtifactRepository localRepository,
-                                             List remoteRepositories, ArtifactMetadataSource source,
-                                             ArtifactFilter filter ) throws TransitiveArtifactResolutionException
+                                              List remoteRepositories, ArtifactMetadataSource source,
+                                              ArtifactFilter filter )
+        throws TransitiveArtifactResolutionException
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
 
@@ -215,14 +215,14 @@ public class DefaultArtifactResolver
 
                     // TODO: scope handler
                     boolean updateScope = false;
-                    if ( Artifact.SCOPE_RUNTIME.equals( newArtifact.getScope() )
-                        && Artifact.SCOPE_TEST.equals( knownArtifact.getScope() ) )
+                    if ( Artifact.SCOPE_RUNTIME.equals( newArtifact.getScope() ) &&
+                        Artifact.SCOPE_TEST.equals( knownArtifact.getScope() ) )
                     {
                         updateScope = true;
                     }
 
-                    if ( Artifact.SCOPE_COMPILE.equals( newArtifact.getScope() )
-                        && !Artifact.SCOPE_COMPILE.equals( knownArtifact.getScope() ) )
+                    if ( Artifact.SCOPE_COMPILE.equals( newArtifact.getScope() ) &&
+                        !Artifact.SCOPE_COMPILE.equals( knownArtifact.getScope() ) )
                     {
                         updateScope = true;
                     }
@@ -235,8 +235,7 @@ public class DefaultArtifactResolver
                                                                                         knownArtifact.getArtifactId(),
                                                                                         knownVersion,
                                                                                         newArtifact.getScope(),
-                                                                                        knownArtifact.getType(),
-                                                                                        knownArtifact.getExtension() );
+                                                                                        knownArtifact.getType() );
                         resolvedArtifacts.put( artifact.getConflictId(), artifact );
                     }
                 }
@@ -261,8 +260,8 @@ public class DefaultArtifactResolver
                     }
                     catch ( ArtifactMetadataRetrievalException e )
                     {
-                        throw new TransitiveArtifactResolutionException( "Error retrieving metadata [" + newArtifact
-                            + "] : ", e );
+                        throw new TransitiveArtifactResolutionException( "Error retrieving metadata [" + newArtifact +
+                                                                         "] : ", e );
                     }
 
                     // the pom for given dependency exisit we will add it to the

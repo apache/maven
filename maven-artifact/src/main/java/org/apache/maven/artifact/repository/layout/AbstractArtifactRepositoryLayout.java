@@ -36,7 +36,8 @@ public abstract class AbstractArtifactRepositoryLayout
 
     protected abstract String groupIdAsPath( String groupId );
 
-    public String pathOf( Artifact artifact ) throws ArtifactPathFormatException
+    public String pathOf( Artifact artifact )
+        throws ArtifactPathFormatException
     {
         String path = layoutPattern();
 
@@ -64,13 +65,13 @@ public abstract class AbstractArtifactRepositoryLayout
         }
         catch ( ArtifactHandlerNotFoundException e )
         {
-            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId()
-                + "\'.", e );
+            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId() +
+                                                   "\'.", e );
         }
 
         path = StringUtils.replace( path, "${directory}", artifactHandler.directory() );
 
-        path = StringUtils.replace( path, "${extension}", artifact.getExtension() );
+        path = StringUtils.replace( path, "${extension}", artifactHandler.extension() );
 
         return path;
     }

@@ -44,26 +44,17 @@ public class DefaultArtifact
 
     private final String scope;
 
-    private final String extension;
-
     private String path;
 
     /**
      * @todo this should be replaced by type handler
-     */
-    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
-                            String extension )
-    {
-        this( groupId, artifactId, version, scope, type, null, extension );
-    }
-
-    /**
      * !!! WARNING !!! Never put <classifier/> in the POM. It is for mojo use
      * only. Classifier is for specifying derived artifacts, like ejb-client.
      */
     public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
-                            String classifier, String extension )
+                            String classifier )
     {
+        // These should help us catch coding errors until this code gets a whole lot clearer
         if ( type == null )
         {
             throw new NullPointerException( "Artifact type cannot be null." );
@@ -80,20 +71,16 @@ public class DefaultArtifact
         this.scope = scope;
 
         this.classifier = classifier;
+    }
 
-        if ( extension == null )
-        {
-            this.extension = type;
-        }
-        else
-        {
-            this.extension = extension;
-        }
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type )
+    {
+        this( groupId, artifactId, version, scope, type, null );
     }
 
     public DefaultArtifact( String groupId, String artifactId, String version, String type )
     {
-        this( groupId, artifactId, version, null, type, null, type );
+        this( groupId, artifactId, version, null, type, null );
     }
 
     public String getClassifier()
@@ -129,11 +116,6 @@ public class DefaultArtifact
     public String getType()
     {
         return type;
-    }
-
-    public String getExtension()
-    {
-        return extension;
     }
 
     // ----------------------------------------------------------------------

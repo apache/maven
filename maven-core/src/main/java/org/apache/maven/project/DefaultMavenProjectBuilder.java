@@ -109,7 +109,8 @@ public class DefaultMavenProjectBuilder
         return build( project, localRepository, true, true );
     }
 
-    public MavenProject build( File project, ArtifactRepository localRepository ) throws ProjectBuildingException
+    public MavenProject build( File project, ArtifactRepository localRepository )
+        throws ProjectBuildingException
     {
         return build( project, localRepository, false, true );
     }
@@ -121,7 +122,8 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject build( File projectDescriptor, ArtifactRepository localRepository,
-                               boolean resolveDependencies, boolean sourceProject ) throws ProjectBuildingException
+                                boolean resolveDependencies, boolean sourceProject )
+        throws ProjectBuildingException
     {
         try
         {
@@ -156,7 +158,8 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject processProjectLogic( MavenProject project, ArtifactRepository localRepository,
-                                             List remoteRepositories, boolean resolveDependencies, boolean sourceProject )
+                                              List remoteRepositories, boolean resolveDependencies,
+                                              boolean sourceProject )
         throws ProjectBuildingException, ModelInterpolationException, ArtifactResolutionException
     {
         Model model = project.getModel();
@@ -196,9 +199,9 @@ public class DefaultMavenProjectBuilder
         {
             try
             {
-                project
-                       .setDistributionManagementArtifactRepository( buildDistributionManagementRepository( dm
-                                                                                                              .getRepository() ) );
+                project.setDistributionManagementArtifactRepository(
+                    buildDistributionManagementRepository(
+                        dm.getRepository() ) );
             }
             catch ( Exception e )
             {
@@ -249,7 +252,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject assembleLineage( File projectDescriptor, ArtifactRepository localRepository,
-                                         LinkedList lineage, List aggregatedRemoteWagonRepositories )
+                                          LinkedList lineage, List aggregatedRemoteWagonRepositories )
         throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
@@ -261,7 +264,8 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject assembleLineage( Model model, ArtifactRepository localRepository, LinkedList lineage,
-                                         List aggregatedRemoteWagonRepositories ) throws ProjectBuildingException
+                                          List aggregatedRemoteWagonRepositories )
+        throws ProjectBuildingException
     {
         MavenProject project = new MavenProject( model );
 
@@ -293,8 +297,8 @@ public class DefaultMavenProjectBuilder
             // as we go in order to do this.
             // ----------------------------------------------------------------------
 
-            aggregatedRemoteWagonRepositories
-                                             .addAll( buildArtifactRepositories( project.getModel().getRepositories() ) );
+            aggregatedRemoteWagonRepositories.addAll(
+                buildArtifactRepositories( project.getModel().getRepositories() ) );
 
             MavenProject parent;
             Model cachedModel = getCachedModel( parentModel.getGroupId(), parentModel.getArtifactId(),
@@ -315,7 +319,8 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private List buildArtifactRepositories( List repositories ) throws ProjectBuildingException
+    private List buildArtifactRepositories( List repositories )
+        throws ProjectBuildingException
     {
         MavenSettings settings = null;
 
@@ -341,7 +346,8 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ComponentLookupException e )
         {
-            throw new ProjectBuildingException( "Cannot find repository layout for: \'" + remoteRepoLayoutId + "\'.", e );
+            throw new ProjectBuildingException( "Cannot find repository layout for: \'" + remoteRepoLayoutId + "\'.",
+                                                e );
         }
         for ( Iterator i = repositories.iterator(); i.hasNext(); )
         {
@@ -358,7 +364,8 @@ public class DefaultMavenProjectBuilder
         return repos;
     }
 
-    private List buildPluginRepositories( List pluginRepositories ) throws Exception
+    private List buildPluginRepositories( List pluginRepositories )
+        throws Exception
     {
         List remotePluginRepositories = new ArrayList();
 
@@ -373,10 +380,8 @@ public class DefaultMavenProjectBuilder
         // TODO: [jc] change this to detect the repository layout type somehow...
         String repoLayoutId = "legacy";
 
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container
-                                                                                        .lookup(
-                                                                                                 ArtifactRepositoryLayout.ROLE,
-                                                                                                 repoLayoutId );
+        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container.lookup(
+            ArtifactRepositoryLayout.ROLE, repoLayoutId );
 
         ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo, settings,
                                                                                                   repositoryLayout );
@@ -386,7 +391,8 @@ public class DefaultMavenProjectBuilder
         return remotePluginRepositories;
     }
 
-    private ArtifactRepository buildDistributionManagementRepository( Repository dmRepo ) throws Exception
+    private ArtifactRepository buildDistributionManagementRepository( Repository dmRepo )
+        throws Exception
     {
         // TODO: needs to be configured from the POM element
 
@@ -395,10 +401,8 @@ public class DefaultMavenProjectBuilder
         // TODO: [jc] change this to detect the repository layout type somehow...
         String repoLayoutId = "legacy";
 
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container
-                                                                                        .lookup(
-                                                                                                 ArtifactRepositoryLayout.ROLE,
-                                                                                                 repoLayoutId );
+        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container.lookup(
+            ArtifactRepositoryLayout.ROLE, repoLayoutId );
 
         ArtifactRepository dmArtifactRepository = artifactRepositoryFactory.createArtifactRepository( dmRepo, settings,
                                                                                                       repositoryLayout );
@@ -406,7 +410,8 @@ public class DefaultMavenProjectBuilder
         return dmArtifactRepository;
     }
 
-    private Model readModel( File file ) throws ProjectBuildingException
+    private Model readModel( File file )
+        throws ProjectBuildingException
     {
         try
         {
@@ -419,12 +424,12 @@ public class DefaultMavenProjectBuilder
         catch ( Exception e )
         {
             throw new ProjectBuildingException(
-                                                "Error while reading model from file '" + file.getAbsolutePath() + "'.",
-                                                e );
+                "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
         }
     }
 
-    private Model readModel( URL url ) throws ProjectBuildingException
+    private Model readModel( URL url )
+        throws ProjectBuildingException
     {
         try
         {
@@ -444,7 +449,7 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         Artifact artifact = artifactFactory.createArtifact( parent.getGroupId(), parent.getArtifactId(),
-                                                            parent.getVersion(), null, "pom", "pom", null );
+                                                            parent.getVersion(), null, "pom", null );
 
         try
         {
@@ -453,8 +458,8 @@ public class DefaultMavenProjectBuilder
         catch ( ArtifactResolutionException e )
         {
             // @todo use parent.toString() if modello could generate it, or specify in a code segment
-            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":"
-                + parent.getArtifactId() + "-" + parent.getVersion(), e );
+            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":" +
+                                                parent.getArtifactId() + "-" + parent.getVersion(), e );
         }
 
         return artifact.getFile();
@@ -507,14 +512,16 @@ public class DefaultMavenProjectBuilder
     //
     // ----------------------------------------------------------------------
 
-    private Model getSuperModel() throws ProjectBuildingException
+    private Model getSuperModel()
+        throws ProjectBuildingException
     {
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" );
 
         return readModel( url );
     }
 
-    public void contextualize( Context context ) throws Exception
+    public void contextualize( Context context )
+        throws Exception
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }

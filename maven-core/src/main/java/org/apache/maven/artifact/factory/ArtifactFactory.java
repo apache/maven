@@ -34,5 +34,5 @@ public interface ArtifactFactory
     Artifact createArtifact( Dependency dependency, ArtifactRepository localRepository, String inheritedScope );
 
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
-                             String extension, String inheritedScope );
+                             String inheritedScope );
 }

@@ -38,7 +38,8 @@ public abstract class ArtifactComponentTestCase
 {
     protected ArtifactHandlerManager artifactHandlerManager;
 
-    protected void setUp() throws Exception
+    protected void setUp()
+        throws Exception
     {
         super.setUp();
 
@@ -47,9 +48,13 @@ public abstract class ArtifactComponentTestCase
 
     protected abstract String component();
 
-    /** Return an existing file, not a directory - causes creation to fail. 
-     * @throws Exception*/
-    protected ArtifactRepository badLocalRepository() throws Exception
+    /**
+     * Return an existing file, not a directory - causes creation to fail.
+     *
+     * @throws Exception
+     */
+    protected ArtifactRepository badLocalRepository()
+        throws Exception
     {
         String path = "target/test-classes/repositories/" + component() + "/bad-local-repository";
 
@@ -65,7 +70,8 @@ public abstract class ArtifactComponentTestCase
         return localRepository;
     }
 
-    protected ArtifactRepository localRepository() throws Exception
+    protected ArtifactRepository localRepository()
+        throws Exception
     {
         String path = "target/test-classes/repositories/" + component() + "/local-repository";
 
@@ -79,7 +85,8 @@ public abstract class ArtifactComponentTestCase
         return localRepository;
     }
 
-    protected ArtifactRepository remoteRepository() throws Exception
+    protected ArtifactRepository remoteRepository()
+        throws Exception
     {
         String path = "target/test-classes/repositories/" + component() + "/remote-repository";
 
@@ -93,7 +100,8 @@ public abstract class ArtifactComponentTestCase
         return repository;
     }
 
-    protected ArtifactRepository badRemoteRepository() throws Exception
+    protected ArtifactRepository badRemoteRepository()
+        throws Exception
     {
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
@@ -103,7 +111,8 @@ public abstract class ArtifactComponentTestCase
         return repository;
     }
 
-    protected void assertRemoteArtifactPresent( Artifact artifact ) throws Exception
+    protected void assertRemoteArtifactPresent( Artifact artifact )
+        throws Exception
     {
         ArtifactRepository remoteRepo = remoteRepository();
 
@@ -117,7 +126,8 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertLocalArtifactPresent( Artifact artifact ) throws Exception
+    protected void assertLocalArtifactPresent( Artifact artifact )
+        throws Exception
     {
         ArtifactRepository localRepo = localRepository();
 
@@ -131,7 +141,8 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertRemoteArtifactNotPresent( Artifact artifact ) throws Exception
+    protected void assertRemoteArtifactNotPresent( Artifact artifact )
+        throws Exception
     {
         ArtifactRepository remoteRepo = remoteRepository();
 
@@ -145,7 +156,8 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertLocalArtifactNotPresent( Artifact artifact ) throws Exception
+    protected void assertLocalArtifactNotPresent( Artifact artifact )
+        throws Exception
     {
         ArtifactRepository localRepo = localRepository();
 
@@ -163,7 +175,8 @@ public abstract class ArtifactComponentTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected List remoteRepositories() throws Exception
+    protected List remoteRepositories()
+        throws Exception
     {
         List remoteRepositories = new ArrayList();
 
@@ -176,7 +189,8 @@ public abstract class ArtifactComponentTestCase
     // Test artifact generation for unit tests
     // ----------------------------------------------------------------------
 
-    protected Artifact createLocalArtifact( String artifactId, String version ) throws Exception
+    protected Artifact createLocalArtifact( String artifactId, String version )
+        throws Exception
     {
         Artifact artifact = createArtifact( artifactId, version );
 
@@ -185,7 +199,8 @@ public abstract class ArtifactComponentTestCase
         return artifact;
     }
 
-    protected Artifact createRemoteArtifact( String artifactId, String version ) throws Exception
+    protected Artifact createRemoteArtifact( String artifactId, String version )
+        throws Exception
     {
         Artifact artifact = createArtifact( artifactId, version );
 
@@ -194,17 +209,20 @@ public abstract class ArtifactComponentTestCase
         return artifact;
     }
 
-    protected void createLocalArtifact( Artifact artifact ) throws Exception
+    protected void createLocalArtifact( Artifact artifact )
+        throws Exception
     {
         createArtifact( artifact, localRepository() );
     }
 
-    protected void createRemoteArtifact( Artifact artifact ) throws Exception
+    protected void createRemoteArtifact( Artifact artifact )
+        throws Exception
     {
         createArtifact( artifact, remoteRepository() );
     }
 
-    protected void createArtifact( Artifact artifact, ArtifactRepository repository ) throws Exception
+    protected void createArtifact( Artifact artifact, ArtifactRepository repository )
+        throws Exception
     {
         String path = repository.pathOf( artifact );
 
@@ -234,15 +252,17 @@ public abstract class ArtifactComponentTestCase
 
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
     {
-        return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type, type );
+        return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type );
     }
 
-    protected void deleteLocalArtifact( Artifact artifact ) throws Exception
+    protected void deleteLocalArtifact( Artifact artifact )
+        throws Exception
     {
         deleteArtifact( artifact, localRepository() );
     }
 
-    protected void deleteArtifact( Artifact artifact, ArtifactRepository repository ) throws Exception
+    protected void deleteArtifact( Artifact artifact, ArtifactRepository repository )
+        throws Exception
     {
         String path = repository.pathOf( artifact );
 

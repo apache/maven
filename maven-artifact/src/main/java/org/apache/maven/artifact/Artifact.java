@@ -42,8 +42,6 @@ public interface Artifact
     // only providing this since classifier is *very* optional...
     boolean hasClassifier();
 
-    String getExtension();
-
     // ----------------------------------------------------------------------
 
     void setPath( String path );
