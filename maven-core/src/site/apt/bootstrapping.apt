@@ -1,13 +1,10 @@
  -----
- Installing maven2
+ Bootstrapping
  -----
  The Maven Team
  -----
 
 Installing maven2
-
- * 
-
 
  * Download m2 {{{http://www.apache.org/~jvanzyl/m2/m2.tgz}here}}.
  
@@ -16,11 +13,3 @@ Installing maven2
  * Put ~/m2/bin in your path.
  
  * Run m2! i.e. <<<m2 jar:jar>>>.
-
-* Notes
-
- * Is M2_HOME required?
- 
- * Format of override needed
- 
- * All the m2 POMs are missing from ibiblio 

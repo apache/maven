@@ -1,10 +1,10 @@
----
-Goal Resolution Discussion
----
-The Maven Team
----
-21-Sept-2004
----
+ ---
+ Goal Resolution Discussion
+ ---
+ The Maven Team
+ ---
+ 21-Sept-2004
+ ---
 
   This document is intended to be a working memory of sorts for the goal 
   resolution algorithm used in Maven-2. It is not intended to supplant the 
