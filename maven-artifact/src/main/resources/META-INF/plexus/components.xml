@@ -107,5 +107,11 @@
       <implementation>org.apache.maven.artifact.handler.PomHandler</implementation>
     </component>
 
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>source</role-hint>
+      <implementation>org.apache.maven.artifact.handler.SourceHandler</implementation>
+    </component>
+
   </components>
 </component-set>
