@@ -91,20 +91,6 @@
      |
      -->
     <component>
-      <role>org.apache.maven.util.GoalWalker</role>
-      <implementation>org.apache.maven.util.GoalWalker</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.plugin.PluginManager</role>
-        </requirement>
-      </requirements>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
       <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
       <implementation>org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler</implementation>
     </component>
