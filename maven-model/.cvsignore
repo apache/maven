@@ -9,3 +9,4 @@ default.ajsym
 *.ipr
 *.iws
 *.iml
+maven.xsd
