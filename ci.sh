@@ -24,6 +24,9 @@ export JAVA_HOME=/usr/local/java
 #export M2_HOME=$HOME_DIR/m2
 export M2_HOME=$HOME/m2
 export PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin
+export MESSAGE_DIR=$HOME_DIR/public_html/m2-build-logs
+export MESSAGE_NAME=m2-build-log-${TIMESTAMP}.txt
+export MESSAGE=${MESSAGE_DIR}/${MESSAGE_NAME}
 
 # ----------------------------------------------------------------------------------
 
@@ -36,6 +39,7 @@ echo "From: $FROM" > log
 echo "To: $TO" >> log
 echo "Subject: [maven2 build] $DATE" >> log
 echo "" >> log
+echo "http://www.codehaus.org/~maven/m2-build-logs/${MESSAGE_NAME}" >> log
 
 export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 
@@ -124,7 +128,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
   
   fi
 
-) >> log 2>&1
+) >> $MESSAGE 2>&1
 
 BUILD_REQUIRED=`cat $HOME_DIR/build_required`
 
