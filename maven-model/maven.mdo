@@ -703,8 +703,9 @@
           <code>
             public String getId()
             {
-                return groupId + ":" + artifactId;
+                return groupId + ":" + artifactId + ":" + type + ":" + version;
             }
+
             public String toString()
             {
                 return groupId + "/" + type + "s:" + artifactId + "-" + version;
