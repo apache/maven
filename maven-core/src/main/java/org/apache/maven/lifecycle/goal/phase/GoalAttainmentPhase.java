@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.phase;
+package org.apache.maven.lifecycle.goal.phase;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,14 +16,16 @@ package org.apache.maven.lifecycle.phase;
  * limitations under the License.
  */
 
-import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.plugin.OgnlProjectValueExtractor;
 import org.apache.maven.plugin.Plugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,10 +37,10 @@ import java.util.Map;
  * @version $Id$
  */
 public class GoalAttainmentPhase
-    extends AbstractMavenLifecyclePhase
+    extends AbstractMavenGoalPhase
 {
     public void execute( MavenGoalExecutionContext context )
-        throws Exception
+        throws GoalExecutionException
     {
         PluginExecutionResponse response;
 
@@ -72,6 +74,14 @@ public class GoalAttainmentPhase
 
                     break;
                 }
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new GoalExecutionException( "Error looking up plugin: ", e );
+            }
+            catch ( Exception e )
+            {
+                throw new GoalExecutionException( "Error executing plugin: ", e );
             }
             finally
             {

@@ -2,7 +2,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 

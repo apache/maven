@@ -17,7 +17,7 @@ package org.apache.maven;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -28,6 +28,8 @@ import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -102,7 +104,9 @@ public class MavenTestCase
 
         project.setProperty( "foo", "bar" );
 
-        MavenSession session = new MavenSession( getContainer(), pluginManager, project, localRepository );
+        List goals = new ArrayList();
+
+        MavenSession session = new MavenSession( getContainer(), pluginManager, project, localRepository, goals );
 
         MojoDescriptor descriptor;
 

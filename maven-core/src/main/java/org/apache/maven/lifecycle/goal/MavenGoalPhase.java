@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.goal;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -17,18 +17,19 @@ package org.apache.maven.lifecycle;
  */
 
 import org.codehaus.plexus.logging.Logger;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public interface MavenLifecyclePhase
+public interface MavenGoalPhase
 {
-    String ROLE = MavenLifecyclePhase.class.getName();
+    String ROLE = MavenGoalPhase.class.getName();
 
     void execute( MavenGoalExecutionContext context )
-        throws Exception;
+        throws GoalExecutionException;
 
     void enableLogging( Logger logger );
 }

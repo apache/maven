@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.phase;
+package org.apache.maven.lifecycle.goal.phase;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -17,9 +17,12 @@ package org.apache.maven.lifecycle.phase;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.Iterator;
 
@@ -28,15 +31,17 @@ import java.util.Iterator;
  * @version $Id$
  */
 public class DependencyDownloadPhase
-    extends AbstractMavenLifecyclePhase
+    extends AbstractMavenGoalPhase
 {
     public void execute( MavenGoalExecutionContext context )
-        throws Exception
+        throws GoalExecutionException
     {
         ArtifactResolver artifactResolver = null;
 
         try
         {
+            // Once this is a property component there will be an assembly phase for
+            // this and we won't have to do this.
             artifactResolver = (ArtifactResolver) context.lookup( ArtifactResolver.ROLE );
 
             for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
@@ -47,6 +52,14 @@ public class DependencyDownloadPhase
                                           context.getRemoteRepositories(),
                                           context.getLocalRepository() );
             }
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new GoalExecutionException( "Can't lookup artifact resolver: ", e );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new GoalExecutionException( "Can't resolve artifact: ", e );
         }
         finally
         {

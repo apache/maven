@@ -16,9 +16,6 @@ package org.apache.maven.lifecycle.session;
  * limitations under the License.
  */
 
-import org.apache.maven.lifecycle.MavenLifecycleManager;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
-
 import java.util.List;
 
 /**
@@ -29,7 +26,7 @@ public interface MavenSessionPhaseManager
 {
     String ROLE = MavenSessionPhaseManager.class.getName();
 
-    void execute( MavenGoalExecutionContext context )
+    void execute( MavenSession session )
         throws Exception;
 
     List getLifecyclePhases();

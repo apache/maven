@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.goal;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.decoration.GoalDecoratorBindings;

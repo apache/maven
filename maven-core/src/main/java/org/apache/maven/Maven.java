@@ -21,6 +21,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 
 import java.io.File;
 import java.util.List;

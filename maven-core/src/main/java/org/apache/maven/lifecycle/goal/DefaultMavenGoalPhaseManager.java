@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.session;
+package org.apache.maven.lifecycle.goal;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -25,9 +25,9 @@ import java.util.List;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class DefaultMavenSessionPhaseManager
+public class DefaultMavenGoalPhaseManager
     extends AbstractLogEnabled
-    implements MavenSessionPhaseManager
+    implements MavenGoalPhaseManager
 {
     private List lifecyclePhases;
 
@@ -36,16 +36,21 @@ public class DefaultMavenSessionPhaseManager
         return lifecyclePhases;
     }
 
-    public void execute( MavenSession context )
-        throws Exception
+    public void execute( MavenGoalExecutionContext context )
+        throws GoalExecutionException
     {
         for ( Iterator iterator = lifecyclePhases.iterator(); iterator.hasNext(); )
         {
-            MavenSessionPhase phase = (MavenSessionPhase) iterator.next();
+            MavenGoalPhase phase = (MavenGoalPhase) iterator.next();
 
             phase.enableLogging( getLogger() );
 
             phase.execute( context );
+
+            if ( context.isExecutionFailure() )
+            {
+                break;
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.goal;
+
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,16 +18,20 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
- */
-public abstract class AbstractMavenLifecyclePhase
-    extends AbstractLogEnabled
-    implements MavenLifecyclePhase
+public class GoalNotFoundException
+    extends GoalExecutionException
 {
-    public abstract void execute( MavenGoalExecutionContext context )
-        throws Exception;
+    private String goalName;
+
+    public GoalNotFoundException( String goal )
+    {
+        super( "Unknown goal \"" + goal + "\"" );
+
+        this.goalName = goal;
+    }
+
+    public String getGoalName()
+    {
+        return this.goalName;
+    }
 }

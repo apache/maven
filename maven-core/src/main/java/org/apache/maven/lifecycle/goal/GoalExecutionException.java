@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.lifecycle.goal;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,20 +16,25 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-public class GoalNotFoundException
+/**
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @version $Id$
+ */
+public class GoalExecutionException
     extends Exception
 {
-    private String goalName;
-
-    public GoalNotFoundException( String goal )
+    public GoalExecutionException( String message )
     {
-        super( "Unknown goal \"" + goal + "\"" );
-
-        this.goalName = goal;
+        super( message );
     }
 
-    public String getGoalName()
+    public GoalExecutionException( Throwable cause )
     {
-        return this.goalName;
+        super( cause );
+    }
+
+    public GoalExecutionException( String message, Throwable cause )
+    {
+        super( message, cause );
     }
 }

@@ -8,6 +8,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.Set;
+import java.util.List;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -41,10 +42,13 @@ public class MavenSession
 
     private Set remoteRepositories;
 
+    private List goals;
+
     public MavenSession( PlexusContainer container,
                          PluginManager pluginManager,
                          MavenProject project,
-                         ArtifactRepository localRepository )
+                         ArtifactRepository localRepository,
+                         List goals )
     {
         this.container = container;
 
@@ -53,6 +57,8 @@ public class MavenSession
         this.project = project;
 
         this.localRepository = localRepository;
+
+        this.goals = goals;
     }
 
     public PlexusContainer getContainer()
@@ -83,6 +89,11 @@ public class MavenSession
         }
 
         return remoteRepositories;
+    }
+
+    public List getGoals()
+    {
+        return goals;
     }
 
     // ----------------------------------------------------------------------

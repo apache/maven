@@ -233,8 +233,6 @@ public class DefaultPluginManager
 
         if ( !isPluginInstalled( pluginId ) )
         {
-            System.out.println( pluginId + " is not installed. Now installing into " + localRepository.getBasedir() + " ..." );
-
             //!! This is entirely crappy. We need a better naming for plugin artifact ids and
             //   we definitely need better version extraction support.
 
@@ -251,8 +249,6 @@ public class DefaultPluginManager
     public void addPlugin( Artifact pluginArtifact )
         throws Exception
     {
-        System.out.println( "adding plugin " + pluginArtifact );
-
         artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
 
         MavenMetadataSource sr = new MavenMetadataSource( remotePluginRepositories,

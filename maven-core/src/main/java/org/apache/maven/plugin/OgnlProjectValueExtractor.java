@@ -18,7 +18,7 @@ package org.apache.maven.plugin;
 
 import ognl.Ognl;
 import ognl.OgnlException;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**

@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.phase;
+package org.apache.maven.lifecycle.goal.phase;
 
 
 /*
@@ -17,11 +17,13 @@ package org.apache.maven.lifecycle.phase;
  * limitations under the License.
  */
 
-import org.apache.maven.GoalNotFoundException;
+import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 import org.apache.maven.decoration.GoalDecorator;
 import org.apache.maven.decoration.GoalDecoratorBindings;
-import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
@@ -36,19 +38,18 @@ import java.util.Set;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class GoalResolutionPhase extends AbstractMavenLifecyclePhase
+public class GoalResolutionPhase extends AbstractMavenGoalPhase
 {
     public void execute( MavenGoalExecutionContext context )
-        throws Exception
+        throws GoalExecutionException
     {
-        PluginManager pluginManager = null;
+        PluginManager pluginManager = context.getSession().getPluginManager();
 
         try
         {
-            pluginManager = (PluginManager) context.lookup( PluginManager.ROLE );
-            
             // First, start by retrieving the currently-requested goal.
             MojoDescriptor goalDescriptor = context.getMojoDescriptor();
+
             if ( goalDescriptor == null )
             {
                 throw new GoalNotFoundException( context.getGoalName() );

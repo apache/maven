@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.phase;
+package org.apache.maven.lifecycle.goal.phase;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,11 +16,12 @@ package org.apache.maven.lifecycle.phase;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.MavenMetadataSource;
-import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 
 import java.util.Iterator;
@@ -30,10 +31,10 @@ import java.util.Iterator;
  * @version $Id$
  */
 public class DependencyResolutionPhase
-    extends AbstractMavenLifecyclePhase
+    extends AbstractMavenGoalPhase
 {
     public void execute( MavenGoalExecutionContext context )
-        throws Exception
+        throws GoalExecutionException
     {
         for ( Iterator iterator = context.getResolvedGoals().iterator(); iterator.hasNext(); )
         {
@@ -41,7 +42,14 @@ public class DependencyResolutionPhase
 
             if ( context.getMojoDescriptor( goalName ).requiresDependencyResolution() )
             {
-                resolveTransitiveDependencies( context );
+                try
+                {
+                    resolveTransitiveDependencies( context );
+                }
+                catch ( Exception e )
+                {
+                    throw new GoalExecutionException( "Can't resolve transitive dependencies: ", e );
+                }
 
                 break;
             }

@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.phase;
+package org.apache.maven.lifecycle.goal.phase;
 
 
 /*
@@ -16,10 +16,12 @@ package org.apache.maven.lifecycle.phase;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import org.apache.maven.decoration.GoalDecorationParser;
 import org.apache.maven.decoration.GoalDecoratorBindings;
-import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -33,7 +35,7 @@ import java.io.IOException;
  * @author <a href="mailto:jdcasey@commonjava.org">John Casey</a>
  * @version $Id$
  */
-public class GoalDecorationPhase extends AbstractMavenLifecyclePhase
+public class GoalDecorationPhase extends AbstractMavenGoalPhase
 {
     public static final String MAVEN_XML_DEFAULT_NAMESPACE = "mavenxml";
     public static final String MAVEN_SCRIPT = "decorators.xml";
@@ -41,31 +43,42 @@ public class GoalDecorationPhase extends AbstractMavenLifecyclePhase
     private boolean decoratorsInitialized = false;
 
     public void execute( MavenGoalExecutionContext context )
-        throws Exception
+        throws GoalExecutionException
     {
         synchronized ( this )
         {
             if ( !decoratorsInitialized )
             {
-                initializeDecorators( context );
+                try
+                {
+                    initializeDecorators( context );
+                }
+                catch ( XmlPullParserException e )
+                {
+                    throw new GoalExecutionException( "Error parsing decorators.xml: ", e );
+                }
+                catch ( IOException e )
+                {
+                    throw new GoalExecutionException( "Error reading decorators.xml file: ", e );
+                }
             }
         }
 
-        context.setGoalDecoratorBindings(decorators);
+        context.setGoalDecoratorBindings( decorators );
     }
 
     private void initializeDecorators( MavenGoalExecutionContext context )
         throws XmlPullParserException, IOException
     {
-        MavenProject project = context.getProject(  );
+        MavenProject project = context.getProject();
 
-        File pom = project.getFile(  );
+        File pom = project.getFile();
 
-        File dir = pom.getParentFile(  );
+        File dir = pom.getParentFile();
 
         File scriptFile = new File( dir, MAVEN_SCRIPT );
 
-        if ( scriptFile.exists(  ) )
+        if ( scriptFile.exists() )
         {
             BufferedReader reader = null;
 
@@ -73,7 +86,7 @@ public class GoalDecorationPhase extends AbstractMavenLifecyclePhase
             {
                 reader = new BufferedReader( new FileReader( scriptFile ) );
 
-                GoalDecorationParser parser = new GoalDecorationParser(  );
+                GoalDecorationParser parser = new GoalDecorationParser();
                 this.decorators = parser.parse( reader );
             }
             finally
@@ -82,7 +95,7 @@ public class GoalDecorationPhase extends AbstractMavenLifecyclePhase
                 {
                     try
                     {
-                        reader.close(  );
+                        reader.close();
                     }
                     catch ( IOException e )
                     {
@@ -90,7 +103,7 @@ public class GoalDecorationPhase extends AbstractMavenLifecyclePhase
                 }
             }
         }
-        
+
         decoratorsInitialized = true;
     }
 }

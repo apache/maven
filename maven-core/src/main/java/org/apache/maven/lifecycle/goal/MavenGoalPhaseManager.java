@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.goal;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,18 +16,20 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+
 import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public interface MavenLifecycleManager
+public interface MavenGoalPhaseManager
 {
-    String ROLE = MavenLifecycleManager.class.getName();
+    String ROLE = MavenGoalPhaseManager.class.getName();
 
     void execute( MavenGoalExecutionContext context )
-        throws Exception;
+        throws GoalExecutionException;
 
     List getLifecyclePhases();
 }

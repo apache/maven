@@ -1,6 +1,7 @@
 package org.apache.maven.lifecycle;
 
 import org.apache.maven.MavenTestCase;
+import org.apache.maven.lifecycle.goal.MavenGoalPhaseManager;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class MavenLifecycleManagerTest
     public void testMavenLifecycleManager()
         throws Exception
     {
-        MavenLifecycleManager mlm = (MavenLifecycleManager) lookup( MavenLifecycleManager.ROLE );
+        MavenGoalPhaseManager mlm = (MavenGoalPhaseManager) lookup( MavenGoalPhaseManager.ROLE );
 
         List lifecyclePhases = mlm.getLifecyclePhases();
 

@@ -17,8 +17,11 @@ package org.apache.maven;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
-import org.apache.maven.lifecycle.MavenLifecycleManager;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.MavenGoalPhaseManager;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.MavenGoalPhaseManager;
+import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -61,7 +64,7 @@ public class DefaultMaven
 
     private PluginManager pluginManager;
 
-    private MavenLifecycleManager lifecycleManager;
+    private MavenGoalPhaseManager lifecycleManager;
 
     private MavenProjectBuilder projectBuilder;
 
@@ -95,7 +98,8 @@ public class DefaultMaven
         MavenSession session = new MavenSession( container,
                                                  pluginManager,
                                                  project,
-                                                 getLocalRepository() );
+                                                 getLocalRepository(),
+                                                 goals );
 
         for ( Iterator iterator = goals.iterator(); iterator.hasNext(); )
         {

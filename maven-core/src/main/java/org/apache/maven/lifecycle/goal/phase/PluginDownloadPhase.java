@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.phase;
+package org.apache.maven.lifecycle.goal.phase;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,10 +16,12 @@ package org.apache.maven.lifecycle.phase;
  * limitations under the License.
  */
 
-import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * From the name of the goal we can determine the plugin that houses the
@@ -32,12 +34,20 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
  * @version $Id$
  */
 public class PluginDownloadPhase
-    extends AbstractMavenLifecyclePhase
+    extends AbstractMavenGoalPhase
 {
     public void execute( MavenGoalExecutionContext context )
-        throws Exception
+        throws GoalExecutionException
     {
-        PluginManager pluginManager = (PluginManager) context.lookup( PluginManager.ROLE );
+        PluginManager pluginManager = null;
+        try
+        {
+            pluginManager = (PluginManager) context.lookup( PluginManager.ROLE );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new GoalExecutionException( "Error looking up plugin manager: ", e );
+        }
 
         String goalName = context.getGoalName();
 
@@ -51,13 +61,18 @@ public class PluginDownloadPhase
 
         // would be good to let the plugin manager deal with all of this
 
-        pluginManager.verifyPluginForGoal( goalName );
+        try
+        {
+            pluginManager.verifyPluginForGoal( goalName );
+        }
+        catch ( Exception e )
+        {
+            throw new GoalExecutionException( "Error verifying plugin: ", e );
+        }
 
         if ( goalName.indexOf( ":" ) < 0 )
         {
             goalName = context.getProject().getType() + ":" + goalName;
-
-            System.out.println( "goalName inside plugin download phase = " + goalName );
         }
 
         MojoDescriptor md = pluginManager.getMojoDescriptor( goalName );

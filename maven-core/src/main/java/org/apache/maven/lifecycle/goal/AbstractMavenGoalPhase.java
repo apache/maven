@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.goal;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -18,39 +18,14 @@ package org.apache.maven.lifecycle;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class DefaultMavenLifecycleManager
+public abstract class AbstractMavenGoalPhase
     extends AbstractLogEnabled
-    implements MavenLifecycleManager
+    implements MavenGoalPhase
 {
-    private List lifecyclePhases;
-
-    public List getLifecyclePhases()
-    {
-        return lifecyclePhases;
-    }
-
-    public void execute( MavenGoalExecutionContext context )
-        throws Exception
-    {
-        for ( Iterator iterator = lifecyclePhases.iterator(); iterator.hasNext(); )
-        {
-            MavenLifecyclePhase phase = (MavenLifecyclePhase) iterator.next();
-
-            phase.enableLogging( getLogger() );
-
-            phase.execute( context );
-
-            if ( context.isExecutionFailure() )
-            {
-                break;
-            }
-        }
-    }
+    public abstract void execute( MavenGoalExecutionContext context )
+        throws GoalExecutionException;
 }

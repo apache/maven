@@ -1,9 +1,9 @@
 /* Created on Jul 14, 2004 */
-package org.apache.maven.lifecycle.phase;
+package org.apache.maven.lifecycle.goal.phase;
 
 import org.apache.maven.decoration.DefaultGoalDecorator;
 import org.apache.maven.decoration.GoalDecoratorBindings;
-import org.apache.maven.lifecycle.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.MavenTestCase;
 
 import java.util.ArrayList;
