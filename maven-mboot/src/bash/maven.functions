@@ -20,7 +20,7 @@ runJava()
 {
   # $1 == classpath
   # $2 == Main class
-  # $3 == Main args
+  # $3 == Mail args
 
   if $cygwin; then
     CP=`cygpath -pw "$1"`
@@ -33,20 +33,7 @@ runJava()
 
 runTests()
 {
-  # $1 == classpath
-  # $2 == home args
-  # $3 == repo local
-  # $4 == dependencies file
-  # $5 == includes file
-  # $6 == excludes file
-
-  if $cygwin; then
-    CP=`cygpath -pw "$1"`
-  else
-    CP=$1
-  fi
-  
-  "${JAVACMD}" -classpath "$CP" TestRunnerBooter "$2" "$3" $4 $5 $6
+#  TO DO 
 }
 
 compile()
@@ -153,8 +140,6 @@ buildMavenProject()
       
       fi
       
-      echo "Building tests in `pwd`"
-        
       repoLocal=`cat bootstrap.repo`
       
       if $cygwin = true; then
@@ -171,9 +156,7 @@ buildMavenProject()
       
       copyResources
       
-      echo "Running tests in `pwd`"
-        
-      runTests ".:${MBOOT_HOME}/classes:$repoLocal/junit/jars/junit-3.8.1.jar:$repoLocal/maven/jars/surefire-runner-1.0.jar:$repoLocal/plexus/jars/plexus-utils-1.0-beta-1.jar" "$home" "$repoLocal" bootstrap.libs bootstrap.tests.includes bootstrap.tests.excludes
+      runTests
       
       if [ "$2" = "default" ]
       then
@@ -182,8 +165,6 @@ buildMavenProject()
         jarName=$2
       fi
       
-      echo "Building jars (${jarName}) in `pwd`/target"
-        
       buildJar $buildDest target/${jarName}
       
       if [ -z $3 ]
@@ -192,8 +173,7 @@ buildMavenProject()
         rm -f bootstrap.libs > /dev/null 2>&1
         rm -f bootstrap.resources > /dev/null 2>&1
         rm -f bootstrap.repo > /dev/null 2>&1
-        rm -f bootstrap.tests.includes > /dev/null 2>&1
-        rm -f bootstrap.tests.excludes > /dev/null 2>&1
+        rm -f bootstrap.test > /dev/null 2>&1
       fi
     )
 }

@@ -20,7 +20,7 @@ if $cygwin = true; then
   repoLocal=`cygpath -pu "$repoLocal"`
 fi
 
-compile ".:$repoLocal/junit/jars/junit-3.8.1.jar:$repoLocal/maven/jars/surefire-runner-1.0.jar:$repoLocal/plexus/jars/plexus-utils-1.0-beta-1.jar" target/classes src/main
+compile .:$repoLocal/junit/jars/junit-3.8.1.jar:$repoLocal/maven/jars/surefire-runner-1.0.jar:$repoLocal/plexus/jars/plexus-utils-1.0-beta-1.jar target/classes src/main
 
 isCommandSuccessful $? "Failed compiling Maven bootstrapper classes!"
 
