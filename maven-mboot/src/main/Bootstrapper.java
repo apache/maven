@@ -54,7 +54,7 @@ public class Bootstrapper
         String basedir = args[0];
 
         Properties properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
-
+        
         baseUrl = properties.getProperty( "maven.repo.remote" );
 
         if ( baseUrl == null )
@@ -268,21 +268,19 @@ public class Bootstrapper
             // ignore
         }
 
-        return null;
+        return new Properties();
     }
 
     private static Properties loadProperties( InputStream is )
     {
+        Properties properties = new Properties();
+        
         try
         {
-            Properties properties = new Properties();
-
             if ( is != null )
             {
                 properties.load( is );
             }
-
-            return properties;
         }
         catch ( IOException e )
         {
@@ -303,7 +301,7 @@ public class Bootstrapper
             }
         }
 
-        return null;
+        return properties;
     }
 
     static class BootstrapPomParser
