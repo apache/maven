@@ -2,7 +2,7 @@ package org.apache.maven.plugin.jar;
 
 /**
  *
- * Copyright 2004 The Apache Software Foundation
+ * Copyright 2004-2005 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,254 +17,152 @@ package org.apache.maven.plugin.jar;
  *  limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractPlugin;
-import org.codehaus.plexus.util.DirectoryScanner;
+import org.apache.maven.plugin.PluginExecutionRequest;
+import org.apache.maven.project.MavenProject;
+
+import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Base class for tasks that build archives in JAR file format.
  *
+ * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Revision$ $Date$
  */
 public abstract class AbstractJarMojo
     extends AbstractPlugin
 {
-    private byte[] buffer = new byte[4096];
-
     /**
-     * Add artifacts from tagged dependencies to the archive.
-     * @param includes a map <String, File> of items to be include in the outpur
-     * @param project  the project object model
-     * @param tag      the property tag to look for; for example "jar.bundle"
-     * @param pathTag  the property tag that specifies the target path; for example, jar.target.path
+     * Return a pre-configured manifest
+     * @todo Add user attributes list and user groups list
      */
-
-    /*
-    protected void addTaggedDependencies(Map includes, MavenProject project, String tag, String pathTag) {
-        addTaggedDependencies(includes, "", project, tag, pathTag);
-    }
-    */
-
-    /**
-     * Add artifacts from tagged dependencies to the archive. For example, the definition:
-     * <code>
-     * <dependency>
-     * <artifactId>my-library</artifactId>
-     * <version>1.0.1</version>
-     * <property>
-     * <jar>my-library.jar
-     * <property>
-     * </dependency>
-     * </code>
-     * would result in the archive <code>my-library-1.0.1.jar</code> being included
-     * in the output jar as /my-library.jar. The entry name will default to the base
-     * name of the archive in the root: <code>/my-library-1.0.1.jar</code>
-     *
-     * @param includes a map <String, File> of items to be include in the outpur
-     * @param prefix   to be added to the jar entry name of each item included
-     * @param project  the project object model
-     * @param tag      the property tag to look for; for example "jar.bundle"
-     * @param pathTag  the property tag that specifies the target path; for example, jar.target.path
-     */
-
-    /*
-    protected void addTaggedDependencies(Map includes, String prefix, MavenProject project, String tag, String pathTag) {
-        for (Iterator i = project.getArtifacts().iterator(); i.hasNext();) {
-            Artifact artifact = (Artifact) i.next();
-            Properties properties = artifact.getDependency().getProperties();
-            if (Boolean.valueOf(properties.getProperty(tag)).booleanValue()) {
-                File file = new File(artifact.getPath());
-                String targetPath = properties.getProperty(pathTag, file.getName());
-                includes.put(prefix + targetPath, file);
-            }
-        }
-    }
-    */
-
-    /**
-     * Add all files in the specified directory to the archive.
-     *
-     * @param includes a map <String, File> of items to be include in the outpur
-     * @param baseDir  the directory to add
-     */
-    protected void addDirectory( Map includes, File baseDir ) throws IOException
+    public Manifest getManifest( PluginExecutionRequest request )
+        throws Exception
     {
-        addDirectory( includes, "", baseDir );
-    }
+        MavenProject project = (MavenProject)request.getParameter("project");
 
-    /**
-     * Add all files in the specified directory to the archive.
-     *
-     * @param includes a map <String, File> of items to be include in the outpur
-     * @param prefix   value to be added to the front of jar entry names
-     * @param baseDir  the directory to add
-     */
-    protected void addDirectory( Map includes, String prefix, File baseDir ) throws IOException
-    {
-        addDirectory( includes, null, null, prefix, baseDir );
-    }
+        String mainClass = (String) request.getParameter( "mainClass" );
 
-    /**
-     * Add all files in the specified directory to the archive.
-     *
-     * @param includes        a map <String, File> of items to be include in the outpur
-     * @param includesPattern Sets the list of include patterns to use
-     * @param excludesPattern Sets the list of exclude patterns to use
-     * @param prefix          value to be added to the front of jar entry names
-     * @param baseDir         the directory to add
-     */
-    protected void addDirectory( Map includes, String includesPattern, String excludesPattern, String prefix, File baseDir )
-        throws IOException
-    {
-        if ( !baseDir.exists() )
-        {
-            return;
-        }
+        boolean addClasspath = new Boolean( (String) request.getParameter( "addClasspath" ) ).booleanValue();
 
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir( baseDir );
-        if ( includesPattern != null )
-        {
-            scanner.setIncludes( StringUtils.split( includesPattern, "," ) );
-        }
+        boolean addExtensions = new Boolean( (String) request.getParameter( "addExtensions" ) ).booleanValue();
 
-        if ( excludesPattern != null )
-        {
-            scanner.setExcludes( StringUtils.split( excludesPattern, "," ) );
-        }
-        scanner.scan();
-        String[] files = scanner.getIncludedFiles();
-        for ( int i = 0; i < files.length; i++ )
-        {
-            String file = files[i];
-            file = file.replace( '\\', '/' ); // todo shouldn't the scanner return platform independent names?
-            includes.put( prefix + file, new File( baseDir, file ) );
-        }
-    }
+        // Added basic entries
+        Manifest m = new Manifest();
+        Manifest.Attribute buildAttr = new Manifest.Attribute( "Built-By", System.getProperty( "user.name" ) );
+        m.addConfiguredAttribute( buildAttr );
+        Manifest.Attribute createdAttr = new Manifest.Attribute( "Created-By", "Apache Maven" );
+        m.addConfiguredAttribute( createdAttr );
+        Manifest.Attribute packageAttr = new Manifest.Attribute( "Package", project.getPackage() );
+        m.addConfiguredAttribute( packageAttr );
+        Manifest.Attribute buildJdkAttr = new Manifest.Attribute( "Build-Jdk", System.getProperty( "java.version" ) );
+        m.addConfiguredAttribute( buildJdkAttr );
 
-    /**
-     * Create the jar file specified and include the listed files.
-     *
-     * @param jarFile  the jar file to create
-     * @param includes a Map<String, File>of items to include; the key is the jar entry name
-     * @throws IOException if there is a problem writing the archive or reading the sources
-     */
-    protected void createJar( File jarFile, Map includes ) throws IOException
-    {
-        File parentJarFile = jarFile.getParentFile();
-        if ( !parentJarFile.exists() )
+        if ( addClasspath )
         {
-            parentJarFile.mkdirs();
-        }
-        JarOutputStream jos = createJar( jarFile, createManifest() );
-        try
-        {
-            addEntries( jos, includes );
-        }
-        finally
-        {
-            jos.close();
-        }
-    }
-
-    /**
-     * Create a manifest for the jar file
-     *
-     * @return a default manifest; the Manifest-Version and Created-By attributes are initialized
-     */
-    protected Manifest createManifest()
-    {
-        Manifest mf = new Manifest();
-        Attributes attrs = mf.getMainAttributes();
-        attrs.putValue( Attributes.Name.MANIFEST_VERSION.toString(), "1.0" );
-        attrs.putValue( "Created-By", "2.0 (Apache Maven)" );
-        return mf;
-    }
-
-    /**
-     * Create the specified jar file and return a JarOutputStream to it
-     *
-     * @param jarFile the jar file to create
-     * @param mf      the manifest to use
-     * @return a JarOutputStream that can be used to write to that file
-     * @throws IOException if there was a problem opening the file
-     */
-    protected JarOutputStream createJar( File jarFile, Manifest mf ) throws IOException
-    {
-        jarFile.getParentFile().mkdirs();
-        FileOutputStream fos = new FileOutputStream( jarFile );
-        try
-        {
-            return new JarOutputStream( fos, mf );
-        }
-        catch ( IOException e )
-        {
-            try
+            StringBuffer classpath = new StringBuffer();
+            List dependencies = project.getDependencies();
+    
+            for ( Iterator iter = dependencies.iterator(); iter.hasNext(); )
             {
-                fos.close();
-                jarFile.delete();
-            }
-            catch ( IOException e1 )
-            {
-                // ignore
-            }
-            throw e;
-        }
-    }
+                Dependency dependency = (Dependency) iter.next();
+                Properties properties = dependency.getProperties();
+                if ( Boolean.valueOf(properties.getProperty("jar.manifest.classpath")).booleanValue())
+                {
+                    if (classpath.length() > 0 )
+                    {
+                        classpath.append( " " );
+                    }
 
-    /**
-     * Add all entries in the supplied Map to the jar
-     *
-     * @param jos      a JarOutputStream that can be used to write to the jar
-     * @param includes a Map<String, File> of entries to add
-     * @throws IOException if there is a problem writing the archive or reading the sources
-     */
-    protected void addEntries( JarOutputStream jos, Map includes ) throws IOException
-    {
-        for ( Iterator i = includes.entrySet().iterator(); i.hasNext(); )
-        {
-            Map.Entry entry = (Map.Entry) i.next();
-            String name = (String) entry.getKey();
-            File file = (File) entry.getValue();
-            addEntry( jos, name, file );
-        }
-    }
-
-    /**
-     * Add a single entry to the jar
-     *
-     * @param jos    a JarOutputStream that can be used to write to the jar
-     * @param name   the entry name to use; must be '/' delimited
-     * @param source the file to add
-     * @throws IOException if there is a problem writing the archive or reading the sources
-     */
-    protected void addEntry( JarOutputStream jos, String name, File source ) throws IOException
-    {
-        FileInputStream fis = new FileInputStream( source );
-        try
-        {
-            jos.putNextEntry( new JarEntry( name ) );
-            int count;
-            while ( ( count = fis.read( buffer ) ) > 0 )
-            {
-                jos.write( buffer, 0, count );
+                    // TODO replace dependency by artifact
+                    classpath.append( dependency.getArtifactId() + "-" + dependency.getVersion() + ".jar");
+                }
             }
-            jos.closeEntry();
+            
+            Manifest.Attribute classpathAttr = new Manifest.Attribute( "Class-Path", classpath.toString() );
+            m.addConfiguredAttribute( classpathAttr );
         }
-        finally
+
+        // Added supplementary entries
+        Manifest.Attribute extensionNameAttr = new Manifest.Attribute( "Extension-Name", project.getArtifactId() );
+        m.addConfiguredAttribute( extensionNameAttr );
+        
+        if ( project.getShortDescription() != null )
         {
-            fis.close();
+            Manifest.Attribute specificationTitleAttr = new Manifest.Attribute( "Specification-Title", project.getShortDescription() );
+            m.addConfiguredAttribute( specificationTitleAttr );
         }
+        
+        if ( project.getOrganization() != null )
+        {
+            Manifest.Attribute specificationVendor = new Manifest.Attribute( "Specification-Vendor", project.getOrganization().getName() );
+            m.addConfiguredAttribute( specificationVendor );
+            Manifest.Attribute implementationVendorAttr = new Manifest.Attribute( "Implementation-Vendor", project.getOrganization().getName() );
+            m.addConfiguredAttribute( implementationVendorAttr );
+        }
+
+        Manifest.Attribute implementationTitleAttr = new Manifest.Attribute( "Implementation-Title", project.getArtifactId() );
+        m.addConfiguredAttribute( implementationTitleAttr );
+        Manifest.Attribute implementationVersionAttr = new Manifest.Attribute( "Implementation-Version", project.getVersion() );
+        m.addConfiguredAttribute( implementationVersionAttr );
+
+        if ( mainClass != null && ! "".equals( mainClass ) )
+        {
+            Manifest.Attribute mainClassAttr = new Manifest.Attribute( "Main-Class", mainClass );
+            m.addConfiguredAttribute( mainClassAttr );
+        }
+
+        // Added extensions
+        if ( addExtensions )
+        {
+            StringBuffer extensionsList = new StringBuffer();
+            Set artifacts = project.getArtifacts();
+
+            for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+            {
+                Artifact artifact = (Artifact) iter.next();
+                if ( "jar".equals( artifact.getType() ) )
+                {
+                    if (extensionsList.length() > 0 )
+                    {
+                        extensionsList.append( " " );
+                    }
+                    extensionsList.append( artifact.getArtifactId() );
+                }
+            }
+
+            if (extensionsList.length() > 0 )
+            {
+                Manifest.Attribute extensionsListAttr = new Manifest.Attribute( "Extension-List", extensionsList.toString() );
+                m.addConfiguredAttribute( extensionsListAttr );
+            }
+            
+            for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+            {
+                Artifact artifact = (Artifact) iter.next();
+                if ( "jar".equals( artifact.getType() ) )
+                {
+                    Manifest.Attribute archExtNameAttr = new Manifest.Attribute( artifact.getArtifactId()
+                        + "-Extension-Name", artifact.getArtifactId() );
+                    m.addConfiguredAttribute( archExtNameAttr );
+                    Manifest.Attribute archImplVersionAttr = new Manifest.Attribute( artifact.getArtifactId()
+                        + "-Implementation-Version", artifact.getVersion() );
+                    m.addConfiguredAttribute( archImplVersionAttr );
+                    Manifest.Attribute archImplUrlAttr = new Manifest.Attribute( artifact.getArtifactId()
+                        + "-Implementation-URL", "http://www.ibiblio.org/maven/" + artifact.toString() );
+                    m.addConfiguredAttribute( archImplUrlAttr );
+                }
+            }
+        }
+
+        return m;
     }
 }

@@ -1,7 +1,7 @@
 package org.apache.maven.plugin.jar;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,24 +20,67 @@ import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
 
+import org.codehaus.plexus.archiver.jar.JarArchiver;
+
 import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @goal jar
  *
  * @description build a jar
  *
- * @prereq surefire:test
- * @prereq resources:resources
- *
  * @parameter
  *  name="jarName"
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#maven.final.name"
+ *  expression="#project.build.finalName"
+ *  description=""
+ * @parameter
+ *  name="compress"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.jar.compress"
+ *  default="true"
+ *  description=""
+ * @parameter
+ *  name="index"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.jar.index"
+ *  default="false"
+ *  description=""
+ * @parameter
+ *  name="manifest"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.jar.manifest"
+ *  description=""
+ * @parameter
+ *  name="mainClass"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.jar.mainClass"
+ *  description=""
+ * @parameter
+ *  name="addClasspath"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.jar.addClasspath"
+ *  default="false"
+ *  description=""
+ * @parameter
+ *  name="addExtensions"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.jar.addExtensions"
+ *  default="false"
  *  description=""
  * @parameter
  *  name="outputDirectory"
@@ -61,12 +104,15 @@ import java.util.Map;
  *  expression="#project"
  *  description="current MavenProject instance"
  *
- * @author <a href="michal@codehaus">Michal Maczka</a>
+ * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
  */
 public class JarMojo
     extends AbstractJarMojo
 {
+    /**
+     * @todo Add license files in META-INF directory.
+     */
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
@@ -74,11 +120,19 @@ public class JarMojo
         //
         // ----------------------------------------------------------------------
 
+        MavenProject project = (MavenProject)request.getParameter("project");
+
+        String manifest = (String) request.getParameter( "manifest" );
+
         File basedir = new File( (String) request.getParameter( "basedir" ) );
 
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
         String jarName = (String) request.getParameter( "jarName" );
+
+        boolean compress = new Boolean( (String) request.getParameter( "compress" ) ).booleanValue();
+
+        boolean index = new Boolean( (String) request.getParameter( "index" ) ).booleanValue();
 
         // ----------------------------------------------------------------------
         //
@@ -87,13 +141,24 @@ public class JarMojo
 
         File jarFile = new File( basedir, jarName + ".jar" );
 
-        Map includes = new LinkedHashMap();
-        
-        addDirectory(includes, "**/**", "**/package.html", "", new File( outputDirectory ) );
-        
-        MavenProject project = (MavenProject)request.getParameter("project");
-        includes.put("META-INF/maven/pom.xml", project.getFile());
-        
-        createJar( jarFile, includes );
+        JarArchiver archiver = new JarArchiver();
+        archiver.addDirectory( new File( outputDirectory ), new String[] { "**/**" }, new String[] { "**/package.html" } );
+        archiver.addFile( project.getFile(), "META-INF/maven/pom.xml" );
+
+        if (manifest != null && ! "".equals( manifest ) )
+        {
+            File manifestFile = new File( manifest );
+            archiver.setManifest( manifestFile );
+        }
+
+        // Configure the jar
+        archiver.addConfiguredManifest( getManifest( request ) );
+
+        archiver.setCompress( compress );
+        archiver.setIndex( index );
+        archiver.setDestFile( jarFile );
+
+        // create archive
+        archiver.createArchive();
     }
 }
