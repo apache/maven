@@ -133,11 +133,11 @@ public class MavenCli
         embedder.start( classWorld );
 
         UserModelBuilder userModelBuilder = (UserModelBuilder) embedder.lookup( UserModelBuilder.ROLE );
-        
+
         UserModel userModel = userModelBuilder.buildUserModel();
-        
-        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder
-                                                                                                  .lookup( ArtifactRepositoryFactory.ROLE );
+
+        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
+            ArtifactRepositoryFactory.ROLE );
 
         ArtifactRepository localRepository = getLocalRepository( userModel, artifactRepositoryFactory );
 
@@ -162,6 +162,11 @@ public class MavenCli
             }
             request = new DefaultMavenExecutionRequest( localRepository, userModel, eventDispatcher,
                                                         commandLine.getArgList(), files, userDir.getPath() );
+
+            if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
+            {
+                request.setRecursive( false );
+            }
         }
 
         LoggerManager manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
@@ -271,6 +276,8 @@ public class MavenCli
 
         private Options options = null;
 
+        public static final char NON_RECURSIVE = 'N';
+
         public CLIManager()
         {
             options = new Options();
@@ -292,6 +299,8 @@ public class MavenCli
                 DEBUG ) );
             options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
                 "Execute goals for project found in the reactor" ).create( REACTOR ) );
+            options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(
+                "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
         }
 
         public CommandLine parse( String[] args )
@@ -360,7 +369,7 @@ public class MavenCli
 
 // TODO [BP]: this should not be necessary - grep for and remove
         System.setProperty( MavenConstants.MAVEN_REPO_LOCAL, localRepository );
-        
+
         Repository repo = new Repository();
 
         repo.setId( "local" );

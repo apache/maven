@@ -52,4 +52,8 @@ public interface MavenExecutionRequest
     UserModel getUserModel();
 
     String getBaseDirectory();
+
+    void setRecursive( boolean recursive );
+
+    boolean isRecursive();
 }

@@ -96,7 +96,7 @@ public class DefaultMaven
 
             try
             {
-                projects = collectProjects( request.getFiles(), request.getLocalRepository() );
+                projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive() );
 
                 projects = projectBuilder.getSortedProjects( projects );
 
@@ -155,7 +155,7 @@ public class DefaultMaven
         }
     }
 
-    private List collectProjects( List files, ArtifactRepository localRepository )
+    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive )
         throws ProjectBuildingException, ReactorException, IOException
     {
         List projects = new ArrayList( files.size() );
@@ -166,7 +166,7 @@ public class DefaultMaven
 
             MavenProject project = getProject( file, localRepository );
 
-            if ( project.getModules() != null && !project.getModules().isEmpty() )
+            if ( project.getModules() != null && !project.getModules().isEmpty() && recursive )
             {
                 project.setPackaging( "pom" );
 
@@ -178,7 +178,7 @@ public class DefaultMaven
                 }
 
                 List moduleFiles = FileUtils.getFiles( project.getFile().getParentFile(), includes, null );
-                List collectedProjects = collectProjects( moduleFiles, localRepository );
+                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }

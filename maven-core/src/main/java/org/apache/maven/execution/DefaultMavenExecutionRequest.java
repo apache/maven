@@ -51,6 +51,8 @@ public class DefaultMavenExecutionRequest
 
     private final String baseDirectory;
 
+    private boolean recursive = true;
+
     public DefaultMavenExecutionRequest( ArtifactRepository localRepository, UserModel userModel,
                                          EventDispatcher eventDispatcher, List goals, List files, String baseDirectory )
     {
@@ -75,6 +77,16 @@ public class DefaultMavenExecutionRequest
     public String getBaseDirectory()
     {
         return baseDirectory;
+    }
+
+    public boolean isRecursive()
+    {
+        return recursive;
+    }
+
+    public void setRecursive( boolean recursive )
+    {
+        this.recursive = false;
     }
 
     public ArtifactRepository getLocalRepository()
