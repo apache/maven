@@ -514,6 +514,11 @@ public class MavenProject
         return model.getRepositories();
     }
 
+    public String getLocalRepositoryPath()
+    {
+        return getLocalRepository().getBasedir();
+    }
+
     public ArtifactRepository getLocalRepository()
     {
         if ( wagonLocalRepository == null && model.getLocal() != null && model.getLocal().getRepository() != null )
