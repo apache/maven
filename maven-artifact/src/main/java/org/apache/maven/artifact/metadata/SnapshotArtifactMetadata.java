@@ -113,15 +113,18 @@ public class SnapshotArtifactMetadata
     public String getVersion()
     {
         String version = artifact.getVersion();
-        if ( version != null )
+        if ( timestamp != null )
         {
-            version = StringUtils.replace( version, "SNAPSHOT", timestamp );
+            if ( version != null )
+            {
+                version = StringUtils.replace( version, "SNAPSHOT", timestamp ) + "-" + buildNumber;
+            }
+            else
+            {
+                version = timestamp + "-" + buildNumber;
+            }
         }
-        else
-        {
-            version = timestamp;
-        }
-        return version + "-" + buildNumber;
+        return version;
     }
 
     public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager )

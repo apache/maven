@@ -214,11 +214,18 @@ public class DefaultArtifactResolver
             throw new ArtifactResolutionException( "Error transitively resolving artifacts: ", e );
         }
 
-        for ( Iterator i = artifactResolutionResult.getArtifacts().values().iterator(); i.hasNext(); )
+        // TODO: this is unclean, but necessary as long as resolve may return a different artifact
+        Map collectedArtifacts = artifactResolutionResult.getArtifacts();
+        Map resolvedArtifacts = new HashMap( collectedArtifacts.size() );
+        for ( Iterator i = collectedArtifacts.keySet().iterator(); i.hasNext(); )
         {
-            // TODO: resolve may modify artifacts, do we need to get the new list?
-            resolve( (Artifact) i.next(), remoteRepositories, localRepository );
+            Object key = i.next();
+            resolvedArtifacts.put( key, resolve( (Artifact) collectedArtifacts.get( key ), remoteRepositories,
+                                                 localRepository ) );
         }
+
+        collectedArtifacts.clear();
+        collectedArtifacts.putAll( resolvedArtifacts );
 
         return artifactResolutionResult;
     }

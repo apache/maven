@@ -49,12 +49,17 @@ public class SnapshotTransformation
                                          ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        if ( isSnapshot( artifact ) && !alreadyResolved( artifact ) )
+        if ( isSnapshot( artifact ) )
         {
             // TODO: this mostly works, however...
             //  - poms and jars are different, so both are checked individually
             //  - when a pom is downloaded, it prevents the JAR getting downloaded because of the timestamp
             //  - need to gather first, group them all up by groupId/artifactId, then go after them
+            //  - alternatively, keep the timestamp when downloading (as is done here), and use the SNAPSHOT file for install
+            //  - however, there is no mechanism to flip back and forward, and presently it keeps looking for 2.0-TIMESTAMP-0 instead as that is in the build file
+
+            //  - we definitely need the manual/daily check as this is quite slow given the large number of snapshots inside m2 presently
+
 /*
             SnapshotArtifactMetadata localMetadata;
             try
@@ -70,32 +75,37 @@ public class SnapshotTransformation
                 throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
             }
 
-            boolean foundRemote = false;
-            for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+            if ( !alreadyResolved( artifact ) )
             {
-                ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
-
-                SnapshotArtifactMetadata remoteMetadata = SnapshotArtifactMetadata.createRemoteSnapshotMetadata(
-                    artifact );
-                remoteMetadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
-
-                if ( remoteMetadata.compareTo( localMetadata ) > 0 )
+                boolean foundRemote = false;
+                for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
                 {
-                    // TODO: investigate transforming this in place, in which case resolve can return void
-                    artifact = createArtifactCopy( artifact, remoteMetadata );
-                    artifact.setRepository( remoteRepository );
+                    ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
 
-                    localMetadata = remoteMetadata;
-                    foundRemote = true;
+                    SnapshotArtifactMetadata remoteMetadata = SnapshotArtifactMetadata.createRemoteSnapshotMetadata(
+                        artifact );
+                    remoteMetadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
+
+                    if ( remoteMetadata.compareTo( localMetadata ) > 0 )
+                    {
+                        // TODO: investigate transforming this in place, in which case resolve can return void
+                        artifact.setRepository( remoteRepository );
+
+                        localMetadata = remoteMetadata;
+                        foundRemote = true;
+                    }
+                }
+
+                if ( foundRemote )
+                {
+                    artifact.addMetadata( localMetadata );
                 }
             }
 
-            if ( foundRemote )
-            {
-                artifact.addMetadata( localMetadata );
-            }
-*/
+            artifact = createArtifactCopy( artifact, localMetadata );
+
             resolvedArtifactCache.add( getCacheKey( artifact ) );
+*/
         }
         return artifact;
     }
@@ -140,15 +150,21 @@ public class SnapshotTransformation
 
     private Artifact createArtifactCopy( Artifact artifact, SnapshotArtifactMetadata metadata )
     {
+        ArtifactRepository oldRepository = artifact.getRepository();
         List list = artifact.getMetadataList();
+
         artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), metadata.getVersion(),
                                         artifact.getScope(), artifact.getType(), artifact.getClassifier() );
+
         for ( Iterator i = list.iterator(); i.hasNext(); )
         {
             ArtifactMetadata m = (ArtifactMetadata) i.next();
             m.setArtifact( artifact );
             artifact.addMetadata( m );
         }
+
+        artifact.setRepository( oldRepository );
+
         return artifact;
     }
 
