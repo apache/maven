@@ -9,3 +9,5 @@ mkdir ${buildDir}
 javac -d ${buildDir} @sources.txt
 
 ( cd ${buildDir} ; jar -cf ../mboot.jar -m ../manifest.txt * )
+
+cp mboot.jar ..
