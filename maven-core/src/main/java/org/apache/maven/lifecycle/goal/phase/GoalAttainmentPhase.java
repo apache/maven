@@ -127,7 +127,10 @@ public class GoalAttainmentPhase
                 map.put( key, value );
             }
 
-            map = mergeProjectDefinedPluginConfiguration( context.getProject(), goal.getId(), map );
+            if ( context.getProject() != null )
+            {
+                map = mergeProjectDefinedPluginConfiguration( context.getProject(), goal.getId(), map );
+            }
         }
 
         for ( int i = 0; i < parameters.size(); i++ )
