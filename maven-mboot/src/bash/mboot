@@ -1,9 +1,5 @@
 #!/bin/sh
 
-[ -z $MBOOT_HOME ] && echo && echo "You must set MBOOT_HOME to use mboot!" && echo && exit
-
-. ${MBOOT_HOME}/maven.functions
-
 VERSION=1.0
 
 dir="."
@@ -42,6 +38,10 @@ while [ $# -gt 0 ]; do
 
     shift
 done
+
+[ -z $MBOOT_HOME ] && echo && echo "You must set MBOOT_HOME to use mboot!" && echo && exit
+
+. ${MBOOT_HOME}/maven.functions
 
 [ ! -d $dir ] && echo "Specified directory doesn't exist!" && exit
 
