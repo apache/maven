@@ -231,7 +231,7 @@ public class DefaultArtifactResolver
                     }
                     catch ( ArtifactMetadataRetrievalException e )
                     {
-                        throw new TransitiveArtifactResolutionException( "Error retrieving metadata: ", e );
+                        throw new TransitiveArtifactResolutionException( "Error retrieving metadata [" + newArtifact + "] : ", e );
                     }
 
                     // the pom for given dependency exisit we will add it to the queue
