@@ -267,11 +267,13 @@ public class DefaultMavenProjectBuilder
                                           List aggregatedRemoteWagonRepositories )
         throws ProjectBuildingException
     {
+        aggregatedRemoteWagonRepositories.addAll( buildArtifactRepositories( model.getRepositories() ) );
+
         MavenProject project = new MavenProject( model );
 
         lineage.addFirst( project );
 
-        Parent parentModel = project.getModel().getParent();
+        Parent parentModel = model.getParent();
 
         if ( parentModel != null )
         {
@@ -296,9 +298,6 @@ public class DefaultMavenProjectBuilder
             // have any repository information ... I think we might have to inherit
             // as we go in order to do this.
             // ----------------------------------------------------------------------
-
-            aggregatedRemoteWagonRepositories.addAll(
-                buildArtifactRepositories( project.getModel().getRepositories() ) );
 
             MavenProject parent;
             Model cachedModel = getCachedModel( parentModel.getGroupId(), parentModel.getArtifactId(),
