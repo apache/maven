@@ -190,7 +190,11 @@
         </field>
         <field>
           <name>organization</name>
-          <description>Umbrella organization for the project.</description>
+          <description>
+            This element describes various attributes of the organziation to
+            which the project belongs.  These attributes are utilized when
+            documentation is created (for copyright notices and links).
+          </description>
           <type>Organization</type>
         </field>
       </fields>
@@ -244,10 +248,20 @@
     </class>
     <class>
       <name>Branch</name>
+      <description>
+        This element describes each of the branches of the
+        project. Each branch is described by a <code>tag</code>
+        element
+      </description>
       <fields>
         <field>
           <name>tag</name>
-          <description>the description</description>
+          <description>
+            The branch tag in the version control system
+            (e.g. cvs) used by the project for the source
+            code associated with this branch of the
+            project.
+          </description>
           <type>String</type>
         </field>
       </fields>
@@ -413,6 +427,13 @@
     </class>
     <class>
       <name>MailingList</name>
+      <description>
+        This element describes all of the mailing lists associated with
+        a project.  Each mailing list is described by a
+        <code>mailingList</code> element, which is then described by
+        additional elements (described below).  The auto-generated site
+        documentation references this information.
+      </description>
       <fields>
         <field>
           <name>name</name>
@@ -574,6 +595,11 @@
     </class>
     <class>
       <name>Version</name>
+      <description>
+        This element describes each of the previous versions of the
+        project. Each version is described by a <code>version</code>
+        element
+      </description>
       <fields>
         <field>
           <name>name</name>
