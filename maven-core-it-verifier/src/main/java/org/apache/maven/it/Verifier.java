@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -28,21 +30,51 @@ public class Verifier
     //
     // ----------------------------------------------------------------------
 
+    public static String interpolate( String text, Map namespace )
+    {
+        Iterator keys = namespace.keySet().iterator();
+
+        while ( keys.hasNext() )
+        {
+            String key = keys.next().toString();
+
+            Object obj = namespace.get( key );
+
+            String value = obj.toString();
+
+            text = replace( text, "${" + key + "}", value );
+
+            if ( key.indexOf( " " ) == -1 )
+            {
+                text = replace( text, "$" + key, value );
+            }
+        }
+        return text;
+    }
+
     public void verify()
         throws VerificationException
     {
-        Properties mavenProperties = new Properties();
+        Properties properties = new Properties();
 
         try
         {
-            mavenProperties.load( new FileInputStream( new File( System.getProperty( "user.home" ), "maven.properties" ) ) );
+            properties.load( new FileInputStream( new File( System.getProperty( "user.home" ), "maven.properties" ) ) );
+
+            for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
+            {
+                String key = (String) i.next();
+
+                properties.setProperty( key, interpolate( properties.getProperty( key ), System.getProperties() ) );
+            }
+
         }
         catch ( IOException e )
         {
             throw new VerificationException( "Can't find the maven.properties file! Verification can't proceed!" );
         }
 
-        mavenRepoLocal = mavenProperties.getProperty( "maven.repo.local" );
+        mavenRepoLocal = properties.getProperty( "maven.repo.local" );
 
         try
         {
