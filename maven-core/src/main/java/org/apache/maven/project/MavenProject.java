@@ -547,5 +547,15 @@ public class MavenProject
     {
         return model.getPostGoals();
     }
+
+    // ----------------------------------------------------------------------
+    // Plugins
+    // ----------------------------------------------------------------------
+
+    
+    public List getPlugins()
+    {
+        return model.getPlugins();
+    }
 }
 

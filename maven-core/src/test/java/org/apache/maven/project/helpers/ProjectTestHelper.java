@@ -61,8 +61,6 @@ public class ProjectTestHelper
 
         assertEquals( "http://maven.apache.org/", project.getUrl() );
 
-
-
         // ----------------------------------------------------------------------
         // Distribution
         // ----------------------------------------------------------------------

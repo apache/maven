@@ -9,9 +9,10 @@
   <plugins>
     <plugin>
       <id>plexus</id>
+      <version>1.0</version>
       <configuration>
         <plexusConfiguration>src/conf/plexus.conf</plexusConfiguration>
-        <plexusConfigurationPropertiesFile>src/conf/plexus.conf</plexusConfigurationPropertiesFile>        
+        <plexusConfigurationPropertiesFile>src/conf/plexus.properties</plexusConfigurationPropertiesFile>
         <plexusApplicationName>Continuum</plexusApplicationName>
       </configuration>
     </plugin>

@@ -21,6 +21,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.PostGoal;
 import org.apache.maven.model.PreGoal;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.Plugin;
 
 import java.util.Iterator;
 import java.util.List;
@@ -264,6 +265,21 @@ public class DefaultModelInheritanceAssembler
             if ( !childRepositories.contains( repository ) )
             {
                 child.addRepository( repository );
+            }
+        }
+
+        // Plugins :: aggregate
+        List parentPlugins = parent.getPlugins();
+
+        List childPlugins = child.getPlugins();
+
+        for ( Iterator iterator = parentPlugins.iterator(); iterator.hasNext(); )
+        {
+            Plugin plugin = (Plugin) iterator.next();
+
+            if ( !childPlugins.contains( plugin ) )
+            {
+                child.addPlugin( plugin );
             }
         }
     }
