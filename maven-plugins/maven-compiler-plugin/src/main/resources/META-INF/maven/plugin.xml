@@ -1,6 +1,7 @@
 <plugin>
   <id>compiler</id>
   <implementation>org.apache.maven.plugin.CompilerPlugin</implementation>
+  <instantiation-strategy>per-lookup</instantiation-strategy>
   <requirements>
     <requirement>
       <role>org.codehaus.plexus.compiler.Compiler</role>
