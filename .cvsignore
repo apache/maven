@@ -3,3 +3,4 @@ target
 .classpath
 .project
 bootstrap.repo
+maven-component.i*
