@@ -57,7 +57,7 @@
   </distributionManagement>
   <modules>
 <!--
-    <module>maven-assemble-plugin</module>
+    <module>maven-assembly-plugin</module>
 -->
     <module>maven-clean-plugin</module>
     <module>maven-compiler-plugin</module>

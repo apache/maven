@@ -84,7 +84,7 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-assemble-plugin</artifactId>
+        <artifactId>maven-assembly-plugin</artifactId>
         <version>1.0-SNAPSHOT</version>
         <configuration>
           <descriptor>src/assemble/bin.xml</descriptor>
