@@ -69,6 +69,11 @@ public class JavacCompiler
 
         args.add( getClasspathString( config.getClasspathEntries() ) );
 
+        if ( config.isDebug() )
+        {
+            args.add( "-g" );
+        }
+
         Iterator it = compilerOptions.entrySet().iterator();
 
         while ( it.hasNext() )
