@@ -9,7 +9,7 @@
   <currentVersion>2.0-SNAPSHOT</currentVersion>
   <gumpRepositoryId>jakarta</gumpRepositoryId>
   <description>Maven components parent</description>
-  <shortDescription></shortDescription>
+  <shortDescription>Maven components parent</shortDescription>
   <url>http://maven.apache.org</url>
   
   <organization>
