@@ -26,7 +26,6 @@ public class MBoot
     
     String[] bootstrapDeps = new String[]
     {
-        "maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar",
         "junit/jars/junit-3.8.1.jar",
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
