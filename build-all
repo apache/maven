@@ -1,0 +1,7 @@
+#!/bin/sh
+
+( cd wagon ; maven jar:install )
+( cd maven-model ; maven jar:install )
+( cd maven-model-tools ; maven jar:install )
+( cd maven-project ; maven jar:install )
+( cd maven-artifact ; maven jar:install )
