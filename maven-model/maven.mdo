@@ -232,9 +232,9 @@
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
-          <name>repository</name>
+          <name>scm</name>
           <description>Specification for the SCM use by the project.</description>
-          <type>Repository</type>
+          <type>Scm</type>
           <comment>This element needs to be renamed as it conflicts with the existing notion of repositories in Maven.</comment>
         </field>
         <field>
@@ -681,7 +681,7 @@
       </fields>
     </class>
     <class>
-      <name>Repository</name>
+      <name>Scm</name>
       <fields>
         <field>
           <name>connection</name>
