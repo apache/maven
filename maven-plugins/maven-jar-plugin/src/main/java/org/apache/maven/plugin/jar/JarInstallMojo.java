@@ -39,15 +39,13 @@ import java.io.File;
  *  validator=""
  *  expression="#maven.final.name"
  *  description=""
- *
  * @parameter
- *   name="outputDirectory"
- *   type="String"
- *   required="true"
- *   validator=""
- *   expression="#maven.build.dir"
- *   description=""
- *
+ *  name="outputDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.directory"
+ *  description=""
  * @parameter
  *  name="project"
  *  type="org.apache.maven.project.MavenProject"
@@ -55,7 +53,6 @@ import java.io.File;
  *  validator=""
  *  expression="#project"
  *  description=""
- *
  * @parameter
  *  name="installer"
  *  type="org.apache.maven.artifact.installer.ArtifactInstaller"
@@ -63,30 +60,23 @@ import java.io.File;
  *  validator=""
  *  expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
  *  description=""
- *
- *
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
- * @version $Id$
  */
 public class JarInstallMojo
-        extends AbstractPlugin
+    extends AbstractPlugin
 {
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-            throws Exception
+        throws Exception
     {
+        String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
-        String outputDirectory = ( String ) request.getParameter( "outputDirectory" );
+        String jarName = (String) request.getParameter( "jarName" );
 
-        String jarName = ( String ) request.getParameter( "jarName" );
+        File jarFile = new File( outputDirectory, jarName + ".jar" );
 
-        File jarFile = new File( outputDirectory , jarName + ".jar" );
+        MavenProject project = (MavenProject) request.getParameter( "project" );
 
-        MavenProject project = ( MavenProject ) request.getParameter( "project"  );
-
-        ArtifactInstaller artifactInstaller = ( ArtifactInstaller ) request.getParameter( "component.org.apache.maven.artifact.installer.ArtifactInstaller"  );
+        ArtifactInstaller artifactInstaller = (ArtifactInstaller) request.getParameter( "installer" );
 
         artifactInstaller.install( jarFile, "jar", project );
-
     }
-
 }
