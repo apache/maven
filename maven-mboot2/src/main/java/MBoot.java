@@ -47,11 +47,27 @@ public class MBoot
         "junit/jars/junit-3.8.1.jar",
         "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
         "surefire/jars/surefire-1.2-SNAPSHOT.jar",
-        "modello/jars/modello-1.0-SNAPSHOT.jar",
+        "modello/jars/modello-core-1.0-SNAPSHOT.jar",
+        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
+        "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
+        "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
         "xpp3/jars/xpp3-1.1.3.3.jar",
         "xstream/jars/xstream-1.0-SNAPSHOT.jar",
         "qdox/jars/qdox-1.2.jar",
         "maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar"
+    };
+
+    String[] modelloDeps = new String[]
+    {
+        "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
+        "plexus/jars/plexus-0.16.jar",
+        "maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
+        "modello/jars/modello-core-1.0-SNAPSHOT.jar",
+//        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
+        "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
+        "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
+        "xpp3/jars/xpp3-1.1.3.3.jar",
+        "xstream/jars/xstream-1.0-SNAPSHOT.jar"
     };
 
     String[] plexusDeps = new String[]
@@ -446,9 +462,13 @@ public class MBoot
 
             generateSources( model.getAbsolutePath(), "java", generatedSources, "3.0.0", "true" );
 
-            generateSources( model.getAbsolutePath(), "xpp3", generatedSources, "4.0.0", "false" );
+            generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, "4.0.0", "false" );
 
-            generateSources( model.getAbsolutePath(), "xpp3", generatedSources, "3.0.0", "true" );
+            generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, "3.0.0", "true" );
+
+            generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, "4.0.0", "false" );
+
+            generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, "3.0.0", "true" );
         }
 
         // ----------------------------------------------------------------------
@@ -576,7 +596,23 @@ public class MBoot
     private void generateSources( String model, String mode, String dir, String modelVersion, String packageWithVersion )
         throws Exception
     {
-        Class c = cl.loadClass( "org.codehaus.modello.Modello" );
+        IsolatedClassLoader modelloClassLoader = new IsolatedClassLoader();
+
+        for ( Iterator i = Arrays.asList( modelloDeps ).iterator(); i.hasNext(); )
+        {
+            String dependency = (String) i.next();
+
+            File f = new File( repoLocal, dependency );
+            if ( !f.exists() )
+            {
+                throw new FileNotFoundException( "Missing dependency: " + dependency + 
+                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
+            }
+
+            modelloClassLoader.addURL( f.toURL() );
+        }
+
+        Class c = modelloClassLoader.loadClass( "org.codehaus.modello.ModelloCli" );
 
         Object generator = c.newInstance();
 
@@ -586,7 +622,7 @@ public class MBoot
 
         ClassLoader old = Thread.currentThread().getContextClassLoader();
 
-        Thread.currentThread().setContextClassLoader( cl );
+        Thread.currentThread().setContextClassLoader( modelloClassLoader );
 
         m.invoke( generator, new Object[]{args} );
 

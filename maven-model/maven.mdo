@@ -20,10 +20,14 @@
   <id>maven</id>
   <name>Maven</name>
   <description>Maven's model for Java project.</description>
-  <packageName>org.apache.maven.model</packageName>
-  <root>Model</root>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.model</value>
+    </default>
+  </defaults>
   <classes>
-    <class>
+    <class rootElement="true">
       <name>Model</name>
       <version>3.0.0+</version>
       <fields>
@@ -41,7 +45,9 @@
           <name>parent</name>
           <version>4.0.0</version>
           <description>Specified which project to extend.</description>
-          <type>Parent</type>
+          <association>
+            <type>Parent</type>
+          </association>
           <comment></comment>
         </field>
         <field>
@@ -148,13 +154,17 @@
           <name>issueManagement</name>
           <version>4.0.0</version>
           <description>The project's issue management information.</description>
-          <type>IssueManagement</type>
+          <association>
+            <type>IssueManagement</type>
+          </association>
         </field>
         <field>
           <name>ciManagement</name>
           <version>4.0.0</version>
           <description>The project's continuous integration management information.</description>
-          <type>CiManagement</type>
+          <association>
+            <type>CiManagement</type>
+          </association>
         </field>
         <field>
           <name>inceptionYear</name>
@@ -200,26 +210,29 @@
           <name>repositories</name>
           <version>4.0.0</version>
           <description>The lists of the remote repositories</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
-<!-- @todo this will not current parse. We want to have a repository element inside here, but it expects a PluginRepository class. Need a way for modello to specify the list tag -->
-<!--
         <field>
           <name>pluginRepositories</name>
           <version>4.0.0</version>
           <description>The lists of the remote repositories for discovering plugins</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
           <comment>This may be removed or relocated in the near future. It is undecided whether plugins really need a remote repository set of their own.</comment>
         </field>
--->
         <field>
           <name>mailingLists</name>
           <version>3.0.0+</version>
           <description>The mailing lists for the project.</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>MailingList</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>developers</name>
@@ -231,8 +244,10 @@
             additional elements (described below).  The auto-generated site
             documentation references this information.
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Developer</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>contributors</name>
@@ -244,8 +259,10 @@
             elements (described below).  The auto-generated site documentation
             references this information.
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Contributor</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>dependencies</name>
@@ -256,8 +273,10 @@
             <code>dependency</code> element, which is then described by
             additional elements (described below).
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
           <comment>These should ultimately only be compile time dependencies when transitive dependencies come into play.</comment>
         </field>
         <field>
@@ -269,8 +288,10 @@
             <code>override</code> element, which is then described by
             additional elements (described below).
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Override</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>licenses</name>
@@ -282,29 +303,37 @@
             references this information.  Projects should only list the license(s) that
             applies to the project and not the licenses that apply to dependencies.
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>License</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>versions</name>
           <version>3.0.0</version>
           <description>The released versions of the project.</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Version</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>branches</name>
           <version>3.0.0</version>
           <description>The SCM branches create for the project.</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Branch</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>packageGroups</name>
           <version>3.0.0+</version>
           <description>Package groups required for complete javadocs.</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>PackageGroup</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>reports</name>
@@ -317,20 +346,26 @@
             reports will be included in the navigation bar for browsing in
             the order they are specified.
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>scm</name>
           <version>4.0.0</version>
           <description>Specification for the SCM use by the project.</description>
-          <type>Scm</type>
+          <association>
+            <type>Scm</type>
+          </association>
         </field>
         <field>
           <name>repository</name>
           <version>3.0.0</version>
           <description>Specification for the SCM use by the project.</description>
-          <type>Repository</type>
+          <association>
+            <type>Repository</type>
+          </association>
           <comment>This element needs to be renamed as it conflicts with the existing notion of repositories in Maven.</comment>
         </field>
         <field>
@@ -338,7 +373,9 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description>Information required to build the project.</description>
-          <type>Build</type>
+          <association>
+            <type>Build</type>
+          </association>
         </field>
         <field>
           <name>organization</name>
@@ -348,20 +385,26 @@
             which the project belongs.  These attributes are utilized when
             documentation is created (for copyright notices and links).
           </description>
-          <type>Organization</type>
+          <association>
+            <type>Organization</type>
+          </association>
         </field>
         <field>
           <name>distributionManagement</name>
           <version>4.0.0</version>
           <description>Distribution information for a project.</description>
-          <type>DistributionManagement</type>
+          <association>
+            <type>DistributionManagement</type>
+          </association>
         </field>
         <field>
           <name>local</name>
           <version>4.0.0</version>
           <required>false</required>
           <description>Local configuration information.</description>
-          <type>Local</type>
+          <association>
+            <type>Local</type>
+          </association>
         </field>
         <!-- @todo long run 4.0.0 may not need properties, with the parameters being specified
           for the plugin directly -->
@@ -372,22 +415,29 @@
             Properties about the project. This allows you to configure your project and the
             plugins it uses.
           </description>
-          <type>java.util.Properties</type>
-          <defaultValue>new Properties()</defaultValue>
+          <type>Properties</type>
+          <association mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>preGoals</name>
           <version>4.0.0</version>
           <description>Set of decorator(s) injected before the target goal(s).</description>
-          <type>java.util.List</type>
-          <defaultValue>new java.util.ArrayList()</defaultValue>
+          <association>
+            <type>PreGoal</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>postGoals</name>
           <version>4.0.0</version>
           <description>Set of decorator(s) injected after the target goal(s).</description>
-          <type>java.util.List</type>
-          <defaultValue>new java.util.ArrayList()</defaultValue>
+          <association>
+            <type>PostGoal</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
       <!-- We need this because we can't use package as a field name. -->
@@ -565,16 +615,20 @@
             to exclude or include various source depending on the environment
             the build is running in.
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>SourceModification</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>unitTest</name>
           <version>3.0.0+</version>
           <required>true</required>
           <description>This element specifies unit tests associated with the project.</description>
-          <type>UnitTest</type>
           <defaultValue>new UnitTest()</defaultValue>
+          <association>
+            <type>UnitTest</type>
+          </association>
         </field>
         <field>
           <name>resources</name>
@@ -586,8 +640,10 @@
             <a href="#resource">below</a>). These resources are used to
             complete the jar file or to run unit test.
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>directory</name>
@@ -686,8 +742,10 @@
             <code>role</code> element, the body of which is a
             role name.
           </description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>timezone</name>
@@ -786,8 +844,11 @@
             in
             <code>WEB-INF/lib</code>. For example syntax, check the war plugin docs.
           </description>
-          <type>java.util.Properties</type>
-          <defaultValue>new Properties()</defaultValue>
+          <type>Properties</type>
+          <association mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
       <codeSegments>
@@ -979,13 +1040,17 @@
           <name>repository</name>
           <version>4.0.0</version>
           <description>Information needed for deploying to remote repository artifacts generated by the project</description>
-          <type>Repository</type>
+          <association>
+            <type>Repository</type>
+          </association>
         </field>
         <field>
           <name>site</name>
           <description>Information needed for deploying website files of the project.</description>
           <version>4.0.0</version>
-          <type>Site</type>
+          <association>
+            <type>Site</type>
+          </association>
         </field>
       </fields>
     </class>
@@ -1088,8 +1153,10 @@
           <name>archives</name>
           <version>4.0.0</version>
           <description>The link to a URL where you can browse the archive.</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
       <comment>
@@ -1157,15 +1224,19 @@
           <name>includes</name>
           <version>3.0.0+</version>
           <description>the description</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>excludes</name>
           <version>3.0.0+</version>
           <description>the description</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
       <codeSegments>
@@ -1300,8 +1371,10 @@
           <name>branches</name>
           <version>4.0.0</version>
           <description>The SCM branches that are currently active for the project. These should only be those forked from the current branch or trunk that are intended to be used.</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
     </class>
@@ -1335,26 +1408,10 @@
           <name>filtering</name>
           <version>3.0.0+</version>
           <description>Describe if resources are filtered or not.</description>
-          <type>String</type>
+          <type>boolean</type>
           <defaultValue>false</defaultValue>
         </field>
       </fields>
-      <codeSegments>
-        <codeSegment>
-          <version>3.0.0+</version>
-          <code>
-            public boolean isFiltering()
-            {
-                return !"false".equals( filtering );
-            }
-
-            public void setFiltering( boolean filtering )
-            {
-                this.filtering = ( filtering ? "true" : "false" );
-            }
-          </code>
-        </codeSegment>
-      </codeSegments>
     </class>
     <class>
       <name>SourceModification</name>
@@ -1390,8 +1447,10 @@
           <name>resources</name>
           <version>3.0.0+</version>
           <description>the description</description>
-          <type>java.util.List</type>
-          <defaultValue>new ArrayList()</defaultValue>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
     </class>
@@ -1591,29 +1650,11 @@
             Whether to run the build online. If not, no remote repositories are consulted for plugins or dependencies
             and this configuration may be used by other plugins requiring online access.
           </description>
-          <type>String</type>
+          <type>boolean</type>
           <defaultValue>true</defaultValue>
           <!-- @todo systemProperty tag (maven.online value) should be supported by modello -->
         </field>
       </fields>
-      <!-- @todo primitive types should be supported natively -->
-      <codeSegments>
-        <codeSegment>
-          <version>4.0.0</version>
-          <code>
-            public boolean isOnline()
-            {
-                // Only the value false is offline - anything else is online
-                return !"false".equals( online );
-            }
-
-            public void setOnline( boolean online )
-            {
-                this.online = ( online ? "true" : "false" );
-            }
-          </code>
-        </codeSegment>
-      </codeSegments>
     </class>
   </classes>
 </model>
