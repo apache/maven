@@ -39,6 +39,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.velocity.VelocityComponent;
 
 /**
@@ -202,13 +203,17 @@ public class DefaultArchetype
     {
         File f;
 
+        template = StringUtils.replace( template, "\\", "/" );
+
         if ( packageInFileName && packageName != null )
         {
+            String templateFileName = StringUtils.replace( template, "/", File.separator );
+
             String path = packageName.replace( '.', '/' );
 
-            String filename = FileUtils.filename( template );
+            String filename = FileUtils.filename( templateFileName );
 
-            String dirname = FileUtils.dirname( template );
+            String dirname = FileUtils.dirname( templateFileName );
 
             f = new File( new File( new File( outputDirectory, dirname ), path ), filename );
         }
