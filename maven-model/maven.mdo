@@ -164,7 +164,12 @@
         </field>
         <field>
           <name>dependencies</name>
-          <description>The project's dependencies.</description>
+          <description>
+            This element describes all of the dependencies associated with a
+            project.  Each dependency is described by a
+            <code>dependency</code> element, which is then described by
+            additional elements (described below).
+          </description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
           <comment>These should ultimately only be compile time dependencies when transitive dependencies come into play.</comment>
@@ -427,22 +432,32 @@
       <fields>
         <field>
           <name>groupId</name>
-          <description>the description</description>
+          <description>
+            The project group that produced the dependency, e.g. <code>geronimo</code>.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
-          <description>the description</description>
+          <description>
+            The unique id for an artifact produced by the project group, e.g.
+            <code>germonimo-jms</code>
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
-          <description>the description</description>
+          <description>
+            The version of the dependency., e.g. <code>3.2.1</code>
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
-          <description>the description</description>
+          <description>
+            This url will be provided to the user if the jar file cannot be downloaded
+            from the central repository.
+          </description>
           <type>String</type>
           <comment>The URL should really be gleaned from a shared database of dependency information.</comment>
         </field>
@@ -453,13 +468,22 @@
         </field>
         <field>
           <name>type</name>
-          <description>The type of dependency.</description>
+          <description>
+            Other known and recognised dependency types are:
+            <code>ejb</code> and <code>plugin</code>.
+          </description>
           <type>String</type>
           <defaultValue>jar</defaultValue>
         </field>
         <field>
           <name>properties</name>
-          <description>Properties for this dependency.</description>
+          <description>
+            Properties about the dependency. Various plugins allow you to
+            <code>mark</code> dependencies with properties. For example the
+            <a href="plugins/war/index.html">war</a> plugin looks for a
+            <code>war.bundle</code> property, and if found will include the dependency
+            in <code>WEB-INF/lib</code>. For example syntax, check the war plugin docs.
+          </description>
           <type>java.util.Properties</type>
           <defaultValue>new Properties()</defaultValue>
         </field>
