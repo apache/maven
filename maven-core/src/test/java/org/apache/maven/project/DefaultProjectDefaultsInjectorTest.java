@@ -27,8 +27,6 @@ import java.util.Properties;
 
 /**
  * @author jdcasey
- *         <p/>
- *         Created on Feb 1, 2005
  */
 public class DefaultProjectDefaultsInjectorTest
 extends TestCase
@@ -53,6 +51,7 @@ extends TestCase
         def.setGroupId( dep.getGroupId() );
         def.setArtifactId( dep.getArtifactId() );
         def.setVersion( "1.0.1" );
+        def.setFile( "file" );
 
         DependencyManagement depMgmt = new DependencyManagement();
 
@@ -203,6 +202,70 @@ extends TestCase
 
         Dependency result = (Dependency) deps.get( 0 );
         assertEquals( "value", result.getProperties().getProperty( "test" ) );
+    }
+
+    public void testShouldMergeDefaultFileWhenDependencyDoesntSupplyFile()
+    {
+        Model model = new Model();
+
+        Dependency dep = new Dependency();
+        dep.setGroupId( "myGroup" );
+        dep.setArtifactId( "myArtifact" );
+        dep.setVersion( "1.0.1" );
+        dep.setFile( "file" );
+
+        model.addDependency( dep );
+
+        Dependency def = new Dependency();
+        def.setGroupId( dep.getGroupId() );
+        def.setArtifactId( dep.getArtifactId() );
+
+        DependencyManagement depMgmt = new DependencyManagement();
+
+        depMgmt.addDependency( def );
+
+        model.setDependencyManagement( depMgmt );
+
+        new DefaultModelDefaultsInjector().injectDefaults( model );
+
+        List deps = model.getDependencies();
+        assertEquals( 1, deps.size() );
+
+        Dependency result = (Dependency) deps.get( 0 );
+
+        assertEquals( "file", result.getFile() );
+    }
+
+    public void testShouldNotMergeDefaultFileWhenDependencySuppliesFile()
+    {
+        Model model = new Model();
+
+        Dependency dep = new Dependency();
+        dep.setGroupId( "myGroup" );
+        dep.setArtifactId( "myArtifact" );
+        dep.setVersion( "1.0.1" );
+        dep.setFile( "file" );
+
+        model.addDependency( dep );
+
+        Dependency def = new Dependency();
+        def.setGroupId( dep.getGroupId() );
+        def.setArtifactId( dep.getArtifactId() );
+        def.setFile( "default" );
+
+        DependencyManagement depMgmt = new DependencyManagement();
+
+        depMgmt.addDependency( def );
+
+        model.setDependencyManagement( depMgmt );
+
+        new DefaultModelDefaultsInjector().injectDefaults( model );
+
+        List deps = model.getDependencies();
+        assertEquals( 1, deps.size() );
+
+        Dependency result = (Dependency) deps.get( 0 );
+        assertEquals( "file", result.getFile() );
     }
 
     public void testShouldRejectDependencyWhereNoVersionIsFoundAfterDefaultsInjection()

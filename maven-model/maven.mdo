@@ -807,6 +807,12 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>file</name>
+          <version>4.0.0</version>
+          <description>Override the use of a repository - retrieve it from this file</description>
+          <type>String</type>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

@@ -82,6 +82,11 @@ public class DefaultModelDefaultsInjector
             dep.setVersion( def.getVersion() );
         }
 
+        if ( dep.getFile() == null && def.getFile() != null )
+        {
+            dep.setFile( def.getFile() );
+        }
+
         Properties props = new Properties( def.getProperties() );
         props.putAll( dep.getProperties() );
         dep.setProperties( props );
