@@ -11,36 +11,47 @@ import java.util.Properties;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.xml.utils.DOMBuilder;
+import org.apache.xpath.XPathAPI;
+import org.w3c.dom.Document;
+
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public class Verifier
 {
     private String basedir;
 
-    private String mavenRepoLocal;
+    private File homeDir;
 
-    public Verifier( String basedir, String mavenRepoLocal )
+    private String localRepo;
+
+    public Verifier( String basedir, String homeDir )
     {
         this.basedir = basedir;
-        this.mavenRepoLocal = mavenRepoLocal;
+        this.homeDir = new File( homeDir );
     }
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    public void verify()
-        throws VerificationException
+    public void verify() throws VerificationException
     {
         try
         {
+            retrieveLocalRepo();
+
             BufferedReader reader = new BufferedReader( new FileReader( new File( basedir, "expected-results.txt" ) ) );
 
             String line = "";
 
-            while ( ( line = reader.readLine() ) != null )
+            while ( (line = reader.readLine()) != null )
             {
                 verifyExpectedResult( line );
             }
@@ -50,13 +61,28 @@ public class Verifier
             throw new VerificationException( e );
         }
 
-        System.out.println( "-----------------------------------------------------------------------------------> OK" );        
+        System.out.println( "-----------------------------------------------------------------------------------> OK" );
     }
 
-    private void verifyExpectedResult( String line )
-        throws VerificationException
+    private void retrieveLocalRepo() throws Exception
     {
-        line = replace( line, "${localRepository}", mavenRepoLocal );
+        localRepo = System.getProperty( "maven.repo.local" );
+        if ( localRepo == null )
+        {
+            // parse ~/.m2/pom.xml for it...
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            File pom = new File( homeDir, ".m2/pom.xml" );
+            Document dom = builder.parse( pom );
+
+            localRepo = XPathAPI.selectSingleNode( dom, "/project/local/repository/text()" ).getNodeValue();
+        }
+    }
+
+    private void verifyExpectedResult( String line ) throws VerificationException
+    {
+        line = replace( line, "${localRepository}", localRepo );
 
         if ( line.indexOf( "!/" ) > 0 )
         {
@@ -128,7 +154,7 @@ public class Verifier
 
         StringBuffer buf = new StringBuffer( text.length() );
         int start = 0, end = 0;
-        while ( ( end = text.indexOf( repl, start ) ) != -1 )
+        while ( (end = text.indexOf( repl, start )) != -1 )
         {
             buf.append( text.substring( start, end ) ).append( with );
             start = end + repl.length();
@@ -141,7 +167,6 @@ public class Verifier
         buf.append( text.substring( start ) );
         return buf.toString();
     }
-
 
     // ----------------------------------------------------------------------
     //
