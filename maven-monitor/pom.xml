@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-component</artifactId>
     <groupId>maven</groupId>
@@ -7,6 +7,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-monitor</artifactId>
-  <packaging>jar</packaging>
   <version>2.0-SNAPSHOT</version>
-</model>
+  <name>Maven Monitor</name>
+</project>
