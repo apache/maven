@@ -735,7 +735,6 @@
       </fields>
     </class>
     <class>
-<<<<<<< maven.mdo
       <name>DistributionManagement</name>
       <version>4.0.0</version>
       <description>
@@ -757,29 +756,6 @@
       </fields>
     </class>
     <class>
-=======
-      <name>DistributionManagement</name>
-      <version>4.0.0</version>
-      <description>
-        This elements describes all that pertains to distribution for a project.
-      </description>
-      <fields>
-        <field>
-          <name>host</name>
-          <version>4.0.0</version>
-          <description>The FQDN of the host where the site resides.</description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>directory</name>
-          <description>The directory on the host where the site resides.</description>
-          <version>4.0.0</version>
-          <type>String</type>
-        </field>
-      </fields>
-    </class>
-    <class>
->>>>>>> 1.41
       <name>License</name>
       <version>3.0.0+</version>
       <fields>
