@@ -118,6 +118,11 @@ public class MavenProject
     {
         return model.getDependencies();
     }
+    
+    public List getDependencyDefaults()
+    {
+        return model.getDependencyDefaults();
+    }
 
     // ----------------------------------------------------------------------
     // Test and compile sourceroots.

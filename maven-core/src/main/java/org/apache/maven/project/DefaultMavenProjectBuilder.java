@@ -70,6 +70,8 @@ public class DefaultMavenProjectBuilder
     private MavenXpp3Reader modelReader;
 
     private PathTranslator pathTranslator;
+    
+    private ProjectDefaultsInjector projectDefaultsInjector;
 
     public void initialize()
         throws Exception
@@ -111,6 +113,8 @@ public class DefaultMavenProjectBuilder
 
                 previous = current;
             }
+            
+            projectDefaultsInjector.injectDefaults(project);
 
             project.setLocalRepository( localRepository );
 

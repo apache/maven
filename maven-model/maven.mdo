@@ -408,6 +408,18 @@
             <type>DistributionManagement</type>
           </association>
         </field>
+          <!-- [ jdcasey:01-Feb-2005 ] Added to handle version management for 
+           | dependencies to be used in sub-projects. -->
+        <field>
+          <name>dependencyDefaults</name>
+          <version>4.0.0</version>
+          <required>false</required>
+          <description><![CDATA[Default dependency information for grouped projects inheriting from this one.]]></description>
+          <association>
+	          <type>DependencyDefault</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
         <field>
           <name>local</name>
           <version>4.0.0</version>
@@ -804,7 +816,8 @@
         <field>
           <name>version</name>
           <version>3.0.0+</version>
-          <required>true</required>
+          <!-- [ jdcasey:01-Feb-2005 ] No longer required. We'll validate after injecting defaults. -->
+          <!-- required>true</required -->
           <description><![CDATA[
             The version of the dependency., e.g.
             <code>3.2.1</code>
@@ -1751,6 +1764,91 @@
           <type>boolean</type>
           <defaultValue>true</defaultValue>
           <!-- @todo systemProperty tag (maven.online value) should be supported by modello -->
+        </field>
+      </fields>
+    </class>
+    <!-- [ jdcasey:01-Feb-2005 ] Added to handle version management for 
+     | dependencies to be used in sub-projects. -->
+    <class>
+      <name>DependencyDefault</name>
+      <version>4.0.0</version>
+      <description><![CDATA[
+      	Default information for a dependency to be used in a sub-project. The 
+        required fields here will be used to match dependency references.
+      ]]></description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description><![CDATA[
+            The project group that produced the dependency, e.g.
+            <code>geronimo</code>.
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description><![CDATA[
+            The unique id for an artifact produced by the project group, e.g.
+            <code>germonimo-jms</code>
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            The version of the dependency., e.g.
+            <code>3.2.1</code>
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            This url will be provided to the user if the jar file cannot be downloaded
+            from the central repository.
+          ]]></description>
+          <type>String</type>
+          <comment>The URL should really be gleaned from a shared database of dependency information.</comment>
+        </field>
+        <field>
+          <name>artifact</name>
+          <version>4.0.0</version>
+          <description><![CDATA[Literal name of the artifact]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            Other known recognised dependency types are:
+            <code>ejb</code> and
+            <code>plugin</code>.
+          ]]></description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <field>
+          <name>properties</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            Properties about the dependency. Various plugins allow you to
+            <code>mark</code> dependencies with properties. For example the
+            <a href="plugins/war/index.html">war</a> plugin looks for a
+            <code>war.bundle</code> property, and if found will include the dependency
+            in
+            <code>WEB-INF/lib</code>. For example syntax, check the war plugin docs.
+          ]]></description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
     </class>

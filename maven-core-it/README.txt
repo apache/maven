@@ -37,6 +37,8 @@ it0010: Since the artifact resolution does not use the project builder, we must
         will check this, by depending on classworlds, which is a dependency of
         maven-component, which is the parent of maven-plugin, which is an
         explicit dependency of this test.
+        
+it0011: Test specification of dependency versions via <dependencyDefaults/>.
 
 -------------------------------------------------------------------------------
 
