@@ -18,6 +18,10 @@ if [ ! -z "$M2_HOME" ]; then
   jvm_args="$jvm_args -Dmaven.home=$M2_HOME"
 fi
 
+if [ ! -z "$MAVEN_OPTS" ]; then
+  jvm_args="$jvm_args $MAVEN_OPTS"
+fi
+
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;
 case "`uname`" in
