@@ -18,8 +18,6 @@ package org.apache.maven.artifact.manager;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
@@ -48,6 +46,8 @@ public interface WagonManager
 
     void put( File source, Artifact artifact, ArtifactRepository deploymentRepository )
         throws Exception;
+
+    void setProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
 
     Artifact createArtifact( String groupId, String artifactId, String version, String type );
 }

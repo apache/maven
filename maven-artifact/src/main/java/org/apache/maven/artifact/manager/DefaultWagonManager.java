@@ -17,11 +17,9 @@ package org.apache.maven.artifact.manager;
  * ====================================================================
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.AbstractArtifactComponent;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -30,18 +28,20 @@ import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
-import org.apache.maven.wagon.observers.ChecksumObserver;
+import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 public class DefaultWagonManager
@@ -49,6 +49,8 @@ public class DefaultWagonManager
     implements WagonManager, Contextualizable
 {
     private PlexusContainer container;
+
+    private Map proxies = new HashMap();
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String type )
     {
@@ -85,7 +87,7 @@ public class DefaultWagonManager
     {
         Wagon wagon = getWagon( repository.getProtocol() );
 
-        wagon.connect( repository );
+        wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
         wagon.put( source, path( artifact ) );
 
@@ -156,7 +158,7 @@ public class DefaultWagonManager
 
                 //wagon.addTransferListener( md5SumObserver );
 
-                wagon.connect( repository );
+                wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
                 wagon.get( path( artifact ), temp );
 
@@ -230,6 +232,38 @@ public class DefaultWagonManager
         }
 
         throw new TransferFailedException( "Unable to download the artifact from any repository" );
+    }
+
+    private ProxyInfo getProxy( String protocol )
+    {
+        return (ProxyInfo) proxies.get( protocol );
+    }
+
+    /**
+     * Set the proxy used for a particular protocol.
+     *
+     * @todo [BP] would be nice to configure this via plexus in some way
+     *
+     * @param protocol the protocol (required)
+     * @param host the proxy host name (required)
+     * @param port the proxy port (required)
+     * @param username the username for the proxy, or null if there is none
+     * @param password the password for the proxy, or null if there is none
+     * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system property format:
+     *  <code>*.foo.com|localhost</code>.
+     */
+    public void setProxy( String protocol, String host, int port, String username, String password,
+                          String nonProxyHosts )
+    {
+        ProxyInfo proxyInfo = new ProxyInfo();
+        proxyInfo.setHost( host );
+        proxyInfo.setType( protocol );
+        proxyInfo.setPort( port );
+        proxyInfo.setNonProxyHosts( nonProxyHosts );
+        proxyInfo.setUserName( username );
+        proxyInfo.setPassword( password );
+
+        proxies.put( protocol, proxyInfo );
     }
 
     public void contextualize( Context context )
