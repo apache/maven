@@ -171,3 +171,46 @@ m2 compile
     having a defined place in the lifecycle by telling maven what phase it contributes too. in this way maven
     can probably assemble the entire execution chain by looking at the mojos the user has specified for use
     in the build process.
+    
+[Added, jdcasey/2005-01-23]
+Notes for discussion:
+
+  - What about enabling goals only for certain enviornments (introduce the concept
+    of a target "environment", like CI/dev/QA/production/etc.)
+  
+    We can't enforce a vocabulary of environments IMO, since different teams 
+    will have different needs, and shouldn't be forced to adapt.
+    
+    What about something like:
++---+
+    .
+    .
+    .
+    <phase>
+      <id>test</id>
+      <goal>
+        <environment>dev</environment>
+        <id>surefire:test</id>
+      </goal>
+    </phase>
+    .
+    .
+    .
++---+
+
+    With an invocation style similar to <<<m2 [-Dtarget.environment=dev] test>>>
+
+  - In keeping with the concept of providing tons of flexibility but providing
+    a comprehensive set of sensible defaults, the default phase-goal bindings
+    will probably be provided in the implied root POM. 
+    
+    That said, how do we allow users to <suppress> those phase-goal bindings?
+    
+    How do we allow users to specify <where> a new binding will go in relation
+    to the defaults provided in the root POM?
+    
+    However we solve this, we need to emphasize intuitive XML as a solution IMO.
+    The implicit ordering in the phase-goal bindings is a step in the right
+    direction, but when you factor inheritance into the mix, this could get 
+    really sticky.
+[/Added, jdcasey/2005-01-23]
