@@ -91,6 +91,7 @@ public class DefaultMavenSettingsBuilder
         // TODO: This replacing shouldn't be necessary as user.home should be in the
         // context of the container and thus the value would be interpolated by Plexus
         String userHome = System.getProperty( "user.home" );
+        userHome = userHome.replaceAll( "\\\\", "/" );
 
         path = path.replaceAll( "\\$\\{user.home\\}", userHome );
         path = path.replaceAll( "\\\\", "/" );
