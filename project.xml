@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <pomVersion>3</pomVersion>
+  <name>Maven Project</name>
+  <groupId>maven</groupId>
+  <id>maven-project</id>
+  <artifactId>maven-project</artifactId>
+  <currentVersion>2.0-SNAPSHOT</currentVersion>
+  <gumpRepositoryId>jakarta</gumpRepositoryId>
+  <description></description>
+  <shortDescription>Java Project Management Tools</shortDescription>
+
+  <organization>
+    <name>Apache Software Foundation</name>
+    <url>http://www.apache.org/</url>
+    <logo>/images/apache-maven-project.png</logo>
+  </organization>
+
+  <developers>
+    <developer>
+      <name>Jason van Zyl</name>
+      <id>jvanzyl</id>
+      <email>jason@zenplex.com</email>
+      <organization>Zenplex</organization>
+      <roles>
+        <role>Architect</role>
+        <role>Release Manager</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <build>
+    <nagEmailAddress>turbine-maven-dev@jakarta.apache.org</nagEmailAddress>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>src/test/resources</directory>
+        </resource>
+        <resource>
+          <directory>src/test/java</directory>
+          <includes>
+            <include>**/*.xml</include>
+          </includes>
+        </resource>
+      </resources>
+    </unitTest>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+  </build>
+  <reports/>
+</project>
