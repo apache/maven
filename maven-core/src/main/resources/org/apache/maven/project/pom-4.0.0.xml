@@ -6,7 +6,7 @@
     <repository>
       <id>central</id>
       <name>Maven Repository Switchboard</name>
-      <url>http://repo1.maven.org</url>
+      <url>http://repo1.maven.org/maven2</url>
     </repository>
   </repositories>
 
@@ -33,22 +33,22 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
           <configuration>
@@ -61,27 +61,27 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pom-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
         <plugin>
-          <groupId>maven</groupId>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>

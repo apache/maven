@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
@@ -62,18 +65,20 @@ public class ResourcesMojo
     {
         try
         {
-            for ( Iterator i = getJarResources( resources ).iterator(); i.hasNext(); )
+            for ( Iterator i = getJarResources( resources ).entrySet().iterator(); i.hasNext(); )
             {
-                ResourceEntry resourceEntry = (ResourceEntry) i.next();
-
-                File destinationFile = new File( outputDirectory, resourceEntry.getDestination() );
+                Map.Entry entry = (Entry) i.next();
+                String source = (String) entry.getKey();
+                String destination = (String) entry.getValue();
+                
+                File destinationFile = new File( outputDirectory, destination );
 
                 if ( !destinationFile.getParentFile().exists() )
                 {
                     destinationFile.getParentFile().mkdirs();
                 }
 
-                fileCopy( resourceEntry.getSource(), destinationFile.getPath() );
+                fileCopy( source, destinationFile.getPath() );
             }
         }
         catch ( Exception e )
@@ -83,10 +88,10 @@ public class ResourcesMojo
         }
     }
 
-    private List getJarResources( List resources )
+    private Map getJarResources( List resources )
         throws Exception
     {
-        List resourceEntries = new ArrayList();
+        Map resourceEntries = new TreeMap();
 
         for ( Iterator i = resources.iterator(); i.hasNext(); )
         {
@@ -139,9 +144,9 @@ public class ResourcesMojo
                     entryName = targetPath + "/" + name;
                 }
 
-                ResourceEntry je = new ResourceEntry( new File( resource.getDirectory(), name ).getPath(), entryName );
+                String resourcePath = new File( resource.getDirectory(), name ).getPath();
 
-                resourceEntries.add( je );
+                resourceEntries.put( resourcePath, entryName );
             }
         }
 
@@ -185,27 +190,4 @@ public class ResourcesMojo
         fileWrite( outFileName, content );
     }
 
-    class ResourceEntry
-    {
-        private String source;
-
-        private String destination;
-
-        public ResourceEntry( String source, String entry )
-        {
-            this.source = source;
-
-            this.destination = entry;
-        }
-
-        public String getSource()
-        {
-            return source;
-        }
-
-        public String getDestination()
-        {
-            return destination;
-        }
-    }
 }

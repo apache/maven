@@ -374,7 +374,7 @@ public class DefaultMavenProjectBuilder
 
         Repository pluginRepo = new Repository();
         pluginRepo.setId( "plugin-repository" );
-        pluginRepo.setUrl( "http://repo1.maven.org" );
+        pluginRepo.setUrl( "http://repo1.maven.org/maven2" );
 
         // TODO: [jc] change this to detect the repository layout type somehow...
         String repoLayoutId = "legacy";
