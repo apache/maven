@@ -4,36 +4,33 @@ import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 
-import java.io.File;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public abstract class AbstractPluginMojo
+public abstract class AbstractGeneratorMojo
     extends AbstractPlugin
 {
+    protected abstract void generate( String sourceDirectory, String outputDirectory, String pom )
+        throws Exception;
 
-    protected File getJarFile( PluginExecutionRequest request )
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
+        throws Exception
     {
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
+        String sourceDirectory = (String) request.getParameter( "sourceDirectory" );
+
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
-        String jarName = (String) request.getParameter( "jarName" );
+        String pom = (String) request.getParameter( "pom" );
 
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
-        File jarFile = new File( new File( outputDirectory ), jarName + ".jar" );
-
-        return jarFile;
+        generate( sourceDirectory, outputDirectory, pom );
     }
-
-
-
-
 }

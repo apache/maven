@@ -33,7 +33,7 @@ import org.apache.maven.plugin.generator.jelly.JellyHarnessGenerator;
  * @version $Id$
  */
 public class JellyGeneratorMojo
-    extends AbstractPluginMojo
+    extends AbstractGeneratorMojo
 {
     protected void generate( String sourceDirectory, String outputDirectory, String pom )
         throws Exception

@@ -13,13 +13,11 @@ import org.codehaus.plexus.util.FileUtils;
  */
 
 /**
- * @goal install
+ * @goal setup
  *
  * @description Installs a plugin into the maven installation.
  *
- * @prereq plugin:descriptor
- *
- * @prereq jar:jar
+ * @prereq plugin:plugin
  *
  * @parameter
  *  name="outputDirectory"
@@ -46,21 +44,16 @@ import org.codehaus.plexus.util.FileUtils;
  *  description=""
  *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
  * @version $Id$
  */
-public class InstallMojo
-    extends AbstractPlugin
+public class PluginSetupMojo
+    extends AbstractPluginMojo
 {
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
 
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        String jarName = (String) request.getParameter( "jarName" );
 
         String pluginHomeName = (String) request.getParameter( "pluginHome" );
 
@@ -68,11 +61,21 @@ public class InstallMojo
         //
         // ----------------------------------------------------------------------
 
-        File jarFile = new File( new File( outputDirectory ), jarName + ".jar" );
+        File jarFile = getJarFile( request );
 
+        File pluginHome = getPluginHome( pluginHomeName );
+
+        System.out.println( "Installing " + jarFile + " in " + pluginHome );
+
+        FileUtils.copyFileToDirectory( jarFile, pluginHome );
+    }
+
+    private File getPluginHome( String pluginHomeName )
+            throws Exception
+    {
         File pluginHome;
 
-        if ( pluginHomeName == null || 
+        if ( pluginHomeName == null ||
              pluginHomeName.trim().length() == 0 ||
              pluginHomeName.equals( "maven.plugin.home" ) )
         {
@@ -113,9 +116,6 @@ public class InstallMojo
         {
             pluginHome = new File( pluginHomeName );
         }
-
-        System.out.println( "Installing " + jarFile + " in " + pluginHome );
-
-        FileUtils.copyFileToDirectory( jarFile, pluginHome );
+        return pluginHome;
     }
 }

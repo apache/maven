@@ -33,7 +33,7 @@ import org.apache.maven.plugin.generator.PluginDescriptorGenerator;
  * @version $Id$
  */
 public class DescriptorGenerator
-    extends AbstractPluginMojo
+    extends AbstractGeneratorMojo
 {
     protected void generate( String sourceDirectory, String outputDirectory, String pom )
         throws Exception
