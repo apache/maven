@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.jar;
+package org.apache.maven.plugin.pom;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,35 +16,43 @@ package org.apache.maven.plugin.jar;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 
 /**
  * @goal install
  *
- * @description install a jar in local repository
+ * @description installs project's main artifact in local repository
  *
- * @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description=""
+ * @parameter name="project"
+ * type="org.apache.maven.project.MavenProject"
+ * required="true"
+ * validator=""
+ * expression="#project"
+ * description=""
  *
- * @parameter
- *  name="installer"
- *  type="org.apache.maven.artifact.installer.ArtifactInstaller"
- *  required="true"
- *  validator=""
- *  expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
- *  description=""
+ * @parameter name="installer"
+ * type="org.apache.maven.artifact.installer.ArtifactInstaller"
+ * required="true"
+ * validator=""
+ * expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
+ * description=""
+ *
+ * @parameter name="localRepository"
+ * type="org.apache.maven.artifact.repository.ArtifactRepository"
+ * required="true"
+ * validator=""
+ * expression="#localRepository"
+ * description=""
+ *
  */
 public class PomInstallMojo
     extends AbstractPlugin
@@ -56,6 +64,15 @@ public class PomInstallMojo
 
         ArtifactInstaller artifactInstaller = (ArtifactInstaller) request.getParameter( "installer" );
 
-        artifactInstaller.install( project.getFile(), "pom", project );
+        ArtifactRepository localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
+
+        Artifact artifact = new DefaultArtifact( project.getGroupId(),
+                                                 project.getArtifactId(),
+                                                 project.getVersion(),
+                                                 "pom" );
+
+        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+
+        artifactInstaller.install( pom, artifact, localRepository );
     }
 }

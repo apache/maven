@@ -17,6 +17,11 @@
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
+      <artifactId>plexus</artifactId>
+      <version>0.16-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
       <version>1.0</version>
     </dependency>

@@ -17,23 +17,20 @@ package org.apache.maven.plugin.jar;
  *  limitations under the License.
  */
 
+import org.apache.maven.plugin.AbstractPlugin;
+import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-
-import org.apache.maven.artifact.MavenArtifact;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Base class for tasks that build archives in JAR file format.
@@ -52,9 +49,12 @@ public abstract class AbstractJarMojo
      * @param tag      the property tag to look for; for example "jar.bundle"
      * @param pathTag  the property tag that specifies the target path; for example, jar.target.path
      */
+
+    /*
     protected void addTaggedDependencies(Map includes, MavenProject project, String tag, String pathTag) {
         addTaggedDependencies(includes, "", project, tag, pathTag);
     }
+    */
 
     /**
      * Add artifacts from tagged dependencies to the archive. For example, the definition:
@@ -77,9 +77,11 @@ public abstract class AbstractJarMojo
      * @param tag      the property tag to look for; for example "jar.bundle"
      * @param pathTag  the property tag that specifies the target path; for example, jar.target.path
      */
+
+    /*
     protected void addTaggedDependencies(Map includes, String prefix, MavenProject project, String tag, String pathTag) {
         for (Iterator i = project.getArtifacts().iterator(); i.hasNext();) {
-            MavenArtifact artifact = (MavenArtifact) i.next();
+            Artifact artifact = (Artifact) i.next();
             Properties properties = artifact.getDependency().getProperties();
             if (Boolean.valueOf(properties.getProperty(tag)).booleanValue()) {
                 File file = new File(artifact.getPath());
@@ -88,6 +90,7 @@ public abstract class AbstractJarMojo
             }
         }
     }
+    */
 
     /**
      * Add all files in the specified directory to the archive.
@@ -95,31 +98,33 @@ public abstract class AbstractJarMojo
      * @param includes a map <String, File> of items to be include in the outpur
      * @param baseDir  the directory to add
      */
-    protected void addDirectory(Map includes, File baseDir) throws IOException {
-        addDirectory(includes, "", baseDir);
+    protected void addDirectory( Map includes, File baseDir ) throws IOException
+    {
+        addDirectory( includes, "", baseDir );
     }
 
     /**
      * Add all files in the specified directory to the archive.
      *
      * @param includes a map <String, File> of items to be include in the outpur
-     * @param prefix value to be added to the front of jar entry names
+     * @param prefix   value to be added to the front of jar entry names
      * @param baseDir  the directory to add
      */
-    protected void addDirectory(Map includes, String prefix, File baseDir) throws IOException {
+    protected void addDirectory( Map includes, String prefix, File baseDir ) throws IOException
+    {
         addDirectory( includes, null, null, prefix, baseDir );
     }
 
     /**
      * Add all files in the specified directory to the archive.
      *
-     * @param includes a map <String, File> of items to be include in the outpur
+     * @param includes        a map <String, File> of items to be include in the outpur
      * @param includesPattern Sets the list of include patterns to use
      * @param excludesPattern Sets the list of exclude patterns to use
-     * @param prefix value to be added to the front of jar entry names
-     * @param baseDir  the directory to add
+     * @param prefix          value to be added to the front of jar entry names
+     * @param baseDir         the directory to add
      */
-    protected void addDirectory(Map includes, String includesPattern, String excludesPattern, String prefix, File baseDir)
+    protected void addDirectory( Map includes, String includesPattern, String excludesPattern, String prefix, File baseDir )
         throws IOException
     {
         if ( !baseDir.exists() )
@@ -128,7 +133,7 @@ public abstract class AbstractJarMojo
         }
 
         DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir(baseDir);
+        scanner.setBasedir( baseDir );
         if ( includesPattern != null )
         {
             scanner.setIncludes( StringUtils.split( includesPattern, "," ) );
@@ -140,10 +145,11 @@ public abstract class AbstractJarMojo
         }
         scanner.scan();
         String[] files = scanner.getIncludedFiles();
-        for (int i = 0; i < files.length; i++) {
+        for ( int i = 0; i < files.length; i++ )
+        {
             String file = files[i];
-            file = file.replace('\\', '/'); // todo shouldn't the scanner return platform independent names?
-            includes.put(prefix + file, new File(baseDir, file));
+            file = file.replace( '\\', '/' ); // todo shouldn't the scanner return platform independent names?
+            includes.put( prefix + file, new File( baseDir, file ) );
         }
     }
 
@@ -154,16 +160,20 @@ public abstract class AbstractJarMojo
      * @param includes a Map<String, File>of items to include; the key is the jar entry name
      * @throws IOException if there is a problem writing the archive or reading the sources
      */
-    protected void createJar(File jarFile, Map includes) throws IOException {
+    protected void createJar( File jarFile, Map includes ) throws IOException
+    {
         File parentJarFile = jarFile.getParentFile();
         if ( !parentJarFile.exists() )
         {
             parentJarFile.mkdirs();
         }
-        JarOutputStream jos = createJar(jarFile, createManifest());
-        try {
-            addEntries(jos, includes);
-        } finally {
+        JarOutputStream jos = createJar( jarFile, createManifest() );
+        try
+        {
+            addEntries( jos, includes );
+        }
+        finally
+        {
             jos.close();
         }
     }
@@ -173,11 +183,12 @@ public abstract class AbstractJarMojo
      *
      * @return a default manifest; the Manifest-Version and Created-By attributes are initialized
      */
-    protected Manifest createManifest() {
+    protected Manifest createManifest()
+    {
         Manifest mf = new Manifest();
         Attributes attrs = mf.getMainAttributes();
-        attrs.putValue(Attributes.Name.MANIFEST_VERSION.toString(), "1.0");
-        attrs.putValue("Created-By", "2.0 (Apache Maven)");
+        attrs.putValue( Attributes.Name.MANIFEST_VERSION.toString(), "1.0" );
+        attrs.putValue( "Created-By", "2.0 (Apache Maven)" );
         return mf;
     }
 
@@ -189,16 +200,23 @@ public abstract class AbstractJarMojo
      * @return a JarOutputStream that can be used to write to that file
      * @throws IOException if there was a problem opening the file
      */
-    protected JarOutputStream createJar(File jarFile, Manifest mf) throws IOException {
+    protected JarOutputStream createJar( File jarFile, Manifest mf ) throws IOException
+    {
         jarFile.getParentFile().mkdirs();
-        FileOutputStream fos = new FileOutputStream(jarFile);
-        try {
-            return new JarOutputStream(fos, mf);
-        } catch (IOException e) {
-            try {
+        FileOutputStream fos = new FileOutputStream( jarFile );
+        try
+        {
+            return new JarOutputStream( fos, mf );
+        }
+        catch ( IOException e )
+        {
+            try
+            {
                 fos.close();
                 jarFile.delete();
-            } catch (IOException e1) {
+            }
+            catch ( IOException e1 )
+            {
                 // ignore
             }
             throw e;
@@ -212,12 +230,14 @@ public abstract class AbstractJarMojo
      * @param includes a Map<String, File> of entries to add
      * @throws IOException if there is a problem writing the archive or reading the sources
      */
-    protected void addEntries(JarOutputStream jos, Map includes) throws IOException {
-        for (Iterator i = includes.entrySet().iterator(); i.hasNext();) {
+    protected void addEntries( JarOutputStream jos, Map includes ) throws IOException
+    {
+        for ( Iterator i = includes.entrySet().iterator(); i.hasNext(); )
+        {
             Map.Entry entry = (Map.Entry) i.next();
             String name = (String) entry.getKey();
             File file = (File) entry.getValue();
-            addEntry(jos, name, file);
+            addEntry( jos, name, file );
         }
     }
 
@@ -229,16 +249,21 @@ public abstract class AbstractJarMojo
      * @param source the file to add
      * @throws IOException if there is a problem writing the archive or reading the sources
      */
-    protected void addEntry(JarOutputStream jos, String name, File source) throws IOException {
-        FileInputStream fis = new FileInputStream(source);
-        try {
-            jos.putNextEntry(new JarEntry(name));
+    protected void addEntry( JarOutputStream jos, String name, File source ) throws IOException
+    {
+        FileInputStream fis = new FileInputStream( source );
+        try
+        {
+            jos.putNextEntry( new JarEntry( name ) );
             int count;
-            while ((count = fis.read(buffer)) > 0) {
-                jos.write(buffer, 0, count);
+            while ( ( count = fis.read( buffer ) ) > 0 )
+            {
+                jos.write( buffer, 0, count );
             }
             jos.closeEntry();
-        } finally {
+        }
+        finally
+        {
             fis.close();
         }
     }

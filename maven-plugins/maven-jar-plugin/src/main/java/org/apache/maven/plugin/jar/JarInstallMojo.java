@@ -16,53 +16,43 @@ package org.apache.maven.plugin.jar;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
 
 /**
  * @goal install
  *
- * @description install a jar in local repository
+ * @description installs project's main artifact in local repository
+ *
+ * @parameter name="project"
+ * type="org.apache.maven.project.MavenProject"
+ * required="true"
+ * validator=""
+ * expression="#project"
+ * description=""
+ *
+ * @parameter name="installer"
+ * type="org.apache.maven.artifact.installer.ArtifactInstaller"
+ * required="true"
+ * validator=""
+ * expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
+ * description=""
+ *
+ * @parameter name="localRepository"
+ * type="org.apache.maven.artifact.repository.ArtifactRepository"
+ * required="true"
+ * validator=""
+ * expression="#localRepository"
+ * description=""
  *
  * @prereq jar:jar
  *
- * @parameter
- *  name="jarName"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#maven.final.name"
- *  description=""
- *
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.directory"
- *  description=""
- *
- * @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description=""
- *
- * @parameter
- *  name="installer"
- *  type="org.apache.maven.artifact.installer.ArtifactInstaller"
- *  required="true"
- *  validator=""
- *  expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
- *  description=""
  */
 public class JarInstallMojo
     extends AbstractPlugin
@@ -70,16 +60,17 @@ public class JarInstallMojo
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        String jarName = (String) request.getParameter( "jarName" );
-
-        File jarFile = new File( outputDirectory, jarName + ".jar" );
-
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
         ArtifactInstaller artifactInstaller = (ArtifactInstaller) request.getParameter( "installer" );
 
-        artifactInstaller.install( jarFile, "jar", project );
+        ArtifactRepository localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
+
+        Artifact artifact = new DefaultArtifact( project.getGroupId(),
+                                                 project.getArtifactId(),
+                                                 project.getVersion(),
+                                                 project.getType() );
+
+        artifactInstaller.install( project.getBuild().getDirectory(), artifact, localRepository );
     }
 }

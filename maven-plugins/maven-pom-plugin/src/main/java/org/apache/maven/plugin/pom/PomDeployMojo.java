@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.jar;
+package org.apache.maven.plugin.pom;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,13 +16,15 @@ package org.apache.maven.plugin.jar;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.deployer.ArtifactDeployer;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.apache.maven.artifact.deployer.ArtifactDeployer;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.maven.repository.RepositoryUtils;
 
 import java.io.File;
 
@@ -57,6 +59,16 @@ public class PomDeployMojo
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
 
-        artifactDeployer.deploy( project.getFile(), "pom", project );
+        ArtifactRepository deploymentRepository =
+            RepositoryUtils.mavenRepositoryToWagonRepository( project.getDistributionManagement().getRepository() );
+
+        Artifact artifact = new DefaultArtifact( project.getGroupId(),
+                                                 project.getArtifactId(),
+                                                 project.getVersion(),
+                                                 "pom" );
+
+        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+
+        artifactDeployer.deploy( pom, artifact, deploymentRepository );
     }
 }

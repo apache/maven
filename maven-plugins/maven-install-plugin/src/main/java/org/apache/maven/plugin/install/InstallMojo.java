@@ -16,62 +16,61 @@ package org.apache.maven.plugin.install;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.Maven;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @goal install
  *
  * @description installs project's main artifact in local repository
  *
-* @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description=""
+ * @parameter name="project"
+ * type="org.apache.maven.project.MavenProject"
+ * required="true"
+ * validator=""
+ * expression="#project"
+ * description=""
  *
- * @parameter
- *  name="maven"
- *  type="org.apache.maven.Maven"
- *  required="true"
- *  validator=""
- *  expression="#component.org.apache.maven.Maven"
- *  description=""""
+ * @parameter name="installer"
+ * type="org.apache.maven.artifact.installer.ArtifactInstaller"
+ * required="true"
+ * validator=""
+ * expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
+ * description=""
  *
- * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
- * @version $Id$
+ * @parameter name="localRepository"
+ * type="org.apache.maven.artifact.repository.ArtifactRepository"
+ * required="true"
+ * validator=""
+ * expression="#localRepository"
+ * description=""
+ *
+ * @prereq build
+ *
  */
 public class InstallMojo
     extends AbstractPlugin
 {
-
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
-
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
-        String type = project.getType();
+        ArtifactInstaller artifactInstaller = (ArtifactInstaller) request.getParameter( "installer" );
 
-        Maven maven = ( Maven ) request.getParameter( "maven" );
+        ArtifactRepository localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
 
-        String goal = type + ":install";
+        Artifact artifact = new DefaultArtifact( project.getGroupId(),
+                                                 project.getArtifactId(),
+                                                 project.getVersion(),
+                                                 project.getType() );
 
-        List goals = new ArrayList( 1 );
-
-        goals.add( goal );
-
-        maven.execute( project, goals );
-
+        artifactInstaller.install( project.getBuild().getDirectory(), artifact, localRepository );
     }
-
-
 }

@@ -22,6 +22,10 @@ import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -29,25 +33,7 @@ import java.io.File;
 /**
  * @goal deploy
  *
- * @description deploys a jar to remote repository
- *
- * @prereq jar:jar
- *
- * @parameter
- *  name="jarName"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#maven.final.name"
- *  description=""
- *
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.directory"
- *  description=""
+ * @description deploys a JAR to remote repository
  *
  * @parameter
  *  name="project"
@@ -71,16 +57,18 @@ public class JarDeployMojo
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        String jarName = (String) request.getParameter( "jarName" );
-
-        File jarFile = new File( outputDirectory, jarName + ".jar" );
-
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
 
-        artifactDeployer.deploy( jarFile, "jar", project );
+        ArtifactRepository deploymentRepository =
+            RepositoryUtils.mavenRepositoryToWagonRepository( project.getDistributionManagement().getRepository() );
+
+        Artifact artifact = new DefaultArtifact( project.getGroupId(),
+                                                 project.getArtifactId(),
+                                                 project.getVersion(),
+                                                 project.getType() );
+
+        artifactDeployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository );
     }
 }
