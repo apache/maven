@@ -1,0 +1,271 @@
+# -----------------------------------------------------------------------------
+# Maven functions
+#
+# @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+# -----------------------------------------------------------------------------
+
+isCommandSuccessful()
+{
+  # $1 == $?
+  # $2 == Error message on failure
+  
+  ret=$1
+  if [ $ret != 0 ]; then  
+    echo $2
+    exit $ret
+  fi
+}
+
+runJava()
+{
+  # $1 == classpath
+  # $2 == Main class
+  # $3 == Mail args
+  
+  "${JAVACMD}" -classpath $1 $2 "$3"
+}
+
+compile()
+{
+  # $1 == classpath
+  # $2 == destination for compiled classes
+  # $3 == source directory
+  # $4 == any extra sources
+
+  if [ -d $3 ]
+  then
+  
+    if [ ! -d $2 ]
+    then
+      mkdir -p $2 
+    fi
+  
+    SOURCES=`find $3 -name '*.java'`
+
+    "${JAVAC}" -classpath $1 -d $2 ${SOURCES} $4
+  
+  fi
+}
+
+buildJar()
+{
+  # $1 == directory to JAR
+  # $2 == JAR path relative to the cwd
+
+  (
+    dir=`pwd`
+    cd $1
+    ${JAVA_HOME}/bin/jar -cf ${dir}/$2 * 
+  )
+}
+
+buildMavenProject()
+{
+    # 1. Parse the model
+    # 2. Download any required dependencies
+    # 3. Compile the sources
+    # 4. Move required resources into location
+    # 5. Create JAR.
+    
+    # I can use maven-model and I can detach maven-model-tools from
+    # Plexus so that I can use it for this tool. I can just use the 
+    # command line compiler for now.
+
+    # $1 == directory where project lives
+    # $4 == jar name
+    # $5 == flag to leave mboot files
+    
+    (
+      home=`pwd`
+      
+      cd $1
+      
+      # Look for source directory in project.xml
+      sourceDirectory=`grep sourceDirectory project.xml | sed -e 's/^*//;s/<sourceDirectory>//;s/<\/sourceDirectory>//'`
+
+      [ -z $sourceDirectory ] && sourceDirectory=src/main
+
+      buildDir=target
+      buildDest=target/classes
+      
+      [ -d $buildDir ] && rm -rf $buildDir
+      
+      echo "Building project in `pwd`"
+      echo "sourceDirectory = $sourceDirectory"
+      echo "buildDest = ${buildDest}"
+        
+      runJava ${MBOOT_HOME}/classes Bootstrapper ${home}
+      
+      isCommandSuccessful $? "Failed running project parser!"
+      
+      projectDependencyClassPath=`cat bootstrap.classpath`:.
+      
+      if [ ! -z $sourceDirectory ] && [ -d $sourceDirectory ]
+      then
+        
+        compile $projectDependencyClassPath $buildDest $sourceDirectory
+      
+        isCommandSuccessful $? "Failed compiling classes!"
+      
+      fi
+      
+      copyResources
+      
+      if [ -z $2 ]
+      then
+        jarName=`getJarName project.xml`
+      else
+        jarName=$2
+      fi
+      
+      buildJar $buildDest target/${jarName}
+      
+      if [ -z $3 ]
+      then
+        rm -f bootstrap.classpath > /dev/null 2>&1
+        rm -f bootstrap.libs > /dev/null 2>&1
+        rm -f bootstrap.resources > /dev/null 2>&1
+      fi
+    )
+}
+
+getJarName()
+{
+  # $1 == project.xml
+  
+  version=`grep currentVersion $1 | sed -e 's/^ *//;s/<currentVersion>//;s/<\/currentVersion>//'`
+
+  artifactId=`grep artifactId $1 | sed -e 's/^ *//;s/<artifactId>//;s/<\/artifactId>//' | awk 'BEGIN { FS = "\n"; RS="" } { print $1 }'`
+
+  if [ -z $artifactId ]
+  then
+    
+    artifactId=`grep id  $1 | sed -e 's/^ *//;s/<id>//;s/<\/id>//' | awk 'BEGIN { FS = "\n"; RS="" } { print $1 }'`    
+  
+  fi
+  
+  jarName="${artifactId}-${version}.jar"
+  
+  echo $jarName
+}
+
+copyResources()
+{
+  resources=`cat bootstrap.resources`
+  
+  for i in $resources
+  do
+    directory=`echo $i | awk 'BEGIN { FS = "@" } { print $1 }' | awk 'BEGIN { FS = "," } { print $1 }'`
+    targetPath=`echo $i | awk 'BEGIN { FS = "@" } { print $1 }' | awk 'BEGIN { FS = "," } { print $2 }'`
+    includes=`echo $i | awk 'BEGIN { FS = "@" } { print $2 }' | awk 'BEGIN { FS = "," } { for ( j = 1; j <= NF; j++ ) { printf( "%s ", $j ) } }'`
+    
+    for include in $includes
+    do
+      files=`eval "find $directory -name $include"`
+      
+      for file in $files
+      do
+        # Replace the "/" with "@" to prevent shell expansion of *.properties
+        # to *.properties in the CWD.
+        tmpDirectory=`echo $directory | sed "s/\//@/g"`
+        tmpFile=`echo $file | sed "s/\//@/g"`
+        
+        # Now grab the path excluding the original directory so we can translate that
+        # path into the target directory.
+        path=`echo $tmpFile | sed "s/$tmpDirectory//;s/\@/\//g;s/^\///"`
+
+        translatedPath=`dirname $path`
+        
+        targetDirectory="target/classes"
+        
+        if [ ! -z $targetPath ]
+        then
+          targetDirectory="${targetDirectory}/${targetPath}"
+        else
+          targetDirectory="${targetDirectory}/${translatedPath}"
+        fi
+        
+        [ ! -d $targetDirectory ] && mkdir -p $targetDirectory
+        
+        cp $file $targetDirectory
+        
+      done
+    done
+  done
+}
+
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+darwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  Darwin*) darwin=true
+           if [ -z "$JAVA_HOME" ] ; then
+             JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home   
+           fi
+           ;;
+esac
+
+# For Cygwin, ensure paths are in UNIX format before anything is touched
+if $cygwin ; then
+  [ -n "$JAVA_HOME" ] &&
+    JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+  [ -n "$CLASSPATH" ] &&
+    CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+fi
+
+# You will need to specify JAVA_HOME if compiling with 1.2 or later.
+
+if [ -n "$JAVA_HOME" ] ; then
+  if [ -f "$JAVA_HOME/lib/tools.jar" ] ; then
+    CLASSPATH=$CLASSPATH:$JAVA_HOME/lib/tools.jar
+  fi
+
+  if [ -f "$JAVA_HOME/lib/classes.zip" ] ; then
+    CLASSPATH=$CLASSPATH:$JAVA_HOME/lib/classes.zip
+  fi
+else
+  echo "Warning: JAVA_HOME environment variable not set."
+  echo "  If build fails because sun.* classes could not be found"
+  echo "  you will need to set the JAVA_HOME environment variable"
+  echo "  to the installation directory of java."
+fi
+
+# IBM's JDK on AIX uses strange locations for the executables:
+# JAVA_HOME/jre/sh for java and rmid
+# JAVA_HOME/sh for javac and rmic
+if [ -z "$JAVAC" ] ; then
+  if [ -n "$JAVA_HOME"  ] ; then
+    if [ -x "$JAVA_HOME/sh/javac" ] ; then
+      JAVAC=${JAVA_HOME}/sh/javac;
+    else
+      JAVAC=${JAVA_HOME}/bin/javac;
+    fi
+  else
+    JAVAC=javac
+  fi
+fi
+if [ -z "$JAVACMD" ] ; then
+  if [ -n "$JAVA_HOME"  ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+      JAVACMD=$JAVA_HOME/jre/sh/java
+    else
+      JAVACMD=$JAVA_HOME/bin/java
+    fi
+  else
+    JAVACMD=java
+  fi
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+  echo "Error: JAVA_HOME is not defined correctly."
+  echo "  We cannot execute $JAVACMD"
+  exit
+fi
+
+# For Cygwin, switch to Windows format before running java
+if $cygwin; then
+  CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
+fi
+
+export CLASSPATH

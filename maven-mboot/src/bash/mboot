@@ -1,0 +1,50 @@
+#!/bin/sh
+
+[ -z $MBOOT_HOME ] && echo && echo "You must set MBOOT_HOME to use mboot!" && echo && exit
+
+. ${MBOOT_HOME}/maven.functions
+
+VERSION=1.0
+
+dir="."
+jar=""
+leaveBootFiles=""
+
+while [ $# -gt 0 ]; do
+    case $1 in
+	--version)
+	    echo "mboot: version $VERSION"
+	    exit 0
+	    ;;
+	-v)
+	    verbose=-v
+	    ;;
+	--dir*)
+	    if echo $1 | grep -q '=' ; then
+	    	dir=`echo $1 | sed 's/^--dir=//'`
+	    else
+		dir=$2
+		shift
+	    fi		    
+	    ;;
+	--jar*)
+	    if echo $1 | grep -q '=' ; then
+	    	jar=`echo $1 | sed 's/^--jar=//'`
+	    else
+		jar=$2
+		shift
+	    fi		    
+	    ;;
+	--leave-boot-files)
+	    leaveBootFiles=1;
+	    ;;
+    esac
+
+    shift
+done
+
+[ ! -d $dir ] && echo "Specified directory doesn't exist!" && exit
+
+[ ! -f $dir/project.xml ] && echo "No project.xml in specified directory!" && exit
+
+buildMavenProject $dir $jar $leaveBootFiles

@@ -1,0 +1,39 @@
+#!/bin/sh
+echo ""
+echo Maven MBoot
+echo ""
+
+echo
+echo "Where would you like to install mboot? [ ~/mboot ] "
+echo
+
+read $DIR
+
+[ -z $DIR ] && DIR=~/mboot
+
+echo "Installing mboot in $DIR ..."
+
+export DIR
+
+[ -d $DIR ] && rm -rf $DIR
+
+mkdir $DIR
+
+SKIP=`awk '/^__ARCHIVE_FOLLOWS__/ { print NR + 1; exit 0; }' $0`
+
+# Take the TGZ portion of this file and pipe it to tar.
+tail +$SKIP $0 | tar xz -C $DIR
+
+# execute the installation script
+
+#PREV=`pwd`
+#cd $WORK_DIR
+#./install.sh
+
+# delete the temp files
+#cd $PREV
+#rm -rf $WORK_DIR
+
+exit 0
+
+__ARCHIVE_FOLLOWS__
