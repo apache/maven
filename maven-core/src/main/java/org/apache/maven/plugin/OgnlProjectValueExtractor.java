@@ -104,22 +104,12 @@ public class OgnlProjectValueExtractor
         }
         else if ( expression.startsWith( "#" ) )
         {
-            new Exception( "Got expression '" + expression + "' that was not recognised" ).printStackTrace();
-/* TODO: this probably isn't needed - log something properly though that is invalid? Probably should throw exception.
-            expression = expression.substring( 1 );
+            // We will attempt to get nab a system property as a way to specify a
+            // parameter to a plugins. My particular case here is allowing the surefire
+            // plugin to run a single test so I want to specify that class on the cli
+            // as a parameter.
 
-            int pathSeparator = expression.indexOf( "/" );
-
-            if ( pathSeparator > 0 )
-            {
-                value = context.getProject().getProperty( expression.substring( 0, pathSeparator ) )
-                    + expression.substring( pathSeparator );
-            }
-            else
-            {
-                value = context.getProject().getProperty( expression );
-            }
-*/
+            value = System.getProperty( expression.substring( 1 ) );
         }
 
         // If we strike out we'll just use the expression which allows
