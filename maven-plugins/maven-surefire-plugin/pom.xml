@@ -24,5 +24,11 @@
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </model>

@@ -97,8 +97,6 @@ public class MBoot
 
     private boolean online = true;
 
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
-
     private static final String SCOPE_TEST = "test";
 
     private static final String SCOPE_COMPILE = "compile";
@@ -256,6 +254,10 @@ public class MBoot
         ClassLoader bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies(), null );
 
         reader = new ModelReader( downloader );
+        reader.parse( new File( basedir, "maven-plugins/maven-surefire-plugin/pom.xml" ) );
+        List surefireDependencies = reader.getDependencies();
+
+        reader = new ModelReader( downloader );
 
         // Install maven-components POM
         installPomFile( repoLocal, new File( basedir, "pom.xml" ) );
@@ -282,7 +284,7 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            reader = buildProject( directory, builds[i], bootstrapClassLoader );
+            reader = buildProject( directory, builds[i], bootstrapClassLoader, surefireDependencies );
 
             if ( reader.getArtifactId().equals( "maven-core" ) )
             {
@@ -308,7 +310,7 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            reader = buildProject( directory, pluginBuilds[i], cl );
+            reader = buildProject( directory, pluginBuilds[i], cl, surefireDependencies );
 
             System.out.println( "--------------------------------------------------------------------" );
         }
@@ -427,7 +429,8 @@ public class MBoot
         System.out.println( "Finished at: " + fullStop );
     }
 
-    public ModelReader buildProject( String basedir, String projectId, ClassLoader classLoader )
+    public ModelReader buildProject( String basedir, String projectId, ClassLoader classLoader,
+                                     List surefireDependencies )
         throws Exception
     {
         System.out.println( "Building project in " + basedir );
@@ -578,7 +581,7 @@ public class MBoot
         // Run tests
         // ----------------------------------------------------------------------
 
-        runTests( basedir, classes, testClasses, reader );
+        runTests( basedir, classes, testClasses, reader, surefireDependencies );
 
         // ----------------------------------------------------------------------
         // Create JAR
@@ -750,7 +753,8 @@ public class MBoot
         }
     }
 
-    private void runTests( String basedir, String classes, String testClasses, ModelReader reader )
+    private void runTests( String basedir, String classes, String testClasses, ModelReader reader,
+                           List surefireDependencies )
         throws Exception
     {
         SurefirePlugin testRunner = new SurefirePlugin();
@@ -769,9 +773,13 @@ public class MBoot
 
         String reportsDir = new File( basedir, "target/surefire-reports" ).getAbsolutePath();
 
-        String[] cp = (String[]) classpath( reader.getDependencies(), null, SCOPE_TEST ).toArray( EMPTY_STRING_ARRAY );
-        boolean success = testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes, cp,
-                                              reportsDir );
+        List depList = new ArrayList( reader.getDependencies() );
+        depList.addAll( surefireDependencies );
+
+        List classpath = classpath( depList, null, SCOPE_TEST );
+        classpath.add( classes );
+        classpath.add( testClasses );
+        boolean success = testRunner.execute( basedir, includes, excludes, classpath, reportsDir );
 
         if ( !success )
         {

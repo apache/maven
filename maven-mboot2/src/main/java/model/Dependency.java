@@ -198,4 +198,9 @@ public class Dependency
     {
         return getArtifactDirectory() + "/" + getType() + "s/" + getArtifact();
     }
+
+    public String toString()
+    {
+        return getRepositoryPath();
+    }
 }

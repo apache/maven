@@ -36,20 +36,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- TODO: should get these from the surefire plugin -->
-    <dependency>
-      <groupId>surefire</groupId>
-      <artifactId>surefire-booter</artifactId>
-      <version>1.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>surefire</groupId>
-      <artifactId>surefire</artifactId>
-      <version>1.2</version>
-      <scope>test</scope>
-    </dependency>
-
     <!-- Just for install... possibly not needed here? -->
     <dependency>
       <groupId>classworlds</groupId>
