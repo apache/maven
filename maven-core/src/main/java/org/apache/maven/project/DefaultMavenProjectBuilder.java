@@ -422,6 +422,8 @@ public class DefaultMavenProjectBuilder
             localRepository = new File( userHome, ".m2/repository" ).getAbsolutePath();
         }
 
+        System.setProperty( "maven.repo.local", localRepository );
+
         return RepositoryUtils.localRepositoryToWagonRepository( localRepository );
     }
 
