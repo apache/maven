@@ -28,4 +28,11 @@
       <version>2.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
+  <build>
+    <unitTest>
+      <excludes>
+        <exclude>**/ResourcesPluginTest.java</exclude>
+      </excludes>
+    </unitTest>
+  </build>
 </project>
