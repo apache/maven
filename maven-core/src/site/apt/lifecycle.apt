@@ -51,12 +51,19 @@ Maven Lifecycle
                 |          v
                 |         do any prereqs need to be processed?
                 |           |
-                |    yes ---+--- no
-                |    |
-                |    |
-                | foreach(prereq = goalX in another plugin)
-                |    |
-                +----+
+                |    yes ---+------ no
+                |    |               |
+                |    |               |
+                | foreach(prereq)    |
+                |    |               |
+                +----+               |
+                                     v
+                                   
+
+
+
+
+
 +-----+
 
  * Multiple goals
