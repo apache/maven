@@ -173,7 +173,10 @@ public class SurefirePlugin
 
         for ( int i = 0; i < classpathElements.length; i++ )
         {
-            surefireBooter.addClassPathUrl( classpathElements[i] );
+            if(classpathElements[i] != null)
+            {
+                surefireBooter.addClassPathUrl( classpathElements[i] );
+            }
         }
 
         surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReporter" );
