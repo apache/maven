@@ -1687,6 +1687,33 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>goals</name>
+          <version>4.0.0</version>
+          <association>
+            <type>Goal</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Goal</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>4.0.0</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>configuration</name>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
     </class>
 
