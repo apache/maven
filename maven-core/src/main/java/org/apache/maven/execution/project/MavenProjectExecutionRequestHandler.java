@@ -24,9 +24,11 @@ public class MavenProjectExecutionRequestHandler
         {
             MavenProject project = getProject( ( (MavenProjectExecutionRequest) request ).getPom(), request.getLocalRepository() );
 
-            response.setStart( new Date() );
+            Date s = new Date();
 
             response = lifecycleManager.execute( createSession( request, project ) );
+
+            response.setStart( s );
 
             response.setFinish( new Date() );
         }
