@@ -119,11 +119,7 @@ public class DefaultMavenProjectBuilder
                 previous = current;
             }
 
-            pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
-
             project = processProjectLogic( project, localRepository, resolveDependencies );
-
-            project.setFile( projectDescriptor );
 
             return project;
         }
@@ -144,7 +140,11 @@ public class DefaultMavenProjectBuilder
 
         MavenProject parentProject = project.getParent();
 
+        File projectDescriptor = project.getFile();
+        pathTranslator.alignToBaseDirectory( model, projectDescriptor );
+
         project = new MavenProject( model );
+        project.setFile( projectDescriptor );
         project.setParent( parentProject );
         project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
 
@@ -382,11 +382,9 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( project, localRepository, resolveDependencies );
+            project.setFile( new File( ".", "pom.xml" ) );
 
-            File projectFile = new File( ".", "pom.xml" );
-            project.setFile( projectFile );
-            pathTranslator.alignToBaseDirectory( project.getModel(), projectFile );
+            project = processProjectLogic( project, localRepository, resolveDependencies );
 
             return project;
         }
