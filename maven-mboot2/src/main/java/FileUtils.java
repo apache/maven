@@ -912,6 +912,11 @@ public class FileUtils
     public static void forceDelete( final File file )
         throws IOException
     {
+        if ( ! file.exists() )
+        {
+            return;
+        }
+
         if ( file.isDirectory() )
         {
             deleteDirectory( file );
@@ -934,6 +939,11 @@ public class FileUtils
     public static void forceDeleteOnExit( final File file )
         throws IOException
     {
+        if ( ! file.exists() )
+        {
+            return;
+        }
+
         if ( file.isDirectory() )
         {
             deleteDirectoryOnExit( file );
