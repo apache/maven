@@ -30,11 +30,18 @@
           </association>
         </field>
         <field>
-          <name>filesets</name>
+          <name>fileSets</name>
           <version>1.0.0</version>
-          <required>true</required>
           <association>
             <type>FileSet</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>dependencySets</name>
+          <version>1.0.0</version>
+          <association>
+            <type>DependencySet</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -54,6 +61,40 @@
           <name>outputDirectory</name>
           <version>1.0.0</version>
           <type>String</type>
+        </field>
+        <field>
+          <name>includes</name>
+          <version>1.0.0</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>excludes</name>
+          <version>1.0.0</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>DependencySet</name>
+      <version>1.0.0</version>
+      <fields>
+        <field>
+          <name>outputDirectory</name>
+          <version>1.0.0</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>scope</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <defaultValue>runtime</defaultValue>
+          <required>true</required>
         </field>
         <field>
           <name>includes</name>

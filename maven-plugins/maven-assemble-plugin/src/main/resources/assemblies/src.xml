@@ -5,18 +5,18 @@
     <format>tar.bz2</format>
     <format>zip</format>
   </formats>
-  <filesets>
-    <fileset>
+  <fileSets>
+    <fileSet>
       <includes>
         <include>README*</include>
         <include>LICENSE*</include>
         <include>NOTICE*</include>
         <include>pom.xml</include>
       </includes>
-    </fileset>
-    <fileset>
+    </fileSet>
+    <fileSet>
       <!-- TODO: use expresssions instead: ${project.build.sourceDirectory}, etc -->
       <directory>src</directory>
-    </fileset>
-  </filesets>
+    </fileSet>
+  </fileSets>
 </assembly>
