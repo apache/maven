@@ -81,6 +81,11 @@ public class DefaultArtifactHandlerManager
     {
         ArtifactHandler handler = (ArtifactHandler) artifactHandlers.get( artifact.getType() );
 
+        if ( handler == null )
+        {
+            throw new ArtifactHandlerNotFoundException( "Artifact handler for type '" + type + "' cannot be found." );
+        }
+
         return interpolateLayout( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), handler
             .directory(), handler.extension() );
     }
