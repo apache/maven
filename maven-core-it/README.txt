@@ -12,6 +12,12 @@ it0002: Builds upon it0001: we add the download of a dependency. We delete
        
 it0003: Builds upon it0001: we add a jar installation step. We delete the JAR
         from the local repository to make sure it is there post build.
+       
+it0004: The simplest of pom installation. We have a pom and we install it in
+        local repository.
+       
+it0005: The simplest of pom installation. We have a snapshot pom and we install
+        it in local repository.
 
 -------------------------------------------------------------------------------
 
