@@ -148,7 +148,7 @@ public class ArtifactResolverTest
                 {
                     try
                     {
-                        dependencies.add( createArtifact( "h", "1.0" ) );
+                        dependencies.add( new DefaultArtifact( "maven", "h", "1.0", "jar" ) );
                     }
                     catch ( Exception e )
                     {
@@ -194,7 +194,7 @@ public class ArtifactResolverTest
                 {
                     try
                     {
-                        dependencies.add( createArtifact( "j", "1.0" ) );
+                        dependencies.add( new DefaultArtifact( "maven", "j", "1.0", "jar" ) );
                     }
                     catch ( Exception e )
                     {
