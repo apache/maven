@@ -16,9 +16,20 @@
         <artifactId>maven-modello-plugin</artifactId>
         <version>1.0-SNAPSHOT</version>
         <configuration>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <model>maven-user.mdo</model>
         </configuration>
+        <goals>
+          <goal>
+            <id>xpp3-writer</id>
+          </goal>
+          <goal>
+            <id>xpp3-reader</id>
+          </goal>
+          <goal>
+            <id>java</id>
+          </goal>
+        </goals>
       </plugin>
     </plugins>
   </build>
