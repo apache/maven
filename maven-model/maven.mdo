@@ -32,7 +32,6 @@
             The location of the parent project, if one exists. Values from the parent project will be
             the default for this project if they are left unspecified.
             The path may be absolute, or relative to the current project.xml file.
-            <source><![CDATA[<extend>${basedir}/../project.xml</extend>]]></source>
           </description>
           <type>String</type>
         </field>
@@ -620,17 +619,26 @@
       <fields>
         <field>
           <name>connection</name>
-          <description>the description</description>
+          <description>
+            The source configuration management system URL
+            that describes the repository and how to connect to the
+            repository.  This is used by Maven when <a
+            href="plugins/dist/index.html">building versions</a>
+            from specific ID.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>developerConnection</name>
-          <description>the description</description>
+          <description>
+            Just like connection, but for developers, i.e. this scm connection
+            will not be read only.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
-          <description>the description</description>
+          <description>The URL to the project's browsable CVS repository.</description>
           <type>String</type>
         </field>
       </fields>
