@@ -129,7 +129,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
     (
       cd $DIR/maven-components
   
-      ./m2-bootstrap-all.sh
+      sh m2-bootstrap-all.sh
     )    
 
     DIST=m2-${TIMESTAMP}.tar.gz

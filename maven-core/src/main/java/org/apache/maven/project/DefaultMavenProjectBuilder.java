@@ -18,6 +18,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -260,17 +261,10 @@ public class DefaultMavenProjectBuilder
     private File findParentModel( Parent parent, Set remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        Dependency dependency = new Dependency();
-
-        dependency.setGroupId( parent.getGroupId() );
-
-        dependency.setArtifactId( parent.getArtifactId() );
-
-        dependency.setVersion( parent.getVersion() );
-
-        dependency.setType( "pom" );
-
-        Artifact artifact = artifactFactory.createArtifact( dependency, localRepository );
+        Artifact artifact = new DefaultArtifact( parent.getGroupId(), 
+                                                 parent.getArtifactId(),
+                                                 parent.getVersion(),
+                                                 "pom" );
 
         try
         {
