@@ -418,19 +418,13 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        return buildSuperProject( localRepository, false );
-    }
-
-    public MavenProject buildSuperProject( ArtifactRepository localRepository, boolean resolveDependencies )
-        throws ProjectBuildingException
-    {
         MavenProject project = new MavenProject( getSuperModel() );
 
         try
         {
             project.setFile( new File( ".", "pom.xml" ) );
 
-            project = processProjectLogic( project, localRepository, resolveDependencies );
+            project = processProjectLogic( project, localRepository, false );
 
             return project;
         }

@@ -36,9 +36,6 @@ public interface MavenProjectBuilder
     MavenProject buildSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject buildSuperProject( ArtifactRepository localRepository, boolean transitive )
-        throws ProjectBuildingException;
-
     // take this out
 
     List getSortedProjects( List projects )
