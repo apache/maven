@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
-  <artifactId>maven-core-it0006</artifactId>
+  <artifactId>maven-core-it0008</artifactId>
   <version>1.0</version>
   <dependencies>
     <dependency>
