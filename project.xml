@@ -22,6 +22,11 @@
     <url>http://cvs.apache.org/viewcvs.cgi/maven-components/${pom.artifactId}</url>
   </scm>
 
+  <issueManagement>
+    <system>jira<system/>
+    <url>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10500</url>
+  <issueManagement>
+
   <mailingLists>
     <mailingList>
       <name>Maven User List</name>
