@@ -43,8 +43,12 @@ public class RepositoryUtils
         return repos;
     }
 
-    public static ArtifactRepository
-    mavenRepositoryToWagonRepository( Repository mavenRepository )
+    /**
+     * @todo [BP]: when deploying to remote, we want to default the username, etc {@link org.apache.maven.wagon.WagonUtils#getAuthInfo()}, and also setup permissions
+     * @param mavenRepository
+     * @return
+     */
+    public static ArtifactRepository mavenRepositoryToWagonRepository( Repository mavenRepository )
     {
         ArtifactRepository retValue = new ArtifactRepository();
         if ( mavenRepository.getUsername() != null )
