@@ -137,7 +137,7 @@ public class DefaultMavenProjectBuilder
                 previous = current;
             }
 
-            if ( userModelFile != null )
+            if ( userModel != null )
             {
                 modelInheritanceAssembler.assembleModelInheritance( userModel, previous );
 
