@@ -23,16 +23,16 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.io.File;
+import java.util.List;
 
-/**
- * @todo snapshot notions need to be dealt with in one place.
- */
 public class DefaultArtifactDeployer
     implements ArtifactDeployer
 {
     private WagonManager wagonManager;
 
     private ArtifactHandlerManager artifactHandlerManager;
+
+    private List artifactTransformations;
 
     public void deploy( String basedir, Artifact artifact, ArtifactRepository deploymentRepository )
         throws ArtifactDeploymentException
@@ -54,6 +54,8 @@ public class DefaultArtifactDeployer
     public void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository )
         throws ArtifactDeploymentException
     {
+        // TODO: perform transformations
+
         try
         {
             wagonManager.putArtifact( source, artifact, deploymentRepository );

@@ -25,6 +25,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -56,6 +57,8 @@ public class DefaultArtifactResolver
 
     private ArtifactHandlerManager artifactHandlerManager;
 
+    private List artifactTransformations;
+
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------
@@ -67,27 +70,32 @@ public class DefaultArtifactResolver
         // ----------------------------------------------------------------------
         // Check for the existence of the artifact in the specified local
         // ArtifactRepository. If it is present then simply return as the
-        // request
-        // for resolution has been satisfied.
+        // request for resolution has been satisfied.
         // ----------------------------------------------------------------------
 
         Logger logger = getLogger();
         logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository + "}\n" +
                       "{remoteRepositories: " + remoteRepositories + "}" );
 
+        // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
+        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
+        {
+            ArtifactTransformation transform = (ArtifactTransformation) i.next();
+            artifact = transform.transformLocalArtifact( artifact, localRepository );
+        }
+
         String localPath;
 
         try
         {
-            localPath = artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository );
+            localPath = localRepository.pathOf( artifact );
         }
         catch ( ArtifactPathFormatException e )
         {
             throw new ArtifactResolutionException( "Error resolving artifact: ", e );
         }
 
-        // TODO: what if it were a snapshot that was transformed?
-        File destination = new File( localPath );
+        File destination = new File( localRepository.getBasedir(), localPath );
         artifact.setFile( destination );
 
         if ( destination.exists() )

@@ -22,18 +22,22 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundExceptio
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 public class DefaultArtifactInstaller
     extends AbstractLogEnabled
     implements ArtifactInstaller
 {
     private ArtifactHandlerManager artifactHandlerManager;
+
+    private List artifactTransformations;
 
     public void install( String basedir, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
@@ -57,12 +61,19 @@ public class DefaultArtifactInstaller
     {
         try
         {
-            String localPath = artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository );
+            // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
+            for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
+            {
+                ArtifactTransformation transform = (ArtifactTransformation) i.next();
+                artifact = transform.transformLocalArtifact( artifact, localRepository );
+            }
+
+            String localPath = localRepository.pathOf( artifact );
 
             getLogger().info( "Installing " + source.getPath() + " to " + localPath );
 
             // TODO: use a file: wagon and the wagon manager?
-            File destination = new File( localPath );
+            File destination = new File( localRepository.getBasedir(), localPath );
             if ( !destination.getParentFile().exists() )
             {
                 destination.getParentFile().mkdirs();

@@ -91,7 +91,7 @@ public class DefaultWagonManager
 
         wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
-        wagon.put( source, artifactHandlerManager.getRemoteRepositoryArtifactPath( artifact, repository ) );
+        wagon.put( source, repository.pathOf( artifact ) );
 
         wagon.disconnect();
 
@@ -107,11 +107,10 @@ public class DefaultWagonManager
         {
             ArtifactRepository repository = (ArtifactRepository) iter.next();
 
-            // TODO: should we avoid doing the transforms on this every time, and instead transform outside the loop?
             String remotePath = null;
             try
             {
-                remotePath = artifactHandlerManager.getRemoteRepositoryArtifactPath( artifact, repository );
+                remotePath = repository.pathOf( artifact );
             }
             catch ( ArtifactPathFormatException e )
             {

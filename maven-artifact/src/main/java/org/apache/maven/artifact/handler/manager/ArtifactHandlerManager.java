@@ -16,10 +16,7 @@ package org.apache.maven.artifact.handler.manager;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -31,10 +28,4 @@ public interface ArtifactHandlerManager
 
     ArtifactHandler getArtifactHandler( String type )
         throws ArtifactHandlerNotFoundException;
-
-    String getLocalRepositoryArtifactPath( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactPathFormatException;
-
-    String getRemoteRepositoryArtifactPath( Artifact artifact, ArtifactRepository remoteRepository )
-        throws ArtifactPathFormatException;
 }

@@ -16,15 +16,9 @@ package org.apache.maven.artifact.handler.manager;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.transform.ArtifactTransformation;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,8 +30,6 @@ import java.util.Set;
 public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
-    private List artifactTransformations;
-
     private Map artifactHandlers;
 
     private ArtifactRepositoryLayout artifactRepositoryLayout;
@@ -58,32 +50,5 @@ public class DefaultArtifactHandlerManager
     public Set getHandlerTypes()
     {
         return artifactHandlers.keySet();
-    }
-
-    public String getRemoteRepositoryArtifactPath( Artifact artifact, ArtifactRepository remoteRepository )
-        throws ArtifactPathFormatException
-    {
-        // TODO: note that these are currrently assuming only PUT operations, not GET operations
-        // TODO: note also that these add metadata to the artifacts, so it is assumed this is only called once per artifact - needs to be fixed
-
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
-        {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
-            artifact = transform.transformRemoteArtifact( artifact, remoteRepository );
-        }
-
-        return remoteRepository.pathOf( artifact );
-    }
-
-    public String getLocalRepositoryArtifactPath( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactPathFormatException
-    {
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
-        {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
-            artifact = transform.transformLocalArtifact( artifact, localRepository );
-        }
-
-        return localRepository.getBasedir() + "/" + localRepository.pathOf( artifact );
     }
 }
