@@ -38,7 +38,7 @@ public class DefaultMavenSessionPhaseManager
         return lifecyclePhases;
     }
 
-    public MavenExecutionResponse execute( MavenSession context )
+    public MavenExecutionResponse execute( MavenSession session )
         throws Exception
     {
         for ( Iterator iterator = lifecyclePhases.iterator(); iterator.hasNext(); )
@@ -47,7 +47,7 @@ public class DefaultMavenSessionPhaseManager
 
             phase.enableLogging( getLogger() );
 
-            MavenExecutionResponse response = phase.execute( context );
+            MavenExecutionResponse response = phase.execute( session );
 
             if ( response.isExecutionFailure() )
             {

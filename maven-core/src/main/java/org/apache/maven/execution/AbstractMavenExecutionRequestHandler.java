@@ -33,7 +33,7 @@ public abstract class AbstractMavenExecutionRequestHandler
 
     protected PlexusContainer container;
 
-    protected MavenSessionPhaseManager lifecycleManager;
+    protected MavenSessionPhaseManager sessionPhaseManager;
 
     protected I18N i18n;
 

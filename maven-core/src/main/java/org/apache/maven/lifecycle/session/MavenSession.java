@@ -124,12 +124,14 @@ public class MavenSession
     //
     // ----------------------------------------------------------------------
 
-    public Object lookup( String role ) throws ComponentLookupException
+    public Object lookup( String role )
+        throws ComponentLookupException
     {
         return container.lookup( role );
     }
 
-    public Object lookup( String role, String roleHint ) throws ComponentLookupException
+    public Object lookup( String role, String roleHint )
+        throws ComponentLookupException
     {
         return container.lookup( role, roleHint );
     }
@@ -200,7 +202,8 @@ public class MavenSession
         }
     }
 
-    public void addImpliedExecution( String goal, String implied ) throws CycleDetectedException
+    public void addImpliedExecution( String goal, String implied )
+        throws CycleDetectedException
     {
         dag.addEdge( goal, implied );
     }

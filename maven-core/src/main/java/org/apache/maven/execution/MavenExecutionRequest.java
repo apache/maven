@@ -15,7 +15,5 @@ public interface MavenExecutionRequest
 
     List getGoals();
 
-    File getMavenHome();
-
     String getType();
 }

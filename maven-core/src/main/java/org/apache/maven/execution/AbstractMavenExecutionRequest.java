@@ -16,8 +16,6 @@ public class AbstractMavenExecutionRequest
 
     protected List goals;
 
-    protected File mavenHome;
-
     protected String type;
 
     public AbstractMavenExecutionRequest( ArtifactRepository localRepository, List goals )
@@ -25,8 +23,6 @@ public class AbstractMavenExecutionRequest
         this.localRepository = localRepository;
 
         this.goals = goals;
-
-        this.mavenHome = mavenHome;
     }
 
     public ArtifactRepository getLocalRepository()
@@ -37,11 +33,6 @@ public class AbstractMavenExecutionRequest
     public List getGoals()
     {
         return goals;
-    }
-
-    public File getMavenHome()
-    {
-        return mavenHome;
     }
 
     public String getType()

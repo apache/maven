@@ -26,7 +26,7 @@ public class MavenProjectExecutionRequestHandler
 
             Date s = new Date();
 
-            response = lifecycleManager.execute( createSession( request, project ) );
+            response = sessionPhaseManager.execute( createSession( request, project ) );
 
             response.setStart( s );
 
