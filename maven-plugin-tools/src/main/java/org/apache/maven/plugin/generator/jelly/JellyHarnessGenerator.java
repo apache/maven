@@ -16,12 +16,12 @@ package org.apache.maven.plugin.generator.jelly;
  * limitations under the License.
  */
 
-import com.thoughtworks.xstream.xml.text.PrettyPrintXMLWriter;
-import com.thoughtworks.xstream.xml.XMLWriter;
-import com.thoughtworks.xstream.xml.xpp3.Xpp3Dom;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.generator.AbstractGenerator;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
+import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -16,11 +16,11 @@ package org.apache.maven.plugin.generator;
  * limitations under the License.
  */
 
-import com.thoughtworks.xstream.xml.XMLWriter;
-import com.thoughtworks.xstream.xml.text.PrettyPrintXMLWriter;
-import com.thoughtworks.xstream.xml.xpp3.Xpp3Dom;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.XMLWriter;
+import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 
 import java.io.File;
 import java.io.FileWriter;

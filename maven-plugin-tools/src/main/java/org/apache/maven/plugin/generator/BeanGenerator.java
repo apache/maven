@@ -16,15 +16,15 @@ package org.apache.maven.plugin.generator;
  * limitations under the License.
  */
 
-import com.thoughtworks.xstream.xml.xpp3.Xpp3Dom;
-import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.codehaus.modello.generator.java.javasource.JClass;
 import org.codehaus.modello.generator.java.javasource.JConstructor;
 import org.codehaus.modello.generator.java.javasource.JMethod;
 import org.codehaus.modello.generator.java.javasource.JParameter;
 import org.codehaus.modello.generator.java.javasource.JSourceWriter;
 import org.codehaus.modello.generator.java.javasource.JType;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.io.FileWriter;
