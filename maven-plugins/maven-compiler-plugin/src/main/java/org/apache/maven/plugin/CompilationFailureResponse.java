@@ -12,6 +12,8 @@ import java.util.Iterator;
 public class CompilationFailureResponse
     extends FailureResponse
 {
+    private String LS = System.getProperty( "line.separator" );
+
     public CompilationFailureResponse( Object o )
     {
         super( o );
@@ -32,7 +34,7 @@ public class CompilationFailureResponse
         {
             CompilerError compilerError = (CompilerError) it.next();
 
-            sb.append( compilerError );
+            sb.append( compilerError ).append( LS );
         }
 
         return sb.toString();
