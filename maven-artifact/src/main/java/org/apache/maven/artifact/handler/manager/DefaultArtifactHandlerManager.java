@@ -83,6 +83,11 @@ public class DefaultArtifactHandlerManager
     public String path( Artifact artifact )
         throws ArtifactHandlerNotFoundException
     {
+        if ( artifact.getType() == null )
+        {
+            throw new ArtifactHandlerNotFoundException( "Artifact handler is null for artifact " + artifact );
+        }
+
         ArtifactHandler handler = getArtifactHandler( artifact.getType() );
 
         return interpolateLayout( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), handler.directory(), handler.extension() );
