@@ -8,6 +8,7 @@
   </parent>
   <groupId>maven</groupId>
   <artifactId>maven-compiler-plugin</artifactId>
+  <type>plugin</type>  
   <name>Maven Compiler Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <inceptionYear>2001</inceptionYear>

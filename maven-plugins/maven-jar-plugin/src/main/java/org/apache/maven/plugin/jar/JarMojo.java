@@ -60,7 +60,7 @@ import java.util.jar.Manifest;
  *  expression="#project.build.output"
  *  description=""
  *
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
+ * @author <a href="michal@codehaus">Michal Maczka</a>
  * @version $Id$
  */
 public class JarMojo

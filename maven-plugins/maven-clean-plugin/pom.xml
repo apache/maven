@@ -8,6 +8,7 @@
   </parent>
   <groupId>maven-clean-plugin</groupId>
   <artifactId>maven-clean-plugin</artifactId>
+  <type>plugin</type>  
   <name>Maven Clean Plugin</name>
   <currentVersion>1.0-SNAPSHOT</currentVersion>
   <inceptionYear>2001</inceptionYear>

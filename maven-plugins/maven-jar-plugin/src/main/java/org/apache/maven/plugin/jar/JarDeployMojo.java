@@ -40,6 +40,7 @@ import java.io.File;
  *  validator=""
  *  expression="#maven.final.name"
  *  description=""
+ *
  * @parameter
  *  name="outputDirectory"
  *  type="String"
@@ -47,6 +48,7 @@ import java.io.File;
  *  validator=""
  *  expression="#project.build.directory"
  *  description=""
+ *
  * @parameter
  *  name="project"
  *  type="org.apache.maven.project.MavenProject"
@@ -54,6 +56,7 @@ import java.io.File;
  *  validator=""
  *  expression="#project"
  *  description=""
+ *
  * @parameter
  *  name="deployer"
  *  type="org.apache.maven.artifact.deployer.ArtifactDeployer"

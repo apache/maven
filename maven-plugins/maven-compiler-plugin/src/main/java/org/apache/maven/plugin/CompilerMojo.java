@@ -22,6 +22,7 @@ import java.util.List;
  *  validator=""
  *  expression="#project.build.sourceDirectory"
  *  description=""
+ *
  * @parameter
  *  name="outputDirectory"
  *  type="String"
@@ -29,6 +30,7 @@ import java.util.List;
  *  validator=""
  *  expression="#project.build.output"
  *  description=""
+ *
  * @parameter
  *  name="classpathElements"
  *  type="String[]"
