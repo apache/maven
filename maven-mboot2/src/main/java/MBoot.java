@@ -368,10 +368,12 @@ public class MBoot
         }
 
         // Copy in deps used for non-java mojo support.
+/* Causing issues
         for ( int i = 0; i < mojoSupportDeps.length; i++ )
         {
             FileUtils.copyFileToDirectory( repoLocal + "/" + mojoSupportDeps[i], lib );
         }
+*/
 
         // Copy maven itself
 
