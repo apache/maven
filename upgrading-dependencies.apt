@@ -1,0 +1,28 @@
+ -----
+ Upgrading Maven2's dependencies
+ -----
+ Jason van Zyl
+ -----
+
+Upgrading Maven2's dependencies
+ 
+ When changing the dependencies that Maven2 requires and to have the
+ bootstrap work correctly there are a few things that must be changed:
+ 
+* MBoot
+
+ The references to dependencies in the mboot must be changed to reflect any
+ updates in the core dependencies. These are primarily Plexus artifacts and
+ Modello artifacts.
+ 
+* Top level POM
+ 
+ The references to common dependencies for the bootstrap build should be
+ changed in the top-level POM to reflect the change in core dependencies
+ and these should match the changes in mboot.
+
+* Reference to Classworlds in the verifier
+
+ The verifier currently has a reference to Classworlds in order to run. This
+ should ulimately be changed as the integration tests should be run as
+ Maven is run itself. 
