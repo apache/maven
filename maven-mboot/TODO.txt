@@ -1,3 +1,4 @@
 o obey jar overrides
 o transitive deps 
 o install
+o interpolation in <extend/> to match behaviour in the maven-project component
