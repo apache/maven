@@ -2,10 +2,11 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.TransferFailedException;
 
@@ -117,7 +118,8 @@ public class DefaultArtifactResolver
     public ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                          Set remoteRepositories,
                                                          ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
+                                                         ArtifactMetadataSource source,
+                                                         ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         ArtifactResolutionResult artifactResolutionResult;
@@ -127,7 +129,8 @@ public class DefaultArtifactResolver
             artifactResolutionResult = collect( artifacts,
                                                 localRepository,
                                                 remoteRepositories,
-                                                source );
+                                                source,
+                                                filter );
         }
         catch ( TransitiveArtifactResolutionException e )
         {
@@ -140,6 +143,15 @@ public class DefaultArtifactResolver
         }
 
         return artifactResolutionResult;
+    }
+
+    public ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                         Set remoteRepositories,
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source )
+        throws ArtifactResolutionException
+    {
+        return resolveTransitively( artifacts, remoteRepositories, localRepository, source, null );
     }
 
     public ArtifactResolutionResult resolveTransitively( Artifact artifact,
@@ -160,10 +172,11 @@ public class DefaultArtifactResolver
     //
     // ----------------------------------------------------------------------
 
-    public ArtifactResolutionResult collect( Set artifacts,
-                                             ArtifactRepository localRepository,
-                                             Set remoteRepositories,
-                                             ArtifactMetadataSource source )
+    protected ArtifactResolutionResult collect( Set artifacts,
+                                                ArtifactRepository localRepository,
+                                                Set remoteRepositories,
+                                                ArtifactMetadataSource source,
+                                                ArtifactFilter filter )
         throws TransitiveArtifactResolutionException
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
@@ -199,7 +212,15 @@ public class DefaultArtifactResolver
                 }
                 else
                 {
-                    //It's the first time we have encountered this artifact
+                    // ----------------------------------------------------------------------
+                    // It's the first time we have encountered this artifact
+                    // ----------------------------------------------------------------------
+
+                    if ( filter != null && !filter.include( newArtifact.getArtifactId() ) )
+                    {
+                        continue;
+                    }
+
                     resolvedArtifacts.put( id, newArtifact );
 
                     Set referencedDependencies = null;
@@ -219,8 +240,10 @@ public class DefaultArtifactResolver
             }
         }
 
+        // ----------------------------------------------------------------------
         // the dependencies list is keyed by groupId+artifactId+type
         // so it must be 'rekeyed' to the complete id: groupId+artifactId+type+version
+        // ----------------------------------------------------------------------
 
         Map artifactResult = result.getArtifacts();
 
@@ -259,5 +282,18 @@ public class DefaultArtifactResolver
         }
 
         conflicts.add( newArtifact );
+    }
+
+    protected boolean includeArtifact( String artifactId, String[] artifactExcludes )
+    {
+        for ( int b = 0; b < artifactExcludes.length; b++ )
+        {
+            if ( artifactId.equals( artifactExcludes[b] ) )
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
