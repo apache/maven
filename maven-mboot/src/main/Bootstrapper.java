@@ -22,29 +22,12 @@ import java.util.StringTokenizer;
 
 public class Bootstrapper
 {
-    public static final String SNAPSHOT_SIGNATURE = "-SNAPSHOT";
-
+    private ArtifactDownloader downloader;
     private BootstrapPomParser bootstrapPomParser;
 
     private List dependencies;
 
     private List resources;
-
-    private File mavenRepoLocal;
-
-    private boolean useTimestamp = true;
-
-    private boolean ignoreErrors = true;
-
-    private List remoteRepos = new ArrayList();
-
-    private String proxyHost;
-
-    private String proxyPort;
-
-    private String proxyUserName;
-
-    private String proxyPassword;
 
     public static void main( String[] args )
         throws Exception
@@ -58,38 +41,8 @@ public class Bootstrapper
         throws Exception
     {
         String basedir = args[0];
-
-        Properties properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
-
-        setRemoteRepo( properties.getProperty( "maven.repo.remote" ) );
-
-        String mavenRepoLocalProperty = properties.getProperty( "maven.repo.local" );
-
-        if ( mavenRepoLocalProperty == null )
-        {
-            mavenRepoLocalProperty = System.getProperty( "user.home" ) + "/.maven/repository";
-        }
-
-        mavenRepoLocal = new File( mavenRepoLocalProperty );
-
-        if ( !mavenRepoLocal.exists() )
-        {
-            if ( !mavenRepoLocal.mkdirs() )
-            {
-                System.err.println( "Cannot create the specified maven.repo.local: " + mavenRepoLocal );
-
-                System.exit( 1 );
-            }
-        }
-
-        if ( !mavenRepoLocal.canWrite() )
-        {
-            System.err.println( "Can't write to " + mavenRepoLocal.getAbsolutePath() );
-
-            System.exit( 1 );
-        }
-
-        System.out.println( "Using the following for your maven.repo.local: " + mavenRepoLocal );
+        
+        downloader = new ArtifactDownloader();
 
         bootstrapPomParser = new BootstrapPomParser();
 
@@ -106,7 +59,7 @@ public class Bootstrapper
             list.add( getArtifactPath( d, "/" ) );
         }
 
-        downloadDependencies( list );
+        downloader.downloadDependencies( list );
 
         StringBuffer classPath = new StringBuffer();
 
@@ -116,9 +69,9 @@ public class Bootstrapper
         {
             Dependency d = (Dependency) i.next();
 
-            classPath.append( mavenRepoLocal + "/" + getArtifactPath( d, "/" ) + ":" );
+            classPath.append( downloader.getMavenRepoLocal() + "/" + getArtifactPath( d, "/" ) + ":" );
 
-            libs.append( mavenRepoLocal + "/" + getArtifactPath( d, "/" ) + "\n" );
+            libs.append( downloader.getMavenRepoLocal() + "/" + getArtifactPath( d, "/" ) + "\n" );
         }
 
         writeFile( "bootstrap.classpath", classPath.toString() );
@@ -178,7 +131,7 @@ public class Bootstrapper
 
         writeFile( "bootstrap.resources", res.toString() );
 
-        writeFile( "bootstrap.repo", mavenRepoLocal.getPath() );
+        writeFile( "bootstrap.repo", downloader.getMavenRepoLocal().getPath() );
     }
 
     private void writeFile( String name, String contents )
@@ -194,231 +147,6 @@ public class Bootstrapper
     private String getArtifactPath( Dependency d, String pathSeparator )
     {
         return d.getArtifactDirectory() + pathSeparator + "jars" + pathSeparator + d.getArtifact();
-    }
-
-    private void downloadDependencies( List files )
-        throws Exception
-    {
-        for ( Iterator j = files.iterator(); j.hasNext(); )
-        {
-            try
-            {
-                String file = (String) j.next();
-
-                File destinationFile = new File( mavenRepoLocal, file );
-
-                // The directory structure for this project may
-                // not exists so create it if missing.
-                File directory = destinationFile.getParentFile();
-
-                if ( directory.exists() == false )
-                {
-                    directory.mkdirs();
-                }
-
-                if ( destinationFile.exists() && !file.endsWith( SNAPSHOT_SIGNATURE ) )
-                {
-                    continue;
-                }
-
-                log( "Downloading dependency: " + file );
-
-                getRemoteArtifact( file, destinationFile );
-
-                if ( !destinationFile.exists() )
-                {
-                    throw new Exception( "Failed to download " + file );
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new Exception( e );
-            }
-        }
-    }
-
-    private void setRemoteRepo( String repos )
-    {
-        remoteRepos = new ArrayList();
-
-        if ( repos == null )
-        {
-            remoteRepos.add( "http://www.ibiblio.org/maven/" );
-            return;
-        }
-
-        StringTokenizer st = new StringTokenizer( repos, "," );
-        while ( st.hasMoreTokens() )
-        {
-            remoteRepos.add( st.nextToken().trim() );
-        }
-    }
-
-    private List getRemoteRepo()
-    {
-        return remoteRepos;
-    }
-
-    private boolean getRemoteArtifact( String file, File destinationFile )
-    {
-        boolean fileFound = false;
-
-        for ( Iterator i = getRemoteRepo().iterator(); i.hasNext(); )
-        {
-            String remoteRepo = (String) i.next();
-
-            // The username and password parameters are not being
-            // used here. Those are the "" parameters you see below.
-            String url = remoteRepo + "/" + file;
-
-            if ( !url.startsWith( "file" ) )
-            {
-                url = replace( url, "//", "/" );
-                if ( url.startsWith( "https" ) )
-                {
-                    url = replace( url, "https:/", "https://" );
-                }
-                else
-                {
-                    url = replace( url, "http:/", "http://" );
-                }
-            }
-
-            // Attempt to retrieve the artifact and set the checksum if retrieval
-            // of the checksum file was successful.
-            try
-            {
-                HttpUtils.getFile( url,
-                                   destinationFile,
-                                   ignoreErrors,
-                                   useTimestamp,
-                                   proxyHost,
-                                   proxyPort,
-                                   proxyUserName,
-                                   proxyPassword,
-                                   true );
-
-                // Artifact was found, continue checking additional remote repos (if any)
-                // in case there is a newer version (i.e. snapshots) in another repo
-                fileFound = true;
-            }
-            catch ( FileNotFoundException e )
-            {
-                // Ignore
-            }
-            catch ( Exception e )
-            {
-                // If there are additional remote repos, then ignore exception
-                // as artifact may be found in another remote repo. If there
-                // are no more remote repos to check and the artifact wasn't found in
-                // a previous remote repo, then artifactFound is false indicating
-                // that the artifact could not be found in any of the remote repos
-                //
-                // arguably, we need to give the user better control (another command-
-                // line switch perhaps) of what to do in this case? Maven already has
-                // a command-line switch to work in offline mode, but what about when
-                // one of two or more remote repos is unavailable? There may be multiple
-                // remote repos for redundancy, in which case you probably want the build
-                // to continue. There may however be multiple remote repos because some
-                // artifacts are on one, and some are on another. In this case, you may
-                // want the build to break.
-                //
-                // print a warning, in any case, so user catches on to mistyped
-                // hostnames, or other snafus
-                log( "Error retrieving artifact from [" + url + "]: " );
-            }
-        }
-
-        return fileFound;
-    }
-
-    /**
-     * <p>Replaces all occurrences of a String within another String.</p>
-     *
-     * This methods comes from Commons Lang
-     *
-     * <p>A <code>null</code> reference passed to this method is a no-op.</p>
-     *
-     * <pre>
-     * StringUtils.replace(null, *, *)        = null
-     * StringUtils.replace("", *, *)          = ""
-     * StringUtils.replace("any", null, *)    = "any"
-     * StringUtils.replace("any", *, null)    = "any"
-     * StringUtils.replace("any", "", *)      = "any"
-     * StringUtils.replace("aba", "a", null)  = "aba"
-     * StringUtils.replace("aba", "a", "")    = "b"
-     * StringUtils.replace("aba", "a", "z")   = "zbz"
-     * </pre>
-     *
-     * @param text  text to search and replace in, may be null
-     * @param repl  the String to search for, may be null
-     * @param with  the String to replace with, may be null
-     * @return the text with any replacements processed,
-     *  <code>null</code> if null String input
-     */
-    private String replace( String text, String repl, String with )
-    {
-        StringBuffer buf = new StringBuffer( text.length() );
-        int start = 0, end = 0;
-        while ( ( end = text.indexOf( repl, start ) ) != -1 )
-        {
-            buf.append( text.substring( start, end ) ).append( with );
-            start = end + repl.length();
-        }
-        buf.append( text.substring( start ) );
-        return buf.toString();
-    }
-
-    private void log( String message )
-    {
-        System.out.println( message );
-    }
-
-    private Properties loadProperties( File file )
-    {
-        try
-        {
-            return loadProperties( new FileInputStream( file ) );
-        }
-        catch ( Exception e )
-        {
-            // ignore
-        }
-
-        return new Properties();
-    }
-
-    private static Properties loadProperties( InputStream is )
-    {
-        Properties properties = new Properties();
-
-        try
-        {
-            if ( is != null )
-            {
-                properties.load( is );
-            }
-        }
-        catch ( IOException e )
-        {
-            // ignore
-        }
-        finally
-        {
-            try
-            {
-                if ( is != null )
-                {
-                    is.close();
-                }
-            }
-            catch ( IOException e )
-            {
-                // ignore
-            }
-        }
-
-        return properties;
     }
 
     static class BootstrapPomParser
