@@ -63,7 +63,7 @@ public class InstallMojo
 
         MavenCore mavenCore = ( MavenCore ) request.getParameter( "mavenCore" );
 
-        String goal = type + ":" + type;
+        String goal = type + ":install";
 
         List goals = new ArrayList( 1 );
 
