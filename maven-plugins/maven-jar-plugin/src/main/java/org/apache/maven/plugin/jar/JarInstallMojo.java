@@ -27,32 +27,26 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @goal install
- *
  * @description installs project's main artifact in local repository
- *
  * @parameter name="project"
  * type="org.apache.maven.project.MavenProject"
  * required="true"
  * validator=""
  * expression="#project"
  * description=""
- *
  * @parameter name="installer"
  * type="org.apache.maven.artifact.installer.ArtifactInstaller"
  * required="true"
  * validator=""
  * expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
  * description=""
- *
  * @parameter name="localRepository"
  * type="org.apache.maven.artifact.repository.ArtifactRepository"
  * required="true"
  * validator=""
  * expression="#localRepository"
  * description=""
- *
  * @prereq jar:jar
- *
  */
 public class JarInstallMojo
     extends AbstractPlugin
@@ -72,5 +66,18 @@ public class JarInstallMojo
                                                  project.getType() );
 
         artifactInstaller.install( project.getBuild().getDirectory(), artifact, localRepository );
+
+        // ----------------------------------------------------------------------
+        // This is not the way to do this, but in order to get the integration
+        // tests working this is what I'm doing. jvz.
+        // ----------------------------------------------------------------------
+
+        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(),
+                                                    project.getArtifactId(),
+                                                    project.getVersion(),
+                                                    project.getType() );
+
+        artifactInstaller.install( project.getFile(), pomArtifact, localRepository );
+
     }
 }
