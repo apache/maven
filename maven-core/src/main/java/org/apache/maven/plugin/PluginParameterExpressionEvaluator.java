@@ -34,6 +34,11 @@ public class PluginParameterExpressionEvaluator
     {
         Object value = null;
 
+        if ( expression == null )
+        {
+            // todo : verify if it's fixed with trygvis modification in Plexus
+            return null;
+        }
         if ( expression.startsWith( "#component" ) )
         {
             String role = expression.substring( 11 );
@@ -112,6 +117,22 @@ public class PluginParameterExpressionEvaluator
             // as a parameter.
 
             value = System.getProperty( expression.substring( 1 ) );
+        }
+
+        if ( value instanceof String )
+        {
+            String val = (String) value;
+            int sharpSeparator = val.indexOf( "#" );
+
+            if ( sharpSeparator > 0 )
+            {
+                val = val.substring( 0, sharpSeparator ) + evaluate( val.substring( sharpSeparator ), context );
+                value = val;
+            }
+            else if ( sharpSeparator > 0 )
+            {
+                value = evaluate( val.substring( sharpSeparator ), context );
+            }
         }
 
         // ----------------------------------------------------------------------

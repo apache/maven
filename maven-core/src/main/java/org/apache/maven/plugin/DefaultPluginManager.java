@@ -373,7 +373,7 @@ public class DefaultPluginManager
                 {
                     if ( parameter.getDefaultValue() != null )
                     {
-                        value = parameter.getDefaultValue();
+                        value = PluginParameterExpressionEvaluator.evaluate( parameter.getDefaultValue(), session );
                     }
                 }
 
