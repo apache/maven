@@ -23,7 +23,9 @@ it0007: We specify a parent in the POM and make sure that it is downloaded as
         part of the process.        
 
 it0008: Simple goal decoration where a plugin binds to a phase and the plugin must
-        be downloaded from a remote repository before it can be executed.
+        be downloaded from a remote repository before it can be executed. This
+        test also checks to make sure that mojo parameters are aligned to the 
+        project basedir when their type is "java.io.File".
         
 it0010: Since the artifact resolution does not use the project builder, we must
         ensure that the full hierarchy of all dependencies is resolved. This
