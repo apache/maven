@@ -8,3 +8,4 @@ maven-component.i*
 mboot.jar
 dummy
 build.ajproperties
+.generated.lst
