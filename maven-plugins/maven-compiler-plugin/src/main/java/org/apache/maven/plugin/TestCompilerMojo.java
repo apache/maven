@@ -1,27 +1,20 @@
 package org.apache.maven.plugin;
 
-import org.codehaus.plexus.compiler.Compiler;
-import org.codehaus.plexus.compiler.CompilerError;
-import org.codehaus.plexus.compiler.javac.JavacCompiler;
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @goal testCompile
  *
  * @description Compiles test sources
  *
- * @prereq compiler:compile
- *
  * @parameter
- *  name="sourceDirectory"
- *  type="String"
+ *  name="compileSourceRootsList"
+ *  type="java.util.List"
  *  required="true"
  *  validator=""
- *  expression="#project.build.unitTestSourceDirectory"
+ *  expression="#project.testCompileSourceRootsList"
  *  description=""
+ *
  * @parameter
  *  name="outputDirectory"
  *  type="String"
@@ -46,8 +39,6 @@ import java.util.List;
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
- * @todo use compile source roots and not the pom.build.sourceDirectory so that any
- *       sort of preprocessing and/or source generation can be taken into consideration.
  */
  public class TestCompilerMojo
     extends CompilerMojo
