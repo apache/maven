@@ -171,7 +171,7 @@ public class JarMojo
         catch ( Exception e )
         {
             // TODO: improve error handling
-            throw new PluginExecutionException( "Error assembling EJB", e );
+            throw new PluginExecutionException( "Error assembling JAR", e );
         }
     }
 
