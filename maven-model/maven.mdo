@@ -27,22 +27,24 @@
       <fields>
         <field>
           <name>extend</name>
-          <description>The model you wish this model to extend.</description>
+          <description>The model you wish your model to extend.</description>
           <type>String</type>
         </field>
         <field>
           <name>modelVersion</name>
-          <description>The version of this model.</description>
+          <description>The version of this model you are using.</description>
           <type>String</type>
         </field>
         <field>
           <name>groupId</name>
-          <description>the description</description>
+          <version>??? used post 3.0.0</version>
+          <description>The primary grouping for your project.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
-          <description>the description</description>
+          <version>??? used post 3.0.0</version>
+          <description>The identifier used when generating the artifact for your project.</description>
           <type>String</type>
         </field>
         <field>
@@ -52,23 +54,25 @@
         </field>
         <field>
           <name>version</name>
-          <description>the description</description>
+          <description>The currently version of your project.</description>
           <type>String</type>
         </field>
         <field>
           <name>shortDescription</name>
-          <description>the description</description>
+          <description>An abbreviated description of your project.</description>
           <type>String</type>
         </field>
         <field>
           <name>description</name>
-          <description>the description</description>
+          <description>A full description of your project.</description>
           <type>String</type>
         </field>
         <field>
           <name>type</name>
-          <description>the description</description>
+          <version>??? use post 3.0.0</version>
+          <description>The type of artifact produced by your project.</description>
           <type>String</type>
+          <defaultValue>jar</defaultValue>
         </field>
         <field>
           <name>url</name>
