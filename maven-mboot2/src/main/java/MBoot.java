@@ -3,25 +3,21 @@ import compile.CompilerConfiguration;
 import compile.JavacCompiler;
 import download.ArtifactDownloader;
 import jar.JarMojo;
+import model.Dependency;
+import model.ModelReader;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 import test.SurefirePlugin;
+import util.AbstractReader;
 import util.Commandline;
 import util.FileUtils;
 import util.IOUtil;
 import util.IsolatedClassLoader;
 import util.Os;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,26 +32,6 @@ import java.util.TreeMap;
 
 public class MBoot
 {
-    // ----------------------------------------------------------------------
-    // These are the bootstrap processes' dependencies
-    // ----------------------------------------------------------------------
-
-    String[] bootstrapDeps = new String[]{"junit/jars/junit-3.8.1.jar",
-                                          "org.codehaus.modello/jars/modello-core-1.0-alpha-1.jar",
-                                          "org.codehaus.modello/jars/modello-xdoc-plugin-1.0-alpha-1.jar",
-                                          "org.codehaus.modello/jars/modello-xml-plugin-1.0-alpha-1.jar",
-                                          "org.codehaus.modello/jars/modello-xpp3-plugin-1.0-alpha-1.jar",
-                                          "plexus/jars/plexus-utils-1.0-alpha-2.jar",
-                                          "surefire/jars/surefire-booter-1.2.jar", "surefire/jars/surefire-1.2.jar",
-                                          "qdox/jars/qdox-1.2.jar"};
-
-    // ----------------------------------------------------------------------
-    // These are plexus' runtime dependencies
-    // ----------------------------------------------------------------------
-
-    String[] plexusDeps = new String[]{"classworlds/jars/classworlds-1.1-alpha-1.jar",
-                                       "plexus/jars/plexus-container-default-1.0-alpha-2.jar"};
-
     String[] pluginGeneratorDeps = new String[]{"plexus/jars/plexus-container-default-1.0-alpha-2.jar",
                                                 "org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar",
                                                 "org.apache.maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
@@ -73,16 +49,9 @@ public class MBoot
                                    "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-verifier"};
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-clean-plugin", "maven-plugins/maven-compiler-plugin",
-                                         "maven-plugins/maven-idea-plugin", "maven-plugins/maven-install-plugin",
-                                         "maven-plugins/maven-jar-plugin", "maven-plugins/maven-plugin-plugin",
-                                         "maven-plugins/maven-resources-plugin", "maven-plugins/maven-surefire-plugin"};
-
-    String[] modelloDeps = new String[]{"classworlds/jars/classworlds-1.1-alpha-1.jar",
-                                        "plexus/jars/plexus-container-default-1.0-alpha-2.jar",
-                                        "org.codehaus.modello/jars/modello-core-1.0-alpha-1.jar",
-                                        "org.codehaus.modello/jars/modello-xdoc-plugin-1.0-alpha-1.jar",
-                                        "org.codehaus.modello/jars/modello-xml-plugin-1.0-alpha-1.jar",
-                                        "org.codehaus.modello/jars/modello-xpp3-plugin-1.0-alpha-1.jar"};
+                                         "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin",
+                                         "maven-plugins/maven-plugin-plugin", "maven-plugins/maven-resources-plugin",
+                                         "maven-plugins/maven-surefire-plugin"};
 
     private static final Map MODELLO_TARGET_VERSIONS;
 
@@ -133,11 +102,11 @@ public class MBoot
 
     private String repoLocal;
 
-    private List mbootDependencies;
-
     private List coreDeps;
 
     private boolean online = true;
+
+    private IsolatedClassLoader bootstrapClassLoader;
 
     // ----------------------------------------------------------------------
     //
@@ -174,7 +143,7 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
-        ModelReader reader = new ModelReader();
+        ModelReader reader = new ModelReader( downloader );
 
         String mavenRepoLocal = System.getProperty( "maven.repo.local" );
 
@@ -238,6 +207,7 @@ public class MBoot
             System.out.println( "HOWEVER, since you did not specify a repository path, maven will use: " +
                                 repoDir.getAbsolutePath() + " to store artifacts locally." );
         }
+        repoLocal = mavenRepoLocal;
 
         String mavenHome = null;
 
@@ -270,26 +240,24 @@ public class MBoot
             online = false;
         }
 
-        downloader = new ArtifactDownloader( mavenRepoLocal, reader.getRemoteRepositories() );
-        if ( userModelReader.getActiveProxy() != null )
+        if ( online )
         {
-            Proxy proxy = userModelReader.getActiveProxy();
-            downloader.setProxy( proxy.getHost(), proxy.getPort(), proxy.getUserName(), proxy.getPassword() );
+            downloader = new ArtifactDownloader( repoLocal, reader.getRemoteRepositories() );
+            if ( userModelReader.getActiveProxy() != null )
+            {
+                Proxy proxy = userModelReader.getActiveProxy();
+                downloader.setProxy( proxy.getHost(), proxy.getPort(), proxy.getUserName(), proxy.getPassword() );
+            }
         }
 
-        repoLocal = downloader.getMavenRepoLocal().getPath();
-
-        reader = new ModelReader();
+        reader = new ModelReader( downloader );
 
         String basedir = System.getProperty( "user.dir" );
 
-        mbootDependencies = Arrays.asList( bootstrapDeps );
+        reader.parse( new File( basedir, "maven-mboot2/pom.xml" ) );
+        bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies() );
 
-        if ( online )
-        {
-            checkMBootDeps();
-            checkModelloDeps();
-        }
+        reader = new ModelReader( downloader );
 
         // Install maven-components POM
         installPomFile( repoLocal, new File( basedir, "pom.xml" ) );
@@ -306,8 +274,6 @@ public class MBoot
         // Install it-support POM
         installPomFile( repoLocal, new File( basedir, "maven-core-it-support/pom.xml" ) );
 
-        createToolsClassLoader();
-
         for ( int i = 0; i < builds.length; i++ )
         {
             String directory = new File( basedir, builds[i] ).getAbsolutePath();
@@ -320,7 +286,7 @@ public class MBoot
 
             reader = buildProject( directory, builds[i] );
 
-            if ( reader.artifactId.equals( "maven-core" ) )
+            if ( reader.getArtifactId().equals( "maven-core" ) )
             {
                 coreDeps = reader.getDependencies();
             }
@@ -328,7 +294,7 @@ public class MBoot
             System.out.println( "--------------------------------------------------------------------" );
         }
 
-        addPluginGeneratorDependencies();
+        addPluginGeneratorDependencies( bootstrapClassLoader );
 
         for ( int i = 0; i < pluginBuilds.length; i++ )
         {
@@ -380,51 +346,45 @@ public class MBoot
         // core
         // ----------------------------------------------------------------------
 
-        String core = new File( dist, "core" ).getAbsolutePath();
+        File core = new File( dist, "core" );
 
-        FileUtils.mkdir( new File( core ).getPath() );
+        core.mkdirs();
 
-        String boot = new File( dist, "core/boot" ).getAbsolutePath();
+        File boot = new File( dist, "core/boot" );
 
-        FileUtils.mkdir( new File( boot ).getPath() );
-
-        for ( int i = 0; i < plexusDeps.length; i++ )
-        {
-            if ( plexusDeps[i].startsWith( "classworlds" ) )
-            {
-                FileUtils.copyFileToDirectory( repoLocal + "/" + plexusDeps[i], boot );
-            }
-            else
-            {
-                FileUtils.copyFileToDirectory( repoLocal + "/" + plexusDeps[i], core );
-            }
-        }
+        boot.mkdirs();
 
         // ----------------------------------------------------------------------
         // lib
         // ----------------------------------------------------------------------
 
-        String lib = new File( dist, "lib" ).getAbsolutePath();
+        File lib = new File( dist, "lib" );
 
-        FileUtils.mkdir( new File( lib ).getPath() );
+        lib.mkdirs();
 
         for ( Iterator i = coreDeps.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
 
-            if ( d.getArtifactId().equals( "classworlds" ) || //d.artifactId.equals( "plexus-container-api" ) ||
-                d.artifactId.equals( "plexus-container-default" ) || //d.artifactId.equals( "plexus-utils" ) ||
-                d.artifactId.equals( "junit" ) )
+            File source = new File( repoLocal, d.getRepositoryPath() );
+            if ( d.getArtifactId().equals( "classworlds" ) )
             {
-                continue;
+                FileUtils.copyFileToDirectory( source, boot );
             }
-
-            FileUtils.copyFileToDirectory( repoLocal + "/" + getArtifactPath( d, "/" ), lib );
+            else if ( d.getArtifactId().equals( "plexus-container-default" ) )
+            {
+                FileUtils.copyFileToDirectory( source, core );
+            }
+            else
+            {
+                FileUtils.copyFileToDirectory( source, lib );
+            }
         }
 
         // Copy maven itself
 
-        FileUtils.copyFileToDirectory( repoLocal + "/org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar", lib );
+        // TODO: create a dependency object
+        FileUtils.copyFileToDirectory( new File( repoLocal, "org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar" ), lib );
 
         System.out.println();
 
@@ -470,7 +430,7 @@ public class MBoot
     {
         System.out.println( "Building project in " + basedir );
 
-        ModelReader reader = new ModelReader();
+        ModelReader reader = new ModelReader( downloader );
 
         if ( !reader.parse( new File( basedir, "pom.xml" ) ) )
         {
@@ -510,7 +470,7 @@ public class MBoot
         {
             System.out.println( "Downloading dependencies ..." );
 
-            downloadDependencies( reader.getDependencies() );
+            downloader.downloadDependencies( reader.getDependencies() );
         }
 
         // ----------------------------------------------------------------------
@@ -555,25 +515,14 @@ public class MBoot
             System.out.println(
                 "Generating model bindings for version \'" + modelVersion + "\' in project: " + projectId );
 
-            generateSources( model.getAbsolutePath(), "java", generatedSources, modelVersion, "false" );
-
-            //generateSources( model.getAbsolutePath(), "java",
-            // generatedSources, "3.0.0", "true" );
-
-            generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, modelVersion, "false" );
-
-            //generateSources( model.getAbsolutePath(), "xpp3-reader",
-            // generatedSources, "3.0.0", "true" );
-
-            generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, modelVersion, "false" );
-
-            //generateSources( model.getAbsolutePath(), "xpp3-writer",
-            // generatedSources, "3.0.0", "true" );
-
-            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, modelVersion, "false" );
-
-            //generateSources( model.getAbsolutePath(), "xdoc", generatedDocs,
-            // "3.0.0", "true" );
+            generateSources( model.getAbsolutePath(), "java", generatedSources, modelVersion, "false",
+                             bootstrapClassLoader );
+            generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, modelVersion, "false",
+                             bootstrapClassLoader );
+            generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, modelVersion, "false",
+                             bootstrapClassLoader );
+            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, modelVersion, "false",
+                             bootstrapClassLoader );
         }
 
         // ----------------------------------------------------------------------
@@ -595,12 +544,12 @@ public class MBoot
         // Plugin descriptor generation
         // ----------------------------------------------------------------------
 
-        if ( reader.type != null && reader.type.equals( "maven-plugin" ) )
+        if ( reader.getPackaging().equals( "maven-plugin" ) )
         {
             System.out.println( "Generating maven plugin descriptor ..." );
 
             generatePluginDescriptor( sources, new File( classes, "META-INF/maven" ).getAbsolutePath(),
-                                      new File( basedir, "pom.xml" ).getAbsolutePath() );
+                                      new File( basedir, "pom.xml" ).getAbsolutePath(), bootstrapClassLoader );
         }
 
         // ----------------------------------------------------------------------
@@ -653,7 +602,9 @@ public class MBoot
 
         installPom( basedir, repoLocal, reader );
 
-        if ( !reader.artifactId.equals( "maven-plugin" ) && reader.artifactId.endsWith( "plugin" ) )
+        String artifactId = reader.getArtifactId();
+
+        if ( !artifactId.equals( "maven-plugin" ) && artifactId.endsWith( "plugin" ) )
         {
             install( basedir, repoLocal, reader, "maven-plugin" );
         }
@@ -665,33 +616,11 @@ public class MBoot
         return reader;
     }
 
-    IsolatedClassLoader cl;
-
-    private void createToolsClassLoader()
+    private void addPluginGeneratorDependencies( IsolatedClassLoader cl )
         throws Exception
     {
-        cl = new IsolatedClassLoader();
+        // TODO: create a separate class loader
 
-        for ( Iterator i = mbootDependencies.iterator(); i.hasNext(); )
-        {
-            String dependency = (String) i.next();
-
-            File f = new File( repoLocal, dependency );
-            if ( !f.exists() )
-            {
-                throw new FileNotFoundException( "Missing dependency: " + dependency +
-                                                 ( !online
-                                                   ? "; run again online"
-                                                   : "; there was a problem downloading it earlier" ) );
-            }
-
-            cl.addURL( f.toURL() );
-        }
-    }
-
-    private void addPluginGeneratorDependencies()
-        throws Exception
-    {
         for ( int i = 0; i < pluginGeneratorDeps.length; i++ )
         {
             String dependency = pluginGeneratorDeps[i];
@@ -709,7 +638,7 @@ public class MBoot
         }
     }
 
-    private void generatePluginDescriptor( String sourceDirectory, String outputDirectory, String pom )
+    private void generatePluginDescriptor( String sourceDirectory, String outputDirectory, String pom, ClassLoader cl )
         throws Exception
     {
         Class cls = cl.loadClass( "org.apache.maven.tools.plugin.pluggy.Main" );
@@ -722,25 +651,9 @@ public class MBoot
     }
 
     private void generateSources( String model, String mode, String dir, String modelVersion,
-                                  String packageWithVersion )
+                                  String packageWithVersion, ClassLoader modelloClassLoader )
         throws Exception
     {
-        IsolatedClassLoader modelloClassLoader = new IsolatedClassLoader();
-
-        for ( Iterator i = Arrays.asList( modelloDeps ).iterator(); i.hasNext(); )
-        {
-            String dependency = (String) i.next();
-
-            File f = new File( repoLocal, dependency );
-            if ( !f.exists() )
-            {
-                String msg = ( !online ? "; run again online" : "; there was a problem downloading it earlier" );
-                throw new FileNotFoundException( "Missing dependency: " + dependency + msg );
-            }
-
-            modelloClassLoader.addURL( f.toURL() );
-        }
-
         Class c = modelloClassLoader.loadClass( "org.codehaus.modello.ModelloCli" );
 
         Object generator = c.newInstance();
@@ -758,20 +671,33 @@ public class MBoot
         Thread.currentThread().setContextClassLoader( old );
     }
 
-    private void checkMBootDeps()
+    private IsolatedClassLoader createClassloaderFromDependencies( List dependencies )
         throws Exception
     {
-        System.out.println( "Checking for MBoot's dependencies ..." );
+        if ( online )
+        {
+            System.out.println( "Checking for dependencies ..." );
 
-        downloader.downloadDependencies( mbootDependencies );
-    }
+            downloader.downloadDependencies( dependencies );
+        }
 
-    private void checkModelloDeps()
-        throws Exception
-    {
-        System.out.println( "Checking for Modello's dependencies ..." );
+        IsolatedClassLoader modelloClassLoader = new IsolatedClassLoader();
 
-        downloader.downloadDependencies( Arrays.asList( modelloDeps ) );
+        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+        {
+            Dependency dependency = (Dependency) i.next();
+
+            File f = new File( repoLocal, dependency.getRepositoryPath() );
+            if ( !f.exists() )
+            {
+                String msg = ( !online ? "; run again online" : "; there was a problem downloading it earlier" );
+                throw new FileNotFoundException( "Missing dependency: " + dependency + msg );
+            }
+
+            modelloClassLoader.addURL( f.toURL() );
+        }
+
+        return modelloClassLoader;
     }
 
     private void createJar( String classes, String buildDir, ModelReader reader )
@@ -779,9 +705,9 @@ public class MBoot
     {
         JarMojo jarMojo = new JarMojo();
 
-        String artifactId = reader.artifactId;
+        String artifactId = reader.getArtifactId();
 
-        String version = reader.version;
+        String version = reader.getVersion();
 
         jarMojo.execute( new File( classes ), buildDir, artifactId + "-" + version );
     }
@@ -789,7 +715,7 @@ public class MBoot
     private void installPomFile( String repoLocal, File pomIn )
         throws Exception
     {
-        ModelReader reader = new ModelReader();
+        ModelReader reader = new ModelReader( downloader );
 
         if ( !reader.parse( pomIn ) )
         {
@@ -798,21 +724,11 @@ public class MBoot
             System.exit( 1 );
         }
 
-        String artifactId = reader.artifactId;
+        String artifactId = reader.getArtifactId();
 
-        String version = reader.version;
+        String version = reader.getVersion();
 
-        String groupId = reader.groupId;
-
-        if ( groupId == null )
-        {
-            groupId = reader.parentGroupId;
-        }
-
-        if ( version == null )
-        {
-            version = reader.parentVersion;
-        }
+        String groupId = reader.getGroupId();
 
         File pom = new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" );
 
@@ -824,21 +740,11 @@ public class MBoot
     private void installPom( String basedir, String repoLocal, ModelReader reader )
         throws Exception
     {
-        String artifactId = reader.artifactId;
+        String artifactId = reader.getArtifactId();
 
-        String version = reader.version;
+        String version = reader.getVersion();
 
-        String groupId = reader.groupId;
-
-        if ( groupId == null )
-        {
-            groupId = reader.parentGroupId;
-        }
-
-        if ( version == null )
-        {
-            version = reader.parentVersion;
-        }
+        String groupId = reader.getGroupId();
 
         File pom = new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" );
 
@@ -850,21 +756,11 @@ public class MBoot
     private void install( String basedir, String repoLocal, ModelReader reader, String type )
         throws Exception
     {
-        String artifactId = reader.artifactId;
+        String artifactId = reader.getArtifactId();
 
-        String version = reader.version;
+        String version = reader.getVersion();
 
-        String groupId = reader.groupId;
-
-        if ( groupId == null )
-        {
-            groupId = reader.parentGroupId;
-        }
-
-        if ( version == null )
-        {
-            version = reader.parentVersion;
-        }
+        String groupId = reader.getGroupId();
 
         String finalName = artifactId + "-" + version;
 
@@ -911,25 +807,6 @@ public class MBoot
     }
 
     // ----------------------------------------------------------------------
-    // Download dependencies
-    // ----------------------------------------------------------------------
-
-    private void downloadDependencies( List dependencies )
-        throws Exception
-    {
-        List list = new ArrayList();
-
-        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-        {
-            Dependency d = (Dependency) i.next();
-
-            list.add( getArtifactPath( d, "/" ) );
-        }
-
-        downloader.downloadDependencies( list );
-    }
-
-    // ----------------------------------------------------------------------
     // Compile
     // ----------------------------------------------------------------------
 
@@ -941,7 +818,7 @@ public class MBoot
         {
             Dependency d = (Dependency) dependencies.get( i );
 
-            classpath[i] = repoLocal + "/" + getArtifactPath( d, "/" );
+            classpath[i] = repoLocal + "/" + d.getRepositoryPath();
         }
 
         classpath[classpath.length - 1] = extraClasspath;
@@ -1013,7 +890,7 @@ public class MBoot
     }
 
     // ----------------------------------------------------------------------
-    // Resource copying
+    // model.Resource copying
     // ----------------------------------------------------------------------
 
     private void copyResources( String sourceDirectory, String destinationDirectory )
@@ -1042,308 +919,6 @@ public class MBoot
             }
 
             FileUtils.copyFile( source, dest );
-        }
-    }
-
-    private String getArtifactPath( Dependency d, String pathSeparator )
-    {
-        return d.getArtifactDirectory() + pathSeparator + d.getPackaging() + "s" + pathSeparator + d.getArtifact();
-    }
-
-    abstract class AbstractReader
-        extends DefaultHandler
-    {
-        private SAXParserFactory saxFactory;
-
-        public boolean parse( File file )
-        {
-            try
-            {
-                saxFactory = SAXParserFactory.newInstance();
-
-                SAXParser parser = saxFactory.newSAXParser();
-
-                InputSource is = new InputSource( new FileInputStream( file ) );
-
-                parser.parse( is, this );
-
-                return true;
-            }
-            catch ( Exception e )
-            {
-                e.printStackTrace();
-
-                return false;
-            }
-        }
-
-        public void warning( SAXParseException spe )
-        {
-            printParseError( "Warning", spe );
-        }
-
-        public void error( SAXParseException spe )
-        {
-            printParseError( "Error", spe );
-        }
-
-        public void fatalError( SAXParseException spe )
-        {
-            printParseError( "Fatal Error", spe );
-        }
-
-        private final void printParseError( String type, SAXParseException spe )
-        {
-            System.err.println( type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: " +
-                                spe.getMessage() );
-        }
-    }
-
-    class ModelReader
-        extends AbstractReader
-    {
-        int depth = 0;
-
-        String artifactId;
-
-        String version;
-
-        String groupId;
-
-        String type;
-
-        private String parentGroupId;
-
-        private String parentArtifactId;
-
-        private String parentVersion;
-
-        private List dependencies = new ArrayList();
-
-        private List remoteRepositories = new ArrayList();
-
-        private List resources = new ArrayList();
-
-        private List testResources = new ArrayList();
-
-        private Dependency currentDependency;
-
-        private Resource currentResource;
-
-        private boolean insideParent = false;
-
-        private boolean insideDependency = false;
-
-        private boolean insideResource = false;
-
-        private boolean insideRepository = false;
-
-        private StringBuffer bodyText = new StringBuffer();
-
-        public List getRemoteRepositories()
-        {
-            return remoteRepositories;
-        }
-
-        public List getDependencies()
-        {
-            return dependencies;
-        }
-
-        public List getResources()
-        {
-            return resources;
-        }
-
-        public void startElement( String uri, String localName, String rawName, Attributes attributes )
-        {
-            if ( rawName.equals( "parent" ) )
-            {
-                insideParent = true;
-            }
-            else if ( rawName.equals( "repository" ) )
-            {
-                insideRepository = true;
-            }
-            else if ( rawName.equals( "dependency" ) )
-            {
-                currentDependency = new Dependency();
-
-                insideDependency = true;
-            }
-            else if ( rawName.equals( "resource" ) )
-            {
-                currentResource = new Resource();
-
-                insideResource = true;
-            }
-            else if ( rawName.equals( "testResource" ) )
-            {
-                currentResource = new Resource();
-
-                insideResource = true;
-            }
-            depth++;
-        }
-
-        public void characters( char buffer[], int start, int length )
-        {
-            bodyText.append( buffer, start, length );
-        }
-
-        private String getBodyText()
-        {
-            return bodyText.toString().trim();
-        }
-
-        public void endElement( String uri, String localName, String rawName )
-            throws SAXException
-        {
-            // support both v3 <extend> and v4 <parent>
-            if ( rawName.equals( "parent" ) )
-            {
-                File f;
-
-                if ( parentArtifactId == null || parentArtifactId.trim().length() == 0 )
-                {
-                    throw new SAXException( "Missing required element in <parent>: artifactId." );
-                }
-
-                if ( parentGroupId == null || parentGroupId.trim().length() == 0 )
-                {
-                    throw new SAXException( "Missing required element in <parent>: groupId." );
-                }
-
-                if ( parentVersion == null || parentVersion.trim().length() == 0 )
-                {
-                    throw new SAXException( "Missing required element in <parent>: version." );
-                }
-
-                f = new File( downloader.getMavenRepoLocal(), parentGroupId + "/poms/" + parentArtifactId + "-" +
-                                                              parentVersion + ".pom" );
-
-                ModelReader p = new ModelReader();
-
-                if ( !p.parse( f ) )
-                {
-                    throw new SAXException( "Could not parse parent pom.xml" );
-                }
-
-                dependencies.addAll( p.getDependencies() );
-
-                resources.addAll( p.getResources() );
-
-                insideParent = false;
-            }
-            else if ( rawName.equals( "dependency" ) )
-            {
-                dependencies.add( currentDependency );
-
-                insideDependency = false;
-            }
-            else if ( rawName.equals( "resource" ) )
-            {
-                resources.add( currentResource );
-
-                insideResource = false;
-            }
-            else if ( rawName.equals( "testResource" ) )
-            {
-                testResources.add( currentResource );
-
-                insideResource = false;
-            }
-            else if ( insideParent )
-            {
-                if ( rawName.equals( "groupId" ) )
-                {
-                    parentGroupId = getBodyText();
-                }
-                else if ( rawName.equals( "artifactId" ) )
-                {
-                    parentArtifactId = getBodyText();
-                }
-                else if ( rawName.equals( "version" ) )
-                {
-                    parentVersion = getBodyText();
-                }
-            }
-            else if ( insideDependency )
-            {
-                if ( rawName.equals( "id" ) )
-                {
-                    currentDependency.setId( getBodyText() );
-                }
-                else if ( rawName.equals( "version" ) )
-                {
-                    currentDependency.setVersion( getBodyText() );
-                }
-                else if ( rawName.equals( "jar" ) )
-                {
-                    currentDependency.setJar( getBodyText() );
-                }
-                else if ( rawName.equals( "packaging" ) )
-                {
-                    currentDependency.setPackaging( getBodyText() );
-                }
-                else if ( rawName.equals( "groupId" ) )
-                {
-                    currentDependency.setGroupId( getBodyText() );
-                }
-                else if ( rawName.equals( "artifactId" ) )
-                {
-                    currentDependency.setArtifactId( getBodyText() );
-                }
-            }
-            else if ( insideResource )
-            {
-                if ( rawName.equals( "directory" ) )
-                {
-                    currentResource.setDirectory( getBodyText() );
-                }
-                else if ( rawName.equals( "include" ) )
-                {
-                    currentResource.addInclude( getBodyText() );
-                }
-                else if ( rawName.equals( "exclude" ) )
-                {
-                    currentResource.addExclude( getBodyText() );
-                }
-            }
-            else if ( depth == 2 )
-            {
-                if ( rawName.equals( "artifactId" ) )
-                {
-                    artifactId = getBodyText();
-                }
-                else if ( rawName.equals( "version" ) )
-                {
-                    version = getBodyText();
-                }
-                else if ( rawName.equals( "groupId" ) )
-                {
-                    groupId = getBodyText();
-                }
-                else if ( rawName.equals( "packaging" ) )
-                {
-                    type = getBodyText();
-                }
-                else if ( rawName.equals( "repository" ) )
-                {
-                    insideRepository = false;
-                }
-            }
-            else if ( insideRepository )
-            {
-                if ( rawName.equals( "url" ) )
-                {
-                    remoteRepositories.add( getBodyText() );
-                }
-            }
-
-            bodyText = new StringBuffer();
-
-            depth--;
         }
     }
 
@@ -1608,198 +1183,4 @@ public class MBoot
         }
     }
 
-    public static class Dependency
-    {
-        private String id;
-
-        private String version;
-
-        private String url;
-
-        private String jar;
-
-        private String artifactId;
-
-        private String groupId;
-
-        private String packaging = "jar";
-
-        public Dependency()
-        {
-        }
-
-        public void setId( String id )
-        {
-            this.id = id;
-        }
-
-        public String getId()
-        {
-            if ( isValid( getGroupId() ) && isValid( getArtifactId() ) )
-            {
-                return getGroupId() + ":" + getArtifactId();
-            }
-
-            return id;
-        }
-
-        public void setGroupId( String groupId )
-        {
-            this.groupId = groupId;
-        }
-
-        public String getGroupId()
-        {
-            return groupId;
-        }
-
-        public String getArtifactDirectory()
-        {
-            if ( isValid( getGroupId() ) )
-            {
-                return getGroupId();
-            }
-
-            return getId();
-        }
-
-        public String getArtifactId()
-        {
-            return artifactId;
-        }
-
-        public void setArtifactId( String artifactId )
-        {
-            this.artifactId = artifactId;
-        }
-
-        public String getArtifact()
-        {
-            // If the jar name has been explicty set then use that. This
-            // is when the <jar/> element is explicity used in the POM.
-            if ( jar != null )
-            {
-                return jar;
-            }
-
-            String artifact;
-
-            if ( isValid( getArtifactId() ) )
-            {
-                artifact = getArtifactId() + "-" + getVersion() + ".";
-            }
-            else
-            {
-                artifact = getId() + "-" + getVersion() + ".";
-            }
-
-            if ( "jar".equals( getPackaging() ) || "maven-plugin".equals( getPackaging() ) )
-            {
-                artifact += "jar";
-            }
-            else
-            {
-                artifact += getPackaging();
-            }
-            return artifact;
-        }
-
-        public void setVersion( String version )
-        {
-            this.version = version;
-        }
-
-        public String getVersion()
-        {
-            return version;
-        }
-
-        public void setJar( String jar )
-        {
-            // This is a check we need because of the jelly interpolation
-            // process. If we don't check an empty string will be set and
-            // screw up getArtifact() above.
-            if ( jar.trim().length() == 0 )
-            {
-                return;
-            }
-
-            this.jar = jar;
-        }
-
-        public String getJar()
-        {
-            return jar;
-        }
-
-        public void setUrl( String url )
-        {
-            this.url = url;
-        }
-
-        public String getUrl()
-        {
-            return url;
-        }
-
-        public String getPackaging()
-        {
-            return packaging;
-        }
-
-        public void setPackaging( String packaging )
-        {
-            this.packaging = packaging;
-        }
-
-        private boolean isValid( String value )
-        {
-            if ( value != null && value.trim().equals( "" ) == false )
-            {
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    public static class Resource
-        implements Serializable
-    {
-        private String directory;
-
-        private List includes = new ArrayList();
-
-        private List excludes = new ArrayList();
-
-        public void addInclude( String pattern )
-        {
-            this.includes.add( pattern );
-        }
-
-        public void addExclude( String pattern )
-        {
-            this.excludes.add( pattern );
-        }
-
-        public List getIncludes()
-        {
-            return this.includes;
-        }
-
-        public List getExcludes()
-        {
-            return this.excludes;
-        }
-
-        public void setDirectory( String directory )
-        {
-            this.directory = directory;
-        }
-
-        public String getDirectory()
-        {
-            return this.directory;
-        }
-    }
 }

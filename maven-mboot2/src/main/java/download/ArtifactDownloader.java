@@ -1,5 +1,7 @@
 package download;
 
+import model.Dependency;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -76,7 +78,7 @@ public class ArtifactDownloader
         proxyPort = port;
         proxyUserName = userName;
         proxyPassword = password;
-        System.out.println("Using the following proxy : " + proxyHost + "/" + proxyPort );
+        System.out.println( "Using the following proxy : " + proxyHost + "/" + proxyPort );
     }
 
     public void downloadDependencies( List files )
@@ -84,11 +86,12 @@ public class ArtifactDownloader
     {
         for ( Iterator j = files.iterator(); j.hasNext(); )
         {
-            String file = (String) j.next();
+            Dependency dep = (Dependency) j.next();
 
-            if ( !downloadedArtifacts.contains( file ) )
+            if ( !downloadedArtifacts.contains( dep ) )
             {
-                File destinationFile = new File( mavenRepoLocal, file );
+                String repositoryPath = dep.getRepositoryPath();
+                File destinationFile = new File( mavenRepoLocal, repositoryPath );
                 // The directory structure for this project may
                 // not exists so create it if missing.
                 File directory = destinationFile.getParentFile();
@@ -98,19 +101,19 @@ public class ArtifactDownloader
                     directory.mkdirs();
                 }
 
-                if ( destinationFile.exists() && file.indexOf( SNAPSHOT_SIGNATURE ) < 0 )
+                if ( destinationFile.exists() && dep.getVersion().indexOf( SNAPSHOT_SIGNATURE ) < 0 )
                 {
                     continue;
                 }
 
-                getRemoteArtifact( file, destinationFile );
+                getRemoteArtifact( repositoryPath, destinationFile );
 
                 if ( !destinationFile.exists() )
                 {
-                    throw new Exception( "Failed to download " + file );
+                    throw new Exception( "Failed to download " + dep );
                 }
 
-                downloadedArtifacts.add( file );
+                downloadedArtifacts.add( dep );
             }
         }
     }
@@ -159,7 +162,7 @@ public class ArtifactDownloader
                     url = replace( url, "http:/", "http://" );
                 }
             }
-            else 
+            else
             {
                 // THe JDK URL for file: should have one or no / instead of // for some reason
                 url = replace( url, "file://", "file:" );
@@ -170,15 +173,8 @@ public class ArtifactDownloader
             try
             {
                 log( "Downloading " + url );
-                HttpUtils.getFile( url,
-                                   destinationFile,
-                                   ignoreErrors,
-                                   useTimestamp,
-                                   proxyHost,
-                                   proxyPort,
-                                   proxyUserName,
-                                   proxyPassword,
-                                   true );
+                HttpUtils.getFile( url, destinationFile, ignoreErrors, useTimestamp, proxyHost, proxyPort,
+                                   proxyUserName, proxyPassword, true );
 
                 // Artifact was found, continue checking additional remote repos (if any)
                 // in case there is a newer version (i.e. snapshots) in another repo
