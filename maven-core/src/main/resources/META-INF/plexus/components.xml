@@ -239,7 +239,6 @@
       <role>org.apache.maven.project.path.PathTranslator</role>
       <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
     </component>
-  </components>
     <!-- ********************* FIXME *******************************************
      | NOTE: This is also declared in plexus.xml for maven. We currently need it
      | in both places, for systems that don't use maven's plexus.xml. This will
@@ -258,4 +257,5 @@
       <role>org.apache.maven.settings.MavenSettingsBuilder</role>
       <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
     </component>
+  </components>
 </component-set>
