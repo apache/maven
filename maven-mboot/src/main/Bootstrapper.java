@@ -1,3 +1,4 @@
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
@@ -28,8 +29,6 @@ public class Bootstrapper
 
     private UnitTests unitTests;
 
-    private List resources;
-
     private Properties properties;
 
     public static void main( String[] args )
@@ -59,7 +58,14 @@ public class Bootstrapper
 
         writeUnitTest();
 
-        writeResources( bootstrapPomParser.getResources(), "bootstrap.resources" );
+        if ( bootstrapPomParser.getResources().size() == 0 )
+        {
+            writeFile( "bootstrap.resources", "src/main/resources@'*'" );
+        }
+        else
+        {
+            writeResources( bootstrapPomParser.getResources(), "bootstrap.resources" );
+        }
 
         writeFile( "bootstrap.repo", downloader.getMavenRepoLocal().getPath() );
     }
@@ -88,9 +94,9 @@ public class Bootstrapper
 
         StringBuffer deps = new StringBuffer();
 
-        String repoLocal = replace(downloader.getMavenRepoLocal().getPath(), "\\", "/");
+        String repoLocal = replace( downloader.getMavenRepoLocal().getPath(), "\\", "/" );
         String classpathSeparator;
-        if (repoLocal.indexOf(":") != -1) //Windows
+        if ( repoLocal.indexOf( ":" ) != -1 ) //Windows
         {
             classpathSeparator = ";";
         }
@@ -98,11 +104,11 @@ public class Bootstrapper
         {
             classpathSeparator = ":";
         }
-        
+
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
-            
+
             classPath.append( repoLocal + "/" + getArtifactPath( d, "/" ) + classpathSeparator );
 
             libs.append( repoLocal + "/" + getArtifactPath( d, "/" ) + "\n" );
@@ -137,7 +143,7 @@ public class Bootstrapper
             // If there are no unitTestIncludes specified then we want it all.
             if ( size == 0 )
             {
-                tests.append( "'*'" );
+                tests.append( "'*Test.java'" );
             }
 
             for ( int j = 0; j < size; j++ )
@@ -164,6 +170,11 @@ public class Bootstrapper
 
             size = unitTests.getExcludes().size();
 
+            if ( size == 0 )
+            {
+                tests.append( "*Abstract*.java'" );
+            }
+
             for ( int j = 0; j < size; j++ )
             {
                 String exclude = (String) unitTests.getExcludes().get( j );
@@ -181,6 +192,14 @@ public class Bootstrapper
             writeFile( "bootstrap.tests.excludes", tests.toString() );
 
             writeResources( unitTests.getResources(), "bootstrap.tests.resources" );
+        }
+        else
+        {
+            writeFile( "bootstrap.tests.includes", "target/test-classes@**/*Test.java" );
+
+            writeFile( "bootstrap.tests.excludes", "target/test-classes@**/*Abstract*.java" );
+
+            writeFile( "bootstrap.tests.resources", "src/test/resources@'*'" );
         }
     }
 
@@ -247,6 +266,8 @@ public class Bootstrapper
         Writer writer = new FileWriter( name );
 
         writer.write( contents );
+
+        writer.flush();
 
         writer.close();
     }
@@ -449,7 +470,7 @@ public class Bootstrapper
         {
             if ( rawName.equals( "extend" ) )
             {
-                String extend = interpolate( getBodyText(), properties ) ;
+                String extend = interpolate( getBodyText(), properties );
 
                 File f = new File( file.getParentFile(), extend );
 
@@ -530,7 +551,7 @@ public class Bootstrapper
                     currentResource.addExclude( getBodyText() );
                 }
             }
-            else if ( ! insideResource && insideUnitTest )
+            else if ( !insideResource && insideUnitTest )
             {
                 if ( rawName.equals( "include" ) )
                 {

@@ -214,30 +214,6 @@ public class ArtifactDownloader
         return fileFound;
     }
 
-    /**
-     * <p>Replaces all occurrences of a String within another String.</p>
-     *
-     * This methods comes from Commons Lang
-     *
-     * <p>A <code>null</code> reference passed to this method is a no-op.</p>
-     *
-     * <pre>
-     * StringUtils.replace(null, *, *)        = null
-     * StringUtils.replace("", *, *)          = ""
-     * StringUtils.replace("any", null, *)    = "any"
-     * StringUtils.replace("any", *, null)    = "any"
-     * StringUtils.replace("any", "", *)      = "any"
-     * StringUtils.replace("aba", "a", null)  = "aba"
-     * StringUtils.replace("aba", "a", "")    = "b"
-     * StringUtils.replace("aba", "a", "z")   = "zbz"
-     * </pre>
-     *
-     * @param text  text to search and replace in, may be null
-     * @param repl  the String to search for, may be null
-     * @param with  the String to replace with, may be null
-     * @return the text with any replacements processed,
-     *  <code>null</code> if null String input
-     */
     private String replace( String text, String repl, String with )
     {
         StringBuffer buf = new StringBuffer( text.length() );

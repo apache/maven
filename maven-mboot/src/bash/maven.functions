@@ -172,7 +172,7 @@ buildMavenProject()
       # Look for source directory in project.xml
       sourceDirectory=`grep sourceDirectory project.xml | sed -e 's/^*//;s/<sourceDirectory>//;s/<\/sourceDirectory>//;s/\${basedir}\///'`
 
-      [ -z $sourceDirectory ] && sourceDirectory=src/main
+      [ -z $sourceDirectory ] && sourceDirectory=src/main/java
 
       buildDir=target
       buildDest=target/classes
@@ -180,7 +180,7 @@ buildMavenProject()
       # Look for unit test source directory in project.xml
       unitTestSourceDirectory=`grep unitTestSourceDirectory project.xml | sed -e 's/^*//;s/<unitTestSourceDirectory>//;s/<\/unitTestSourceDirectory>//;s/\${basedir}\///'`
 
-      [ -z $unitTestSourceDirectory ] && unitTestSourceDirectory=src/test
+      [ -z $unitTestSourceDirectory ] && unitTestSourceDirectory=src/test/java
       
       buildTestDest=target/test-classes
       
