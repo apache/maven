@@ -83,9 +83,9 @@ public class DefaultPluginManager
     protected ArtifactFilter artifactFilter;
 
     protected PathTranslator pathTranslator;
-    
+
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
-    
+
     protected UserModelBuilder userModelBuilder;
 
     public DefaultPluginManager()
@@ -135,7 +135,8 @@ public class DefaultPluginManager
 
     private Set pluginsInProcess = new HashSet();
 
-    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor ) throws CycleDetectedException
+    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor )
+        throws CycleDetectedException
     {
         if ( pluginsInProcess.contains( mavenPluginDescriptor.getPluginId() ) )
         {
@@ -206,7 +207,8 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPluginForGoal( String goalName, MavenSession session ) throws Exception
+    public void verifyPluginForGoal( String goalName, MavenSession session )
+        throws Exception
     {
         String pluginId = getPluginId( goalName );
 
@@ -215,7 +217,8 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPlugin( String groupId, String artifactId, MavenSession session ) throws Exception
+    public void verifyPlugin( String groupId, String artifactId, MavenSession session )
+        throws Exception
     {
         if ( !isPluginInstalled( groupId, artifactId ) )
         {
@@ -260,8 +263,9 @@ public class DefaultPluginManager
 
                 artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
-                Artifact pluginArtifact = artifactFactory.createArtifact( "maven", artifactId, version, null, "plugin",
-                                                                          "jar", null );
+                // TODO: more hard coding here...
+                Artifact pluginArtifact = artifactFactory.createArtifact( "maven", artifactId, version, null,
+                                                                          "maven-plugin", "jar", null );
 
                 addPlugin( pluginArtifact, session );
             }
@@ -276,7 +280,8 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    protected void addPlugin( Artifact pluginArtifact, MavenSession session ) throws Exception
+    protected void addPlugin( Artifact pluginArtifact, MavenSession session )
+        throws Exception
     {
         ArtifactResolver artifactResolver = null;
         MavenProjectBuilder mavenProjectBuilder = null;
@@ -424,7 +429,8 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request ) throws Exception
+    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
+        throws Exception
     {
         if ( request != null && request.getParameters() != null )
         {
@@ -470,8 +476,8 @@ public class DefaultPluginManager
                 String expression = parameter.getExpression();
 
                 Object value = PluginParameterExpressionEvaluator.evaluate( expression, session );
-                
-                getLogger().debug("Evaluated mojo parameter expression: \'" + expression + "\' to: " + value);
+
+                getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
 
                 if ( value == null )
                 {
@@ -485,7 +491,7 @@ public class DefaultPluginManager
 
                 if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
                 {
-                    value = pathTranslator.alignToBaseDirectory( (String)value,
+                    value = pathTranslator.alignToBaseDirectory( (String) value,
                                                                  session.getProject().getFile().getParentFile() );
                 }
 
@@ -555,8 +561,8 @@ public class DefaultPluginManager
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " )
-               .append( mojo.getId() ).append( " mojo and cannot be null." );
+        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " ).append(
+            mojo.getId() ).append( " mojo and cannot be null." );
 
         return message.toString();
     }
@@ -565,7 +571,8 @@ public class DefaultPluginManager
     // Lifecycle
     // ----------------------------------------------------------------------
 
-    public void contextualize( Context context ) throws ContextException
+    public void contextualize( Context context )
+        throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -573,18 +580,11 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[] {
-            "maven-core",
-            "maven-artifact",
-            "maven-model",
-            "maven-user-model",
-            "maven-monitor",
-            "maven-plugin",
-            "plexus-container-api",
-            "plexus-container-default",
-            "plexus-artifact-container",
-            "wagon-provider-api",
-            "classworlds" } );
+        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
+                                                              "maven-user-model", "maven-monitor", "maven-plugin",
+                                                              "plexus-container-api", "plexus-container-default",
+                                                              "plexus-artifact-container", "wagon-provider-api",
+                                                              "classworlds"} );
 
         // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new ArrayList();
@@ -601,13 +601,14 @@ public class DefaultPluginManager
             // TODO: Warn about this failure.
             userModel = new UserModel();
         }
-        
+
         Repository pluginRepo = new Repository();
         pluginRepo.setId( "plugin-repository" );
         pluginRepo.setUrl( "http://repo1.maven.org" );
-        
-        ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo, userModel );
-        
+
+        ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo,
+                                                                                                  userModel );
+
         remotePluginRepositories.add( pluginRepository );
     }
 
@@ -616,7 +617,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
-                                               MavenProjectBuilder mavenProjectBuilder )
+                                                MavenProjectBuilder mavenProjectBuilder )
         throws ArtifactResolutionException
     {
         MavenProject project = context.getProject();

@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-ejb-plugin</artifactId>
-  <packaging>plugin</packaging>
+  <packaging>maven-plugin</packaging>
   <name>Maven EJB Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <dependencies>

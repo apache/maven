@@ -6,7 +6,7 @@
   </parent>
   <groupId>maven</groupId>
   <artifactId>maven-pom-plugin</artifactId>
-  <packaging>plugin</packaging>
+  <packaging>maven-plugin</packaging>
   <name>Maven POM Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <dependencies>

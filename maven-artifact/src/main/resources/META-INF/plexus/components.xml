@@ -103,7 +103,7 @@
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>plugin</role-hint>
+      <role-hint>maven-plugin</role-hint>
       <implementation>org.apache.maven.artifact.handler.PluginHandler</implementation>
     </component>
 

@@ -30,6 +30,6 @@ public class PluginHandler
 
     public String directory()
     {
-        return "plugins";
+        return "maven-plugins";
     }
 }
