@@ -5,5 +5,3 @@ repoLocal=`cat $HOME/maven.properties | grep "maven.repo.local" | sed 's/^.*= */
 echo "Removing maven-core-it0005-1.0.pom from the local repository so we can verify pom installation ..."
 
 rm -f $repoLocal/maven/poms/maven-core-it0005-1.0-SNAPSHOT.pom > /dev/null 2>&1
-
-rm -f $repoLocal/maven/poms/maven-core-it0005-1.0-SNAPSHOT.pom.snapshot-version > /dev/null 2>&1
