@@ -548,6 +548,15 @@
           <type>String</type>
         </field>
         <field>
+          <name>integrationUnitTestSourceDirectory</name>
+          <version>3.0.0+</version>
+          <description>
+            This element specifies a directory containing integration test
+            sources of the project.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
           <name>sourceModifications</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -1261,6 +1270,22 @@
           <defaultValue>false</defaultValue>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>3.0.0+</version>
+          <code>
+            public boolean isFiltering()
+            {
+                return !"false".equals( filtering );
+            }
+
+            public void setFiltering( boolean filtering )
+            {
+                this.filtering = ( filtering ? "true" : "false" );
+            }
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>SourceModification</name>
@@ -1438,7 +1463,7 @@
     </class>
     <class>
       <name>GoalDecorator</name>
-      <version>3.0.0+</version>
+      <version>4.0.0</version>
       <fields>
         <field>
           <name>name</name>
