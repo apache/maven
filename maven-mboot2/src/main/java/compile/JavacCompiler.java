@@ -1,6 +1,21 @@
-package compile;
+/**
+ *
+ * Copyright 2004 The Apache Software Foundation
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
-import util.IsolatedClassLoader;
+package compile;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -12,9 +27,13 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+
+import util.IsolatedClassLoader;
 
 public class JavacCompiler
     extends AbstractCompiler
@@ -25,42 +44,44 @@ public class JavacCompiler
     {
     }
 
-    public List compile( String[] classpathElements, String[] sourceDirectories, String destinationDirectory )
-        throws Exception
+    public List compile( CompilerConfiguration config ) throws Exception
     {
-        /*
-        for ( int i = 0; i < classpathElements.length; i++ )
-        {
-            System.out.println( "classpathElement = " + classpathElements[i] );
-        }
-        */
-
-        File destinationDir = new File( destinationDirectory );
+        File destinationDir = new File( config.getOutputLocation() );
 
         if ( !destinationDir.exists() )
         {
             destinationDir.mkdirs();
         }
 
-        String[] sources = getSourceFiles( sourceDirectories );
+        String[] sources = getSourceFiles( config );
 
-        int j = 5;
+        Map compilerOptions = config.getCompilerOptions();
 
-        String[] args = new String[sources.length + j];
+        List args = new ArrayList( sources.length + 5 + compilerOptions.size() * 2 );
 
-        args[0] = "-d";
+        args.add( "-d" );
 
-        args[1] = destinationDir.getAbsolutePath();
+        args.add( destinationDir.getAbsolutePath() );
 
-        args[2] = "-nowarn";
+        args.add( "-nowarn" );
 
-        args[3] = "-classpath";
+        args.add( "-classpath" );
 
-        args[4] = getClasspathString( classpathElements );
+        args.add( getClasspathString( config.getClasspathEntries() ) );
+
+        Iterator it = compilerOptions.entrySet().iterator();
+
+        while ( it.hasNext() )
+        {
+            Map.Entry entry = (Map.Entry) it.next();
+            args.add( entry.getKey() );
+            if ( (entry.getValue() != null) )
+                args.add( entry.getValue() );
+        }
 
         for ( int i = 0; i < sources.length; i++ )
         {
-            args[i + j] = sources[i];
+            args.add( sources[i] );
         }
 
         IsolatedClassLoader cl = new IsolatedClassLoader();
@@ -71,23 +92,22 @@ public class JavacCompiler
 
         Class c = cl.loadClass( "sun.tools.javac.Main" );
 
-        Constructor cons = c.getConstructor( new Class[]{OutputStream.class, String.class} );
+        Constructor cons = c.getConstructor( new Class[] { OutputStream.class, String.class } );
 
         ByteArrayOutputStream err = new ByteArrayOutputStream();
 
-        Object compiler = cons.newInstance( new Object[]{err, "javac"} );
+        Object compiler = cons.newInstance( new Object[] { err, "javac" } );
 
-        Method compile = c.getMethod( "compile", new Class[]{String[].class} );
+        Method compile = c.getMethod( "compile", new Class[] { String[].class } );
 
-        Boolean ok = (Boolean) compile.invoke( compiler, new Object[]{args} );
+        Boolean ok = (Boolean) compile.invoke( compiler, new Object[] { args.toArray( new String[0] ) } );
 
         List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
 
         return messages;
     }
 
-    protected List parseModernStream( BufferedReader input )
-        throws IOException
+    protected List parseModernStream( BufferedReader input ) throws IOException
     {
         List errors = new ArrayList();
 
@@ -103,7 +123,7 @@ public class JavacCompiler
             // most errors terminate with the '^' char
             do
             {
-                if ( ( line = input.readLine() ) == null )
+                if ( (line = input.readLine()) == null )
                 {
                     return errors;
                 }
@@ -111,8 +131,7 @@ public class JavacCompiler
                 buffer.append( line );
 
                 buffer.append( '\n' );
-            }
-            while ( !line.endsWith( "^" ) );
+            } while ( !line.endsWith( "^" ) );
 
             // add the error bean
             errors.add( parseModernError( buffer.toString() ) );

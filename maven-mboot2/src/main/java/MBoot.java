@@ -1,4 +1,5 @@
 
+import compile.CompilerConfiguration;
 import compile.JavacCompiler;
 import download.ArtifactDownloader;
 import jar.JarMojo;
@@ -860,14 +861,31 @@ public class MBoot
 
         if ( sourceDirectories != null )
         {
-            List errors = compiler.compile( classpath( dependencies, extraClasspath ), sourceDirectories, outputDirectory );
+            CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+            
+            compilerConfiguration.setOutputLocation(outputDirectory);
+            compilerConfiguration.setClasspathEntries(Arrays.asList(classpath( dependencies, extraClasspath )));
+            compilerConfiguration.setSourceLocations(Arrays.asList(sourceDirectories));
+            
+            /* Compile with debugging info */
+            String debugAsString = System.getProperty( "maven.compiler.debug" );
 
-            for ( Iterator i = errors.iterator(); i.hasNext(); )
+            if ( debugAsString != null )
+            {
+                if ( Boolean.valueOf( debugAsString ).booleanValue() )
+                {
+                    compilerConfiguration.setDebug( true );
+                }
+            }
+
+            List messages = compiler.compile(compilerConfiguration);
+
+            for ( Iterator i = messages.iterator(); i.hasNext(); )
             {
                 System.out.println( i.next() );
             }
 
-            if ( errors.size() > 0 )
+            if ( messages.size() > 0 )
             {
                 throw new Exception( "Compilation error." );
             }

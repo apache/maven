@@ -1,3 +1,20 @@
+/**
+ *
+ * Copyright 2004 The Apache Software Foundation
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package compile;
 
 /**
@@ -43,21 +60,23 @@ public class CompilerError
     /**
      * The error message constructor.
      *
-     * @param file        The name of the file containing the offending program text
-     * @param error       The actual error text produced by the language processor
-     * @param startline   The start line number of the offending program text
+     * @param file The name of the file containing the offending program text
+     * @param error The actual error text produced by the language processor
+     * @param startline The start line number of the offending program text
      * @param startcolumn The start column number of the offending program text
-     * @param endline     The end line number of the offending program text
-     * @param endcolumn   The end column number of the offending program text
-     * @param message     The actual error text produced by the language processor
+     * @param endline The end line number of the offending program text
+     * @param endcolumn The end column number of the offending program text
+     * @param message The actual error text produced by the language processor
      */
-    public CompilerError( String file,
-                          boolean error,
-                          int startline,
-                          int startcolumn,
-                          int endline,
-                          int endcolumn,
-                          String message )
+    public CompilerError(
+        String file,
+        boolean error,
+        int startline,
+        int startcolumn,
+        int endline,
+        int endcolumn,
+        String message
+        )
     {
         this.file = file;
         this.error = error;
@@ -113,7 +132,7 @@ public class CompilerError
      * error
      *
      * @return The starting column number of the program text originating this
-     *         error
+     * error
      */
     public int getStartColumn()
     {
@@ -135,7 +154,7 @@ public class CompilerError
      * error
      *
      * @return The ending column number of the program text originating this
-     *         error
+     * error
      */
     public int getEndColumn()
     {

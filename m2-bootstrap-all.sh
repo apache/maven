@@ -26,7 +26,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo " Building maven2 components ... "
   echo "-----------------------------------------------------------------------"  
 
-  $JAVA_HOME/bin/java $ARGS -jar mboot.jar
+  $JAVA_HOME/bin/java $ARGS $MAVEN_OPTS -jar mboot.jar
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi

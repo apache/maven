@@ -5,41 +5,64 @@ import util.DirectoryScanner;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
+ *
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:michal.maczka@dimatics.com">Michal Maczka</a>
+ *
  * @version $Id$
  */
 public abstract class AbstractCompiler
+    implements Compiler
 {
     private static String PS = System.getProperty( "path.separator" );
 
-    public String getClasspathString( String[] classpathElements )
+    public String getClasspathString( List classpathElements )
         throws Exception
     {
         StringBuffer sb = new StringBuffer();
 
-        for ( int i = 0; i < classpathElements.length; i++ )
+        for ( Iterator it = classpathElements.iterator(); it.hasNext(); )
         {
-            sb.append( classpathElements[i] ).append( PS );
+            String element = (String) it.next();
+            
+            sb.append( element ).append( PS );
         }
 
         return sb.toString();
     }
 
-    protected String[] getSourceFiles( String[] sourceDirectories )
+    protected String[] getSourceFiles( CompilerConfiguration config )
     {
         List sources = new ArrayList();
 
-        for ( int i = 0; i < sourceDirectories.length; i++ )
+        for ( Iterator it = config.getSourceLocations().iterator(); it.hasNext(); )
         {
+            String sourceLocation = (String) it.next();
+            
             DirectoryScanner scanner = new DirectoryScanner();
 
-            scanner.setBasedir( sourceDirectories[i] );
+            scanner.setBasedir( sourceLocation );
 
-            scanner.setIncludes( new String[]{"**/*.java"} );
+            Set includes = config.getIncludes();
+            if(includes != null && !includes.isEmpty()) {
+                String[] inclStrs = (String[])includes.toArray(new String[includes.size()]);
+                scanner.setIncludes( inclStrs );
+            }
+            else {
+                scanner.setIncludes(new String[] {"**/*.java"});
+            }
+
+            Set excludes = config.getIncludes();
+            if(excludes != null && !excludes.isEmpty()) {
+                String[] exclStrs = (String[])excludes.toArray(new String[excludes.size()]);
+                scanner.setIncludes( exclStrs );
+            }
 
             scanner.scan();
 
@@ -47,7 +70,7 @@ public abstract class AbstractCompiler
 
             for ( int j = 0; j < sourceDirectorySources.length; j++ )
             {
-                File f = new File( sourceDirectories[i], sourceDirectorySources[j] );
+                File f =  new File( sourceLocation, sourceDirectorySources[j] );
 
                 sources.add( f.getPath() );
             }

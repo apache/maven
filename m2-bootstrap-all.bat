@@ -111,7 +111,7 @@ call .\build
 @REM Build Maven2
 cd ..
 
-%MAVEN_JAVA_EXE% %MAVEN_CMD_LINE_ARGS% -jar mboot.jar
+%MAVEN_JAVA_EXE% %MAVEN_CMD_LINE_ARGS% %MAVEN_OPTS% -jar mboot.jar
 
 echo Running integration tests
 cd maven-core-it

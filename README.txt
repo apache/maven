@@ -2,20 +2,18 @@
 Bootstrapping Maven
 -------------------------------------------------------------------------------
 
-To bootstrap Maven you must have a ~/maven.properties file with the following
-entries:
+To bootstrap Maven you must have a ~/.m2/maven.properties file with the following
+entry:
 
-maven.home = /path/to/your/maven/installation
 maven.repo.local = /path/to/your/local/repository
 
-Once you have your ~/maven.properties setup then:
+Set the environment variable M2_HOME pointing to the dir where you want Maven2 installed.
 
-java -jar mboot.jar 
+You can set the parameters passed to the Java VM when running Maven2 bootstrap,
+setting the environment variable MAVEN_OPTS, e.g.
+e.g. to run in offline mode, set MAVEN_OPTS=-Dmaven.online=false
+e.g. to build maven with debug info, set MAVEN_OPTS=-Dmaven.compiler.debug=true
 
-Should do the trick to produce a working installation of Maven
-in ${maven.home}.
+Then run m2-bootstrap-all.bat (in Windows) or m2-bootstrap-all.sh (in Unix)
 
 NOTE: You must run these instructions from this directory!
-
-NOTE: If you want to run in offline mode where no downloading is done
-      then add: 'maven.online = false' to your ~/maven.properties file.
