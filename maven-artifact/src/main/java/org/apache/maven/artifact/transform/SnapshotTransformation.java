@@ -46,7 +46,7 @@ public class SnapshotTransformation
     private WagonManager wagonManager;
 
     /**
-     * @todo very primitve. Probably we can resolvedArtifactCache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
+     * @todo very primitve. Probably we can cache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
      */
     private static Set resolvedArtifactCache = new HashSet();
 
@@ -133,7 +133,7 @@ public class SnapshotTransformation
             }
 
             // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
-            if ( artifact.getFile().exists() && artifact.getFile().lastModified() > localMetadata.getLastModified() )
+            if ( artifact.getFile().exists() && !localMetadata.newerThanFile( artifact.getFile() ) )
             {
                 if ( !alreadyResolved )
                 {

@@ -230,4 +230,21 @@ public class SnapshotArtifactMetadata
     {
         return lastModified;
     }
+
+    public boolean newerThanFile( File file )
+    {
+        long fileTime = file.lastModified();
+
+        // previous behaviour - compare based on timestamp of file
+        //  problem was that version.txt is often updated even if the remote snapshot was not
+        // return ( lastModified > fileTime );
+
+        // Compare to timestamp
+        if ( timestamp != null )
+        {
+            String fileTimestamp = getUtcDateFormatter().format( new Date( fileTime ) );
+            return ( fileTimestamp.compareTo( timestamp ) < 0 );
+        }
+        return true;
+    }
 }
