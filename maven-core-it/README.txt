@@ -1,3 +1,4 @@
+-------------------------------------------------------------------------------
 it0000: The simplest of builds. We have one application class and one test
         class. There are no resources, no source generation, no resource
         generation and a the super model is employed to provide the build
@@ -31,3 +32,21 @@ it0003: Builds upon it0001: we add a jar installation step. We delete the JAR
   which which use the reactor and inheritence. we need to have
   integration tests that go far beyond what the average user
   would ever setup.
+  
+-------------------------------------------------------------------------------
+These are a set of builds that contain known errors. They should be captured
+and reported in a useful manner to the user. We will start at it1000 for 
+intentially flawed builds.
+-------------------------------------------------------------------------------
+it1000: A build which contains a malformed pom.xml. We have intentionally 
+        created a mismatch in the first element. We have:
+        <projectX>...</project>
+-------------------------------------------------------------------------------
+it1001: A build whose pom.xml does not contain a <groupId/> element.
+-------------------------------------------------------------------------------
+it1002: A build with a syntax error in the first field declaration.
+-------------------------------------------------------------------------------
+it1003: A build with a simple test failure.
+-------------------------------------------------------------------------------
+
+- checksum mismatch
