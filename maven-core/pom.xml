@@ -81,4 +81,16 @@
       <url>scp://www.apache.org//www/maven.apache.org/m2</url>
     </site>
   </distributionManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assemble-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <descriptor>src/assemble/bin.xml</descriptor>
+          <finalName>maven-2.0-SNAPSHOT</finalName>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
