@@ -1,4 +1,4 @@
-package org.apache.maven.tools.repoclean.pom;
+package org.apache.maven.tools.repoclean.translate;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.

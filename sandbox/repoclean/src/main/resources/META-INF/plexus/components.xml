@@ -10,7 +10,7 @@
       <implementation>org.apache.maven.tools.repoclean.RepositoryCleaner</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.tools.repoclean.pom.PomV3ToV4Translator</role>
+          <role>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.tools.repoclean.correlate.ArtifactPomCorrelator</role>
@@ -32,8 +32,8 @@
      |
      -->
     <component>
-      <role>org.apache.maven.tools.repoclean.pom.PomV3ToV4Translator</role>
-      <implementation>org.apache.maven.tools.repoclean.pom.PomV3ToV4Translator</implementation>
+      <role>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</role>
+      <implementation>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</implementation>
     </component>
     <!--
      |

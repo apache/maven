@@ -1,4 +1,4 @@
-package org.apache.maven.tools.repoclean.pom;
+package org.apache.maven.tools.repoclean.translate;
 
 import org.apache.maven.model.v4_0_0.Build;
 import org.apache.maven.model.v4_0_0.CiManagement;
@@ -145,7 +145,7 @@ public class PomV3ToV4Translator
                 Notifier notifier = new Notifier();
 
                 notifier.setAddress( nagEmailAddress );
-                notifier.setType( "email" );
+                notifier.setType( "mail" );
 
                 ciMgmt = new CiManagement();
                 ciMgmt.addNotifier( notifier );
