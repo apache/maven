@@ -12,10 +12,6 @@ integration_tests=`cat integration-tests.txt | egrep -v '^#'`
 
 for integration_test in $integration_tests
 do
-
-  echo "----------------------------------------------------------"
-  echo "Running integration test $integration_test ..."
-  echo "----------------------------------------------------------"  
   (
     cd $integration_test
     
@@ -27,7 +23,6 @@ do
     fi
     
     m2 clean:clean `cat goals.txt`
-    ret=$?; if [ $ret != 0 ]; then exit $ret; fi
     
     if [ -f postbuild.hook ]
     then    
@@ -38,8 +33,17 @@ do
     
     basedir=.
     
-    java -cp "$cp" $verifier "$basedir"
-    ret=$?; if [ $ret != 0 ]; then exit $ret; fi
-  )
-  ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+    java -cp "$cp" $verifier "$basedir"        
+  ) > ${integration_test}-log.txt
+
+  if [ "$?" = "0" ]
+  then
+    echo "Integration test $integration_test OK"
+  else
+    echo "Integration test $integration_test FAILED!"
+    echo "Details:"
+    cat ${integration_test}-log.txt
+    echo
+  fi
+
 done
