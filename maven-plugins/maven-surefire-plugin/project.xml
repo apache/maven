@@ -8,7 +8,7 @@
   </parent>
   <groupId>maven</groupId>
   <artifactId>maven-surefire-plugin</artifactId>
-  <name>Maven</name>
+  <name>Maven Surefire Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <package>org.apache.maven</package>
   <dependencies>
