@@ -13,6 +13,13 @@
 #
 # ----------------------------------------------------------------------------------
 
+export JAVA_HOME=/usr/local/java
+export MBOOT_HOME=$HOME/mboot
+export MAVEN_HOME=$HOME/maven
+export PATH=$PATH:$MBOOT_HOME:$MAVEN_HOME/bin
+
+# ----------------------------------------------------------------------------------
+
 DIR=maven2
 REPO=maven-repo-local
 FROM=jvanzyl@maven.org
@@ -54,4 +61,4 @@ echo "" >> log
   )  
 ) >> log 2>&1
 
-sendmail -t < log
+/usr/sbin/sendmail -t < log
