@@ -79,6 +79,7 @@ public class MBoot
 
     String[] builds = new String[] {
         "maven-model",
+        "maven-user-model",
         "maven-monitor",
         "maven-plugin",
         "maven-artifact",
@@ -477,9 +478,21 @@ public class MBoot
         // Generating sources
         // ----------------------------------------------------------------------
 
-        File model = new File( basedir, "maven.mdo" );
+        File base = new File(basedir);
+        
+        String[] basedirFiles = base.list();
+        
+        File model = null;
+        for ( int i = 0; i < basedirFiles.length; i++ )
+        {
+            if(basedirFiles[i].endsWith(".mdo"))
+            {
+                model = new File(base, basedirFiles[i]);
+                break;
+            }
+        }
 
-        if ( model.exists() )
+        if ( model != null && model.exists() )
         {
             System.out.println( "Model exists!" );
 

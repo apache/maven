@@ -7,3 +7,4 @@ maven-component.i*
 .settings
 mboot.jar
 dummy
+build.ajproperties

@@ -5,6 +5,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.project.MavenProject;
@@ -41,7 +42,7 @@ public class PluginParameterExpressionEvaluatorTest
         PluginManager mgr = (PluginManager)lookup(PluginManager.ROLE);
         
         PlexusContainer container = getContainer();
-        MavenSession session = new MavenSession(container, mgr, repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
+        MavenSession session = new MavenSession(container, mgr, new UserModel(), repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
         
         Build build = new Build();
         build.setDirectory(expected.substring(0, expected.length() - "/classes".length()));
@@ -73,7 +74,7 @@ public class PluginParameterExpressionEvaluatorTest
         PluginManager mgr = (PluginManager)lookup(PluginManager.ROLE);
         
         PlexusContainer container = getContainer();
-        MavenSession session = new MavenSession(container, mgr, repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
+        MavenSession session = new MavenSession(container, mgr, new UserModel(), repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
         Object value = PluginParameterExpressionEvaluator.evaluate( role, session );
 
         assertNotNull( value );
@@ -86,7 +87,7 @@ public class PluginParameterExpressionEvaluatorTest
         PluginManager mgr = (PluginManager)lookup(PluginManager.ROLE);
         
         PlexusContainer container = getContainer();
-        MavenSession session = new MavenSession(container, mgr, repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
+        MavenSession session = new MavenSession(container, mgr, new UserModel(), repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
         
         Object value = PluginParameterExpressionEvaluator.evaluate( "#localRepository", session );
 

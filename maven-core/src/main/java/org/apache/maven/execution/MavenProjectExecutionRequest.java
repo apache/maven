@@ -18,6 +18,7 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 
 import java.io.File;
@@ -35,12 +36,13 @@ extends AbstractMavenExecutionRequest
     private File pom;
 
     public MavenProjectExecutionRequest( ArtifactRepository localRepository,
+                                         UserModel userModel,
                                          EventDispatcher eventDispatcher,
                                          Properties properties,
                                          List goals,
                                          File pom )
     {
-        super( localRepository, eventDispatcher, properties, goals );
+        super( localRepository, userModel, eventDispatcher, properties, goals );
 
         this.pom = pom;
 

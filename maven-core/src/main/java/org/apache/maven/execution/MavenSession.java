@@ -18,6 +18,7 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.PluginManager;
@@ -62,12 +63,16 @@ public class MavenSession
 
     private Log log;
 
-    public MavenSession( PlexusContainer container, PluginManager pluginManager, ArtifactRepository localRepository,
+    private final UserModel userModel;
+
+    public MavenSession( PlexusContainer container, PluginManager pluginManager, UserModel userModel, ArtifactRepository localRepository,
         EventDispatcher eventDispatcher, Log log, List goals )
     {
         this.container = container;
 
         this.pluginManager = pluginManager;
+        
+        this.userModel = userModel;
 
         this.localRepository = localRepository;
 
@@ -79,7 +84,7 @@ public class MavenSession
 
         this.goals = goals;
     }
-
+    
     public PlexusContainer getContainer()
     {
         return container;
@@ -142,6 +147,11 @@ public class MavenSession
     public Log getLog()
     {
         return log;
+    }
+    
+    public UserModel getUserModel()
+    {
+        return userModel;
     }
 
     public void addImpliedExecution( String goal, String implied ) throws CycleDetectedException

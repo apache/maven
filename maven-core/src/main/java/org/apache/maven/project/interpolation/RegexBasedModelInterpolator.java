@@ -38,7 +38,7 @@ public class RegexBasedModelInterpolator
     implements ModelInterpolator
 {
 
-    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{([^}]+)\\}" );
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom|project\\.)?([^}]+)\\}" );
 
     /**
      * Added: Feb 3, 2005 by jdcasey
@@ -87,7 +87,7 @@ public class RegexBasedModelInterpolator
         while ( matcher.find() )
         {
             String wholeExpr = matcher.group( 0 );
-            String realExpr = matcher.group( 1 );
+            String realExpr = matcher.group( 2 );
 
             String value = null;
             try

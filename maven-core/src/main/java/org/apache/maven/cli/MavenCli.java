@@ -33,11 +33,13 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenInitializingExecutionRequest;
 import org.apache.maven.execution.MavenProjectExecutionRequest;
 import org.apache.maven.execution.MavenReactorExecutionRequest;
+import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Plugin;
+import org.apache.maven.util.UserModelUtils;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.logging.Logger;
@@ -117,7 +119,9 @@ public class MavenCli
         File projectFile = new File( userDir, POMv4 );
         
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
-
+        
+        UserModel userModel = UserModelUtils.getUserModel();
+        
         if ( projectFile.exists() )
         {
             if ( commandLine.hasOption( CLIManager.REACTOR ) )
@@ -127,6 +131,7 @@ public class MavenCli
                 String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
                 request = new MavenReactorExecutionRequest( localRepository,
+                                                            userModel,
                                                             eventDispatcher,
                                                             mavenProperties,
                                                             commandLine.getArgList(),
@@ -137,6 +142,7 @@ public class MavenCli
             else
             {
                 request = new MavenProjectExecutionRequest( localRepository,
+                                                            userModel,
                                                             eventDispatcher,
                                                             mavenProperties,
                                                             commandLine.getArgList(),
@@ -145,7 +151,7 @@ public class MavenCli
         }
         else
         {
-            request = new MavenInitializingExecutionRequest( localRepository, eventDispatcher, mavenProperties, commandLine.getArgList() );
+            request = new MavenInitializingExecutionRequest( localRepository, userModel, eventDispatcher, mavenProperties, commandLine.getArgList() );
         }
 
         // ----------------------------------------------------------------------

@@ -267,6 +267,7 @@ public class DefaultMaven
     {
         return new MavenSession( container,
                                  pluginManager,
+                                 request.getUserModel(),
                                  request.getLocalRepository(),
                                  request.getEventDispatcher(),
                                  request.getLog(),

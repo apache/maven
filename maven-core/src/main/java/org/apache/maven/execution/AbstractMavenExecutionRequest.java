@@ -18,7 +18,7 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.monitor.logging.Log;
@@ -48,15 +48,24 @@ implements MavenExecutionRequest
     
     private EventDispatcher eventDispatcher;
 
-    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, EventDispatcher eventDispatcher, Properties parameters, List goals )
+    private final UserModel userModel;
+
+    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, UserModel userModel, EventDispatcher eventDispatcher, Properties parameters, List goals )
     {
         this.localRepository = localRepository;
+        
+        this.userModel = userModel;
 
         this.parameters = parameters;
 
         this.goals = goals;
         
         this.eventDispatcher = eventDispatcher;
+    }
+    
+    public UserModel getUserModel()
+    {
+        return userModel;
     }
 
     public ArtifactRepository getLocalRepository()
