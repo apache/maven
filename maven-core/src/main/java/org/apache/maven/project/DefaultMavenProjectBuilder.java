@@ -78,7 +78,7 @@ public class DefaultMavenProjectBuilder
     private ModelDefaultsInjector modelDefaultsInjector;
 
     private ModelInterpolator modelInterpolator;
-    
+
     private MavenSettingsBuilder mavenSettingsBuilder;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
@@ -198,7 +198,7 @@ public class DefaultMavenProjectBuilder
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(), repos,
                                                                                     localRepository, sourceReader );
 
-            project.getArtifacts().addAll( result.getArtifacts().values() );
+            project.addArtifacts( result.getArtifacts().values() );
         }
 
         ModelValidationResult validationResult = validator.validate( model );

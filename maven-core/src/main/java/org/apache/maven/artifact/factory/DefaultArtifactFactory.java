@@ -73,6 +73,13 @@ public class DefaultArtifactFactory
             desiredScope = Artifact.SCOPE_COMPILE;
         }
 
+        // vvv added to retain compile scope. Remove if you want compile inherited as runtime
+        else if ( Artifact.SCOPE_COMPILE.equals( scope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
+        {
+            desiredScope = Artifact.SCOPE_COMPILE;
+        }
+        // ^^^ added to retain compile scope. Remove if you want compile inherited as runtime
+
         if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_TEST.equals( inheritedScope ) )
         {
             desiredScope = Artifact.SCOPE_TEST;

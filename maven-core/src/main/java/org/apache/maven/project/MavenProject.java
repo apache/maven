@@ -18,6 +18,7 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -40,8 +41,10 @@ import org.codehaus.plexus.util.dag.TopologicalSorter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -643,6 +646,54 @@ public class MavenProject
         }
 
         return sortedProjects;
+    }
+
+    public void addArtifacts( Collection newArtifacts )
+    {
+//        project.getArtifacts().addAll( result.getArtifacts().values() );
+        // We need to override the scope if one declared it higher
+        // TODO: could surely be more efficient, and use the scope handler, be part of maven-artifact...
+        Map artifacts = new HashMap();
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+            artifacts.put( a.getId(), a );
+        }
+        for ( Iterator i = newArtifacts.iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+            String id = a.getId();
+            if ( artifacts.containsKey( id ) )
+            {
+                Artifact existing = (Artifact) artifacts.get( id );
+                boolean updateScope = false;
+                if ( Artifact.SCOPE_RUNTIME.equals( a.getScope() ) &&
+                    Artifact.SCOPE_TEST.equals( existing.getScope() ) )
+                {
+                    updateScope = true;
+                }
+
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) &&
+                    !Artifact.SCOPE_COMPILE.equals( existing.getScope() ) )
+                {
+                    updateScope = true;
+                }
+
+                if ( updateScope )
+                {
+                    // TODO: Artifact factory?
+                    Artifact artifact = new DefaultArtifact( existing.getGroupId(), existing.getArtifactId(),
+                                                             existing.getVersion(), a.getScope(), existing.getType(),
+                                                             existing.getExtension() );
+                    artifacts.put( id, artifact );
+                }
+            }
+            else
+            {
+                artifacts.put( id, a );
+            }
+        }
+        setArtifacts( new HashSet( artifacts.values() ) );
     }
 }
 

@@ -85,7 +85,7 @@ public class DefaultPluginManager
     protected PathTranslator pathTranslator;
 
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
-    
+
     protected MavenSettingsBuilder mavenSettingsBuilder;
 
     public DefaultPluginManager()
@@ -605,7 +605,7 @@ public class DefaultPluginManager
         Repository pluginRepo = new Repository();
         pluginRepo.setId( "plugin-repository" );
         pluginRepo.setUrl( "http://repo1.maven.org" );
-        
+
         ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo, settings );
 
         remotePluginRepositories.add( pluginRepository );
@@ -628,7 +628,7 @@ public class DefaultPluginManager
                                                                                 context.getLocalRepository(),
                                                                                 sourceReader );
 
-        project.getArtifacts().addAll( result.getArtifacts().values() );
+        project.addArtifacts( result.getArtifacts().values() );
     }
 
     // ----------------------------------------------------------------------
