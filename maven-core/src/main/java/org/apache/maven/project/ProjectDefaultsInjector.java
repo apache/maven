@@ -8,7 +8,7 @@ package org.apache.maven.project;
  */
 public interface ProjectDefaultsInjector
 {
-    public static final String ROLE = DefaultProjectDefaultsInjector.class.getName();
+    String ROLE = ProjectDefaultsInjector.class.getName();
 
     void injectDefaults( MavenProject project );
 }
