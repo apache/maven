@@ -26,7 +26,7 @@ import org.apache.maven.plugin.generator.jelly.JellyHarnessGenerator;
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.getFile().getPath()"
+ *  expression="#project.file.path"
  *  description="x"
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
