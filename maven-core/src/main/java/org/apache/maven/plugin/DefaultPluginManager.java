@@ -17,6 +17,8 @@ import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
@@ -31,8 +33,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.codehaus.plexus.util.dag.DAG;
-import org.codehaus.plexus.util.dag.TopologicalSorter;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +62,8 @@ public class DefaultPluginManager
     protected Set remotePluginRepositories;
 
     protected ArtifactRepository localRepository;
+
+    protected ArtifactFilter artifactFilter;
 
     public DefaultPluginManager()
     {
@@ -108,7 +110,7 @@ public class DefaultPluginManager
             MavenMojoDescriptor mavenMojoDescriptor = (MavenMojoDescriptor) it.next();
 
             MojoDescriptor mojoDescriptor = mavenMojoDescriptor.getMojoDescriptor();
-            
+
             mojoDescriptors.put( mojoDescriptor.getId(), mojoDescriptor );
 
             pluginDescriptors.put( pluginDescriptor.getId(), pluginDescriptor );
@@ -123,7 +125,7 @@ public class DefaultPluginManager
     {
         ComponentSetDescriptor componentSetDescriptor = event.getComponentSetDescriptor();
 
-        if ( !(componentSetDescriptor instanceof MavenPluginDescriptor) )
+        if ( !( componentSetDescriptor instanceof MavenPluginDescriptor ) )
         {
             return;
         }
@@ -201,12 +203,7 @@ public class DefaultPluginManager
 
         MavenMetadataSource sr = new MavenMetadataSource( remotePluginRepositories, localRepository, artifactResolver );
 
-        // TODO: needs to be configurable
-        String[] excludes = new String[] { "maven-core", "maven-artifact", "maven-model", "maven-plugin", "plexus",
-            "xstream", "xpp3", "classworlds", "ognl" };
-
-        container.addComponent( pluginArtifact, artifactResolver, remotePluginRepositories, localRepository, sr,
-            excludes );
+        container.addComponent( pluginArtifact, artifactResolver, remotePluginRepositories, localRepository, sr, artifactFilter );
     }
 
     public void contextualize( Context context )
@@ -218,6 +215,19 @@ public class DefaultPluginManager
     public void initialize()
         throws Exception
     {
+        artifactFilter = new ExclusionSetFilter( new String[]
+        {
+            "maven-core",
+            "maven-artifact",
+            "maven-model",
+            "maven-plugin",
+            "plexus",
+            "xstream",
+            "xpp3",
+            "classworlds",
+            "ognl"
+        } );
+
         // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new HashSet();
 
