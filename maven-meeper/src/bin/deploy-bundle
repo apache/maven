@@ -7,7 +7,7 @@ VERSION=$2
 
 WORKDIR=bundle.tmp
 # repo dir relative to WORKDIR
-REPODIR=../repository
+REPODIR=$HOME/repository/ibiblio-v1
 
 rm -rf $WORKDIR > /dev/null 2>&1
 
