@@ -548,45 +548,9 @@ public class MavenProject
         return false;
     }
 
-    /**
-     * @return
-     * @todo create something like MavenContants class and put "maven.repo.local"
-     * @todo In fact I am not sure if this object should be used for accessing the information
-     * where maven local repository is. There should be only one local repository and it
-     * should be shared between all projects. Probably we can have a component like
-     * MavenEnvinromnent which will contain all behavioral settings shared between projects.
-     * This component can read on the startup ${user.home}/build.properties file
-     * <p/>
-     * <p/>
-     * there
-     */
-    public String getLocalRepository()
-    {
-        return getProperty( "maven.repo.local" );
-    }
-
-    public void setLocalRepository( String path )
-    {
-        properties.put( "maven.repo.local", path );
-    }
-
     public List getRepositories()
     {
         return model.getRepositories();
-    }
-
-    public void addRepository( Repository repository )
-    {
-        model.getRepositories().add( repository );
-    }
-
-    public void addRepository( String url )
-    {
-        Repository repository = new Repository();
-
-        repository.setUrl( url );
-
-        addRepository( repository );
     }
 }
 

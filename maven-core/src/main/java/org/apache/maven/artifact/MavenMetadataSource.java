@@ -4,7 +4,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -64,8 +63,6 @@ public class MavenMetadataSource
 
         try
         {
-            // This is using the current format for the metadata
-
             Artifact metadataArtifact = new DefaultArtifact( artifact.getGroupId(),
                                                              artifact.getArtifactId(),
                                                              artifact.getVersion(),
@@ -80,7 +77,6 @@ public class MavenMetadataSource
         catch ( Exception e )
         {
             throw new ArtifactMetadataRetrievalException( "Cannot read artifact source: ", e );
-
         }
 
         return artifacts;

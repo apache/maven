@@ -71,20 +71,4 @@ public class AbstractProjectTestCase
     {
         return buildProject( f, localRepository, false );
     }
-
-    protected void initRemoteRepositories( MavenProject project )
-    {
-        //we will remove ibiblio
-        project.getRepositories().clear();
-
-        File repo_1 = new File( getBasedir(), "target/test-classes/remote-repo-1" );
-
-        File repo_2 = new File( getBasedir(), "target/test-classes/remote-repo-2" );
-
-        project.addRepository( "file://" + repo_1.getPath() );
-
-        project.addRepository( "file://" + repo_2.getPath() );
-
-        assertEquals( 2, project.getRepositories().size() );
-    }
 }
