@@ -20,7 +20,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.user.UserModel;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
@@ -32,12 +34,12 @@ import java.io.File;
  * @goal deploy
  * @description deploys a pom to remote repository
  * @parameter name="project" type="org.apache.maven.project.MavenProject"
- *            required="true" validator="" expression="#project" description=""
+ * required="true" validator="" expression="#project" description=""
  * @parameter name="deployer"
- *            type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- *            required="true" validator=""
- *            expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
- *            description=""
+ * type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ * required="true" validator=""
+ * expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ * description=""
  * @parameter name="project"
  * type="org.apache.maven.project.MavenProject"
  * required="true"
@@ -50,6 +52,18 @@ import java.io.File;
  * validator=""
  * expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
  * description=""
+ * @parameter name="artifactRepositoryFactory"
+ * type="org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
+ * required="true"
+ * validator=""
+ * expression="#component.org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
+ * description=""
+ * @parameter name="userModel"
+ * type="org.apache.maven.model.user.UserModel"
+ * required="true"
+ * validator=""
+ * expression="#userModel"
+ * description=""
  */
 public class PomDeployMojo
     extends AbstractPlugin
@@ -61,18 +75,28 @@ public class PomDeployMojo
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
 
+        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) request.getParameter(
+            "artifactRepositoryFactory" );
+
+        UserModel userModel = (UserModel) request.getParameter( "userModel" );
+
         // TODO: validation instead
         if ( project.getDistributionManagement() == null )
         {
             // TODO: simple failure response
             throw new Exception( "distributionManagement is required for deployment" );
         }
-        Repository repo = project.getDistributionManagement().getRepository();
-        ArtifactRepository deploymentRepository = new ArtifactRepository( repo.getId(), repo.getUrl() );
+        Repository repository = project.getDistributionManagement().getRepository();
+        ArtifactRepository deploymentRepository = artifactRepositoryFactory.createArtifactRepository( repository,
+                                                                                                      userModel );
 
-        Artifact artifact = new DefaultArtifact( project.getGroupId(),
-                                                 project.getArtifactId(),
-                                                 project.getVersion(),
+        if ( deploymentRepository.getAuthenticationInfo() == null )
+        {
+            request.getLog().warn(
+                "Deployment repository {id: \'" + repository.getId() + "\'} has no associated authentication info!" );
+        }
+
+        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
                                                  "pom" );
 
         File pom = new File( project.getFile().getParentFile(), "pom.xml" );
