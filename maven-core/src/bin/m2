@@ -53,9 +53,12 @@ if [ -z "$JAVA_HOME" ] ; then
   echo "  to the installation directory of java."
 fi
 
-if [ "$cygwin" = "true" ]
-then
-  M2_HOME=`cygpath -pu "$M2_HOME"`
+if $cygwin; then
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --unix "$M2_HOME"`
+fi
+
+if [ -z "$M2_HOME" ]; then
+  M2_HOME=`dirname $0/..`
 fi
 
 CLASSWORLDS_CONF="${M2_HOME}/bin/classworlds.conf"
@@ -67,6 +70,7 @@ if $cygwin; then
   [ -n "$CP" ] && CP=`cygpath --path --windows "$CP"`
   [ -n "$CLASSWORLDS_CONF" ] && CLASSWORLDS_CONF=`cygpath --path --windows "$CLASSWORLDS_CONF"`
   [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --windows "$M2_HOME"`
 fi
 
 MAIN_CLASS=org.codehaus.classworlds.Launcher
@@ -75,4 +79,6 @@ $JAVACMD \
   $MAVEN_OPTS \
   -classpath "$CP" \
   "-Dclassworlds.conf=$CLASSWORLDS_CONF"  \
+  "-Dmaven.home=$M2_HOME"  \
   $MAIN_CLASS $@
+
