@@ -60,10 +60,10 @@ public class ArtifactDownloader
         System.out.println( "Using the following proxy : " + proxyHost + "/" + proxyPort );
     }
 
-    public void downloadDependencies( List files )
+    public void downloadDependencies( List dependencies )
         throws Exception
     {
-        for ( Iterator j = files.iterator(); j.hasNext(); )
+        for ( Iterator j = dependencies.iterator(); j.hasNext(); )
         {
             Dependency dep = (Dependency) j.next();
 

@@ -280,7 +280,22 @@ public class MBoot
 
         reader = new ModelReader( localRepository );
         reader.parse( new File( basedir, "maven-plugins/maven-surefire-plugin/pom.xml" ) );
-        List surefireDependencies = reader.getDependencies();
+        List surefireDependencies = new ArrayList();
+
+        // TODO: while we have maven-artifact in there, it needs to be filtered...
+        for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
+        {
+            Dependency d = (Dependency) i.next();
+            if ( d.getGroupId().equals( "surefire" ) )
+            {
+                surefireDependencies.add( d );
+            }
+        }
+
+        if ( online )
+        {
+            downloader.downloadDependencies( surefireDependencies );
+        }
 
         reader = new ModelReader( localRepository );
 
