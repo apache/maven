@@ -256,7 +256,7 @@ public abstract class AbstractGenerator
 
             pd.setType( parameter.getNamedParameter( "type" ) );
 
-            pd.setRequired( Boolean.getBoolean( parameter.getNamedParameter( "required" ) ) );
+            pd.setRequired( parameter.getNamedParameter( "required" ).equals( "true" ) ? true : false );
 
             pd.setValidator( parameter.getNamedParameter( "validator" ) );
 
