@@ -1,13 +1,5 @@
 package org.apache.maven.artifact.handler.manager;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.codehaus.plexus.util.StringUtils;
-
-import java.util.Map;
-import java.util.Set;
-
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -24,6 +16,14 @@ import java.util.Set;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.codehaus.plexus.util.StringUtils;
+
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id: DefaultArtifactHandlerManager.java,v 1.1.1.1 2004/08/09
@@ -34,7 +34,8 @@ public class DefaultArtifactHandlerManager
 {
     private Map artifactHandlers;
 
-    public ArtifactHandler getArtifactHandler( String type ) throws ArtifactHandlerNotFoundException
+    public ArtifactHandler getArtifactHandler( String type )
+        throws ArtifactHandlerNotFoundException
     {
         ArtifactHandler handler = (ArtifactHandler) artifactHandlers.get( type );
 
@@ -68,7 +69,7 @@ public class DefaultArtifactHandlerManager
     }
 
     public String localRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
-         throws ArtifactHandlerNotFoundException
+        throws ArtifactHandlerNotFoundException
     {
         return localRepository.getBasedir() + "/" + path( artifact );
     }
@@ -79,16 +80,16 @@ public class DefaultArtifactHandlerManager
         return remoteRepository.getUrl() + "/" + path( artifact );
     }
 
-    public String path( Artifact artifact ) throws ArtifactHandlerNotFoundException
+    public String path( Artifact artifact )
+        throws ArtifactHandlerNotFoundException
     {
         ArtifactHandler handler = getArtifactHandler( artifact.getType() );
 
-        return interpolateLayout( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), handler
-            .directory(), handler.extension() );
+        return interpolateLayout( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), handler.directory(), handler.extension() );
     }
 
     private String interpolateLayout( String groupId, String artifactId, String version, String directory,
-        String extension )
+                                      String extension )
     {
         String layout = getLayout();
 
