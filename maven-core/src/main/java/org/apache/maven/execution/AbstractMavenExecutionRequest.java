@@ -32,7 +32,7 @@ import java.util.Properties;
 public class AbstractMavenExecutionRequest
 implements MavenExecutionRequest
 {
-    // @todo [BP] is this required? This hands off to MavenSession, but could be passed through the handler.handle function (+ createSession) 
+    /** @todo [BP] is this required? This hands off to MavenSession, but could be passed through the handler.handle function (+ createSession). */
     protected ArtifactRepository localRepository;
     protected final Properties parameters;
     protected List goals;

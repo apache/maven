@@ -17,12 +17,14 @@ package org.apache.maven.execution;
  * ====================================================================
  */
 
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.lifecycle.session.MavenSessionPhaseManager;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.i18n.I18N;
@@ -70,6 +72,33 @@ public abstract class AbstractMavenExecutionRequestHandler
                                                  request.getGoals() );
 
         return session;
+    }
+
+    /** @todo [BP] this might not be required if there is a better way to pass them in. It doesn't feel quite right. */
+    private void resolveParameters( MavenExecutionRequest request )
+        throws ComponentLookupException
+    {
+        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
+        if ( request.getParameter( "maven.proxy.http.host" ) != null )
+        {
+            String p = request.getParameter( "maven.proxy.http.port" );
+            int port = 8080;
+            if ( p != null )
+            {
+                try
+                {
+                    port = Integer.valueOf( p ).intValue();
+                }
+                catch ( NumberFormatException e )
+                {
+                    getLogger().warn( "maven.proxy.http.port was not valid" );
+                }
+            }
+            wagonManager.setProxy( "http", request.getParameter( "maven.proxy.http.host" ), port,
+                                   request.getParameter( "maven.proxy.http.username" ),
+                                   request.getParameter( "maven.proxy.http.password" ),
+                                   request.getParameter( "maven.proxy.http.nonProxyHosts" ) );
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -188,6 +217,8 @@ public abstract class AbstractMavenExecutionRequestHandler
             request.setSession( createSession( request ) );
 
             response.setStart( new Date() );
+
+            resolveParameters( request );
 
             sessionPhaseManager.execute( request, response );
 
