@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Deploy JAR to the repository
+# $1 : artifact to copy
+# $2 : project id
+
+ARTIFACT=$1
+ID=$2
+ARTIFACT_TYPE=licenses
+REPO=login.ibiblio.org
+DIR=/public/html/maven/${ID}/${ARTIFACT_TYPE}
+
+echo ${DIR}
+
+# Make sure the target directory is present.
+ssh $REPO "mkdir -p ${DIR}"
+
+# Copy the artifact to the repository.
+scp $ARTIFACT ${REPO}:${DIR}
+
+# Make sure the perms are correct. Just in case
+ssh $REPO "chmod 664 ${DIR}/${ARTIFACT}; chgrp maven ${DIR}/${ARTIFACT}; cd ${DIR}; md5sum ${ARTIFACT} | sed 's/ .*$//' > ${ARTIFACT}.md5; chgrp maven ${ARTIFACT}.md5"
