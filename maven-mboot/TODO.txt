@@ -1,2 +1,3 @@
 o obey jar overrides
 o transitive deps 
+o use parent model
