@@ -20,7 +20,7 @@ import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.MavenCore;
+import org.apache.maven.Maven;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +39,11 @@ import java.util.List;
  *  description=""
  *
  * @parameter
- *  name="mavenCore"
- *  type="org.apache.maven.MavenCore"
+ *  name="maven"
+ *  type="org.apache.maven.Maven"
  *  required="true"
  *  validator=""
- *  expression="#component.org.apache.maven.MavenCore"
+ *  expression="#component.org.apache.maven.Maven"
  *  description=""""
  *
  * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
@@ -61,7 +61,7 @@ public class InstallMojo
 
         String type = project.getType();
 
-        MavenCore mavenCore = ( MavenCore ) request.getParameter( "mavenCore" );
+        Maven maven = ( Maven ) request.getParameter( "maven" );
 
         String goal = type + ":install";
 
@@ -69,7 +69,7 @@ public class InstallMojo
 
         goals.add( goal );
 
-        mavenCore.execute( project, goals );
+        maven.execute( project, goals );
 
     }
 
