@@ -106,12 +106,6 @@
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>test</role-hint>
-      <implementation>org.apache.maven.artifact.handler.TestHandler</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>pom</role-hint>
       <implementation>org.apache.maven.artifact.handler.PomHandler</implementation>
     </component>
