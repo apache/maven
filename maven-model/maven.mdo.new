@@ -1,0 +1,1278 @@
+<!--
+ |
+ | o add specification element to a field, this would be more a technical description of
+ |   what is allowed in the field.
+ |
+ | o validators: there could be several levels of validation. Simple type validation could
+ |   be done with a regex, but we need inter-field validation and rules which could be
+ |   dealt with by something like drools.
+ |
+ | o i18n: would be good to be able to have names/descriptions/specifications
+ |   in as many languages as possible.
+ |
+ | o versioning of individual elements on the class level and the field level so that
+ |   different versions of the model can be output.
+ |
+ | o annotation mechanism so that changes to the model can be accurately tracked.
+ |
+ -->
+<model>
+  <id>maven</id>
+  <name>Maven</name>
+  <description>Maven's model for Java project.</description>
+  <packageName>org.apache.maven.model</packageName>
+  <root>Model</root>
+  <classes>
+    <class>
+      <name>Model</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>extend</name>
+          <version>3.0.0+</version>
+          <description>
+            The location of the parent project, if one exists. Values from the parent project will be
+            the default for this project if they are left unspecified. 
+            The path may be absolute, or relative to the current project.xml file.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>parent</name>
+          <version>4.0.0</version>
+          <description>Specified which project to extend.</description>
+          <type>Parent</type>
+          <comment></comment>
+        </field>
+        <field>
+          <name>modelVersion</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>The version of this model you are using.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>pomVersion</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>The primary id for your project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>The primary grouping for your project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>The identifier used when generating the artifact for your project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <description>The type of artifact this project produces.</description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>Human readable name of the project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>currentVersion</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>The current version of the project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>shortDescription</name>
+          <version>3.0.0+</version>
+          <description>An abbreviated description of the project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>description</name>
+          <version>3.0.0+</version>
+          <description>
+            A detailed description of the project.  This element is
+            usually specified as CDATA to enable the use of HTML tags
+            within the description.  This description is used to
+            generate the
+            <a href="plugins/site/index.html">front page</a>
+            of the project's web site.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>The URL where the project can be found.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>logo</name>
+          <version>3.0.0+</version>
+          <description>The logo for the project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>issueTrackingUrl</name>
+          <version>3.0.0</version>
+          <description>The URL where the issue tracking system used by the project can be found.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>issueManagement</name>
+          <version>4.0.0</version>
+          <description>The project's issue management information.</description>
+          <type>IssueManagement</type>
+        </field>
+        <field>
+          <name>ciManagement</name>
+          <version>4.0.0</version>
+          <description>The project's continuous integration management information.</description>
+          <type>CiManagement</type>
+        </field>
+        <field>
+          <name>inceptionYear</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>The year the project started.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>gumpRepositoryId</name>
+          <version>3.0.0</version>
+          <description>Hint for the gump continuous integration build system.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>siteAddress</name>
+          <version>3.0.0</version>
+          <description>The FQDN of the host where the project's site is uploaded.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>siteDirectory</name>
+          <version>3.0.0</version>
+          <description>The directory on the site host where site documentation is placed when the site is uploaded.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distributionSite</name>
+          <version>3.0.0</version>
+          <description>The FQDN of the host where the project's artifacts are uploaded.</description>
+          <type>String</type>
+          <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
+        </field>
+        <field>
+          <name>distributionDirectory</name>
+          <version>3.0.0</version>
+          <description>The directory on the distribution host where artifacts are placed when uploaded.</description>
+          <type>String</type>
+          <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
+        </field>
+        <field>
+          <name>repositories</name>
+          <version>4.0.0</version>
+          <description>The lists of the remote repositories</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+
+        <field>
+          <name>mailingLists</name>
+          <version>3.0.0+</version>
+          <description>The mailing lists for the project.</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>developers</name>
+          <version>3.0.0+</version>
+          <description>
+            This element describes all of the developers associated with a
+            project.  Each developer is described by a
+            <code>developer</code> element, which is then described by
+            additional elements (described below).  The auto-generated site
+            documentation references this information.
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>contributors</name>
+          <version>3.0.0+</version>
+          <description>
+            This element describes all of the contributors associated with a
+            project who are not developers.  Each contributor is described by a
+            <code>contributor</code> element, which is then describe by additional
+            elements (described below).  The auto-generated site documentation
+            references this information.
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>dependencies</name>
+          <version>3.0.0+</version>
+          <description>
+            This element describes all of the dependencies associated with a
+            project.  Each dependency is described by a
+            <code>dependency</code> element, which is then described by
+            additional elements (described below).
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+          <comment>These should ultimately only be compile time dependencies when transitive dependencies come into play.</comment>
+        </field>
+        <field>
+          <name>licenses</name>
+          <version>3.0.0+</version>
+          <description>
+            This element describes all of the licenses for this project.  Each license is described by a
+            <code>license</code> element, which is then describe by additional
+            elements (described below).  The auto-generated site documentation
+            references this information.  Projects should only list the license(s) that
+            applies to the project and not the licenses that apply to dependencies.
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>versions</name>
+          <version>3.0.0</version>
+          <description>The released versions of the project.</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>branches</name>
+          <version>3.0.0</version>
+          <description>The SCM branches create for the project.</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>packageGroups</name>
+          <version>3.0.0+</version>
+          <description>Package groups required for complete javadocs.</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>reports</name>
+          <version>3.0.0+</version>
+          <description>
+            This element includes the specification of reports to be
+            included in a Maven-generated site.  These reports will be run
+            when a user executes
+            <code>maven site</code>.  All of the
+            reports will be included in the navigation bar for browsing in
+            the order they are specified.
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>scm</name>
+          <version>4.0.0</version>
+          <description>Specification for the SCM use by the project.</description>
+          <type>Scm</type>
+        </field>
+        <field>
+          <name>repository</name>
+          <version>3.0.0</version>
+          <description>Specification for the SCM use by the project.</description>
+          <type>Repository</type>
+          <comment>This element needs to be renamed as it conflicts with the existing notion of repositories in Maven.</comment>
+        </field>
+        <field>
+          <name>build</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>Information required to build the project.</description>
+          <type>Build</type>
+        </field>
+        <field>
+          <name>organization</name>
+          <version>3.0.0+</version>
+          <description>
+            This element describes various attributes of the organziation to
+            which the project belongs.  These attributes are utilized when
+            documentation is created (for copyright notices and links).
+          </description>
+          <type>Organization</type>
+        </field>
+        <field>
+          <name>distributionManagement</name>
+          <version>4.0.0</version>
+          <description>Distribution information for a project.</description>
+          <type>DistributionManagement</type>
+        </field>
+      </fields>
+      <!-- We need this because we can't use package as a field name. -->
+      <codeSegments>
+        <codeSegment>
+          <version>3.0.0+</version>
+          <code>
+            private String packageName;
+
+            public void setPackage(String packageName)
+            {
+                this.packageName = packageName;
+            }
+
+            public String getPackage()
+            {
+                return packageName;
+            }
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            public String getId()
+            {
+                StringBuffer id = new StringBuffer();
+
+                id.append( getGroupId() );
+                id.append( ":" );
+                id.append( getArtifactId() );
+                id.append( ":" );
+                id.append( getType() );
+                id.append( ":" );
+                id.append( getVersion() );
+
+                return id.toString();
+            }
+          </code>
+        </codeSegment>
+<!--
+        <codeSegment>
+          <version>3.0.0</version>
+          <code>
+            public void setId( String id )
+            {
+                int i = id.indexOf( "+" );
+                int j = id.indexOf( ":" );
+
+                if ( i > 0 )
+                {
+                    setGroupId( id.substring( 0, i ) );
+                    setArtifactId( id.replace( '+', '-' ) );
+                }
+                else if ( j > 0 )
+                {
+                    setGroupId( id.substring( 0, j ) );
+                    setArtifactId( id.substring( j + 1 ) );
+                }
+                else
+                {
+                    setGroupId( id );
+                    setArtifactId( id );
+                }
+            }
+          </code>
+        </codeSegment>
+-->
+      </codeSegments>
+    </class>
+    <class>
+      <name>Branch</name>
+      <version>3.0.0</version>
+      <description>
+        This element describes each of the branches of the
+        project. Each branch is described by a
+        <code>tag</code>
+        element
+      </description>
+      <fields>
+        <field>
+          <name>tag</name>
+          <version>3.0.0</version>
+          <description>
+            The branch tag in the version control system
+            (e.g. cvs) used by the project for the source
+            code associated with this branch of the
+            project.
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Build</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>nagEmailAddress</name>
+          <version>3.0.0</version>
+          <description>
+            An address to which notifications regarding the status of builds
+            for this project can be sent. This is intended for use by tools
+            which do unattended builds, for example those providing for
+            continuous integration. Currently this is used by the
+            <a href="build-file.html#maven:gump-descriptor">maven:gump-descriptor</a>
+            target.
+          </description>
+          <type>String</type>
+          <comment>This should be moved out of the build section. Vestigal for use with Gump.</comment>
+        </field>
+        <field>
+          <name>sourceDirectory</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            This element specifies a directory containing the source
+            of the project. The generated build system will compile
+            the source in this directory when the project is built.
+            The path given is relative to the project descriptor.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>unitTestSourceDirectory</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            This element specifies a directory containing the unit test
+            source of the project. The generated build system will
+            compile these directories when the project is being tested.
+            The unit tests must use the JUnit test framework.
+            The path given is relative to the project descriptor.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>aspectSourceDirectory</name>
+          <version>3.0.0+</version>
+          <description>
+            This element specifies a directory containing Aspect
+            sources of the project.  The generated build system will
+            compile the Aspects in this directory when the project is
+            built if Aspects have been enabled (see the
+            <a
+              href="plugins/aspectj/goals.html">Aspectj goals</a> document).
+            The path given is relative to the project descriptor.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>sourceModifications</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            This element describes all of the sourceModifications associated with a
+            project.  Each source modification is described by a
+            <code>sourceModification</code> element, which is then described by
+            additional elements (described below).  These modifications are used
+            to exclude or include various source depending on the environment
+            the build is running in.
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>unitTest</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>This element specifies unit tests associated with the project.</description>
+          <type>UnitTest</type>
+          <defaultValue>new UnitTest()</defaultValue>
+        </field>
+        <field>
+          <name>resources</name>
+          <version>3.0.0+</version>
+          <description>
+            This element describes all of the resources associated with a project or unit tests.
+            Each resource is described by a resource element, which is then described by additional
+            elements (described
+            <a href="#resource">below</a>). These resources are used to
+            complete the jar file or to run unit test.
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>directory</name>
+          <version>4.0.0</version>
+          <description>
+            The directory where all generated by the build is placed.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>output</name>
+          <version>4.0.0</version>
+          <description>
+            The directory where compiled application classes are placed.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>testOutput</name>
+          <version>4.0.0</version>
+          <description>
+            The directory where compiled test classes are placed.
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>CiManagement</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>system</name>
+          <version>4.0.0</version>
+          <description>The name of the continuous integration system i.e. Bugzilla</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>Url for the continuous integration system use by the project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>nagEmailAddress</name>
+          <version>4.0.0</version>
+          <description>Email address for the party to be notified on unsuccessful builds.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Contributor</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <description>The full name of the contributor.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>email</name>
+          <version>3.0.0+</version>
+          <description>The email address of the contributor.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>The URL for the homepage of the contributor.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>organization</name>
+          <version>3.0.0+</version>
+          <description>The organization to which the contributor belongs.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>roles</name>
+          <version>3.0.0+</version>
+          <description>
+            The roles the contributor plays in the project.  Each role is
+            describe by a
+            <code>role</code> element, the body of which is a
+            role name.
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>timezone</name>
+          <version>3.0.0+</version>
+          <description>
+            The timezone the contributor is in. This is a number in the range -14 to 14.
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Dependency</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            The id of the dependency.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            The project group that produced the dependency, e.g.
+            <code>geronimo</code>.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            The unique id for an artifact produced by the project group, e.g.
+            <code>germonimo-jms</code>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            The version of the dependency., e.g.
+            <code>3.2.1</code>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>
+            This url will be provided to the user if the jar file cannot be downloaded
+            from the central repository.
+          </description>
+          <type>String</type>
+          <comment>The URL should really be gleaned from a shared database of dependency information.</comment>
+        </field>
+        <field>
+          <name>jar</name>
+          <version>3.0.0</version>
+          <description>Literal name of the artifact.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifact</name>
+          <version>4.0.0+</version>
+          <description>Literal name of the artifact</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>type</name>
+          <version>3.0.0+</version>
+          <description>
+            Other known recognised dependency types are:
+            <code>ejb</code> and
+            <code>plugin</code>.
+          </description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <field>
+          <name>properties</name>
+          <version>3.0.0+</version>
+          <description>
+            Properties about the dependency. Various plugins allow you to
+            <code>mark</code> dependencies with properties. For example the
+            <a href="plugins/war/index.html">war</a> plugin looks for a
+            <code>war.bundle</code> property, and if found will include the dependency
+            in
+            <code>WEB-INF/lib</code>. For example syntax, check the war plugin docs.
+          </description>
+          <type>java.util.Properties</type>
+          <defaultValue>new Properties()</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            public String getId()
+            {
+                return groupId + ":" + artifactId + ":" + type + ":" + version;
+            }
+
+            public String toString()
+            {
+                return groupId + "/" + type + "s:" + artifactId + "-" + version;
+            }
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <superClass>Contributor</superClass>
+      <name>Developer</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>3.0.0+</version>
+          <description>The username of the developer.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>IssueManagement</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>system</name>
+          <version>4.0.0</version>
+          <description>The name of the issue management system i.e. Bugzilla</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>Url for the issue management system use by the project.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>DistributionManagement</name>
+      <version>4.0.0</version>
+      <description>
+        This elements describes all that pertains to distribution for a project.
+      </description>
+      <fields>
+        <field>
+          <name>repository</name>
+          <version>4.0.0</version>
+          <description>Information needed for deploying to remote repository artifacts generated by the project</description>
+          <type>Repository</type>
+        </field>
+        <field>
+          <name>site</name>
+          <description>Information needed for deploying website files of the project.</description>
+          <version>4.0.0</version>
+          <type>Site</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>License</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <description>The full legal name of the license.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>The official url for the license text.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distribution</name>
+          <version>3.0.0</version>
+          <description>
+              The primary method by which this project may be distributed.
+            <dl>
+              <dt>repo</dt>
+              <dd>may be downloaded from the Maven repository</dd>
+              <dt>manual</dt>
+              <dd>user must manually download and install the dependency.</dd>
+            </dl>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>comments</name>
+          <version>3.0.0+</version>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>MailingList</name>
+      <version>3.0.0+</version>
+      <description>
+        This element describes all of the mailing lists associated with
+        a project.  Each mailing list is described by a
+        <code>mailingList</code> element, which is then described by
+        additional elements (described below).  The auto-generated site
+        documentation references this information.
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <description>The name of the mailing list.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>subscribe</name>
+          <version>3.0.0+</version>
+          <description>
+            The email address or link that can be used to subscribe to the mailing list.
+            If this is an email address, a
+            <code>mailto:</code> link will automatically be created when
+            the documentation is created.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>unsubscribe</name>
+          <version>3.0.0+</version>
+          <description>
+            The email address or link that can be used to unsubscribe to
+            the mailing list.  If this is an email address, a
+            <code>mailto:</code> link will automatically be created
+            when the documentation is created.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>archive</name>
+          <version>3.0.0+</version>
+          <description>The link to a URL where you can browse the archive.</description>
+          <type>String</type>
+        </field>
+      </fields>
+      <comment>
+        We could probably have a specific element for a dev mailing list for
+        things like CI, and maybe even a specific element for the user and scm
+        mailing lists. Then leave the more lose structure for any other type
+        of mailing list.
+      </comment>
+    </class>
+    <class>
+      <name>Organization</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <description>The full name of the organization.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0+</version>
+          <description>The URL to the organization's home page.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>logo</name>
+          <version>3.0.0+</version>
+          <description>
+            The URL to the organization's logo image.  This can be an URL relative
+            to the base directory of the generated web site,
+            (e.g.,
+            <code>/images/org-logo.png</code>) or an absolute URL
+            (e.g.,
+            <code>http://my.corp/logo.png</code>).  This value is used
+            when generating the project documentation.
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PackageGroup</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>title</name>
+          <version>3.0.0+</version>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>packages</name>
+          <version>3.0.0+</version>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PatternSet</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>includes</name>
+          <version>3.0.0+</version>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>excludes</name>
+          <version>3.0.0+</version>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>3.0.0+</version>
+          <code>
+            public List getDefaultExcludes()
+            {
+                List defaultExcludes = new ArrayList();
+                defaultExcludes.add( "**/*~" );
+                defaultExcludes.add( "**/#*#" );
+                defaultExcludes.add( "**/.#*" );
+                defaultExcludes.add( "**/%*%" );
+                defaultExcludes.add( "**/._*" );
+
+                // CVS
+                defaultExcludes.add( "**/CVS" );
+                defaultExcludes.add( "**/CVS/**" );
+                defaultExcludes.add( "**/.cvsignore" );
+
+                // SCCS
+                defaultExcludes.add( "**/SCCS" );
+                defaultExcludes.add( "**/SCCS/**" );
+
+                // Visual SourceSafe
+                defaultExcludes.add( "**/vssver.scc" );
+
+                // Subversion
+                defaultExcludes.add( "**/.svn" );
+                defaultExcludes.add( "**/.svn/**" );
+
+                // Mac
+                defaultExcludes.add( "**/.DS_Store" );
+                return defaultExcludes;
+            }
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Parent</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <description>The artifact id of the project to extend.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <description>The group id of the project to extend.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description>The versi>on of the project to extend.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Repository</name>
+      <version>3.0.0</version>
+      <fields>
+        <field>
+          <name>connection</name>
+          <version>3.0.0</version>
+          <description>
+            The source configuration management system URL
+            that describes the repository and how to connect to the
+            repository.  This is used by Maven when
+            <a
+              href="plugins/dist/index.html">building versions</a>
+            from specific ID.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>developerConnection</name>
+          <version>3.0.0</version>
+          <description>
+            Just like connection, but for developers, i.e. this scm connection
+            will not be read only.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>3.0.0</version>
+          <description>The URL to the project's browsable CVS repository.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Scm</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>connection</name>
+          <version>4.0.0</version>
+          <description>
+            The source configuration management system URL
+            that describes the repository and how to connect to the
+            repository.  This is used by Maven when
+            <a
+              href="plugins/dist/index.html">building versions</a>
+            from specific ID.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>developerConnection</name>
+          <version>4.0.0</version>
+          <description>
+            Just like connection, but for developers, i.e. this scm connection
+            will not be read only.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>The URL to the project's browsable CVS repository.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Resource</name>
+      <version>3.0.0+</version>
+      <superClass>PatternSet</superClass>
+      <fields>
+        <field>
+          <name>directory</name>
+          <version>3.0.0+</version>
+          <description>
+            Describe the directory where the resource is stored.
+            The path may be absolute, or relative to the project.xml file.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>targetPath</name>
+          <version>3.0.0+</version>
+          <description>
+            Describe the resource target path. For example, if you want that resource
+            appear into a specific package (
+            <code>org.apache.maven.messages</code>), you must specify this
+            element with this value :
+            <code>org/apache/maven/messages</code>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>filtering</name>
+          <version>3.0.0+</version>
+          <description>Describe if resources are filtered or not.</description>
+          <type>String</type>
+          <defaultValue>false</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>SourceModification</name>
+      <version>3.0.0+</version>
+      <superClass>Resource</superClass>
+      <fields>
+        <field>
+          <name>className</name>
+          <version>3.0.0+</version>
+          <description>
+            If the class with this name can
+            <strong>not</strong> be
+            loaded, then the includes and excludes specified below
+            will be applied to the contents of the
+            <a href="#sourceDirectory">sourceDirectory</a>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>property</name>
+          <version>3.0.0+</version>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>UnitTest</name>
+      <version>3.0.0+</version>
+      <superClass>PatternSet</superClass>
+      <fields>
+        <field>
+          <name>resources</name>
+          <version>3.0.0+</version>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Version</name>
+      <version>3.0.0</version>
+      <description>
+        This element describes each of the previous versions of the
+        project. Each version is described by a
+        <code>version</code>
+        element
+      </description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>3.0.0</version>
+          <description>
+            The external version number under which this release was distributed. Examples include:
+            <code>1.0</code>,
+            <code>1.1-alpha1</code>,
+            <code>1.2-beta</code>,
+            <code>1.3.2</code> etc.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>tag</name>
+          <version>3.0.0</version>
+          <description>
+            The name given in the version control system (e.g. cvs) used by the project for the source
+            code associated with this version of the project.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <description>
+            A unique identifier for a version.  This ID is
+            used to specify the version that
+            <a href="plugins/dist/index.html">
+              <code>maven:dist</code>
+            </a> builds.
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>Repository</name>
+      <version>4.0.0</version>
+      <description>
+         Repository contains the information needed
+         for establishing connections with remote repoistory
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>4.0.0</version>
+          <description>
+            A unique identifier for a repository.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>name</name>
+          <version>4.0.0</version>
+          <description>
+            Human readable name of the repository
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>
+             The url of of the repository
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            public boolean equals( Object obj )
+            {
+                Repository other =  ( Repository ) obj;
+
+                boolean retValue = false;
+
+                if ( id != null )
+                {
+                    retValue = id.equals( other.id );
+                }
+
+                return retValue;
+            }
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <!--@todo find better solution for managment of site deployments -->
+    <class>
+      <name>Site</name>
+      <version>4.0.0</version>
+      <description>
+         Site contains the information needed
+         for deploying websites.
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>4.0.0</version>
+          <description>
+            A unique identifier for a deployment locataion.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>name</name>
+          <version>4.0.0</version>
+          <description>
+            Human readable name of the deployment location
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>
+             The url of of the location where website is deployed
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
+  </classes>
+</model>
