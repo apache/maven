@@ -25,7 +25,7 @@
         </parameter>
         <parameter>
           <name>resources</name>
-          <expression>#project.build.unitTeset.resources</expression>
+          <expression>#project.build.unitTest.resources</expression>
         </parameter>
       </parameters>
     </goal>
