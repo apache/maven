@@ -34,7 +34,9 @@
       </resource>
       <resource>
         <directory>src/main/scripts</directory>
-        <includes>**/*.mmld</includes>
+        <includes>
+          <include>**/*.mmld</include>
+        </includes>
       </resource>
     </resources>
   </build>

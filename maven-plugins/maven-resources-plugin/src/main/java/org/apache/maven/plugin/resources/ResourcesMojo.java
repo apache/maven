@@ -20,6 +20,7 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -103,22 +104,29 @@ public class ResourcesMojo
             // If we only have a directory then we want to include
             // everything we can find within that path.
 
-            String includes = resource.getIncludes();
+            String includesAsString = "**/**";
 
-            if ( includes == null || includes.length() == 0 )
+            java.util.List includes = resource.getIncludes();
+            if ( includes != null && includes.size() > 0 )
             {
-                includes = "**/**";
+                includesAsString = StringUtils.join( includes.iterator(), "," );
             }
 
-            String excludes = resource.getExcludes();
+            List excludes = resource.getExcludes();
 
-            if ( excludes != null && excludes.length() > 0 )
+            if ( excludes == null )
             {
-                excludes += ",";
+                excludes = resource.getDefaultExcludes();
             }
-            excludes += listToString( resource.getDefaultExcludes() );
+            else
+            {
+                excludes = new ArrayList( excludes );
+                excludes.addAll( resource.getDefaultExcludes() );
+            }
 
-            List files = FileUtils.getFileNames( resourceDirectory, includes, excludes, false );
+            String excludesAsString = StringUtils.join( excludes.iterator(), "," );
+
+            List files = FileUtils.getFileNames( resourceDirectory, includesAsString, excludesAsString, false );
 
             for ( Iterator j = files.iterator(); j.hasNext(); )
             {
@@ -138,23 +146,6 @@ public class ResourcesMojo
         }
 
         return resourceEntries;
-    }
-
-    private String listToString( List list )
-    {
-        StringBuffer sb = new StringBuffer();
-
-        for ( int i = 0; i < list.size(); i++ )
-        {
-            sb.append( list.get( i ) );
-
-            if ( i != list.size() - 1 )
-            {
-                sb.append( "," );
-            }
-        }
-
-        return sb.toString();
     }
 
     public static byte[] fileRead( String fileName )

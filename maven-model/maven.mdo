@@ -1443,7 +1443,7 @@
       <fields>
         <field>
           <name>includes</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description><![CDATA[the description]]></description>
           <association>
             <type>String</type>
@@ -1452,24 +1452,12 @@
         </field>
         <field>
           <name>excludes</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description><![CDATA[the description]]></description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
-        </field>
-        <field>
-          <name>includes</name>
-          <version>4.0.0</version>
-          <description><![CDATA[the description]]></description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>excludes</name>
-          <version>4.0.0</version>
-          <description><![CDATA[the description]]></description>
-          <type>String</type>
         </field>
       </fields>
       <codeSegments>

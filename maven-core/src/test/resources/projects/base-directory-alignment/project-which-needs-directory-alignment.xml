@@ -89,18 +89,29 @@
     <resources>
       <resource>
         <directory>src/test</directory>
-        <includes>**/*.xml</includes>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
       </resource>
     </resources>
     <testResources>
       <testResource>
         <directory>src/conf</directory>
-        <includes>*.xsd,*.dtd,*.mod,log4j.properties,driver.jelly,driver.properties</includes>
+        <includes>
+          <include>*.xsd</include>
+          <include>*.dtd</include>
+          <include>*.mod</include>
+          <include>log4j.properties</include>
+          <include>driver.jelly</include>
+          <include>driver.properties</include>
+        </includes>
       </testResource>
       <testResource>
         <directory>src/messages</directory>
         <targetPath>org/apache/maven/messages</targetPath>
-        <includes>messages*.properties</includes>
+        <includes>
+          <include>messages*.properties</include>
+        </includes>
       </testResource>
     </testResources>
   </build>
