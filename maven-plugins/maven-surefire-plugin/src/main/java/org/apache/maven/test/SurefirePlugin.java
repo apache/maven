@@ -131,7 +131,7 @@ public class SurefirePlugin
         // come through if it has not been set.
         // ----------------------------------------------------------------------
 
-        if ( !test.equals( "#test" ) )
+        if ( test != null )
         {
             // FooTest -> **/FooTest.java
 
