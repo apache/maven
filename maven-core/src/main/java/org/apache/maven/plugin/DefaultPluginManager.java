@@ -182,14 +182,16 @@ public class DefaultPluginManager
         return pluginDescriptors.containsKey( constructPluginKey( groupId, artifactId ) );
     }
 
-    private String getPluginId( String goalName )
+    private static String getPluginId( String goalName )
     {
-        if ( goalName.indexOf( ":" ) > 0 )
+        String pluginId = goalName;
+
+        if ( pluginId.indexOf( ":" ) > 0 )
         {
-            return goalName.substring( 0, goalName.indexOf( ":" ) );
+            pluginId = pluginId.substring( 0, pluginId.indexOf( ":" ) );
         }
 
-        return goalName;
+        return "maven-" + pluginId + "-plugin";
     }
 
     // TODO: don't throw Exception
@@ -198,7 +200,7 @@ public class DefaultPluginManager
         String pluginId = getPluginId( goalName );
 
         // TODO: hardcoding of group ID/artifact ID
-        verifyPlugin( "maven", "maven-" + pluginId + "-plugin", session );
+        verifyPlugin( "maven", pluginId, session );
     }
 
     // TODO: don't throw Exception
@@ -515,7 +517,7 @@ public class DefaultPluginManager
 
         if ( project.getPlugins() != null )
         {
-            String pluginId = goalId.substring( 0, goalId.indexOf( ":" ) );
+            String pluginId = getPluginId( goalId );
 
             for ( Iterator iterator = project.getPlugins().iterator(); iterator.hasNext(); )
             {
