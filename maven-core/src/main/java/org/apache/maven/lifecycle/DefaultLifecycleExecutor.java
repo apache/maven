@@ -34,7 +34,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -49,7 +48,7 @@ import java.util.Map;
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
-    implements LifecycleExecutor, Initializable
+    implements LifecycleExecutor
 {
     // ----------------------------------------------------------------------
     // Components
@@ -64,8 +63,6 @@ public class DefaultLifecycleExecutor
     private PluginManager pluginManager;
 
     private List phases;
-
-    private Map phaseMap;
 
     // ----------------------------------------------------------------------
     //
@@ -84,6 +81,16 @@ public class DefaultLifecycleExecutor
 
         response.setStart( new Date() );
 
+        Map phaseMap = new HashMap();
+
+        for ( Iterator i = phases.iterator(); i.hasNext(); )
+        {
+            Phase p = (Phase) i.next();
+
+            // Make a copy of the phase as we will modify it
+            phaseMap.put( p.getId(), new Phase( p ) );
+        }
+
         try
         {
             MavenProject project = session.getProject();
@@ -94,7 +101,7 @@ public class DefaultLifecycleExecutor
             {
                 if ( artifactHandler.packageGoal() != null )
                 {
-                    verifyMojoPhase( artifactHandler.packageGoal(), session );
+                    verifyMojoPhase( artifactHandler.packageGoal(), session, phaseMap );
                 }
 
                 if ( artifactHandler.additionalPlugin() != null )
@@ -111,21 +118,21 @@ public class DefaultLifecycleExecutor
 
                     plugin.setArtifactId( additionalPluginArtifactId );
 
-                    processPluginPhases( plugin, session );
+                    processPluginPhases( plugin, session, phaseMap );
                 }
             }
 
-            processPluginConfiguration( session.getProject(), session );
+            processPluginConfiguration( session.getProject(), session, phaseMap );
 
             for ( Iterator i = tasks.iterator(); i.hasNext(); )
             {
                 String task = (String) i.next();
 
-                processGoalChain( task, session );
+                processGoalChain( task, session, phaseMap );
 
                 if ( phaseMap.containsKey( task ) )
                 {
-                    executePhase( task, session, response );
+                    executePhase( task, session, response, phaseMap );
                 }
                 else
                 {
@@ -184,14 +191,14 @@ public class DefaultLifecycleExecutor
     }
 
     // TODO: don't throw Exception
-    private void processPluginConfiguration( MavenProject project, MavenSession mavenSession )
+    private void processPluginConfiguration( MavenProject project, MavenSession mavenSession, Map phaseMap )
         throws Exception
     {
         for ( Iterator i = project.getPlugins().iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
 
-            processPluginPhases( plugin, mavenSession );
+            processPluginPhases( plugin, mavenSession, phaseMap );
         }
     }
 
@@ -204,7 +211,7 @@ public class DefaultLifecycleExecutor
      * @throws Exception
      */
     // TODO: don't throw Exception
-    private void processPluginPhases( Plugin plugin, MavenSession mavenSession )
+    private void processPluginPhases( Plugin plugin, MavenSession mavenSession, Map phaseMap )
         throws Exception
     {
         String groupId = plugin.getGroupId();
@@ -225,7 +232,7 @@ public class DefaultLifecycleExecutor
         {
             String pluginId = pluginDescriptor.getArtifactId();
 
-            // Right now this maven-foo-plugin so this is a hack right now.
+            // TODO: Right now this maven-foo-plugin so this is a hack right now.
 
             pluginId = pluginId.substring( 6 );
 
@@ -245,7 +252,7 @@ public class DefaultLifecycleExecutor
                         "A goal '" + mojoId + "' was declared in pom.xml, but does not exist" );
                 }
 
-                configureMojo( mojoDescriptor );
+                configureMojo( mojoDescriptor, phaseMap );
             }
         }
         else
@@ -254,7 +261,7 @@ public class DefaultLifecycleExecutor
             {
                 MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
 
-                configureMojo( mojoDescriptor );
+                configureMojo( mojoDescriptor, phaseMap );
             }
         }
     }
@@ -267,7 +274,7 @@ public class DefaultLifecycleExecutor
      * @param mojoDescriptor
      * @throws Exception
      */
-    private void configureMojo( MojoDescriptor mojoDescriptor )
+    private void configureMojo( MojoDescriptor mojoDescriptor, Map phaseMap )
         throws Exception
     {
         if ( mojoDescriptor.getPhase() != null )
@@ -278,7 +285,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void processGoalChain( String task, MavenSession session )
+    private void processGoalChain( String task, MavenSession session, Map phaseMap )
         throws Exception
     {
         if ( phaseMap.containsKey( task ) )
@@ -288,7 +295,10 @@ public class DefaultLifecycleExecutor
 
             for ( int j = 0; j <= index; j++ )
             {
+                // TODO: phases should just be strings...
                 Phase p = (Phase) phases.get( j );
+
+                p = (Phase) phaseMap.get( p.getId() );
 
                 if ( p.getGoals() != null )
                 {
@@ -296,18 +306,18 @@ public class DefaultLifecycleExecutor
                     {
                         String goal = (String) k.next();
 
-                        verifyMojoPhase( goal, session );
+                        verifyMojoPhase( goal, session, phaseMap );
                     }
                 }
             }
         }
         else
         {
-            verifyMojoPhase( task, session );
+            verifyMojoPhase( task, session, phaseMap );
         }
     }
 
-    private void verifyMojoPhase( String task, MavenSession session )
+    private void verifyMojoPhase( String task, MavenSession session, Map phaseMap )
         throws Exception
     {
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
@@ -332,7 +342,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executePhase( String phase, MavenSession session, MavenExecutionResponse response )
+    private void executePhase( String phase, MavenSession session, MavenExecutionResponse response, Map phaseMap )
         throws LifecycleExecutionException
     {
         // only execute up to the given phase
@@ -343,6 +353,8 @@ public class DefaultLifecycleExecutor
         for ( int j = 0; j <= index; j++ )
         {
             Phase p = (Phase) phases.get( j );
+
+            p = (Phase) phaseMap.get( p.getId() );
 
             String event = MavenEvents.PHASE_EXECUTION;
 
@@ -395,7 +407,11 @@ public class DefaultLifecycleExecutor
         try
         {
             Logger logger = getLogger();
-            logger.debug( "Resolving artifacts from:\n" + "\t{localRepository: " + session.getLocalRepository() + "}\n" + "\t{remoteRepositories: " + session.getRemoteRepositories() + "}" );
+            logger.debug(
+                "Resolving artifacts from:\n" + "\t{localRepository: " + session.getLocalRepository() + "}\n" +
+                "\t{remoteRepositories: " +
+                session.getRemoteRepositories() +
+                "}" );
 
             return pluginManager.executeMojo( session, id );
         }
@@ -412,27 +428,5 @@ public class DefaultLifecycleExecutor
     public List getPhases()
     {
         return phases;
-    }
-
-    public Phase getPhase( String id )
-    {
-        return (Phase) phaseMap.get( id );
-    }
-
-    // ----------------------------------------------------------------------
-    // Lifecylce Management
-    // ----------------------------------------------------------------------
-
-    public void initialize()
-        throws Exception
-    {
-        phaseMap = new HashMap();
-
-        for ( Iterator i = phases.iterator(); i.hasNext(); )
-        {
-            Phase p = (Phase) i.next();
-
-            phaseMap.put( p.getId(), p );
-        }
     }
 }

@@ -30,6 +30,19 @@ public class Phase
 
     private Set goals;
 
+    public Phase()
+    {
+    }
+
+    Phase( Phase phase )
+    {
+        this.id = phase.id;
+        if ( phase.goals != null )
+        {
+            this.goals = new HashSet( phase.goals );
+        }
+    }
+
     public String getId()
     {
         return id;
@@ -42,5 +55,27 @@ public class Phase
             goals = new HashSet();
         }
         return goals;
+    }
+
+    public boolean equals( Object obj )
+    {
+        if ( obj == this )
+        {
+            return true;
+        }
+
+        if ( !( obj instanceof Phase ) )
+        {
+            return false;
+        }
+
+        Phase p = (Phase) obj;
+
+        return id.equals( p.id );
+    }
+
+    public int hashCode()
+    {
+        return id.hashCode();
     }
 }

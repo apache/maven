@@ -189,12 +189,12 @@ public class DefaultMaven
 
     private MavenExecutionResponse processProject( MavenExecutionRequest request, MavenProject project,
                                                    EventDispatcher dispatcher, List goals )
-        throws ComponentLookupException
+        throws Exception
     {
         MavenSession session = createSession( request );
 
         session.setProject( project );
-        
+
         session.setRemoteRepositories( getArtifactRepositories( project, request.getSettings() ) );
 
         resolveParameters( request );
@@ -216,6 +216,7 @@ public class DefaultMaven
         catch ( Exception e )
         {
             dispatcher.dispatchError( event, project.getId(), e );
+            throw e;
         }
         // End event monitoring.
 
@@ -298,9 +299,8 @@ public class DefaultMaven
 
         if ( proxy != null )
         {
-            wagonManager.setProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
-                                   proxy.getUsername(), proxy.getPassword(),
-                                   proxy.getNonProxyHosts() );
+            wagonManager.setProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+                                   proxy.getPassword(), proxy.getNonProxyHosts() );
         }
 
     }
