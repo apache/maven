@@ -19,6 +19,7 @@ package org.apache.maven.artifact.metadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 import java.io.IOException;
 
@@ -39,6 +40,15 @@ public interface ArtifactMetadata
      */
     void storeInLocalRepository( ArtifactRepository localRepository )
         throws IOException, ArtifactPathFormatException;
+
+    /**
+     * Retrieve the metadata from the remote repository into the local repository.
+     *
+     * @param remoteRepository the remote repository
+     * @param localRepository  the local repository
+     */
+    void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, ArtifactRepository localRepository )
+        throws IOException, ArtifactResolutionException;
 
     /**
      * Get the associated artifact.

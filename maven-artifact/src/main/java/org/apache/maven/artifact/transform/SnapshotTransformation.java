@@ -189,7 +189,7 @@ public class SnapshotTransformation
     {
         if ( shouldProcessArtifact( artifact ) )
         {
-            // only store the snapshot-version-local.txt file for POMs as every file has an associated POM
+            // only store the version-local.txt file for POMs as every file has an associated POM
             ArtifactMetadata metadata = SnapshotArtifactMetadata.createLocalSnapshotMetadata( artifact );
             artifact.addMetadata( metadata );
         }
@@ -200,6 +200,9 @@ public class SnapshotTransformation
     {
         if ( shouldProcessArtifact( artifact ) )
         {
+            ArtifactMetadata metadata = SnapshotArtifactMetadata.createRemoteSnapshotMetadata( artifact );
+//            wagonManager.getMetadata( metadata, remoteRepository, localRepository );
+
             // TODO: implement
         }
         return artifact;

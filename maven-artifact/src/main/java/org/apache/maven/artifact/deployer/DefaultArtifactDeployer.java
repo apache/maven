@@ -56,7 +56,7 @@ public class DefaultArtifactDeployer
     {
         try
         {
-            wagonManager.put( source, artifact, deploymentRepository );
+            wagonManager.putArtifact( source, artifact, deploymentRepository );
         }
         catch ( Exception e )
         {

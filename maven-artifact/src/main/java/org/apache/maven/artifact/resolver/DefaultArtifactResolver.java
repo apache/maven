@@ -29,6 +29,7 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +46,8 @@ public class DefaultArtifactResolver
     extends AbstractLogEnabled
     implements ArtifactResolver
 {
+    private final ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
+
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
@@ -57,15 +60,10 @@ public class DefaultArtifactResolver
     // Implementation
     // ----------------------------------------------------------------------
 
-    private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
-
+    // TODO: would like to avoid the returning of a new artifact - is it ok to modify the original though?
     public Artifact resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
-        // ----------------------------------------------------------------------
-        // Perform any transformation on the artifacts
-        // ----------------------------------------------------------------------
-
         // ----------------------------------------------------------------------
         // Check for the existence of the artifact in the specified local
         // ArtifactRepository. If it is present then simply return as the
@@ -73,28 +71,37 @@ public class DefaultArtifactResolver
         // for resolution has been satisfied.
         // ----------------------------------------------------------------------
 
+        Logger logger = getLogger();
+        logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository + "}\n" +
+                      "{remoteRepositories: " + remoteRepositories + "}" );
+
+        String localPath;
+
         try
         {
-            Logger logger = getLogger();
-            logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository +
-                          "}\n" + "{remoteRepositories: " + remoteRepositories + "}" );
-
-            artifact.setPath( artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository ) );
-
-            if ( artifact.exists() )
-            {
-                return artifact;
-            }
-
-            wagonManager.get( artifact, remoteRepositories, localRepository );
-        }
-        catch ( TransferFailedException e )
-        {
-            throw new ArtifactResolutionException( artifactNotFound( artifact, remoteRepositories ), e );
+            localPath = artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository );
         }
         catch ( ArtifactPathFormatException e )
         {
             throw new ArtifactResolutionException( "Error resolving artifact: ", e );
+        }
+
+        // TODO: what if it were a snapshot that was transformed?
+        File destination = new File( localPath );
+        artifact.setFile( destination );
+
+        if ( destination.exists() )
+        {
+            return artifact;
+        }
+
+        try
+        {
+            wagonManager.getArtifact( artifact, remoteRepositories, destination );
+        }
+        catch ( TransferFailedException e )
+        {
+            throw new ArtifactResolutionException( artifactNotFound( localPath, remoteRepositories ), e );
         }
 
         return artifact;
@@ -102,12 +109,19 @@ public class DefaultArtifactResolver
 
     private static final String LS = System.getProperty( "line.separator" );
 
-    private String artifactNotFound( Artifact artifact, List remoteRepositories )
+    private String artifactNotFound( String path, List remoteRepositories )
     {
         StringBuffer sb = new StringBuffer();
 
-        sb.append( "The artifact is not present locally as:" ).append( LS ).append( LS ).append( artifact.getPath() ).append(
-            LS ).append( LS ).append( "or in any of the specified remote repositories:" ).append( LS ).append( LS );
+        sb.append( "The artifact is not present locally as:" );
+        sb.append( LS );
+        sb.append( LS );
+        sb.append( path );
+        sb.append( LS );
+        sb.append( LS );
+        sb.append( "or in any of the specified remote repositories:" );
+        sb.append( LS );
+        sb.append( LS );
 
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
@@ -160,10 +174,18 @@ public class DefaultArtifactResolver
             throw new ArtifactResolutionException( "Error transitively resolving artifacts: ", e );
         }
 
-        for ( Iterator i = artifactResolutionResult.getArtifacts().values().iterator(); i.hasNext(); )
+        // TODO: this is unclean, but necessary as long as resolve may return a different artifact
+        Map collectedArtifacts = artifactResolutionResult.getArtifacts();
+        Map resolvedArtifacts = new HashMap( collectedArtifacts.size() );
+        for ( Iterator i = collectedArtifacts.keySet().iterator(); i.hasNext(); )
         {
-            resolve( (Artifact) i.next(), remoteRepositories, localRepository );
+            Object key = i.next();
+            resolvedArtifacts.put( key, resolve( (Artifact) collectedArtifacts.get( key ), remoteRepositories,
+                                                 localRepository ) );
         }
+
+        collectedArtifacts.clear();
+        collectedArtifacts.putAll( resolvedArtifacts );
 
         return artifactResolutionResult;
     }
@@ -242,6 +264,7 @@ public class DefaultArtifactResolver
                     {
                         // TODO: Artifact factory?
                         // TODO: [jc] Is this a better way to centralize artifact construction here?
+
                         Artifact artifact = artifactConstructionSupport.createArtifact( knownArtifact.getGroupId(),
                                                                                         knownArtifact.getArtifactId(),
                                                                                         knownVersion,
@@ -293,15 +316,6 @@ public class DefaultArtifactResolver
         for ( Iterator it = resolvedArtifacts.values().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-
-            try
-            {
-                artifact.setPath( artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository ) );
-            }
-            catch ( ArtifactPathFormatException e )
-            {
-                throw new TransitiveArtifactResolutionException( "Error collecting artifact: ", e );
-            }
 
             artifactResult.put( artifact.getId(), artifact );
         }

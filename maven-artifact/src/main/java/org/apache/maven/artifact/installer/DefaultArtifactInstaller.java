@@ -57,16 +57,18 @@ public class DefaultArtifactInstaller
     {
         try
         {
-            artifact.setPath( artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository ) );
+            String localPath = artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository );
 
-            if ( !artifact.getFile().getParentFile().exists() )
+            getLogger().info( "Installing " + source.getPath() + " to " + localPath );
+
+            // TODO: use a file: wagon and the wagon manager?
+            File destination = new File( localPath );
+            if ( !destination.getParentFile().exists() )
             {
-                artifact.getFile().getParentFile().mkdirs();
+                destination.getParentFile().mkdirs();
             }
 
-            getLogger().info( "Installing " + source.getPath() + " to " + artifact.getPath() );
-
-            FileUtils.copyFile( source, artifact.getFile() );
+            FileUtils.copyFile( source, destination );
 
             // must be after the artifact is installed
             for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )

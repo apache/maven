@@ -267,8 +267,9 @@ public class DefaultPluginManager
 
                 artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
-                Artifact pluginArtifact = artifactFactory.createArtifact( AbstractPlugin.getDefaultPluginGroupId(), artifactId,
-                                                                          version, null, MAVEN_PLUGIN, null );
+                Artifact pluginArtifact = artifactFactory.createArtifact( AbstractPlugin.getDefaultPluginGroupId(),
+                                                                          artifactId, version, null, MAVEN_PLUGIN,
+                                                                          null );
 
                 addPlugin( pluginArtifact, session );
             }
@@ -774,6 +775,7 @@ public class DefaultPluginManager
         {
             Artifact artifact = (Artifact) it.next();
 
+            // TODO: should I get the modified artifacts back into the project?
             artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
         }
     }

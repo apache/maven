@@ -235,7 +235,8 @@ public class MavenProject
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) )
             {
-                list.add( a.getPath() );
+                // TODO: this assumes resolution, which may not have been the case - improve error reporting in that instance
+                list.add( a.getFile().getPath() );
             }
         }
         return list;
@@ -257,7 +258,8 @@ public class MavenProject
                 if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
                     Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
-                    list.add( a.getPath() );
+                    // TODO: this assumes resolution, which may not have been the case - improve error reporting in that instance
+                    list.add( a.getFile().getPath() );
                 }
             }
         }
@@ -279,7 +281,8 @@ public class MavenProject
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
-                    list.add( a.getPath() );
+                    // TODO: this assumes resolution, which may not have been the case - improve error reporting in that instance
+                    list.add( a.getFile().getPath() );
                 }
             }
         }

@@ -39,6 +39,13 @@ public interface Artifact
 
     String getVersion();
 
+    /**
+     * Get the scope of the artifact. If the artifact is a standalone rather than a dependency, it's scope will be
+     * <code>null</code>. The scope may not be the same as it was declared on the original dependency, as this is the
+     * result of combining it with the main project scope.
+     *
+     * @return the scope
+     */
     String getScope();
 
     String getType();
@@ -48,19 +55,9 @@ public interface Artifact
     // only providing this since classifier is *very* optional...
     boolean hasClassifier();
 
-    // ----------------------------------------------------------------------
-
-    void setPath( String path );
-
-    String getPath();
-
     File getFile();
 
-    boolean exists();
-
-    // ----------------------------------------------------------------------
-
-    File getChecksumFile();
+    void setFile( File destination );
 
     // ----------------------------------------------------------------------
 

@@ -18,7 +18,9 @@ package org.apache.maven.artifact.manager;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -82,7 +84,7 @@ public class DefaultWagonManager
     }
 
     // TODO: don't throw exception
-    public void put( File source, Artifact artifact, ArtifactRepository repository )
+    public void putArtifact( File source, Artifact artifact, ArtifactRepository repository )
         throws Exception
     {
         Wagon wagon = getWagon( repository.getProtocol() );
@@ -96,148 +98,163 @@ public class DefaultWagonManager
         releaseWagon( wagon );
     }
 
-    public void get( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void getArtifact( Artifact artifact, List remoteRepositories, File destination )
         throws TransferFailedException
     {
-        get( artifact, artifact.getFile(), remoteRepositories );
-    }
-
-    /**
-     * Look in a set of repositories and return when the first valid artifact is
-     * found.
-     */
-
-    /**
-     * @param artifact
-     * @param destination
-     * @throws TransferFailedException
-     * @todo I want to somehow plug artifact validators at such low level.
-     * Simply if artifact was downloaded but it was rejected by
-     * validator(s) the loop should continue. Some of the validators can
-     * be feeded directly using events so number of i/o operation could be
-     * limited. <p/>If we won't plug validation process here the question
-     * is what we can do afterwards? We don't know from which
-     * ArtifactRepository artifact was fetched and where we should
-     * restart. We should be also fetching md5 sums and such from the same
-     * exact directory then artifacts <p/>
-     * @todo probably all exceptions should just be logged and continue
-     * @todo is the exception for warnings logged at debug level correct?
-     */
-    public void get( Artifact artifact, File destination, List repositories )
-        throws TransferFailedException
-    {
-        File temp = null;
-
-        // TODO [BP]: do this handling in Wagon itself
-        temp = new File( destination + ".tmp" );
-        temp.deleteOnExit();
-
         // TODO [BP]: The exception handling here needs some work
-        for ( Iterator iter = repositories.iterator(); iter.hasNext(); )
+        boolean successful = false;
+        for ( Iterator iter = remoteRepositories.iterator(); iter.hasNext() && !successful; )
         {
             ArtifactRepository repository = (ArtifactRepository) iter.next();
 
+            // TODO: should we avoid doing the transforms on this every time, and instead transform outside the loop?
+            String remotePath = null;
             try
             {
-                Wagon wagon = getWagon( repository.getProtocol() );
+                remotePath = artifactHandlerManager.getRemoteRepositoryArtifactPath( artifact, repository );
+            }
+            catch ( ArtifactPathFormatException e )
+            {
+                // TODO may be more appropriate to propogate the APFE
+                throw new TransferFailedException( "Failed to determine path for artifact", e );
+            }
 
-                // ----------------------------------------------------------------------
-                // These can certainly be configurable ... registering listeners
-                // ...
+            try
+            {
+                getRemoteFile( repository, destination, remotePath );
 
-                //ChecksumObserver md5SumObserver = new ChecksumObserver();
-
-                // ----------------------------------------------------------------------
-
-                //wagon.addTransferListener( md5SumObserver );
-
-                if ( downloadMonitor != null )
-                {
-                    wagon.addTransferListener( downloadMonitor );
-                }
-
-                wagon.connect( repository, getProxy( repository.getProtocol() ) );
-
-                // TODO: should we avoid doing the transforms on this every time, and instead transform outside the loop?
-                String remotePath = artifactHandlerManager.getRemoteRepositoryArtifactPath( artifact, repository );
-
-                wagon.get( remotePath, temp );
-
-                // TODO [BP]: put all disconnects in finally
-                wagon.disconnect();
-
-                releaseWagon( wagon );
-
+                successful = true;
             }
             catch ( ResourceDoesNotExistException e )
             {
                 // This one we will eat when looking through remote repositories
                 // because we want to cycle through them all before squawking.
 
-                continue;
+                getLogger().warn( "Unable to get resource from repository " + repository.getUrl() );
             }
-            catch ( UnsupportedProtocolException e )
-            {
-                throw new TransferFailedException( "Unsupported Protocol: ", e );
-            }
-            catch ( ConnectionException e )
-            {
-                throw new TransferFailedException( "Connection failed: ", e );
-            }
-            catch ( AuthenticationException e )
-            {
-                throw new TransferFailedException( "Authentication failed: ", e );
-            }
-            catch ( AuthorizationException e )
-            {
-                throw new TransferFailedException( "Authorization failed: ", e );
-            }
-            catch ( TransferFailedException e )
-            {
-                getLogger().warn( "Failure getting artifact from repository '" + repository + "': " + e );
+        }
 
-                getLogger().debug( "Stack trace", e );
+        if ( !successful )
+        {
+            throw new TransferFailedException( "Unable to download the artifact from any repository" );
+        }
+    }
 
-                continue;
+    public void getMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
+                             ArtifactRepository localRepository )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        String remotePath;
+        String localPath;
+        try
+        {
+            remotePath = remoteRepository.pathOfMetadata( metadata );
+            localPath = localRepository.pathOfMetadata( metadata );
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            // TODO may be more appropriate to propogate APFE
+            throw new TransferFailedException( "Failed to determine path for artifact", e );
+        }
+
+        File metadataFile = new File( localRepository.getBasedir(), localPath );
+        getRemoteFile( remoteRepository, metadataFile, remotePath );
+    }
+
+    private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        Wagon wagon;
+
+        try
+        {
+            wagon = getWagon( repository.getProtocol() );
+        }
+        catch ( UnsupportedProtocolException e )
+        {
+            throw new TransferFailedException( "Unsupported Protocol: ", e );
+        }
+
+        // ----------------------------------------------------------------------
+        // These can certainly be configurable ... registering listeners
+        // ...
+
+        //ChecksumObserver md5SumObserver = new ChecksumObserver();
+
+        // ----------------------------------------------------------------------
+
+        //wagon.addTransferListener( md5SumObserver );
+
+        if ( downloadMonitor != null )
+        {
+            wagon.addTransferListener( downloadMonitor );
+        }
+
+        // TODO [BP]: do this handling in Wagon itself
+        if ( !destination.getParentFile().exists() )
+        {
+            destination.getParentFile().mkdirs();
+        }
+
+        File temp = new File( destination + ".tmp" );
+        temp.deleteOnExit();
+
+        try
+        {
+            wagon.connect( repository, getProxy( repository.getProtocol() ) );
+
+            wagon.get( remotePath, temp );
+
+            // TODO [BP]: put all disconnects in finally
+            wagon.disconnect();
+        }
+        catch ( ConnectionException e )
+        {
+            throw new TransferFailedException( "Connection failed: ", e );
+        }
+        catch ( AuthenticationException e )
+        {
+            throw new TransferFailedException( "Authentication failed: ", e );
+        }
+        catch ( AuthorizationException e )
+        {
+            throw new TransferFailedException( "Authorization failed: ", e );
+        }
+        finally
+        {
+            try
+            {
+                releaseWagon( wagon );
             }
             catch ( Exception e )
             {
                 throw new TransferFailedException( "Release of wagon failed: ", e );
             }
-
-            if ( !destination.getParentFile().exists() )
-            {
-                destination.getParentFile().mkdirs();
-            }
-
-            // The temporary file is named destination + ".tmp" and is done this
-            // way to ensure
-            // that the temporary file is in the same file system as the
-            // destination because the
-            // File.renameTo operation doesn't really work across file systems.
-            // So we will attempt
-            // to do a File.renameTo for efficiency and atomicity, if this fails
-            // then we will use
-            // a brute force copy and delete the temporary file.
-
-            if ( !temp.renameTo( destination ) )
-            {
-                try
-                {
-                    FileUtils.copyFile( temp, destination );
-
-                    temp.delete();
-                }
-                catch ( IOException e )
-                {
-                    throw new TransferFailedException( "Error copying temporary file to the final destination: ", e );
-                }
-            }
-
-            return;
         }
 
-        throw new TransferFailedException( "Unable to download the artifact from any repository" );
+        // The temporary file is named destination + ".tmp" and is done this
+        // way to ensure
+        // that the temporary file is in the same file system as the
+        // destination because the
+        // File.renameTo operation doesn't really work across file systems.
+        // So we will attempt
+        // to do a File.renameTo for efficiency and atomicity, if this fails
+        // then we will use
+        // a brute force copy and delete the temporary file.
+
+        if ( !temp.renameTo( destination ) )
+        {
+            try
+            {
+                FileUtils.copyFile( temp, destination );
+
+                temp.delete();
+            }
+            catch ( IOException e )
+            {
+                throw new TransferFailedException( "Error copying temporary file to the final destination: ", e );
+            }
+        }
     }
 
     private ProxyInfo getProxy( String protocol )

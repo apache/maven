@@ -27,6 +27,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.wagon.util.IoUtils;
 
 import java.io.FileReader;
 import java.util.List;
@@ -69,56 +71,68 @@ public class MavenMetadataSource
     public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        try
-        {
-            List dependencies = null;
+        List dependencies = null;
 
-            if ( mavenProjectBuilder != null )
+        if ( mavenProjectBuilder != null )
+        {
+            Model model = mavenProjectBuilder.getCachedModel( artifact.getGroupId(), artifact.getArtifactId(),
+                                                              artifact.getVersion() );
+            if ( model != null )
             {
-                Model model = mavenProjectBuilder.getCachedModel( artifact.getGroupId(), artifact.getArtifactId(),
-                                                                  artifact.getVersion() );
-                if ( model != null )
-                {
-                    dependencies = model.getDependencies();
-                }
+                dependencies = model.getDependencies();
+            }
+        }
+
+        if ( dependencies == null )
+        {
+            Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(),
+                                                                        artifact.getArtifactId(),
+                                                                        artifact.getVersion(), artifact.getScope(),
+                                                                        "pom", null );
+
+            try
+            {
+                metadataArtifact = artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new ArtifactMetadataRetrievalException( "Error while resolving metadata artifact", e );
             }
 
-            if ( dependencies == null )
+            // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable
+            // post-processing and inheritance calculation before retrieving the
+            // associated artifacts. This should improve consistency.
+            if ( mavenProjectBuilder != null )
             {
-                Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(),
-                                                                            artifact.getArtifactId(),
-                                                                            artifact.getVersion(), artifact.getScope(),
-                                                                            "pom", null );
-
-                artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
-
-                // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable
-                // post-processing and inheritance calculation before retrieving the
-                // associated artifacts. This should improve consistency.
                 try
                 {
-                    if ( mavenProjectBuilder != null )
-                    {
-                        MavenProject p = mavenProjectBuilder.buildFromRepository( metadataArtifact, localRepository );
-                        dependencies = p.getDependencies();
-                    }
-                    else
-                    {
-                        Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
-                        dependencies = model.getDependencies();
-                    }
+                    MavenProject p = mavenProjectBuilder.buildFromRepository( metadataArtifact, localRepository );
+                    dependencies = p.getDependencies();
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+                }
+            }
+            else
+            {
+                FileReader reader = null;
+                try
+                {
+                    reader = new FileReader( metadataArtifact.getFile() );
+                    Model model = this.reader.read( reader );
+                    dependencies = model.getDependencies();
                 }
                 catch ( Exception e )
                 {
-                    throw new ArtifactMetadataRetrievalException(
-                        "Cannot read artifact source: " + metadataArtifact.getPath(), e );
+                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+                }
+                finally
+                {
+                    IoUtils.close( reader );
                 }
             }
-            return artifactFactory.createArtifacts( dependencies, localRepository, artifact.getScope() );
         }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Error while resolving metadata artifact", e );
-        }
+        return artifactFactory.createArtifacts( dependencies, localRepository, artifact.getScope() );
     }
 }

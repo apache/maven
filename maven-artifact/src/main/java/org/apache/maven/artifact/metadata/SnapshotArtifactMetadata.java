@@ -19,6 +19,7 @@ package org.apache.maven.artifact.metadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.IOException;
@@ -46,6 +47,8 @@ public class SnapshotArtifactMetadata
 
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
+    private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
+
     private SnapshotArtifactMetadata( Artifact artifact, String filename )
     {
         super( artifact, filename );
@@ -56,11 +59,32 @@ public class SnapshotArtifactMetadata
         return new SnapshotArtifactMetadata( artifact, SNAPSHOT_VERSION_LOCAL_FILE );
     }
 
+    public static ArtifactMetadata createRemoteSnapshotMetadata( Artifact artifact )
+    {
+        return new SnapshotArtifactMetadata( artifact, SNAPSHOT_VERSION_FILE );
+    }
+
     public void storeInLocalRepository( ArtifactRepository localRepository )
         throws IOException, ArtifactPathFormatException
     {
         FileUtils.fileWrite( localRepository.getBasedir() + "/" + localRepository.pathOfMetadata( this ),
                              getTimestamp() + "-" + buildNumber );
+    }
+
+    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, ArtifactRepository localRepository )
+        throws IOException, ArtifactResolutionException
+    {
+/*
+// TODO: this is getting the artifact - needs to get the version.txt
+        resolver.resolve( artifact, Collections.singletonList( remoteRepository ), localRepository );
+
+        String version = FileUtils.fileRead( artifact.getPath() );
+
+        int index = UTC_TIMESTAMP_PATTERN.length();
+        timestamp = version.substring( 0, index );
+
+        buildNumber = Integer.valueOf( version.substring( index + 1 ) ).intValue();
+*/
     }
 
     public String getTimestamp()
@@ -72,9 +96,9 @@ public class SnapshotArtifactMetadata
         return timestamp;
     }
 
-    public DateFormat getUtcDateFormatter()
+    public static DateFormat getUtcDateFormatter()
     {
-        DateFormat utcDateFormatter = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
+        DateFormat utcDateFormatter = new SimpleDateFormat( UTC_TIMESTAMP_PATTERN );
         utcDateFormatter.setTimeZone( UTC_TIME_ZONE );
         return utcDateFormatter;
     }

@@ -27,15 +27,11 @@ import java.util.List;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
+ * @todo this should possibly be replaced by type handler
  */
 public class DefaultArtifact
     implements Artifact
 {
-
-    // ----------------------------------------------------------------------
-    // These are the only things i need to specify
-    // ----------------------------------------------------------------------
-
     private final String groupId;
 
     private final String artifactId;
@@ -48,12 +44,11 @@ public class DefaultArtifact
 
     private final String scope;
 
-    private String path;
-
     private List metadataList;
 
+    private File file;
+
     /**
-     * @todo this should be replaced by type handler
      * !!! WARNING !!! Never put <classifier/> in the POM. It is for mojo use
      * only. Classifier is for specifying derived artifacts, like ejb-client.
      */
@@ -124,33 +119,18 @@ public class DefaultArtifact
         return type;
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    public String getPath()
+    public void setFile( File file )
     {
-        return path;
-    }
-
-    public void setPath( String path )
-    {
-        this.path = path;
-    }
-
-    public boolean exists()
-    {
-        return getFile().exists();
+        this.file = file;
     }
 
     public File getFile()
     {
-        return new File( getPath() );
-    }
-
-    public File getChecksumFile()
-    {
-        return new File( getFile().getAbsolutePath() + ".md5" );
+        if ( file == null )
+        {
+            throw new IllegalStateException( "Artifact's local file has not yet been assigned - not resolved" );
+        }
+        return file;
     }
 
     // ----------------------------------------------------------------------

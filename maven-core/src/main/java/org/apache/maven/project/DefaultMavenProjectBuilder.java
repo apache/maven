@@ -459,7 +459,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
+            artifact = artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
         }
         catch ( ArtifactResolutionException e )
         {

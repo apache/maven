@@ -32,7 +32,8 @@ public interface ArtifactTransformation
      * Take in a artifact and return the transformed artifact for locating in the local repository. If no
      * transformation has occured the original artifact is returned.
      *
-     * @param artifact Artifact to be transformed.
+     * @param artifact        Artifact to be transformed.
+     * @param localRepository the local repository it will be stored in
      * @return The transformed Artifact
      */
     Artifact transformLocalArtifact( Artifact artifact, ArtifactRepository localRepository );
@@ -43,6 +44,7 @@ public interface ArtifactTransformation
      *
      * @param artifact Artifact to be transformed.
      * @return The transformed Artifact
+     * @todo finish doco
      */
     Artifact transformRemoteArtifact( Artifact artifact, ArtifactRepository remoteRepository );
 }

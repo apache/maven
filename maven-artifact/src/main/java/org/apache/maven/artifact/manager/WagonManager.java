@@ -17,7 +17,9 @@ package org.apache.maven.artifact.manager;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
@@ -41,12 +43,16 @@ public interface WagonManager
     void releaseWagon( Wagon wagon )
         throws Exception;
 
-    void get( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    void getArtifact( Artifact artifact, List remoteRepositories, File destination )
         throws TransferFailedException;
 
     // TODO: don't throw exception
-    void put( File source, Artifact artifact, ArtifactRepository deploymentRepository )
+    void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
         throws Exception;
+
+    void getMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
+                      ArtifactRepository localRepository )
+        throws TransferFailedException, ResourceDoesNotExistException;
 
     void setProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
 

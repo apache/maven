@@ -70,6 +70,11 @@ public abstract class ArtifactComponentTestCase
         return localRepository;
     }
 
+    protected String getRepositoryLayout()
+    {
+        return "legacy";
+    }
+
     protected ArtifactRepository localRepository()
         throws Exception
     {
