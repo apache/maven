@@ -12,4 +12,4 @@ cd %buildDir%
 %JAVA_HOME%\bin\jar -cfm ..\mboot.jar ..\manifest.txt *
 cd ..
 
-cp mboot.jar ..
+copy mboot.jar ..
