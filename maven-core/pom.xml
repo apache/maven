@@ -18,7 +18,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-artifact-container</artifactId>
-      <version>1.0-alpha-1</version>
+      <version>1.0-alpha-1-SNAPSHOT</version>
     </dependency>
     <!-- maven component -->
     <dependency>
