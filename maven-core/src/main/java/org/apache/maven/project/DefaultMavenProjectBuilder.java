@@ -95,7 +95,7 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File projectDescriptor, boolean resolveDependencies )
         throws ProjectBuildingException
     {
-        return build( null, projectDescriptor, false );
+        return build( null, projectDescriptor, resolveDependencies );
     }
 
     /** @todo can we move the super model reading to the initialize method? what about the user/site? Is it reused?
@@ -115,8 +115,8 @@ public class DefaultMavenProjectBuilder
             LinkedList lineage = new LinkedList();
 
             MavenProject project = assembleLineage( projectDescriptor,
-                                                    localRepository, 
-                                                    lineage, 
+                                                    localRepository,
+                                                    lineage,
                                                     superModel.getRepositories() );
 
             Model previous = superModel;
@@ -195,8 +195,8 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private MavenProject assembleLineage( File projectDescriptor, 
-                                          ArtifactRepository localRepository, 
+    private MavenProject assembleLineage( File projectDescriptor,
+                                          ArtifactRepository localRepository,
                                           LinkedList lineage,
                                           List remoteRepositories )
         throws Exception
@@ -290,7 +290,7 @@ public class DefaultMavenProjectBuilder
     private File findParentModel( Parent parent, Set remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        Artifact artifact = new DefaultArtifact( parent.getGroupId(), 
+        Artifact artifact = new DefaultArtifact( parent.getGroupId(),
                                                  parent.getArtifactId(),
                                                  parent.getVersion(),
                                                  "pom" );
@@ -302,9 +302,9 @@ public class DefaultMavenProjectBuilder
         catch ( ArtifactResolutionException e )
         {
             // @todo use parent.toString() if modello could generate it, or specify in a code segment
-            throw new ProjectBuildingException( "Missing parent POM: " + 
-                parent.getGroupId() + ":" + 
-                parent.getArtifactId() + "-" + 
+            throw new ProjectBuildingException( "Missing parent POM: " +
+                parent.getGroupId() + ":" +
+                parent.getArtifactId() + "-" +
                 parent.getVersion(), e );
         }
 
@@ -377,13 +377,13 @@ public class DefaultMavenProjectBuilder
 
     /**
      * Locate the local repository.
-     * 
+     *
      * <ol>
      *  <li>Try ${maven.repo.local}
      *  <li>Look in mavenHomeLocal/override.xml
      *  <li>Set to the default value (${user.home}/.m2/repository).
      * </ol>
-     * 
+     *
      * @param mavenHomeLocal The maven local home directory
      * @return Returns the local repository
      * @throws ProjectBuildingException
