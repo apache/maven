@@ -64,6 +64,7 @@
       <artifactId>d1</artifactId>
       <version>1.0</version>
       <url>d1-url</url>
+      <file>foo/bar</file>
     </dependency>
 
     <dependency>
@@ -71,9 +72,27 @@
       <artifactId>d2</artifactId>
       <version>2.0</version>
       <url>d2-url</url>
+      <file>/top/level/path</file>
+    </dependency>
+
+    <dependency>
+      <groupId>g3</groupId>
+      <artifactId>d3</artifactId>
     </dependency>
 
   </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>g3</groupId>
+        <artifactId>d3</artifactId>
+        <version>3.0</version>
+        <url>d3-url</url>
+        <file>g3/d3</file>
+      </dependency>      
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <nagEmailAddress>jason@maven.org</nagEmailAddress>

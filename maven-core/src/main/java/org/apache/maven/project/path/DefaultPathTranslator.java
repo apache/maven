@@ -18,6 +18,7 @@ package org.apache.maven.project.path;
  */
 
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 
@@ -92,6 +93,25 @@ public class DefaultPathTranslator
                 if ( requiresBaseDirectoryAlignment( s ) )
                 {
                     resource.setDirectory( new File( projectFile.getParentFile(), s ).getPath() );
+                }
+            }
+
+            List dependencies = model.getDependencies();
+
+            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+            {
+                Dependency dependency = (Dependency) i.next();
+
+                s = dependency.getFile();
+
+                if ( s != null )
+                {
+                    s = stripBasedirToken( s );
+
+                    if ( requiresBaseDirectoryAlignment( s ) )
+                    {
+                        dependency.setFile( new File( projectFile.getParentFile(), s ).getPath() );
+                    }
                 }
             }
 
