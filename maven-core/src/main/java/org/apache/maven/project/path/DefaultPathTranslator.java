@@ -87,7 +87,7 @@ public class DefaultPathTranslator
                 }
             }
 
-            List unitTestResources = build.getResources();
+            List unitTestResources = build.getUnitTest().getResources();
 
             for ( Iterator i = unitTestResources.iterator(); i.hasNext(); )
             {
