@@ -23,6 +23,8 @@ import org.apache.maven.model.Dependency;
 import java.util.List;
 import java.util.Set;
 
+// TODO: packaging is very confusing - this isn't in artifact after all
+
 public interface ArtifactFactory
 {
     static String ROLE = ArtifactFactory.class.getName();
