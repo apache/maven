@@ -17,9 +17,10 @@ package org.apache.maven.plugin;
  * ====================================================================
  */
 
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.util.introspection.ReflectionValueExtractor;
+import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
@@ -28,7 +29,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  */
 public class PluginParameterExpressionEvaluator
 {
-    public static Object evaluate( String expression, MavenGoalExecutionContext context )
+    public static Object evaluate( String expression, MavenSession context )
         throws PluginConfigurationException
     {
         Object value = null;
@@ -48,12 +49,12 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( expression.equals( "#localRepository" ) )
         {
-            value = context.getSession().getLocalRepository();
+            value = context.getLocalRepository();
         }
         else if ( expression.equals( "#maven.repo.local" ) )
         {
             // TODO: remove this alias: but note that it is a string instead of an ArtifactRepository
-            value = context.getSession().getLocalRepository().getUrl().substring( "file://".length() );
+            value = context.getLocalRepository().getUrl().substring( "file://".length() );
         }
         else if ( expression.equals( "#maven.final.name" ) )
         {

@@ -18,7 +18,10 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.AbstractMavenExecutionRequest;
+import org.codehaus.plexus.util.FileUtils;
 
+import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
@@ -26,12 +29,49 @@ import java.util.Properties;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class MavenSetupExecutionRequest
+public class MavenReactorExecutionRequest
 extends AbstractMavenExecutionRequest
 {
-    public MavenSetupExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals )
+    private String includes;
+
+    private String excludes;
+
+    private File baseDirectory;
+
+    public MavenReactorExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals,
+                                         String includes, String excludes, File baseDirectory )
     {
         super( localRepository, properties, goals );
-        type = "setup";
+
+        this.includes = includes;
+
+        this.excludes = excludes;
+
+        this.baseDirectory = baseDirectory;
+
+        type = "reactor";
+    }
+
+    public String getIncludes()
+    {
+        return includes;
+    }
+
+    public String getExcludes()
+    {
+        return excludes;
+    }
+
+    public File getBaseDirectory()
+    {
+        return baseDirectory;
+    }
+
+    public List getProjectFiles()
+        throws Exception
+    {
+        List files = FileUtils.getFiles( new File( System.getProperty( "user.dir" ) ), includes, excludes );
+
+        return files;
     }
 }

@@ -20,11 +20,12 @@ package org.apache.maven.lifecycle.goal.phase;
 import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.util.AbstractGoalVisitor;
 import org.apache.maven.util.GoalWalker;
 import org.apache.maven.util.GraphTraversalException;
+import org.apache.maven.execution.MavenSession;
 
 import java.util.LinkedList;
 import java.util.List;

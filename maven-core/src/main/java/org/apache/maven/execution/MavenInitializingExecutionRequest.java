@@ -1,4 +1,4 @@
-package org.apache.maven.execution.manager;
+package org.apache.maven.execution;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -17,25 +17,29 @@ package org.apache.maven.execution.manager;
  * ====================================================================
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.AbstractMavenExecutionRequest;
+
+import java.util.List;
+import java.util.Properties;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class MavenExecutionRequestHandlerNotFoundException
-    extends Exception
+public class MavenInitializingExecutionRequest
+extends AbstractMavenExecutionRequest
 {
-    public MavenExecutionRequestHandlerNotFoundException( String message )
+    public MavenInitializingExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals )
     {
-        super( message );
+        super( localRepository, properties, goals );
+
+        type = "initializing";
     }
 
-    public MavenExecutionRequestHandlerNotFoundException( Throwable cause )
+    public List getProjectFiles()
+        throws Exception
     {
-        super( cause );
-    }
-
-    public MavenExecutionRequestHandlerNotFoundException( String message, Throwable cause )
-    {
-        super( message, cause );
+        return null;
     }
 }

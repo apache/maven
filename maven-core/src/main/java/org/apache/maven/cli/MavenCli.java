@@ -26,13 +26,13 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.maven.Maven;
 import org.apache.maven.MavenConstants;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
-import org.apache.maven.execution.initialize.MavenInitializingExecutionRequest;
-import org.apache.maven.execution.project.MavenProjectExecutionRequest;
-import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
+import org.apache.maven.execution.MavenInitializingExecutionRequest;
+import org.apache.maven.execution.MavenProjectExecutionRequest;
+import org.apache.maven.execution.MavenReactorExecutionRequest;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 
@@ -47,17 +47,20 @@ import java.util.Properties;
 public class MavenCli
 {
     public static final String POMv4 = "pom.xml";
+
     public static final String userHome = System.getProperty( "user.home" );
+
     public static File userDir = new File( System.getProperty( "user.dir" ) );
 
     public static int main( String[] args, ClassWorld classWorld )
-    throws Exception
+        throws Exception
     {
         // ----------------------------------------------------------------------
         // Setup the command line parser
         // ----------------------------------------------------------------------
 
         CLIManager cliManager = new CLIManager();
+
         CommandLine commandLine = cliManager.parse( args );
 
         // ----------------------------------------------------------------------
@@ -69,7 +72,9 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         File userConfigurationDirectory = getUserConfigurationDirectory();
+
         Properties mavenProperties = getMavenProperties( userConfigurationDirectory );
+
         ArtifactRepository localRepository = getLocalRepository( mavenProperties, userConfigurationDirectory );
 
         // ----------------------------------------------------------------------
@@ -100,27 +105,37 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         MavenExecutionRequest request = null;
+
         File projectFile = new File( userDir, POMv4 );
+
         if ( projectFile.exists() )
         {
             if ( commandLine.hasOption( CLIManager.REACTOR ) )
             {
                 String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
+
                 String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
-                request = new MavenReactorExecutionRequest( localRepository, mavenProperties, commandLine.getArgList(),
-                                                            includes, excludes, userDir );
+
+                request = new MavenReactorExecutionRequest( localRepository,
+                                                            mavenProperties,
+                                                            commandLine.getArgList(),
+                                                            includes,
+                                                            excludes,
+                                                            userDir );
             }
             else
             {
-                request = new MavenProjectExecutionRequest( localRepository, mavenProperties, commandLine.getArgList(),
+                request = new MavenProjectExecutionRequest( localRepository,
+                                                            mavenProperties,
+                                                            commandLine.getArgList(),
                                                             projectFile );
             }
         }
         else
         {
-            request = new MavenInitializingExecutionRequest( localRepository, mavenProperties,
-                                                             commandLine.getArgList() );
+            request = new MavenInitializingExecutionRequest( localRepository, mavenProperties, commandLine.getArgList() );
         }
+
         MavenExecutionResponse response = new MavenExecutionResponse();
 
         // ----------------------------------------------------------------------
@@ -129,12 +144,13 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
+
         embedder.start( classWorld );
 
         // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place.
         WagonManager wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
-        wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
 
+        wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
 
         Maven maven = (Maven) embedder.lookup( Maven.ROLE );
 
@@ -143,6 +159,7 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         response = maven.execute( request );
+
         if ( response.isExecutionFailure() )
         {
             return 1;
@@ -178,18 +195,24 @@ public class MavenCli
     private static void setCliProperty( String property )
     {
         String name = null;
+
         String value = null;
+
         int i = property.indexOf( "=" );
+
         if ( i <= 0 )
         {
             name = property.trim();
+
             value = "true";
         }
         else
         {
             name = property.substring( 0, i ).trim();
+
             value = property.substring( i + 1 ).trim();
         }
+
         System.setProperty( name, value );
     }
 
@@ -200,13 +223,21 @@ public class MavenCli
     static class CLIManager
     {
         public static final char NO_BANNER = 'b';
+
         public static final char SET_SYSTEM_PROPERTY = 'D';
+
         public static final char WORK_OFFLINE = 'o';
+
         public static final char REACTOR = 'r';
+
         public static final char DEBUG = 'X';
+
         public static final char HELP = 'h';
+
         public static final char VERSION = 'v';
+
         public static final char LIST_GOALS = 'g';
+
         private Options options = null;
 
         public CLIManager()
@@ -253,7 +284,7 @@ public class MavenCli
         }
 
         public CommandLine parse( String[] args )
-        throws ParseException
+            throws ParseException
         {
             CommandLineParser parser = new PosixParser();
             return parser.parse( options, args );
@@ -288,7 +319,7 @@ public class MavenCli
         Properties mavenProperties = new Properties();
         File mavenPropertiesFile = new File( mavenHomeLocal, MavenConstants.MAVEN_PROPERTIES );
         try
-              {
+        {
             mavenProperties.load( new FileInputStream( mavenPropertiesFile ) );
         }
         catch ( Exception e )

@@ -1,5 +1,4 @@
-package org.apache.maven.execution.manager;
-
+package org.apache.maven.lifecycle;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -18,18 +17,23 @@ package org.apache.maven.execution.manager;
  * ====================================================================
  */
 
-import org.apache.maven.execution.MavenExecutionRequestHandler;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public interface MavenExecutionRequestHandlerManager
+public class Phase
 {
-    String ROLE = MavenExecutionRequestHandlerManager.class.getName();
+    String id;
 
-    MavenExecutionRequestHandler lookup( String roleHint )
-        throws MavenExecutionRequestHandlerNotFoundException;
+    String goal;
 
-    int managedCount();
+    public String getId()
+    {
+        return id;
+    }
+
+    public String getGoal()
+    {
+        return goal;
+    }
 }

@@ -17,8 +17,10 @@ package org.apache.maven.plugin;
  * ====================================================================
  */
 
-import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.execution.MavenSession;
 
 import java.util.Map;
 
@@ -29,6 +31,9 @@ import java.util.Map;
 public interface PluginManager
 {
     String ROLE = PluginManager.class.getName();
+
+    PluginExecutionResponse executeMojo( MavenSession session, String goalName )
+         throws GoalExecutionException;
 
     void processPluginDescriptor( MavenPluginDescriptor pluginDescriptor )
         throws Exception;

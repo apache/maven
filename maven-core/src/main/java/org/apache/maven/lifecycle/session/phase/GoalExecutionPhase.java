@@ -22,7 +22,7 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.goal.MavenGoalPhaseManager;
 import org.apache.maven.lifecycle.session.AbstractMavenSessionPhase;
-import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.execution.MavenSession;
 
 import java.util.Iterator;
 

@@ -1,4 +1,6 @@
-package org.apache.maven.execution.project;
+package org.apache.maven.lifecycle;
+
+import org.apache.maven.MavenTestCase;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -17,32 +19,20 @@ package org.apache.maven.execution.project;
  * ====================================================================
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.AbstractMavenExecutionRequest;
-
-import java.io.File;
-import java.util.List;
-import java.util.Properties;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class MavenProjectExecutionRequest
-extends AbstractMavenExecutionRequest
+public class LifecycleExecutorTest
+    extends MavenTestCase
 {
-    private File pom;
-
-    public MavenProjectExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals,
-                                         File pom )
+    public void testLifecycleExecutor()
+        throws Exception
     {
-        super( localRepository, properties, goals );
-        this.pom = pom;
-        type = "project";
-    }
+        LifecycleExecutor le = (LifecycleExecutor) lookup( LifecycleExecutor.ROLE );
 
-    public File getPom()
-    {
-        return pom;
+        assertEquals( 15, le.getPhases().size() );
+
+        //le.execute( "test", createGoalExecutionContext().getSession() );
     }
 }

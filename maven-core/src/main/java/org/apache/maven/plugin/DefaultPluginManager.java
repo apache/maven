@@ -25,22 +25,28 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
-import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.util.HashMap;
@@ -92,6 +98,14 @@ public class DefaultPluginManager
         return mojoDescriptors;
     }
 
+    /**
+     * Mojo descriptors are looked up using their id which is of the form
+     * <pluginId>:<mojoId>. So this might be archetype:create for example which
+     * is the create mojo that resides in the archetype plugin.
+     *
+     * @param name
+     * @return
+     */
     public MojoDescriptor getMojoDescriptor( String name )
     {
         return (MojoDescriptor) mojoDescriptors.get( name );
@@ -224,6 +238,198 @@ public class DefaultPluginManager
                                                                metadataSource,
                                                                artifactFilter );
     }
+
+    // ----------------------------------------------------------------------
+    // Plugin execution
+    // ----------------------------------------------------------------------
+
+    public PluginExecutionResponse executeMojo( MavenSession session, String goalName )
+        throws GoalExecutionException
+    {
+        try
+        {
+            verifyPluginForGoal( goalName, session );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
+
+        PluginExecutionRequest request;
+
+        PluginExecutionResponse response;
+
+        MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );;
+
+        try
+        {
+            getLogger().info( "[" + mojoDescriptor.getId() + "]" );
+
+            request = new PluginExecutionRequest( DefaultPluginManager.createParameters( mojoDescriptor, session ) );
+        }
+        catch ( PluginConfigurationException e )
+        {
+            throw new GoalExecutionException( "Error configuring plugin for execution.", e );
+        }
+
+        response = new PluginExecutionResponse();
+
+        Plugin plugin = null;
+
+        try
+        {
+            plugin = (Plugin) container.lookup( Plugin.ROLE, goalName );
+
+            plugin.execute( request, response );
+
+            releaseComponents( mojoDescriptor, request );
+
+            container.release( plugin );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new GoalExecutionException( "Error looking up plugin: ", e );
+        }
+        catch ( Exception e )
+        {
+            throw new GoalExecutionException( "Error executing plugin: ", e );
+        }
+
+        return response;
+    }
+
+    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
+        throws Exception
+    {
+        if ( request != null && request.getParameters() != null )
+        {
+            for ( Iterator iterator = goal.getParameters().iterator(); iterator.hasNext(); )
+            {
+                Parameter parameter = (Parameter) iterator.next();
+
+                String key = parameter.getName();
+
+                String expression = parameter.getExpression();
+
+                if ( expression != null & expression.startsWith( "#component" ) )
+                {
+                    Object component = request.getParameter( key );
+
+                    container.release( component );
+                }
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // Mojo Parameter Handling
+    // ----------------------------------------------------------------------
+
+    public static Map createParameters( MojoDescriptor goal, MavenSession session )
+        throws PluginConfigurationException
+    {
+        Map map = null;
+
+        List parameters = goal.getParameters();
+
+        if ( parameters != null )
+        {
+            map = new HashMap();
+
+            for ( int i = 0; i < parameters.size(); i++ )
+            {
+                Parameter parameter = (Parameter) parameters.get( i );
+
+                String key = parameter.getName();
+
+                String expression = parameter.getExpression();
+
+                Object value = PluginParameterExpressionEvaluator.evaluate( expression, session );
+
+                if ( value == null )
+                {
+                    if ( parameter.getDefaultValue() != null )
+                    {
+                        value = parameter.getDefaultValue();
+                    }
+                }
+
+                map.put( key, value );
+            }
+
+            if ( session.getProject() != null )
+            {
+                map = mergeProjectDefinedPluginConfiguration( session.getProject(), goal.getId(), map );
+            }
+        }
+
+        for ( int i = 0; i < parameters.size(); i++ )
+        {
+            Parameter parameter = (Parameter) parameters.get( i );
+
+            String key = parameter.getName();
+
+            Object value = map.get( key );
+
+            // ----------------------------------------------------------------------
+            // We will perform a basic check here for parameters values that are
+            // required. Required parameters can't be null so we throw an
+            // Exception in the case where they are. We probably want some pluggable
+            // mechanism here but this will catch the most obvious of
+            // misconfigurations.
+            // ----------------------------------------------------------------------
+
+            if ( value == null && parameter.isRequired() )
+            {
+                throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
+            }
+        }
+
+        return map;
+    }
+
+    public static Map mergeProjectDefinedPluginConfiguration( MavenProject project, String goalId, Map map )
+    {
+        // ----------------------------------------------------------------------
+        // I would like to be able to lookup the Plugin object using a key but
+        // we have a limitation in modello that will be remedied shortly. So
+        // for now I have to iterate through and see what we have.
+        // ----------------------------------------------------------------------
+
+        if ( project.getPlugins() != null )
+        {
+            String pluginId = goalId.substring( 0, goalId.indexOf( ":" ) );
+
+            for ( Iterator iterator = project.getPlugins().iterator(); iterator.hasNext(); )
+            {
+                org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) iterator.next();
+
+                if ( pluginId.equals( plugin.getId() ) )
+                {
+                    return CollectionUtils.mergeMaps( plugin.getConfiguration(), map );
+                }
+            }
+        }
+
+        return map;
+    }
+
+    public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter )
+    {
+        StringBuffer message = new StringBuffer();
+
+        message.append( "The '" + parameter.getName() ).
+            append( "' parameter is required for the execution of the " ).
+            append( mojo.getId() ).
+            append( " mojo and cannot be null." );
+
+        return message.toString();
+    }
+
+    // ----------------------------------------------------------------------
+    // Lifecycle
+    // ----------------------------------------------------------------------
+
 
     public void contextualize( Context context )
         throws ContextException

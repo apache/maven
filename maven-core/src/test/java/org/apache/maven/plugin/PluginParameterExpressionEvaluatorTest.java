@@ -34,7 +34,7 @@ public class PluginParameterExpressionEvaluatorTest
     public void testValueExtractionWithAPomValueContainingAPath()
         throws Exception
     {
-        Object value = PluginParameterExpressionEvaluator.evaluate( "#project.build.directory/classes", context );
+        Object value = PluginParameterExpressionEvaluator.evaluate( "#project.build.directory/classes", context.getSession() );
 
         String expected = getTestFile( "target/test-classes/target/classes" ).getCanonicalPath();
 
@@ -48,7 +48,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         String role = "#component.org.apache.maven.project.MavenProjectBuilder";
 
-        Object value = PluginParameterExpressionEvaluator.evaluate( role, context );
+        Object value = PluginParameterExpressionEvaluator.evaluate( role, context.getSession() );
 
         assertNotNull( value );
     }
@@ -56,7 +56,7 @@ public class PluginParameterExpressionEvaluatorTest
     public void testLocalRepositoryExtraction()
         throws Exception
     {
-        Object value = PluginParameterExpressionEvaluator.evaluate( "#localRepository", context );
+        Object value = PluginParameterExpressionEvaluator.evaluate( "#localRepository", context.getSession() );
 
         assertEquals( "local", ((ArtifactRepository)value).getId() );
     }

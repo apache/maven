@@ -18,8 +18,6 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.project.MavenProjectExecutionRequest;
-import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
@@ -42,5 +40,6 @@ public interface MavenExecutionRequest
 
     MavenSession getSession();
 
-    MavenProjectExecutionRequest createProjectExecutionRequest( MavenProject project );
+    List getProjectFiles()
+        throws Exception;
 }

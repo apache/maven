@@ -1,4 +1,4 @@
-package org.apache.maven.execution.initialize;
+package org.apache.maven.execution;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -20,19 +20,44 @@ package org.apache.maven.execution.initialize;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.AbstractMavenExecutionRequest;
 
+import java.io.File;
 import java.util.List;
 import java.util.Properties;
+import java.util.ArrayList;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class MavenInitializingExecutionRequest
+public class MavenProjectExecutionRequest
 extends AbstractMavenExecutionRequest
 {
-    public MavenInitializingExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals )
+    private File pom;
+
+    public MavenProjectExecutionRequest( ArtifactRepository localRepository,
+                                         Properties properties,
+                                         List goals,
+                                         File pom )
     {
         super( localRepository, properties, goals );
-        type = "initializing";
+
+        this.pom = pom;
+
+        type = "project";
+    }
+
+    public File getPom()
+    {
+        return pom;
+    }
+
+    public List getProjectFiles()
+        throws Exception
+    {
+        List files = new ArrayList();
+
+        files.add( pom );
+
+        return files;
     }
 }

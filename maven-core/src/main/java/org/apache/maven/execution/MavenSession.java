@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.session;
+package org.apache.maven.execution;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.

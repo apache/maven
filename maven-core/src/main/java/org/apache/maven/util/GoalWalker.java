@@ -17,7 +17,7 @@ package org.apache.maven.util;
  * ====================================================================
  */
 
-import org.apache.maven.lifecycle.session.MavenSession;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 

@@ -18,8 +18,6 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.project.MavenProjectExecutionRequest;
-import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
@@ -29,20 +27,26 @@ import java.util.Properties;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class AbstractMavenExecutionRequest
+public abstract class AbstractMavenExecutionRequest
 implements MavenExecutionRequest
 {
     /** @todo [BP] is this required? This hands off to MavenSession, but could be passed through the handler.handle function (+ createSession). */
     protected ArtifactRepository localRepository;
+
     protected final Properties parameters;
+
     protected List goals;
+
     protected String type;
+
     protected MavenSession session;
 
     public AbstractMavenExecutionRequest( ArtifactRepository localRepository, Properties parameters, List goals )
     {
         this.localRepository = localRepository;
+
         this.parameters = parameters;
+
         this.goals = goals;
     }
 
@@ -78,10 +82,5 @@ implements MavenExecutionRequest
     public void setSession( MavenSession session )
     {
         this.session = session;
-    }
-
-    public MavenProjectExecutionRequest createProjectExecutionRequest( MavenProject project )
-    {
-        return new MavenProjectExecutionRequest( getLocalRepository(), parameters, getGoals(), project.getFile() );
     }
 }
