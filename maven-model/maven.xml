@@ -1,0 +1,15 @@
+<project xmlns:modello="modello" xmlns:ant="jelly:ant" xmlns:maven="jelly:maven" xmlns:j="jelly:core">
+  <preGoal name="java:compile">
+    <ant:copy tofile="target/maven.mdo.m1" file="maven.mdo" />
+    <ant:replace file="target/maven.mdo.m1" token="org.apache.maven.model" value="org.apache.maven.project" />
+
+    <ant:path id="modello.sources" location="target/generated-sources" />
+    <maven:addPath id="maven.compile.src.set" refid="modello.sources" />
+    <j:set var="sourcesPresent" value="true" />
+
+    <modello:generate model="target/maven.mdo.m1" type="java" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
+    <modello:generate model="target/maven.mdo.m1" type="xpp3-reader" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
+    <modello:generate model="target/maven.mdo.m1" type="xpp3-writer" packageWithVersion="false" version="3.0.0" targetDirectory="target/generated-sources" />
+  </preGoal>
+</project>
+
