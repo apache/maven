@@ -103,13 +103,11 @@ public class CompilerMojo
             {
                 compilationError = true;
             }
-
-            System.out.println( message.getMessage() );
         }
 
         if ( compilationError )
         {
-            throw new Exception( "Compilation failure!" );
+            response.setExecutionFailure( true, new CompilationFailureResponse( messages ) );
         }
     }
 }

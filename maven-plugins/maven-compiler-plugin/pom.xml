@@ -15,8 +15,13 @@
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus-compiler</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <artifactId>plexus-compiler-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-compiler-javac</artifactId>
+      <version>1.0</version>
     </dependency>
   </dependencies>
 </project>
