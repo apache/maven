@@ -64,6 +64,13 @@
           <type>String</type>
         </field>
         <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <description>The type of artifact this project produces.</description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <field>
           <name>name</name>
           <description>Human readable name of the project.</description>
           <type>String</type>
