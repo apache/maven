@@ -14,9 +14,11 @@
  |   different versions of the model can be output.
  |
  | o annotation mechanism so that changes to the model can be accurately tracked.
+ |
  -->
 <model>
   <name>Maven</name>
+  <version>3.0.0</version>
   <description>the description</description>
   <packageName>org.apache.maven.model</packageName>
   <classes>
