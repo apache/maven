@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.installer;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,6 @@ import org.codehaus.plexus.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * @todo notions of snapshots should be dealt with in one single place.
- */
 public class DefaultArtifactInstaller
     extends AbstractArtifactComponent
     implements ArtifactInstaller

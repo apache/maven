@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.installer;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,27 @@ public interface ArtifactInstaller
 {
     String ROLE = ArtifactInstaller.class.getName();
 
+    /**
+     * Install an artifact from a particular directory. The artifact handler is used to determine the filename
+     * of the source file.
+     *
+     * @param basedir         the directory where the artifact is stored
+     * @param artifact        the artifact definition
+     * @param localRepository the local repository to install into
+     * @throws ArtifactInstallationException if an error occurred installing the artifact
+     */
     void install( String basedir, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException;
 
+
+    /**
+     * Install an artifact from a particular file.
+     *
+     * @param source          the file to install
+     * @param artifact        the artifact definition
+     * @param localRepository the local repository to install into
+     * @throws ArtifactInstallationException if an error occurred installing the artifact
+     */
     void install( File source, Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactInstallationException;    
+        throws ArtifactInstallationException;
 }

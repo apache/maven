@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.repository;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.apache.maven.wagon.repository.Repository;
 /**
  * This class is an abstraction of the location from/to resources can be
  * transfered.
- * 
+ *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
  */
@@ -49,7 +49,8 @@ public class ArtifactRepository
         this.layout = layout;
     }
 
-    public String pathOf( Artifact artifact ) throws ArtifactPathFormatException
+    public String pathOf( Artifact artifact )
+        throws ArtifactPathFormatException
     {
         return layout.pathOf( artifact );
     }

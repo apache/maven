@@ -1,9 +1,7 @@
 package org.apache.maven.artifact.resolver.filter;
 
-import org.apache.maven.artifact.Artifact;
-
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +15,8 @@ import org.apache.maven.artifact.Artifact;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.artifact.Artifact;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

@@ -22,11 +22,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import java.util.List;
 import java.util.Set;
 
-// Currently the only thing we need from the artifact metadata source is the
-// dependency information, but i figure I'll just leave this generally as a
-// metadata retrieval mechanism so we can retrieve whatever metadata about
-// the artifact we may wish to provide in this layer. jvz.
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
