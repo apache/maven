@@ -57,7 +57,6 @@ public class MarmaladeMojo
         catch ( MarmaladeExecutionException e )
         {
             FailureResponse failure = new MarmaladeMojoFailureResponse( script.getLocation(), e );
-            // TODO: specify marmalade goal name here
             response.setExecutionFailure( failure );
         }
 
