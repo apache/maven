@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.plugin.clean;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,19 +16,23 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.plugin.AbstractPlugin;
+import org.apache.maven.plugin.PluginExecutionRequest;
+import org.apache.maven.plugin.PluginExecutionResponse;
+
 import java.io.File;
 
 /**
- * @maven.plugin.id clean
- * @maven.plugin.description A maven2 plugin which cleans the build
- *
- * @parameter failedOnError String true validator description
- * @parameter outputDirectory String true validator description
- *
  * @goal clean
- * @goal.description Goal which cleans the build
- * @goal.parameter failedOnError false
- * @goal.parameter outputDirectory #project.build.directory
+ *
+ * @description Goal which cleans the build
+ *
+ * @parameter
+ *  name="outputDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.directory"
  *
  * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
  * @version $Id$
@@ -40,15 +44,15 @@ public class CleanPlugin
 
     private String outputDirectory;
 
-    private boolean failedOnError;
+    private boolean failOnError;
 
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
         outputDirectory = (String) request.getParameter( "outputDirectory" );
 
-        failedOnError = Boolean.valueOf( (String) request.getParameter( "failedOnError" ) ).booleanValue();
-
+        failOnError = Boolean.valueOf( (String) request.getParameter( "failedOnError" ) ).booleanValue();
+        
         if ( outputDirectory != null )
         {
             File dir = new File( outputDirectory );
@@ -114,7 +118,7 @@ public class CleanPlugin
                 {
                     String message = "Unable to delete file "
                         + f.getAbsolutePath();
-                    if ( failedOnError )
+                    if ( failOnError )
                     {
                         throw new Exception( message );
                     }
@@ -130,7 +134,7 @@ public class CleanPlugin
         {
             String message = "Unable to delete directory "
                 + d.getAbsolutePath();
-            if ( failedOnError )
+            if ( failOnError )
             {
                 throw new Exception( message );
             }

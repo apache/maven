@@ -33,16 +33,23 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @maven.plugin.id resources
- * @maven.plugin.description Maven plugin to build jars
- *
- * @parameter outputDirectory String true validator description
- * @parameter resources List true validator description
- *
  * @goal resources
- * @goal.description copy application resources
- * @goal.parameter outputDirectory #project.build.directory/classes
- * @goal.parameter resources #project.build.resources
+ *
+ * @description copy application resources
+ *
+ * @parameter
+ *  name="outputDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.directory/classes"
+ *  description=""
+ * @parameter
+ *  name="resources"
+ *  type="List"
+ *  required="true"
+ *  validator="#project.build.resources"
+ *  description=""
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

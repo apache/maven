@@ -25,32 +25,23 @@ import java.io.File;
 
 
 /**
+ * @goal install
+ *
+ * @description install a jar in local repository
+ * 
+ * @prereq jar:jar
+ *
+ * @parameter name=jarName type=String required=true validator= expression=#maven.final.name
+ * @parameter name=outputDirectory type=String required=true validator= expression=#project.build.directory
+ * @parameter name=basedir type=String required=true validator= expression=#project.build.directory
+ * @parameter name=groupId type=String required=true validator= expression=#project.groupId
+ * @parameter name=artifactId type=String required=true validator= expression=#project.artifactId
+ * @parameter name=version type=String required=true validator= expression=#project.version
+ * @parameter name=localRepository type=String required=true validator= expression=#project.localRepository
+ * @parameter name=pomFile type=java.io.File required=true validator= expression=#project.file
+ *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @version $Id$
- *
- * @maven.plugin.id jar
- * @maven.plugin.description Maven plugin to build jars
- *
- * @parameter jarName String true validator description
- * @parameter outputDirectory String true validator description
- * @parameter basedir String true validator description
- * @parameter groupId String true validator description
- * @parameter version String true validator description
- * @parameter localRepository String true validator description
- * @parameter pomFile java.io.File true validator description
- * *
- * @goal jar:install
- * @goal.description install a jar in local repository
- *
- * @goal.prereq jar
- * @goal.parameter jarName #maven.final.name
- * @goal.parameter outputDirectory #project.build.directory
- * @goal.parameter basedir #project.build.directory/classes
- * @goal.parameter pomFile #project.file
- * @goal.parameter groupId #project.groupId
- * @goal.parameter artifactId #project.artifactId
- * @goal.parameter version #project.version
- * @goal.parameter localRepository #project.localRepository
  */
 public class JarInstallMojo
         extends AbstractPlugin

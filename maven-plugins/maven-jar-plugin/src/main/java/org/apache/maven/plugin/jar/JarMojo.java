@@ -31,30 +31,37 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 /**
- * @maven.plugin.id jar
- * @maven.plugin.description Maven plugin to build jars
- *
- * @parameter jarName String true validator description
- * @parameter outputDirectory String true validator description
- * @parameter basedir String true validator description
- *
  * @goal jar
- * @goal.description build a jar
- * @goal.prereq test
- * @goal.prereq resources
- * @goal.parameter jarName #maven.final.name
- * @goal.parameter outputDirectory #project.build.directory
- * @goal.parameter basedir #project.build.directory/classes
+ *
+ * @description build a jar
+ *
+ * @prereq surefire:test
+ * @prereq resources:resources
+ *
+ * @parameter
+ *  name="jarName"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#maven.final.name"
+ *  description=""
+ * @parameter
+ *  name="outputDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.directory"
+ *  description=""
+ * @parameter
+ *  name="basedir"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.directory/classes"
+ *  description=""
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @version $Id$
- *
- * maven.jar.manifest.extensions.add
- * maven.jar.includes
- * maven.jar.excludes
- * maven.jar.index
- * maven.jar.compress
- * maven.remote.group
  */
 public class JarMojo
     extends AbstractPlugin

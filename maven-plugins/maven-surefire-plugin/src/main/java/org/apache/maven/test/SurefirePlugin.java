@@ -9,28 +9,49 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @maven.plugin.id surefire
- * @maven.plugin.description A maven2 plugin which uses surefire as a test runner
- *
- * @parameter mavenRepoLocal String required validator
- * @parameter basedir String required validator
- * @parameter includes String required validator
- * @parameter excludes String required validator
- * @parameter classpathElements String[] required validator
- *
  * @goal test
- * @goal.description Run tests using surefire
  *
- * @goal.prereq test:compile
- * @goal.prereq resources
- * @goal.prereq test:resources
+ * @description Run tests using surefire
  *
- * @goal.parameter mavenRepoLocal #maven.repo.local
- * @goal.parameter basedir #basedir
- * @goal.parameter includes #project.build.unitTest.includes
- * @goal.parameter excludes #project.build.unitTest.excludes
- * @goal.parameter classpathElements #project.classpathElements
-
+ * @prereq compiler:test:compile
+ * @prereq resources:resources
+ * @prereq resources:test:resources
+ *
+ * @parameter
+ *  name="mavenRepoLocal"
+ *  type="String"
+ *  required="true"
+ *  validator="validator"
+ *  expression="#maven.repo.local"
+ * @parameter
+ *  name="basedir"
+ *  type="String"
+ *  required="true"
+ *  validator="validator"
+ *  expression="#basedir"
+ *  description=""
+ * @parameter
+ *  name="includes"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.unitTest.includes"
+ *  description=""
+ * @parameter
+ *  name="excludes"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.unitTest.excludes"
+ *  description=""
+ * @parameter
+ *  name="classpathElements"
+ *  type="String[]"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.classpathElements"
+ *  description=""
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  *

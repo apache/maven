@@ -17,6 +17,7 @@ package org.apache.maven.plugin.resources;
  * ====================================================================
  */
 
+
 import org.apache.maven.model.Resource;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -29,16 +30,24 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @maven.plugin.id resources
- * @maven.plugin.description Maven plugin to build jars
- *
- * @parameter outputDirectory String true validator description
- * @parameter resources List true validator description
- *
  * @goal test:resources
- * @goal.description copy test resources
- * @goal.parameter outputDirectory #project.build.directory/test-classes
- * @goal.parameter resources #project.build.unitTest.resources
+ *
+ * @description copy test resources
+ *
+ * @parameter
+ *  name="outputDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.unitTest.resources"
+ *  description=""
+ * @parameter
+ *  name="resources"
+ *  type="List"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.directory/test-classes"
+ *  description=""
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
