@@ -41,10 +41,12 @@ public class Verifier
         {
             throw new VerificationException( e );
         }
+
+        System.out.println( "\n" );
         
         System.out.println( "-------------------------------------" );
         
-        System.out.println( "OK" );
+        System.out.println( "Integration test OK" );
         
         System.out.println( "-------------------------------------" );
     }
