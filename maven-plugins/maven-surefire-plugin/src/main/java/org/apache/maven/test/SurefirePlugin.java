@@ -1,8 +1,23 @@
 package org.apache.maven.test;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginExecutionException;
 import org.codehaus.surefire.SurefireBooter;
 
 import java.io.File;
@@ -76,36 +91,36 @@ import java.util.StringTokenizer;
 public class SurefirePlugin
     extends AbstractPlugin
 {
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    private String mavenRepoLocal;
+
+    private String basedir;
+
+    private String classesDirectory;
+
+    private String testClassesDirectory;
+
+    private List classpathElements;
+
+    private String reportsDirectory;
+
+    private String test;
+
+    private List includes;
+
+    private List excludes;
+
+    public void execute()
+        throws PluginExecutionException
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        String mavenRepoLocal = (String) request.getParameter( "mavenRepoLocal" );
-
-        String basedir = (String) request.getParameter( "basedir" );
-
-        String classesDirectory = (String) request.getParameter( "classesDirectory" );
-
-        String testClassesDirectory = (String) request.getParameter( "testClassesDirectory" );
-
-        List testClasspathElements = (List) request.getParameter( "classpathElements" );
-
-        String reportsDirectory = (String) request.getParameter( "reportsDirectory" );
-
-        String test = (String) request.getParameter( "test" );
-
         // ----------------------------------------------------------------------
         // Setup the surefire booter
         // ----------------------------------------------------------------------
 
         SurefireBooter surefireBooter = new SurefireBooter();
 
-        System.out.println("Setting reports dir: " + reportsDirectory);
+        System.out.println( "Setting reports dir: " + reportsDirectory );
         System.out.flush();
-        
+
         surefireBooter.setReportsDirectory( reportsDirectory );
 
         // ----------------------------------------------------------------------
@@ -133,10 +148,6 @@ public class SurefirePlugin
         }
         else
         {
-            List includes = (List) request.getParameter( "includes" );
-
-            List excludes = (List) request.getParameter( "excludes" );
-
             // defaults here, qdox doesn't like the end javadoc value
             if ( includes == null )
             {
@@ -168,7 +179,7 @@ public class SurefirePlugin
 
         surefireBooter.addClassPathUrl( new File( testClassesDirectory ).getPath() );
 
-        for ( Iterator i = testClasspathElements.iterator(); i.hasNext(); )
+        for ( Iterator i = classpathElements.iterator(); i.hasNext(); )
         {
             surefireBooter.addClassPathUrl( (String) i.next() );
         }
@@ -177,11 +188,20 @@ public class SurefirePlugin
 
         surefireBooter.addReport( "org.codehaus.surefire.report.FileReporter" );
 
-        boolean success = surefireBooter.run();
+        boolean success = false;
+        try
+        {
+            success = surefireBooter.run();
+        }
+        catch ( Exception e )
+        {
+            // TODO: better handling
+            throw new PluginExecutionException( "Error executing surefire", e );
+        }
 
         if ( !success )
         {
-            response.setExecutionFailure( new SurefireFailureResponse( null ) );
+            throw new PluginExecutionException( "There are some test failures." );
         }
     }
 
