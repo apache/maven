@@ -76,28 +76,27 @@ public class MavenArchiver
         if ( addClasspath )
         {
             StringBuffer classpath = new StringBuffer();
-            List dependencies = project.getDependencies();
+            Set artifacts = project.getArtifacts();
 
-            for ( Iterator iter = dependencies.iterator(); iter.hasNext(); )
+            for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
             {
-                Dependency dependency = (Dependency) iter.next();
-/* TODO: need to add to jar plugin config
-                Properties properties = dependency.getProperties();
-                if ( Boolean.valueOf(properties.getProperty("manifest.classpath")).booleanValue())
+                Artifact artifact = (Artifact) iter.next();
+                if ( "jar".equals( artifact.getType() ) && Artifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
                 {
-                    if (classpath.length() > 0 )
+                    if ( classpath.length() > 0 )
                     {
                         classpath.append( " " );
                     }
 
-                    // TODO replace dependency by artifact
-                    classpath.append( dependency.getArtifactId() + "-" + dependency.getVersion() + ".jar");
+                    classpath.append( artifact.getArtifactId() + "-" + artifact.getVersion() + ".jar");
                 }
-*/
             }
 
-            Manifest.Attribute classpathAttr = new Manifest.Attribute( "Class-Path", classpath.toString() );
-            m.addConfiguredAttribute( classpathAttr );
+            if ( classpath.length() > 0 )
+            {
+                Manifest.Attribute classpathAttr = new Manifest.Attribute( "Class-Path", classpath.toString() );
+                m.addConfiguredAttribute( classpathAttr );
+            }
         }
 
         // Added supplementary entries
