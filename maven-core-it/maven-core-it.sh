@@ -34,7 +34,7 @@ do
       echo
     fi
     
-    m2 clean:clean jar:jar
+    m2 clean:clean `cat goals.txt`
     
     if [ -f postbuild.hook ]
     then    
