@@ -139,7 +139,12 @@ public class MavenCli
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
             ArtifactRepositoryFactory.ROLE );
 
-        if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
+        if ( commandLine.hasOption( CLIManager.OFFLINE ) )
+        {
+            // TODO: this will still check to download if the artifact does not exist locally, instead of failing as it should in offline mode
+            artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_NEVER );
+        }
+        else if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
         {
             artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS );
         }
@@ -285,7 +290,7 @@ public class MavenCli
 
         public static final char SET_SYSTEM_PROPERTY = 'D';
 
-        public static final char WORK_OFFLINE = 'o';
+        public static final char OFFLINE = 'o';
 
         public static final char REACTOR = 'r';
 
@@ -315,14 +320,12 @@ public class MavenCli
                 NO_BANNER ) );
             options.addOption( OptionBuilder.withLongOpt( "define" ).hasArg().withDescription(
                 "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
-            options.addOption( OptionBuilder.withLongOpt( "offline" ).hasArg().withDescription( "Work offline" ).create(
-                WORK_OFFLINE ) );
+            options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create(
+                OFFLINE ) );
             options.addOption( OptionBuilder.withLongOpt( "mojoDescriptors" ).withDescription(
                 "Display available mojoDescriptors" ).create( LIST_GOALS ) );
             options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create(
                 HELP ) );
-            options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Build is happening offline" ).create(
-                WORK_OFFLINE ) );
             options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
                 VERSION ) );
             options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(

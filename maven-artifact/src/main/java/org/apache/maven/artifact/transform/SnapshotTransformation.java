@@ -72,9 +72,7 @@ public class SnapshotTransformation
             }
 
             String version = localMetadata.constructVersion();
-            // TODO: remove hack
-            if ( !alreadyResolved( artifact ) &&
-                !Boolean.valueOf( System.getProperty( "maven.debug.snapshot.disabled", "false" ) ).booleanValue() )
+            if ( !alreadyResolved( artifact ) )
             {
                 boolean checkedUpdates = false;
                 for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
