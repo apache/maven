@@ -1,6 +1,6 @@
-package org.apache.maven.tools.repoclean.artifact;
+package org.apache.maven.tools.repoclean.artifact.handler;
 
-import org.apache.maven.artifact.handler.AbstractArtifactHandler;
+import org.apache.maven.artifact.handler.JarHandler;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -22,16 +22,16 @@ import org.apache.maven.artifact.handler.AbstractArtifactHandler;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class TldHandler
-    extends AbstractArtifactHandler
+public class RarHandler
+    extends JarHandler
 {
     public String directory()
     {
-        return "tlds";
+        return "rars";
     }
 
-//    public String packageGoal()
-//    {
-//        return "ejb:ejb";
-//    }
+    public String packageGoal()
+    {
+        return "rar:rar";
+    }
 }

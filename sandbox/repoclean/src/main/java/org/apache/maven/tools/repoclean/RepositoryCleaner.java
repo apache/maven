@@ -17,8 +17,10 @@ package org.apache.maven.tools.repoclean;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.tools.repoclean.artifact.metadata.ProjectMetadata;
 import org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier;
 import org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer;
 import org.apache.maven.tools.repoclean.report.Reporter;
@@ -182,6 +184,7 @@ public class RepositoryCleaner
 
         try
         {
+            logger.info("Rewriting " + artifacts.size() + " artifacts (Should be " + (artifacts.size() * 2) + " rewrites including POMs).");
             for ( Iterator it = artifacts.iterator(); it.hasNext(); )
             {
                 Artifact artifact = (Artifact) it.next();
@@ -194,101 +197,108 @@ public class RepositoryCleaner
                     boolean errorOccurred = false;
 
                     File artifactSource = new File( sourceRepo.getBasedir(), sourceRepo.pathOf( artifact ) );
-                    File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
-
-                    artifact.setFile( artifactSource );
                     
-                    try
+                    if(artifactSource.exists())
                     {
-                        if ( !configuration.reportOnly() )
+                        File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
+
+                        artifact.setFile( artifactSource );
+                        
+                        try
                         {
-                            if(logger.isDebugEnabled())
+                            if ( !configuration.reportOnly() )
                             {
-                                logger.debug( "sourceRepo basedir is: \'" + sourceRepo.getBasedir() + "\'" );
-                                logger.debug( "targetRepo basedir is: \'" + targetRepo.getBasedir() + "\'" );
-                            }
+                                if(logger.isDebugEnabled())
+                                {
+                                    logger.debug( "sourceRepo basedir is: \'" + sourceRepo.getBasedir() + "\'" );
+                                    logger.debug( "targetRepo basedir is: \'" + targetRepo.getBasedir() + "\'" );
+                                }
 
-                            File targetParent = artifactTarget.getParentFile();
-                            if ( !targetParent.exists() )
+                                File targetParent = artifactTarget.getParentFile();
+                                if ( !targetParent.exists() )
+                                {
+                                    targetParent.mkdirs();
+                                }
+
+                                if ( logger.isDebugEnabled() )
+                                {
+                                    logger.debug( "Copying artifact[" + artifact.getId() + "] from \'" + artifactSource
+                                        + "\' to \'" + artifactTarget + "\'." );
+                                }
+
+                                copyArtifact( artifact, artifactTarget, artifactReporter );
+                            }
+                            else
                             {
-                                targetParent.mkdirs();
+                                artifactReporter.info( "Skipping artifact copy (we're in report-only mode)." );
                             }
+                        }
+                        catch ( Exception e )
+                        {
+                            repoReporter.error( "Error transferring artifact[" + artifact.getId()
+                                + "] to the target repository.", e );
 
+                            // if we can't copy the jar over, then skip the rest.
+                            errorOccurred = true;
+                        }
+
+                        if ( !errorOccurred )
+                        {
                             if ( logger.isDebugEnabled() )
                             {
-                                logger.debug( "Copying artifact[" + artifact.getId() + "] from \'" + artifactSource
-                                    + "\' to \'" + artifactTarget + "\'." );
+                                logger.debug( "working on digest for artifact[" + artifact.getId() + "] with groupId: \'"
+                                    + artifact.getGroupId() + "\'" );
                             }
 
-                            copyArtifact( artifactSource, artifactTarget, artifactReporter );
+                            try
+                            {
+                                artifactDigestVerifier.verifyDigest( artifact, artifactTarget, artifactReporter,
+                                                                     configuration.reportOnly() );
+                            }
+                            catch ( Exception e )
+                            {
+                                repoReporter.error( "Error verifying digest for artifact[" + artifact.getId() + "]", e );
+                            }
                         }
-                        else
+
+                        if ( !errorOccurred )
                         {
-                            artifactReporter.info( "Skipping artifact copy (we're in report-only mode)." );
+                            ArtifactMetadata pom = new ProjectMetadata( artifact );
+                            
+                            artifactPomRewriter = (ArtifactPomRewriter) container.lookup( ArtifactPomRewriter.ROLE,
+                                                                                          configuration.getSourcePomVersion() );
+
+                            File sourcePom = new File( sourceRepositoryBase, sourceRepo.pathOfMetadata( pom ) );
+
+                            File targetPom = new File( targetRepositoryBase, targetRepo.pathOfMetadata( pom ) );
+
+                            try
+                            {
+                                artifactPomRewriter.rewrite( artifact, sourcePom, targetPom, artifactReporter,
+                                                             configuration.reportOnly() );
+                            }
+                            catch ( Exception e )
+                            {
+                                repoReporter.error( "Error rewriting POM for artifact[" + artifact.getId()
+                                    + "] into the target repository.", e );
+                            }
                         }
+
                     }
-                    catch ( Exception e )
+                    else
                     {
-                        repoReporter.error( "Error transferring artifact[" + artifact.getId()
-                            + "] to the target repository.", e );
-
-                        // if we can't copy the jar over, then skip the rest.
-                        errorOccurred = true;
+                        artifactReporter.error("Cannot find source file for artifact: \'" + artifact.getId() + "\' under path: \'" + artifactSource + "\'");
                     }
-
-                    if ( !errorOccurred )
-                    {
-                        if ( logger.isDebugEnabled() )
-                        {
-                            logger.debug( "working on digest for artifact[" + artifact.getId() + "] with groupId: \'"
-                                + artifact.getGroupId() + "\'" );
-                        }
-
-                        try
-                        {
-                            artifactDigestVerifier.verifyDigest( artifact, artifactTarget, artifactReporter,
-                                                                 configuration.reportOnly() );
-                        }
-                        catch ( Exception e )
-                        {
-                            repoReporter.error( "Error verifying digest for artifact[" + artifact.getId() + "]", e );
-                        }
-                    }
-
-                    if ( !errorOccurred )
-                    {
-                        Artifact pomArtifact = buildPomArtifact( artifact );
-
-                        artifactPomRewriter = (ArtifactPomRewriter) container.lookup( ArtifactPomRewriter.ROLE,
-                                                                                      configuration.getSourcePomVersion() );
-
-                        File sourcePom = new File( sourceRepositoryBase, sourceRepo.pathOf( pomArtifact ) );
-
-                        File targetPom = new File( targetRepositoryBase, targetRepo.pathOf( pomArtifact ) );
-
-                        try
-                        {
-                            artifactPomRewriter.rewrite( artifact, sourcePom, targetPom, artifactReporter,
-                                                         configuration.reportOnly() );
-                        }
-                        catch ( Exception e )
-                        {
-                            repoReporter.error( "Error rewriting POM for artifact[" + artifact.getId()
-                                + "] into the target repository.", e );
-                        }
-                    }
-
+                    
                     if ( artifactReporter.hasError() )
                     {
                         repoReporter.warn( "Error(s) occurred while rewriting artifact: \'" + artifact.getId()
                             + "\' or its POM." );
                     }
-
-                    if ( artifactReporter.hasWarning() )
-                    {
-                        repoReporter.info( "Warning(s) occurred while rewriting artifact: \'" + artifact.getId()
-                            + "\' or its POM." );
-                    }
+                }
+                catch(Exception e)
+                {
+                    artifactReporter.error("Error while rewriting file or POM for artifact: \'" + artifact.getId() + "\'", e);
                 }
                 finally
                 {
@@ -308,9 +318,11 @@ public class RepositoryCleaner
         }
     }
 
-    private void copyArtifact( File artifactSource, File artifactTarget, Reporter reporter )
+    private void copyArtifact( Artifact artifact, File artifactTarget, Reporter reporter )
         throws IOException
     {
+        File artifactSource = artifact.getFile();
+        
         InputStream inStream = null;
         OutputStream outStream = null;
         try
@@ -340,12 +352,6 @@ public class RepositoryCleaner
             IOUtil.close( inStream );
             IOUtil.close( outStream );
         }
-    }
-
-    private Artifact buildPomArtifact( Artifact artifact )
-    {
-        return artifactConstructionSupport.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                           artifact.getVersion(), artifact.getScope(), "pom" );
     }
 
     private File normalizeTargetRepositoryBase( String targetRepositoryPath )

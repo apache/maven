@@ -15,7 +15,7 @@ case "`uname`" in
   CYGWIN*) cygwin=true ;;
 esac
 
-if [ $cygwin ]; then
+if [ $cygwin == true ]; then
   CP=`cygpath -pw $CP`
 fi
 
@@ -28,4 +28,4 @@ if [ "$1" == "profile" ]; then
   shift
 fi
 
-java $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $* | tee repoclean-log.txt
+nice -n 19 java -Xmx128M -Xms64M -Xincgc $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $* | tee repoclean-log.txt

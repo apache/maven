@@ -1,4 +1,4 @@
-package org.apache.maven.tools.repoclean.artifact;
+package org.apache.maven.tools.repoclean.artifact.handler;
 
 import org.apache.maven.artifact.handler.JarHandler;
 

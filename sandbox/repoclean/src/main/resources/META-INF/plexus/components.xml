@@ -8,7 +8,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>plugin</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.LegacyPluginHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.LegacyPluginHandler</implementation>
     </component>
     <!--
      |
@@ -18,7 +18,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>distribution</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.JarDistroHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.JarDistroHandler</implementation>
     </component>
     <!--
      |
@@ -28,7 +28,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>distribution-tgz</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.TgzDistroHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.TgzDistroHandler</implementation>
     </component>
     <!--
      |
@@ -38,7 +38,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>distribution-zip</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.ZipDistroHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.ZipDistroHandler</implementation>
     </component>
     <!--
      |
@@ -48,7 +48,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>tld</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.TldHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.TldHandler</implementation>
     </component>
     <!--
      |
@@ -58,7 +58,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>dtd</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.DtdHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.DtdHandler</implementation>
     </component>
     <!--
      |
@@ -68,7 +68,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ear</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.EarHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.EarHandler</implementation>
     </component>
     <!--
      |
@@ -78,7 +78,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>rar</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.RarHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.RarHandler</implementation>
     </component>
     <!--
      |
@@ -88,7 +88,7 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>sar</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.SarHandler</implementation>
+      <implementation>org.apache.maven.tools.repoclean.artifact.handler.SarHandler</implementation>
     </component>
     <!--
      |

@@ -1,4 +1,4 @@
-package org.apache.maven.tools.repoclean.artifact;
+package org.apache.maven.tools.repoclean.artifact.handler;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -19,7 +19,7 @@ import org.apache.maven.artifact.handler.AbstractArtifactHandler;
 /**
  * @author jdcasey
  */
-public class TgzDistroHandler
+public class ZipDistroHandler
     extends AbstractArtifactHandler
 {
 
@@ -30,6 +30,6 @@ public class TgzDistroHandler
 
     public String extension()
     {
-        return "tar.gz";
+        return "zip";
     }
 }

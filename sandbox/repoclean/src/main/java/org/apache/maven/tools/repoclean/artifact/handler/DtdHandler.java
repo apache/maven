@@ -1,6 +1,6 @@
-package org.apache.maven.tools.repoclean.artifact;
+package org.apache.maven.tools.repoclean.artifact.handler;
 
-import org.apache.maven.artifact.handler.JarHandler;
+import org.apache.maven.artifact.handler.AbstractArtifactHandler;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -22,16 +22,16 @@ import org.apache.maven.artifact.handler.JarHandler;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class EarHandler
-    extends JarHandler
+public class DtdHandler
+    extends AbstractArtifactHandler
 {
     public String directory()
     {
-        return "ears";
+        return "dtds";
     }
 
-    public String packageGoal()
-    {
-        return "ear:ear";
-    }
+//    public String packageGoal()
+//    {
+//        return "ejb:ejb";
+//    }
 }

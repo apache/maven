@@ -42,17 +42,6 @@ public class ArtifactDigestVerifier
         // create the digest target file from which to copy/create.
         File digestTargetFile = new File( artifactTarget + ".md5" );
         
-        if(!reportOnly)
-        {
-            File targetParent = digestTargetFile.getParentFile();
-
-            if ( !targetParent.exists() )
-            {
-                reporter.info( "MD5 parent directory \'" + targetParent + "\' does not exist. Creating..." );
-                targetParent.mkdirs();
-            }
-        }
-
         boolean verified = false;
 
         // if the digest source file exists, then verify it.

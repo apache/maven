@@ -130,10 +130,11 @@ public class LegacyArtifactDiscoverer
             avceTokenList.addLast( lastAvceToken );
         }
 
-        String validVersionParts = "([Dd][Ee][Vv][_.0-9]*)|" + "([Ss][Nn][Aa][Pp][Ss][Hh][Oo][Tt])|" + "([_.0-9ab]+)|"
+        String validVersionParts = "([Dd][Ee][Vv][_.0-9]*)|" + "([Ss][Nn][Aa][Pp][Ss][Hh][Oo][Tt])|" + "([0-9][_.0-9a-zA-Z]*)|"
             + "([Gg]?[_.0-9ab]*([Pp][Rr][Ee]|[Rr][Cc]|[Gg]|[Mm])[_.0-9]*)|" + "([Aa][Ll][Pp][Hh][Aa][_.0-9]*)|"
             + "([Bb][Ee][Tt][Aa][_.0-9]*)|" + "([Rr][Cc][_.0-9]*)|" + "([Tt][Ee][Ss][Tt][_.0-9]*)|"
             + "([Dd][Ee][Bb][Uu][Gg][_.0-9]*)|" + "([Uu][Nn][Oo][Ff][Ff][Ii][Cc][Ii][Aa][Ll][_.0-9]*)|"
+            + "([Cc][Uu][Rr][Rr][Ee][Nn][Tt])|" + "([Ll][Aa][Tt][Ee][Ss][Tt])|" + "([Ff][Cc][Ss])|"
             + "([Rr][Ee][Ll][Ee][Aa][Ss][Ee][_.0-9]*)|" + "([Nn][Ii][Gg][Hh][Tt][Ll][Yy])";
 
         // let's discover the version, and whatever's leftover will be either
