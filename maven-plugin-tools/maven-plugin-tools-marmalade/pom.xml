@@ -63,11 +63,6 @@
       <artifactId>wagon-http-lightweight</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>maven</groupId>
-      <artifactId>wagon-file</artifactId>
-      <version>1.0-alpha-2-SNAPSHOT</version>
-    </dependency>
 <!-- /For testing. -->
     <dependency>
       <groupId>maven</groupId>

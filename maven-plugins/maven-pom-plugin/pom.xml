@@ -30,8 +30,8 @@
     </dependency>
     <dependency>
       <groupId>maven</groupId>
-      <artifactId>wagon-api</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
+      <artifactId>wagon-provider-api</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
