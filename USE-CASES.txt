@@ -144,3 +144,43 @@ their source trees set up in the same way as their collegues.
    project out into multiple projects with a reactor, per the Maven 1 guidelines. But if this
    limitation was removed, it might help Marvin adoption. (PR)
 
+- File inclusion in POM - project inheritance allows to factorize some common pom attributes, 
+  however there are some cases where this mechanism is not enough. For instance we might want 
+  to share common dependencies between projects whose ancestors union is empty. Providing poms
+  easier to read by extracting various elements into their own xml fragments is another example.
+  
+  afaik the only way to obtain this behaviour today is to use xml entities. There are some really 
+  bad limitations to this system : 
+  
+    * cannot use interpolation b/c doctype is processed before pom is interpolated
+    * if using reactor, there is no uniform way to declare the entities since it 
+      depends badly on the multiproject structure (nested vs. parallel projects)
+    * being able to run maven from either parent project dir or subproject 
+      dir is not straigthforward b/c we have to think about the directory structure
+      which is a low-level concern
+       
+  Also i dont know what is the behaviour when running from an arbitrary folder (-d, -p options) 
+  
+  adding support for file inclusion in pom would provide simplification and better consistency 
+  among pom base.
+  
+  POM could perhaps have an <inclusions> section :
+  
+    <inclusions>
+      <inclusion>
+        <file>path_to_xml_fragment</file>
+        <alias>toBeIncluded</alias>
+      </inclusion>
+    </inclusions>
+  
+    then we could reference the fragment with something like :
+    
+    <include>toBeIncluded</include>
+    
+  where path_to_xml_fragment would be relative to ${basedir}. another advantage is the 
+  possibility to perform some filtering on the included files, for instance dependending 
+  on some (build dependent) properties.
+  
+  the drawback of this proposal is the complexity it adds to the POM structure, polluting it 
+  with non project related elements.
+  
