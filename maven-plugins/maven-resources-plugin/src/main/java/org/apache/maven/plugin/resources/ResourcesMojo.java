@@ -122,9 +122,9 @@ public class ResourcesMojo
             {
                 includes = "**/**";
             }
-            
+
             List excludes = resource.getExcludes();
-            
+
             excludes.addAll( resource.getDefaultExcludes() );
 
             List files = FileUtils.getFileNames( resourceDirectory,
