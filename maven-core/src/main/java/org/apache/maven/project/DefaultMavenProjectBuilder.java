@@ -76,7 +76,8 @@ public class DefaultMavenProjectBuilder
 
     private ProjectInterpolator projectInterpolator;
 
-    public void initialize() throws Exception
+    public void initialize()
+        throws Exception
     {
         modelReader = new MavenXpp3Reader();
     }
@@ -91,8 +92,8 @@ public class DefaultMavenProjectBuilder
         return build( projectDescriptor, localRepository, false );
     }
 
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository,
-        boolean resolveDependencies ) throws ProjectBuildingException
+    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, boolean resolveDependencies )
+        throws ProjectBuildingException
     {
         try
         {
@@ -100,14 +101,15 @@ public class DefaultMavenProjectBuilder
 
             LinkedList lineage = new LinkedList();
 
+            Set aggregatedRemoteWagonRepositories = RepositoryUtils.mavenToWagon( superModel.getRepositories() );
             MavenProject project = assembleLineage( projectDescriptor, localRepository, lineage,
-                superModel.getRepositories() );
+                                                    aggregatedRemoteWagonRepositories );
 
             Model previous = superModel;
 
-            for( Iterator i = lineage.iterator(); i.hasNext(); )
+            for ( Iterator i = lineage.iterator(); i.hasNext(); )
             {
-                Model current = ((MavenProject) i.next()).getModel();
+                Model current = ( (MavenProject) i.next() ).getModel();
 
                 modelInheritanceAssembler.assembleModelInheritance( current, previous );
 
@@ -118,8 +120,7 @@ public class DefaultMavenProjectBuilder
 
             projectDefaultsInjector.injectDefaults( project );
 
-            project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(),
-                localRepository ) );
+            project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository ) );
 
             // @todo this should be in the super POM when interpolation works
             setupMavenFinalName( project );
@@ -136,24 +137,23 @@ public class DefaultMavenProjectBuilder
             // this snippet of code here.
             // ----------------------------------------------------------------------
 
-            if( resolveDependencies )
+            if ( resolveDependencies )
             {
                 Set repos = RepositoryUtils.mavenToWagon( project.getRepositories() );
 
                 MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
 
-                ArtifactResolutionResult result = artifactResolver.resolveTransitively( project
-                    .getArtifacts(), repos, localRepository, sourceReader );
+                ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(), repos,
+                                                                                        localRepository, sourceReader );
 
                 project.getArtifacts().addAll( result.getArtifacts().values() );
             }
 
             ModelValidationResult validationResult = validator.validate( project.getModel() );
 
-            if( validationResult.getMessageCount() > 0 )
+            if ( validationResult.getMessageCount() > 0 )
             {
-                throw new ProjectBuildingException( "Exception while building project: "
-                    + validationResult.toString() );
+                throw new ProjectBuildingException( "Exception while building project: " + validationResult.toString() );
             }
 
             project.setFile( projectDescriptor );
@@ -162,15 +162,14 @@ public class DefaultMavenProjectBuilder
 
             return project;
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
-            throw new ProjectBuildingException( "Error building project from " + projectDescriptor,
-                e );
+            throw new ProjectBuildingException( "Error building project from " + projectDescriptor, e );
         }
     }
 
-    private MavenProject assembleLineage( File projectDescriptor,
-        ArtifactRepository localRepository, LinkedList lineage, List remoteRepositories )
+    private MavenProject assembleLineage( File projectDescriptor, ArtifactRepository localRepository,
+                                          LinkedList lineage, Set aggregatedRemoteWagonRepositories )
         throws Exception
     {
         Model model = readModel( projectDescriptor );
@@ -183,18 +182,17 @@ public class DefaultMavenProjectBuilder
 
         Parent parentModel = model.getParent();
 
-        if( parentModel != null )
+        if ( parentModel != null )
         {
-            if( StringUtils.isEmpty( parentModel.getGroupId() ) )
+            if ( StringUtils.isEmpty( parentModel.getGroupId() ) )
             {
                 throw new ProjectBuildingException( "Missing groupId element from parent element" );
             }
-            else if( StringUtils.isEmpty( parentModel.getArtifactId() ) )
+            else if ( StringUtils.isEmpty( parentModel.getArtifactId() ) )
             {
-                throw new ProjectBuildingException(
-                    "Missing artifactId element from parent element" );
+                throw new ProjectBuildingException( "Missing artifactId element from parent element" );
             }
-            else if( StringUtils.isEmpty( parentModel.getVersion() ) )
+            else if ( StringUtils.isEmpty( parentModel.getVersion() ) )
             {
                 throw new ProjectBuildingException( "Missing version element from parent element" );
             }
@@ -208,13 +206,12 @@ public class DefaultMavenProjectBuilder
             // as we go in order to do this.
             // ----------------------------------------------------------------------
 
-            remoteRepositories.addAll( model.getRepositories() );
+            aggregatedRemoteWagonRepositories.addAll( RepositoryUtils.mavenToWagon( model.getRepositories() ) );
 
-            File parentPom = findParentModel( parentModel, RepositoryUtils
-                .mavenToWagon( remoteRepositories ), localRepository );
+            File parentPom = findParentModel( parentModel, aggregatedRemoteWagonRepositories, localRepository );
 
             MavenProject parent = assembleLineage( parentPom, localRepository, lineage,
-                remoteRepositories );
+                                                   aggregatedRemoteWagonRepositories );
 
             project.setParent( parent );
         }
@@ -224,32 +221,33 @@ public class DefaultMavenProjectBuilder
 
     private void setupMavenFinalName( MavenProject project )
     {
-        if( project.getModel().getBuild().getFinalName() == null )
+        if ( project.getModel().getBuild().getFinalName() == null )
         {
-            project.getModel().getBuild().setFinalName(
-                project.getArtifactId() + "-" + project.getVersion() );
+            project.getModel().getBuild().setFinalName( project.getArtifactId() + "-" + project.getVersion() );
         }
     }
 
-    private Model readModel( File projectDescriptor ) throws ProjectBuildingException
+    private Model readModel( File projectDescriptor )
+        throws ProjectBuildingException
     {
         try
         {
             return readModel( new FileReader( projectDescriptor ) );
         }
-        catch( FileNotFoundException ex )
+        catch ( FileNotFoundException ex )
         {
             throw new ProjectBuildingException( "Error while building model.", ex );
         }
     }
 
-    private Model readModel( Reader reader ) throws ProjectBuildingException
+    private Model readModel( Reader reader )
+        throws ProjectBuildingException
     {
         try
         {
             return modelReader.read( reader );
         }
-        catch( Exception ex )
+        catch ( Exception ex )
         {
             throw new ProjectBuildingException( "Error while building model.", ex );
         }
@@ -259,21 +257,21 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private File findParentModel( Parent parent, Set remoteRepositories,
-        ArtifactRepository localRepository ) throws ProjectBuildingException
+    private File findParentModel( Parent parent, Set remoteArtifactRepositories, ArtifactRepository localRepository )
+        throws ProjectBuildingException
     {
-        Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(),
-            parent.getVersion(), "pom" );
+        Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), parent.getVersion(),
+                                                 "pom" );
 
         try
         {
-            artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+            artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
         }
-        catch( ArtifactResolutionException e )
+        catch ( ArtifactResolutionException e )
         {
             // @todo use parent.toString() if modello could generate it, or specify in a code segment
-            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":"
-                + parent.getArtifactId() + "-" + parent.getVersion(), e );
+            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":" +
+                                                parent.getArtifactId() + "-" + parent.getVersion(), e );
         }
 
         return artifact.getFile();
@@ -290,13 +288,14 @@ public class DefaultMavenProjectBuilder
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
      */
-    public List getSortedProjects( List projects ) throws Exception
+    public List getSortedProjects( List projects )
+        throws Exception
     {
         DAG dag = new DAG();
 
         Map projectMap = new HashMap();
 
-        for( Iterator i = projects.iterator(); i.hasNext(); )
+        for ( Iterator i = projects.iterator(); i.hasNext(); )
         {
             MavenProject project = (MavenProject) i.next();
 
@@ -307,19 +306,19 @@ public class DefaultMavenProjectBuilder
             projectMap.put( artifactId, project );
         }
 
-        for( Iterator i = projects.iterator(); i.hasNext(); )
+        for ( Iterator i = projects.iterator(); i.hasNext(); )
         {
             MavenProject project = (MavenProject) i.next();
 
             String artifactId = project.getArtifactId();
 
-            for( Iterator j = project.getDependencies().iterator(); j.hasNext(); )
+            for ( Iterator j = project.getDependencies().iterator(); j.hasNext(); )
             {
                 Dependency dependency = (Dependency) j.next();
 
                 String dependencyArtifactId = dependency.getArtifactId();
 
-                if( dag.getVertex( dependencyArtifactId ) != null )
+                if ( dag.getVertex( dependencyArtifactId ) != null )
                 {
                     dag.addEdge( artifactId, dependency.getArtifactId() );
                 }
@@ -328,7 +327,7 @@ public class DefaultMavenProjectBuilder
 
         List sortedProjects = new ArrayList();
 
-        for( Iterator i = TopologicalSorter.sort( dag ).iterator(); i.hasNext(); )
+        for ( Iterator i = TopologicalSorter.sort( dag ).iterator(); i.hasNext(); )
         {
             String artifactId = (String) i.next();
 
@@ -342,9 +341,10 @@ public class DefaultMavenProjectBuilder
     //
     // ----------------------------------------------------------------------
 
-    private Model getSuperModel() throws ProjectBuildingException
+    private Model getSuperModel()
+        throws ProjectBuildingException
     {
-        return readModel( new InputStreamReader( DefaultMavenProjectBuilder.class
-            .getResourceAsStream( "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" ) ) );
+        return readModel( new InputStreamReader( DefaultMavenProjectBuilder.class.getResourceAsStream(
+            "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" ) ) );
     }
 }
