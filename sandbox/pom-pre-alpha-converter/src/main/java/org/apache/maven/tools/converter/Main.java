@@ -73,6 +73,7 @@ public class Main
             if ( reverse )
             {
                 FileUtils.copyFile( backup, file );
+                backup.delete();
             }
             else
             {
@@ -81,6 +82,11 @@ public class Main
 
                 try
                 {
+                    if ( backup.exists() )
+                    {
+                        System.err.println( "skipping... backup exists" );
+                    }
+
                     FileReader fileReader = new FileReader( file );
                     Model model = reader.read( fileReader );
                     fileReader.close();
