@@ -60,8 +60,6 @@ public class JavaMojoDescriptorExtractor
 
     public static final String GOAL_DESCRIPTION = "description";
 
-    public static final String GOAL_PREREQ = "prereq";
-
     public static final String GOAL_REQUIRES_DEPENDENCY_RESOLUTION = "requiresDependencyResolution";
 
     public static final String GOAL_MULTI_EXECUTION_STRATEGY = "attainAlways";
@@ -217,23 +215,6 @@ public class JavaMojoDescriptorExtractor
         }
 
         mojoDescriptor.setParameters( parameters );
-
-        // ----------------------------------------------------------------------
-        // Prereqs must in the form pluginId:goalName
-        // ----------------------------------------------------------------------
-
-        DocletTag[] goalPrereqTags = javaClass.getTagsByName( GOAL_PREREQ );
-
-        List goalPrereqs = new ArrayList();
-
-        for ( int j = 0; j < goalPrereqTags.length; j++ )
-        {
-            DocletTag goalPrereq = goalPrereqTags[j];
-
-            goalPrereqs.add( goalPrereq.getValue() );
-        }
-
-        mojoDescriptor.setPrereqs( goalPrereqs );
 
         return mojoDescriptor;
     }
