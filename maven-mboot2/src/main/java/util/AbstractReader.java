@@ -19,6 +19,7 @@ package util;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,6 +28,10 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.FileReader;
+import java.io.StringReader;
+import java.util.Arrays;
 
 /**
  * Parse an XML file.
@@ -45,7 +50,13 @@ public abstract class AbstractReader
 
         SAXParser parser = saxFactory.newSAXParser();
 
-        InputSource is = new InputSource( new FileInputStream( file ) );
+        // Cheap and cheerful. Please add more to skip if the parser chokes (or use the actual
+        StringWriter output = new StringWriter();
+        IOUtil.copy( new FileReader( file ), output);
+        String out = output.toString();
+        out = StringUtils.replace( out, "&oslash;", "\u00f8" );
+
+        InputSource is = new InputSource( new StringReader( out ) );
 
         parser.parse( is, this );
     }

@@ -169,6 +169,13 @@ public class SnapshotArtifactMetadata
         String version = FileUtils.fileRead( file );
         lastModified = file.lastModified();
 
+/* TODO: try this
+        if( version.matches( "/^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$/" ))
+        {
+
+        }
+*/
+
         int index = version.lastIndexOf( "-" );
         if ( version.indexOf( "SNAPSHOT" ) >= 0 || index < 0 )
         {

@@ -16,6 +16,8 @@ package model;
  * limitations under the License.
  */
 
+import download.ArtifactDownloader;
+import download.DownloadFailedException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import util.AbstractReader;
@@ -23,7 +25,14 @@ import util.AbstractReader;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Parse a POM.
@@ -49,7 +58,7 @@ public class ModelReader
 
     private String parentVersion;
 
-    private List dependencies = new ArrayList();
+    private Map dependencies = new HashMap();
 
     private List repositories = new ArrayList();
 
@@ -71,13 +80,23 @@ public class ModelReader
 
     private StringBuffer bodyText = new StringBuffer();
 
-    private final Repository localRepository;
+    private final boolean resolveTransitiveDependencies;
 
     private Repository currentRepository;
 
-    public ModelReader( Repository downloader )
+    private final ArtifactDownloader downloader;
+
+    private static Set inProgress = new HashSet();
+
+    private Map parentDependencies = new HashMap();
+
+    private Map transitiveDependencies = new HashMap();
+
+    public ModelReader( ArtifactDownloader downloader, boolean resolveTransitiveDependencies )
     {
-        this.localRepository = downloader;
+        this.downloader = downloader;
+
+        this.resolveTransitiveDependencies = resolveTransitiveDependencies;
     }
 
     public List getRemoteRepositories()
@@ -85,9 +104,13 @@ public class ModelReader
         return repositories;
     }
 
-    public List getDependencies()
+    public Collection getDependencies()
     {
-        return dependencies;
+        Map m = new HashMap();
+        m.putAll( transitiveDependencies );
+        m.putAll( parentDependencies );
+        m.putAll( dependencies );
+        return m.values();
     }
 
     public List getResources()
@@ -169,22 +192,10 @@ public class ModelReader
                 version = parentVersion;
             }
 
-            ModelReader p = new ModelReader( localRepository );
+            // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way (marmalade, and currently m2)
+            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, false );
 
-            try
-            {
-                p.parse( localRepository.getArtifactFile( parentGroupId, parentArtifactId, parentVersion, "pom" ) );
-            }
-            catch ( ParserConfigurationException e )
-            {
-                throw new SAXException( "Error getting parent POM", e );
-            }
-            catch ( IOException e )
-            {
-                throw new SAXException( "Error getting parent POM", e );
-            }
-
-            dependencies.addAll( p.getDependencies() );
+            addDependencies( p.getDependencies(), parentDependencies );
 
             resources.addAll( p.getResources() );
 
@@ -192,9 +203,19 @@ public class ModelReader
         }
         else if ( rawName.equals( "dependency" ) )
         {
-            dependencies.add( currentDependency );
-
             insideDependency = false;
+
+            if ( !hasDependency( currentDependency, dependencies ) )
+            {
+                if ( resolveTransitiveDependencies )
+                {
+                    ModelReader p = retrievePom( currentDependency.getGroupId(), currentDependency.getArtifactId(),
+                                                 currentDependency.getVersion(), resolveTransitiveDependencies );
+
+                    addDependencies( p.getDependencies(), transitiveDependencies );
+                }
+            }
+            dependencies.put( currentDependency.getConflictId(), currentDependency );
         }
         else if ( rawName.equals( "resource" ) )
         {
@@ -309,6 +330,79 @@ public class ModelReader
         bodyText = new StringBuffer();
 
         depth--;
+    }
+
+    private void addDependencies( Collection dependencies, Map target )
+    {
+        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+        {
+            Dependency d = (Dependency) i.next();
+
+            if ( !hasDependency( d, target ) )
+            {
+                target.put( d.getConflictId(), d );
+            }
+        }
+    }
+
+    private boolean hasDependency( Dependency d, Map dependencies )
+    {
+        String conflictId = d.getConflictId();
+        if ( dependencies.containsKey( conflictId ) )
+        {
+            // We only care about pushing in compile scope dependencies I think
+            // if not, we'll need to be able to get the original and pick the appropriate scope
+            if ( d.getScope().equals( "compile" ) )
+            {
+                dependencies.remove( conflictId );
+            }
+            else
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ModelReader retrievePom( String groupId, String artifactId, String version,
+                                     boolean resolveTransitiveDependencies )
+        throws SAXException
+    {
+        String key = groupId + ":" + artifactId + ":" + version;
+
+        if ( inProgress.contains( key ) )
+        {
+            throw new SAXException( "Circular dependency found, looking for " + key + "\nIn progress:" + inProgress );
+        }
+
+        inProgress.add( key );
+
+        ModelReader p = new ModelReader( downloader, resolveTransitiveDependencies );
+
+        try
+        {
+            Dependency pom = new Dependency( groupId, artifactId, version, "pom" );
+            downloader.downloadDependencies( Collections.singletonList( pom ) );
+
+            Repository localRepository = downloader.getLocalRepository();
+            p.parse( localRepository.getArtifactFile( pom ) );
+        }
+        catch ( IOException e )
+        {
+            throw new SAXException( "Error getting parent POM", e );
+        }
+        catch ( ParserConfigurationException e )
+        {
+            throw new SAXException( "Error getting parent POM", e );
+        }
+        catch ( DownloadFailedException e )
+        {
+            throw new SAXException( "Error getting parent POM", e );
+        }
+
+        inProgress.remove( key );
+
+        return p;
     }
 
     public String getArtifactId()

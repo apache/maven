@@ -84,7 +84,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-marmalade-factory</artifactId>
-      <version>1.0-alpha-2-SNAPSHOT</version>
+      <version>1.0-alpha-2</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
@@ -98,7 +98,7 @@
     <dependency>
       <groupId>marmalade</groupId>
       <artifactId>marmalade-core</artifactId>
-      <version>1.0-alpha2-SNAPSHOT</version>
+      <version>1.0-alpha2</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>

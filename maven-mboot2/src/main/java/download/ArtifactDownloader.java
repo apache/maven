@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Collection;
 
 public class ArtifactDownloader
 {
@@ -60,14 +61,14 @@ public class ArtifactDownloader
         System.out.println( "Using the following proxy : " + proxyHost + "/" + proxyPort );
     }
 
-    public void downloadDependencies( List dependencies )
-        throws Exception
+    public void downloadDependencies( Collection dependencies )
+        throws DownloadFailedException
     {
         for ( Iterator j = dependencies.iterator(); j.hasNext(); )
         {
             Dependency dep = (Dependency) j.next();
 
-            if ( !downloadedArtifacts.contains( dep.getId() ) )
+            if ( !downloadedArtifacts.contains( dep ) )
             {
                 File destinationFile = localRepository.getArtifactFile( dep );
                 // The directory structure for this project may
@@ -94,10 +95,10 @@ public class ArtifactDownloader
 
                 if ( !destinationFile.exists() )
                 {
-                    throw new Exception( "Failed to download " + dep );
+                    throw new DownloadFailedException( "Failed to download " + dep );
                 }
 
-                downloadedArtifacts.add( dep.getId() );
+                downloadedArtifacts.add( dep );
             }
         }
     }
@@ -208,5 +209,10 @@ public class ArtifactDownloader
     private void log( String message )
     {
         System.out.println( message );
+    }
+
+    public Repository getLocalRepository()
+    {
+        return localRepository;
     }
 }

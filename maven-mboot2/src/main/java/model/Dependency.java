@@ -199,4 +199,52 @@ public class Dependency
     {
         return getId() + ":" + getVersion() + ":" + getType();
     }
+
+    public int hashCode()
+    {
+        int result = 17;
+        result = 37 * result + groupId.hashCode();
+        result = 37 * result + artifactId.hashCode();
+        result = 37 * result + type.hashCode();
+        result = 37 * result + version.hashCode();
+        return result;
+    }
+
+    public boolean equals( Object o )
+    {
+        if ( o == this )
+        {
+            return true;
+        }
+
+        if ( !( o instanceof Dependency ) )
+        {
+            return false;
+        }
+
+        Dependency d = (Dependency) o;
+
+        if ( !d.getGroupId().equals( groupId ) )
+        {
+            return false;
+        }
+        else if ( !d.getArtifactId().equals( artifactId ) )
+        {
+            return false;
+        }
+        else if ( !d.getVersion().equals( version ) )
+        {
+            return false;
+        }
+        else if ( !d.getType().equals( type ) )
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public String getConflictId()
+    {
+        return getGroupId() + ":" + getArtifactId() + ":" + getType();
+    }
 }

@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -242,11 +243,9 @@ public class MBoot
 
         Repository localRepository = new Repository( mavenRepoLocal, Repository.LAYOUT_DEFAULT );
 
-        ModelReader reader = new ModelReader( localRepository );
-
         if ( online )
         {
-            downloader = new ArtifactDownloader( localRepository, reader.getRemoteRepositories() );
+            downloader = new ArtifactDownloader( localRepository, Collections.EMPTY_LIST );
             if ( userModelReader.getActiveProxy() != null )
             {
                 Proxy proxy = userModelReader.getActiveProxy();
@@ -271,14 +270,14 @@ public class MBoot
         // Install it-support POM
         installPomFile( localRepository, new File( basedir, "maven-core-it-support/pom.xml" ) );
 
-        reader = new ModelReader( localRepository );
+        ModelReader reader = new ModelReader( downloader, true );
 
         reader.parse( new File( basedir, "maven-mboot2/pom.xml" ) );
 
         ClassLoader bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies(), null,
                                                                               localRepository );
 
-        reader = new ModelReader( localRepository );
+        reader = new ModelReader( downloader, true );
         reader.parse( new File( basedir, "maven-plugins/maven-surefire-plugin/pom.xml" ) );
         List surefireDependencies = new ArrayList();
 
@@ -297,9 +296,9 @@ public class MBoot
             downloader.downloadDependencies( surefireDependencies );
         }
 
-        reader = new ModelReader( localRepository );
+        reader = new ModelReader( downloader, true );
 
-        List coreDeps = null;
+        Collection coreDeps = null;
         Dependency corePom = null;
 
         for ( int i = 0; i < builds.length; i++ )
@@ -324,7 +323,7 @@ public class MBoot
             System.out.println( "--------------------------------------------------------------------" );
         }
 
-        reader = new ModelReader( localRepository );
+        reader = new ModelReader( downloader, true );
         reader.parse( new File( basedir, "maven-plugin-tools/maven-plugin-tools-pluggy/pom.xml" ) );
         List dependencies = new ArrayList( reader.getDependencies() );
         dependencies.add(
@@ -394,6 +393,7 @@ public class MBoot
         // lib
         // ----------------------------------------------------------------------
 
+        // TODO: check this - we are transitively including in /lib...
         File lib = new File( dist, "lib" );
 
         lib.mkdirs();
@@ -411,8 +411,9 @@ public class MBoot
             {
                 FileUtils.copyFileToDirectory( source, core );
             }
-            else
+            else if ( !d.getScope().equals( SCOPE_TEST ) && !d.getArtifactId().equals( "plexus-utils" ) )
             {
+                // only compile and runtime
                 FileUtils.copyFileToDirectory( source, lib );
             }
         }
@@ -465,7 +466,7 @@ public class MBoot
     {
         System.out.println( "Building project in " + basedir );
 
-        ModelReader reader = new ModelReader( localRepository );
+        ModelReader reader = new ModelReader( downloader, true );
 
         reader.parse( new File( basedir, "pom.xml" ) );
 
@@ -482,8 +483,6 @@ public class MBoot
         String testClasses = new File( basedir, TEST_CLASSES ).getAbsolutePath();
 
         String generatedSources = new File( basedir, GENERATED_SOURCES ).getAbsolutePath();
-
-        String generatedDocs = new File( basedir, GENERATED_DOCS ).getAbsolutePath();
 
         File buildDirFile = new File( basedir, BUILD_DIR );
         String buildDir = buildDirFile.getAbsolutePath();
@@ -546,7 +545,6 @@ public class MBoot
                              classLoader );
             generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, modelVersion, "false",
                              classLoader );
-            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, modelVersion, "false", classLoader );
         }
 
         // ----------------------------------------------------------------------
@@ -591,7 +589,7 @@ public class MBoot
 
         System.out.println( "Compiling test sources ..." );
 
-        List testDependencies = reader.getDependencies();
+        Collection testDependencies = reader.getDependencies();
 
         compile( testDependencies, testSources, testClasses, classes, null, SCOPE_TEST, localRepository );
 
@@ -666,7 +664,7 @@ public class MBoot
         Thread.currentThread().setContextClassLoader( old );
     }
 
-    private IsolatedClassLoader createClassloaderFromDependencies( List dependencies, ClassLoader parent,
+    private IsolatedClassLoader createClassloaderFromDependencies( Collection dependencies, ClassLoader parent,
                                                                    Repository localRepository )
         throws Exception
     {
@@ -719,7 +717,7 @@ public class MBoot
     private void installPomFile( Repository localRepository, File pomIn )
         throws Exception
     {
-        ModelReader reader = new ModelReader( localRepository );
+        ModelReader reader = new ModelReader( downloader, false );
 
         reader.parse( pomIn );
 
@@ -814,13 +812,13 @@ public class MBoot
     // Compile
     // ----------------------------------------------------------------------
 
-    private List classpath( List dependencies, String extraClasspath, String scope, Repository localRepository )
+    private List classpath( Collection dependencies, String extraClasspath, String scope, Repository localRepository )
     {
         List classpath = new ArrayList( dependencies.size() + 1 );
 
-        for ( int i = 0; i < dependencies.size(); i++ )
+        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
-            Dependency d = (Dependency) dependencies.get( i );
+            Dependency d = (Dependency) i.next();
 
             String element = localRepository.getArtifactFile( d ).getAbsolutePath();
 
@@ -849,8 +847,8 @@ public class MBoot
         return classpath;
     }
 
-    private void compile( List dependencies, String sourceDirectory, String outputDirectory, String extraClasspath,
-                          String generatedSources, String scope, Repository localRepository )
+    private void compile( Collection dependencies, String sourceDirectory, String outputDirectory,
+                          String extraClasspath, String generatedSources, String scope, Repository localRepository )
         throws Exception
     {
         JavacCompiler compiler = new JavacCompiler();
@@ -874,7 +872,6 @@ public class MBoot
         {
             if ( new File( sourceDirectory ).exists() )
             {
-
                 sourceDirectories = new String[]{sourceDirectory};
             }
         }
@@ -882,7 +879,6 @@ public class MBoot
         if ( sourceDirectories != null )
         {
             CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
-
             compilerConfiguration.setOutputLocation( outputDirectory );
             compilerConfiguration.setClasspathEntries(
                 classpath( dependencies, extraClasspath, scope, localRepository ) );
