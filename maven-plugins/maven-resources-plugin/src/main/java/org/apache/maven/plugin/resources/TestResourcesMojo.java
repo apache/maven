@@ -17,7 +17,6 @@ package org.apache.maven.plugin.resources;
  * ====================================================================
  */
 
-
 import org.apache.maven.model.Resource;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -39,7 +38,7 @@ import java.util.List;
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory/test-classes"
+ *  expression="#project.build.testOutput"
  *  description=""
  * @parameter
  *  name="resources"

@@ -25,7 +25,7 @@ import java.util.List;
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory/test-classes"
+ *  expression="#project.build.testOutput"
  *  description=""
  * @parameter
  *  name="classpathElements"
@@ -40,7 +40,6 @@ import java.util.List;
  * @todo use compile source roots and not the pom.build.sourceDirectory so that any
  *       sort of preprocessing and/or source generation can be taken into consideration.
  */
-
  public class TestCompilerMojo
     extends CompilerMojo
 {

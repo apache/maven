@@ -42,7 +42,7 @@ import java.util.List;
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory/classes"
+ *  expression="#project.build.output"
  *  description=""
  * @parameter
  *  name="resources"

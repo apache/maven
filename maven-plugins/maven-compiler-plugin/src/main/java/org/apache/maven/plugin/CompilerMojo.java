@@ -25,7 +25,7 @@ import java.util.List;
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory/classes"
+ *  expression="#project.build.output"
  *  description=""
  * @parameter
  *  name="classpathElements"
@@ -57,15 +57,9 @@ public class CompilerMojo
 
         String sourceDirectory = (String) request.getParameter( "sourceDirectory" );
 
-        System.out.println( "sourceDirectory = " + sourceDirectory );
-
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
-        System.out.println( "outputDirectory = " + outputDirectory );
-
         String[] classpathElements = (String[]) request.getParameter( "classpathElements" );
-
-        String compilerId = (String) request.getParameter( "compiler" );
 
         // ----------------------------------------------------------------------
         //

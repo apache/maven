@@ -57,7 +57,7 @@ import java.util.jar.Manifest;
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory/classes"
+ *  expression="#project.build.output"
  *  description=""
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
