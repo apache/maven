@@ -19,6 +19,7 @@ package org.apache.maven.project.inheritance;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -73,10 +74,7 @@ public class DefaultModelInheritanceAssembler
         // Distribution
         // ----------------------------------------------------------------------
 
-        if ( child.getDistributionManagement() == null )
-        {
-            child.setDistributionManagement( parent.getDistributionManagement() );
-        }
+        assembleDistributionInheritence( child, parent );
 
         // issueManagement
         if ( child.getIssueManagement() == null )
@@ -423,5 +421,33 @@ public class DefaultModelInheritanceAssembler
             }
         }
     }
+
+    private void assembleDistributionInheritence( Model child, Model parent )
+    {
+        if ( parent.getDistributionManagement() != null )
+        {
+            DistributionManagement parentDistMgmt = parent.getDistributionManagement();
+
+            DistributionManagement childDistMgmt = child.getDistributionManagement();
+
+            if ( childDistMgmt == null )
+            {
+                childDistMgmt = new DistributionManagement();
+
+                child.setDistributionManagement( childDistMgmt );
+            }
+
+            if ( childDistMgmt.getSite() == null )
+            {
+                childDistMgmt.setSite( parentDistMgmt.getSite() );
+            }
+
+            if ( childDistMgmt.getRepository() == null )
+            {
+                childDistMgmt.setRepository( parentDistMgmt.getRepository() );
+            }
+        }
+    }
+
 
 }
