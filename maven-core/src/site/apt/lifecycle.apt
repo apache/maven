@@ -27,6 +27,20 @@ Maven Lifecycle
 
  * Multiple goals
  
+   - session lifecycle+
+   
+     - dep resolution (if POM present)
+     
+     - dep download++
+     
+     - goal lifecycle (assume that multiple goals are supplied by user)
+     
+       - goal resolution (assume multiple goals)
+       
+         - download plugin for goal(s) as necessary++
+       
+       - goal execution
+ 
  * Reactor with a single goal
  
  * Reactor with multiple goals
