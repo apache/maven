@@ -27,9 +27,9 @@ public class MojoDescriptor
     implements Cloneable
 {
     public static final String SINGLE_PASS_EXEC_STRATEGY = "once-per-session";
-    
+
     public static final String MULTI_PASS_EXEC_STRATEGY = "always";
-    
+
     private String implementation;
 
     private String description;
@@ -41,7 +41,7 @@ public class MojoDescriptor
     private Map parameterMap;
 
     private String instantiationStrategy = "singleton";
-    
+
     private String executionStrategy = SINGLE_PASS_EXEC_STRATEGY;
 
     private String goal;
@@ -188,28 +188,31 @@ public class MojoDescriptor
         this.goal = goal;
     }
 
-    public boolean alwaysExecute() {
-        return MULTI_PASS_EXEC_STRATEGY.equals(executionStrategy);
+    public boolean alwaysExecute()
+    {
+        return MULTI_PASS_EXEC_STRATEGY.equals( executionStrategy );
     }
-    
-    public String getExecutionStrategy() {
+
+    public String getExecutionStrategy()
+    {
         return executionStrategy;
     }
 
-    public void setExecutionStrategy(String executionStrategy) {
+    public void setExecutionStrategy( String executionStrategy )
+    {
         this.executionStrategy = executionStrategy;
     }
-    
+
     public MojoDescriptor copy()
     {
         try
         {
-        return (MojoDescriptor) this.clone();
+            return (MojoDescriptor) this.clone();
         }
         catch ( Exception e )
         {
         }
-        
+
         return null;
     }
 }
