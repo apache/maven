@@ -332,14 +332,9 @@ public class DefaultLifecycleExecutor
             {
                 throw new LifecycleExecutionException( "Required goal not found: " + task );
             }
-
-            if ( mojoDescriptor.getPhase() != null )
-            {
-                Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
-
-                phase.getGoals().add( task );
-            }
         }
+
+        configureMojo( mojoDescriptor, phaseMap );
     }
 
     private void executePhase( String phase, MavenSession session, MavenExecutionResponse response, Map phaseMap )
@@ -407,11 +402,8 @@ public class DefaultLifecycleExecutor
         try
         {
             Logger logger = getLogger();
-            logger.debug(
-                "Resolving artifacts from:\n" + "\t{localRepository: " + session.getLocalRepository() + "}\n" +
-                "\t{remoteRepositories: " +
-                session.getRemoteRepositories() +
-                "}" );
+            logger.debug( "Resolving artifacts from:\n" + "\t{localRepository: " + session.getLocalRepository() +
+                          "}\n" + "\t{remoteRepositories: " + session.getRemoteRepositories() + "}" );
 
             return pluginManager.executeMojo( session, id );
         }
