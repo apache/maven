@@ -91,9 +91,15 @@ runTests()
     CP=$1
   fi
   
+  if $cygwin; then
+    repo=`cygpath -pw "$3"`
+  else
+    repo=$3
+  fi
+  
   if [ -f $5 ]
   then
-    "${JAVACMD}" -classpath "$CP" org.codehaus.surefire.SurefireBooter "$2" "$3" $4 $5 $6
+    "${JAVACMD}" -classpath "$CP" org.codehaus.surefire.SurefireBooter "$2" "$repo" $4 $5 $6
   fi
 }
 
