@@ -68,6 +68,20 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 /**
+ * @maven.plugin.id jar
+ * @maven.plugin.description Maven plugin to build jars
+ *
+ * @parameter jarName String true validator description
+ * @parameter outputDirectory String true validator description
+ * @parameter basedir String true validator description
+ *
+ * @goal.name jar
+ * @goal.jar.description build a jar
+ * @goal.jar.prereq test
+ * @goal.jar.prereq resources
+ * @goal.jar.parameter jarName #maven.final.name
+ * @goal.jar.parameter outputDirectory #maven.build.dir
+ * @goal.jar.parameter basedir #maven.build.dest
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @version $Id$
@@ -80,17 +94,27 @@ import java.util.jar.Manifest;
  * maven.remote.group
  */
 public class JarPlugin
+    extends AbstractPlugin
 {
-    private String jarName;
-
-    private String outputDirectory;
-
-    private String basedir;
-
-    public void execute()
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
-        File basedir = new File( this.basedir );
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        System.out.println( request.getParameter( "basedir" ) );
+
+        File basedir = new File( (String) request.getParameter( "basedir" ) );
+
+        String outputDirectory = (String) request.getParameter( "outputDirectory" );
+
+        String jarName = (String) request.getParameter( "jarName" );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
 
         File jarFile = new File( new File( outputDirectory ), jarName + ".jar" );
 

@@ -2,27 +2,33 @@ package org.apache.maven.plugin;
 
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.javac.JavacCompiler;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
- * @plugin.id compiler
- * @plugin.description A maven2 plugin which integrates the use of Maven2 with IntelliJ's IDEA
+ * @maven.plugin.id compiler
+ * @maven.plugin.description A maven2 plugin compiles project sources.
  *
- * @parameter <name> <type> <required> <validatator> <description>
- * 
- * This may be on a per method basis
- * @parameter sourceDirectories String[] required validator
+ * @parameter sourceDirectory String required validator
  * @parameter outputDirectory String required validator
  * @parameter classpathElements String[] required validator
  * @parameter compiler String required validator
  * 
- * The goal would map to a method if multiple methods were allowed
- * @goal.name idea
- * @goal.idea.parameter project #project
+ * @goal.name compile
+ * @goal.compile.description Compiles application sources
+ * @goal.compile.parameter sourceDirectory #project.build.sourceDirectory
+ * @goal.compile.parameter outputDirectory #maven.build.dest
+ * @goal.compile.parameter classpathElements #project.classpathElements
+ *
+ * @goal.name test:compile
+ * @goal.test:compile.prereq compile
+ * @goal.test:compile.description Compiles test sources
+ * @goal.test:compile.parameter sourceDirectory #project.build.unitTestSourceDirectory
+ * @goal.test:compile.parameter outputDirectory #maven.test.dest
+ * @goal.test:compile.parameter classpathElements #project.classpathElements
  *
  * There could be threadsafe and non threadsafe versions of a compiler
  * plugin. The case where you instantiate a compiler plugin that maintains
@@ -40,7 +46,7 @@ import java.util.Map;
 public class CompilerPlugin
     extends AbstractPlugin
 {
-    private Map compilers;
+    private Compiler compiler = new JavacCompiler();
 
     private boolean debug = false;
 
@@ -67,8 +73,6 @@ public class CompilerPlugin
         {
             return;
         }
-
-        Compiler compiler = (Compiler) compilers.get( compilerId );
 
         List messages = compiler.compile( classpathElements, new String[]{sourceDirectory}, outputDirectory );
 

@@ -1,11 +1,28 @@
 <plugin>
   <id>clean</id>
   <implementation>org.apache.maven.plugin.CleanPlugin</implementation>
-  <instantiation-strategy>singleton</instantiation-strategy>
+  <instantiationStrategy>singleton</instantiationStrategy>
   <mode>integrated</mode>
+  <parameters>
+    <parameter>
+      <name>failedOnError</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
+      <description>description </description>
+    </parameter>
+    <parameter>
+      <name>outputDirectory</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
+      <description>description </description>
+    </parameter>
+  </parameters>
   <goals>
     <goal>
       <name>clean</name>
+      <description>Goal which cleans the build</description>
       <parameters>
         <parameter>
           <name>failedOnError</name>

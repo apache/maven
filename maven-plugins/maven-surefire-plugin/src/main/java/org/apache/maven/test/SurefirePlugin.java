@@ -9,20 +9,39 @@ import java.io.File;
 import java.util.List;
 
 /**
+ * @maven.plugin.id surefire
+ * @maven.plugin.description A maven2 plugin which uses surefire as a test runner
+ *
+ * @parameter mavenRepoLocal String required validator
+ * @parameter basedir String required validator
+ * @parameter includes String required validator
+ * @parameter excludes String required validator
+ * @parameter classpathElements String[] required validator
+ *
+ * @goal.name test
+ * @goal.test.description Run tests using surefire
+ *
+ * @goal.test.prereq test:compile
+ * @goal.test.prereq resources
+ * @goal.test.prereq test:resources
+ *
+ * @goal.test.parameter mavenRepoLocal #maven.repo.local
+ * @goal.test.parameter basedir #basedir
+ * @goal.test.parameter includes #project.build.unitTest.includes
+ * @goal.test.parameter excludes #project.build.unitTest.excludes
+ * @goal.test.parameter classpathElements #project.classpathElements
+
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ *
  * @todo make version of junit and surefire configurable
  * @todo make report to be produced configurable
  */
 public class SurefirePlugin
     extends AbstractPlugin
 {
-
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
-
-        //public void execute( String mavenRepoLocal, String basedir, List includes, List excludes, String[] classpathElements )
-        //    throws Exception
     {
         // ----------------------------------------------------------------------
         //

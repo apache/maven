@@ -1,15 +1,35 @@
 <plugin>
   <id>jar</id>
   <implementation>org.apache.maven.plugin.JarPlugin</implementation>
-  <instantiation-strategy>per-lookup</instantiation-strategy>
-  <mode>field</mode>
+  <instantiationStrategy>singleton</instantiationStrategy>
+  <mode>integrated</mode>
+  <parameters>
+    <parameter>
+      <name>jarName</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
+      <description>description </description>
+    </parameter>
+    <parameter>
+      <name>outputDirectory</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
+      <description>description </description>
+    </parameter>
+    <parameter>
+      <name>basedir</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
+      <description>description </description>
+    </parameter>
+  </parameters>
   <goals>
     <goal>
       <name>jar</name>
-      <prereqs>
-        <prereq>test</prereq>
-        <prereq>resources</prereq>
-      </prereqs>
+      <description>build a jar</description>
       <parameters>
         <parameter>
           <name>jarName</name>
@@ -24,6 +44,10 @@
           <expression>#maven.build.dest</expression>
         </parameter>
       </parameters>
+      <prereqs>
+        <prereq>test</prereq>
+        <prereq>resources</prereq>
+      </prereqs>
     </goal>
   </goals>
 </plugin>

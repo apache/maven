@@ -19,14 +19,16 @@ package org.apache.maven.plugin;
 import java.io.File;
 
 /**
- * @plugin.id clean
- * @plugin.description A maven2 plugin which cleans the build
- * @plugin.instantiation singleton
- * @plugin.mode integrated
+ * @maven.plugin.id clean
+ * @maven.plugin.description A maven2 plugin which cleans the build
+ *
+ * @parameter failedOnError String true validator description
+ * @parameter outputDirectory String true validator description
  *
  * @goal.name clean
+ * @goal.clean.description Goal which cleans the build
  * @goal.clean.parameter failedOnError false
- * @goal.clean.outputDirectory #maven.build.dir
+ * @goal.clean.parameter outputDirectory #maven.build.dir
  *
  * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
  * @version $Id$

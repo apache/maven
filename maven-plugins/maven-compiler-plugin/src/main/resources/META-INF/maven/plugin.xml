@@ -1,51 +1,42 @@
 <plugin>
   <id>compiler</id>
   <implementation>org.apache.maven.plugin.CompilerPlugin</implementation>
-  <instantiation-strategy>singleton</instantiation-strategy>
+  <instantiationStrategy>singleton</instantiationStrategy>
   <mode>integrated</mode>
-  <requirements>
-    <requirement>
-      <role>org.codehaus.plexus.compiler.Compiler</role>
-      <field-name>compilers</field-name>
-    </requirement>
-  </requirements>
-
-  <!--
   <parameters>
     <parameter>
       <name>sourceDirectory</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
       <description></description>
     </parameter>
     <parameter>
       <name>outputDirectory</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
       <description></description>
     </parameter>
     <parameter>
       <name>classpathElements</name>
+      <type>String[]</type>
+      <required>false</required>
+      <validator>validator</validator>
       <description></description>
     </parameter>
     <parameter>
       <name>compiler</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
       <description></description>
     </parameter>
   </parameters>
-
   <goals>
     <goal>
       <name>compile</name>
-      <expressions>
-        <expression>#project.build.sourceDirectory</expression>
-        <expression>#maven.build.dest</expression>
-        <expression>#project.classpathElements</expression>
-        <expression>javac</expression>
-      </expressions>
-    </goal>
-  </goals>
-  -->
-
-  <goals>
-    <goal>
-      <name>compile</name>
+      <description>Compiles application sources</description>
       <parameters>
         <parameter>
           <name>sourceDirectory</name>
@@ -59,17 +50,11 @@
           <name>classpathElements</name>
           <expression>#project.classpathElements</expression>
         </parameter>
-        <parameter>
-          <name>compiler</name>
-          <expression>javac</expression>
-        </parameter>
       </parameters>
     </goal>
     <goal>
       <name>test:compile</name>
-      <prereqs>
-        <prereq>compile</prereq>
-      </prereqs>
+      <description>Compiles test sources</description>
       <parameters>
         <parameter>
           <name>sourceDirectory</name>
@@ -83,60 +68,10 @@
           <name>classpathElements</name>
           <expression>#project.classpathElements</expression>
         </parameter>
-        <parameter>
-          <name>compiler</name>
-          <expression>javac</expression>
-        </parameter>
       </parameters>
-    </goal>
-  </goals>
-
-
-  <goals>
-    <goal>
-      <name>compile</name>
-      <parameters>
-        <parameter>
-          <name>sourceDirectory</name>
-          <expression>#project.build.sourceDirectory</expression>
-        </parameter>
-        <parameter>
-          <name>outputDirectory</name>
-          <expression>#maven.build.dest</expression>
-        </parameter>
-        <parameter>
-          <name>classpathElements</name>
-          <expression>#project.classpathElements</expression>
-        </parameter>
-        <parameter>
-          <name>compiler</name>
-          <expression>javac</expression>
-        </parameter>
-      </parameters>
-    </goal>
-    <goal>
-      <name>test:compile</name>
       <prereqs>
         <prereq>compile</prereq>
       </prereqs>
-      <parameters>
-        <parameter>
-          <name>sourceDirectory</name>
-          <expression>#project.build.unitTestSourceDirectory</expression>
-        </parameter>
-        <parameter>
-          <name>outputDirectory</name>
-          <expression>#maven.test.dest</expression>
-        </parameter>
-        <parameter>
-          <name>classpathElements</name>
-          <expression>#project.classpathElements</expression>
-        </parameter>
-        <parameter>
-          <name>compiler</name>
-          <expression>javac</expression>
-        </parameter>
-      </parameters>
     </goal>
   </goals>
 </plugin>

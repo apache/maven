@@ -1,11 +1,28 @@
 <plugin>
-  <id>resource-copier</id>
+  <id>resources</id>
   <implementation>org.apache.maven.plugin.ResourcesPlugin</implementation>
-  <instantiation-strategy>per-lookup</instantiation-strategy>
-  <mode>field</mode>
+  <instantiationStrategy>singleton</instantiationStrategy>
+  <mode>integrated</mode>
+  <parameters>
+    <parameter>
+      <name>outputDirectory</name>
+      <type>String</type>
+      <required>false</required>
+      <validator>validator</validator>
+      <description>description </description>
+    </parameter>
+    <parameter>
+      <name>resources</name>
+      <type>List</type>
+      <required>false</required>
+      <validator>validator</validator>
+      <description>description </description>
+    </parameter>
+  </parameters>
   <goals>
     <goal>
       <name>resources</name>
+      <description>copy application resources</description>
       <parameters>
         <parameter>
           <name>outputDirectory</name>
@@ -19,6 +36,7 @@
     </goal>
     <goal>
       <name>test:resources</name>
+      <description>copy test resources</description>
       <parameters>
         <parameter>
           <name>outputDirectory</name>

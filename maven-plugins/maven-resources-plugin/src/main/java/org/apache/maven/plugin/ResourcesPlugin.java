@@ -68,30 +68,46 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * @maven.plugin.id resources
+ * @maven.plugin.description Maven plugin to build jars
+ *
+ * @parameter outputDirectory String true validator description
+ * @parameter resources List true validator description
+ *
+ * @goal.name resources
+ * @goal.resources.description copy application resources
+ * @goal.resources.parameter outputDirectory #maven.build.dest
+ * @goal.resources.parameter resources #project.build.resources
+ *
+ * @goal.name test:resources
+ * @goal.test:resources.description copy test resources
+ * @goal.test:resources.parameter outputDirectory #maven.test.dest
+ * @goal.test:resources.parameter resources #project.build.unitTest.resources
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ *
  * @version $Id$
  *
- * maven.jar.manifest.extensions.add
- * maven.jar.includes
- * maven.jar.excludes
- * maven.jar.index
- * maven.jar.compress
- * maven.remote.group
- *
- * @todo separate this into a resources plugin and jar plugin so that the resource
- * copying can be used as part of testing, right now the resources are being copied
- * directly into the JAR, need to make them available to testing.
  */
 public class ResourcesPlugin
+    extends AbstractPlugin
 {
-    private String outputDirectory;
-
-    private List resources;
-
-    public void execute()
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        String outputDirectory = (String) request.getParameter( "outputDirectory" );
+
+        List resources = (List) request.getParameter( "resources" );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
         for ( Iterator i = getJarResources( resources ).iterator(); i.hasNext(); )
         {
             ResourceEntry resourceEntry = (ResourceEntry) i.next();
