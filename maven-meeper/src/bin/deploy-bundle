@@ -24,6 +24,11 @@ echo $BUNDLE
 
   jar xf $BUNDLE
 
+  # copy files in subdirs to workdir
+  for d in `find ./* -type d` ; do
+    for f in `find $d -type f` ; do cp $f .; done;
+  done
+
   POM=project.xml
   less $POM
 
