@@ -408,24 +408,15 @@
             <type>DistributionManagement</type>
           </association>
         </field>
-          <!-- [ jdcasey:01-Feb-2005 ] Added to handle version management for 
-           | dependencies to be used in sub-projects. -->
+        <!-- [ jdcasey:01-Feb-2005 ] Added to handle version management for
+         | dependencies to be used in sub-projects. -->
         <field>
           <name>dependencyManagement</name>
           <version>4.0.0</version>
           <required>false</required>
           <description><![CDATA[Default dependency information for grouped projects inheriting from this one.]]></description>
           <association>
-	          <type>DependencyManagement</type>
-          </association>
-        </field>
-        <field>
-          <name>local</name>
-          <version>4.0.0</version>
-          <required>false</required>
-          <description><![CDATA[Local configuration information.]]></description>
-          <association>
-            <type>Local</type>
+            <type>DependencyManagement</type>
           </association>
         </field>
         <!-- @todo long run 4.0.0 may not need properties, with the parameters being specified
@@ -461,9 +452,14 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <!-- @todo is this for javadoc only? maybe make it a plugin property? -->
+        <field xml.tagName="package">
+          <name>packageName</name>
+          <version>3.0.0+</version>
+          <type>String</type>
+          <description>The Java package that the code resides in.</description>
+        </field>
       </fields>
-      <!-- We need this because we can't use package as a field name. -->
-      <!-- @todo this means it is undocumented. Should we instead provide an optional field name so package can be mapped to the field packageName? -->
       <codeSegments>
         <codeSegment>
           <version>3.0.0</version>
@@ -479,11 +475,10 @@
             }
           </code>
         </codeSegment>
+        <!-- We need this because we can't use package as a field name. -->
         <codeSegment>
           <version>3.0.0+</version>
           <code>
-            private String packageName;
-
             public void setPackage(String packageName)
             {
                 this.packageName = packageName;
@@ -1753,64 +1748,28 @@
         </field>
       </fields>
     </class>
-
-    <!-- @todo should modello take a parameter/code segment that will forbid the
-         specification of this in a project other than the user pom? -->
     <class>
-      <name>Local</name>
+      <name>DependencyManagement</name>
       <version>4.0.0</version>
-      <description><![CDATA[
-        Local contains the information that is specific to the user's
-        local environment. This would only be expected in a user or site pom,
-        not a project POM.
-      ]]></description>
+      <description>
+        Section for management of default dependency information for use in a group of POMs.
+      </description>
       <fields>
-        <!-- @todo should local repository actually be part of the <repositories/> element, or be of repository type? -->
         <field>
-          <name>repository</name>
+          <name>dependencies</name>
           <version>4.0.0</version>
-          <description><![CDATA[
-            The local repository that contains downloaded artifacts.
-          ]]></description>
-          <type>String</type>
-          <!-- @todo systemProperty tag (maven.repo.local value) should be supported by modello -->
-        </field>
-        <field>
-          <name>online</name>
-          <version>4.0.0</version>
-          <description><![CDATA[
-            Whether to run the build online. If not, no remote repositories are consulted for plugins or dependencies
-            and this configuration may be used by other plugins requiring online access.
-          ]]></description>
-          <type>boolean</type>
-          <defaultValue>true</defaultValue>
-          <!-- @todo systemProperty tag (maven.online value) should be supported by modello -->
+          <description>
+            The dependencies specified here are not validated until they
+            are referenced in a POM within the group. This allows the
+            specification of a "standard" version for a particular
+            dependency.
+          </description>
+          <association>
+            <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
-    </class>
-    <class>
-        <name>DependencyManagement</name>
-        <version>4.0.0</version>
-        <description><![CDATA[
-        	Section for management of default dependency information for use in 
-            a group of POMs.
-        ]]></description>
-        <fields>
-            <field>
-                <name>dependencies</name>
-                <version>4.0.0</version>
-                <description><![CDATA[
-                	The dependencies specified here are not validated until they
-                    are referenced in a POM within the group. This allows the 
-                    specification of a "standard" version for a particular
-                    dependency.
-                ]]></description>
-                <association>
-                    <type>Dependency</type>
-                    <multiplicity>*</multiplicity>
-                </association>
-            </field>
-        </fields>
     </class>
   </classes>
 </model>
