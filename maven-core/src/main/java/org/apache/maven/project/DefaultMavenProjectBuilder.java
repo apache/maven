@@ -21,8 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,7 +41,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
@@ -69,8 +66,6 @@ public class DefaultMavenProjectBuilder
 
     private ModelValidator validator;
 
-    private MavenXpp3Writer modelWriter;
-
     private MavenXpp3Reader modelReader;
 
     private PathTranslator pathTranslator;
@@ -78,8 +73,6 @@ public class DefaultMavenProjectBuilder
     public void initialize()
         throws Exception
     {
-        modelWriter = new MavenXpp3Writer();
-
         modelReader = new MavenXpp3Reader();
     }
 
@@ -127,7 +120,7 @@ public class DefaultMavenProjectBuilder
                                                     superModel.getRepositories() );
 
             Model previous = superModel;
-            
+
             for ( Iterator i = lineage.iterator(); i.hasNext(); )
             {
                 Model current = ( (MavenProject) i.next() ).getModel();
@@ -146,6 +139,9 @@ public class DefaultMavenProjectBuilder
                 project.setFile( parent.getFile() );
                 project.setParent( parent );
                 project.setType( previous.getType() );
+
+                // TODO: This shouldn't be necessary
+                project.setScm( previous.getScm() );
             }
 
             project.setLocalRepository( localRepository );
@@ -313,22 +309,6 @@ public class DefaultMavenProjectBuilder
         }
 
         return artifact.getFile();
-    }
-
-    private Model interpolateModel( Model model, Map map )
-        throws Exception
-    {
-        return modelReader.read( new StringReader( StringUtils.interpolate( getProjectString( model ), map ) ) );
-    }
-
-    private String getProjectString( Model project )
-        throws Exception
-    {
-        StringWriter writer = new StringWriter();
-
-        modelWriter.write( writer, project );
-
-        return writer.toString();
     }
 
     /**

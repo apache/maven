@@ -16,15 +16,18 @@ package org.apache.maven.project.inheritance;
  * limitations under the License.
  */
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PostGoal;
 import org.apache.maven.model.PreGoal;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Scm;
 
-import java.util.Iterator;
-import java.util.List;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -120,9 +123,40 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Scm
-        if ( child.getScm() == null )
+        if ( parent.getScm() != null )
         {
-            child.setScm( parent.getScm() );
+            Scm parentScm = parent.getScm();
+
+            Scm childScm = child.getScm();
+
+            if ( childScm == null )
+            {
+                childScm = new Scm();
+
+                child.setScm( childScm );
+            }
+
+            if ( StringUtils.isEmpty( childScm.getConnection() ) && 
+                !StringUtils.isEmpty( parentScm.getConnection() ) )
+            {
+                childScm.setConnection( parentScm.getConnection() + "/" + child.getArtifactId() );
+            }
+
+            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
+                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
+            {
+                childScm.setDeveloperConnection( parentScm.getDeveloperConnection() + "/" + child.getArtifactId() );
+            }
+
+            if ( StringUtils.isEmpty( childScm.getUrl() ) )
+            {
+                childScm.setUrl( parentScm.getUrl() );
+            }
+
+            if ( parentScm.getBranches() != null )
+            {
+                childScm.getBranches().addAll( parentScm.getBranches() );
+            }
         }
 
         // developers
