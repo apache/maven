@@ -80,6 +80,7 @@ public class DefaultMavenSettingsBuilder
     private File getSettingsFile()
     {
         String userDir = System.getProperty( "user.home" );
+        userDir = userDir.replaceAll( "\\\\", "/" );
         
         String path = settingsPath;
         
