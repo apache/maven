@@ -6,10 +6,10 @@
     <artifactId>maven-plugin-parent</artifactId>
     <version>2.0-SNAPSHOT</version>
   </parent>
-  <groupId>maven-install-plugin</groupId>
+  <groupId>maven</groupId>
   <artifactId>maven-install-plugin</artifactId>
   <name>Maven Install Plugin</name>
-  <currentVersion>1.0-SNAPSHOT</currentVersion>
+  <version>1.0-SNAPSHOT</version>
   <inceptionYear>2004</inceptionYear>
   <package>org.apache.maven.plugin.install</package>
   <dependencies>
