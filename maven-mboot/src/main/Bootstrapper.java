@@ -86,13 +86,24 @@ public class Bootstrapper
 
         StringBuffer libs = new StringBuffer();
 
+        String repoLocal = replace(downloader.getMavenRepoLocal().getPath(), "\\", "/");
+        String classpathSeparator;
+        if (repoLocal.indexOf(":") != -1) //Windows
+        {
+            classpathSeparator = ";";
+        }
+        else
+        {
+            classpathSeparator = ":";
+        }
+        
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
+            
+            classPath.append( repoLocal + "/" + getArtifactPath( d, "/" ) + classpathSeparator );
 
-            classPath.append( downloader.getMavenRepoLocal() + "/" + getArtifactPath( d, "/" ) + ":" );
-
-            libs.append( downloader.getMavenRepoLocal() + "/" + getArtifactPath( d, "/" ) + "\n" );
+            libs.append( repoLocal + "/" + getArtifactPath( d, "/" ) + "\n" );
         }
 
         writeFile( "bootstrap.classpath", classPath.toString() );
