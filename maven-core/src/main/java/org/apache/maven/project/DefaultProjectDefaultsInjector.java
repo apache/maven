@@ -9,7 +9,6 @@ import java.util.TreeMap;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author jdcasey Created on Feb 1, 2005

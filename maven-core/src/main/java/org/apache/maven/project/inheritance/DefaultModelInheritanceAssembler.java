@@ -140,14 +140,13 @@ public class DefaultModelInheritanceAssembler
                 child.setScm( childScm );
             }
 
-            if ( StringUtils.isEmpty( childScm.getConnection() ) && 
-                !StringUtils.isEmpty( parentScm.getConnection() ) )
+            if ( StringUtils.isEmpty( childScm.getConnection() ) && !StringUtils.isEmpty( parentScm.getConnection() ) )
             {
                 childScm.setConnection( parentScm.getConnection() + "/" + child.getArtifactId() );
             }
 
-            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
-                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
+            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() )
+                && !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
                 childScm.setDeveloperConnection( parentScm.getDeveloperConnection() + "/" + child.getArtifactId() );
             }
@@ -326,37 +325,39 @@ public class DefaultModelInheritanceAssembler
                 child.addPlugin( plugin );
             }
         }
-        
+
         DependencyManagement parentDepMgmt = parent.getDependencyManagement();
+
         DependencyManagement childDepMgmt = child.getDependencyManagement();
-        if(parentDepMgmt != null)
+
+        if ( parentDepMgmt != null )
         {
-            if(childDepMgmt == null)
+            if ( childDepMgmt == null )
             {
-                child.setDependencyManagement(parentDepMgmt);
+                child.setDependencyManagement( parentDepMgmt );
             }
             else
             {
                 List parentDeps = parentDepMgmt.getDependencies();
-                
+
                 Map mappedParentDeps = new TreeMap();
                 for ( Iterator it = parentDeps.iterator(); it.hasNext(); )
                 {
                     Dependency dep = (Dependency) it.next();
-                    mappedParentDeps.put(dep.getManagementKey(), dep);
+                    mappedParentDeps.put( dep.getManagementKey(), dep );
                 }
-                
-                List deps = new ArrayList(parentDeps);
+
+                List deps = new ArrayList( parentDeps );
                 for ( Iterator it = childDepMgmt.getDependencies().iterator(); it.hasNext(); )
                 {
                     Dependency dep = (Dependency) it.next();
-                    if(!mappedParentDeps.containsKey(dep.getManagementKey()))
+                    if ( !mappedParentDeps.containsKey( dep.getManagementKey() ) )
                     {
-                        deps.add(dep);
+                        deps.add( dep );
                     }
                 }
-                
-                childDepMgmt.setDependencies(deps);
+
+                childDepMgmt.setDependencies( deps );
             }
         }
     }
