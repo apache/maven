@@ -1978,7 +1978,7 @@
         <field>
           <name>disabled</name>
           <version>4.0.0</version>
-          <type>Boolean</type>
+          <type>String</type>
           <!-- defaultValue>false</defaultValue -->
         </field>
         <field>
@@ -2011,7 +2011,7 @@
         <field>
           <name>disabled</name>
           <version>4.0.0</version>
-          <type>Boolean</type>
+          <type>String</type>
           <!-- defaultValue>false</defaultValue -->
         </field>
         <field>
