@@ -73,8 +73,6 @@ public class JarMojo
         //
         // ----------------------------------------------------------------------
 
-        System.out.println( request.getParameter( "basedir" ) );
-
         File basedir = new File( (String) request.getParameter( "basedir" ) );
 
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
