@@ -16,24 +16,19 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @deprecated
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ * @deprecated
  */
 public class PluginExecutionRequest
 {
     private Map parameters;
 
-    private Map context;
-
     public PluginExecutionRequest( Map parameters )
     {
-        context = new HashMap();
-
         this.parameters = parameters;
     }
 
@@ -50,15 +45,5 @@ public class PluginExecutionRequest
     public Object getParameter( String key )
     {
         return parameters.get( key );
-    }
-
-    public void addContextValue( Object key, Object value )
-    {
-        context.put( key, value );
-    }
-
-    public Object getContextValue( String key )
-    {
-        return context.get( key );
     }
 }

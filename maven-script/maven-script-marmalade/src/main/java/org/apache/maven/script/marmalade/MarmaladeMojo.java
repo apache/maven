@@ -25,9 +25,6 @@ import org.codehaus.marmalade.runtime.DefaultContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
 
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * @author jdcasey
  */
@@ -42,7 +39,8 @@ public class MarmaladeMojo
         this.script = script;
     }
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
+        throws Exception
     {
 
         MarmaladeExecutionContext context = new DefaultContext( request.getParameters() );
@@ -60,13 +58,14 @@ public class MarmaladeMojo
             response.setExecutionFailure( failure );
         }
 
-        Map externalizedVars = context.getExternalizedVariables();
-        for ( Iterator it = externalizedVars.entrySet().iterator(); it.hasNext(); )
-        {
-            Map.Entry entry = (Map.Entry) it.next();
-
-            request.addContextValue( entry.getKey(), entry.getValue() );
-        }
+        // TODO: need to be able to pass back results
+//        Map externalizedVars = context.getExternalizedVariables();
+//        for ( Iterator it = externalizedVars.entrySet().iterator(); it.hasNext(); )
+//        {
+//            Map.Entry entry = (Map.Entry) it.next();
+//
+//            request.addContextValue( entry.getKey(), entry.getValue() );
+//        }
     }
 
 }
