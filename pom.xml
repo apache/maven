@@ -67,7 +67,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus</artifactId>
-      <version>0.14-SNAPSHOT</version>
+      <version>0.16</version>
     </dependency>
     <dependency>
       <groupId>xstream</groupId>
