@@ -30,14 +30,15 @@ import java.net.URL;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
-public class MavenTestCase
+public abstract class MavenTestCase
     extends ArtifactEnabledPlexusTestCase
 {
     protected PluginManager pluginManager;
 
     protected MavenProjectBuilder projectBuilder;
 
-    protected void setUp() throws Exception
+    protected void setUp()
+        throws Exception
     {
         super.setUp();
 
@@ -70,7 +71,8 @@ public class MavenTestCase
         return resourceFile;
     }
 
-    protected ArtifactRepository getLocalRepository() throws Exception
+    protected ArtifactRepository getLocalRepository()
+        throws Exception
     {
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
@@ -85,12 +87,14 @@ public class MavenTestCase
     // Project building
     // ----------------------------------------------------------------------
 
-    protected MavenProject getProjectWithDependencies( File pom ) throws Exception
+    protected MavenProject getProjectWithDependencies( File pom )
+        throws Exception
     {
         return projectBuilder.buildWithDependencies( pom, getLocalRepository() );
     }
 
-    protected MavenProject getProject( File pom ) throws Exception
+    protected MavenProject getProject( File pom )
+        throws Exception
     {
         return projectBuilder.build( pom, getLocalRepository() );
     }
