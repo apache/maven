@@ -1,10 +1,7 @@
 #!/bin/sh
 
-# Deploy JAR to the repository
-# $1 : artifact to copy
-# $2 : project id
-
 BUNDLE=$1
+VERSION=$2
 
 [ "${BUNDLE}" = "" ] && echo && echo "You must specify a bundle!" && echo && exit
 
@@ -27,11 +24,16 @@ cp $BUNDLE $WORKDIR
 
   [ ! -f ${POM} ] && echo && echo "Cannot deploy without the project.xml file!" && echo && exit
 
-  version=`cat ${POM} | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<version>' | sed -e 's#^.*<version>##;s#</version>.*$##'`
-
-  if [ -z $version ]
+  if [ ! -z $VERSION ]
   then
-    version=`grep currentVersion ${POM} | sed -e 's/^ *//;s/<currentVersion>//;s/<\/currentVersion>//'`
+    version=$VERSION
+  else
+    version=`cat ${POM} | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<version>' | sed -e 's#^.*<version>##;s#</version>.*$##'`
+
+    if [ -z $version ]
+    then
+      version=`grep currentVersion ${POM} | sed -e 's/^ *//;s/<currentVersion>//;s/<\/currentVersion>//'`
+    fi
   fi
 
   artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<artifactId>' | sed -e 's#^.*<artifactId>##;s#</artifactId>.*$##'`

@@ -6,6 +6,8 @@
 # @author <a href="mailto:emmanuel@venisse.net">Emmanuel Venisse</a>
 # -----------------------------------------------------------------------------
 
+POM=pom.xml
+
 downloadMBootDependencies()
 {
   findAndSetMavenRepoLocal
@@ -189,16 +191,16 @@ buildMavenProject()
 
       fi
 
-      # Look for source directory in project.xml
-      sourceDirectory=`grep sourceDirectory project.xml | sed -e 's/^*//;s/<sourceDirectory>//;s/<\/sourceDirectory>//;s/\${basedir}\///'`
+      # Look for source directory in pom.xml
+      sourceDirectory=`grep sourceDirectory ${POM} | sed -e 's/^*//;s/<sourceDirectory>//;s/<\/sourceDirectory>//;s/\${basedir}\///'`
 
       [ -z $sourceDirectory ] && sourceDirectory=src/main/java
 
       buildDir=target
       buildDest=target/classes
       
-      # Look for unit test source directory in project.xml
-      unitTestSourceDirectory=`grep unitTestSourceDirectory project.xml | sed -e 's/^*//;s/<unitTestSourceDirectory>//;s/<\/unitTestSourceDirectory>//;s/\${basedir}\///'`
+      # Look for unit test source directory in pom.xml
+      unitTestSourceDirectory=`grep unitTestSourceDirectory ${POM} | sed -e 's/^*//;s/<unitTestSourceDirectory>//;s/<\/unitTestSourceDirectory>//;s/\${basedir}\///'`
 
       [ -z $unitTestSourceDirectory ] && unitTestSourceDirectory=src/test/java
 
@@ -259,7 +261,7 @@ buildMavenProject()
       
       if [ "$2" = "default" ]
       then
-        jarName=`getJarName project.xml`
+        jarName=`getJarName ${POM}`
       else
         jarName=$2
       fi
@@ -306,7 +308,7 @@ installPom()
 
   groupId=`getGroupId`
 
-  pomName=`getPomName project.xml`
+  pomName=`getPomName ${POM}`
 
   dir=${repoLocal}/${groupId}/poms
 
@@ -314,12 +316,12 @@ installPom()
 
   mkdir -p ${dir}
 
-  cp project.xml ${dir}/${pomName}
+  cp ${POM} ${dir}/${pomName}
 }
 
 getJarName()
 {
-  # $1 == project.xml
+  # $1 == pom.xml
   
   version=`cat $1 | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<version>' | sed -e 's#^.*<version>##;s#</version>.*$##'`
 
@@ -364,7 +366,7 @@ getPomName()
 
 getGroupId()
 {
-  groupId=`cat project.xml | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<groupId>' | sed -e 's#^.*<groupId>##;s#</groupId>.*$##'`
+  groupId=`cat ${POM} | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<groupId>' | sed -e 's#^.*<groupId>##;s#</groupId>.*$##'`
 
   echo $groupId
 }

@@ -51,9 +51,9 @@ public class Bootstrapper
 
         bootstrapPomParser = new BootstrapPomParser();
 
-        if( ! bootstrapPomParser.parse( new File( "project.xml" ) ) )
+        if( ! bootstrapPomParser.parse( new File( "pom.xml" ) ) )
         {
-            System.err.println( "Could not parse project.xml" );
+            System.err.println( "Could not parse pom.xml" );
             System.exit( 1 );
         }
 
@@ -520,7 +520,7 @@ public class Bootstrapper
                 BootstrapPomParser p = new BootstrapPomParser();
 
                 if ( ! p.parse( f ) )
-                    throw new SAXException( "Could not parse parent project.xml" );
+                    throw new SAXException( "Could not parse parent pom.xml" );
 
                 dependencies.addAll( p.getDependencies() );
 
