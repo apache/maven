@@ -65,12 +65,6 @@ public class DefaultModelInheritanceAssembler
             child.setVersion( parent.getVersion() );
         }
 
-        // type
-        if ( child.getType() == null )
-        {
-            child.setType( parent.getType() );
-        }
-
         // inceptionYear
         if ( child.getInceptionYear() == null )
         {
