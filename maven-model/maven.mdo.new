@@ -45,7 +45,9 @@
           <name>parent</name>
           <version>4.0.0</version>
           <description>Specified which project to extend.</description>
-          <type>Parent</type>
+          <association>
+            <type>Parent</type>
+          </association>
           <comment></comment>
         </field>
         <field>
