@@ -19,11 +19,18 @@ package org.apache.maven.plugin;
 import java.io.File;
 
 /**
- * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
+ * @plugin.id clean
+ * @plugin.description A maven2 plugin which cleans the build
+ * @plugin.instantiation singleton
+ * @plugin.mode integrated
  *
+ * @goal.name clean
+ * @goal.clean.parameter failedOnError false
+ * @goal.clean.outputDirectory #maven.build.dir
+ *
+ * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
  * @version $Id$
  */
-
 public class CleanPlugin
     extends AbstractPlugin
 {
