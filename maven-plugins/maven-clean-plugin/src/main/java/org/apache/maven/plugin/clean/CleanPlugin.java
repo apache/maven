@@ -33,6 +33,7 @@ import java.io.File;
  *  required="true"
  *  validator=""
  *  expression="#project.build.directory"
+ *  description=""
  *
  * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
  * @version $Id$

@@ -28,17 +28,65 @@ import java.io.File;
  * @goal install
  *
  * @description install a jar in local repository
- * 
+ *
  * @prereq jar:jar
  *
- * @parameter name=jarName type=String required=true validator= expression=#maven.final.name
- * @parameter name=outputDirectory type=String required=true validator= expression=#project.build.directory
- * @parameter name=basedir type=String required=true validator= expression=#project.build.directory
- * @parameter name=groupId type=String required=true validator= expression=#project.groupId
- * @parameter name=artifactId type=String required=true validator= expression=#project.artifactId
- * @parameter name=version type=String required=true validator= expression=#project.version
- * @parameter name=localRepository type=String required=true validator= expression=#project.localRepository
- * @parameter name=pomFile type=java.io.File required=true validator= expression=#project.file
+ * @parameter
+ *  name="jarName"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#maven.final.name"
+ *  description=""
+ * @parameter
+ *  name="outputDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.directory"
+ *  description=""
+ * @parameter
+ *  name="basedir"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.directory"
+ *  description=""
+ * @parameter
+ *  name="groupId"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.groupId"
+ *  description=""
+ * @parameter
+ *  name="artifactId"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.artifactId"
+ *  description=""
+ * @parameter
+ *  name="version"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.version"
+ *  description=""
+ * @parameter
+ *  name="localRepository"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.localRepository"
+ *  description=""
+ * @parameter
+ *  name="pomFile"
+ *  type="java.io.File"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.file"
+ *  description=""
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @version $Id$

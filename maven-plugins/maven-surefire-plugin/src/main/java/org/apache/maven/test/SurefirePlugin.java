@@ -23,6 +23,7 @@ import java.util.List;
  *  required="true"
  *  validator="validator"
  *  expression="#maven.repo.local"
+ *  description=""
  * @parameter
  *  name="basedir"
  *  type="String"
