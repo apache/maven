@@ -13,7 +13,7 @@
   <dependencies>
     <dependency>
       <groupId>org.codehaus.modello</groupId>
-      <artifactId>modello-xpp3-plugin</artifactId>
+      <artifactId>modello-plugin-xpp3</artifactId>
       <version>1.0-alpha-1</version>
       <scope>runtime</scope>
     </dependency>
