@@ -41,21 +41,22 @@ public class MarmaladeMojoDescriptorExtractorTest
 
         Model model = new Model();
         model.setArtifactId( "testArtifactId" );
-        
+
         Build build = new Build();
-        
+
         Resource resource = new Resource();
-        resource.setDirectory(basedir.getPath());
-        
-        build.addResource(resource);
-        
-        model.setBuild(build);
+        resource.setDirectory( basedir.getPath() );
+
+        build.addResource( resource );
+
+        model.setBuild( build );
 
         MavenProject project = new MavenProject( model );
-        
-        project.setFile(new File(basedir, "pom.xml"));
 
-        MarmaladeMojoDescriptorExtractor extractor = (MarmaladeMojoDescriptorExtractor) lookup(MojoDescriptorExtractor.ROLE, "marmalade");
+        project.setFile( new File( basedir, "pom.xml" ) );
+
+        MarmaladeMojoDescriptorExtractor extractor = (MarmaladeMojoDescriptorExtractor) lookup( MojoDescriptorExtractor.ROLE,
+                                                                                                "marmalade" );
 
         Set descriptors = extractor.execute( project );
 

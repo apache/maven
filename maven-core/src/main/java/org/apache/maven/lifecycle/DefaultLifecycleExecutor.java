@@ -24,6 +24,8 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -229,25 +231,44 @@ public class DefaultLifecycleExecutor
         // only execute up to the given phase
         int index = phases.indexOf( phaseMap.get( phase ) );
 
+        EventDispatcher dispatcher = session.getEventDispatcher();
+        
         for ( int j = 0; j <= index; j++ )
         {
             Phase p = (Phase) phases.get( j );
+            
+            String event = MavenEvents.PHASE_EXECUTION;
 
-            if ( p.getGoals() != null )
+            // !! This is ripe for refactoring to an aspect.
+            // Event monitoring.
+            dispatcher.dispatchStart( event, p.getId() );
+            try
             {
-                for ( Iterator i = p.getGoals().iterator(); i.hasNext(); )
+                if ( p.getGoals() != null )
                 {
-                    String goal = (String) i.next();
-
-                    PluginExecutionResponse pluginResponse = executeMojo( goal, session );
-
-                    if ( pluginResponse.isExecutionFailure() )
+                    for ( Iterator i = p.getGoals().iterator(); i.hasNext(); )
                     {
-                        response.setExecutionFailure( goal, pluginResponse.getFailureResponse() );
-                        return;
+                        String goal = (String) i.next();
+
+                        PluginExecutionResponse pluginResponse = executeMojo( goal, session );
+
+                        if ( pluginResponse.isExecutionFailure() )
+                        {
+                            response.setExecutionFailure( goal, pluginResponse.getFailureResponse() );
+                            return;
+                        }
                     }
                 }
+                
+                dispatcher.dispatchEnd( event, p.getId() );
             }
+            catch ( LifecycleExecutionException e )
+            {
+                dispatcher.dispatchError( event, p.getId(), e );
+                
+                throw e;
+            }
+            // End event monitoring.
         }
     }
 

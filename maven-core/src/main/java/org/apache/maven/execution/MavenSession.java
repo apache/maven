@@ -20,6 +20,8 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.PostGoal;
 import org.apache.maven.model.PreGoal;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositoryUtils;
@@ -61,9 +63,15 @@ public class MavenSession
 
     private Map postGoalMappings;
 
+    private EventDispatcher eventDispatcher;
+
+    private Log log;
+
     public MavenSession( PlexusContainer container,
                          PluginManager pluginManager,
                          ArtifactRepository localRepository,
+                         EventDispatcher eventDispatcher,
+                         Log log,
                          List goals )
     {
         this.container = container;
@@ -71,6 +79,10 @@ public class MavenSession
         this.pluginManager = pluginManager;
 
         this.localRepository = localRepository;
+
+        this.eventDispatcher = eventDispatcher;
+        
+        this.log = log;
 
         this.dag = new DAG();
 
@@ -157,6 +169,16 @@ public class MavenSession
                 //@todo what to do here?
             }
         }
+    }
+    
+    public EventDispatcher getEventDispatcher()
+    {
+        return eventDispatcher;
+    }
+    
+    public Log getLog()
+    {
+        return log;
     }
 
     //!! this should probably not be done here as there are request types that

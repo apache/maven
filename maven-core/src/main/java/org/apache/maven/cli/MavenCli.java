@@ -33,8 +33,13 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenInitializingExecutionRequest;
 import org.apache.maven.execution.MavenProjectExecutionRequest;
 import org.apache.maven.execution.MavenReactorExecutionRequest;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.monitor.event.DefaultEventMonitor;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.logging.DefaultLog;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
+import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -108,6 +113,8 @@ public class MavenCli
         MavenExecutionRequest request = null;
 
         File projectFile = new File( userDir, POMv4 );
+        
+        EventDispatcher eventDispatcher = new DefaultEventDispatcher();
 
         if ( projectFile.exists() )
         {
@@ -118,6 +125,7 @@ public class MavenCli
                 String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
                 request = new MavenReactorExecutionRequest( localRepository,
+                                                            eventDispatcher,
                                                             mavenProperties,
                                                             commandLine.getArgList(),
                                                             includes,
@@ -127,6 +135,7 @@ public class MavenCli
             else
             {
                 request = new MavenProjectExecutionRequest( localRepository,
+                                                            eventDispatcher,
                                                             mavenProperties,
                                                             commandLine.getArgList(),
                                                             projectFile );
@@ -134,7 +143,7 @@ public class MavenCli
         }
         else
         {
-            request = new MavenInitializingExecutionRequest( localRepository, mavenProperties, commandLine.getArgList() );
+            request = new MavenInitializingExecutionRequest( localRepository, eventDispatcher, mavenProperties, commandLine.getArgList() );
         }
 
         // ----------------------------------------------------------------------
@@ -145,7 +154,15 @@ public class MavenCli
         ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
 
         embedder.start( classWorld );
-
+        
+        Logger logger = embedder.getContainer().getLogger();
+        if( logger != null )
+        {
+            request.setLog( new DefaultLog( logger ) );
+            
+            request.addEventMonitor( new DefaultEventMonitor( logger ) );
+        }
+        
         // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place.
         WagonManager wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
 

@@ -117,15 +117,15 @@ public class PluginDescriptorGenerator
         w.writeText( mojoDescriptor.getImplementation() );
 
         w.endElement();
-        
+
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
         w.startElement( "language" );
-        
+
         w.writeText( mojoDescriptor.getLanguage() );
-        
+
         w.endElement();
 
         // ----------------------------------------------------------------------

@@ -78,6 +78,7 @@ public class MBoot
 
     String[] builds = new String[] {
         "maven-model",
+        "maven-monitor",
         "maven-plugin",
         "maven-artifact",
         "maven-script/maven-script-marmalade",

@@ -18,6 +18,7 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -39,10 +40,11 @@ extends AbstractMavenExecutionRequest
 
     private File baseDirectory;
 
-    public MavenReactorExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals,
-                                         String includes, String excludes, File baseDirectory )
+    public MavenReactorExecutionRequest( ArtifactRepository localRepository, EventDispatcher eventDispatcher, 
+                                         Properties properties, List goals, String includes, 
+                                         String excludes, File baseDirectory )
     {
-        super( localRepository, properties, goals );
+        super( localRepository, eventDispatcher, properties, goals );
 
         this.includes = includes;
 
@@ -76,6 +78,6 @@ extends AbstractMavenExecutionRequest
 
     public MavenProjectExecutionRequest createProjectExecutionRequest( MavenProject project )
     {
-        return new MavenProjectExecutionRequest( localRepository, parameters, goals, project.getFile() );
+        return new MavenProjectExecutionRequest( localRepository, getEventDispatcher(), parameters, goals, project.getFile() );
     }
 }

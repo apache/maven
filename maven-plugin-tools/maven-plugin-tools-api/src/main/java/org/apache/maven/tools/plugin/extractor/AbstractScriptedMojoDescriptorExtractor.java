@@ -23,17 +23,17 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
     public Set execute( MavenProject project ) throws Exception
     {
         Build buildSection = project.getBuild();
-        
+
         List resources = null;
-        if(buildSection != null)
+        if ( buildSection != null )
         {
             resources = buildSection.getResources();
         }
-        
-        Map scriptFilesKeyedByBasedir = gatherScriptSourcesByBasedir(resources, getScriptFileExtension());
-        
-        Set mojoDescriptors = extractMojoDescriptors(scriptFilesKeyedByBasedir);
-        
+
+        Map scriptFilesKeyedByBasedir = gatherScriptSourcesByBasedir( resources, getScriptFileExtension() );
+
+        Set mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir );
+
         return mojoDescriptors;
     }
 
@@ -44,59 +44,59 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
     protected Map gatherScriptSourcesByBasedir( List resources, String scriptFileExtension )
     {
         Map sourcesByBasedir = new TreeMap();
-        
-        if(resources != null)
+
+        if ( resources != null )
         {
             for ( Iterator it = resources.iterator(); it.hasNext(); )
             {
                 Set sources = new HashSet();
-                
+
                 Resource resource = (Resource) it.next();
-                
+
                 String resourceDir = resource.getDirectory();
-                File dir = new File(resourceDir);
-                
-                if(dir.exists())
+                File dir = new File( resourceDir );
+
+                if ( dir.exists() )
                 {
                     DirectoryScanner scanner = new DirectoryScanner();
-                    
-                    scanner.setBasedir(dir);
-                    
+
+                    scanner.setBasedir( dir );
+
                     List includes = resource.getIncludes();
-                    
-                    if(includes != null && !includes.isEmpty())
+
+                    if ( includes != null && !includes.isEmpty() )
                     {
-                        scanner.setIncludes((String[])includes.toArray(new String[includes.size()]));
+                        scanner.setIncludes( (String[]) includes.toArray( new String[includes.size()] ) );
                     }
-                    
+
                     List excludes = resource.getExcludes();
-                    
-                    if(excludes != null && !excludes.isEmpty())
+
+                    if ( excludes != null && !excludes.isEmpty() )
                     {
-                        scanner.setExcludes((String[])excludes.toArray(new String[excludes.size()]));
+                        scanner.setExcludes( (String[]) excludes.toArray( new String[excludes.size()] ) );
                     }
-                    
+
                     scanner.addDefaultExcludes();
                     scanner.scan();
-                    
+
                     String[] relativePaths = scanner.getIncludedFiles();
-                    
+
                     for ( int i = 0; i < relativePaths.length; i++ )
                     {
                         String relativePath = relativePaths[i];
-                        File scriptFile = new File(dir, relativePath);
-                        
-                        if(scriptFile.isFile() && relativePath.endsWith(scriptFileExtension))
+                        File scriptFile = new File( dir, relativePath );
+
+                        if ( scriptFile.isFile() && relativePath.endsWith( scriptFileExtension ) )
                         {
-                            sources.add(scriptFile);
+                            sources.add( scriptFile );
                         }
                     }
-                    
-                    sourcesByBasedir.put(resourceDir, sources);
+
+                    sourcesByBasedir.put( resourceDir, sources );
                 }
             }
         }
-        
+
         return sourcesByBasedir;
     }
 

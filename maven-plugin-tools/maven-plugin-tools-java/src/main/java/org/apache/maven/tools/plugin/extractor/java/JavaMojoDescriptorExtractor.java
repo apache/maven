@@ -248,11 +248,11 @@ public class JavaMojoDescriptorExtractor
         JavaDocBuilder builder = new JavaDocBuilder();
 
         File basedir = project.getBasedir();
-        
-        System.out.println("Project basedir: " + basedir);
-        
+
+        System.out.println( "Project basedir: " + basedir );
+
         String sourceDir = null;
-        
+
         Build buildSection = project.getBuild();
         if ( buildSection != null )
         {
@@ -264,8 +264,8 @@ public class JavaMojoDescriptorExtractor
             File src = new File( basedir, "src/main/java" );
             sourceDir = src.getPath();
         }
-        
-        System.out.println("Source directory for java mojo extraction: " + sourceDir);
+
+        System.out.println( "Source directory for java mojo extraction: " + sourceDir );
 
         File sourceDirectoryFile = new File( sourceDir );
 

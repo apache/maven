@@ -41,18 +41,18 @@ public class JavaMojoDescriptorExtractorTest
         System.out.println( "found source file: " + sourceFile );
 
         File dir = sourceFile.getParentFile();
-        
+
         Model model = new Model();
         model.setArtifactId( "maven-unitTesting-plugin" );
-        
+
         Build build = new Build();
-        build.setSourceDirectory(new File(dir, "source").getPath());
-        
-        model.setBuild(build);
+        build.setSourceDirectory( new File( dir, "source" ).getPath() );
+
+        model.setBuild( build );
 
         MavenProject project = new MavenProject( model );
-        
-        project.setFile(new File(dir, "pom.xml"));
+
+        project.setFile( new File( dir, "pom.xml" ) );
 
         Set results = extractor.execute( project );
         assertEquals( 2, results.size() );

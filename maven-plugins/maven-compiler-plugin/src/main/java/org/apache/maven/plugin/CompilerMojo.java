@@ -119,7 +119,8 @@ public class CompilerMojo
                     message = "Warning! not present in repository!";
                 }
 
-                System.out.println( "classpathElements[ "+ i +" ] = " + classpathElements[i] + ": " + message );
+//                System.out.println( "classpathElements[ "+ i +" ] = " + classpathElements[i] + ": " + message );
+                request.getLog().debug( "classpathElements[ "+ i +" ] = " + classpathElements[i] + ": " + message );
             }
         }
 

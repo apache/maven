@@ -18,7 +18,10 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.monitor.logging.Log;
 
 import java.util.List;
 import java.util.Properties;
@@ -41,13 +44,19 @@ implements MavenExecutionRequest
 
     protected MavenSession session;
 
-    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, Properties parameters, List goals )
+    private Log log;
+    
+    private EventDispatcher eventDispatcher;
+
+    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, EventDispatcher eventDispatcher, Properties parameters, List goals )
     {
         this.localRepository = localRepository;
 
         this.parameters = parameters;
 
         this.goals = goals;
+        
+        this.eventDispatcher = eventDispatcher;
     }
 
     public ArtifactRepository getLocalRepository()
@@ -83,4 +92,25 @@ implements MavenExecutionRequest
     {
         this.session = session;
     }
+    
+    public void setLog(Log log)
+    {
+        this.log = log;
+    }
+    
+    public Log getLog()
+    {
+        return log;
+    }
+    
+    public void addEventMonitor(EventMonitor monitor)
+    {
+        eventDispatcher.addEventMonitor(monitor);
+    }
+    
+    public EventDispatcher getEventDispatcher()
+    {
+        return eventDispatcher;
+    }
+    
 }

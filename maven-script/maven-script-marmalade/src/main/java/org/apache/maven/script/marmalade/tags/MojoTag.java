@@ -40,37 +40,37 @@ public class MojoTag
     {
         return false;
     }
-    
+
     protected void doExecute( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
     {
         for ( Iterator it = children().iterator(); it.hasNext(); )
         {
             MarmaladeTag child = (MarmaladeTag) it.next();
-            if(!(child instanceof ExecuteTag))
+            if ( !(child instanceof ExecuteTag) )
             {
-                child.execute(context);
+                child.execute( context );
             }
         }
     }
-    
+
     public Object getComponent()
     {
         MarmaladeTag realRoot = null;
         for ( Iterator it = children().iterator(); it.hasNext(); )
         {
             MarmaladeTag child = (MarmaladeTag) it.next();
-            if(child instanceof ExecuteTag)
+            if ( child instanceof ExecuteTag )
             {
                 realRoot = child;
                 break;
             }
         }
-        
-        if(realRoot == null)
+
+        if ( realRoot == null )
         {
-            throw new IllegalStateException("Mojo scripts MUST have a <execute> tag.");
+            throw new IllegalStateException( "Mojo scripts MUST have a <execute> tag." );
         }
-        
+
         MarmaladeScript script = new MarmaladeScript( getTagInfo().getSourceFile(), realRoot );
         return new MarmaladeMojo( script );
     }

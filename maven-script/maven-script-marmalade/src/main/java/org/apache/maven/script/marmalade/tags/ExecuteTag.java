@@ -38,8 +38,7 @@ public class ExecuteTag
         for ( Iterator it = children().iterator(); it.hasNext(); )
         {
             MarmaladeTag child = (MarmaladeTag) it.next();
-            System.out.println("Will execute: " + child);
         }
     }
-    
+
 }

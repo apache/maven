@@ -29,6 +29,8 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -279,9 +281,11 @@ public class DefaultPluginManager
 
         try
         {
-            getLogger().info( "[" + mojoDescriptor.getId() + "]" );
+//            getLogger().info( "[" + mojoDescriptor.getId() + "]" );
 
             request = new PluginExecutionRequest( DefaultPluginManager.createParameters( mojoDescriptor, session ) );
+
+            request.setLog( session.getLog() );
         }
         catch ( PluginConfigurationException e )
         {
@@ -295,8 +299,25 @@ public class DefaultPluginManager
         try
         {
             plugin = (Plugin) container.lookup( Plugin.ROLE, goalName );
+            
+            // !! This is ripe for refactoring to an aspect.
+            // Event monitoring.
+            String event = MavenEvents.MOJO_EXECUTION;
+            EventDispatcher dispatcher = session.getEventDispatcher();
 
-            plugin.execute( request, response );
+            dispatcher.dispatchStart( event, goalName );
+            try
+            {
+                plugin.execute( request, response );
+                
+                dispatcher.dispatchEnd( event, goalName );
+            }
+            catch(Exception e)
+            {
+                session.getEventDispatcher().dispatchError( event, goalName, e );
+                throw e;
+            }
+            // End event monitoring.
 
             releaseComponents( mojoDescriptor, request );
 
@@ -455,7 +476,7 @@ public class DefaultPluginManager
     public void initialize()
     {
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
-                                                              "maven-plugin", "plexus-container-api",
+                                                              "maven-monitor", "maven-plugin", "plexus-container-api",
                                                               "plexus-container-default", "plexus-artifact-container",
                                                               "classworlds"} );
 

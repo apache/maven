@@ -51,15 +51,15 @@ public class MarmaladeMojoTest
         MarmaladeMojo mojo = new MarmaladeMojo( script );
 
         PluginExecutionRequest request = new PluginExecutionRequest( Collections.EMPTY_MAP );
-        request.setParameters(Collections.singletonMap("param", "paramValue"));
-        
+        request.setParameters( Collections.singletonMap( "param", "paramValue" ) );
+
         PluginExecutionResponse response = new PluginExecutionResponse();
 
         mojo.execute( request, response );
 
         Object result = request.getContextValue( "testvar" );
-        
-        assertEquals("paramValue/testval", result);
+
+        assertEquals( "paramValue/testval", result );
     }
 
 }

@@ -18,6 +18,9 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.monitor.logging.Log;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,4 +44,12 @@ public interface MavenExecutionRequest
     MavenSession getSession();
 
     List getProjectFiles() throws IOException;
+
+    void setLog( Log log );
+    
+    Log getLog();
+
+    void addEventMonitor( EventMonitor monitor );
+    
+    EventDispatcher getEventDispatcher();
 }

@@ -104,16 +104,16 @@ public class MetadataTag
         String basePath = (String) context.getVariable( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR,
                                                         getExpressionEvaluator() );
 
-        if(basePath != null)
+        if ( basePath != null )
         {
-            if(basePath.endsWith("/"))
+            if ( basePath.endsWith( "/" ) )
             {
-                basePath = basePath.substring(0, basePath.length()-2);
+                basePath = basePath.substring( 0, basePath.length() - 2 );
             }
-            
+
             String implementationPath = getTagInfo().getSourceFile().substring( basePath.length() );
-            
-            implementationPath = implementationPath.replace('\\', '/');
+
+            implementationPath = implementationPath.replace( '\\', '/' );
 
             descriptor.setImplementation( implementationPath );
         }

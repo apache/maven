@@ -27,6 +27,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 import org.apache.maven.lifecycle.session.MavenSessionPhaseManager;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -103,7 +105,26 @@ public class DefaultMaven
 
         resolveParameters( request );
 
-        MavenExecutionResponse response = lifecycleExecutor.execute( request.getGoals(), session );
+        // !! This is ripe for refactoring to an aspect.
+        // Event monitoring.
+        EventDispatcher dispatcher = request.getEventDispatcher();
+        String event = MavenEvents.PROJECT_EXECUTION;
+        
+        dispatcher.dispatchStart( event, project.getId() );
+        
+        MavenExecutionResponse response = null;
+        try
+        {
+            // Actual meat of the code.
+            response = lifecycleExecutor.execute( request.getGoals(), session );
+            
+            dispatcher.dispatchEnd( event, project.getId() );
+        }
+        catch(Exception e)
+        {
+            dispatcher.dispatchError( event, project.getId(), e );
+        }
+        // End event monitoring.
 
         // TODO: is this perhaps more appropriate in the CLI?
         if ( response.isExecutionFailure() )
@@ -133,79 +154,95 @@ public class DefaultMaven
     public MavenExecutionResponse handleReactor( MavenReactorExecutionRequest request )
         throws ReactorException
     {
-        List projects = new ArrayList();
-
-        getLogger().info( "Starting the reactor..." );
-
+        EventDispatcher dispatcher = request.getEventDispatcher();
+        String event = MavenEvents.REACTOR_EXECUTION;
+        
+        dispatcher.dispatchStart( event, request.getBaseDirectory().getPath() );
         try
         {
-            List files = request.getProjectFiles();
+            List projects = new ArrayList();
 
-            for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
-            {
-                File file = (File) iterator.next();
-
-                MavenProject project = getProject( file, request.getLocalRepository() );
-
-                projects.add( project );
-            }
-
-            projects = projectBuilder.getSortedProjects( projects );
-        }
-        catch ( IOException e )
-        {
-            throw new ReactorException( "Error processing projects for the reactor: ", e );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            throw new ReactorException( "Error processing projects for the reactor: ", e );
-        }
-        catch ( CycleDetectedException e )
-        {
-            throw new ReactorException( "Error processing projects for the reactor: ", e );
-        }
-
-        getLogger().info( "Our processing order:" );
-
-        for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
-        {
-            MavenProject project = (MavenProject) iterator.next();
-
-            getLogger().info( project.getName() );
-        }
-
-        for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
-        {
-            MavenProject project = (MavenProject) iterator.next();
-
-            System.out.println( "\n\n\n" );
-
-            line();
-
-            getLogger().info( "Building " + project.getName() );
-
-            line();
-
-            MavenProjectExecutionRequest projectExecutionRequest = request.createProjectExecutionRequest( project );
+            getLogger().info( "Starting the reactor..." );
 
             try
             {
-                MavenExecutionResponse response = handleProject( projectExecutionRequest );
+                List files = request.getProjectFiles();
 
-                if ( response.isExecutionFailure() )
+                for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
                 {
-                    return response;
+                    File file = (File) iterator.next();
+
+                    MavenProject project = getProject( file, request.getLocalRepository() );
+
+                    projects.add( project );
                 }
+
+                projects = projectBuilder.getSortedProjects( projects );
+
             }
-            catch ( Exception e )
+            catch ( IOException e )
             {
-                throw new ReactorException( "Error executing project within the reactor", e );
+                throw new ReactorException( "Error processing projects for the reactor: ", e );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new ReactorException( "Error processing projects for the reactor: ", e );
+            }
+            catch ( CycleDetectedException e )
+            {
+                throw new ReactorException( "Error processing projects for the reactor: ", e );
             }
 
-        }
+            getLogger().info( "Our processing order:" );
 
-        // TODO: not really satisfactory
-        return null;
+            for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
+            {
+                MavenProject project = (MavenProject) iterator.next();
+
+                getLogger().info( project.getName() );
+            }
+
+            for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
+            {
+                MavenProject project = (MavenProject) iterator.next();
+
+                System.out.println( "\n\n\n" );
+
+                line();
+
+                getLogger().info( "Building " + project.getName() );
+
+                line();
+
+                MavenProjectExecutionRequest projectExecutionRequest = request.createProjectExecutionRequest( project );
+
+                try
+                {
+                    MavenExecutionResponse response = handleProject( projectExecutionRequest );
+
+                    if ( response.isExecutionFailure() )
+                    {
+                        return response;
+                    }
+                }
+                catch ( Exception e )
+                {
+                    throw new ReactorException( "Error executing project within the reactor", e );
+                }
+
+            }
+            
+            dispatcher.dispatchEnd( event, request.getBaseDirectory().getPath() );
+
+            // TODO: not really satisfactory
+            return null;
+        }
+        catch ( ReactorException e )
+        {
+            dispatcher.dispatchError( event, request.getBaseDirectory().getPath(), e );
+            
+            throw e;
+        }
     }
 
     public MavenProject getProject( File pom, ArtifactRepository localRepository )
@@ -232,7 +269,7 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request )
     {
-        return new MavenSession( container, pluginManager, request.getLocalRepository(), request.getGoals() );
+        return new MavenSession( container, pluginManager, request.getLocalRepository(), request.getEventDispatcher(), request.getLog(), request.getGoals() );
     }
 
     /**

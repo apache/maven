@@ -22,6 +22,9 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.monitor.logging.DefaultLog;
+import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
@@ -130,7 +133,9 @@ public class MavenTestCase
     {
         List goals = new ArrayList();
 
-        MavenSession session = new MavenSession( getContainer(), pluginManager, localRepository, goals );
+        Log log = new DefaultLog(getContainer().getLogger());
+        
+        MavenSession session = new MavenSession( getContainer(), pluginManager, localRepository, new DefaultEventDispatcher(), log, goals );
 
         session.setProject( project );
 

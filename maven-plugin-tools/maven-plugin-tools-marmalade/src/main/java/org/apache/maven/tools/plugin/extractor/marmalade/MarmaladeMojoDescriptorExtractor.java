@@ -44,7 +44,7 @@ import java.util.TreeMap;
 public class MarmaladeMojoDescriptorExtractor
     extends AbstractScriptedMojoDescriptorExtractor
 {
-    
+
     protected String getScriptFileExtension()
     {
         return ".mmld";
@@ -55,42 +55,43 @@ public class MarmaladeMojoDescriptorExtractor
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try
         {
-            Thread.currentThread().setContextClassLoader(MarmaladeMojoDescriptorExtractor.class.getClassLoader());
-            
+            Thread.currentThread().setContextClassLoader( MarmaladeMojoDescriptorExtractor.class.getClassLoader() );
+
             Set descriptors = new HashSet();
-            
+
             for ( Iterator mapIterator = sourceFilesKeyedByBasedir.entrySet().iterator(); mapIterator.hasNext(); )
             {
                 Map.Entry entry = (Map.Entry) mapIterator.next();
-                
-                String basedir = (String)entry.getKey();
-                Set scriptFiles = (Set)entry.getValue();
-                
+
+                String basedir = (String) entry.getKey();
+                Set scriptFiles = (Set) entry.getValue();
+
                 for ( Iterator it = scriptFiles.iterator(); it.hasNext(); )
                 {
                     File scriptFile = (File) it.next();
-                    
-                    MarmaladeScript script = parse(scriptFile);
-                    
+
+                    MarmaladeScript script = parse( scriptFile );
+
                     MarmaladeTag rootTag = script.getRoot();
-                    if(rootTag instanceof MojoTag)
+                    if ( rootTag instanceof MojoTag )
                     {
                         Map contextMap = new TreeMap();
                         contextMap.put( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR, basedir );
-                        
-                        MarmaladeExecutionContext context = new DefaultContext(contextMap);
-                        
-                        script.execute(context);
-                        
+
+                        MarmaladeExecutionContext context = new DefaultContext( contextMap );
+
+                        script.execute( context );
+
                         contextMap = context.getExternalizedVariables();
-    
+
                         MojoDescriptor descriptor = (MojoDescriptor) contextMap.get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
-    
+
                         descriptors.add( descriptor );
                     }
                     else
                     {
-                        System.out.println("This script is not a mojo. Its root tag is {element: " + rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}");
+                        System.out.println( "This script is not a mojo. Its root tag is {element: "
+                            + rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}" );
                     }
                 }
             }
@@ -99,40 +100,40 @@ public class MarmaladeMojoDescriptorExtractor
         }
         finally
         {
-            Thread.currentThread().setContextClassLoader(oldCl);
+            Thread.currentThread().setContextClassLoader( oldCl );
         }
     }
 
     private MarmaladeScript parse( File scriptFile ) throws Exception
     {
         BufferedReader reader = null;
-        
+
         try
         {
-            reader = new BufferedReader(new FileReader(scriptFile));
-            
+            reader = new BufferedReader( new FileReader( scriptFile ) );
+
             MarmaladeParsingContext parsingContext = new DefaultParsingContext();
-            
-            parsingContext.setInputLocation(scriptFile.getPath());
-            parsingContext.setInput(reader);
-            
+
+            parsingContext.setInputLocation( scriptFile.getPath() );
+            parsingContext.setInput( reader );
+
             ScriptParser parser = new ScriptParser();
-            
-            ScriptBuilder builder = parser.parse(parsingContext);
-            
+
+            ScriptBuilder builder = parser.parse( parsingContext );
+
             MarmaladeScript script = builder.build();
-            
+
             return script;
         }
         finally
         {
-            if(reader != null)
+            if ( reader != null )
             {
                 try
                 {
                     reader.close();
                 }
-                catch(Exception e)
+                catch ( Exception e )
                 {
                 }
             }

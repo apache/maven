@@ -18,6 +18,7 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.monitor.event.EventDispatcher;
 
 import java.util.List;
 import java.util.Properties;
@@ -29,9 +30,9 @@ import java.util.Properties;
 public class MavenInitializingExecutionRequest
 extends AbstractMavenExecutionRequest
 {
-    public MavenInitializingExecutionRequest( ArtifactRepository localRepository, Properties properties, List goals )
+    public MavenInitializingExecutionRequest( ArtifactRepository localRepository, EventDispatcher eventDispatcher, Properties properties, List goals )
     {
-        super( localRepository, properties, goals );
+        super( localRepository, eventDispatcher, properties, goals );
 
         type = "initializing";
     }
