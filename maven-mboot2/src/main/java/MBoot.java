@@ -402,7 +402,10 @@ public class MBoot
 
         // clean
         System.out.println( "Cleaning " + buildDirFile + "..." );
-        FileUtils.forceDelete( buildDirFile );
+        if ( buildDirFile.exists() )
+        {
+            FileUtils.forceDelete( buildDirFile );
+        }
 
         // ----------------------------------------------------------------------
         // Download deps
