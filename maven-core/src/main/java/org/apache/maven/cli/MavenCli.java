@@ -143,6 +143,7 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.REACTOR ) )
         {
+            // TODO: should we now include the pom.xml in the current directory?
             String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
 
             String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );

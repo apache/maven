@@ -39,22 +39,4 @@ public class ArtifactRepository
     {
         super( id, url, authInfo );
     }
-
-    /*
-     * private String layout; public String getLayout() { if ( layout == null ) {
-     * return "${groupId}/${type}s/${artifactId}-${version}.${extension}"; }
-     * return layout; } public String artifactPath( Artifact artifact ) { return
-     * interpolateLayout( artifact.getGroupId(), artifact.getArtifactId(),
-     * artifact.getVersion(), artifact.getType(), artifact.getExtension() ); }
-     * public String fullArtifactPath( Artifact artifact ) { return getBasedir() +
-     * "/" + artifactPath( artifact ); } public String artifactUrl( Artifact
-     * artifact ) { return getUrl() + "/" + artifactPath( artifact ); } private
-     * String interpolateLayout( String groupId, String artifactId, String
-     * version, String type, String extension ) { String layout = getLayout();
-     * layout = StringUtils.replace( layout, "${groupId}", groupId ); layout =
-     * StringUtils.replace( layout, "${artifactId}", artifactId ); layout =
-     * StringUtils.replace( layout, "${type}", type ); layout =
-     * StringUtils.replace( layout, "${version}", version ); layout =
-     * StringUtils.replace( layout, "${extension}", extension ); return layout; }
-     */
 }

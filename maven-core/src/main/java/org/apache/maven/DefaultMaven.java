@@ -50,7 +50,6 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -134,8 +133,12 @@ public class DefaultMaven
                     List goals;
                     if ( "pom".equals( project.getPackaging() ) )
                     {
+                        goals = new ArrayList();
+
                         // TODO: not required if discovered and cached
-                        goals = Collections.singletonList( "pom:install" );
+                        goals.add( "pom:install" );
+
+                        goals.addAll( request.getGoals() );
                     }
                     else
                     {
@@ -423,19 +426,4 @@ public class DefaultMaven
             return secs + " seconds";
         }
     }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    // ----------------------------------------------------------------------
-    // Reactor
-    // ----------------------------------------------------------------------
-
-    public List getSortedProjects( List projects )
-        throws CycleDetectedException
-    {
-        return projectBuilder.getSortedProjects( projects );
-    }
-
 }
