@@ -105,6 +105,8 @@ public class MBoot
 
     private List coreDeps;
 
+    private boolean online = true;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -120,7 +122,7 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
-        File mavenPropertiesFile =  new File( System.getProperty( "user.home" ), "maven.properties" );
+        File mavenPropertiesFile = new File( System.getProperty( "user.home" ), "maven.properties" );
 
         if ( !mavenPropertiesFile.exists() )
         {
@@ -143,7 +145,14 @@ public class MBoot
         {
             String key = (String) i.next();
 
-            properties.setProperty( key, StringUtils.interpolate( properties.getProperty(key), System.getProperties() ) );
+            properties.setProperty( key, StringUtils.interpolate( properties.getProperty( key ), System.getProperties() ) );
+        }
+
+        String onlineProperty = properties.getProperty( "maven.online" );
+
+        if ( onlineProperty != null && onlineProperty.equals( "false" ) )
+        {
+            online = false;
         }
 
         downloader = new ArtifactDownloader( properties );
@@ -154,13 +163,18 @@ public class MBoot
 
         String basedir = System.getProperty( "user.dir" );
 
-        checkMBootDeps();
+        mbootDependencies = Arrays.asList( deps );
+
+        if ( online )
+        {
+            checkMBootDeps();
+        }
 
         // Install maven-components POM
-        installPomFile( repoLocal,  new File( basedir, "pom.xml" ) );
+        installPomFile( repoLocal, new File( basedir, "pom.xml" ) );
 
         // Install plugin-parent POM
-        installPomFile( repoLocal,  new File( basedir, "maven-plugins/pom.xml" ) );
+        installPomFile( repoLocal, new File( basedir, "maven-plugins/pom.xml" ) );
 
         for ( int i = 0; i < builds.length; i++ )
         {
@@ -356,9 +370,12 @@ public class MBoot
         // Download deps
         // ----------------------------------------------------------------------
 
-        System.out.println( "Downloading dependencies ..." );
+        if ( online )
+        {
+            System.out.println( "Downloading dependencies ..." );
 
-        downloadDependencies( reader.getDependencies() );
+            downloadDependencies( reader.getDependencies() );
+        }
 
         // ----------------------------------------------------------------------
         // Generating sources
@@ -525,8 +542,6 @@ public class MBoot
         throws Exception
     {
         System.out.println( "Checking for MBoot's dependencies ..." );
-
-        mbootDependencies = Arrays.asList( deps );
 
         downloader.downloadDependencies( mbootDependencies );
     }
