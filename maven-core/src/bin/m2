@@ -58,7 +58,11 @@ if $cygwin; then
 fi
 
 if [ -z "$M2_HOME" ]; then
-  M2_HOME=`dirname $0/..`
+  #find the path of the bin directory
+  BIN_DIR=`dirname $0`
+
+  #use dirname once again to trim the /bin from the m2_home path
+  M2_HOME=`dirname $BIN_DIR`
 fi
 
 CLASSWORLDS_CONF="${M2_HOME}/bin/classworlds.conf"
