@@ -78,7 +78,7 @@ sub syncSource()
         $repoDirectory = $sourceConfiguration->val( "host", "repoDirectory" );
     }
     
-    my $cmd = "rsync $standardOptions $options --rsh=\"ssh -l $rsyncUser\" $address:$directory/ $repoDirectory";
+    my $cmd = "rsync $standardOptions $options --rsh=\"ssh -T -v -l $rsyncUser\" $address:$directory/ $repoDirectory";
     
     runRsync( $cmd, $sourceConfiguration );
 }
@@ -199,11 +199,18 @@ sub runRsync()
     
     close( RAW_REPORT );
 
-    $rawReportText = $rawReportText . "\n\nYou can view the syncronization reports for today here: \n\n";
+    if ( $rawReportText )
+
+    {
+
+        $rawReportText = $rawReportText . "\n\nYou can view the syncronization reports for today here: \n\n";
     
-    $rawReportText = $rawReportText . $reportUrl . "/" . $dir;
+        $rawReportText = $rawReportText . $reportUrl . "/" . $dir;
     
-    notify( $sourceConfiguration, $reportName, $rawReportText );
+        notify( $sourceConfiguration, $reportName, $rawReportText );
+
+    }
+
 }
 
 sub date
