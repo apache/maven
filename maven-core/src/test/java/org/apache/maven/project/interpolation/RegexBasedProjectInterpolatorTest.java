@@ -37,7 +37,7 @@ public class RegexBasedProjectInterpolatorTest
         model.setVersion( "3.8.1" );
 
         Dependency dep = new Dependency();
-        dep.setVersion( "#version" );
+        dep.setVersion( "${version}" );
 
         model.addDependency( dep );
 
@@ -53,13 +53,30 @@ public class RegexBasedProjectInterpolatorTest
         model.setVersion( "3.8.1" );
 
         Dependency dep = new Dependency();
-        dep.setVersion( "#something" );
+        dep.setVersion( "${something}" );
 
         model.addDependency( dep );
 
         Model out = new RegexBasedModelInterpolator().interpolate( model );
 
-        assertEquals( "#something", ((Dependency) out.getDependencies().get( 0 )).getVersion() );
+        assertEquals( "${something}", ((Dependency) out.getDependencies().get( 0 )).getVersion() );
+    }
+
+    public void testTwoReferences()
+        throws ModelInterpolationException
+    {
+        Model model = new Model();
+        model.setVersion( "3.8.1" );
+        model.setArtifactId( "foo" );
+
+        Dependency dep = new Dependency();
+        dep.setVersion( "${artifactId}-${version}" );
+
+        model.addDependency( dep );
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model );
+
+        assertEquals( "foo-3.8.1", ((Dependency) out.getDependencies().get( 0 )).getVersion() );
     }
 
 }

@@ -23,6 +23,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -37,12 +38,13 @@ public class RegexBasedModelInterpolator
     implements ModelInterpolator
 {
 
-    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "#([A-Za-z.]+)" );
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{([^}]+)\\}" );
 
     /**
      * Added: Feb 3, 2005 by jdcasey
      */
-    public Model interpolate( Model model ) throws ModelInterpolationException
+    public Model interpolate( Model model )
+        throws ModelInterpolationException
     {
         StringWriter sWriter = new StringWriter();
 
@@ -51,10 +53,9 @@ public class RegexBasedModelInterpolator
         {
             writer.write( sWriter, model );
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
-            throw new ModelInterpolationException(
-                "Cannot serialize project model for interpolation.", e );
+            throw new ModelInterpolationException( "Cannot serialize project model for interpolation.", e );
         }
 
         String serializedModel = sWriter.toString();
@@ -67,7 +68,7 @@ public class RegexBasedModelInterpolator
         {
             model = modelReader.read( sReader );
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
             throw new ModelInterpolationException(
                 "Cannot read project model from interpolating filter of serialized version.", e );
@@ -83,7 +84,7 @@ public class RegexBasedModelInterpolator
     {
         String result = src;
         Matcher matcher = EXPRESSION_PATTERN.matcher( result );
-        while( matcher.find() )
+        while ( matcher.find() )
         {
             String wholeExpr = matcher.group( 0 );
             String realExpr = matcher.group( 1 );
@@ -93,19 +94,21 @@ public class RegexBasedModelInterpolator
             {
                 value = String.valueOf( ReflectionValueExtractor.evaluate( realExpr, model ) );
             }
-            catch( Exception e )
+            catch ( Exception e )
             {
                 Logger logger = getLogger();
-                if( logger != null )
+                if ( logger != null )
                 {
-                    logger.debug( "POM interpolation cannot proceed with expression: " + wholeExpr
-                        + ". Skipping...", e );
+                    logger.debug( "POM interpolation cannot proceed with expression: " + wholeExpr + ". Skipping...", e );
                 }
             }
 
-            if( value != null )
+            if ( value != null )
             {
-                result = result.replaceAll( wholeExpr, value );
+                result = StringUtils.replace( result, wholeExpr, value );
+                // could use:
+                // result = matcher.replaceFirst( value );
+                // but this could result in multiple lookups of value, and replaceAll is not correct behaviour 
                 matcher.reset( result );
             }
         }

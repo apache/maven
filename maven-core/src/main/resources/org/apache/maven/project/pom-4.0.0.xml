@@ -32,7 +32,7 @@
     <!-- This all may just fold into plugin parameters -->
     <directory>target</directory>
     <output>target/classes</output>
-    <finalName>#artifactId-#version</finalName>
+    <finalName>${artifactId}-${version}</finalName>
     <testOutput>target/test-classes</testOutput>
     <sourceDirectory>src/main/java</sourceDirectory>
     <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
