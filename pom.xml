@@ -1,8 +1,8 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-component</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <name>Maven Project</name>
   <version>2.0-SNAPSHOT</version>
   <description>Maven components parent</description>
@@ -103,4 +103,4 @@
       <url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url>
     </repository>
   </distributionManagement>
-</model>
+</project>
