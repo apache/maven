@@ -169,14 +169,14 @@ public class SnapshotArtifactMetadata
         String version = FileUtils.fileRead( file );
         lastModified = file.lastModified();
 
-        if ( version.indexOf( "SNAPSHOT" ) >= 0 )
+        int index = version.lastIndexOf( "-" );
+        if ( version.indexOf( "SNAPSHOT" ) >= 0 || index < 0 )
         {
             timestamp = null;
             buildNumber = 0;
             return;
         }
 
-        int index = version.lastIndexOf( "-" );
         timestamp = version.substring( 0, index );
         buildNumber = Integer.valueOf( version.substring( index + 1 ) ).intValue();
         index = timestamp.lastIndexOf( "-" );
