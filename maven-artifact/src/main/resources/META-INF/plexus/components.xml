@@ -113,5 +113,11 @@
       <implementation>org.apache.maven.artifact.handler.SourceHandler</implementation>
     </component>
 
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>war</role-hint>
+      <implementation>org.apache.maven.artifact.handler.WarHandler</implementation>
+    </component>
+
   </components>
 </component-set>
