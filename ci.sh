@@ -18,6 +18,7 @@ SCM_LOG=scm.log
 TIMESTAMP=`date +%Y%M%d.%H%M%S`
 DEPLOY_DIR=$HOME_DIR/public_html/m2
 DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2
+DIST=m2-${TIMESTAMP}.tar.gz
 
 export JAVA_HOME=/usr/local/java
 # Required until classworlds.conf is updated
@@ -34,12 +35,6 @@ export MESSAGE=${MESSAGE_DIR}/${MESSAGE_NAME}
 # from scratch.
 
 # ----------------------------------------------------------------------------------
-
-echo "From: $FROM" > log
-echo "To: $TO" >> log
-echo "Subject: [maven2 build] $DATE" >> log
-echo "" >> log
-echo "http://www.codehaus.org/~maven/m2-build-logs/${MESSAGE_NAME}" >> log
 
 export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 
@@ -109,9 +104,11 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
       cd $DIR/maven-components
   
       sh m2-bootstrap-all.sh -Dmaven.repo.local="$HOME_DIR/$REPO" -Dmaven.home="$M2_HOME"
+      ret=$?; if [ $ret != 0 ]; then exit $ret; fi
     )    
+    ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
-    DIST=m2-${TIMESTAMP}.tar.gz
+    # Only created on success
 
     echo
     echo "Creating m2 distribution for public consumption: ${DEPLOY_SITE}/${DIST}"
@@ -129,6 +126,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
   fi
 
 ) >> $MESSAGE 2>&1
+ret=$?
 
 BUILD_REQUIRED=`cat $HOME_DIR/build_required`
 
@@ -138,5 +136,19 @@ host=`hostname`
 
 if [ "$BUILD_REQUIRED" = "true" ]
 then
+  echo "From: $FROM" > log
+  echo "To: $TO" >> log
+  if [ $ret != 0 ]; then
+    echo "Subject: [maven2 build - FAILED] $DATE" >> log
+  else
+    echo "Subject: [maven2 build - SUCCESS] $DATE" >> log
+    echo "" >> log
+    echo "Distribution:" >> log
+    echo "${DEPLOY_SITE}${DIST}" >>log
+  fi
+  echo "" >> log
+  echo "Log:" >> log
+  echo "http://www.codehaus.org/~maven/m2-build-logs/${MESSAGE_NAME}" >> log
+
   /usr/sbin/sendmail -t < log
 fi
