@@ -12,72 +12,64 @@ import org.apache.maven.model.DependencyManagement;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * @author jdcasey
- *
- * Created on Feb 1, 2005
+ * @author jdcasey Created on Feb 1, 2005
  */
-public class DefaultProjectDefaultsInjector implements ProjectDefaultsInjector
+public class DefaultProjectDefaultsInjector
+    implements ProjectDefaultsInjector
 {
-    
-    public void injectDefaults(MavenProject project)
+
+    public void injectDefaults( MavenProject project )
     {
-        injectDependencyDefaults(project.getDependencies(), project.getDependencyManagement());
+        injectDependencyDefaults( project.getDependencies(), project.getDependencyManagement() );
     }
 
-    /** Added: Feb 1, 2005 by jdcasey
+    /**
+     * Added: Feb 1, 2005 by jdcasey
      */
     private void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )
     {
-        if(dependencyManagement != null)
+        if ( dependencyManagement != null )
         {
-            // a given project's dependencies should be smaller than the group-defined defaults set...
-            // in other words, the project's deps will probably be a subset of those specified in defaults.
+            // a given project's dependencies should be smaller than the
+            // group-defined defaults set...
+            // in other words, the project's deps will probably be a subset of
+            // those specified in defaults.
             Map depsMap = new TreeMap();
             for ( Iterator it = dependencies.iterator(); it.hasNext(); )
             {
                 Dependency dep = (Dependency) it.next();
-                depsMap.put(dep.getManagementKey(), dep);
+                depsMap.put( dep.getManagementKey(), dep );
             }
-            
+
             List dependencyDefaults = dependencyManagement.getDependencies();
-            
+
             for ( Iterator it = dependencyDefaults.iterator(); it.hasNext(); )
             {
                 Dependency def = (Dependency) it.next();
                 String key = def.getManagementKey();
-                
-                Dependency dep = (Dependency) depsMap.get(key);
-                if(dep != null)
+
+                Dependency dep = (Dependency) depsMap.get( key );
+                if ( dep != null )
                 {
-                    mergeWithDefaults(dep, def);
-                    validateDependency(dep);
+                    mergeWithDefaults( dep, def );
                 }
             }
         }
     }
 
-    /** Added: Feb 1, 2005 by jdcasey
+    /**
+     * Added: Feb 1, 2005 by jdcasey
      */
     private void mergeWithDefaults( Dependency dep, Dependency def )
     {
-        if(dep.getVersion() == null && def.getVersion() != null)
+        if ( dep.getVersion() == null && def.getVersion() != null )
         {
-            dep.setVersion(def.getVersion());
+            dep.setVersion( def.getVersion() );
         }
-        
-        Properties props = new Properties(def.getProperties());
-        props.putAll(dep.getProperties());
-        dep.setProperties(props);
-    }
 
-    /** Added: Feb 1, 2005 by jdcasey
-     */
-    private void validateDependency( Dependency dep )
-    {
-        if(StringUtils.isEmpty(dep.getVersion()))
-        {
-            throw new IllegalStateException("Dependency version is null for: " + dep.getId());
-        }
+        Properties props = new Properties( def.getProperties() );
+        props.putAll( dep.getProperties() );
+        dep.setProperties( props );
     }
 
 }

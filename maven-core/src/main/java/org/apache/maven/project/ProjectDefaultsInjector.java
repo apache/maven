@@ -2,9 +2,7 @@
 package org.apache.maven.project;
 
 /**
- * @author jdcasey
- *
- * Created on Feb 1, 2005
+ * @author jdcasey Created on Feb 1, 2005
  */
 public interface ProjectDefaultsInjector
 {
