@@ -16,11 +16,11 @@ package org.apache.maven.plugin.ejb;
  * limitations under the License.
  */
 
+import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.archiver.jar.Manifest;
 
 import java.io.File;
 
@@ -36,51 +36,11 @@ import java.io.File;
  * validator=""
  * expression="#project.build.finalName"
  * description=""
- * @parameter name="compress"
- * type="String"
+ * @parameter name="archive"
+ * type=""
  * required="false"
+ * expression=""
  * validator=""
- * expression="#maven.ejb.compress"
- * default="true"
- * description=""
- * @parameter name="index"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.ejb.index"
- * default="false"
- * description=""
- * @parameter name="packageName"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.ejb.package"
- * description=""
- * @parameter name="manifest"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.ejb.manifest"
- * description=""
- * @parameter name="mainClass"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.ejb.mainClass"
- * description=""
- * @parameter name="addClasspath"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.ejb.addClasspath"
- * default="false"
- * description=""
- * @parameter name="addExtensions"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.ejb.addExtensions"
- * default="false"
  * description=""
  * @parameter name="generateClient"
  * type="String"
@@ -133,31 +93,7 @@ public class EjbMojo
 
     private MavenProject project;
 
-    private String mainClass;
-
-    private String packageName;
-
-    private String manifest;
-
-    /**
-     * @todo boolean instead
-     */
-    private String addClasspath;
-
-    /**
-     * @todo boolean instead
-     */
-    private String addExtensions;
-
-    /**
-     * @todo boolean instead
-     */
-    private String index;
-
-    /**
-     * @todo boolean instead
-     */
-    private String compress;
+    private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     /**
      * @todo Add license files in META-INF directory.
@@ -183,13 +119,9 @@ public class EjbMojo
             archiver.getArchiver().addFile( new File( outputDirectory, ejbJarXmlFile ), ejbJarXmlFile );
 
             // create archive
-            Manifest configuredManifest = archiver.getManifest( project, mainClass, packageName,
-                                                                convertBoolean( addClasspath ),
-                                                                convertBoolean( addExtensions ) );
-            archiver.createArchive( project, manifest, convertBoolean( compress ), convertBoolean( index ),
-                                    configuredManifest );
+            archiver.createArchive( project, archive );
 
-            if ( convertBoolean( generateClient ) )
+            if ( new Boolean( generateClient ).booleanValue() )
             {
                 getLog().info( "Building ejb client " + jarName + "-client" );
 
@@ -203,11 +135,7 @@ public class EjbMojo
                                                            DEFAULT_EXCLUDES );
 
                 // create archive
-                configuredManifest =
-                    clientArchiver.getManifest( project, mainClass, packageName, convertBoolean( addClasspath ),
-                                                convertBoolean( addExtensions ) );
-                clientArchiver.createArchive( project, manifest, convertBoolean( compress ), convertBoolean( index ),
-                                              configuredManifest );
+                archiver.createArchive( project, archive );
             }
         }
         catch ( Exception e )
@@ -217,8 +145,4 @@ public class EjbMojo
         }
     }
 
-    private static boolean convertBoolean( String s )
-    {
-        return new Boolean( s ).booleanValue();
-    }
 }

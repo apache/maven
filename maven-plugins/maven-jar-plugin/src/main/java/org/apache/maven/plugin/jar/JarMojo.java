@@ -16,11 +16,11 @@ package org.apache.maven.plugin.jar;
  * limitations under the License.
  */
 
+import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.archiver.jar.Manifest;
 
 import java.io.File;
 
@@ -36,51 +36,11 @@ import java.io.File;
  * validator=""
  * expression="#project.build.finalName"
  * description=""
- * @parameter name="compress"
- * type="String"
+ * @parameter name="archive"
+ * type=""
  * required="false"
+ * expression=""
  * validator=""
- * expression="#maven.jar.compress"
- * default="true"
- * description=""
- * @parameter name="index"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.index"
- * default="false"
- * description=""
- * @parameter name="packageName"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.package"
- * description=""
- * @parameter name="manifest"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.manifest"
- * description=""
- * @parameter name="mainClass"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.mainClass"
- * description=""
- * @parameter name="addClasspath"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.addClasspath"
- * default="false"
- * description=""
- * @parameter name="addExtensions"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.addExtensions"
- * default="false"
  * description=""
  * @parameter name="outputDirectory"
  * type="String"
@@ -119,31 +79,7 @@ public class JarMojo
 
     private MavenProject project;
 
-    private String manifest;
-
-    private String mainClass;
-
-    private String packageName;
-
-    /**
-     * @todo boolean instead
-     */
-    private String addClasspath;
-
-    /**
-     * @todo boolean instead
-     */
-    private String addExtensions;
-
-    /**
-     * @todo boolean instead
-     */
-    private String index;
-
-    /**
-     * @todo boolean instead
-     */
-    private String compress;
+    private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     /**
      * @todo Add license files in META-INF directory.
@@ -169,12 +105,7 @@ public class JarMojo
                 archiver.getArchiver().addDirectory( contentDirectory, DEFAULT_INCLUDES, DEFAULT_EXCLUDES );
             }
 
-            // create archive
-            Manifest configuredManifest = archiver.getManifest( project, mainClass, packageName,
-                                                                convertBoolean( addClasspath ),
-                                                                convertBoolean( addExtensions ) );
-            archiver.createArchive( project, manifest, convertBoolean( compress ), convertBoolean( index ),
-                                    configuredManifest );
+            archiver.createArchive( project, archive );
         }
         catch ( Exception e )
         {
@@ -183,8 +114,4 @@ public class JarMojo
         }
     }
 
-    private static boolean convertBoolean( String s )
-    {
-        return Boolean.valueOf( s ).booleanValue();
-    }
 }

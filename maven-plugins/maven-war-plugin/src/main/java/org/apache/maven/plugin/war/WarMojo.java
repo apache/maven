@@ -16,13 +16,13 @@ package org.apache.maven.plugin.war;
  * limitations under the License.
  */
 
+import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.archiver.jar.ManifestException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 import org.codehaus.plexus.util.FileUtils;
@@ -44,38 +44,11 @@ import java.util.Set;
  * validator=""
  * expression="#project.build.finalName"
  * description=""
- * @parameter name="compress"
- * type="String"
+ * @parameter name="archive"
+ * type=""
  * required="false"
+ * expression=""
  * validator=""
- * expression="#maven.jar.compress"
- * default="true"
- * description=""
- * @parameter name="index"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.index"
- * default="false"
- * description=""
- * @parameter name="packageName"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.package"
- * description=""
- * @parameter name="manifest"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.manifest"
- * description=""
- * @parameter name="addExtensions"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.jar.addExtensions"
- * default="false"
  * description=""
  * @parameter name="warSourceDirectory"
  * type="String"
@@ -183,31 +156,7 @@ public class WarMojo
 
     private String warName;
 
-    private String mainClass;
-
-    private String packageName;
-
-    private String manifest;
-
-    /**
-     * @todo boolean instead
-     */
-    private String addClasspath;
-
-    /**
-     * @todo boolean instead
-     */
-    private String addExtensions;
-
-    /**
-     * @todo boolean instead
-     */
-    private String index;
-
-    /**
-     * @todo boolean instead
-     */
-    private String compress;
+    private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     public void copyResources( File sourceDirectory, File webappDirectory, String includes, String excludes,
                                String webXml )
@@ -302,7 +251,7 @@ public class WarMojo
         catch ( Exception e )
         {
             // TODO: improve error handling
-            throw new PluginExecutionException( "Error assembling EJB", e );
+            throw new PluginExecutionException( "Error assembling WAR", e );
         }
     }
 
@@ -335,17 +284,9 @@ public class WarMojo
                 warArchiver.setWebxml( new File( webappDirectory, "WEB-INF/web.xml" ) );
 
                 // create archive
-                Manifest configuredManifest = archiver.getManifest( project, mainClass, packageName,
-                                                                    convertBoolean( addClasspath ),
-                                                                    convertBoolean( addExtensions ) );
-                archiver.createArchive( project, manifest, convertBoolean( compress ), convertBoolean( index ),
-                                        configuredManifest );
+                archiver.createArchive( project, archive );
             }
         }
     }
 
-    private static boolean convertBoolean( String s )
-    {
-        return Boolean.valueOf( s ).booleanValue();
-    }
 }

@@ -29,9 +29,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * @todo improve the use of this now that plugin fields are used instead of a request object - add an <archive> element to configuration?
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Revision$ $Date$
+ * @todo improve the use of this now that plugin fields are used instead of a request object - add an <archive> element to configuration?
  */
 public class MavenArchiver
 {
@@ -44,8 +44,7 @@ public class MavenArchiver
      *
      * @todo Add user attributes list and user groups list
      */
-    public Manifest getManifest( MavenProject project, String mainClass, String packageName, boolean addClasspath,
-                                 boolean addExtensions )
+    public Manifest getManifest( MavenProject project, ManifestConfiguration config )
         throws ManifestException
     {
         // Added basic entries
@@ -55,16 +54,16 @@ public class MavenArchiver
         Manifest.Attribute createdAttr = new Manifest.Attribute( "Created-By", "Apache Maven" );
         m.addConfiguredAttribute( createdAttr );
 
-        if ( packageName != null )
+        if ( config.getPackageName() != null )
         {
-            Manifest.Attribute packageAttr = new Manifest.Attribute( "Package", packageName );
+            Manifest.Attribute packageAttr = new Manifest.Attribute( "Package", config.getPackageName() );
             m.addConfiguredAttribute( packageAttr );
         }
 
         Manifest.Attribute buildJdkAttr = new Manifest.Attribute( "Build-Jdk", System.getProperty( "java.version" ) );
         m.addConfiguredAttribute( buildJdkAttr );
 
-        if ( addClasspath )
+        if ( config.isAddClasspath() )
         {
             StringBuffer classpath = new StringBuffer();
             Set artifacts = project.getArtifacts();
@@ -118,6 +117,7 @@ public class MavenArchiver
                                                                                project.getVersion() );
         m.addConfiguredAttribute( implementationVersionAttr );
 
+        String mainClass = config.getMainClass();
         if ( mainClass != null && !"".equals( mainClass ) )
         {
             Manifest.Attribute mainClassAttr = new Manifest.Attribute( "Main-Class", mainClass );
@@ -125,7 +125,7 @@ public class MavenArchiver
         }
 
         // Added extensions
-        if ( addExtensions )
+        if ( config.isAddExtensions() )
         {
             StringBuffer extensionsList = new StringBuffer();
             Set artifacts = project.getArtifacts();
@@ -162,11 +162,15 @@ public class MavenArchiver
                     String name = artifact.getArtifactId() + "-Implementation-Version";
                     Manifest.Attribute archImplVersionAttr = new Manifest.Attribute( name, artifact.getVersion() );
                     m.addConfiguredAttribute( archImplVersionAttr );
-                    // TODO: make repo configurable
-                    name = artifact.getArtifactId() + "-Implementation-URL";
-                    String url = "http://www.ibiblio.org/maven/" + artifact.toString();
-                    Manifest.Attribute archImplUrlAttr = new Manifest.Attribute( name, url );
-                    m.addConfiguredAttribute( archImplUrlAttr );
+
+                    if ( artifact.getRepository() != null )
+                    {
+                        // TODO: is this correct
+                        name = artifact.getArtifactId() + "-Implementation-URL";
+                        String url = artifact.getRepository().getUrl() + "/" + artifact.toString();
+                        Manifest.Attribute archImplUrlAttr = new Manifest.Attribute( name, url );
+                        m.addConfiguredAttribute( archImplUrlAttr );
+                    }
                 }
             }
         }
@@ -189,8 +193,7 @@ public class MavenArchiver
         archiveFile = outputFile;
     }
 
-    public void createArchive( MavenProject project, String manifestFile, boolean compress, boolean index,
-                               Manifest manifest )
+    public void createArchive( MavenProject project, MavenArchiveConfiguration archiveConfiguration )
         throws ArchiverException, ManifestException, IOException
     {
         // ----------------------------------------------------------------------
@@ -199,16 +202,19 @@ public class MavenArchiver
 
         archiver.addFile( project.getFile(), "META-INF/maven/pom.xml" );
 
+        String manifestFile = archiveConfiguration.getManifestFile();
         if ( manifestFile != null && !"".equals( manifestFile ) )
         {
             archiver.setManifest( new File( manifestFile ) );
         }
 
+        Manifest manifest = getManifest( project, archiveConfiguration.getManifest() );
+
         // Configure the jar
         archiver.addConfiguredManifest( manifest );
 
-        archiver.setCompress( compress );
-        archiver.setIndex( index );
+        archiver.setCompress( archiveConfiguration.isCompress() );
+        archiver.setIndex( archiveConfiguration.isIndex() );
         archiver.setDestFile( archiveFile );
 
         // create archive
