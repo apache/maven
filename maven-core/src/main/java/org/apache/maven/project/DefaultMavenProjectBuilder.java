@@ -164,6 +164,9 @@ public class DefaultMavenProjectBuilder
 
             pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
 
+            project.addCompileSourceRoot( project.getBuild().getSourceDirectory() );
+            project.addTestCompileSourceRoot( project.getBuild().getUnitTestSourceDirectory() );
+
             return project;
         }
         catch ( Exception e )

@@ -30,10 +30,9 @@
       <version>3.8.1</version>
     </dependency>
   </dependencies>
-  <preGoals>
-    <preGoal>
-      <name>compiler:compile</name>
-      <attain>plexus:descriptor</attain>
-    </preGoal>
-  </preGoals>
+  <plugins>
+    <plugin>
+      <id>plexus</id>
+    </plugin>
+  </plugins>
 </project>

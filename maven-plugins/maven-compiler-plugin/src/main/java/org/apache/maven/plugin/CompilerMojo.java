@@ -18,11 +18,11 @@ import java.util.List;
  * @description Compiles application sources
  *
  * @parameter
- *  name="compileSourceRootsList"
+ *  name="compileSourceRoots"
  *  type="java.util.List"
  *  required="true"
  *  validator=""
- *  expression="#project.compileSourceRootsList"
+ *  expression="#project.compileSourceRoots"
  *  description=""
  *
  * @parameter
@@ -68,7 +68,7 @@ public class CompilerMojo
         //
         // ----------------------------------------------------------------------
 
-        List compileSourceRootsList = (List) request.getParameter( "compileSourceRootsList" );
+        List compileSourceRoots = (List) request.getParameter( "compileSourceRoots" );
 
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
@@ -78,8 +78,8 @@ public class CompilerMojo
         //
         // ----------------------------------------------------------------------
 
-        compileSourceRootsList = removeEmptyCompileSourceRoots( compileSourceRootsList );
-        if ( compileSourceRootsList.isEmpty() )
+        compileSourceRoots = removeEmptyCompileSourceRoots( compileSourceRoots );
+        if ( compileSourceRoots.isEmpty() )
         {
             return;
         }
@@ -88,7 +88,7 @@ public class CompilerMojo
         
         compilerConfiguration.setOutputLocation(outputDirectory);
         compilerConfiguration.setClasspathEntries( classpathElements );
-        compilerConfiguration.setSourceLocations( compileSourceRootsList );
+        compilerConfiguration.setSourceLocations( compileSourceRoots );
         
         /* Compile with debugging info */
         String debugAsString = (String) request.getParameter( "debug" );

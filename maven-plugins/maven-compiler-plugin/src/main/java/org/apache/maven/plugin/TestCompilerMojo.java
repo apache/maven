@@ -10,11 +10,11 @@ package org.apache.maven.plugin;
  * @requiresDependencyResolution
  *
  * @parameter
- *  name="compileSourceRootsList"
+ *  name="compileSourceRoots"
  *  type="java.util.List"
  *  required="true"
  *  validator=""
- *  expression="#project.testCompileSourceRootsList"
+ *  expression="#project.testCompileSourceRoots"
  *  description=""
  *
  * @parameter

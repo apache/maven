@@ -57,7 +57,7 @@ public class DefaultArtifact
     /** @todo this should be replaced by type handler */
     public DefaultArtifact( String groupId, String artifactId, String version, String type, String extension )
     {
-        this( groupId, artifactId, version, null, type, extension );
+        this( groupId, artifactId, version, SCOPE_RUNTIME, type, extension );
     }
 
     public DefaultArtifact( String groupId, String artifactId, String version, String type )

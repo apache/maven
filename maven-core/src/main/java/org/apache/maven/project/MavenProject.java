@@ -30,7 +30,6 @@ import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -125,88 +124,48 @@ public class MavenProject
     // Test and compile sourceroots.
     // ----------------------------------------------------------------------
 
-    //!!! Refactor, collect the list of compile source roots and create a
-    // path1:path2
-    // type construct from the list instead of the other way around. jvz.
+    private List compileSourceRoots = new ArrayList();
 
-    private String compileSourceRoots = "";
-
-    private String testCompileSourceRoots = "";
+    private List testCompileSourceRoots = new ArrayList();
 
     public void addCompileSourceRoot( String path )
     {
-        if ( path != null || path.trim().length() != 0 )
+        if ( path != null )
         {
-            if ( compileSourceRoots.length() > 0 )
+            path = path.trim();
+            if ( path.length() != 0 )
             {
-                compileSourceRoots += File.pathSeparator;
+                if ( !compileSourceRoots.contains( path ) )
+                {
+                    compileSourceRoots.add( path );
+                }
             }
-            compileSourceRoots += path;
         }
-    }
-
-    public String getCompileSourceRoots()
-    {
-        // Get rid of any trailing path separators.
-        if ( compileSourceRoots.endsWith( File.pathSeparator ) )
-        {
-            compileSourceRoots = compileSourceRoots.substring( 0, compileSourceRoots.length() - 1 );
-        }
-
-        // Always add the build.sourceDirectory
-        return getBuild().getSourceDirectory() + File.pathSeparator + compileSourceRoots;
-    }
-
-    public List getCompileSourceRootsList()
-    {
-        String[] s = StringUtils.split( getCompileSourceRoots(), File.pathSeparator );
-
-        List list = new ArrayList();
-
-        for ( int i = 0; i < s.length; i++ )
-        {
-            list.add( s[i] );
-        }
-
-        return list;
     }
 
     public void addTestCompileSourceRoot( String path )
     {
-        if ( path != null || path.trim().length() != 0 )
+        if ( path != null )
         {
-            if ( testCompileSourceRoots.length() > 0 )
+            path = path.trim();
+            if ( path.length() != 0 )
             {
-                testCompileSourceRoots += File.pathSeparator;
+                if ( !testCompileSourceRoots.contains( path ) )
+                {
+                    testCompileSourceRoots.add( path );
+                }
             }
-            testCompileSourceRoots += path;
         }
     }
 
-    public String getTestCompileSourceRoots()
+    public List getCompileSourceRoots()
     {
-        // Get rid of any trailing path separators.
-        if ( testCompileSourceRoots.endsWith( File.pathSeparator ) )
-        {
-            testCompileSourceRoots = testCompileSourceRoots.substring( 0, testCompileSourceRoots.length() - 1 );
-        }
-
-        // Always add the build.unitTestSourceDirectory
-        return getBuild().getUnitTestSourceDirectory() + File.pathSeparator + testCompileSourceRoots;
+        return compileSourceRoots;
     }
 
-    public List getTestCompileSourceRootsList()
+    public List getTestCompileSourceRoots()
     {
-        String[] s = StringUtils.split( getTestCompileSourceRoots(), File.pathSeparator );
-
-        List list = new ArrayList();
-
-        for ( int i = 0; i < s.length; i++ )
-        {
-            list.add( s[i] );
-        }
-
-        return list;
+        return testCompileSourceRoots;
     }
 
     public List getCompileClasspathElements()
@@ -218,7 +177,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: let the scope handler deal with this
-            if ( a.getScope() == null || "compile".equals( a.getScope() ) )
+            if ( a.getScope() == null || Artifact.SCOPE_COMPILE.equals( a.getScope() ) )
             {
                 list.add( a.getPath() );
             }
@@ -239,8 +198,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( a.getScope() == null || "test".equals( a.getScope() ) || "compile".equals( a.getScope() )
-                    || "runtime".equals( a.getScope() ) )
+                if ( a.getScope() == null || Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
                     list.add( a.getPath() );
                 }

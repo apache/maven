@@ -20,6 +20,11 @@ import java.io.File;
 
 public interface Artifact
 {
+    // TODO: into scope handler
+    String SCOPE_COMPILE = "compile";
+    String SCOPE_TEST = "test";
+    String SCOPE_RUNTIME = "runtime";
+
     String getGroupId();
 
     String getArtifactId();
