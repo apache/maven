@@ -144,6 +144,7 @@
           <description>The project's dependencies.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
+          <comment>These should ultimately only be compile time dependencies when transitive dependencies come into play.</comment>
         </field>
         <field>
           <name>licenses</name>
@@ -165,30 +166,30 @@
         </field>
         <field>
           <name>packageGroups</name>
-          <description>the description</description>
+          <description>Package groups required for complete javadocs.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>reports</name>
-          <description>the description</description>
+          <description>Reports to be generated for the project.</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>repository</name>
-          <description>the description</description>
+          <description>Specification for the SCM use by the project.</description>
           <type>Repository</type>
           <comment>This element needs to be renamed as it conflicts with the existing notion of repositories in Maven.</comment>
         </field>
         <field>
           <name>build</name>
-          <description>the description</description>
+          <description>Information required to build the project.</description>
           <type>Build</type>
         </field>
         <field>
           <name>organization</name>
-          <description>the description</description>
+          <description>Umbrella organization for the project.</description>
           <type>Organization</type>
         </field>
       </fields>
@@ -346,6 +347,7 @@
           <name>url</name>
           <description>the description</description>
           <type>String</type>
+          <comment>The URL should really be gleaned from a shared database of dependency information.</comment>
         </field>
         <field>
           <name>artifact</name>
