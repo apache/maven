@@ -61,13 +61,13 @@ public class SurefireBooter
 
         Object batteryExecutor = batteryExecutorClass.newInstance();
 
-        Method run = batteryExecutorClass.getMethod( "run", new Class[] { List.class, List.class, ClassLoader.class } );
+        Method run = batteryExecutorClass.getMethod( "run", new Class[] { List.class, List.class, ClassLoader.class, String.class } );
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         Thread.currentThread().setContextClassLoader( surefireClassLoader );
 
-        Boolean result = (Boolean) run.invoke( batteryExecutor, new Object[]{ reports, batteries, surefireClassLoader } );
+        Boolean result = (Boolean) run.invoke( batteryExecutor, new Object[]{ reports, batteries, surefireClassLoader, "dummy" } );
 
         Thread.currentThread().setContextClassLoader( oldContextClassLoader );
 
