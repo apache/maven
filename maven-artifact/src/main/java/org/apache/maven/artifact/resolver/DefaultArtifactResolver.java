@@ -20,12 +20,14 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.transform.ArtifactTransformation;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -81,7 +83,14 @@ public class DefaultArtifactResolver
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
         {
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
-            artifact = transform.transformForResolve( artifact );
+            try
+            {
+                artifact = transform.transformForResolve( artifact, remoteRepositories, localRepository );
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                throw new ArtifactResolutionException( "Unable to transform artifact", e );
+            }
         }
 
         String localPath;
@@ -105,11 +114,34 @@ public class DefaultArtifactResolver
 
         try
         {
-            wagonManager.getArtifact( artifact, remoteRepositories, destination );
+            if ( artifact.getRepository() != null )
+            {
+                // the transformations discovered the artifact - so use it exclusively
+                wagonManager.getArtifact( artifact, artifact.getRepository(), destination );
+            }
+            else
+            {
+                wagonManager.getArtifact( artifact, remoteRepositories, destination );
+            }
+
+            // must be after the artifact is downloaded
+            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+            {
+                ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                metadata.storeInLocalRepository( localRepository );
+            }
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            throw new ArtifactResolutionException( artifactNotFound( localPath, remoteRepositories ), e );
         }
         catch ( TransferFailedException e )
         {
-            throw new ArtifactResolutionException( artifactNotFound( localPath, remoteRepositories ), e );
+            throw new ArtifactResolutionException( "Error downloading artifact " + artifact, e );
+        }
+        catch ( ArtifactMetadataRetrievalException e )
+        {
+            throw new ArtifactResolutionException( "Error downloading artifact " + artifact, e );
         }
 
         return artifact;

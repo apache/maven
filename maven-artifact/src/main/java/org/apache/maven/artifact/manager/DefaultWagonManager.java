@@ -168,7 +168,7 @@ public class DefaultWagonManager
     }
 
     public void getArtifact( Artifact artifact, List remoteRepositories, File destination )
-        throws TransferFailedException
+        throws TransferFailedException, ResourceDoesNotExistException
     {
         // TODO [BP]: The exception handling here needs some work
         boolean successful = false;
@@ -176,20 +176,9 @@ public class DefaultWagonManager
         {
             ArtifactRepository repository = (ArtifactRepository) iter.next();
 
-            String remotePath = null;
             try
             {
-                remotePath = repository.pathOf( artifact );
-            }
-            catch ( ArtifactPathFormatException e )
-            {
-                // TODO may be more appropriate to propogate the APFE
-                throw new TransferFailedException( "Failed to determine path for artifact", e );
-            }
-
-            try
-            {
-                getRemoteFile( repository, destination, remotePath );
+                getArtifact( artifact, repository, destination );
 
                 successful = true;
             }
@@ -204,8 +193,25 @@ public class DefaultWagonManager
 
         if ( !successful )
         {
-            throw new TransferFailedException( "Unable to download the artifact from any repository" );
+            throw new ResourceDoesNotExistException( "Unable to download the artifact from any repository" );
         }
+    }
+
+    public void getArtifact( Artifact artifact, ArtifactRepository repository, File destination )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        String remotePath = null;
+        try
+        {
+            remotePath = repository.pathOf( artifact );
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            // TODO may be more appropriate to propogate the APFE
+            throw new TransferFailedException( "Failed to determine path for artifact", e );
+        }
+
+        getRemoteFile( repository, destination, remotePath );
     }
 
     public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination )

@@ -17,6 +17,7 @@ package org.apache.maven.artifact;
  */
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -47,6 +48,8 @@ public class DefaultArtifact
     private List metadataList;
 
     private File file;
+
+    private ArtifactRepository repository;
 
     /**
      * !!! WARNING !!! Never put <classifier/> in the POM. It is for mojo use
@@ -133,6 +136,16 @@ public class DefaultArtifact
         return file;
     }
 
+    public ArtifactRepository getRepository()
+    {
+        return repository;
+    }
+
+    public void setRepository( ArtifactRepository repository )
+    {
+        this.repository = repository;
+    }
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -172,13 +185,49 @@ public class DefaultArtifact
 
     public int hashCode()
     {
-        return getId().hashCode();
+        int result = 17;
+        result = 37 * result + groupId.hashCode();
+        result = 37 * result + artifactId.hashCode();
+        result = 37 * result + type.hashCode();
+        result = 37 * result + version.hashCode();
+        result = 37 * result + ( classifier != null ? classifier.hashCode() : 0 );
+        return result;
     }
 
     public boolean equals( Object o )
     {
-        Artifact other = (Artifact) o;
+        if ( o == this )
+        {
+            return true;
+        }
 
-        return getId().equals( other.getId() );
+        if ( !( o instanceof Artifact ) )
+        {
+            return false;
+        }
+
+        Artifact a = (Artifact) o;
+
+        if ( !a.getGroupId().equals( groupId ) )
+        {
+            return false;
+        }
+        else if ( !a.getArtifactId().equals( artifactId ) )
+        {
+            return false;
+        }
+        else if ( !a.getVersion().equals( version ) )
+        {
+            return false;
+        }
+        else if ( !a.getType().equals( type ) )
+        {
+            return false;
+        }
+        else if ( classifier == null ? a.getClassifier() != null : !a.getClassifier().equals( classifier ) )
+        {
+            return false;
+        }
+        return true;
     }
 }

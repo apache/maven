@@ -24,8 +24,10 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -38,165 +40,74 @@ public class SnapshotTransformation
 {
     private WagonManager wagonManager;
 
-/* TODO: use and remove
-    public Artifact transform( Artifact artifact, ArtifactRepository localRepository, List repositories,
-                               Map parameters )
-        throws Exception
+    /**
+     * @todo very primitve. Probably we can resolvedArtifactCache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
+     */
+    private static Set resolvedArtifactCache = new HashSet();
+
+    public Artifact transformForResolve( Artifact artifact, List remoteRepositories,
+                                         ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException
     {
-        Date localVersion = getLocalVersion( artifact, localRepository );
-
-        Date remoteVersion = getRemoteVersion( artifact, repositories, localRepository );
-
-        if ( remoteVersion != null )
+        if ( isSnapshot( artifact ) && !alreadyResolved( artifact ) )
         {
-            //if local version is unknown (null) it means that
-            //we don't have this file locally. so we will be happy
-            // to have any snapshot.
-            // we wil download in two cases:
-            //  a) we don't have any snapot in local repo
-            //  b) we have found newer version in remote repository
-            if ( localVersion == null || localVersion.before( remoteVersion ) )
+            // TODO: this mostly works, however...
+            //  - poms and jars are different, so both are checked individually
+            //  - when a pom is downloaded, it prevents the JAR getting downloaded because of the timestamp
+            //  - need to gather first, group them all up by groupId/artifactId, then go after them
+/*
+            SnapshotArtifactMetadata localMetadata;
+            try
             {
-                // here we know that we have artifact like foo-1.2-SNAPSHOT.jar
-                // and the remote timestamp is something like 20010304.121212
-                // so we might as well fetch foo-1.2-20010304.121212.jar
-                // but we are just going to fetch foo-1.2-SNAPSHOT.jar.
-                // We can change the strategy which is used here later on
+                localMetadata = SnapshotArtifactMetadata.readLocalSnapshotMetadata( artifact, localRepository );
+            }
+            catch ( ArtifactPathFormatException e )
+            {
+                throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
+            }
+            catch ( IOException e )
+            {
+                throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
+            }
 
-                // @todo we will delete old file first.
-                //it is not really a right thing to do. Artifact Dowloader
-                // should
-                // fetch to temprary file and replace the old file with the new
-                // one once download was finished
+            boolean foundRemote = false;
+            for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+            {
+                ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
 
-                artifact.getFile().delete();
+                SnapshotArtifactMetadata remoteMetadata = SnapshotArtifactMetadata.createRemoteSnapshotMetadata(
+                    artifact );
+                remoteMetadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
 
-                artifactResolver.resolve( artifact, repositories, localRepository );
-
-                File snapshotVersionFile = getSnapshotVersionFile( artifact, localRepository );
-
-                String timestamp = getTimestamp( remoteVersion );
-
-                // delete old one
-                if ( snapshotVersionFile.exists() )
+                if ( remoteMetadata.compareTo( localMetadata ) > 0 )
                 {
-                    snapshotVersionFile.delete();
+                    // TODO: investigate transforming this in place, in which case resolve can return void
+                    artifact = createArtifactCopy( artifact, remoteMetadata );
+                    artifact.setRepository( remoteRepository );
+
+                    localMetadata = remoteMetadata;
+                    foundRemote = true;
                 }
-
-                FileUtils.fileWrite( snapshotVersionFile.getPath(), timestamp );
             }
-        }
 
+            if ( foundRemote )
+            {
+                artifact.addMetadata( localMetadata );
+            }
+*/
+            resolvedArtifactCache.add( getCacheKey( artifact ) );
+        }
         return artifact;
     }
 
-    private File getSnapshotVersionFile( Artifact artifact, ArtifactRepository localRepository )
+    private boolean alreadyResolved( Artifact artifact )
     {
-        return null;
-        //return new File( localRepository.fullArtifactPath( artifact ) );
+        return resolvedArtifactCache.contains( getCacheKey( artifact ) );
     }
 
-    private Date getRemoteVersion( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws Exception
+    private static String getCacheKey( Artifact artifact )
     {
-        Date retValue = null;
-
-        artifactResolver.resolve( artifact, remoteRepositories, localRepository );
-
-        String timestamp = FileUtils.fileRead( artifact.getPath() );
-
-        retValue = parseTimestamp( timestamp );
-
-        return retValue;
-    }
-
-    private Date getLocalVersion( Artifact artifact, ArtifactRepository localRepository )
-    {
-        //assert artifact.exists();
-
-        Date retValue = null;
-
-        try
-        {
-            File file = getSnapshotVersionFile( artifact, localRepository );
-
-            if ( file.exists() )
-            {
-                String timestamp = FileUtils.fileRead( file );
-
-                retValue = parseTimestamp( timestamp );
-
-            }
-        }
-        catch ( Exception e )
-        {
-            // ignore
-        }
-
-        if ( retValue == null )
-        {
-            //try "traditional method" used in maven1 for obtaining snapshot
-            // version
-
-            File file = artifact.getFile();
-
-            if ( file.exists() )
-            {
-                retValue = new Date( file.lastModified() );
-
-                //@todo we should "normalize" the time.
-
-                //
-                // TimeZone gmtTimeZone = TimeZone.getTimeZone( "GMT" );
-                // TimeZone userTimeZone = TimeZone.getDefault(); long diff =
-                //
-            }
-        }
-
-        return retValue;
-    }
-
-    private final static String DATE_FORMAT = "yyyyMMdd.HHmmss";
-
-    private static SimpleDateFormat getFormatter()
-    {
-        SimpleDateFormat formatter = new SimpleDateFormat( DATE_FORMAT );
-
-        formatter.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-
-        return formatter;
-    }
-
-    public static String getTimestamp()
-    {
-        Date now = new Date();
-
-        SimpleDateFormat formatter = getFormatter();
-
-        String retValue = formatter.format( now );
-
-        return retValue;
-    }
-
-    public static Date parseTimestamp( String timestamp )
-        throws ParseException
-    {
-        Date retValue = getFormatter().parse( timestamp );
-
-        return retValue;
-    }
-
-    public static String getTimestamp( Date snapshotVersion )
-    {
-        String retValue = getFormatter().format( snapshotVersion );
-
-        return retValue;
-    }
-    */
-    public Artifact transformForResolve( Artifact artifact )
-    {
-        // TODO: implement
-        return artifact;
+        return artifact.getConflictId();
     }
 
     public Artifact transformForInstall( Artifact artifact, ArtifactRepository localRepository )
@@ -221,16 +132,22 @@ public class SnapshotTransformation
 
             // TODO: note, we could currently transform this in place, as it is only used through the deploy mojo,
             //   which creates the artifact and then disposes of it
-            List list = artifact.getMetadataList();
-            artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), metadata.getVersion(),
-                                            artifact.getScope(), artifact.getType(), artifact.getClassifier() );
-            for ( Iterator i = list.iterator(); i.hasNext(); )
-            {
-                ArtifactMetadata m = (ArtifactMetadata) i.next();
-                m.setArtifact( artifact );
-                artifact.addMetadata( m );
-            }
+            artifact = createArtifactCopy( artifact, metadata );
             artifact.addMetadata( metadata );
+        }
+        return artifact;
+    }
+
+    private Artifact createArtifactCopy( Artifact artifact, SnapshotArtifactMetadata metadata )
+    {
+        List list = artifact.getMetadataList();
+        artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), metadata.getVersion(),
+                                        artifact.getScope(), artifact.getType(), artifact.getClassifier() );
+        for ( Iterator i = list.iterator(); i.hasNext(); )
+        {
+            ArtifactMetadata m = (ArtifactMetadata) i.next();
+            m.setArtifact( artifact );
+            artifact.addMetadata( m );
         }
         return artifact;
     }

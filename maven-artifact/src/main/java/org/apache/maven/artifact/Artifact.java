@@ -17,6 +17,7 @@ package org.apache.maven.artifact;
  */
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.io.File;
 import java.util.List;
@@ -68,4 +69,8 @@ public interface Artifact
     void addMetadata( ArtifactMetadata metadata );
 
     List getMetadataList();
+
+    void setRepository( ArtifactRepository remoteRepository );
+
+    ArtifactRepository getRepository();
 }

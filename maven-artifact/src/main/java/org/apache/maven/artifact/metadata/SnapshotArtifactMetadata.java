@@ -40,6 +40,7 @@ import java.util.TimeZone;
  */
 public class SnapshotArtifactMetadata
     extends AbstractArtifactMetadata
+    implements Comparable
 {
     private String timestamp = null;
 
@@ -56,6 +57,19 @@ public class SnapshotArtifactMetadata
     private SnapshotArtifactMetadata( Artifact artifact, String filename )
     {
         super( artifact, filename );
+    }
+
+    public static SnapshotArtifactMetadata readLocalSnapshotMetadata( Artifact artifact,
+                                                                      ArtifactRepository localRepository )
+        throws ArtifactPathFormatException, IOException
+    {
+        SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact, SNAPSHOT_VERSION_LOCAL_FILE );
+        File f = metadata.getLocalRepositoryLocation( localRepository );
+        if ( f.exists() )
+        {
+            metadata.readFromFile( f );
+        }
+        return metadata;
     }
 
     public static SnapshotArtifactMetadata createLocalSnapshotMetadata( Artifact artifact )
@@ -77,7 +91,7 @@ public class SnapshotArtifactMetadata
             {
                 timestamp = getUtcDateFormatter().format( new Date() );
             }
-            String path = new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) ).getPath();
+            String path = getLocalRepositoryLocation( localRepository ).getPath();
             FileUtils.fileWrite( path, getVersion() );
         }
         catch ( IOException e )
@@ -88,6 +102,12 @@ public class SnapshotArtifactMetadata
         {
             throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
         }
+    }
+
+    private File getLocalRepositoryLocation( ArtifactRepository localRepository )
+        throws ArtifactPathFormatException
+    {
+        return new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
     }
 
     public String getVersion()
@@ -122,17 +142,7 @@ public class SnapshotArtifactMetadata
                 return;
             }
 
-            String version = FileUtils.fileRead( destination );
-
-            int index = version.lastIndexOf( "-" );
-            timestamp = version.substring( 0, index );
-            buildNumber = Integer.valueOf( version.substring( index + 1 ) ).intValue();
-            index = version.indexOf( "-" );
-            if ( index >= 0 )
-            {
-                // ignore starting version part, will be prepended later
-                timestamp = timestamp.substring( index + 1 );
-            }
+            readFromFile( destination );
         }
         catch ( TransferFailedException e )
         {
@@ -141,6 +151,22 @@ public class SnapshotArtifactMetadata
         catch ( IOException e )
         {
             throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+        }
+    }
+
+    private void readFromFile( File destination )
+        throws IOException
+    {
+        String version = FileUtils.fileRead( destination );
+
+        int index = version.lastIndexOf( "-" );
+        timestamp = version.substring( 0, index );
+        buildNumber = Integer.valueOf( version.substring( index + 1 ) ).intValue();
+        index = version.indexOf( "-" );
+        if ( index >= 0 )
+        {
+            // ignore starting version part, will be prepended later
+            timestamp = timestamp.substring( index + 1 );
         }
     }
 
@@ -160,5 +186,24 @@ public class SnapshotArtifactMetadata
     {
         this.buildNumber++;
         timestamp = getUtcDateFormatter().format( new Date() );
+    }
+
+
+    public int compareTo( Object o )
+    {
+        SnapshotArtifactMetadata metadata = (SnapshotArtifactMetadata) o;
+
+        if ( buildNumber > metadata.buildNumber )
+        {
+            return 1;
+        }
+        else if ( timestamp == null )
+        {
+            return -1;
+        }
+        else
+        {
+            return timestamp.compareTo( metadata.timestamp );
+        }
     }
 }

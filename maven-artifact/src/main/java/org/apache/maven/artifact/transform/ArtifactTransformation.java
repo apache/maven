@@ -20,6 +20,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.util.List;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id: ArtifactTransformation.java,v 1.1 2005/03/03 15:37:25
@@ -33,10 +35,14 @@ public interface ArtifactTransformation
      * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
      * transformation has occured the original artifact is returned.
      *
-     * @param artifact Artifact to be transformed.
+     * @param artifact           Artifact to be transformed.
+     * @param remoteRepositories the repositories to check
+     * @param localRepository    the local repository
      * @return The transformed Artifact
      */
-    Artifact transformForResolve( Artifact artifact );
+    public Artifact transformForResolve( Artifact artifact, List remoteRepositories,
+                                         ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException;
 
     /**
      * Take in a artifact and return the transformed artifact for locating in the local repository. If no

@@ -40,7 +40,10 @@ public interface WagonManager
         throws UnsupportedProtocolException;
 
     void getArtifact( Artifact artifact, List remoteRepositories, File destination )
-        throws TransferFailedException;
+        throws TransferFailedException, ResourceDoesNotExistException;
+
+    public void getArtifact( Artifact artifact, ArtifactRepository repository, File destination )
+        throws TransferFailedException, ResourceDoesNotExistException;
 
     void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
         throws TransferFailedException;

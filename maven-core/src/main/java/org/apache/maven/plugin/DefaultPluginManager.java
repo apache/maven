@@ -159,10 +159,10 @@ public class DefaultPluginManager
             MojoDescriptor mojoDescriptor = mavenMojoDescriptor.getMojoDescriptor();
 
             mojoDescriptors.put( mojoDescriptor.getId(), mojoDescriptor );
-
-            String key = constructPluginKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
-            pluginDescriptors.put( key, pluginDescriptor );
         }
+
+        String key = constructPluginKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
+        pluginDescriptors.put( key, pluginDescriptor );
     }
 
     // ----------------------------------------------------------------------
@@ -267,9 +267,8 @@ public class DefaultPluginManager
 
                 artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
-                Artifact pluginArtifact = artifactFactory.createArtifact( AbstractPlugin.getDefaultPluginGroupId(),
-                                                                          artifactId, version, null, MAVEN_PLUGIN,
-                                                                          null );
+                Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version, null,
+                                                                          MAVEN_PLUGIN, null );
 
                 addPlugin( pluginArtifact, session );
             }
