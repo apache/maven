@@ -943,6 +943,8 @@ public class MBoot
     class ModelReader
         extends DefaultHandler
     {
+        int depth = 0;
+
         String artifactId;
 
         String version;
@@ -963,8 +965,6 @@ public class MBoot
 
         private UnitTests unitTests;
 
-        private Local local = new Local();
-
         private List resources = new ArrayList();
 
         private Dependency currentDependency;
@@ -976,8 +976,6 @@ public class MBoot
         private boolean insideParent = false;
 
         private boolean insideDependency = false;
-
-        private boolean insideLocal = false;
 
         private boolean insideUnitTest = false;
 
@@ -1014,11 +1012,6 @@ public class MBoot
             return resources;
         }
 
-        public Local getLocal()
-        {
-            return local;
-        }
-
         public boolean parse( File file )
         {
             this.file = file;
@@ -1049,13 +1042,9 @@ public class MBoot
             {
                 insideParent = true;
             }
-            else if ( rawName.equals( "repository" ) && !insideLocal )
+            else if ( rawName.equals( "repository" ) )
             {
                 insideRepository = true;
-            }
-            else if ( rawName.equals( "local" ) )
-            {
-                insideLocal = true;
             }
             else if ( rawName.equals( "unitTest" ) )
             {
@@ -1075,6 +1064,7 @@ public class MBoot
 
                 insideResource = true;
             }
+            depth ++;
         }
 
         public void characters( char buffer[], int start, int length )
@@ -1126,10 +1116,6 @@ public class MBoot
                 resources.addAll( p.getResources() );
 
                 insideParent = false;
-            }
-            else if ( rawName.equals( "local" ) )
-            {
-                insideLocal = false;
             }
             else if ( rawName.equals( "unitTest" ) )
             {
@@ -1226,29 +1212,25 @@ public class MBoot
                     unitTests.addExclude( getBodyText() );
                 }
             }
-            else if ( rawName.equals( "artifactId" ) )
+            else if ( depth == 2 )
             {
-                artifactId = getBodyText();
-            }
-            else if ( rawName.equals( "version" ) )
-            {
-                version = getBodyText();
-            }
-            else if ( rawName.equals( "groupId" ) )
-            {
-                groupId = getBodyText();
-            }
-            else if ( rawName.equals( "type" ) )
-            {
-                type = getBodyText();
-            }
-            else if ( rawName.equals( "repository" ) )
-            {
-                if ( insideLocal )
+                if ( rawName.equals( "artifactId" ) )
                 {
-                    local.repository = getBodyText();
+                    artifactId = getBodyText();
                 }
-                else
+                else if ( rawName.equals( "version" ) )
+                {
+                    version = getBodyText();
+                }
+                else if ( rawName.equals( "groupId" ) )
+                {
+                    groupId = getBodyText();
+                }
+                else if ( rawName.equals( "type" ) )
+                {
+                    type = getBodyText();
+                }
+                else if ( rawName.equals( "repository" ) )
                 {
                     insideRepository = false;
                 }
@@ -1262,6 +1244,8 @@ public class MBoot
             }
 
             bodyText = new StringBuffer();
+
+            depth --;
         }
 
         public void warning( SAXParseException spe )
@@ -1542,34 +1526,6 @@ public class MBoot
         public void setFiltering( boolean filtering )
         {
             this.filtering = filtering;
-        }
-    }
-
-    public static class Local
-        implements Serializable
-    {
-        private String repository;
-
-        private String online;
-
-        public String getRepository()
-        {
-            return this.repository;
-        }
-
-        public void setRepository( String repository )
-        {
-            this.repository = repository;
-        }
-
-        public String getOnline()
-        {
-            return this.online;
-        }
-
-        public void setOnline( String online )
-        {
-            this.online = online;
         }
     }
 }
