@@ -80,6 +80,7 @@ public class DeployMojo
             throw new PluginExecutionException( msg );
         }
 
+        // TODO: put into the deployer
         if ( deploymentRepository.getAuthenticationInfo() == null )
         {
             getLog().warn( "Deployment repository {id: \'" + deploymentRepository.getId() +
