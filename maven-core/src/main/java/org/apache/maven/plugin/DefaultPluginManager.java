@@ -381,7 +381,19 @@ public class DefaultPluginManager
 
             plugin.setLog( session.getLog() );
 
-            if ( plugin.supportsNewMojoParadigm() )
+            // TODO: remove
+            boolean newMojoTechnique = false;
+            try
+            {
+                plugin.getClass().getDeclaredMethod( "execute", new Class[0] );
+                newMojoTechnique = true;
+            }
+            catch ( NoSuchMethodException e )
+            {
+                // intentionally ignored
+            }
+
+            if ( newMojoTechnique )
             {
                 populateParameters( plugin, mojoDescriptor, session );
             }
@@ -398,7 +410,7 @@ public class DefaultPluginManager
             dispatcher.dispatchStart( event, goalName );
             try
             {
-                if ( plugin.supportsNewMojoParadigm() )
+                if ( newMojoTechnique )
                 {
                     plugin.execute();
                 }

@@ -83,14 +83,6 @@ public abstract class AbstractPlugin
     public void execute()
         throws PluginExecutionException
     {
-        if ( supportsNewMojoParadigm() )
-        {
-            throw new PluginExecutionException( "You must override execute() if you implement the new paradigm" );
-        }
-    }
-
-    public boolean supportsNewMojoParadigm()
-    {
-        return false;
+        throw new PluginExecutionException( "You must override execute() if you implement the new paradigm" );
     }
 }

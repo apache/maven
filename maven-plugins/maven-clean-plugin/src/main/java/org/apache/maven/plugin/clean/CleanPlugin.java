@@ -42,10 +42,6 @@ public class CleanPlugin
 
     // TODO: not in the descriptor previously
 //    private boolean failOnError;
-    public boolean supportsNewMojoParadigm()
-    {
-        return true;
-    }
 
     public void execute()
         throws PluginExecutionException
