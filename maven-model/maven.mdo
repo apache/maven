@@ -109,16 +109,17 @@
           <description>The directory on the site host where site documentation is placed when the site is uploaded.</description>
           <type>String</type>
         </field>
-        <!-- This naming is inconsistent and distriubtion should occur from a repository structure. -->
         <field>
           <name>distributionSite</name>
           <description>The FQDN of the host where the project's artifacts are uploaded.</description>
           <type>String</type>
+          <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
         </field>
         <field>
           <name>distributionDirectory</name>
           <description>The directory on the distribution host where artifacts are placed when uploaded.</description>
           <type>String</type>
+          <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
         </field>
         <field>
           <name>mailingLists</name>
