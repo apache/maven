@@ -22,6 +22,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import java.util.Set;
  *          jvanzyl Exp $
  */
 public class SnapshotTransformation
+    extends AbstractLogEnabled
     implements ArtifactTransformation
 {
     private WagonManager wagonManager;
@@ -69,6 +71,7 @@ public class SnapshotTransformation
                 throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
             }
 
+            String version = localMetadata.constructVersion();
             if ( !alreadyResolved( artifact ) )
             {
                 boolean foundRemote = false;
@@ -76,12 +79,14 @@ public class SnapshotTransformation
                 {
                     ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
 
+                    getLogger().info(
+                        artifact.getArtifactId() + ": checking for updates from " + remoteRepository.getId() );
+
                     SnapshotArtifactMetadata remoteMetadata = SnapshotArtifactMetadata.retrieveFromRemoteRepository(
                         artifact, remoteRepository, wagonManager );
 
                     if ( remoteMetadata.compareTo( localMetadata ) > 0 )
                     {
-                        // TODO: investigate transforming this in place, in which case resolve can return void
                         artifact.setRepository( remoteRepository );
 
                         localMetadata = remoteMetadata;
@@ -94,9 +99,26 @@ public class SnapshotTransformation
                     artifact.addMetadata( localMetadata );
                 }
 
+                if ( getLogger().isInfoEnabled() )
+                {
+                    if ( !version.equals( artifact.getBaseVersion() ) )
+                    {
+                        String message = artifact.getArtifactId() + ": resolved to version " + version;
+                        if ( foundRemote )
+                        {
+                            message += " from repository " + artifact.getRepository().getId();
+                        }
+                        else
+                        {
+                            message += " from local repository";
+                        }
+                        getLogger().info( message );
+                    }
+                }
+
                 resolvedArtifactCache.add( getCacheKey( artifact ) );
             }
-            artifact.setVersion( localMetadata.constructVersion() );
+            artifact.setVersion( version );
         }
     }
 
@@ -114,14 +136,6 @@ public class SnapshotTransformation
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
     {
         // Nothing to do
-/* TODO: remove
-        if ( isSnapshot( artifact ) )
-        {
-            // only store the version-local.txt file for POMs as every file has an associated POM
-            ArtifactMetadata metadata = SnapshotArtifactMetadata.createLocalSnapshotMetadata( artifact );
-            artifact.addMetadata( metadata );
-        }
-*/
     }
 
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )

@@ -211,7 +211,7 @@ public class DefaultWagonManager
             throw new TransferFailedException( "Failed to determine path for artifact", e );
         }
 
-        getRemoteFile( repository, destination, remotePath );
+        getRemoteFile( repository, destination, remotePath, downloadMonitor );
     }
 
     public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination )
@@ -228,10 +228,12 @@ public class DefaultWagonManager
             throw new TransferFailedException( "Failed to determine path for artifact", e );
         }
 
-        getRemoteFile( remoteRepository, destination, remotePath );
+        // TODO: maybe some other listener that still notifies when metadata is being retrieved?
+        getRemoteFile( remoteRepository, destination, remotePath, null );
     }
 
-    private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath )
+    private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
+                                TransferListener downloadMonitor )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         Wagon wagon;
@@ -255,7 +257,6 @@ public class DefaultWagonManager
 
         //wagon.addTransferListener( md5SumObserver );
 
-        // TODO: probably don't want this on metadata...
         if ( downloadMonitor != null )
         {
             wagon.addTransferListener( downloadMonitor );
