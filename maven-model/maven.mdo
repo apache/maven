@@ -1632,11 +1632,31 @@
 
     <!--
 
+    A sketch of what a plugin configuration might look like where
+    we have plugin wide parameters that apply to all goals/mojos
+    and goal/mojo specific parameters that will override any
+    of the plugin wide definitions.
+
+    At first the configuration element will be a flat set of properties
+    but i would like the configuration to actually be an arbiitrary
+    data model or a simple DOM like structure so that mojos can
+    be arbitrarily configured in the same fashion plexus plugins
+    are configured.
+
     <plugins>
       <plugin>
         <id>plexus</id>
         <configuration>
+          <key>value</key>
         </configuration>
+        <goals>
+          <goal>
+            <id></id>
+            <configuration>
+              <key>value</key>
+            </configuration>
+          </goal>
+        </goals>
       </plugin>
     </plugins>
 
