@@ -16,8 +16,8 @@ package org.apache.maven.archetype;
  * limitations under the License.
  */
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
@@ -36,6 +36,6 @@ public interface Archetype
     String ARCHETYPE_POM = "pom.xml";
 
     void createArchetype( String archetypeGroupId, String archetypeArtifactId, String archetypeVersion,
-                          ArtifactRepository localRepository, Set remoteRepositories, Map parameters )
+                          ArtifactRepository localRepository, List remoteRepositories, Map parameters )
         throws ArchetypeNotFoundException, ArchetypeDescriptorException, ArchetypeTemplateProcessingException;
 }

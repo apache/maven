@@ -26,6 +26,12 @@ import java.io.File;
 public interface MavenProjectBuilder
 {
     String ROLE = MavenProjectBuilder.class.getName();
+    
+    static final String STANDALONE_SUPERPOM_GROUPID = "maven";
+    
+    static final String STANDALONE_SUPERPOM_ARTIFACTID = "super-pom";
+    
+    static final String STANDALONE_SUPERPOM_VERSION = "2.0";
 
     MavenProject build( File project, ArtifactRepository localRepository )
         throws ProjectBuildingException;
@@ -36,7 +42,7 @@ public interface MavenProjectBuilder
     MavenProject buildFromRepository( Artifact artifact, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject buildSuperProject( ArtifactRepository localRepository )
+    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
     Model getCachedModel( String groupId, String artifactId, String version );

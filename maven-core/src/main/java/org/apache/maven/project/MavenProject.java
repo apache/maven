@@ -18,7 +18,7 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -74,6 +74,8 @@ public class MavenProject
     private Set artifacts;
 
     private List collectedProjects = Collections.EMPTY_LIST;
+    
+    private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
     public MavenProject( Model model )
     {
@@ -682,9 +684,14 @@ public class MavenProject
                 if ( updateScope )
                 {
                     // TODO: Artifact factory?
-                    Artifact artifact = new DefaultArtifact( existing.getGroupId(), existing.getArtifactId(),
-                                                             existing.getVersion(), a.getScope(), existing.getType(),
-                                                             existing.getExtension() );
+                    // TODO: [jc] Is this a better way to centralize artifact construction here?
+                    Artifact artifact = artifactConstructionSupport.createArtifact( existing.getGroupId(), 
+                                                                                    existing.getArtifactId(), 
+                                                                                    existing.getVersion(), 
+                                                                                    a.getScope(), 
+                                                                                    existing.getType(),
+                                                                                    existing.getExtension() );
+
                     artifacts.put( id, artifact );
                 }
             }

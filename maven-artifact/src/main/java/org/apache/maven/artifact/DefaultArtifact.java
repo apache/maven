@@ -25,6 +25,7 @@ import java.io.File;
 public class DefaultArtifact
     implements Artifact
 {
+    
     // ----------------------------------------------------------------------
     // These are the only things i need to specify
     // ----------------------------------------------------------------------
@@ -48,6 +49,11 @@ public class DefaultArtifact
      */
     public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type, String extension )
     {
+        if(type == null)
+        {
+            throw new NullPointerException("Artifact type cannot be null.");
+        }
+
         this.groupId = groupId;
 
         this.artifactId = artifactId;

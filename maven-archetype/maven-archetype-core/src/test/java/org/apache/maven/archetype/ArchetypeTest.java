@@ -16,16 +16,16 @@ package org.apache.maven.archetype;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.codehaus.plexus.PlexusTestCase;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Properties;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -65,7 +65,7 @@ public class ArchetypeTest
 
         ArtifactRepository localRepository = new ArtifactRepository( "local", "file://" + mavenProperties.getProperty( "maven.repo.local" ) );
 
-        Set remoteRepositories = new HashSet();
+        List remoteRepositories = new ArrayList();
 
         ArtifactRepository remoteRepository = new ArtifactRepository( "remote", "http://repo1.maven.org" );
 

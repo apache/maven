@@ -101,7 +101,7 @@ public class DefaultMaven
 
                 if ( projects.isEmpty() )
                 {
-                    projects.add( projectBuilder.buildSuperProject( request.getLocalRepository() ) );
+                    projects.add( projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() ) );
                 }
             }
             catch ( IOException e )

@@ -17,7 +17,7 @@ package org.apache.maven.artifact.factory;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 
@@ -29,6 +29,7 @@ import java.util.Set;
 // TODO: packaging is very confusing - this isn't in artifact after all
 
 public class DefaultArtifactFactory
+    extends ArtifactConstructionSupport
     implements ArtifactFactory
 {
     public Set createArtifacts( List dependencies, ArtifactRepository localRepository, String inheritedScope )
@@ -55,35 +56,4 @@ public class DefaultArtifactFactory
                                dependency.getScope(), dependency.getType(), dependency.getType(), inheritedScope );
     }
 
-    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
-                                    String extension, String inheritedScope )
-    {
-        // TODO: can refactor, use scope handler
-
-        // if this artifact is test, and the dependency is test, don't transitively create
-        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) && Artifact.SCOPE_TEST.equals( scope ) )
-        {
-            return null;
-        }
-
-        // TODO: localRepository not used (should be used here to resolve path?
-        String desiredScope = Artifact.SCOPE_RUNTIME;
-        if ( Artifact.SCOPE_COMPILE.equals( scope ) && inheritedScope == null )
-        {
-            desiredScope = Artifact.SCOPE_COMPILE;
-        }
-
-        // vvv added to retain compile scope. Remove if you want compile inherited as runtime
-        else if ( Artifact.SCOPE_COMPILE.equals( scope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
-        {
-            desiredScope = Artifact.SCOPE_COMPILE;
-        }
-        // ^^^ added to retain compile scope. Remove if you want compile inherited as runtime
-
-        if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_TEST.equals( inheritedScope ) )
-        {
-            desiredScope = Artifact.SCOPE_TEST;
-        }
-        return new DefaultArtifact( groupId, artifactId, version, desiredScope, type, extension );
-    }
 }

@@ -54,6 +54,7 @@ public class MBoot
 
     String[] pluginGeneratorDeps = new String[]{"plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
                                                 "maven/jars/maven-core-2.0-SNAPSHOT.jar",
+                                                "maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
                                                 "maven/jars/maven-model-2.0-SNAPSHOT.jar",
                                                 "maven/jars/maven-plugin-2.0-SNAPSHOT.jar",
                                                 "maven/jars/maven-plugin-tools-api-2.0-SNAPSHOT.jar",

@@ -26,12 +26,11 @@ import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.maven.archetype.descriptor.ArchetypeDescriptor;
 import org.apache.maven.archetype.descriptor.ArchetypeDescriptorBuilder;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -54,33 +53,33 @@ public class DefaultArchetype
     // ----------------------------------------------------------------------
 
     private VelocityComponent velocity;
-
-    private WagonManager wagonManager;
-
+    
     private ArtifactResolver artifactResolver;
 
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------
+    
+    private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
     // groupId = maven
     // artifactId = maven-foo-archetype
     // version = latest
 
     public void createArchetype( String archetypeGroupId, String archetypeArtifactId, String archetypeVersion,
-                                 ArtifactRepository localRepository, Set remoteRepositories, Map parameters )
+                                 ArtifactRepository localRepository, List remoteRepositories, Map parameters )
         throws ArchetypeNotFoundException, ArchetypeDescriptorException, ArchetypeTemplateProcessingException
     {
         // ----------------------------------------------------------------------
         // Download the archetype
         // ----------------------------------------------------------------------
 
-        Artifact archetypeJar =
-            wagonManager.createArtifact( archetypeGroupId, archetypeArtifactId, archetypeVersion, "jar" );
+        Artifact archetypeArtifact =
+            artifactConstructionSupport.createArtifact( archetypeGroupId, archetypeArtifactId, archetypeVersion, Artifact.SCOPE_RUNTIME, "jar" );
 
         try
         {
-            artifactResolver.resolve( archetypeJar, remoteRepositories, localRepository );
+            artifactResolver.resolve( archetypeArtifact, remoteRepositories, localRepository );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -107,7 +106,7 @@ public class DefaultArchetype
         {
             URL[] urls = new URL[1];
 
-            urls[0] = archetypeJar.getFile().toURL();
+            urls[0] = archetypeArtifact.getFile().toURL();
 
             archetypeJarLoader = new URLClassLoader( urls );
 

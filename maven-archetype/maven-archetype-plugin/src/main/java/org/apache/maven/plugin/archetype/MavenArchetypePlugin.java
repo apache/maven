@@ -22,8 +22,8 @@ import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @goal create
@@ -131,7 +131,7 @@ public class MavenArchetypePlugin
 
         ArtifactRepository localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
 
-        Set remoteRepositories = new HashSet();
+        List remoteRepositories = new ArrayList();
 
         ArtifactRepository remoteRepository = new ArtifactRepository( "remote", "http://repo1.maven.org" );
 

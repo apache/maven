@@ -377,10 +377,18 @@ public class DefaultMavenProjectBuilder
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    public MavenProject buildSuperProject( ArtifactRepository localRepository )
+    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        MavenProject project = new MavenProject( getSuperModel() );
+        Model superModel = getSuperModel();
+        
+        superModel.setGroupId( STANDALONE_SUPERPOM_GROUPID );
+
+        superModel.setArtifactId( STANDALONE_SUPERPOM_ARTIFACTID );
+
+        superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
+        
+        MavenProject project = new MavenProject( superModel );
 
         try
         {
