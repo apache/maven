@@ -87,10 +87,22 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
+    public MavenProject build( File projectDescriptor )
+        throws ProjectBuildingException
+    {
+        return build( null, projectDescriptor, false );
+    }
+
     public MavenProject build( File mavenLocalHome, File projectDescriptor )
         throws ProjectBuildingException
     {
         return build( mavenLocalHome, projectDescriptor, false );
+    }
+
+    public MavenProject build( File projectDescriptor, boolean resolveDependencies )
+        throws ProjectBuildingException
+    {
+        return build( null, projectDescriptor, false );
     }
 
     /** @todo can we move the super model reading to the initialize method? what about the user/site? Is it reused?
@@ -401,23 +413,26 @@ public class DefaultMavenProjectBuilder
     {
         String localRepository = System.getProperty( "maven.repo.local" );
 
-        Model superModel = getSuperModel();
-
         if ( !StringUtils.isEmpty( localRepository ) )
         {
             return RepositoryUtils.localRepositoryToWagonRepository( localRepository );
         }
+
+        Model superModel = getSuperModel();
 
         if ( superModel.getLocal() != null && superModel.getLocal().getRepository() != null )
         {
             localRepository = superModel.getLocal().getRepository();
         }
 
-        Model userModel = getUserOverrideModel( superModel, mavenHomeLocal );
-
-        if ( userModel != null && userModel.getLocal() != null && userModel.getLocal().getRepository() != null )
+        if ( mavenHomeLocal != null )
         {
-            localRepository = userModel.getLocal().getRepository();
+            Model userModel = getUserOverrideModel( superModel, mavenHomeLocal );
+
+            if ( userModel != null && userModel.getLocal() != null && userModel.getLocal().getRepository() != null )
+            {
+                localRepository = userModel.getLocal().getRepository();
+            }
         }
 
         if ( localRepository == null )
