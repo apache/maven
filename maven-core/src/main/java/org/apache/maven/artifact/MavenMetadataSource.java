@@ -1,18 +1,19 @@
 package org.apache.maven.artifact;
 
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-
 import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -61,22 +62,26 @@ public class MavenMetadataSource
     {
         Set artifacts;
 
+        Artifact metadataArtifact = new DefaultArtifact( artifact.getGroupId(),
+                                                         artifact.getArtifactId(),
+                                                         artifact.getVersion(),
+                                                         "pom" );
+
         try
         {
-            Artifact metadataArtifact = new DefaultArtifact( artifact.getGroupId(),
-                                                             artifact.getArtifactId(),
-                                                             artifact.getVersion(),
-                                                             "pom" );
-
             artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
 
             Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
 
             artifacts = createArtifacts( model.getDependencies(), localRepository );
         }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Error while resolving metadata artifact", e );
+        }
         catch ( Exception e )
         {
-            throw new ArtifactMetadataRetrievalException( "Cannot read artifact source: ", e );
+            throw new ArtifactMetadataRetrievalException( "Cannot read artifact source: " + metadataArtifact.getFile(), e );
         }
 
         return artifacts;
