@@ -48,8 +48,8 @@ import java.util.List;
  *  name="resources"
  *  type="List"
  *  required="true"
- *  validator="#project.build.resources"
- *  expression="#project.build.unitTest.resources"
+ *  validator=""
+ *  expression="#project.build.resources"
  *  description=""
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
