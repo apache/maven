@@ -30,24 +30,19 @@ import java.io.File;
 
 /**
  * @goal deploy
- *
  * @description deploys a pom to remote repository
- *
- * @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description=""
- *
- * @parameter
- *  name="deployer"
- *  type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- *  required="true"
- *  validator=""
- *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
- *  description=""
+ * @parameter name="project"
+ * type="org.apache.maven.project.MavenProject"
+ * required="true"
+ * validator=""
+ * expression="#project"
+ * description=""
+ * @parameter name="deployer"
+ * type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ * required="true"
+ * validator=""
+ * expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ * description=""
  */
 public class PomDeployMojo
     extends AbstractPlugin
@@ -59,12 +54,17 @@ public class PomDeployMojo
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
 
-        ArtifactRepository deploymentRepository =
-            RepositoryUtils.mavenRepositoryToWagonRepository( project.getDistributionManagement().getRepository() );
+        // TODO: validation instead
+        if ( project.getDistributionManagement() == null )
+        {
+            // TODO: simple failure response
+            throw new Exception( "distributionManagement is required for deployment" );
+        }
 
-        Artifact artifact = new DefaultArtifact( project.getGroupId(),
-                                                 project.getArtifactId(),
-                                                 project.getVersion(),
+        ArtifactRepository deploymentRepository = RepositoryUtils.mavenRepositoryToWagonRepository(
+            project.getDistributionManagement().getRepository() );
+
+        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
                                                  "pom" );
 
         File pom = new File( project.getFile().getParentFile(), "pom.xml" );
