@@ -11,5 +11,5 @@
   <name>Maven Clean Plugin</name>
   <currentVersion>1.0-SNAPSHOT</currentVersion>
   <inceptionYear>2001</inceptionYear>
-  <package>org.apache.maven</package>
+  <package>org.apache.maven.plugin.clean</package>
 </project>
