@@ -22,6 +22,7 @@
   <version>3.0.0</version>
   <description>Maven's model for Java project.</description>
   <packageName>org.apache.maven.model</packageName>
+  <root>Model</root>
   <classes>
     <class>
       <name>Model</name>
@@ -415,8 +416,8 @@
             describe by a <code>role</code> element, the body of which is a
             role name.
           </description>
-          <type>java.util.SortedSet</type>
-          <defaultValue>new TreeSet()</defaultValue>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>timezone</name>
@@ -691,7 +692,8 @@
         <field>
           <name>filtering</name>
           <description>Describe if resources are filtered or not.</description>
-          <type>boolean</type>
+          <type>String</type>
+          <defaultValue>false</defaultValue>
         </field>
       </fields>
     </class>
