@@ -5,6 +5,8 @@ import org.apache.maven.it.cli.Commandline;
 import org.apache.maven.it.cli.CommandLineUtils;
 import org.apache.maven.it.cli.StreamConsumer;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -216,8 +218,10 @@ public class Verifier
                 File pom = new File( System.getProperty( "user.home" ), ".m2/override.xml" );
 
                 Document dom = builder.parse( pom );
-    
-                repo = XPathAPI.selectSingleNode( dom, "/project/local/repository/text()" ).getNodeValue();
+                Element e = dom.getDocumentElement();
+                e = (Element) e.getElementsByTagName( "local" ).item( 0 );
+                Node n = (Element) e.getElementsByTagName( "repository" ).item( 0 );
+                repo = n.getFirstChild().getNodeValue();
             }
             catch ( Exception e )
             {
