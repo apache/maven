@@ -35,8 +35,6 @@
 @REM enable echoing my setting MAVEN_BATCH_ECHO to 'on'
 @if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
 
-set CLASSWORLDS_VERSION=1.1-SNAPSHOT
-
 @REM Execute a user defined script before this one
 if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
 
@@ -121,12 +119,9 @@ goto Win9xApp
 :endInit
 if "%MAVEN_OPTS%"=="" SET MAVEN_OPTS="-Xmx256m"
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
-SET MAVEN_CLASSPATH="%M2_HOME%\core\boot\classworlds-%CLASSWORLDS_VERSION%.jar"
-SET MAVEN_MAIN_CLASS=org.codehaus.classworlds.Launcher
-SET CLASSWORLDS_CONF="%M2_HOME%\bin\classworlds.conf"
 
 @REM Start MAVEN2
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %MAVEN_CLASSPATH% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%M2_HOME%" %MAVEN_MAIN_CLASS% %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %M2_HOME%\core\boot\classworlds-*.jar "-Dclassworlds.conf=%M2_HOME%\bin\classworlds.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
 goto :end
 
 :end
@@ -136,10 +131,7 @@ if "%OS%"=="Windows_NT" goto endNT
 @REM For old DOS remove the set variables from ENV - we assume they were not set
 @REM before we started - at least we don't leave any baggage around
 set MAVEN_JAVA_EXE=
-set MAVEN_CLASSPATH=
-set MAVEN_MAIN_CLASS=
 set MAVEN_CMD_LINE_ARGS=
-set CLASSWORLDS_VERSION=
 goto postExec
 
 :endNT
