@@ -87,7 +87,7 @@ public class DefaultLifecycleExecutor
         try
         {
             MavenProject project = session.getProject();
-            
+
             ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
 
             if ( artifactHandler != null )
@@ -239,6 +239,12 @@ public class DefaultLifecycleExecutor
 
                 MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( mojoId );
 
+                if ( mojoDescriptor == null )
+                {
+                    throw new LifecycleExecutionException(
+                        "A goal '" + mojoId + "' was declared in pom.xml, but does not exist" );
+                }
+
                 configureMojo( mojoDescriptor );
             }
         }
@@ -389,10 +395,8 @@ public class DefaultLifecycleExecutor
         try
         {
             Logger logger = getLogger();
-            logger.debug("Resolving artifacts from:\n" +
-                    "\t{localRepository: " + session.getLocalRepository() + "}\n" +
-                    "\t{remoteRepositories: " + session.getRemoteRepositories() + "}");
-            
+            logger.debug( "Resolving artifacts from:\n" + "\t{localRepository: " + session.getLocalRepository() + "}\n" + "\t{remoteRepositories: " + session.getRemoteRepositories() + "}" );
+
             return pluginManager.executeMojo( session, id );
         }
         catch ( GoalExecutionException e )
