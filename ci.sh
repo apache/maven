@@ -26,11 +26,12 @@ CMD=$1
 
 [ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit
 
-DIR=maven2
+DIR=m2
 REPO=maven-repo-local
 FROM=jvanzyl@maven.org
 TO=maven2-user@lists.codehaus.org
 SCM_LOG=scm.log
+TIMESTAMP=`date +%Y%M%d.%H%M%S`
 
 # ----------------------------------------------------------------------------------
 
@@ -114,8 +115,8 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
       cd $DIR/maven-components/maven-core
   
       ./bootstrap-all.sh
-    )
-  
+    )    
+
   else
   
     echo "No updates occured, no build required. Done."
