@@ -45,50 +45,57 @@ import java.io.FileWriter;
  *  validator=""
  *  expression="target/test-basedir-alignment"
  *  description=""
+ *
+ * @parameter name="pluginItem" type="String" required="false" validator="" description="" expression="" defaultValue="foo"
+ * @parameter name="goalItem" type="String" required="false" validator="" description="" expression="bar"
  */
 public class CoreItMojo
     extends AbstractPlugin
 {
-    private static final int DELETE_RETRY_SLEEP_MILLIS = 10;
+    private String outputDirectory;
+
+    private File basedirAlignmentDirectory;
+
+    private String pluginItem;
+
+    private String goalItem;
 
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
+        touch( new File( outputDirectory ), "touch.txt" );
 
-        File f = new File( outputDirectory );
-        
-        if ( !f.exists() )
-        {
-            f.mkdirs();
-        }
-        
-        File touch = new File( f, "touch.txt" );
-        
-        FileWriter w = new FileWriter( touch );
-        
-        w.write( "touch.txt" );
-        
-        w.close();
-        
         // This parameter should be aligned to the basedir as the parameter type is specified
         // as java.io.File
         
-        String basedirAlignmentDirectory = (String) request.getParameter( "basedirAlignmentDirectory" );
+        touch( basedirAlignmentDirectory, "touch.txt" );
 
-        f = new File( basedirAlignmentDirectory );
-        
-        if ( !f.exists() )
+        // Test parameter setting
+        if ( pluginItem != null )
         {
-            f.mkdirs();
-        }         
+            touch( new File( outputDirectory ), pluginItem );
+        }
+
+        if ( goalItem != null )
+        {
+            touch( new File( outputDirectory ), goalItem );
+        }
+    }
+
+    private static void touch( File dir, String file )
+        throws Exception
+    {
+        if ( !dir.exists() )
+        {
+            dir.mkdirs();
+        }
         
-        touch = new File( f, "touch.txt" );
+        File touch = new File( dir, file );
+
+        FileWriter w = new FileWriter( touch );
         
-        w = new FileWriter( touch );
+        w.write( file );
         
-        w.write( "touch.txt" );
-        
-        w.close();        
+        w.close();
     }
 }
