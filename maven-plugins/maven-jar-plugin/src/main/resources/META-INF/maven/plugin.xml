@@ -1,0 +1,18 @@
+<plugin>
+  <id>jar</id>
+  <implementation>org.apache.maven.plugin.JarPlugin</implementation>
+  <goals>
+    <goal>
+      <name>jar</name>
+      <prereqs>
+        <prereq>test</prereq>
+        <prereq>resources</prereq>
+      </prereqs>
+      <configuration>
+        <jarName>#maven.final.name</jarName>
+        <outputDirectory>#maven.build.dir</outputDirectory>
+        <basedir>#maven.build.dest</basedir>
+      </configuration>
+    </goal>
+  </goals>
+</plugin>

@@ -1,0 +1,20 @@
+<plugin>
+  <id>resource-copier</id>
+  <implementation>org.apache.maven.plugin.ResourcesPlugin</implementation>
+  <goals>
+    <goal>
+      <name>resources</name>
+      <configuration>
+        <outputDirectory>#maven.build.dest</outputDirectory>
+        <resources>#project.build.resources</resources>
+      </configuration>
+    </goal>
+    <goal>
+      <name>test:resources</name>
+      <configuration>
+        <outputDirectory>#maven.test.dest</outputDirectory>
+        <resources>#project.build.unitTest.resources</resources>
+      </configuration>
+    </goal>
+  </goals>
+</plugin>

@@ -1,0 +1,33 @@
+<plugin>
+  <id>compiler</id>
+  <implementation>org.apache.maven.plugin.CompilerPlugin</implementation>
+  <requirements>
+    <requirement>
+      <role>org.codehaus.plexus.compiler.Compiler</role>
+      <field-name>compilers</field-name>
+    </requirement>
+  </requirements>
+  <goals>
+    <goal>
+      <name>compile</name>
+      <configuration>
+        <sourceDirectory>#project.build.sourceDirectory</sourceDirectory>
+        <outputDirectory>#maven.build.dest</outputDirectory>
+        <classpathElements>#project.classpathElements</classpathElements>
+        <compiler>javac</compiler>
+      </configuration>
+    </goal>
+    <goal>
+      <name>test:compile</name>
+      <prereqs>
+        <prereq>compile</prereq>
+      </prereqs>
+      <configuration>
+        <sourceDirectory>#project.build.unitTestSourceDirectory</sourceDirectory>
+        <outputDirectory>#maven.test.dest</outputDirectory>
+        <classpathElements>#project.classpathElements</classpathElements>
+        <compiler>javac</compiler>
+      </configuration>
+    </goal>
+  </goals>
+</plugin>

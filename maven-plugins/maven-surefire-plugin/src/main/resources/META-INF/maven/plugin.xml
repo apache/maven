@@ -1,0 +1,76 @@
+<!--
+
+This here is a clear example of some nastiness that has crept into Maven and here
+is where it will be cleaned up. This plugin is specific to running tests with
+surefire but it may well be a test runner for something else requiring a
+different set of resources. The surefire plugin's concern is to run surefire
+tests and to do that it must:
+
+o compile the test sources
+o copy over the test resources
+o run sure fire
+
+So currently below there are prereqs for the test:compile and test:resources
+but it is entirely unclear what those things are doing without looking
+at the other plugins which is not scalable. If surefire needed to add
+foo.jar and bar.jar to the classpath for compiling there would be some
+serious nastiness going on in order to modify the parameters of the compile.
+
+So, the surefire plugin should use the other plugins to satisfy its requirements
+and by using the plugins directly it can control their use for the specific
+purpose of running surefire tests.
+
+A goal is essentially a sequence of plugin executions that have been parameterized for
+a specific task.
+
+<plugin>
+  <id>compiler</id>
+  <configuration>
+    <sourceDirectory>#project.build.unitTestSourceDirectory</sourceDirectory>
+    <outputDirectory>#maven.test.dest</outputDirectory>
+    <classpathElements>#project.classpathElements</classpathElements>
+    <compiler>javac</compiler>
+  </configuration>
+</plugin>
+<plugin>
+  <id>resource-copier</id>
+  <configuration>
+    <outputDirectory>#maven.test.dest</outputDirectory>
+    <resources>#project.build.unitTest.resources</resources>
+  </configuration>
+</plugin>
+<plugin>
+  <id>surefire</id>
+  <configuration>
+    <mavenRepoLocal>#maven.repo.local</mavenRepoLocal>
+    <basedir>#basedir</basedir>
+    <includes>#project.build.unitTest.includes</includes>
+    <excludes>#project.build.unitTest.excludes</excludes>
+    <classpathElements>#project.classpathElements</classpathElements>
+  </configuration>
+</plugin>
+
+If say for example you used DbUnit or XMLUnit then the configurations for
+each of the plugin executions would be different.
+
+-->
+<plugin>
+  <id>surefire</id>
+  <implementation>org.apache.maven.test.SurefirePlugin</implementation>
+  <goals>
+    <goal>
+      <name>test</name>
+      <prereqs>
+        <prereq>test:compile</prereq>
+        <prereq>test:resources</prereq>
+      </prereqs>
+      <configuration>
+        <mavenRepoLocal>#maven.repo.local</mavenRepoLocal>
+        <basedir>#basedir</basedir>
+        <includes>#project.build.unitTest.includes</includes>
+        <excludes>#project.build.unitTest.excludes</excludes>
+        <classpathElements>#project.classpathElements</classpathElements>
+      </configuration>
+    </goal>
+  </goals>
+</plugin>
