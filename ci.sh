@@ -10,7 +10,8 @@ HOME_DIR=`pwd`
 DATE=`date`
 DIR=m2-build
 REPO=maven-repo-local
-FROM=brett@maven.org
+FROM=jvanzyl@maven.org
+#FROM=brett@apache.org
 #TO=maven2-user@lists.codehaus.org
 TO=m2-dev@maven.apache.org
 SCM_LOG=scm.log
@@ -19,7 +20,9 @@ DEPLOY_DIR=$HOME_DIR/public_html/m2
 DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2
 
 export JAVA_HOME=/usr/local/java
-export M2_HOME=$HOME_DIR/m2
+# Required until classworlds.conf is updated
+#export M2_HOME=$HOME_DIR/m2
+export M2_HOME=$HOME/m2
 export PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin
 
 # ----------------------------------------------------------------------------------
