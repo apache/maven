@@ -193,12 +193,18 @@ buildMavenProject()
       
       isCommandSuccessful $? "Failed running project parser!"
       
-      projectDependencyClassPath=`cat bootstrap.classpath`:.
+      bootstrapClasspath=`cat bootstrap.classpath`
+
+      if $cygwin = true; then
+        bootstrapClasspath=`cygpath -pu "$bootstrapClasspath"`
+      fi
+      
+      projectDependencyClassPath=$bootstrapClasspath:.
       
       if [ ! -z $sourceDirectory ] && [ -d $sourceDirectory ]
       then
         
-        compile $projectDependencyClassPath $buildDest $sourceDirectory
+        compile "$projectDependencyClassPath" $buildDest $sourceDirectory
       
         isCommandSuccessful $? "Failed compiling classes!"
       
