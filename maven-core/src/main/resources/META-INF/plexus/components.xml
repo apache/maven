@@ -109,15 +109,6 @@
      |
      -->
     <component>
-      <role>org.apache.maven.project.path.PathTranslator</role>
-      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
       <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
       <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
     </component>

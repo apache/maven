@@ -35,6 +35,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -76,6 +77,8 @@ public class DefaultPluginManager
     protected List remotePluginRepositories;
 
     protected ArtifactFilter artifactFilter;
+
+    protected PathTranslator pathTranslator;
 
     public DefaultPluginManager()
     {
@@ -216,8 +219,6 @@ public class DefaultPluginManager
             {
                 MavenProject project = session.getProject();
 
-                List projectPlugins = project.getPlugins();
-
                 org.apache.maven.model.Plugin pluginConfig = null;
 
                 for ( Iterator it = project.getPlugins().iterator(); it.hasNext(); )
@@ -227,6 +228,7 @@ public class DefaultPluginManager
                     if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
                     {
                         pluginConfig = plugin;
+
                         break;
                     }
                 }
@@ -277,6 +279,7 @@ public class DefaultPluginManager
         try
         {
             artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
+
             mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
             MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
@@ -304,7 +307,8 @@ public class DefaultPluginManager
     // Plugin execution
     // ----------------------------------------------------------------------
 
-    public PluginExecutionResponse executeMojo( MavenSession session, String goalName ) throws GoalExecutionException
+    public PluginExecutionResponse executeMojo( MavenSession session, String goalName )
+        throws GoalExecutionException
     {
         try
         {
@@ -363,9 +367,7 @@ public class DefaultPluginManager
 
         try
         {
-            //            getLogger().info( "[" + mojoDescriptor.getId() + "]" );
-
-            request = new PluginExecutionRequest( DefaultPluginManager.createParameters( mojoDescriptor, session ) );
+            request = new PluginExecutionRequest( createParameters( mojoDescriptor, session ) );
 
             request.setLog( session.getLog() );
         }
@@ -444,7 +446,7 @@ public class DefaultPluginManager
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
 
-    public static Map createParameters( MojoDescriptor goal, MavenSession session ) 
+    public Map createParameters( MojoDescriptor goal, MavenSession session )
         throws PluginConfigurationException
     {
         Map map = null;
@@ -471,6 +473,14 @@ public class DefaultPluginManager
                     {
                         value = PluginParameterExpressionEvaluator.evaluate( parameter.getDefaultValue(), session );
                     }
+                }
+
+                String type = parameter.getType();
+
+                if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
+                {
+                    value = pathTranslator.alignToBaseDirectory( (String)value,
+                                                                 session.getProject().getFile().getParentFile() );
                 }
 
                 map.put( key, value );

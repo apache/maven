@@ -30,4 +30,6 @@ public interface PathTranslator
     static final String ROLE = PathTranslator.class.getName();
 
     void alignToBaseDirectory( Model model, File projectFile );
+
+    String alignToBaseDirectory( String path, File basedir );
 }

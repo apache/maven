@@ -31,83 +31,48 @@ public class DefaultPathTranslator
 
     public void alignToBaseDirectory( Model model, File projectFile )
     {
-        // build.directory
-        // build.sourceDirectory
-        // build.unitTestSourceDirectory
-        // build.aspectSourceDirectory
-        // build.resources.resource.directory
-        // unitTest.resources.resource.directory
-
-        // build.output
-        // build.testOutput
-
         Build build = model.getBuild();
+
+        File basedir = projectFile.getParentFile();
 
         if ( build != null )
         {
-            String s = stripBasedirToken( build.getDirectory() );
+            build.setDirectory( alignToBaseDirectory( build.getDirectory(), basedir ) );
 
-            if ( requiresBaseDirectoryAlignment( s ) )
-            {
-                build.setDirectory( new File( projectFile.getParentFile(), s ).getPath() );
-            }
+            build.setSourceDirectory( alignToBaseDirectory( build.getSourceDirectory(), basedir ) );
 
-            s = stripBasedirToken( build.getSourceDirectory() );
+            build.setTestSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) );
 
-            if ( requiresBaseDirectoryAlignment( s ) )
-            {
-                build.setSourceDirectory( new File( projectFile.getParentFile(), s ).getPath() );
-            }
-
-            s = stripBasedirToken( build.getTestSourceDirectory() );
-
-            if ( requiresBaseDirectoryAlignment( s ) )
-            {
-                build.setTestSourceDirectory( new File( projectFile.getParentFile(), s ).getPath() );
-            }
-
-            List buildResources = build.getResources();
-
-            for ( Iterator i = buildResources.iterator(); i.hasNext(); )
+            for ( Iterator i = build.getResources().iterator(); i.hasNext(); )
             {
                 Resource resource = (Resource) i.next();
 
-                s = stripBasedirToken( resource.getDirectory() );
-
-                if ( requiresBaseDirectoryAlignment( s ) )
-                {
-                    resource.setDirectory( new File( projectFile.getParentFile(), s ).getPath() );
-                }
+                resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
-            List unitTestResources = build.getTestResources();
-
-            for ( Iterator i = unitTestResources.iterator(); i.hasNext(); )
+            for ( Iterator i = build.getTestResources().iterator(); i.hasNext(); )
             {
                 Resource resource = (Resource) i.next();
 
-                s = stripBasedirToken( resource.getDirectory() );
-
-                if ( requiresBaseDirectoryAlignment( s ) )
-                {
-                    resource.setDirectory( new File( projectFile.getParentFile(), s ).getPath() );
-                }
+                resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
-            s = stripBasedirToken( build.getOutputDirectory() );
+            build.setOutputDirectory( alignToBaseDirectory( build.getOutputDirectory(), basedir ) );
 
-            if ( requiresBaseDirectoryAlignment( s ) )
-            {
-                build.setOutputDirectory( new File( projectFile.getParentFile(), s ).getPath() );
-            }
-
-            s = stripBasedirToken( build.getTestOutputDirectory() );
-
-            if ( requiresBaseDirectoryAlignment( s ) )
-            {
-                build.setTestOutputDirectory( new File( projectFile.getParentFile(), s ).getPath() );
-            }
+            build.setTestOutputDirectory( alignToBaseDirectory( build.getTestOutputDirectory(), basedir ) );
         }
+    }
+
+    public String alignToBaseDirectory( String path, File basedir )
+    {
+        String s = stripBasedirToken( path );
+
+        if ( requiresBaseDirectoryAlignment( s ) )
+        {
+            s = new File( basedir, s ).getPath();
+        }
+
+        return s;
     }
 
     private String stripBasedirToken( String s )
