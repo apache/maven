@@ -151,8 +151,6 @@ public class ProjectTestHelper
 
         assertEquals( "1.0", dep.getVersion() );
 
-        assertEquals( "d1-url", dep.getUrl() );
-
         Dependency dep2 = (Dependency) project.getDependencies().get( 1 );
 
         assertEquals( "g2", dep2.getGroupId() );
@@ -160,8 +158,6 @@ public class ProjectTestHelper
         assertEquals( "d2", dep2.getArtifactId() );
 
         assertEquals( "2.0", dep2.getVersion() );
-
-        assertEquals( "d2-url", dep2.getUrl() );
 
         // ----------------------------------------------------------------------
         // Build

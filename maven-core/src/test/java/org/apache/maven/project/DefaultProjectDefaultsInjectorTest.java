@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyDefault;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 
 import junit.framework.TestCase;
@@ -24,7 +24,7 @@ public class DefaultProjectDefaultsInjectorTest
         new DefaultProjectDefaultsInjector();
     }
     
-    public void testShouldSucceedInMergingDependencyWithDependencyDefault()
+    public void testShouldSucceedInMergingDependencyWithDependency()
     {
         Model model = new Model();
         
@@ -34,12 +34,16 @@ public class DefaultProjectDefaultsInjectorTest
         
         model.addDependency(dep);
         
-        DependencyDefault def = new DependencyDefault();
+        Dependency def = new Dependency();
         def.setGroupId(dep.getGroupId());
         def.setArtifactId(dep.getArtifactId());
         def.setVersion("1.0.1");
         
-        model.addDependencyDefault(def);
+        DependencyManagement depMgmt = new DependencyManagement();
+        
+        depMgmt.addDependency(def);
+        
+        model.setDependencyManagement(depMgmt);
         
         MavenProject project = new MavenProject(model);
         
@@ -62,14 +66,16 @@ public class DefaultProjectDefaultsInjectorTest
         
         model.addDependency(dep);
         
-        DependencyDefault def = new DependencyDefault();
+        Dependency def = new Dependency();
         def.setGroupId(dep.getGroupId());
         def.setArtifactId(dep.getArtifactId());
-        def.setArtifact("myArtifact");
-        def.setUrl("http://www.google.com");
         def.setVersion("1.0.1");
         
-        model.addDependencyDefault(def);
+        DependencyManagement depMgmt = new DependencyManagement();
+        
+        depMgmt.addDependency(def);
+        
+        model.setDependencyManagement(depMgmt);
         
         MavenProject project = new MavenProject(model);
         
@@ -80,8 +86,6 @@ public class DefaultProjectDefaultsInjectorTest
         
         Dependency result = (Dependency)deps.get(0);
         assertEquals(def.getVersion(), result.getVersion());
-        assertEquals(def.getArtifact(), result.getArtifact());
-        assertEquals(def.getUrl(), result.getUrl());
     }
 
     public void testShouldNotMergeDefaultUrlOrArtifactWhenDependencySuppliesVersion()
@@ -95,13 +99,15 @@ public class DefaultProjectDefaultsInjectorTest
         
         model.addDependency(dep);
         
-        DependencyDefault def = new DependencyDefault();
+        Dependency def = new Dependency();
         def.setGroupId(dep.getGroupId());
         def.setArtifactId(dep.getArtifactId());
-        def.setArtifact("myArtifact");
-        def.setUrl("http://www.google.com");
         
-        model.addDependencyDefault(def);
+        DependencyManagement depMgmt = new DependencyManagement();
+        
+        depMgmt.addDependency(def);
+        
+        model.setDependencyManagement(depMgmt);
         
         MavenProject project = new MavenProject(model);
         
@@ -112,8 +118,6 @@ public class DefaultProjectDefaultsInjectorTest
         
         Dependency result = (Dependency)deps.get(0);
         assertEquals(dep.getVersion(), result.getVersion());
-        assertNull(result.getArtifact());
-        assertNull(result.getUrl());
     }
 
     public void testShouldMergeDefaultPropertiesWhenDependencyDoesntSupplyProperties()
@@ -127,7 +131,7 @@ public class DefaultProjectDefaultsInjectorTest
         
         model.addDependency(dep);
         
-        DependencyDefault def = new DependencyDefault();
+        Dependency def = new Dependency();
         def.setGroupId(dep.getGroupId());
         def.setArtifactId(dep.getArtifactId());
         
@@ -136,7 +140,11 @@ public class DefaultProjectDefaultsInjectorTest
         
         def.setProperties(props);
         
-        model.addDependencyDefault(def);
+        DependencyManagement depMgmt = new DependencyManagement();
+        
+        depMgmt.addDependency(def);
+        
+        model.setDependencyManagement(depMgmt);
         
         MavenProject project = new MavenProject(model);
         
@@ -146,6 +154,7 @@ public class DefaultProjectDefaultsInjectorTest
         assertEquals(1, deps.size());
         
         Dependency result = (Dependency)deps.get(0);
+        
         assertEquals("value", result.getProperties().getProperty("test"));
     }
 
@@ -165,7 +174,7 @@ public class DefaultProjectDefaultsInjectorTest
         
         model.addDependency(dep);
         
-        DependencyDefault def = new DependencyDefault();
+        Dependency def = new Dependency();
         def.setGroupId(dep.getGroupId());
         def.setArtifactId(dep.getArtifactId());
         
@@ -174,7 +183,11 @@ public class DefaultProjectDefaultsInjectorTest
         
         def.setProperties(props2);
         
-        model.addDependencyDefault(def);
+        DependencyManagement depMgmt = new DependencyManagement();
+        
+        depMgmt.addDependency(def);
+        
+        model.setDependencyManagement(depMgmt);
         
         MavenProject project = new MavenProject(model);
         
@@ -197,11 +210,15 @@ public class DefaultProjectDefaultsInjectorTest
         
         model.addDependency(dep);
         
-        DependencyDefault def = new DependencyDefault();
+        Dependency def = new Dependency();
         def.setGroupId(dep.getGroupId());
         def.setArtifactId(dep.getArtifactId());
         
-        model.addDependencyDefault(def);
+        DependencyManagement depMgmt = new DependencyManagement();
+        
+        depMgmt.addDependency(def);
+        
+        model.setDependencyManagement(depMgmt);
         
         MavenProject project = new MavenProject(model);
         

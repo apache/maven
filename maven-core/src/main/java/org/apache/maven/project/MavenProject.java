@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.IssueManagement;
@@ -119,9 +120,9 @@ public class MavenProject
         return model.getDependencies();
     }
     
-    public List getDependencyDefaults()
+    public DependencyManagement getDependencyManagement()
     {
-        return model.getDependencyDefaults();
+        return model.getDependencyManagement();
     }
 
     // ----------------------------------------------------------------------
