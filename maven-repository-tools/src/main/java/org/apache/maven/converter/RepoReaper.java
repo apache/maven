@@ -21,16 +21,14 @@ import java.util.Iterator;
 
 import org.apache.maven.model.Model;
 
+import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
+
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l </a>
  * @version $Id$
  */
 public class RepoReaper
 {
-    MavenRepository inRepository = new Maven1Repository();
-
-    MavenRepository outRepository = new Maven2Repository();
-
     public static void main( String[] args )
         throws Exception
     {
@@ -65,6 +63,14 @@ public class RepoReaper
     public void work( File inbase, File outbase )
         throws Exception
     {
+        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
+
+        embedder.start();
+
+        MavenRepository inRepository = (MavenRepository)embedder.lookup( MavenRepository.ROLE, "maven1" );
+
+        MavenRepository outRepository = (MavenRepository)embedder.lookup( MavenRepository.ROLE, "maven2" );
+
         inRepository.setRepository( inbase );
 
         System.out.println( "Input basedir: " + inbase.getAbsolutePath() );

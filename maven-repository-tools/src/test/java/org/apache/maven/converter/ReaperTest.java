@@ -18,6 +18,8 @@ package org.apache.maven.converter;
 
 import java.io.File;
 
+import org.codehaus.plexus.DefaultArtifactEnabledContainer;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -28,6 +30,11 @@ import org.codehaus.plexus.util.FileUtils;
 public class ReaperTest
     extends PlexusTestCase
 {
+    public PlexusContainer getContainerInstance()
+    {
+        return new DefaultArtifactEnabledContainer();
+    }
+
     public void testReaper()
         throws Exception
     {

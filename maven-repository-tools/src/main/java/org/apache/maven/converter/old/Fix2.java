@@ -1,4 +1,4 @@
-package org.apache.maven.converter;
+package org.apache.maven.converter.old;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.

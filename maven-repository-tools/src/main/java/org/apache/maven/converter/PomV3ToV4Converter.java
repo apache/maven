@@ -51,7 +51,7 @@ import org.apache.maven.model.Site;
 import org.apache.maven.model.SourceModification;
 import org.apache.maven.model.UnitTest;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.model.v300.io.xpp3.MavenV300Xpp3Reader;
+import org.apache.maven.model.v300.io.xpp3.MavenXpp3Reader;
 
 import org.codehaus.plexus.util.FileUtils;
 
@@ -791,12 +791,13 @@ public class PomV3ToV4Converter
     private org.apache.maven.model.v300.Model loadV3Pom( File inputFile )
         throws Exception
     {
-        MavenV300Xpp3Reader v3Reader = new MavenV300Xpp3Reader();
+        MavenXpp3Reader v3Reader = new MavenXpp3Reader();
 
         org.apache.maven.model.v300.Model model;
 
         model = v3Reader.read( new FileReader( inputFile ) );
 
+/*
         String id = model.getId();
 
         String groupId = model.getGroupId();
@@ -842,7 +843,7 @@ public class PomV3ToV4Converter
                 model.setArtifactId( artifactId );
             }
         }
-
+*/
         return model;
     }
 

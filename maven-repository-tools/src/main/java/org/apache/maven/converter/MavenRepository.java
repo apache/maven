@@ -15,6 +15,8 @@ import org.apache.maven.model.Model;
  */
 public interface MavenRepository
 {
+    String ROLE = MavenRepository.class.getName();
+
     void setRepository( File repository );
 
     File getRepository();

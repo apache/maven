@@ -14,6 +14,10 @@ import java.io.Writer;
 import java.security.MessageDigest;
 import java.util.Iterator;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
@@ -27,15 +31,21 @@ import org.codehaus.plexus.util.IOUtil;
 public class Maven2Repository
     extends AbstractMavenRepository
 {
+    private ArtifactInstaller installer;
+
     public Iterator getArtifactsByType( String type )
         throws Exception
     {
         throw new Exception( "Not implemented." );
     }
 
-    public void installArtifact( File artifact, Model model )
+    public void installArtifact( File artifactFile, Model model )
         throws Exception
     {
+        ArtifactRepository repository = new ArtifactRepository();
+
+        repository.setBasedir( getRepository().getAbsolutePath() );
+/*
         String type = model.getType();
 
         if ( type.equals( "jar" ) )
@@ -46,6 +56,10 @@ public class Maven2Repository
         {
             throw new Exception( "This installer can only handle jars." );
         }
+*/
+        Artifact artifact = new DefaultArtifact( model.getGroupId(), model.getArtifactId(), model.getVersion(), model.getType() );
+
+        installer.install( artifactFile, artifact, repository );
     }
 
     public String getPomForArtifact( String artifactPath )
