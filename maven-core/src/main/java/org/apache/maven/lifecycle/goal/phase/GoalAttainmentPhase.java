@@ -23,6 +23,7 @@ import org.apache.maven.plugin.OgnlProjectValueExtractor;
 import org.apache.maven.plugin.Plugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -54,7 +55,14 @@ public class GoalAttainmentPhase
 
             getLogger().info( "[" + mojoDescriptor.getId() + "]" );
 
-            request = new PluginExecutionRequest( createParameters( mojoDescriptor, context ) );
+            try
+            {
+                request = new PluginExecutionRequest( createParameters( mojoDescriptor, context ) );
+            }
+            catch ( PluginConfigurationException e )
+            {
+                throw new GoalExecutionException( "Error configuring plugin for execution.", e );
+            }
 
             response = new PluginExecutionResponse();
 
@@ -93,6 +101,7 @@ public class GoalAttainmentPhase
     }
 
     private Map createParameters( MojoDescriptor goal, MavenGoalExecutionContext context )
+        throws PluginConfigurationException
     {
         Map map = null;
 

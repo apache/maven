@@ -28,6 +28,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public class OgnlProjectValueExtractor
 {
     public static Object evaluate( String expression, MavenGoalExecutionContext context )
+        throws PluginConfigurationException
     {
         Object value = null;
 
@@ -80,8 +81,8 @@ public class OgnlProjectValueExtractor
             }
             catch ( OgnlException e )
             {
-                // do nothing
-                e.printStackTrace(); // TODO: should log? should ignore as previously?
+                throw new PluginConfigurationException(
+                    "Error evaluating plugin parameter expression: " + expression, e );
             }
         }
         else if ( expression.equals( "#basedir" ) )
