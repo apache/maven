@@ -1,0 +1,16 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${groupId}</groupId>
+  <artifactId>${artifactId}</artifactId>
+  <packaging>jar</packaging>
+  <version>${version}</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</model>
