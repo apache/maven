@@ -69,7 +69,6 @@ public class SnapshotTransformation
                 throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
             }
 
-            String version = localMetadata.constructVersion();
             boolean alreadyResolved = alreadyResolved( artifact );
             if ( !alreadyResolved )
             {
@@ -144,6 +143,8 @@ public class SnapshotTransformation
             }
             else
             {
+                String version = localMetadata.constructVersion();
+                
                 if ( getLogger().isInfoEnabled() )
                 {
                     if ( !version.equals( artifact.getBaseVersion() ) && !alreadyResolved )
