@@ -71,7 +71,8 @@ public class MBoot
         "maven-plugin",
         "maven-plugin-tools",
         "maven-artifact",
-        "maven-core"
+        "maven-core",
+        "maven-core-it-verifier"
     };
 
     String[] pluginBuilds = new String[]
