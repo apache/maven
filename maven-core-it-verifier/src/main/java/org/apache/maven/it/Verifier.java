@@ -1,29 +1,25 @@
 package org.apache.maven.it;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import org.apache.xpath.XPathAPI;
+import org.apache.maven.it.cli.Commandline;
+import org.apache.maven.it.cli.CommandLineUtils;
+import org.apache.maven.it.cli.StreamConsumer;
+import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.xml.utils.DOMBuilder;
-import org.apache.xpath.XPathAPI;
-import org.w3c.dom.Document;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.Writer;
+import java.io.FileWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -37,6 +33,7 @@ public class Verifier
     private final String basedir;
 
     private final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
     private final ByteArrayOutputStream errStream = new ByteArrayOutputStream();
 
     private final PrintStream originalOut;
@@ -47,31 +44,38 @@ public class Verifier
         this.basedir = basedir;
 
         originalOut = System.out;
+
         System.setOut( new PrintStream( outStream ) );
             
         originalErr = System.err;
+
         System.setErr( new PrintStream( errStream ) );
     }
 
     public void resetStreams()
     {
         System.setOut( originalOut );
+
         System.setErr( originalErr );
     }
 
     public void displayStreamBuffers()
     {
         String out = outStream.toString();
+
         if ( out != null && out.trim().length() > 0 )
         {
             System.out.println( "----- Standard Out -----" );
+
             System.out.println( out );
         }
 
         String err = errStream.toString();
+
         if ( err != null && err.trim().length() > 0 )
         {
             System.err.println( "----- Standard Error -----" );
+
             System.err.println( err );
         }
     }
@@ -83,9 +87,11 @@ public class Verifier
     public void verify() throws VerificationException
     {
         List lines = loadFile( basedir, "expected-results.txt" );
+
         for ( Iterator i = lines.iterator(); i.hasNext(); )
         {
             String line = ( String ) i.next();
+
             verifyExpectedResult( line );
         }
     }
@@ -108,12 +114,14 @@ public class Verifier
             while ( (line = reader.readLine()) != null )
             {
                 line = line.trim();
+
                 if ( line.startsWith( "#" ) || line.length() == 0 )
                 {
                     continue;
                 }
 
                 line = replace( line, "${localRepository}", localRepo );
+
                 lines.add( line );
             }
         }
@@ -129,6 +137,7 @@ public class Verifier
         try
         {
             File f = new File( basedir, filename );
+
             if ( !f.exists() )
             {
                 return;
@@ -139,6 +148,7 @@ public class Verifier
             for ( Iterator i = lines.iterator(); i.hasNext(); )
             {
                 String line = ( String ) i.next();
+
                 executeCommand( line );
             }
         }
@@ -155,11 +165,15 @@ public class Verifier
     private static void executeCommand( String line ) throws VerificationException
     {
         int index = line.indexOf( " " );
+
         String cmd;
+
         String args = null;
+
         if ( index >= 0 )
         {
             cmd = line.substring( 0, index );
+
             args = line.substring( index + 1 );
         }
         else
@@ -170,7 +184,9 @@ public class Verifier
         if ( cmd.equals( "rm" ) )
         {
             System.out.println( "Removing file: " + args );
+
             File f = new File( args );
+
             if ( f.exists() && !f.delete() )
             {
                 throw new VerificationException( "Error removing file - delete failed" );
@@ -185,15 +201,18 @@ public class Verifier
     private static String retrieveLocalRepo()
     {
         String repo = System.getProperty( "maven.repo.local" );
+
         if ( repo == null )
         {
             try
             {
                 // parse ~/.m2/override.xml for it...
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
                 DocumentBuilder builder = factory.newDocumentBuilder();
     
                 File pom = new File( System.getProperty( "user.home" ), ".m2/override.xml" );
+
                 Document dom = builder.parse( pom );
     
                 repo = XPathAPI.selectSingleNode( dom, "/project/local/repository/text()" ).getNodeValue();
@@ -235,6 +254,7 @@ public class Verifier
         else
         {
             File expectedFile = new File( line );
+
             if ( !expectedFile.isAbsolute() && !line.startsWith( "/" ) )
             {
                 expectedFile = new File( basedir, line );
@@ -269,10 +289,13 @@ public class Verifier
         }
 
         StringBuffer buf = new StringBuffer( text.length() );
+
         int start = 0, end = 0;
+
         while ( (end = text.indexOf( repl, start )) != -1 )
         {
             buf.append( text.substring( start, end ) ).append( with );
+
             start = end + repl.length();
 
             if ( --max == 0 )
@@ -280,40 +303,58 @@ public class Verifier
                 break;
             }
         }
+
         buf.append( text.substring( start ) );
+
         return buf.toString();
     }
 
     public void executeGoals( String filename ) throws VerificationException
     {
         String mavenHome = System.getProperty( "maven.home" );
+
         if ( mavenHome == null )
         {
             throw new VerificationException( "maven.home has not been specified" );
         }
 
         List goals = loadFile( basedir, filename );
+
         if ( goals.size() == 0 )
         {
             throw new VerificationException( "No goals specified" );
         }
+
         List allGoals = new ArrayList();
+
         allGoals.add( "clean:clean" );
+
         allGoals.addAll( goals );
 
         int ret = 0;
-        try 
+
+        try
         {
-            String prevUserDir = System.getProperty( "user.dir" );
-            System.setProperty( "user.dir", basedir );
-            System.setProperty( "classworlds.conf", mavenHome + "/bin/classworlds.conf" );
-            URL classWorldsUrl = new URL( "file:" + mavenHome + "/core/boot/classworlds-1.1-SNAPSHOT.jar" );
-            ClassLoader cl = URLClassLoader.newInstance( new URL[] { classWorldsUrl } );
-            Class c = Class.forName( "org.codehaus.classworlds.Launcher", true, cl );
-            Method m = c.getMethod( "mainWithExitCode", new Class[] { String[].class } );
-            Object o = m.invoke( null, new Object[] { allGoals.toArray( new String[0] ) } );
-            System.setProperty( "user.dir", prevUserDir );
-            ret = ( ( Integer ) o ).intValue();
+            Commandline cli = new Commandline();
+
+            cli.setWorkingDirectory( basedir );
+
+            cli.setExecutable( "m2" );
+
+            for ( Iterator i = allGoals.iterator(); i.hasNext(); )
+            {
+                cli.createArgument().setValue( (String) i.next() );
+            }
+
+            Writer logWriter = new FileWriter( new File( basedir, "log.txt" ) );
+
+            StreamConsumer out = new WriterStreamConsumer( logWriter );
+
+            StreamConsumer err = new WriterStreamConsumer( logWriter );
+
+            ret = CommandLineUtils.executeCommandLine( cli, out, err );
+
+            logWriter.close();
         }
         catch ( Exception e )
         {
@@ -323,6 +364,7 @@ public class Verifier
         if ( ret > 0 )
         {
             System.err.println( "Exit code: " + ret );
+
             throw new VerificationException();
         }
     }
@@ -334,17 +376,21 @@ public class Verifier
     public static void main( String args[] )
     {
         String basedir = System.getProperty( "user.dir" );
+
         localRepo = retrieveLocalRepo();
 
         List tests = null;
-        try 
+
+        try
         {
             tests = loadFile( basedir, "integration-tests.txt" );
         }
         catch ( VerificationException e )
         {
             System.err.println( "Unable to load integration tests file" );
+
             System.err.println( e.getMessage() );
+
             System.exit( 2 );
         }
 
@@ -357,7 +403,7 @@ public class Verifier
 
         for ( Iterator i = tests.iterator(); i.hasNext(); )
         {
-            String test = ( String ) i.next(); 
+            String test = ( String ) i.next();
 
             System.out.print( test + "... " );
 
@@ -366,9 +412,11 @@ public class Verifier
             try
             {
                 verifier.executeHook( "prebuild-hook.txt" );
+
                 verifier.executeGoals( "goals.txt" );
+
                 verifier.executeHook( "postbuild-hook.txt" );
-    
+
                 verifier.verify();
 
                 verifier.resetStreams();
@@ -384,9 +432,11 @@ public class Verifier
                 verifier.displayStreamBuffers();
 
                 e.printStackTrace();
+
                 exitCode = 1;
             }
         }
+
         System.exit( exitCode );
     }
 }
