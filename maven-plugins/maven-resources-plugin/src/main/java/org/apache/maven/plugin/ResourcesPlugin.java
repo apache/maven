@@ -92,6 +92,10 @@ public class ResourcesPlugin
     public void execute()
         throws Exception
     {
+        System.out.println( "outputDirectory = " + outputDirectory );
+
+        System.out.println( "resources = " + resources );
+
         for ( Iterator i = getJarResources( resources ).iterator(); i.hasNext(); )
         {
             ResourceEntry resourceEntry = (ResourceEntry) i.next();
@@ -125,8 +129,22 @@ public class ResourcesPlugin
                 continue;
             }
 
+            // If we only have a directory then we want to include
+            // everything we can find within that path.
+
+            String includes;
+
+            if ( resource.getIncludes().size() > 0 )
+            {
+                includes = listToString( resource.getIncludes() );
+            }
+            else
+            {
+                includes = "**/**";
+            }
+
             List files = FileUtils.getFileNames( resourceDirectory,
-                                                 listToString( resource.getIncludes() ),
+                                                 includes,
                                                  listToString( resource.getExcludes() ),
                                                  false );
 
@@ -135,7 +153,6 @@ public class ResourcesPlugin
                 String name = (String) j.next();
 
                 String entryName = name;
-                ;
 
                 if ( targetPath != null )
                 {
