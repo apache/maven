@@ -459,49 +459,36 @@ public class DefaultPluginManager
     public Map createParameters( MojoDescriptor goal, MavenSession session )
         throws PluginConfigurationException
     {
-        Map map = null;
-
         List parameters = goal.getParameters();
 
-        if ( parameters != null )
+        Map map = new HashMap();
+
+        for ( int i = 0; i < parameters.size(); i++ )
         {
-            map = new HashMap();
+            Parameter parameter = (Parameter) parameters.get( i );
 
-            for ( int i = 0; i < parameters.size(); i++ )
+            String key = parameter.getName();
+
+            String expression = parameter.getExpression();
+
+            Object value = PluginParameterExpressionEvaluator.evaluate( expression, session );
+
+            getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
+
+            if ( value == null )
             {
-                Parameter parameter = (Parameter) parameters.get( i );
-
-                String key = parameter.getName();
-
-                String expression = parameter.getExpression();
-
-                Object value = PluginParameterExpressionEvaluator.evaluate( expression, session );
-
-                getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
-
-                if ( value == null )
+                if ( parameter.getDefaultValue() != null )
                 {
-                    if ( parameter.getDefaultValue() != null )
-                    {
-                        value = PluginParameterExpressionEvaluator.evaluate( parameter.getDefaultValue(), session );
-                    }
+                    value = PluginParameterExpressionEvaluator.evaluate( parameter.getDefaultValue(), session );
                 }
-
-                String type = parameter.getType();
-
-                if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
-                {
-                    value = pathTranslator.alignToBaseDirectory( (String) value,
-                                                                 session.getProject().getFile().getParentFile() );
-                }
-
-                map.put( key, value );
             }
 
-            if ( session.getProject() != null )
-            {
-                map = mergeProjectDefinedPluginConfiguration( session.getProject(), goal.getId(), map );
-            }
+            map.put( key, value );
+        }
+
+        if ( session.getProject() != null )
+        {
+            map = mergeProjectDefinedPluginConfiguration( session.getProject(), goal.getId(), map );
         }
 
         for ( int i = 0; i < parameters.size(); i++ )
@@ -525,6 +512,15 @@ public class DefaultPluginManager
             {
                 throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
             }
+
+            String type = parameter.getType();
+
+            if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
+            {
+                value = pathTranslator.alignToBaseDirectory( (String) value,
+                                                             session.getProject().getFile().getParentFile() );
+                map.put( key, value );
+            }
         }
 
         return map;
@@ -546,7 +542,7 @@ public class DefaultPluginManager
             {
                 org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) iterator.next();
 
-                // TODO: groupID not handled
+// TODO: groupID not handled
                 if ( pluginId.equals( plugin.getArtifactId() ) )
                 {
                     return CollectionUtils.mergeMaps( plugin.getConfiguration(), map );
@@ -567,9 +563,9 @@ public class DefaultPluginManager
         return message.toString();
     }
 
-    // ----------------------------------------------------------------------
-    // Lifecycle
-    // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Lifecycle
+// ----------------------------------------------------------------------
 
     public void contextualize( Context context )
         throws ContextException
@@ -586,11 +582,11 @@ public class DefaultPluginManager
                                                               "plexus-artifact-container", "wagon-provider-api",
                                                               "classworlds"} );
 
-        // TODO: move this to be configurable from the Maven component
+// TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new ArrayList();
 
-        // TODO: needs to be configured from the POM element
-        
+// TODO: needs to be configured from the POM element
+
         MavenSettings settings = null;
         try
         {
@@ -611,9 +607,9 @@ public class DefaultPluginManager
         remotePluginRepositories.add( pluginRepository );
     }
 
-    // ----------------------------------------------------------------------
-    // Artifact resolution
-    // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Artifact resolution
+// ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
                                                 MavenProjectBuilder mavenProjectBuilder )
@@ -631,9 +627,9 @@ public class DefaultPluginManager
         project.addArtifacts( result.getArtifacts().values() );
     }
 
-    // ----------------------------------------------------------------------
-    // Artifact downloading
-    // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Artifact downloading
+// ----------------------------------------------------------------------
 
     private void downloadDependencies( MavenSession context, ArtifactResolver artifactResolver )
         throws GoalExecutionException
