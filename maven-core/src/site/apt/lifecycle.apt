@@ -41,9 +41,12 @@ Maven Lifecycle
        
        - goal execution
  
+ * Implied goals (prereq, preGoal, postGoal)
+ 
  * Reactor with a single goal
  
  * Reactor with multiple goals
+
  
  Use Cases
   
