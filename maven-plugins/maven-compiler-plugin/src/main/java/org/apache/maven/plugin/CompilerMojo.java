@@ -41,10 +41,19 @@ import java.util.List;
  *  expression="#project.classpathElements"
  *  description=""
  *
+ * @parameter
+ *  name="debug"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.compiler.debug"
+ *  description="Whether to include debugging information in the compiled class files; the default value is false"
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  * @todo use compile source roots and not the pom.build.sourceDirectory so that any
  *       sort of preprocessing and/or source generation can be taken into consideration.
+ * @todo change debug parameter type to Boolean
  */
 
 public class CompilerMojo
@@ -83,7 +92,13 @@ public class CompilerMojo
         compilerConfiguration.setSourceLocations(Arrays.asList(new String[] {sourceDirectory}));
         
         /* Compile with debugging info */
-        compilerConfiguration.addCompilerOption("-g", null);
+        String debugAsString = (String) request.getParameter( "debug" );
+
+        if (debugAsString != null)
+        {
+            if (Boolean.valueOf(debugAsString).booleanValue())
+                compilerConfiguration.addCompilerOption("-g", null);
+        }
 
         List messages = compiler.compile(compilerConfiguration);
 
