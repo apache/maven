@@ -16,8 +16,6 @@ package org.apache.maven.plugin.descriptor;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.descriptor.Parameter;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
