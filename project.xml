@@ -8,7 +8,7 @@
   <artifactId>maven-project</artifactId>
   <currentVersion>2.0-SNAPSHOT</currentVersion>
   <gumpRepositoryId>jakarta</gumpRepositoryId>
-  <description></description>
+  <description>Maven components parent</description>
   <shortDescription>Java Project Management Tools</shortDescription>
   <url>http://maven.apache.org</url>
   
