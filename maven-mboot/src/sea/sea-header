@@ -30,7 +30,7 @@ mkdir $DIR
 SKIP=`awk '/^__ARCHIVE_FOLLOWS__/ { print NR + 1; exit 0; }' $0`
 
 # Take the TGZ portion of this file and pipe it to tar.
-tail +$SKIP $0 | tar xz -C $DIR
+tail -n +$SKIP $0 | tar xz -C $DIR
 
 . ${MBOOT_HOME}/maven.functions
 
