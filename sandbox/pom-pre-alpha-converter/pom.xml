@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-component</artifactId>
     <groupId>maven</groupId>
@@ -32,4 +32,4 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-</model>
+</project>
