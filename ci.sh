@@ -115,7 +115,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
     echo
 
     (
-      cd $DIR/maven-components/maven-core
+      cd $DIR/maven-components
   
       ./m2-bootstrap-all.sh
     )    
