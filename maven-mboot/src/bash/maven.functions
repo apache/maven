@@ -200,6 +200,7 @@ buildMavenProject()
         rm -f bootstrap.repo > /dev/null 2>&1
         rm -f bootstrap.tests.includes > /dev/null 2>&1
         rm -f bootstrap.tests.excludes > /dev/null 2>&1
+        rm -f bootstrap.tests.resources > /dev/null 2>&1        
       fi
     )
 }
@@ -231,6 +232,9 @@ copyResources()
 {
   # $1 == resourcesfile
   # $2 == target directory
+  
+  if [ -f $1 ]
+  then
   
   resources=`cat $1`
   
@@ -281,7 +285,9 @@ copyResources()
     done
   done
   
-  find target/classes -name 'CVS*' -exec rm -rf {} > /dev/null 2>&1 \;
+  find $2 -name 'CVS*' -exec rm -rf {} > /dev/null 2>&1 \;
+  
+  fi
 }
 
 # OS specific support.  $var _must_ be set to either true or false.
