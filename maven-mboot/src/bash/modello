@@ -4,7 +4,7 @@ VERSION=1.0
 
 usage () 
 {
-  echo "usage: `basename $0` --model=<model> --version=<version> --mode=java|xsd|xpp3 --dir=<dir>" >&2
+  echo "usage: `basename $0` --model=<model> --version=<version> --mode=java|xsd|xpp3 --dir=<dir> --package-with-version" >&2
   echo "" >&2
   echo "       (ex: `basename $0` --model=model.mdo --version=4.0.0 --mode=java --dir=target/src)" >&2
   exit 1
@@ -14,6 +14,7 @@ dir="target/src/java"
 model="model.mdo"
 model_version=""
 mode="java"
+package_with_version=false
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -55,6 +56,9 @@ while [ $# -gt 0 ]; do
 		shift
 	    fi		    
 	    ;;
+	--package-with-version)
+	    package_with_version=true
+	    ;;
     esac
 
     shift
@@ -76,4 +80,4 @@ if $cygwin; then
   CP=`cygpath -pw "$CP"`
 fi
 
-java -classpath "$CP" org.codehaus.modello.Modello $model $mode "$dir" "$model_version"
+java -classpath "$CP" org.codehaus.modello.Modello $model $mode "$dir" "$model_version" "$package_with_version"
