@@ -79,12 +79,14 @@ public class MavenGoalExecutionContext
         return session.getRemoteRepositories();
     }
 
-    public Object lookup( String role ) throws ComponentLookupException
+    public Object lookup( String role )
+        throws ComponentLookupException
     {
         return session.lookup( role );
     }
 
-    public Object lookup( String role, String hint ) throws ComponentLookupException
+    public Object lookup( String role, String hint )
+        throws ComponentLookupException
     {
         return session.lookup( role, hint );
     }
@@ -125,7 +127,7 @@ public class MavenGoalExecutionContext
 
     public boolean isExecutionFailure()
     {
-        return (failedGoal != null);
+        return ( failedGoal != null );
     }
 
     public String getFailedGoal()
@@ -162,10 +164,9 @@ public class MavenGoalExecutionContext
     {
         this.requiresDependencies = requiresDependencies;
     }
-    
+
     public boolean requiresDependencies()
     {
         return requiresDependencies;
     }
-    
 }
