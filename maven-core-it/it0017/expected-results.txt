@@ -1,4 +1,4 @@
 target/classes/org/apache/maven/it0017/Person.class
 target/maven-core-it0017-1.0.jar
-target/maven-core-it0017-1.0.jar!/META-INF/ejbjar.xml
+target/maven-core-it0017-1.0.jar!/META-INF/ejb-jar.xml
 target/maven-core-it0017-1.0.jar!/org/apache/maven/it0017/Person.class
