@@ -16,6 +16,14 @@
     <logo>/images/apache-maven-project.png</logo>
   </organization>
 
+  <distributionManagement>
+    <repository>
+      <id>central</id>
+      <name>Maven Central Repository at Ibiblio</name>
+      <url>scp://login.ibiblio.org//public/html/maven</url>
+    </repository>
+  </distributionManagement>
+    
   <scm>
     <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components/${pom.artifactId}</connection>
     <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components/${pom.artifactId}</developerConnection>
