@@ -3,6 +3,7 @@
 # Maven functions
 #
 # @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+# @author <a href="mailto:emmanuel@venisse.net">Emmanuel Venisse</a>
 # -----------------------------------------------------------------------------
 
 downloadMBootDependencies()

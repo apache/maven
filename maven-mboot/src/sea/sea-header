@@ -1,8 +1,8 @@
 #!/bin/sh
 
-echo ""
+echo "-----------------------------------------------------------------------"
 echo Maven MBoot
-echo ""
+echo "-----------------------------------------------------------------------"
 
 if [ -z $MBOOT_HOME ]; then
 
@@ -31,16 +31,6 @@ SKIP=`awk '/^__ARCHIVE_FOLLOWS__/ { print NR + 1; exit 0; }' $0`
 
 # Take the TGZ portion of this file and pipe it to tar.
 tail +$SKIP $0 | tar xz -C $DIR
-
-# execute the installation script
-
-#PREV=`pwd`
-#cd $WORK_DIR
-#./install.sh
-
-# delete the temp files
-#cd $PREV
-#rm -rf $WORK_DIR
 
 . ${MBOOT_HOME}/maven.functions
 
