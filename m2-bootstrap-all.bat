@@ -113,6 +113,11 @@ cd ..
 
 %MAVEN_JAVA_EXE% %MAVEN_CMD_LINE_ARGS% %MAVEN_OPTS% -jar mboot.jar
 
+echo Rebuilding maven2 plugins
+cd maven-plugins
+m2 install
+cd ..
+
 echo Running integration tests
 cd maven-core-it
 call maven-core-it

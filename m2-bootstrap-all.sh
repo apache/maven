@@ -32,6 +32,17 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
 (
+  echo "-----------------------------------------------------------------------"
+  echo " Rebuilding maven2 plugins ... "
+  echo "-----------------------------------------------------------------------"  
+
+  cd maven-plugins
+  m2 install
+  ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+)
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+
+(
   cd ./maven-core-it
   echo
   echo "Running maven-core integration tests ..."

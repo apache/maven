@@ -67,11 +67,14 @@
     </repository>
   </distributionManagement>
   <modules>
+<!--
     <module>maven-assemble-plugin</module>
+-->
     <module>maven-clean-plugin</module>
     <module>maven-compiler-plugin</module>
     <module>maven-deploy-plugin</module>
     <module>maven-ejb-plugin</module>
+    <module>maven-idea-plugin</module>
     <module>maven-install-plugin</module>
     <module>maven-jar-plugin</module>
     <module>maven-plugin-plugin</module>
