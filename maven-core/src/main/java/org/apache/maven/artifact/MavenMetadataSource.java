@@ -116,7 +116,8 @@ public class MavenMetadataSource
     protected Artifact createArtifact( Dependency dependency, String scope, ArtifactRepository localRepository )
     {
         // TODO: can refactor
-        if ( Artifact.SCOPE_TEST.equals( scope ) )
+        String requestedScope = dependency.getScope();
+        if ( Artifact.SCOPE_TEST.equals( scope ) && Artifact.SCOPE_TEST.equals( requestedScope ) )
         {
             return null;
         }
@@ -124,7 +125,7 @@ public class MavenMetadataSource
         // TODO: duplicated with the ArtifactFactory, localRepository not used (should be used here to resolve path?
         // TODO: scope handler
         String desiredScope = Artifact.SCOPE_RUNTIME;
-        if ( Artifact.SCOPE_TEST.equals( dependency.getScope() ) )
+        if ( Artifact.SCOPE_TEST.equals( requestedScope ) || Artifact.SCOPE_TEST.equals( scope ) )
         {
             desiredScope = Artifact.SCOPE_TEST;
         }
