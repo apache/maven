@@ -42,8 +42,6 @@ package org.apache.maven.plugin.install;
  * expression="#localRepository"
  * description=""
  *
- * @prereq package
- *
  */
 public class InstallMojo
     extends AbstractInstallMojo
