@@ -97,7 +97,8 @@ public class MBoot
         "maven-plugins/maven-plugin-plugin",
         "maven-plugins/maven-pom-plugin",
         "maven-plugins/maven-resources-plugin",
-        "maven-plugins/maven-surefire-plugin" };
+        "maven-plugins/maven-surefire-plugin",
+        "maven-plugins/maven-war-plugin" };
 
     // ----------------------------------------------------------------------
     // Standard locations for resources in Maven projects.
