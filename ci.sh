@@ -35,6 +35,7 @@ TO=maven2-user@lists.codehaus.org
 SCM_LOG=scm.log
 TIMESTAMP=`date +%Y%M%d.%H%M%S`
 DEPLOY_DIR=$HOME_DIR/public_html/m2
+DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2/
 
 # ----------------------------------------------------------------------------------
 
@@ -118,16 +119,18 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
       ./bootstrap-all.sh
     )    
 
+    DIST=m2-${TIMESTAMP}.tar.gz
+
     echo
-    echo "Creating m2 distribution for public consumption ... "
+    echo "Creating m2 distribution for public consumption: ${DEPLOY_SITE}/${DIST}"
     echo
     
     (
       cd $DIR/maven-components/maven-core/dist
       
-      tar czf m2-${TIMESTAMP}.tar.gz m2
+      tar czf $DIST m2
       
-      cp m2-${TIMESTAMP}.tar.gz $DEPLOY_DIR
+      cp $DIST $DEPLOY_DIR
     )
 
   else
