@@ -7,9 +7,9 @@
 #
 # 2. export MBOOT_HOME=~/mboot
 #
-# 3. export MAVEN_HOME=~/maven
+# 3. export M2_HOME=~/maven
 #    
-# 4. export PATH=$PATH:$MBOOT:$MAVEN_HOME/bin
+# 4. export PATH=$PATH:$MBOOT:$M2_HOME/bin
 #
 # 5. Your ~/build.properties must have: maven.repo.local = ~/path/to/repo
 #
@@ -17,8 +17,8 @@
 
 export JAVA_HOME=/usr/local/java
 export MBOOT_HOME=$HOME/mboot
-export MAVEN_HOME=$HOME/maven
-export PATH=$PATH:$MBOOT_HOME:$MAVEN_HOME/bin:$JAVA_HOME/bin
+export M2_HOME=$HOME/maven
+export PATH=$PATH:$MBOOT_HOME:$M2_HOME/bin:$JAVA_HOME/bin
 
 # ----------------------------------------------------------------------------------
 
