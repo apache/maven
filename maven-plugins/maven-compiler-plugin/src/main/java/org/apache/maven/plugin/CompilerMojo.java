@@ -1,10 +1,12 @@
 package org.apache.maven.plugin;
 
 import org.codehaus.plexus.compiler.Compiler;
+import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
 import org.codehaus.plexus.compiler.javac.JavacCompiler;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -73,8 +75,17 @@ public class CompilerMojo
         {
             return;
         }
+        
+        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
+        
+        compilerConfiguration.setOutputLocation(outputDirectory);
+        compilerConfiguration.setClasspathEntries(Arrays.asList(classpathElements));
+        compilerConfiguration.setSourceLocations(Arrays.asList(new String[] {sourceDirectory}));
+        
+        /* Compile with debugging info */
+        compilerConfiguration.addCompilerOption("-g", null);
 
-        List messages = compiler.compile( classpathElements, new String[]{sourceDirectory}, outputDirectory );
+        List messages = compiler.compile(compilerConfiguration);
 
         if ( debug )
         {

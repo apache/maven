@@ -23,12 +23,12 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
-      <version>1.0</version>
+      <version>1.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-javac</artifactId>
-      <version>1.0</version>
+      <version>1.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
