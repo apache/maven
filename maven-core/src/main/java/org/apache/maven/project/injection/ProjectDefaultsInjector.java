@@ -16,7 +16,9 @@ package org.apache.maven.project.injection;
  * limitations under the License.
  */
 
-import org.apache.maven.project.MavenProject; /**
+import org.apache.maven.project.MavenProject;
+
+/**
  * @author jdcasey Created on Feb 1, 2005
  */
 public interface ProjectDefaultsInjector
