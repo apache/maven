@@ -48,6 +48,9 @@ Maven Lifecycle
   * where a goal does not require a pom.xml (pom-writer, for example).
     Here, the pom should NOT be read.
 
+  * is there a case where a goal should in fact be executed twice in a
+    session? Something like "m2 clean foo clean"
+
  Notes
  
   * Goal Resolution: Involves resolving all implied goals (via prereqs, pre- 
