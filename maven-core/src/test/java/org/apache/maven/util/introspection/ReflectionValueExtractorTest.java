@@ -33,14 +33,10 @@ public class ReflectionValueExtractorTest
 {
     private MavenProject project;
 
-    private MavenProjectBuilder builder;
-
     protected void setUp()
         throws Exception
     {
         super.setUp();
-
-        builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
 
         File f = getFileForClasspathResource( "pom.xml" );
 
@@ -87,5 +83,11 @@ public class ReflectionValueExtractorTest
         Build build = (Build) ReflectionValueExtractor.evaluate( "project.build", project );
 
         assertNotNull( build );
+    }
+
+    public void testValueExtractorWithAInvalidExpression()
+        throws Exception
+    {
+        assertNull( ReflectionValueExtractor.evaluate( "project.foo", project ) );
     }
 }

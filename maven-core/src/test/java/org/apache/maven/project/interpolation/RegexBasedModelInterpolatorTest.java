@@ -16,17 +16,18 @@ package org.apache.maven.project.interpolation;
  * limitations under the License.
  */
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 
+import junit.framework.TestCase;
+
 /**
  * @author jdcasey
+ * @version $Id$
  */
 public class RegexBasedModelInterpolatorTest
     extends TestCase
 {
-
     public void testShouldInterpolateDependencyVersionToSetSameAsProjectVersion()
         throws ModelInterpolationException
     {
@@ -75,5 +76,4 @@ public class RegexBasedModelInterpolatorTest
 
         assertEquals( "foo-3.8.1", ( (Dependency) out.getDependencies().get( 0 ) ).getVersion() );
     }
-
 }

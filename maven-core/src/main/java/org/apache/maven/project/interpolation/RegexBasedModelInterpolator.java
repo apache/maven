@@ -1,20 +1,19 @@
 package org.apache.maven.project.interpolation;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import org.apache.maven.model.Model;
@@ -32,12 +31,12 @@ import java.util.regex.Pattern;
 
 /**
  * @author jdcasey Created on Feb 3, 2005
+ * @version $Id$
  */
 public class RegexBasedModelInterpolator
     extends AbstractLogEnabled
     implements ModelInterpolator
 {
-
     private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom|project\\.)?([^}]+)\\}" );
 
     /**
@@ -89,10 +88,11 @@ public class RegexBasedModelInterpolator
             String wholeExpr = matcher.group( 0 );
             String realExpr = matcher.group( 2 );
 
-            String value = null;
+            Object value = null;
+
             try
             {
-                value = String.valueOf( ReflectionValueExtractor.evaluate( realExpr, model ) );
+                value = ReflectionValueExtractor.evaluate( realExpr, model );
             }
             catch ( Exception e )
             {
@@ -105,15 +105,14 @@ public class RegexBasedModelInterpolator
 
             if ( value != null )
             {
-                result = StringUtils.replace( result, wholeExpr, value );
+                result = StringUtils.replace( result, wholeExpr, String.valueOf( value ) );
                 // could use:
-                // result = matcher.replaceFirst( value );
-                // but this could result in multiple lookups of value, and replaceAll is not correct behaviour 
+                // result = matcher.replaceFirst( stringValue );
+                // but this could result in multiple lookups of stringValue, and replaceAll is not correct behaviour
                 matcher.reset( result );
             }
         }
 
         return result;
     }
-
 }
