@@ -11,10 +11,13 @@ downloadMBootDependencies()
   
   for i in `cat ${MBOOT_HOME}/deps`
   do
-    if [ ! -f $repoLocal/$i ]
+    echo $i | grep SNAPSHOT > /dev/null 2>&1
+    snapshot=$?
+
+    if [ "$snapshot" = "0" ] || [ ! -f $repoLocal/$i ]
     then
       mkdir -p `dirname $repoLocal/$i` > /dev/null 2>&1
-      wget http://www.ibiblio.org/maven/$i -O $repoLocal/$i 
+      wget http://www.ibiblio.org/maven/$i -O $repoLocal/$i
     fi
   done
 }
