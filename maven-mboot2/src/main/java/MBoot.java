@@ -279,8 +279,11 @@ public class MBoot
         // Install plugin-parent POM
         installPomFile( repoLocal, new File( basedir, "maven-plugins/pom.xml" ) );
 
-        // Install plugin-parent POM
+        // Install plugin-tools-parent POM
         installPomFile( repoLocal, new File( basedir, "maven-plugin-tools/pom.xml" ) );
+
+        // Install maven-script-parent POM
+        installPomFile( repoLocal, new File( basedir, "maven-script/pom.xml" ) );
 
         createToolsClassLoader();
 
