@@ -189,11 +189,11 @@ public class Verifier
         {
             try
             {
-                // parse ~/.m2/pom.xml for it...
+                // parse ~/.m2/override.xml for it...
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = factory.newDocumentBuilder();
     
-                File pom = new File( System.getProperty( "user.home" ), ".m2/pom.xml" );
+                File pom = new File( System.getProperty( "user.home" ), ".m2/override.xml" );
                 Document dom = builder.parse( pom );
     
                 repo = XPathAPI.selectSingleNode( dom, "/project/local/repository/text()" ).getNodeValue();
