@@ -9,7 +9,13 @@ Maven Lifecycle
  * Single goal
 
    - session lifecycle
-
+     
+     - POM reading: we always attempt to read the POM but it may not be
+       present because some goals don't require the presence of a POM like
+       stub generation, project setup or whatever. So we can flag this state
+       and throw an exception down the line if a goal in fact requires a
+       project, or if there is a POM when there shouldn't be one.
+     
      - dep resolution (if POM present)
      
      - dep download
