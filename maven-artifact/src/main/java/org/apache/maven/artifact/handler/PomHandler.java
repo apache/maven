@@ -36,4 +36,9 @@ public class PomHandler
     {
         return "poms";
     }
+
+    public String packageGoal()
+    {
+        return null;
+    }
 }

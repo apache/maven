@@ -18,6 +18,8 @@ package org.apache.maven.lifecycle;
  */
 
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
@@ -49,6 +51,8 @@ public class DefaultLifecycleExecutor
 
     private ArtifactResolver artifactResolver;
 
+    private ArtifactHandlerManager artifactHandlerManager;
+
     private MavenProjectBuilder projectBuilder;
 
     private PluginManager pluginManager;
@@ -77,7 +81,21 @@ public class DefaultLifecycleExecutor
         try
         {
             // TODO: should enrich this with the type handler, but for now just use "type" as is
-            processPluginPhases( session.getProject().getType(), session );
+            ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( session.getProject().getType() );
+
+            if ( handler != null )
+            {
+                // TODO: perhaps each type should define their own lifecycle completely, using the base as a default?
+                // If so, remove both of these goals from type handler
+                if ( handler.packageGoal() != null )
+                {
+                    verifyMojoPhase( handler.packageGoal(), session );
+                }
+                if ( handler.additionalPlugin() != null )
+                {
+                    processPluginPhases( handler.additionalPlugin(), session );
+                }
+            }
 
             processPluginConfiguration( session.getProject(), session );
 
@@ -191,7 +209,7 @@ public class DefaultLifecycleExecutor
         {
             pluginManager.verifyPluginForGoal( task, session );
             mojoDescriptor = pluginManager.getMojoDescriptor( task );
-            if ( mojoDescriptor.getPhase() != null )
+            if ( mojoDescriptor != null && mojoDescriptor.getPhase() != null )
             {
                 Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
                 phase.getGoals().add( task );

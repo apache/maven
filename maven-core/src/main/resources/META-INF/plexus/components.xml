@@ -185,6 +185,9 @@
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
         </requirement>
         <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.project.MavenProjectBuilder</role>
         </requirement>
         <requirement>
@@ -260,9 +263,6 @@
           <!-- 13 -->
           <phase>
             <id>package</id>
-            <goals>
-              <goal implementation="java.lang.String">jar:jar</goal>
-            </goals>
           </phase>
           <!-- 14 -->
           <phase>

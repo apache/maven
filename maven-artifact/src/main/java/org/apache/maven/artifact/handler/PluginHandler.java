@@ -27,6 +27,11 @@ import java.io.File;
 public class PluginHandler
     extends AbstractArtifactHandler
 {
+    public String additionalPlugin()
+    {
+        return "plugin";
+    }
+
     public String directory()
     {
         return "plugins";
