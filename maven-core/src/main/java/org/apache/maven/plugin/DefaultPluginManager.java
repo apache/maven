@@ -218,7 +218,7 @@ public class DefaultPluginManager
     public void contextualize( Context context )
         throws ContextException
     {
-        container = (ArtifactEnabledContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     public void initialize()
