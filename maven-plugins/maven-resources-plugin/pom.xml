@@ -30,11 +30,4 @@
       <version>0.16</version>
     </dependency>
   </dependencies>
-  <build>
-    <unitTest>
-      <excludes>
-        <exclude>**/ResourcesMojoTest.java</exclude>
-      </excludes>
-    </unitTest>
-  </build>
 </project>
