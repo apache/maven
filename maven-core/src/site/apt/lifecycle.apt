@@ -39,9 +39,9 @@ Maven Lifecycle
                 |          |          v
                 |          |      download the plugin which
                 |          |      contains code for this goal
-                |          |          |
-                |          |          |
-                |          |          v
+   each prereq  |          |          |
+  is a goal in  |          |          |
+another plugin  |          |          v
                 |          |      process the plugin descriptor
                 |          |      and cache the results
                 |          |          |
@@ -58,7 +58,7 @@ Maven Lifecycle
                 |    |               |
                 +----+               |
                                      v
-                                   
+
 
 
 
