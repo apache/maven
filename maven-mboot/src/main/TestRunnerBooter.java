@@ -2,11 +2,14 @@ import org.apache.maven.test.TestRunner;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class TestRunnerBooter
 {
@@ -34,15 +37,40 @@ public class TestRunnerBooter
         
         File dependenciesFile = new File(args[2]);
         
+        List dependencies = new ArrayList();
+        BufferedReader buf = new BufferedReader(new FileReader(dependenciesFile));
+        String line;
+        while ((line = buf.readLine()) != null)
+        {
+            dependencies.add(line);
+        }
+        buf.close();
+        
         processDependencies( dependencies, classLoader );
 
         File includesFile = new File(args[3]);
+        List includes = new ArrayList();
+        buf = new BufferedReader(new FileReader(includesFile));
+        line = buf.readLine();
+        String includesStr = line.substring(line.indexOf("@")+1);
+        StringTokenizer st = new StringTokenizer( includesStr, "," );
+        while ( st.hasMoreTokens() )
+        {
+            includes.add( st.nextToken().trim() );
+        }
+        buf.close();
 
         File excludesFile = new File(args[4]);
-        
-        List includes = new ArrayList();
-
         List excludes = new ArrayList();
+        buf = new BufferedReader(new FileReader(excludesFile));
+        line = buf.readLine();
+        String excludesStr = line.substring(line.indexOf("@")+1);
+        st = new StringTokenizer( excludesStr, "," );
+        while ( st.hasMoreTokens() )
+        {
+            excludes.add( st.nextToken().trim() );
+        }
+        buf.close();
         
         String[] tests = collectTests( basedir,
                                        includes,
@@ -64,6 +92,7 @@ public class TestRunnerBooter
     }
     
     private void processDependencies(List dependencies, IsolatedClassLoader classLoader)
+        throws Exception
     {
         for (Iterator i=dependencies.iterator(); i.hasNext(); )
         {
