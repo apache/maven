@@ -1,18 +1,26 @@
 package org.apache.maven.execution.initialize;
 
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.reactor.ReactorException;
-import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
-import org.apache.maven.execution.project.MavenProjectExecutionRequestHandler;
-import org.apache.maven.execution.MavenExecutionRequestHandler;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResponse;
-import org.codehaus.plexus.util.FileUtils;
+/* ====================================================================
+ *   Copyright 2001-2004 The Apache Software Foundation.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ * ====================================================================
+ */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestHandler;
+import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.project.MavenProjectExecutionRequestHandler;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -22,9 +30,4 @@ public class MavenInitializingExecutionRequestHandler
     extends MavenProjectExecutionRequestHandler
     implements MavenExecutionRequestHandler
 {
-    public void handle( MavenExecutionRequest request, MavenExecutionResponse response )
-        throws Exception
-    {
-            super.handle( null, null );
-    }
 }

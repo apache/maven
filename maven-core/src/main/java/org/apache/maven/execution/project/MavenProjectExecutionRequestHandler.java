@@ -1,11 +1,29 @@
 package org.apache.maven.execution.project;
 
+/* ====================================================================
+ *   Copyright 2001-2004 The Apache Software Foundation.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ * ====================================================================
+ */
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.AbstractMavenExecutionRequestHandler;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.lifecycle.session.MavenSession;
 
 import java.io.File;
 import java.util.Date;
@@ -17,42 +35,6 @@ import java.util.Date;
 public class MavenProjectExecutionRequestHandler
     extends AbstractMavenExecutionRequestHandler
 {
-    public void handle( MavenExecutionRequest request, MavenExecutionResponse response )
-        throws Exception
-    {
-        try
-        {
-            MavenProject project = getProject( ( (MavenProjectExecutionRequest) request ).getPom(), request.getLocalRepository() );
-
-            Date s = new Date();
-
-            response = sessionPhaseManager.execute( createSession( request, project ) );
-
-            response.setStart( s );
-
-            response.setFinish( new Date() );
-        }
-        catch ( Exception e )
-        {
-            response.setFinish( new Date() );
-
-            response.setException( e );
-
-            logError( response );
-
-            return;
-        }
-
-        if ( response.isExecutionFailure() )
-        {
-            logFailure( response );
-        }
-        else
-        {
-            logSuccess( response );
-        }
-    }
-
     // ----------------------------------------------------------------------
     // Project building
     // ----------------------------------------------------------------------
@@ -69,5 +51,17 @@ public class MavenProjectExecutionRequestHandler
         }
 
         return projectBuilder.build( pom, localRepository );
+    }
+
+    protected MavenSession createSession( MavenExecutionRequest request )
+        throws Exception
+    {
+        MavenSession session = super.createSession( request );
+
+        MavenProject project = getProject( ( (MavenProjectExecutionRequest) request ).getPom(), request.getLocalRepository() );
+
+        session.setProject( project );
+
+        return session;
     }
 }

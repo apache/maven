@@ -1,5 +1,22 @@
 package org.apache.maven.lifecycle.session;
 
+/* ====================================================================
+ *   Copyright 2001-2004 The Apache Software Foundation.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ * ====================================================================
+ */
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.PostGoal;
 import org.apache.maven.model.PreGoal;
@@ -19,22 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
-/*
- * Copyright 2001-2004 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -62,7 +63,6 @@ public class MavenSession
 
     public MavenSession( PlexusContainer container,
                          PluginManager pluginManager,
-                         MavenProject project,
                          ArtifactRepository localRepository,
                          List goals )
     {
@@ -70,19 +70,11 @@ public class MavenSession
 
         this.pluginManager = pluginManager;
 
-        this.project = project;
-
         this.localRepository = localRepository;
 
         this.dag = new DAG();
 
         this.goals = goals;
-
-        this.preGoalMappings = new TreeMap();
-
-        this.postGoalMappings = new TreeMap();
-
-        initGoalDecoratorMappings();
     }
 
     public PlexusContainer getContainer()
@@ -98,6 +90,21 @@ public class MavenSession
     public MavenProject getProject()
     {
         return project;
+    }
+
+    public void setProject( MavenProject project )
+    {
+        this.project = project;
+
+        // ----------------------------------------------------------------------
+        // We only need these things to be done when we have a project.
+        // ----------------------------------------------------------------------
+
+        this.preGoalMappings = new TreeMap();
+
+        this.postGoalMappings = new TreeMap();
+
+        initGoalDecoratorMappings();
     }
 
     public ArtifactRepository getLocalRepository()
@@ -151,15 +158,20 @@ public class MavenSession
         }
     }
 
+    //!! this should probably not be done here as there are request types that
+    // have no project
+
     public List getPreGoals( String goal )
     {
         List result = (List) preGoalMappings.get( goal );
+
         return result;
     }
 
     public List getPostGoals( String goal )
     {
         List result = (List) postGoalMappings.get( goal );
+
         return result;
     }
 

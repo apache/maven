@@ -123,12 +123,15 @@ public class MavenTestCase
         return createGoalExecutionContext( project, getLocalRepository(), goal );
     }
 
-    protected MavenGoalExecutionContext createGoalExecutionContext( MavenProject project,
-        ArtifactRepository localRepository, String goal )
+    protected MavenGoalExecutionContext createGoalExecutionContext( MavenProject project,        
+                                                                    ArtifactRepository localRepository,
+                                                                    String goal )
     {
         List goals = new ArrayList();
 
-        MavenSession session = new MavenSession( getContainer(), pluginManager, project, localRepository, goals );
+        MavenSession session = new MavenSession( getContainer(), pluginManager, localRepository, goals );
+
+        session.setProject( project );
 
         MavenGoalExecutionContext context = new MavenGoalExecutionContext( session, goal );
 
