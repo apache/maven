@@ -71,7 +71,7 @@ public abstract class AbstractDeployMojo
 
         ArtifactRepository deploymentRepository = RepositoryUtils.mavenRepositoryToWagonRepository( repository );
 
-        // Deplou the POM
+        // Deploy the POM
         Artifact pomArtifact = new DefaultArtifact( project.getGroupId(),
                                                  project.getArtifactId(),
                                                  project.getVersion(),
