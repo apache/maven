@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Set;
+import java.util.HashSet;
 
 public class ArtifactDownloader
 {
@@ -79,6 +81,8 @@ public class ArtifactDownloader
         return mavenRepoLocal;
     }
 
+    private Set downloadedArtifacts = new HashSet();
+
     public void downloadDependencies( List files )
         throws Exception
     {
@@ -88,29 +92,31 @@ public class ArtifactDownloader
             {
                 String file = (String) j.next();
 
-                File destinationFile = new File( mavenRepoLocal, file );
-
-                // The directory structure for this project may
-                // not exists so create it if missing.
-                File directory = destinationFile.getParentFile();
-
-                if ( directory.exists() == false )
+                if ( !downloadedArtifacts.contains( file ) )
                 {
-                    directory.mkdirs();
-                }
+                    File destinationFile = new File( mavenRepoLocal, file );
+                    // The directory structure for this project may
+                    // not exists so create it if missing.
+                    File directory = destinationFile.getParentFile();
 
-                if ( destinationFile.exists() && file.indexOf( SNAPSHOT_SIGNATURE ) < 0 )
-                {
-                    continue;
-                }
+                    if ( directory.exists() == false )
+                    {
+                        directory.mkdirs();
+                    }
 
-                //log( "Downloading dependency: " + file );
+                    if ( destinationFile.exists() && file.indexOf( SNAPSHOT_SIGNATURE ) < 0 )
+                    {
+                        continue;
+                    }
 
-                getRemoteArtifact( file, destinationFile );
+                    getRemoteArtifact( file, destinationFile );
 
-                if ( !destinationFile.exists() )
-                {
-                    throw new Exception( "Failed to download " + file );
+                    if ( !destinationFile.exists() )
+                    {
+                        throw new Exception( "Failed to download " + file );
+                    }
+
+                    downloadedArtifacts.add( file );
                 }
             }
             catch ( Exception e )

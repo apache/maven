@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Date;
 
 public class MBoot
 {
@@ -119,6 +120,10 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
+        Date fullStop;
+
+        Date fullStart = new Date();
+
         properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
 
         downloader = new ArtifactDownloader( properties );
@@ -130,6 +135,17 @@ public class MBoot
         String basedir = System.getProperty( "user.dir" );
 
         checkMBootDeps();
+
+        if ( !reader.parse( new File( basedir, "pom.xml" ) ) )
+        {
+            System.err.println( "Could not parse pom.xml" );
+
+            System.exit( 1 );
+        }
+
+        installPom( basedir, repoLocal );
+
+        reader.reset();
 
         for ( int i = 0; i < builds.length; i++ )
         {
@@ -263,6 +279,36 @@ public class MBoot
 
             FileUtils.copyFileToDirectory( f.getAbsolutePath(), plugins );
         }
+
+        fullStop = new Date();
+
+        stats( fullStart, fullStop );
+    }
+
+    protected static String formatTime( long ms )
+    {
+        long secs = ms / 1000;
+
+        long min = secs / 60;
+        secs = secs % 60;
+
+        if ( min > 0 )
+        {
+            return min + " minutes " + secs + " seconds";
+        }
+        else
+        {
+            return secs + " seconds";
+        }
+    }
+
+    private void stats( Date fullStart, Date fullStop )
+    {
+        long fullDiff = fullStop.getTime() - fullStart.getTime();
+
+        System.out.println( "Total time: " + formatTime( fullDiff ) );
+
+        System.out.println( "Finished at: " + fullStop );
     }
 
     public void buildProject( String basedir )
@@ -481,8 +527,11 @@ public class MBoot
 
         String groupId = reader.groupId;
 
-        FileUtils.copyFile( new File( basedir, "pom.xml" ),
-                            new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" ) );
+        File pom = new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" );
+
+        System.out.println( "Installing POM: " + pom );
+
+        FileUtils.copyFile( new File( basedir, "pom.xml" ), pom );
     }
 
     private void installJar( String basedir, String repoLocal )
