@@ -33,5 +33,14 @@ public class CompilerMojo
 }
 +-----+
 
-o trying to alleviate the need to log internally by gleaning information
-  from the response.
+Parameters available to Mojos
+
+*----------*-------------------------------------------------------------------*
+#project   | The MavenProject object:                           
+           | You can use #project itself or any valid OGNL expression to
+           | extract any part of the MavenProject object graph
+*----------*-------------------------------------------------------------------*
+#component | Any arbitrary Plexus component:
+           | By using the role name of the plexus component you can use the
+           | said component in your mojo. Usage: #component.<role>
+*----------*-------------------------------------------------------------------*
