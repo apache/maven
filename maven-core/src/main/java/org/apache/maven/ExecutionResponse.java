@@ -43,7 +43,7 @@ public class ExecutionResponse
 
     public boolean isExecutionFailure()
     {
-        return ( failedGoal != null );
+        return ( failedGoal != null || exception != null );
     }
 
     public String getFailedGoal()
