@@ -39,6 +39,8 @@
       <implementation>org.apache.maven.lifecycle.goal.DefaultMavenGoalPhaseManager</implementation>
       <configuration>
         <lifecycle-phases>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.PluginResolutionPhase"/>
+          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalMappingPhase"/>
           <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalResolutionPhase"/>
           <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.DependencyResolutionPhase"/>
           <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.DependencyDownloadPhase"/>
@@ -64,6 +66,15 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.apache.maven.util.GoalWalker</role>
+      <implementation>org.apache.maven.util.GoalWalker</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.plugin.PluginManager</role>
         </requirement>
       </requirements>
     </component>

@@ -19,6 +19,6 @@ public class MavenLifecycleManagerTest
 
         List lifecyclePhases = mlm.getLifecyclePhases();
 
-        assertEquals( 4, lifecyclePhases.size() );
+        assertEquals( 6, lifecyclePhases.size() );
     }
 }

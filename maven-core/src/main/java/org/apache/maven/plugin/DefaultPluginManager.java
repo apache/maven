@@ -47,8 +47,6 @@ public class DefaultPluginManager
 {
     static String MAVEN_PLUGIN = "maven-plugin";
 
-    protected DAG dag;
-
     protected Map mojoDescriptors;
 
     protected Map pluginDescriptors;
@@ -67,22 +65,11 @@ public class DefaultPluginManager
 
     public DefaultPluginManager()
     {
-        dag = new DAG();
-
         mojoDescriptors = new HashMap();
 
         pluginDescriptors = new HashMap();
 
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    public List getGoals( String goal )
-    {
-        return TopologicalSorter.sort( dag.getVertex( goal ) );
     }
 
     // ----------------------------------------------------------------------
@@ -121,58 +108,11 @@ public class DefaultPluginManager
             MavenMojoDescriptor mavenMojoDescriptor = (MavenMojoDescriptor) it.next();
 
             MojoDescriptor mojoDescriptor = mavenMojoDescriptor.getMojoDescriptor();
-
-            if ( mojoDescriptor.getPrereqs() != null )
-            {
-                for ( Iterator k = mojoDescriptor.getPrereqs().iterator(); k.hasNext(); )
-                {
-                    String prereq = (String) k.next();
-
-                    if ( !processEdge( mojoDescriptor.getId(), prereq ) )
-                    {
-                        continue;
-                    }
-                }
-            }
-            else
-            {
-                dag.addVertex( mojoDescriptor.getId() );
-            }
-
+            
             mojoDescriptors.put( mojoDescriptor.getId(), mojoDescriptor );
 
             pluginDescriptors.put( pluginDescriptor.getId(), pluginDescriptor );
         }
-    }
-
-    private boolean processEdge( String mojoId, String prereq ) throws CycleDetectedException
-    {
-        dag.addEdge( mojoId, prereq );
-
-        // We don't want to verify a plugin that we are already in the process
-        // of verifying.
-        String prereqPlugin = getPluginId( prereq );
-
-        String goalPlugin = getPluginId( mojoId );
-
-        if ( isPluginInstalled( prereqPlugin ) )
-        {
-            return false;
-        }
-
-        if ( !goalPlugin.equals( prereqPlugin ) )
-        {
-            try
-            {
-                verifyPluginForGoal( prereq );
-            }
-            catch ( Exception e )
-            {
-                e.printStackTrace();
-            }
-        }
-
-        return true;
     }
 
     // ----------------------------------------------------------------------

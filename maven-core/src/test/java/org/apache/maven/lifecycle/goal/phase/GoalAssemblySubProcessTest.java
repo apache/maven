@@ -4,6 +4,7 @@ package org.apache.maven.lifecycle.goal.phase;
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PostGoal;
 import org.apache.maven.model.PreGoal;
@@ -17,10 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
+/** The point of this test class is to check out the functioning of the 
+ * plugin resolution, goal mapping, and goal resolution phases. These are 
+ * intertwined here to make testing easier, but should be separated into their
+ * own unit tests.
+ * 
  * @author jdcasey
  */
-public class GoalResolutionPhaseTest
+public class GoalAssemblySubProcessTest
     extends MavenTestCase
 {
     /*
@@ -267,18 +272,25 @@ public class GoalResolutionPhaseTest
         MavenGoalExecutionContext context = createGoalExecutionContext( project, localRepository, mainGoal );
         context.setGoalName( mainGoal );
 
-        GoalResolutionPhase phase = new GoalResolutionPhase();
+        PluginResolutionPhase pluginPhase = new PluginResolutionPhase();
+        GoalMappingPhase mappingPhase = new GoalMappingPhase();
+        GoalResolutionPhase goalPhase = new GoalResolutionPhase();
 
-        phase.execute( context );
+        pluginPhase.execute( context );
+        mappingPhase.execute( context );
+        goalPhase.execute( context );
 
         List goals = context.getResolvedGoals();
+        
+        //System.out.println("Expected chain: " + expectedOrder);
+        //System.out.println("Actual chain: " + goals);
 
         assertNotNull( goals );
 
         assertEquals( expectedOrder.size(), goals.size() );
 
         int index = 0;
-
+        
         for ( Iterator it = expectedOrder.iterator(); it.hasNext(); )
         {
             String goal = (String) it.next();

@@ -19,17 +19,25 @@ package org.apache.maven.lifecycle.goal.phase;
 import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.lifecycle.goal.phase.PluginResolutionPhase.PluginResolutionVisitor;
+import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.model.GoalDecorator;
 import org.apache.maven.model.PreGoal;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.util.AbstractGoalVisitor;
+import org.apache.maven.util.GoalWalker;
+import org.apache.maven.util.GraphTraversalException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -38,114 +46,76 @@ import java.util.Set;
 public class GoalResolutionPhase
     extends AbstractMavenGoalPhase
 {
+
     public void execute( MavenGoalExecutionContext context ) throws GoalExecutionException
     {
-        PluginManager pluginManager = context.getSession().getPluginManager();
+        GoalResolutionVisitor visitor = new GoalResolutionVisitor( context.getSession().getPluginManager() );
 
         try
         {
-            // First, start by retrieving the currently-requested goal.
-            String goal = context.getGoalName();
-
-            List resolvedGoals = resolveTopLevel( goal, new HashSet(), new LinkedList(), context, pluginManager );
-
-            context.setResolvedGoals( resolvedGoals );
-
-            if ( goal.indexOf( ":" ) < 0 )
-            {
-                goal = context.getProject().getType() + ":" + goal;
-            }
-
-            MojoDescriptor md = pluginManager.getMojoDescriptor( goal );
-
-            context.setMojoDescriptor( md );
+            GoalWalker.walk( context.getGoalName(), context.getSession(), visitor );
         }
-        catch ( Exception e )
+        catch ( GraphTraversalException e )
         {
-            throw new GoalExecutionException( "Error resolving goals: ", e );
+            throw new GoalExecutionException("Cannot calculate goal execution chain", e);
         }
-        finally
-        {
-            context.release( pluginManager );
-        }
+        
+        context.setResolvedGoals(visitor.getExecutionChain());
     }
 
-    private List resolveTopLevel( String goal, Set includedGoals, List results, MavenGoalExecutionContext context,
-        PluginManager pluginManager ) throws Exception
+    public static final class GoalResolutionVisitor
+        extends AbstractGoalVisitor
     {
+        private PluginManager pluginManager;
 
-        // Ensure that the plugin for this goal is installed.
-        pluginManager.verifyPluginForGoal( goal );
+        private List executionChain = new LinkedList();
+        
+        private Map prereqChains = new TreeMap();
 
-        // Retrieve the prereqs-driven execution path for this goal, using the
-        // DAG.
-        List work = pluginManager.getGoals( goal );
-
-        // Reverse the original goals list to preserve encapsulation while
-        // decorating.
-        Collections.reverse( work );
-
-        return resolveWithPrereqs( work, includedGoals, results, context, pluginManager );
-    }
-
-    private List resolveWithPrereqs( List work, Set includedGoals, List results, MavenGoalExecutionContext context,
-        PluginManager pluginManager ) throws Exception
-    {
-        if ( !work.isEmpty() )
+        GoalResolutionVisitor( PluginManager pluginManager )
         {
-            String goal = (String) work.remove( 0 );
-
-            MojoDescriptor descriptor = context.getMojoDescriptor( goal );
-
-            if ( descriptor.alwaysExecute() || !includedGoals.contains( goal ) )
-            {
-                List preGoals = new LinkedList();
-                List allPreGoals = context.getProject().getModel().getPreGoals();
-                for ( Iterator it = allPreGoals.iterator(); it.hasNext(); )
-                {
-                    PreGoal preGoal = (PreGoal) it.next();
-                    if ( goal.equals( preGoal.getName() ) )
-                    {
-                        preGoals.add( preGoal.getAttain() );
-                    }
-                }
-
-                results = resolveGoalDecorators( goal, true, includedGoals, results, context, pluginManager );
-
-                results = resolveWithPrereqs( work, includedGoals, results, context, pluginManager );
-                includedGoals.add( goal );
-                results.add( goal );
-
-                results = resolveGoalDecorators( goal, false, includedGoals, results, context, pluginManager );
-            }
-        }
-        return results;
-    }
-
-    private List resolveGoalDecorators( String baseGoal, boolean usePreGoals, Set includedGoals, List results,
-        MavenGoalExecutionContext context, PluginManager pluginManager ) throws Exception
-    {
-        List decorators = null;
-        if ( usePreGoals )
-        {
-            decorators = context.getProject().getModel().getPreGoals();
-        }
-        else
-        {
-            decorators = context.getProject().getModel().getPostGoals();
+            this.pluginManager = pluginManager;
         }
 
-        for ( Iterator it = decorators.iterator(); it.hasNext(); )
+        public boolean shouldVisit( String goal, MavenSession session )
         {
-            GoalDecorator decorator = (GoalDecorator) it.next();
-            if ( baseGoal.equals( decorator.getName() ) )
-            {
-                String goal = decorator.getAttain();
-                resolveTopLevel( goal, includedGoals, results, context, pluginManager );
-            }
+            boolean result = !executionChain.contains( goal );
+            
+            return result;
         }
 
-        return results;
+        public void visitGoal( String goal, MavenSession session )
+        {
+            executionChain.add( goal );
+        }
+        
+        public void visitPostGoal( String goal, String postGoal, MavenSession session ) 
+        throws GraphTraversalException
+        {
+            List chain = session.getExecutionChain( postGoal );
+            
+            executionChain.addAll( chain );
+        }
+        
+        public void visitPreGoal( String goal, String preGoal, MavenSession session ) 
+        throws GraphTraversalException
+        {
+            List chain = session.getExecutionChain( preGoal );
+            
+            executionChain.addAll( chain );
+        }
+        
+        public void visitPrereq( String goal, String prereq, MavenSession session)
+        throws GraphTraversalException
+        {
+            GoalWalker.walk( prereq, session, this );
+        }
+        
+        public List getExecutionChain()
+        {
+            return executionChain;
+        }
+
     }
 
 }
