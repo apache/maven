@@ -3,8 +3,14 @@ it0000: The simplest of builds. We have one application class and one test
         generation and a the super model is employed to provide the build
         information.
 
-it0001: Build upon it0000 we add an application resource that is packaged
+it0001: Builds upon it0000: we add an application resource that is packaged
         up in the resultant JAR.
+
+it0002: Builds upon it0001: we add the download of a dependency. We delete
+        the JAR from the local repository and make sure it is there post build.
+       
+it0003: Builds upon it0001: we add a jar installation step. We delete the JAR
+        from the local repository to make sure it is there post build.
 
 -------------------------------------------------------------------------------
 
