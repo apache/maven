@@ -911,7 +911,7 @@
         <field>
           <name>type</name>
           <version>4.0.0</version>
-          <defaultValue>email</defaultValue>
+          <defaultValue>mail</defaultValue>
           <type>String</type>
           <description>The mechanism used to deliver notifications.</description>
         </field>
