@@ -6,6 +6,10 @@ home=`pwd`
 
 cp=`pwd`/../maven-core-it-verifier/target/maven-core-it-verifier-1.0.jar
 
+if $cygwin; then
+  cp=`cygpath -pw "$cp"`
+fi
+
 if [ ! -f $cp ]
 then
   echo 
@@ -43,6 +47,12 @@ do
       echo
     fi
     
-    java -cp $cp $verifier `pwd`
+    basedir=`pwd`
+    
+    if $cygwin; then
+      basedir=`cygpath -pw "$basedir"`
+    fi
+    
+    java -cp "$cp" $verifier "$basedir"
   )
 done
