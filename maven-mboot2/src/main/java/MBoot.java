@@ -9,6 +9,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -535,6 +536,11 @@ public class MBoot
             String dependency = (String) i.next();
 
             File f = new File( repoLocal, dependency );
+            if ( !f.exists() )
+            {
+                throw new FileNotFoundException( "Missing dependency: " + dependency + 
+                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
+            }
 
             cl.addURL( f.toURL() );
         }
