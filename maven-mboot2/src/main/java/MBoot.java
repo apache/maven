@@ -147,7 +147,7 @@ public class MBoot
         {
             System.out.println( "You must have a ~/maven.properties file and must contain the following entries:" );
 
-            System.out.println( "maven.home = /path/to/m2/installtion" );
+            System.out.println( "maven.home = /path/to/m2/installation" );
 
             System.out.println( "maven.repo.local = /path/to/m2/repository" );
 
