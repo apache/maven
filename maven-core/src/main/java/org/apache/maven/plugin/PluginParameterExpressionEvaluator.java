@@ -42,7 +42,7 @@ public class PluginParameterExpressionEvaluator
             }
             catch ( ComponentLookupException e )
             {
-                throw new PluginConfigurationException( "Cannot lookup component: ", e );
+                throw new PluginConfigurationException( "Cannot lookup component: " + role + ".", e );
             }
         }
         else if ( expression.equals( "#localRepository" ) )
@@ -112,7 +112,7 @@ public class PluginParameterExpressionEvaluator
             value = System.getProperty( expression.substring( 1 ) );
         }
 
-        // ----------------------------------------------------------------------              
+        // ----------------------------------------------------------------------
         // If we strike and we are not dealing with an expression then we will
         // will let the value pass through unaltered so that users can hardcode
         // literal values. Expressions that evaluate to null will be passed
