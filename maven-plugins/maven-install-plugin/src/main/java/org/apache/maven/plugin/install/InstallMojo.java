@@ -16,34 +16,76 @@ package org.apache.maven.plugin.install;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.installer.ArtifactInstallationException;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.AbstractPlugin;
+import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.project.MavenProject;
+
+import java.io.File;
+
 /**
+ * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @version $Id$
  * @goal install
- *
  * @description installs project's main artifact in local repository
- *
  * @parameter name="project"
  * type="org.apache.maven.project.MavenProject"
  * required="true"
  * validator=""
  * expression="#project"
  * description=""
- *
  * @parameter name="installer"
  * type="org.apache.maven.artifact.installer.ArtifactInstaller"
  * required="true"
  * validator=""
  * expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
  * description=""
- *
  * @parameter name="localRepository"
  * type="org.apache.maven.artifact.repository.ArtifactRepository"
  * required="true"
  * validator=""
  * expression="#localRepository"
  * description=""
- *
  */
 public class InstallMojo
-    extends AbstractInstallMojo
+    extends AbstractPlugin
 {
+    private MavenProject project;
+
+    private ArtifactInstaller installer;
+
+    private ArtifactRepository localRepository;
+
+    public void execute()
+        throws PluginExecutionException
+    {
+        // Install the POM
+        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                    project.getVersion(), "pom" );
+
+        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+
+        try
+        {
+            installer.install( pom, pomArtifact, localRepository );
+
+            //Install artifact
+            if ( !"pom".equals( project.getPackaging() ) )
+            {
+                Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                         project.getVersion(), project.getPackaging() );
+
+                installer.install( project.getBuild().getDirectory(), artifact, localRepository );
+            }
+        }
+        catch ( ArtifactInstallationException e )
+        {
+            // TODO: install exception that does not give a trace
+            throw new PluginExecutionException( "Error installing artifact", e );
+        }
+    }
 }
