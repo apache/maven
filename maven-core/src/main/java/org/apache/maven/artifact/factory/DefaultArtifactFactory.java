@@ -26,8 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-// TODO: packaging is very confusing - this isn't in artifact after all
-
 public class DefaultArtifactFactory
     extends ArtifactConstructionSupport
     implements ArtifactFactory
