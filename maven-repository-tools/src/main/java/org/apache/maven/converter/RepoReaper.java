@@ -17,11 +17,14 @@ package org.apache.maven.converter;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 
 import org.apache.maven.model.Model;
 
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
+
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l </a>
@@ -110,13 +113,24 @@ public class RepoReaper
             {
                 warning( "Could not parse: '" + pomPath + "'.");
 
-                Throwable t = ex;
-
-                while ( t != null )
+                if ( ex instanceof XmlPullParserException || 
+                     ex instanceof FileNotFoundException )
                 {
                     warning( "  " + ex.getMessage() );
+                }
+                else
+                {
+/*
+                    Throwable t = ex;
 
-                    t = t.getCause();
+                    while ( t != null )
+                    {
+                        warning( "  " + ex.getMessage() );
+
+                        t = t.getCause();
+                    }
+*/
+                    ex.printStackTrace( System.err );
                 }
 
                 continue;

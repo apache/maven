@@ -23,7 +23,7 @@ public class Maven1Repository
     public Iterator getArtifactsByType( String type )
         throws Exception
     {
-        List files = FileUtils.getFiles( getRepository(), "tambora*/" + type + "s/*." + type, "" );
+        List files = FileUtils.getFiles( getRepository(), "*/" + type + "s/*." + type, "" );
 
         Collections.sort( files );
 

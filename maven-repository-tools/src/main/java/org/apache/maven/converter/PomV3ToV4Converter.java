@@ -23,6 +23,7 @@ package org.apache.maven.converter;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
@@ -54,6 +55,10 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.v300.io.xpp3.MavenXpp3Reader;
 
 import org.codehaus.plexus.util.FileUtils;
+
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -182,7 +187,14 @@ public class PomV3ToV4Converter
         // Group id
         String groupId = v3Model.getGroupId();
 
-        if( isEmpty( groupId ) && isEmpty( v3ParentModel.getGroupId() ) )
+        String parentGroupId = null;
+
+        if ( v3ParentModel != null )
+        {
+            parentGroupId = v3ParentModel.getGroupId();
+        }
+
+        if( isEmpty( groupId ) && isEmpty( parentGroupId ) )
         {
             throw new Exception( "Missing 'groupId' from both pom and the extended pom." );
         }
@@ -194,15 +206,18 @@ public class PomV3ToV4Converter
 
         if ( isEmpty( artifactId ) )
         {
-            throw new Exception( "Missing element 'artifactId'." );
+//            throw new Exception( "Missing element 'artifactId'." );
+            v4Model.setArtifactId( groupId );
         }
-
-        v4Model.setArtifactId( artifactId );
+        else
+        {
+            v4Model.setArtifactId( artifactId );
+        }
 
         // Version
         String version = v3Model.getCurrentVersion();
 
-        if( isEmpty( version ) && isEmpty( v3ParentModel.getCurrentVersion() ) )
+        if( isEmpty( version ) && (v3ParentModel == null || isEmpty( v3ParentModel.getCurrentVersion() ) ) )
         {
             throw new Exception( "Missing 'currentVersion' from both pom and the extended pom." );
         }
@@ -301,7 +316,7 @@ public class PomV3ToV4Converter
 
         if ( !extendFile.isFile() )
         {
-            throw new Exception( "Could not find the file the pom extends: '" + extendFile.getAbsolutePath() + "' is not a file." );
+            throw new FileNotFoundException( "Could not find the file the pom extends: '" + extendFile.getAbsolutePath() + "' is not a file." );
         }
 
         // try to find the parent pom.
@@ -797,8 +812,21 @@ public class PomV3ToV4Converter
 
         model = v3Reader.read( new FileReader( inputFile ) );
 
-/*
-        String id = model.getId();
+        SAXReader r = new SAXReader();
+
+        Document d = r.read( new FileReader( inputFile ) );
+
+        Element root = d.getRootElement();
+
+        Element idElement = root.element( "id" );
+
+        String id = null;
+
+        if ( idElement != null )
+        {
+            id = idElement.getText();
+        }
+//        String id = model.getId();
 
         String groupId = model.getGroupId();
 
@@ -843,7 +871,7 @@ public class PomV3ToV4Converter
                 model.setArtifactId( artifactId );
             }
         }
-*/
+/**/
         return model;
     }
 
