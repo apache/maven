@@ -18,10 +18,11 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.AbstractMavenExecutionRequest;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -68,10 +69,13 @@ extends AbstractMavenExecutionRequest
     }
 
     public List getProjectFiles()
-        throws Exception
+        throws IOException
     {
-        List files = FileUtils.getFiles( new File( System.getProperty( "user.dir" ) ), includes, excludes );
+        return FileUtils.getFiles( new File( System.getProperty( "user.dir" ) ), includes, excludes );
+    }
 
-        return files;
+    public MavenProjectExecutionRequest createProjectExecutionRequest( MavenProject project )
+    {
+        return new MavenProjectExecutionRequest( localRepository, parameters, goals, project.getFile() );
     }
 }

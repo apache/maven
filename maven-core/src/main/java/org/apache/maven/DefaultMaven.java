@@ -21,6 +21,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.MavenProjectExecutionRequest;
 import org.apache.maven.execution.MavenReactorExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
@@ -39,7 +40,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -78,14 +78,18 @@ public class DefaultMaven
     public MavenExecutionResponse execute( MavenExecutionRequest request )
         throws GoalNotFoundException, Exception
     {
-        MavenExecutionResponse response = new MavenExecutionResponse();
-
-        handleProject( request );
-
-        return response;
+        // TODO: not happy about this:
+        if ( request instanceof MavenReactorExecutionRequest )
+        {
+            return handleReactor( (MavenReactorExecutionRequest) request );
+        }
+        else
+        {
+            return handleProject( request );
+        }
     }
 
-    public void handleProject( MavenExecutionRequest request )
+    public MavenExecutionResponse handleProject( MavenExecutionRequest request )
         throws Exception
     {
         MavenSession session = createSession( request );
@@ -98,10 +102,13 @@ public class DefaultMaven
 
         MavenExecutionResponse response = lifecycleExecutor.execute( request.getGoals(), session );
 
+        // TODO: is this perhaps more appropriate in the CLI?
         if ( response.isExecutionFailure() )
         {
             if ( response.getException() != null )
             {
+                // TODO: this should be a "FATAL" exception, reported to the developers - however currently a LOT of
+                // "user" errors fall through the cracks (like invalid POMs, as one example)
                 logError( response );
             }
             else
@@ -113,14 +120,15 @@ public class DefaultMaven
         {
             logSuccess( response );
         }
+        return response;
     }
 
     // ----------------------------------------------------------------------
     // Reactor
     // ----------------------------------------------------------------------
 
-    public void handleReactor( MavenExecutionRequest request, MavenExecutionResponse response )
-        throws Exception
+    public MavenExecutionResponse handleReactor( MavenReactorExecutionRequest request )
+        throws ReactorException
     {
         List projects = new ArrayList();
 
@@ -128,9 +136,7 @@ public class DefaultMaven
 
         try
         {
-            List files = FileUtils.getFiles( new File( System.getProperty( "user.dir" ) ),
-                                             ( (MavenReactorExecutionRequest) request ).getIncludes(),
-                                             ( (MavenReactorExecutionRequest) request ).getExcludes() );
+            List files = request.getProjectFiles();
 
             for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
             {
@@ -169,15 +175,26 @@ public class DefaultMaven
 
             line();
 
-            //MavenProjectExecutionRequest projectExecutionRequest = request.createProjectExecutionRequest( project );
+            MavenProjectExecutionRequest projectExecutionRequest = request.createProjectExecutionRequest( project );
 
-            //handleProject( projectExecutionRequest, response );
-
-            if ( response.isExecutionFailure() )
+            try
             {
-                break;
+                MavenExecutionResponse response = handleProject( projectExecutionRequest );
+
+                if ( response.isExecutionFailure() )
+                {
+                    return response;
+                }
             }
+            catch ( Exception e )
+            {
+                throw new ReactorException( "Error executing project within the reactor", e );
+            }
+
         }
+
+        // TODO: not really satisfactory
+        return null;
     }
 
     public MavenProject getProject( File pom, ArtifactRepository localRepository )

@@ -136,8 +136,6 @@ public class MavenCli
             request = new MavenInitializingExecutionRequest( localRepository, mavenProperties, commandLine.getArgList() );
         }
 
-        MavenExecutionResponse response = new MavenExecutionResponse();
-
         // ----------------------------------------------------------------------
         // Now that we have everything that we need we will fire up plexus and
         // bring the maven component to life for use.
@@ -158,9 +156,9 @@ public class MavenCli
         //
         // ----------------------------------------------------------------------
 
-        response = maven.execute( request );
+        MavenExecutionResponse response = maven.execute( request );
 
-        if ( response.isExecutionFailure() )
+        if ( response != null && response.isExecutionFailure() )
         {
             return 1;
         }
