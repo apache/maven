@@ -144,6 +144,8 @@ Maven Lifecycle
       should ensure that only explicit multi-calls execute multiple
       times.
 
+  * ability to alias a goal to a series of other goals, eg: my-goal: clean, foo, clean
+
 *Notes
  
   [[1]] POM reading: we always attempt to read the POM but it may not be
