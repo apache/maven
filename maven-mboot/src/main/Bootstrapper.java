@@ -1,3 +1,4 @@
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
@@ -12,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +23,7 @@ import java.util.StringTokenizer;
 public class Bootstrapper
 {
     public static final String SNAPSHOT_SIGNATURE = "-SNAPSHOT";
-    
+
     private BootstrapPomParser bootstrapPomParser;
 
     private List dependencies;
@@ -58,16 +60,16 @@ public class Bootstrapper
         String basedir = args[0];
 
         Properties properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
-        
-        setRemoteRepo(properties.getProperty( "maven.repo.remote" ));
+
+        setRemoteRepo( properties.getProperty( "maven.repo.remote" ) );
 
         String mavenRepoLocalProperty = properties.getProperty( "maven.repo.local" );
-        
+
         if ( mavenRepoLocalProperty == null )
         {
             mavenRepoLocalProperty = System.getProperty( "user.home" ) + "/maven/repository";
         }
-        
+
         mavenRepoLocal = new File( mavenRepoLocalProperty );
 
         if ( !mavenRepoLocal.exists() )
@@ -117,20 +119,11 @@ public class Bootstrapper
             classPath.append( mavenRepoLocal + "/" + getArtifactPath( d, "/" ) + ":" );
 
             libs.append( mavenRepoLocal + "/" + getArtifactPath( d, "/" ) + "\n" );
-
         }
 
-        FileWriter writer = new FileWriter( "bootstrap.classpath" );
+        writeFile( "bootstrap.classpath", classPath.toString() );
 
-        writer.write( classPath.toString() );
-
-        writer.close();
-
-        writer = new FileWriter( "bootstrap.libs" );
-
-        writer.write( libs.toString() );
-
-        writer.close();
+        writeFile( "bootstrap.libs", libs.toString() );
 
         resources = bootstrapPomParser.getResources();
 
@@ -138,7 +131,7 @@ public class Bootstrapper
 
         for ( Iterator i = resources.iterator(); i.hasNext(); )
         {
-            Resource r  = (Resource) i.next();
+            Resource r = (Resource) i.next();
 
             // Not sure why r would be null. Happening in drools-core.
             if ( r == null )
@@ -157,6 +150,12 @@ public class Bootstrapper
 
             int size = r.getIncludes().size();
 
+            // If there are no includes specified then we want it all.
+            if ( size == 0 )
+            {
+                res.append( "'*'" );
+            }
+
             for ( int j = 0; j < size; j++ )
             {
                 String include = (String) r.getIncludes().get( j );
@@ -166,7 +165,7 @@ public class Bootstrapper
                     include = include.substring( 3 );
                 }
 
-                res.append("'").append( include ).append("'");
+                res.append( "'" ).append( include ).append( "'" );
 
                 if ( j != size - 1 )
                 {
@@ -177,9 +176,17 @@ public class Bootstrapper
             res.append( "\n" );
         }
 
-        writer = new FileWriter( "bootstrap.resources" );
+        writeFile( "bootstrap.resources", res.toString() );
 
-        writer.write( res.toString() );
+        writeFile( "bootstrap.repo", mavenRepoLocal.getPath() );
+    }
+
+    private void writeFile( String name, String contents )
+        throws Exception
+    {
+        Writer writer = new FileWriter( name );
+
+        writer.write( contents );
 
         writer.close();
     }
@@ -209,15 +216,15 @@ public class Bootstrapper
                     directory.mkdirs();
                 }
 
-                if ( destinationFile.exists() && !file.endsWith(SNAPSHOT_SIGNATURE))
+                if ( destinationFile.exists() && !file.endsWith( SNAPSHOT_SIGNATURE ) )
                 {
                     continue;
                 }
 
                 log( "Downloading dependency: " + file );
-                
-                getRemoteArtifact(file, destinationFile);
-                
+
+                getRemoteArtifact( file, destinationFile );
+
                 if ( !destinationFile.exists() )
                 {
                     throw new Exception( "Failed to download " + file );
@@ -229,40 +236,34 @@ public class Bootstrapper
             }
         }
     }
-    
-    private void setRemoteRepo(String repos)
+
+    private void setRemoteRepo( String repos )
     {
         remoteRepos = new ArrayList();
-        
-        if (repos == null)
+
+        if ( repos == null )
         {
-            remoteRepos.add("http://www.ibiblio.org/maven/");
+            remoteRepos.add( "http://www.ibiblio.org/maven/" );
             return;
         }
-        
-        StringTokenizer st = new StringTokenizer(repos, ",");
-        while (st.hasMoreTokens())
+
+        StringTokenizer st = new StringTokenizer( repos, "," );
+        while ( st.hasMoreTokens() )
         {
-            remoteRepos.add((String)st.nextToken().trim());
+            remoteRepos.add( st.nextToken().trim() );
         }
     }
-    
+
     private List getRemoteRepo()
     {
         return remoteRepos;
     }
 
-    /**
-     * Retrieve a <code>remoteFile</code> from the maven remote repositories
-     * and store it at <code>localFile</code>
-     * @param artifact the artifact to retrieve from the repositories.
-     * @return true if the retrieval succeeds, false otherwise.
-     */
     private boolean getRemoteArtifact( String file, File destinationFile )
     {
         boolean fileFound = false;
 
-        for ( Iterator i = getRemoteRepo().iterator(); i.hasNext();)
+        for ( Iterator i = getRemoteRepo().iterator(); i.hasNext(); )
         {
             String remoteRepo = (String) i.next();
 
@@ -301,7 +302,7 @@ public class Bootstrapper
                 // in case there is a newer version (i.e. snapshots) in another repo
                 fileFound = true;
             }
-            catch (FileNotFoundException e)
+            catch ( FileNotFoundException e )
             {
                 // Ignore
             }
@@ -324,13 +325,13 @@ public class Bootstrapper
                 //
                 // print a warning, in any case, so user catches on to mistyped
                 // hostnames, or other snafus
-                log("Error retrieving artifact from [" + url + "]: ");
+                log( "Error retrieving artifact from [" + url + "]: " );
             }
         }
 
         return fileFound;
     }
-    
+
     /**
      * <p>Replaces all occurrences of a String within another String.</p>
      *
@@ -355,19 +356,19 @@ public class Bootstrapper
      * @return the text with any replacements processed,
      *  <code>null</code> if null String input
      */
-    private String replace(String text, String repl, String with)
+    private String replace( String text, String repl, String with )
     {
-        StringBuffer buf = new StringBuffer(text.length());
+        StringBuffer buf = new StringBuffer( text.length() );
         int start = 0, end = 0;
-        while ((end = text.indexOf(repl, start)) != -1)
+        while ( ( end = text.indexOf( repl, start ) ) != -1 )
         {
-            buf.append(text.substring(start, end)).append(with);
+            buf.append( text.substring( start, end ) ).append( with );
             start = end + repl.length();
         }
-        buf.append(text.substring(start));
+        buf.append( text.substring( start ) );
         return buf.toString();
     }
-    
+
     private void log( String message )
     {
         System.out.println( message );
@@ -390,7 +391,7 @@ public class Bootstrapper
     private static Properties loadProperties( InputStream is )
     {
         Properties properties = new Properties();
-        
+
         try
         {
             if ( is != null )
@@ -479,7 +480,7 @@ public class Bootstrapper
             {
                 return;
             }
-            else if( rawName.equals( "unitTest" ) )
+            else if ( rawName.equals( "unitTest" ) )
             {
                 insideUnitTest = true;
             }
@@ -640,8 +641,8 @@ public class Bootstrapper
 
         public String getId()
         {
-            if (    isValid( getGroupId() )
-                 && isValid( getArtifactId() ) )
+            if ( isValid( getGroupId() )
+                && isValid( getArtifactId() ) )
             {
                 // We have something like:
                 //
@@ -691,7 +692,7 @@ public class Bootstrapper
         {
             // If the jar name has been explicty set then use that. This
             // is when the <jar/> element is explicity used in the POM.
-            if ( jar != null)
+            if ( jar != null )
             {
                 return jar;
             }
@@ -756,8 +757,8 @@ public class Bootstrapper
 
         private boolean isValid( String value )
         {
-            if (    value != null
-                 && value.trim().equals("") == false )
+            if ( value != null
+                && value.trim().equals( "" ) == false )
             {
                 return true;
             }
