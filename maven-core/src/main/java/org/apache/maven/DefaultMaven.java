@@ -98,7 +98,7 @@ public class DefaultMaven
             {
                 projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive() );
 
-                projects = projectBuilder.getSortedProjects( projects );
+                projects = MavenProject.getSortedProjects( projects );
 
                 if ( projects.isEmpty() )
                 {
