@@ -1,7 +1,10 @@
 <model>
   <id>mavenUserModel</id>
   <name>MavenUserModel</name>
-  <description><![CDATA[Maven's user-config model for Java project.]]></description>
+  <description><![CDATA[
+    User-specific configuration for maven. Includes things that should not 
+    be distributed with the pom.xml file, such as developer identity, along with 
+    local settings, like proxy information.]]></description>
   <defaults>
     <default>
       <key>package</key>
@@ -9,14 +12,21 @@
     </default>
   </defaults>
   <classes>
-    <class rootElement="true">
+    <class rootElement="true" xml.tagName="userModel">
       <name>UserModel</name>
       <version>1.0.0</version>
+      <description>Root element of the user configuration file.</description>
       <fields>
         <field>
           <name>jdkProfiles</name>
           <version>1.0.0</version>
-          <description><![CDATA[Configuration for different java environment profiles.]]></description>
+          <description><![CDATA[
+          	Configuration for different java environment profiles. One good use
+            for this might be to configure both JDK 1.4 and JDK 1.5 to work with
+            maven. Profiles will allow switching of entire java environments
+            based on the profile id, either in the defaults section below, or on
+            the command line.
+          ]]></description>
           <association>
             <type>JdkProfile</type>
             <multiplicity>*</multiplicity>
@@ -25,7 +35,13 @@
         <field>
           <name>proxyProfiles</name>
           <version>1.0.0</version>
-          <description><![CDATA[Configuration for different proxy profiles.]]></description>
+          <description><![CDATA[
+          	Configuration for different proxy profiles. Multiple proxy profiles
+            might come in handy for anyone working from a notebook or other 
+            mobile platform, to enable easy switching of entire proxy 
+            configurations by simply specifying the profile id, again either from
+            the command line or from the defaults section below.
+          ]]></description>
           <association>
             <type>ProxyProfile</type>
             <multiplicity>*</multiplicity>
@@ -34,7 +50,11 @@
         <field>
           <name>serverProfiles</name>
           <version>1.0.0</version>
-          <description><![CDATA[Server-access profiles.]]></description>
+          <description><![CDATA[
+          	Configuration of server-specific settings, mainly authentication
+            method. This allows configuration of authentication on a per-server
+            basis.
+          ]]></description>
           <association>
             <type>ServerProfile</type>
             <multiplicity>*</multiplicity>
@@ -43,7 +63,14 @@
         <field>
           <name>mavenProfiles</name>
           <version>1.0.0</version>
-          <description><![CDATA[Collection of runtime configurations for local repo, etc.]]></description>
+          <description><![CDATA[
+          	Configuration for different runtime profiles for maven itself. For
+            example, this will allow plugin developers to switch from a "work"
+            local repository to a "testing" local repository. It may also allow
+            configuration of such things as password keystore, etc. Once again, 
+            the active profile will be switchable via either the defaults section
+            or the command line (read: system properties).
+          ]]></description>
           <association>
             <type>MavenProfile</type>
             <multiplicity>*</multiplicity>
@@ -51,6 +78,7 @@
         </field>
         <field>
           <name>defaultProfiles</name>
+          <description>Contains the ids for active profiles.</description>
           <version>1.0.0</version>
           <association>
             <type>DefaultProfiles</type>
@@ -124,7 +152,10 @@
         <field>
           <name>nonProxyHosts</name>
           <version>1.0.0</version>
-          <description><![CDATA[The non-proxied hosts.]]></description>
+          <description><![CDATA[
+          	The list of non-proxied hosts (usually 
+          	comma-delimited).
+          ]]></description>
           <type>String</type>
         </field>
       </fields>
@@ -137,38 +168,38 @@
           <name>id</name>
           <version>1.0.0</version>
           <required>true</required>
-          <description><![CDATA[The ID of this configuration for external reference.]]></description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>host</name>
-          <version>1.0.0</version>
-          <required>true</required>
-          <description><![CDATA[The hostname for this configuration.]]></description>
+          <description><![CDATA[
+          	The ID of this configuration for indicating the default or "active" 
+            profile.
+          ]]></description>
           <type>String</type>
         </field>
         <field>
           <name>username</name>
           <version>1.0.0</version>
-          <description><![CDATA[The username used to access this server with this config.]]></description>
+          <description><![CDATA[The username used to authenticate.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>password</name>
           <version>1.0.0</version>
-          <description><![CDATA[The password used to access this server with this config.]]></description>
+          <description><![CDATA[
+          	The password used in conjunction with the username to authenticate.
+          ]]></description>
           <type>String</type>
         </field>
         <field>
           <name>privateKey</name>
           <version>1.0.0</version>
-          <description><![CDATA[The private key location used to access this server with this config.]]></description>
+          <description><![CDATA[The private key location used to authenticate.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>passphrase</name>
           <version>1.0.0</version>
-          <description><![CDATA[The passphrase used to access this server with a private key in this config.]]></description>
+          <description><![CDATA[
+          	The passphrase used in conjunction with the privateKey to authenticate.
+          ]]></description>
           <type>String</type>
         </field>
       </fields>
@@ -181,21 +212,23 @@
           <name>id</name>
           <version>1.0.0</version>
           <required>true</required>
-          <description><![CDATA[The ID of this configuration for external reference.]]></description>
+          <description><![CDATA[
+          	The ID of this profile used to specify the active configuration.
+          ]]></description>
           <type>String</type>
         </field>
         <field>
           <name>localRepository</name>
           <version>1.0.0</version>
           <required>true</required>
-          <description><![CDATA[The local repository to use for this runtime profile.]]></description>
+          <description><![CDATA[The local repository.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>passwordStore</name>
           <version>1.0.0</version>
           <required>true</required>
-          <description><![CDATA[The keystore used to store passwords for this runtime profile.]]></description>
+          <description><![CDATA[The keystore used to store passwords.]]></description>
           <type>String</type>
         </field>
       </fields>
@@ -206,24 +239,31 @@
       <fields>
         <field>
           <name>serverProfileId</name>
+          <description>
+            The active server profile for any usage that does not specify a 
+            server id.
+          </description>
           <version>1.0.0</version>
           <required>false</required>
           <type>String</type>
         </field>
         <field>
           <name>mavenProfileId</name>
+          <description>The active runtime profile.</description>
           <version>1.0.0</version>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>jdkVersion</name>
+          <description>The active JDK configuration.</description>
           <version>1.0.0</version>
           <required>false</required>
           <type>String</type>
         </field>
         <field>
           <name>proxyProfileId</name>
+          <description>The active proxy configuration.</description>
           <version>1.0.0</version>
           <required>false</required>
           <type>String</type>
