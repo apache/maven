@@ -544,30 +544,33 @@ public class DefaultPluginManager
             String key = (String) i.next();
             Object value = map.get( key );
 
-            Class clazz = plugin.getClass();
-            try
+            if ( value != null )
             {
-                Field f = findPluginField( clazz, key );
-                boolean accessible = f.isAccessible();
-                if ( !accessible )
+                Class clazz = plugin.getClass();
+                try
                 {
-                    f.setAccessible( true );
+                    Field f = findPluginField( clazz, key );
+                    boolean accessible = f.isAccessible();
+                    if ( !accessible )
+                    {
+                        f.setAccessible( true );
+                    }
+
+                    f.set( plugin, value );
+
+                    if ( !accessible )
+                    {
+                        f.setAccessible( false );
+                    }
                 }
-
-                f.set( plugin, value );
-
-                if ( !accessible )
+                catch ( NoSuchFieldException e )
                 {
-                    f.setAccessible( false );
+                    throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
                 }
-            }
-            catch ( NoSuchFieldException e )
-            {
-                throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
-            }
-            catch ( IllegalAccessException e )
-            {
-                throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
+                catch ( IllegalAccessException e )
+                {
+                    throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
+                }
             }
         }
     }
