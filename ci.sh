@@ -5,20 +5,10 @@
 #
 # 1. export JAVA_HOME=/path/to/java
 #
-# 2. export MBOOT_HOME=~/mboot
-#
-# 3. export M2_HOME=~/maven
-#    
-# 4. export PATH=$PATH:$MBOOT:$M2_HOME/bin
-#
-# 5. Your ~/maven.properties must have: maven.repo.local = ~/path/to/repo
-#
 # ----------------------------------------------------------------------------------
 
 export JAVA_HOME=/usr/local/java
-export MBOOT_HOME=$HOME/mboot
-export M2_HOME=$HOME/m2
-export PATH=$PATH:$MBOOT_HOME:$M2_HOME/bin:$JAVA_HOME/bin
+export PATH=$PATH:$JAVA_HOME/bin
 
 # ----------------------------------------------------------------------------------
 
@@ -117,7 +107,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
     (
       cd $DIR/maven-components
   
-      sh m2-bootstrap-all.sh
+      sh m2-bootstrap-all.sh -Dmaven.repo.local="$HOME_DIR/$REPO" -Dmaven.home="$HOME_DIR/m2"
     )    
 
     DIST=m2-${TIMESTAMP}.tar.gz
@@ -128,6 +118,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 
     mkdir -p $DEPLOY_DIR > /dev/null 2>&1
 
+    # Assumes pwd is still $HOME_DIR
     tar czf $DEPLOY_DIR/$DIST m2
 
   else

@@ -20,6 +20,8 @@
     <repository>
       <id>central</id>
       <name>Maven Central Repository at Ibiblio</name>
+      <!-- TODO: should this be scp:://login.ibiblio.org:/public/html/maven? Or should we even use url?
+           How about protocol, host, directory, etc? -->
       <url>scp://login.ibiblio.org//public/html/maven</url>
     </repository>
   </distributionManagement>

@@ -35,6 +35,7 @@ public class JarOverrideRequestTransformation
                                Map parameters )
         throws Exception
     {
+/* TODO: need an override in the POM
         MavenProject project = (MavenProject) parameters.get( "project" );
 
         boolean mavenJarOverride = project.getBooleanProperty( "maven.jar.override" );
@@ -49,7 +50,7 @@ public class JarOverrideRequestTransformation
                                                                 artifact.getType() );
             return transformedArtifact;
         }
-
+*/
         return artifact;
     }
 }

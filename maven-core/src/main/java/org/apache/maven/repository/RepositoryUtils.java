@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * @todo not sure "wagon" notation is appropriate here - it is really maven-artifact which is not the same as wagon
  * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
  * @version $Id$
  */
@@ -25,7 +26,6 @@ public class RepositoryUtils
 
         return repos;
     }
-
     public static ArtifactRepository
         mavenRepositoryToWagonRepository( Repository mavenRepository )
     {
@@ -34,5 +34,10 @@ public class RepositoryUtils
         retValue.setUrl( mavenRepository.getUrl() );
 
         return retValue;
+    }
+
+    public static ArtifactRepository localRepositoryToWagonRepository( String repository )
+    {
+        return new ArtifactRepository( "local", "file://" + repository );
     }
 }

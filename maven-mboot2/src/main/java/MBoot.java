@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Date;
 
 public class MBoot
@@ -117,8 +116,6 @@ public class MBoot
 
     private ModelReader reader;
 
-    private Properties properties;
-
     private String repoLocal;
 
     private List mbootDependencies;
@@ -142,45 +139,54 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
-        File mavenPropertiesFile = new File( System.getProperty( "user.home" ), "maven.properties" );
+        File userPomFile = new File( System.getProperty( "user.home" ), ".m2/pom.xml" );
 
-        if ( !mavenPropertiesFile.exists() )
+        reader = new ModelReader();
+        if ( !reader.parse( userPomFile ) )
         {
-            System.out.println( "You must have a ~/maven.properties file and must contain the following entries:" );
-
-            System.out.println( "maven.home = /path/to/m2/installation" );
-
-            System.out.println( "maven.repo.local = /path/to/m2/repository" );
+            System.out.println( "You must have a ~/.m2/pom.xml file and must contain the following entries:" );
+            System.out.println( "<local>\n" );
+            System.out.println( "  <repository>/path/to/m2/repository</repository> (required)\n" );
+            System.out.println( "  <online>true</online> (optional)\n" );
+            System.out.println( "</local>" );
 
             System.exit( 1 );
         }
+
+        String mavenHome = null;
+
+        if ( args.length == 1 )
+        {
+            mavenHome = args[0];
+        }
+        else
+        {
+            mavenHome = System.getProperty( "maven.home" );
+
+            if ( mavenHome == null )
+            {
+                mavenHome = new File( System.getProperty( "user.home" ), "m2" ).getAbsolutePath();
+            }
+        }
+
+        File dist = new File( mavenHome );
+
+        System.out.println( "Maven installation directory: " + dist );
 
         Date fullStop;
 
         Date fullStart = new Date();
 
-        properties = loadProperties( mavenPropertiesFile );
-
-        // Make the system properties override maven.properties
-        properties.putAll( System.getProperties() );
-
-        for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
-        {
-            String key = (String) i.next();
-
-            // TODO: the namespace should be "properties" itself to support variables within the same file,
-            //       however, StringUtils would need to support recursive replacement
-            properties.setProperty( key, StringUtils.interpolate( properties.getProperty( key ), System.getProperties() ) );
-        }
-
-        String onlineProperty = properties.getProperty( "maven.online" );
+        String onlineProperty = System.getProperty( "maven.online", reader.getLocal().getOnline() );
 
         if ( onlineProperty != null && onlineProperty.equals( "false" ) )
         {
             online = false;
         }
 
-        downloader = new ArtifactDownloader( properties );
+        String mavenRepoLocal = System.getProperty( "maven.repo.local", reader.getLocal().getRepository() );
+
+        downloader = new ArtifactDownloader( mavenRepoLocal, reader.getRemoteRepositories() );
 
         repoLocal = downloader.getMavenRepoLocal().getPath();
 
@@ -250,24 +256,6 @@ public class MBoot
 
         // build the installation
 
-        String mavenHome;
-
-        if ( args.length == 1 )
-        {
-            mavenHome = args[0];
-        }
-        else
-        {
-            mavenHome = properties.getProperty( "maven.home" );
-
-            if ( mavenHome == null )
-            {
-                mavenHome = new File( System.getProperty( "user.home" ), "m2" ).getAbsolutePath();
-            }
-        }
-
-        File dist = new File( mavenHome );
-
         FileUtils.deleteDirectory( dist );
 
         // ----------------------------------------------------------------------
@@ -328,7 +316,8 @@ public class MBoot
                 d.artifactId.equals( "xpp3" ) ||
                 d.artifactId.equals( "junit" ) ||
                 d.artifactId.equals( "wagon-api" ) ||
-                d.artifactId.equals( "maven-artifact" ) )
+                d.artifactId.equals( "maven-artifact" ) 
+)
             {
                 continue;
             }
@@ -845,53 +834,6 @@ public class MBoot
         return d.getArtifactDirectory() + pathSeparator + "jars" + pathSeparator + d.getArtifact();
     }
 
-    private Properties loadProperties( File file )
-    {
-        try
-        {
-            return loadProperties( new FileInputStream( file ) );
-        }
-        catch ( Exception e )
-        {
-            // ignore
-        }
-
-        return new Properties();
-    }
-
-    private static Properties loadProperties( InputStream is )
-    {
-        Properties properties = new Properties();
-
-        try
-        {
-            if ( is != null )
-            {
-                properties.load( is );
-            }
-        }
-        catch ( IOException e )
-        {
-            // ignore
-        }
-        finally
-        {
-            try
-            {
-                if ( is != null )
-                {
-                    is.close();
-                }
-            }
-            catch ( IOException e )
-            {
-                // ignore
-            }
-        }
-
-        return properties;
-    }
-
     class ModelReader
         extends DefaultHandler
     {
@@ -911,7 +853,11 @@ public class MBoot
 
         private List dependencies = new ArrayList();
 
+        private List remoteRepositories = new ArrayList();
+
         private UnitTests unitTests;
+
+        private Local local = new Local();
 
         private List resources = new ArrayList();
 
@@ -925,9 +871,13 @@ public class MBoot
 
         private boolean insideDependency = false;
 
+        private boolean insideLocal = false;
+
         private boolean insideUnitTest = false;
 
         private boolean insideResource = false;
+
+        private boolean insideRepository = false;
 
         private StringBuffer bodyText = new StringBuffer();
 
@@ -936,6 +886,11 @@ public class MBoot
         public void reset()
         {
             dependencies = new ArrayList();
+        }
+
+        public List getRemoteRepositories()
+        {
+            return remoteRepositories;
         }
 
         public List getDependencies()
@@ -951,6 +906,11 @@ public class MBoot
         public List getResources()
         {
             return resources;
+        }
+
+        public Local getLocal()
+        {
+            return local;
         }
 
         public boolean parse( File file )
@@ -982,6 +942,14 @@ public class MBoot
             if ( rawName.equals( "parent" ) )
             {
                 insideParent = true;
+            }
+            else if ( rawName.equals( "repository" ) && !insideLocal )
+            {
+                insideRepository = true;
+            }
+            else if ( rawName.equals( "local" ) )
+            {
+                insideLocal = true;
             }
             else if ( rawName.equals( "unitTest" ) )
             {
@@ -1052,6 +1020,10 @@ public class MBoot
                 resources.addAll( p.getResources() );
 
                 insideParent = false;
+            }
+            else if ( rawName.equals( "local" ) )
+            {
+                insideLocal = false;
             }
             else if ( rawName.equals( "unitTest" ) )
             {
@@ -1163,6 +1135,24 @@ public class MBoot
             else if ( rawName.equals( "type" ) )
             {
                 type = getBodyText();
+            }
+            else if ( rawName.equals( "repository" ) )
+            {
+                if ( insideLocal )
+                {
+                    local.repository = getBodyText();
+                }
+                else 
+                {
+                    insideRepository = false;
+                }
+            }
+            else if ( insideRepository )
+            {
+                if ( rawName.equals( "url" ) )
+                {
+                    remoteRepositories.add( getBodyText() );
+                }
             }
 
             bodyText = new StringBuffer();
@@ -1450,5 +1440,33 @@ public class MBoot
         {
             this.filtering = filtering;
         }
+    }
+
+    public static class Local
+        implements Serializable
+    {
+        private String repository;
+
+        private String online;
+
+        public String getRepository()
+        {
+            return this.repository;
+        }
+
+        public void setRepository( String repository )
+        {
+            this.repository = repository;
+        }   
+    
+        public String getOnline()
+        {
+            return this.online;
+        }
+
+        public void setOnline( String online )
+        {
+            this.online = online;
+        }   
     }
 }

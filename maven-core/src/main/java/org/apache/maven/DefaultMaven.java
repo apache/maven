@@ -51,7 +51,7 @@ public class DefaultMaven
 
     private String mavenHome;
 
-    private String localRepository;
+    private String mavenHomeLocal;
 
     private boolean logResults = true;
 
@@ -70,7 +70,9 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
     // Project execution
     // ----------------------------------------------------------------------
-
+  
+    /** @todo probable need to do getProject( null ) here instead - but no project doesn't seem supported just yet, 
+        at least from the CLI. */
     public ExecutionResponse execute( List goals ) throws GoalNotFoundException
     {
         return execute( (MavenProject) null, goals );
@@ -90,7 +92,13 @@ public class DefaultMaven
 
         ExecutionResponse response = new ExecutionResponse();
 
-        MavenSession session = new MavenSession( container, pluginManager, project, getLocalRepository(), goals );
+        pluginManager.setLocalRepository( project.getLocalRepository() );
+
+        MavenSession session = new MavenSession( container,
+                                                 pluginManager,
+                                                 project,
+                                                 project.getLocalRepository(),
+                                                 goals );
 
         try
         {
@@ -205,7 +213,7 @@ public class DefaultMaven
             {
                 File f = (File) iterator.next();
 
-                MavenProject project = projectBuilder.build( f, getLocalRepository() );
+                MavenProject project = projectBuilder.build( f );
 
                 projects.add( project );
             }
@@ -281,7 +289,7 @@ public class DefaultMaven
             }
         }
 
-        return projectBuilder.build( project, getLocalRepository() );
+        return projectBuilder.build( project );
     }
 
     // ----------------------------------------------------------------------
@@ -307,25 +315,14 @@ public class DefaultMaven
         return mavenHome;
     }
 
-    // ----------------------------------------------------------------------
-    // Maven local repository
-    // ----------------------------------------------------------------------
-
-    public void setLocalRepository( String localRepository )
+    public void setMavenHomeLocal( String mavenHomeLocal )
     {
-        this.localRepository = localRepository;
+        this.mavenHomeLocal = mavenHomeLocal;
     }
 
-    private ArtifactRepository wagonLocalRepository;
-
-    public ArtifactRepository getLocalRepository()
+    public String getMavenHomeLocal()
     {
-        if ( wagonLocalRepository == null )
-        {
-            wagonLocalRepository = new ArtifactRepository( "local", "file://" + localRepository );
-        }
-
-        return wagonLocalRepository;
+        return mavenHomeLocal;
     }
 
     // ----------------------------------------------------------------------
@@ -357,14 +354,5 @@ public class DefaultMaven
         {
             return secs + " seconds";
         }
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    public void booty() throws Exception
-    {
-        pluginManager.setLocalRepository( getLocalRepository() );
     }
 }

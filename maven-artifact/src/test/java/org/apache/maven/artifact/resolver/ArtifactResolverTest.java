@@ -256,5 +256,18 @@ public class ArtifactResolverTest
 
         assertLocalArtifactPresent( l );
     }
+
+/*
+    public void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepositoryAndLocalCannotBeCreated()
+        throws Exception
+    {
+        Artifact m = createRemoteArtifact( "m", "1.0" );
+
+        artifactResolver.resolve( m, remoteRepositories(), badLocalRepository() );
+
+        // TODO [failing test case]: throw and handle a more informative exception
+    }
+*/
+
 }
 

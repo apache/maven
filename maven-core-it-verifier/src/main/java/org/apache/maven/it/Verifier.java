@@ -21,61 +21,19 @@ public class Verifier
 
     private String mavenRepoLocal;
 
-    public Verifier( String basedir )
+    public Verifier( String basedir, String mavenRepoLocal )
     {
         this.basedir = basedir;
+        this.mavenRepoLocal = mavenRepoLocal;
     }
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    public static String interpolate( String text, Map namespace )
-    {
-        Iterator keys = namespace.keySet().iterator();
-
-        while ( keys.hasNext() )
-        {
-            String key = keys.next().toString();
-
-            Object obj = namespace.get( key );
-
-            String value = obj.toString();
-
-            text = replace( text, "${" + key + "}", value );
-
-            if ( key.indexOf( " " ) == -1 )
-            {
-                text = replace( text, "$" + key, value );
-            }
-        }
-        return text;
-    }
-
     public void verify()
         throws VerificationException
     {
-        Properties properties = new Properties();
-
-        try
-        {
-            properties.load( new FileInputStream( new File( System.getProperty( "user.home" ), "maven.properties" ) ) );
-
-            for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
-            {
-                String key = (String) i.next();
-
-                properties.setProperty( key, interpolate( properties.getProperty( key ), System.getProperties() ) );
-            }
-
-        }
-        catch ( IOException e )
-        {
-            throw new VerificationException( "Can't find the maven.properties file! Verification can't proceed!" );
-        }
-
-        mavenRepoLocal = properties.getProperty( "maven.repo.local" );
-
         try
         {
             BufferedReader reader = new BufferedReader( new FileReader( new File( basedir, "expected-results.txt" ) ) );
@@ -98,7 +56,7 @@ public class Verifier
     private void verifyExpectedResult( String line )
         throws VerificationException
     {
-        line = replace( line, "${maven.repo.local}", mavenRepoLocal );
+        line = replace( line, "${localRepository}", mavenRepoLocal );
 
         if ( line.indexOf( "!/" ) > 0 )
         {
@@ -191,7 +149,7 @@ public class Verifier
 
     public static void main( String args[] )
     {
-        Verifier verifier = new Verifier( args[0] );
+        Verifier verifier = new Verifier( args[0], args[1] );
 
         try
         {

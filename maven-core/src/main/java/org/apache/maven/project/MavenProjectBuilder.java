@@ -16,8 +16,6 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
 import java.io.File;
 import java.util.List;
 
@@ -27,10 +25,10 @@ public interface MavenProjectBuilder
 
     // ----------------------------------------------------------------------
 
-    MavenProject build( File project, ArtifactRepository localRepository )
+    MavenProject build( File project )
         throws ProjectBuildingException;
 
-    MavenProject build( File project, ArtifactRepository localRepository, boolean followTransitiveDeps )
+    MavenProject build( File project, boolean followTransitiveDeps )
         throws ProjectBuildingException;
 
     // ----------------------------------------------------------------------

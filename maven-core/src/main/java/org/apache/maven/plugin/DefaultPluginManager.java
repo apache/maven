@@ -207,7 +207,7 @@ public class DefaultPluginManager
 
     public boolean isPluginInstalled( String pluginId )
     {
-        return (pluginDescriptors.get( pluginId ) != null);
+        return pluginDescriptors.containsKey( pluginId );
     }
 
     private String getPluginId( String goalName )
@@ -261,6 +261,7 @@ public class DefaultPluginManager
 
         MavenMetadataSource sr = new MavenMetadataSource( remotePluginRepositories, localRepository, artifactResolver );
 
+        // TODO: needs to be configurable
         String[] excludes = new String[] { "maven-core", "maven-artifact", "maven-model", "maven-plugin", "plexus",
             "xstream", "xpp3", "classworlds", "ognl" };
 
@@ -275,17 +276,20 @@ public class DefaultPluginManager
 
     public void initialize() throws Exception
     {
-        //!! move this to be configurable from the Maven component
+        // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new HashSet();
 
+        // TODO: needs to be configured from the POM element
         remotePluginRepositories.add( new ArtifactRepository( "plugin-repository", "http://www.ibiblio.org/maven" ) );
     }
 
+    // TODO: is this needed or can it be found from the session?
     public ArtifactRepository getLocalRepository()
     {
         return localRepository;
     }
 
+    // TODO: is this needed or can it be found from the session? It is currently set from the session
     public void setLocalRepository( ArtifactRepository localRepository )
     {
         this.localRepository = localRepository;

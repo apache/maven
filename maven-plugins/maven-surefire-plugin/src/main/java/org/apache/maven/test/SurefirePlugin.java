@@ -108,6 +108,7 @@ public class SurefirePlugin
 
         surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery", new Object[]{basedir, includes, excludes} );
 
+        // TODO: there should be a better way to construct a classpath
         surefireBooter.addClassPathUrl( new File( mavenRepoLocal, "junit/jars/junit-3.8.1.jar" ).getPath() );
 
         surefireBooter.addClassPathUrl( new File( mavenRepoLocal, "surefire/jars/surefire-1.1.jar" ).getPath() );

@@ -17,7 +17,7 @@ public class ProjectBaseDirectoryAlignmentTest
     {
         File f = new File( basedir, dir + "project-which-needs-directory-alignment.xml" );
         
-        MavenProject project = projectBuilder.build( f, getLocalRepository(), false );
+        MavenProject project = projectBuilder.build( f, false );
 
         assertNotNull( "Test project can't be null!", project );
 
@@ -32,7 +32,7 @@ public class ProjectBaseDirectoryAlignmentTest
         assertTrue( resource.getDirectory().startsWith( basedir ) );
     }
 
-    /*
+    /* TODO: why commented out?
     public void testProjectDirectoryBaseDirectoryAlignmentInheritance()
         throws Exception
     {

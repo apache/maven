@@ -30,25 +30,9 @@ public class OgnlProjectValueExtractorTest
 
         File f =  new File( basedir, "src/test/resources/pom.xml" );
 
-        project = builder.build( f, new ArtifactRepository() );
-
-        project.setProperty( "foo", "bar" );
+        project = builder.build( f );
 
         context = createGoalExecutionContext();
-    }
-
-    public void testPropertyValueExtraction()
-    {
-        Object value = OgnlProjectValueExtractor.evaluate( "#foo", context );
-
-        assertEquals( "bar", value );
-    }
-
-    public void testValueExtractionWithAPropertyContainingAPath()
-    {
-        Object value = OgnlProjectValueExtractor.evaluate( "#foo/META-INF/maven", context );
-
-        assertEquals( "bar/META-INF/maven", value );
     }
 
     public void testValueExtractionWithAPomValueContainingAPath()

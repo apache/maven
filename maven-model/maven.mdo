@@ -177,15 +177,16 @@
           <version>3.0.0</version>
           <description>The FQDN of the host where the project's artifacts are uploaded.</description>
           <type>String</type>
-          <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
+          <comment>This naming is inconsistent and distribution should occur from a repository structure.</comment>
         </field>
         <field>
           <name>distributionDirectory</name>
           <version>3.0.0</version>
           <description>The directory on the distribution host where artifacts are placed when uploaded.</description>
           <type>String</type>
-          <comment>This naming is inconsistent and distriubtion should occur from a repository structure.</comment>
+          <comment>This naming is inconsistent and distribution should occur from a repository structure.</comment>
         </field>
+
         <field>
           <name>repositories</name>
           <version>4.0.0</version>
@@ -193,7 +194,17 @@
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
-
+<!-- @todo this will not current parse. We want to have a repository element inside here, but it expects a PluginRepository class. Need a way for modello to specify the list tag -->
+<!--
+        <field>
+          <name>pluginRepositories</name>
+          <version>4.0.0</version>
+          <description>The lists of the remote repositories for discovering plugins</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+          <comment>This may be removed or relocated in the near future. It is undecided whether plugins really need a remote repository set of their own.</comment>
+        </field>
+-->
         <field>
           <name>mailingLists</name>
           <version>3.0.0+</version>
@@ -239,6 +250,18 @@
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
           <comment>These should ultimately only be compile time dependencies when transitive dependencies come into play.</comment>
+        </field>
+        <field>
+          <name>overrides</name>
+          <version>4.0.0</version>
+          <description>
+            This element describes all of the dependency overrides for a
+            project.  Each dependency is described by a
+            <code>override</code> element, which is then described by
+            additional elements (described below).
+          </description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>licenses</name>
@@ -325,6 +348,25 @@
           <type>DistributionManagement</type>
         </field>
         <field>
+          <name>local</name>
+          <version>4.0.0</version>
+          <required>false</required>
+          <description>Local configuration information.</description>
+          <type>Local</type>
+        </field>
+        <!-- @todo long run 4.0.0 may not need properties, with the parameters being specified
+          for the plugin directly -->
+        <field>
+          <name>properties</name>
+          <version>3.0.0+</version>
+          <description>
+            Properties about the project. This allows you to configure your project and the
+            plugins it uses.
+          </description>
+          <type>java.util.Properties</type>
+          <defaultValue>new Properties()</defaultValue>
+        </field>
+        <field>
           <name>preGoals</name>
           <version>4.0.0</version>
           <description>Set of decorator(s) injected before the target goal(s).</description>
@@ -340,6 +382,7 @@
         </field>
       </fields>
       <!-- We need this because we can't use package as a field name. -->
+      <!-- @todo this means it is undocumented. Should we instead provide an optional field name so package can be mapped to the field packageName? -->
       <codeSegments>
         <codeSegment>
           <version>3.0.0+</version>
@@ -404,9 +447,10 @@
         </codeSegment>
       </codeSegments>
     </class>
+    <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
     <class>
       <name>Branch</name>
-      <version>3.0.0</version>
+      <version>3.0.0+</version>
       <description>
         This element describes each of the branches of the
         project. Each branch is described by a
@@ -416,12 +460,31 @@
       <fields>
         <field>
           <name>tag</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
+          <required>true</required>
           <description>
             The branch tag in the version control system
             (e.g. cvs) used by the project for the source
             code associated with this branch of the
             project.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>description</name>
+          <version>4.0.0</version>
+          <description>
+            A description of the branch and its strategy.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>lastMergeTag</name>
+          <version>4.0.0</version>
+          <description>
+            This is the tag in the version control system that was last used
+            to merge from the branch to the current codebase. Future merges
+            should merge only the changes from this tag to the next.
           </description>
           <type>String</type>
         </field>
@@ -533,6 +596,16 @@
           <version>4.0.0</version>
           <description>
             The directory where compiled application classes are placed.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>finalName</name>
+          <version>4.0.0</version>
+          <description>
+            The filename (including an extension, but with no path information) that the produced artifact
+            will be called. The default value is artifactId-version.extension (where extension is derived from
+            type).
           </description>
           <type>String</type>
         </field>
@@ -729,6 +802,64 @@
       </codeSegments>
     </class>
     <class>
+      <name>Override</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            The project group that produced the dependency, e.g.
+            <code>geronimo</code>.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            The unique id for an artifact produced by the project group, e.g.
+            <code>germonimo-jms</code>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>type</name>
+          <version>4.0.0</version>
+          <description>
+            Other known recognised dependency types are:
+            <code>ejb</code> and
+            <code>plugin</code>.
+          </description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <!-- @todo this doesn't consider forced-version overrides, and do we need the version to override? -->
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            The version of the dependency., e.g.
+            <code>3.2.1</code>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>file</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            The filename of the dependency that will be used to override the one from the repository, e.g.
+            <code>lib/non-distributable-code-1.3.jar</code>
+          </description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
       <superClass>Contributor</superClass>
       <name>Developer</name>
       <version>3.0.0+</version>
@@ -858,10 +989,29 @@
           <type>String</type>
         </field>
         <field>
+          <name>post</name>
+          <version>4.0.0</version>
+          <description>
+            The email address or link that can be used to post to
+            the mailing list.  If this is an email address, a
+            <code>mailto:</code> link will automatically be created
+            when the documentation is created.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
           <name>archive</name>
           <version>3.0.0+</version>
           <description>The link to a URL where you can browse the archive.</description>
           <type>String</type>
+          <comment>This should probably be removed from 4.0.0 before alpha-1</comment>
+        </field>
+        <field>
+          <name>archives</name>
+          <version>4.0.0</version>
+          <description>The link to a URL where you can browse the archive.</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
         </field>
       </fields>
       <comment>
@@ -943,6 +1093,7 @@
       <codeSegments>
         <codeSegment>
           <version>3.0.0+</version>
+          <!-- @todo: should these be built somewhere so they are only created once, and can be modified? -->
           <code>
             public List getDefaultExcludes()
             {
@@ -1066,6 +1217,13 @@
           <version>4.0.0</version>
           <description>The URL to the project's browsable CVS repository.</description>
           <type>String</type>
+        </field>
+        <field>
+          <name>branches</name>
+          <version>4.0.0</version>
+          <description>The SCM branches that are currently active for the project. These should only be those forked from the current branch or trunk that are intended to be used.</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
         </field>
       </fields>
     </class>
@@ -1311,5 +1469,58 @@
       <fields></fields>
     </class>
 
+    <!-- @todo should modello take a parameter/code segment that will forbid the
+         specification of this in a project other than the user pom? -->
+    <class>
+      <name>Local</name>
+      <version>4.0.0</version>
+      <description>
+        Local contains the information that is specific to the user's
+        local environment. This would only be expected in a user or site pom,
+        not a project POM.
+      </description>
+      <fields>
+        <!-- @todo should local repository actually be part of the <repositories/> element, or be of repository type? -->
+        <field>
+          <name>repository</name>
+          <version>4.0.0</version>
+          <description>
+            The local repository that contains downloaded artifacts.
+          </description>
+          <type>String</type>
+          <!-- @todo systemProperty tag (maven.repo.local value) should be supported by modello -->
+        </field>
+        <field>
+          <name>online</name>
+          <version>4.0.0</version>
+          <description>
+            Whether to run the build online. If not, no remote repositories are consulted for plugins or dependencies
+            and this configuration may be used by other plugins requiring online access.
+          </description>
+          <type>String</type>
+          <defaultValue>true</defaultValue>
+          <!-- @todo systemProperty tag (maven.online value) should be supported by modello -->
+        </field>
+      </fields>
+      <!-- @todo primitive types should be supported natively -->
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            public boolean isOnline()
+            {
+                // Only the value false is offline - anything else is online
+                return !"false".equals( online );
+            }
+
+            public void setOnline( boolean online )
+            {
+                this.online = ( online ? "true" : "false" );
+            }
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
   </classes>
 </model>
+

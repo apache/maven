@@ -32,43 +32,21 @@ public class AbstractProjectTestCase
         return localRepository;
     }
 
-    public void initLocalRepository()
-    {
-        File tempLocalRepository = new File( getBasedir(), "target/temp-repo-local" );
-        
-        // delete 
-        try
-        {
-            FileUtils.deleteDirectory( tempLocalRepository );
-        }
-        catch ( Exception e )
-        {
-            System.out.println( "Could not delete the remaining from previous tests!! Test will continue anyway " );
-
-        }
-
-        tempLocalRepository.mkdirs();
-
-        System.out.println( "Created temporary local repository: " + tempLocalRepository );
-
-        System.setProperty( "maven.repo.local", tempLocalRepository.getPath() );
-    }
-
-    protected MavenProject buildProject( File f, ArtifactRepository localRepository, boolean followTransitiveDeps  )
+    protected MavenProject buildProject( File f, boolean followTransitiveDeps )
        throws Exception
     {
         MavenProject project;
 
-        project = projectBuilder.build( f, localRepository, followTransitiveDeps );
+        project = projectBuilder.build( f, followTransitiveDeps );
 
         assertNotNull( "Project is null", project );
 
         return project;
     }
 
-    protected MavenProject buildProject( File f, ArtifactRepository localRepository )
+    protected MavenProject buildProject( File f )
         throws Exception
     {
-        return buildProject( f, localRepository, false );
+        return buildProject( f, false );
     }
 }

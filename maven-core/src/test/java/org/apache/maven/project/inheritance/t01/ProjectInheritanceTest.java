@@ -39,7 +39,7 @@ public class ProjectInheritanceTest
         // Check p0 value for org name
         // ----------------------------------------------------------------------
 
-        MavenProject p0 = projectBuilder.build( projectFile( "p0" ), getLocalRepository() );
+        MavenProject p0 = projectBuilder.build( projectFile( "p0" ) );
 
         assertEquals( "p0-org", p0.getOrganization().getName() );
 
@@ -47,7 +47,7 @@ public class ProjectInheritanceTest
         // Check p1 value for org name
         // ----------------------------------------------------------------------
 
-        MavenProject p1 = projectBuilder.build( projectFile( "p1" ), getLocalRepository() );
+        MavenProject p1 = projectBuilder.build( projectFile( "p1" ) );
 
         assertEquals( "p1-org", p1.getOrganization().getName() );
 
@@ -55,7 +55,7 @@ public class ProjectInheritanceTest
         // Check p2 value for org name
         // ----------------------------------------------------------------------
 
-        MavenProject p2 = projectBuilder.build( projectFile( "p2" ), getLocalRepository() );
+        MavenProject p2 = projectBuilder.build( projectFile( "p2" ) );
 
         assertEquals( "p2-org", p2.getOrganization().getName() );
 
@@ -63,7 +63,7 @@ public class ProjectInheritanceTest
         // Check p2 value for org name
         // ----------------------------------------------------------------------
 
-        MavenProject p3 = projectBuilder.build( projectFile( "p3" ), getLocalRepository() );
+        MavenProject p3 = projectBuilder.build( projectFile( "p3" ) );
 
         assertEquals( "p3-org", p3.getOrganization().getName() );
 
@@ -71,7 +71,7 @@ public class ProjectInheritanceTest
         // Check p4 value for org name
         // ----------------------------------------------------------------------
 
-        MavenProject p4 = projectBuilder.build( projectFile( "p4" ), getLocalRepository() );
+        MavenProject p4 = projectBuilder.build( projectFile( "p4" ) );
 
         assertEquals( "p4-org", p4.getOrganization().getName() );
     }

@@ -12,7 +12,7 @@ ARGS="$@"
   echo "-----------------------------------------------------------------------"  
 
   cd ./maven-mboot2
-  ./build
+  ./build $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi

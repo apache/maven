@@ -44,9 +44,19 @@ public class OgnlProjectValueExtractor
                 // do nothing
             }
         }
-        else if ( expression.equals( "#localRepository") )
+        else if ( expression.equals( "#localRepository" ) )
         {
-            value = context.getLocalRepository();
+            value = context.getSession().getLocalRepository();
+        }
+        else if ( expression.equals( "#maven.repo.local" ) )
+        {
+            // TODO: remove this alias: but note that it is a string instead of an ArtifactRepository
+            value = context.getSession().getLocalRepository().getUrl().substring( "file://".length() );
+        }
+        else if ( expression.equals( "#maven.final.name" ) )
+        {
+            // TODO: remove this alias
+            value = context.getProject().getModel().getBuild().getFinalName();
         }
         else if ( expression.equals( "#project" ) )
         {
@@ -71,6 +81,7 @@ public class OgnlProjectValueExtractor
             catch ( OgnlException e )
             {
                 // do nothing
+                e.printStackTrace(); // TODO: should log? should ignore as previously?
             }
         }
         else if ( expression.equals( "#basedir" ) )
@@ -79,6 +90,8 @@ public class OgnlProjectValueExtractor
         }
         else if ( expression.startsWith( "#" ) )
         {
+            new Exception( "Got expression '" + expression + "' that was not recognised" ).printStackTrace();
+/* TODO: this probably isn't needed - log something properly though that is invalid? Probably should throw exception.
             expression = expression.substring( 1 );
 
             int pathSeparator = expression.indexOf( "/" );
@@ -92,9 +105,8 @@ public class OgnlProjectValueExtractor
             {
                 value = context.getProject().getProperty( expression );
             }
-
+*/
         }
-
 
         // If we strike out we'll just use the expression which allows
         // people to use hardcoded values if they wish.
@@ -107,3 +119,4 @@ public class OgnlProjectValueExtractor
         return value;
     }
 }
+

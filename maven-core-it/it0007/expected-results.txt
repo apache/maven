@@ -2,4 +2,4 @@ target/classes/org/apache/maven/it0007/Person.class
 target/test-classes/org/apache/maven/it0007/PersonTest.class
 target/maven-core-it0007-1.0.jar
 target/maven-core-it0007-1.0.jar!/it0007.properties
-${maven.repo.local}/maven/poms/maven-it-support-parent-1.0.pom
+${localRepository}/maven/poms/maven-it-support-parent-1.0.pom

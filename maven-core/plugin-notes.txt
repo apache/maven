@@ -42,7 +42,7 @@ a specific task.
 <plugin>
   <id>surefire</id>
   <configuration>
-    <mavenRepoLocal>#maven.repo.local</mavenRepoLocal>
+    <mavenRepoLocal>#localRepository</mavenRepoLocal>
     <basedir>#basedir</basedir>
     <includes>#project.build.unitTest.includes</includes>
     <excludes>#project.build.unitTest.excludes</excludes>

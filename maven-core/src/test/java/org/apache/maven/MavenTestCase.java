@@ -76,6 +76,7 @@ public class MavenTestCase
 
         getContainer().addContextValue( "rootClassRealm", rootClassRealm );
 
+        // TODO: are these used? Are they correct?
         getContainer().addContextValue( "maven.home", new File( getBasedir(), "target/maven.home" ).getPath() );
 
         getContainer().addContextValue( "maven.home.local",
@@ -105,13 +106,13 @@ public class MavenTestCase
 
         if ( pom != null )
         {
-            project = projectBuilder.build( pom, localRepository );
+            project = projectBuilder.build( pom );
         }
         else
         {
             File f = new File( basedir, "target/test-classes/pom.xml" );
 
-            project = projectBuilder.build( f, localRepository );
+            project = projectBuilder.build( f );
         }
 
         return createGoalExecutionContext( project, localRepository, goal );
@@ -120,8 +121,6 @@ public class MavenTestCase
     protected MavenGoalExecutionContext createGoalExecutionContext( MavenProject project,
         ArtifactRepository localRepository, String goal )
     {
-        project.setProperty( "foo", "bar" );
-
         List goals = new ArrayList();
 
         MavenSession session = new MavenSession( getContainer(), pluginManager, project, localRepository, goals );

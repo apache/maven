@@ -62,11 +62,9 @@ public class MavenCli
 
         Maven maven = (Maven) embedder.lookup( Maven.ROLE );
 
-        maven.setMavenHome( findMavenHome() );
+        maven.setMavenHome( System.getProperty( "maven.home" ) );
 
-        maven.setLocalRepository( findLocalRepository() );
-
-        maven.booty();
+        maven.setMavenHomeLocal( System.getProperty( "maven.home.local", System.getProperty( "user.home" ) + "/.m2" ) );
 
         //---
 
@@ -96,6 +94,10 @@ public class MavenCli
             // Take this info from generated piece of meta data which uses
             // the POM itself as the source. We don't want to get into the same
             // bullshit of manually updating some constant in the source.
+            // [Brett] My thoughts on this (something I long ago slated for m1), is to store the pom in
+            //  META-INF or something similar for a jar, and then read that back. maven-model being so
+            //  trim makes that more of a reality. The other alternative is simply to store that info in
+            //  the manifest in plain text and read that back.
             System.out.println( "Maven version: " );
 
             return;
@@ -153,46 +155,6 @@ public class MavenCli
     }
 
     // ----------------------------------------------------------------------
-    // Local repository
-    // ----------------------------------------------------------------------
-
-    /** @todo shouldn't need to duplicate the code to load maven.properties. */
-    private static String findLocalRepository()
-        throws Exception
-    {
-        Properties properties = new Properties();
-
-        properties.load( new FileInputStream( new File( System.getProperty( "user.home" ), "maven.properties" ) ) );
-
-        for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
-        {
-            String key = (String) i.next();
-
-            properties.setProperty( key, StringUtils.interpolate( properties.getProperty( key ), System.getProperties() ) );
-        }
-
-        String localRepository = properties.getProperty( MavenConstants.MAVEN_REPO_LOCAL );
-
-        if ( localRepository == null )
-        {
-            throw new Exception( "Missing 'maven.repo.local' from ~/maven.properties." );
-        }
-
-        return localRepository;
-    }
-
-    // ----------------------------------------------------------------------
-    // Maven home
-    // ----------------------------------------------------------------------
-
-    private static String findMavenHome()
-    {
-        String mavenHome = System.getProperty( "maven.home" );
-
-        return mavenHome;
-    }
-
-    // ----------------------------------------------------------------------
     // System properties handling
     // ----------------------------------------------------------------------
 
@@ -209,15 +171,6 @@ public class MavenCli
         else
         {
             System.setProperty( MavenConstants.DEBUG_ON, "false" );
-        }
-
-        if ( commandLine.hasOption( CLIManager.WORK_OFFLINE ) )
-        {
-            System.setProperty( MavenConstants.WORK_OFFLINE, "true" );
-        }
-        else
-        {
-            System.setProperty( MavenConstants.WORK_OFFLINE, "false" );
         }
 
         if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )

@@ -31,17 +31,13 @@ public abstract class ProjectInheritanceTestCase
         super.setUp();
 
         projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+
+        System.setProperty( "maven.repo.local", getLocalRepository() );
     }
 
-    protected ArtifactRepository getLocalRepository()
+    private String getLocalRepository()
     {
-        ArtifactRepository r = new ArtifactRepository();
-
-        String s = new File( basedir, "src/test/resources/inheritance-repo/" + getTestSeries() ).getPath();
-
-        r.setUrl( "file://" + s );
-
-        return r;
+        return new File( basedir, "src/test/resources/inheritance-repo/" + getTestSeries() ).getPath();
     }
 
     protected File projectFile( String name )

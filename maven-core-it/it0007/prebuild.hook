@@ -1,7 +1,5 @@
 #!/bin/sh
 
-repoLocal=`cat $HOME/maven.properties | grep "maven.repo.local" | sed 's/^.*= *//'`
-
 echo "Removing maven-it-support-parent-1.0.pom from the local repository so we can verify its downloading ..."
 
-rm -f $repoLocal/maven/poms/maven-it-support-parent-1.0.pom > /dev/null 2>&1
+rm -f $1/maven/poms/maven-it-support-parent-1.0.pom > /dev/null 2>&1

@@ -10,6 +10,17 @@ verifier=org.apache.maven.it.Verifier
 
 integration_tests=`cat integration-tests.txt | egrep -v '^#'`
 
+# TODO: this is rubbish. Let's rewrite this in java
+local_repo=`cat $HOME/.m2/pom.xml | tr '\n' ' ' | sed 's/^.*<local> *<repository>//' | sed 's#</repository> *</local>.*$##'`
+
+for i in "$@"
+do
+ j=`echo $i | sed 's/^-Dmaven.repo.local=//'`
+ if [ "$i" != "$j" ]; then
+  local_repo=$j
+ fi
+done
+
 for integration_test in $integration_tests
 do
   (
@@ -18,11 +29,11 @@ do
     if [ -f prebuild.hook ]
     then
       echo      
-       sh prebuild.hook
+       sh prebuild.hook "$local_repo"
       echo
     fi
     
-    m2 clean:clean `cat goals.txt`
+    m2 -Dmaven.repo.local="$local_repo" clean:clean `cat goals.txt`
     
     if [ -f postbuild.hook ]
     then    
@@ -33,7 +44,7 @@ do
     
     basedir=.
     
-    java -cp "$cp" $verifier "$basedir"        
+    java -cp "$cp" $verifier "$basedir" "$local_repo"
   ) > ${integration_test}-log.txt
 
   if [ "$?" = "0" ]
@@ -47,3 +58,4 @@ do
   fi
 
 done
+

@@ -18,17 +18,6 @@ package org.apache.maven;
 
 public class MavenConstants
 {
-    public static final int MAVEN_VERSION = 3;
-
-    public static final int POM_VERSION = 3;
-
-    public static final String MAVEN_PROPERTIES = "maven.properties";
-
+    // TODO: remove? only used in CLI for now - once set, never used
     public static final String DEBUG_ON = "maven.debugOn";
-
-    public static final String WORK_OFFLINE = "maven.workOffline";
-
-    public static final String MAVEN_HOME = "m2.home";
-
-    public static final String MAVEN_REPO_LOCAL = "maven.repo.local";
 }

@@ -46,6 +46,21 @@ public abstract class ArtifactComponentTestCase
 
     protected abstract String component();
 
+    /** Return an existing file, not a directory - causes creation to fail. */
+    protected ArtifactRepository badLocalRepository() throws IOException
+    {
+        ArtifactRepository localRepository = new ArtifactRepository();
+
+        String path = "target/test-classes/repositories/" + component() + "/bad-local-repository";
+
+        File f = new File( path );
+        f.createNewFile();
+
+        localRepository.setUrl( "file://" + path );
+
+        return localRepository;
+    }
+
     protected ArtifactRepository localRepository()
     {
         ArtifactRepository localRepository = new ArtifactRepository();

@@ -264,7 +264,6 @@ public class GoalResolutionPhaseTest
         model.setPostGoals( postGoals );
 
         MavenProject project = new MavenProject( model );
-        project.setProperties( new TreeMap() );
 
         MavenGoalExecutionContext context = createGoalExecutionContext( project, localRepository, mainGoal );
         context.setGoalName( mainGoal );

@@ -6,7 +6,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Set;
 import java.util.HashSet;
@@ -21,7 +20,7 @@ public class ArtifactDownloader
 
     private boolean useTimestamp = true;
 
-    private boolean ignoreErrors = true;
+    private boolean ignoreErrors = false;
 
     private String proxyHost;
 
@@ -31,26 +30,25 @@ public class ArtifactDownloader
 
     private String proxyPassword;
 
-    public ArtifactDownloader( Properties properties )
+    public ArtifactDownloader( String localRepository, List remoteRepositories )
         throws Exception
     {
-        setRemoteRepo( properties.getProperty( "maven.repo.remote" ) );
+        setRemoteRepos( remoteRepositories );
 
-        String mavenRepoLocalProperty = properties.getProperty( "maven.repo.local" );
-        if ( mavenRepoLocalProperty == null )
+        if ( localRepository == null )
         {
-            System.err.println( "maven.repo.local not specified in ~/maven.properties" );
+            System.err.println( "local repository not specified" );
 
             System.exit( 1 );
         }
 
-        mavenRepoLocal = new File( mavenRepoLocalProperty );
+        mavenRepoLocal = new File( localRepository );
 
         if ( !mavenRepoLocal.exists() )
         {
             if ( !mavenRepoLocal.mkdirs() )
             {
-                System.err.println( "Cannot create the specified maven.repo.local: " + mavenRepoLocal );
+                System.err.println( "Cannot create the specified local repository: " + mavenRepoLocal );
 
                 System.exit( 1 );
             }
@@ -63,7 +61,8 @@ public class ArtifactDownloader
             System.exit( 1 );
         }
 
-        System.out.println( "Using the following for your maven.repo.local: " + mavenRepoLocal );
+        System.out.println( "Using the following for your local repository: " + mavenRepoLocal );
+        System.out.println( "Using the following for your remote repositories: " + remoteRepos );
     }
 
     public File getMavenRepoLocal()
@@ -78,62 +77,53 @@ public class ArtifactDownloader
     {
         for ( Iterator j = files.iterator(); j.hasNext(); )
         {
-            try
-            {
-                String file = (String) j.next();
+            String file = (String) j.next();
 
-                if ( !downloadedArtifacts.contains( file ) )
+            if ( !downloadedArtifacts.contains( file ) )
+            {
+                File destinationFile = new File( mavenRepoLocal, file );
+                // The directory structure for this project may
+                // not exists so create it if missing.
+                File directory = destinationFile.getParentFile();
+
+                if ( directory.exists() == false )
                 {
-                    File destinationFile = new File( mavenRepoLocal, file );
-                    // The directory structure for this project may
-                    // not exists so create it if missing.
-                    File directory = destinationFile.getParentFile();
-
-                    if ( directory.exists() == false )
-                    {
-                        directory.mkdirs();
-                    }
-
-                    if ( destinationFile.exists() && file.indexOf( SNAPSHOT_SIGNATURE ) < 0 )
-                    {
-                        continue;
-                    }
-
-                    getRemoteArtifact( file, destinationFile );
-
-                    if ( !destinationFile.exists() )
-                    {
-                        throw new Exception( "Failed to download " + file );
-                    }
-
-                    downloadedArtifacts.add( file );
+                    directory.mkdirs();
                 }
-            }
-            catch ( Exception e )
-            {
-                throw new Exception( e );
+
+                if ( destinationFile.exists() && file.indexOf( SNAPSHOT_SIGNATURE ) < 0 )
+                {
+                    continue;
+                }
+
+                getRemoteArtifact( file, destinationFile );
+
+                if ( !destinationFile.exists() )
+                {
+                    throw new Exception( "Failed to download " + file );
+                }
+
+                downloadedArtifacts.add( file );
             }
         }
     }
 
-    private void setRemoteRepo( String repos )
+    private void setRemoteRepos( List repositories )
     {
         remoteRepos = new ArrayList();
 
-        if ( repos == null )
+        if ( repositories != null )
         {
-            remoteRepos.add( "http://www.ibiblio.org/maven/" );
-            return;
+            remoteRepos.addAll( repositories );
         }
 
-        StringTokenizer st = new StringTokenizer( repos, "," );
-        while ( st.hasMoreTokens() )
+        if ( repositories.isEmpty() )
         {
-            remoteRepos.add( st.nextToken().trim() );
+            remoteRepos.add( "http://www.ibiblio.org/maven/" );
         }
     }
 
-    private List getRemoteRepo()
+    private List getRemoteRepos()
     {
         return remoteRepos;
     }
@@ -142,7 +132,7 @@ public class ArtifactDownloader
     {
         boolean fileFound = false;
 
-        for ( Iterator i = getRemoteRepo().iterator(); i.hasNext(); )
+        for ( Iterator i = getRemoteRepos().iterator(); i.hasNext(); )
         {
             String remoteRepo = (String) i.next();
 
@@ -162,11 +152,17 @@ public class ArtifactDownloader
                     url = replace( url, "http:/", "http://" );
                 }
             }
+            else 
+            {
+                // THe JDK URL for file: should have one or no / instead of // for some reason
+                url = replace( url, "file://", "file:" );
+            }
 
             // Attempt to retrieve the artifact and set the checksum if retrieval
             // of the checksum file was successful.
             try
             {
+                log( "Downloading " + url );
                 HttpUtils.getFile( url,
                                    destinationFile,
                                    ignoreErrors,
@@ -183,6 +179,7 @@ public class ArtifactDownloader
             }
             catch ( FileNotFoundException e )
             {
+                log( "Artifact not found at [" + url + "]" );
                 // Ignore
             }
             catch ( Exception e )
@@ -204,7 +201,7 @@ public class ArtifactDownloader
                 //
                 // print a warning, in any case, so user catches on to mistyped
                 // hostnames, or other snafus
-                log( "Error retrieving artifact from [" + url + "]: " );
+                log( "Error retrieving artifact from [" + url + "]: " + e );
             }
         }
 

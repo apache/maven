@@ -10,6 +10,24 @@
     </repository>
   </repositories>
 
+<!--
+  <pluginRepositories>
+    <repository>
+      <id>pluginCentral</id>
+      <name>Maven Central Repository at ibiblio</name>
+      <url>http://www.ibiblio.org/maven</url>
+    </repository>
+  </pluginRepositories>
+-->
+
+  <!-- TODO: should be the maven local home -->
+  <!-- TODO: substitution not working -->
+<!--
+  <local>
+    <repository>${user.home}/.m2/repository</repository>
+  </local>
+-->
+
   <!-- Default plugins
   <plugins>
     <plugin>

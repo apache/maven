@@ -71,13 +71,9 @@ public interface Maven
 
     String getMavenHome();
 
-    // ----------------------------------------------------------------------
-    // Maven local repository
-    // ----------------------------------------------------------------------
+    void setMavenHomeLocal( String mavenHomeLocal );
 
-    void setLocalRepository( String localRepository );
-
-    ArtifactRepository getLocalRepository();
+    String getMavenHomeLocal();
 
     // ----------------------------------------------------------------------
     // Maven project handling
@@ -85,11 +81,4 @@ public interface Maven
 
     MavenProject getProject( File project )
         throws ProjectBuildingException;
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    void booty()
-        throws Exception;
 }

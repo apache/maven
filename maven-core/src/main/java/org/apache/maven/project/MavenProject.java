@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -32,10 +33,11 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
+import org.apache.maven.model.Local;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
-
+import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -63,7 +65,7 @@ public class MavenProject
 
     private Set artifacts;
 
-    private Map properties;
+    private ArtifactRepository wagonLocalRepository;
 
     public MavenProject( Model model )
     {
@@ -509,59 +511,24 @@ public class MavenProject
         return artifacts;
     }
 
-    public void setProperty( String key, String value )
-    {
-        getProperties().put( key, value );
-    }
-
-    public void setProperties( Map properties )
-    {
-        this.properties = properties;
-    }
-
-    public Map getProperties()
-    {
-        return properties;
-    }
-
-    public String getProperty( String key )
-    {
-        String property = (String) properties.get( key );
-
-        if ( property == null && hasParent() )
-        {
-            property = getParent().getProperty( key );
-        }
-
-        return property;
-    }
-
-    /**
-     * Convert a <code>String</code> property to a
-     * <code>Boolean</code> based on its contents.  It would be nice
-     * if Jelly would deal with this automatically.
-     *
-     * @param key The property key to lookup and convert.
-     * @return The boolean value of the property if convertiable,
-     *         otherwise <code>Boolean.FALSE</code>.
-     */
-    public boolean getBooleanProperty( String key )
-    {
-        String value = getProperty( key );
-
-        if ( "true".equalsIgnoreCase( value )
-            || "on".equalsIgnoreCase( value )
-            || "1".equals( value ) )
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     public List getRepositories()
     {
         return model.getRepositories();
+    }
+
+    public ArtifactRepository getLocalRepository()
+    {
+        if ( wagonLocalRepository == null && model.getLocal() != null && model.getLocal().getRepository() != null )
+        {
+            wagonLocalRepository = RepositoryUtils.localRepositoryToWagonRepository( model.getLocal().getRepository() );
+        }
+
+        return wagonLocalRepository;
+    }
+
+    public void setLocalRepository( ArtifactRepository repository )
+    {
+        this.wagonLocalRepository = repository;
     }
 }
 
