@@ -12,7 +12,7 @@ Installing maven2
  
  * Put ~/m2/bin in your path.
  
- * Run m2! i.e. <<<m2 jar>>>.
+ * Run m2! i.e. <<<m2 jar:jar>>>.
 
 * Notes
 
