@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
@@ -144,12 +143,6 @@ import org.codehaus.plexus.util.FileUtils;
  *  validator=""
  *  expression="#project.build.directory"
  *  description=""
- * @parameter name="localRepository"
- *  type="org.apache.maven.artifact.repository.ArtifactRepository"
- *  required="true"
- *  validator=""
- *  expression="#localRepository"
- *  description=""
  * @parameter
  *  name="project"
  *  type="org.apache.maven.project.MavenProject"
@@ -171,8 +164,6 @@ public class WarMojo
     private String mode;
 
     private MavenProject project;
-
-    private ArtifactRepository localRepository;
 
     private File classesDirectory;
 
@@ -211,13 +202,12 @@ public class WarMojo
     }
 
     /**
-     * @todo properties 'war.bundle' and 'war.target.path'
-     * @todo copy classes to classes webapp directory
+     * @todo properties 'war.target.path'
      */
     public void buildWebapp( MavenProject project )
         throws IOException
     {
-        request.getLog().info( "Assembling webapp " + project.getArtifactId() );
+        request.getLog().info( "Assembling webapp " + project.getArtifactId() + " in " + webappDirectory.getAbsolutePath() );
 
         File libDirectory = new File( webappDirectory, WEB_INF + "/lib" );
 
@@ -235,13 +225,14 @@ public class WarMojo
         for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
         {
             Artifact artifact = (Artifact) iter.next();
-            if ( "jar".equals( artifact.getType() ) )
+
+            if ( "jar".equals( artifact.getType() ) && Artifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
             {
-                FileUtils.copyFileToDirectory( new File( localRepository.getBasedir(), artifact.toString() ) , libDirectory );
+                FileUtils.copyFileToDirectory( artifact.getFile() , libDirectory );
             }
             if ( "tld".equals( artifact.getType() ) )
             {
-                FileUtils.copyFileToDirectory( new File( localRepository.getBasedir(), artifact.toString() ) , tldDirectory );
+                FileUtils.copyFileToDirectory( artifact.getFile() , tldDirectory );
             }
         }
     }
@@ -317,8 +308,6 @@ public class WarMojo
         this.request = request;
 
         project = (MavenProject) request.getParameter( "project" );
-
-        localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
 
         classesDirectory = new File( (String) request.getParameter( "classesDirectory" ) );
 
