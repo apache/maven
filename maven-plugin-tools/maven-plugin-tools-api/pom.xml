@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>maven</groupId>
+    <!-- 
+      | NOT inheriting from maven-plugin-tools, because that POM will have this
+      | as a dependency, for the convenience of implementation projects.
+      -->
+    <artifactId>maven-component</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+  <groupId>maven</groupId>
+  <artifactId>maven-plugin-tools-api</artifactId>
+  <name>Maven Plugin Tools APIs</name>
+  <version>2.0-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>modello</groupId>
+      <artifactId>modello</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>maven-plugin</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>wagon-provider-api</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>

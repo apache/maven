@@ -1,0 +1,17 @@
+<component-set>
+  <components>
+
+    <!--
+     |
+     | JavaMojoDescriptorExtractor, a MojoDescriptor extractor to read
+     | descriptors from java sources.
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.plugin.extractor.MojoDescriptorExtrator</role>
+      <role-hint>java</role-hint>
+      <implementation>org.apache.maven.tools.plugin.extractor.JavaMojoDescriptorExtrator</implementation>
+    </component>
+    
+  </components>
+</component-set>

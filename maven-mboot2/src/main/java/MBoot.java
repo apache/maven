@@ -58,6 +58,21 @@ public class MBoot
         //"plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
         //"plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar"
     };
+    
+    String[] pluginGeneratorDeps = new String[]{
+        "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
+        "classworlds/jars/classworlds-1.1-alpha-1.jar",
+        "maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
+        "maven/jars/maven-core-2.0-SNAPSHOT.jar",
+        "maven/jars/maven-model-2.0-SNAPSHOT.jar",
+        "maven/jars/maven-plugin-2.0-SNAPSHOT.jar",
+        "maven/jars/maven-plugin-tools-api-2.0-SNAPSHOT.jar",
+        "maven/jars/maven-plugin-tools-java-2.0-SNAPSHOT.jar",
+        "maven/jars/maven-plugin-tools-pluggy-2.0-SNAPSHOT.jar",
+        "maven/jars/wagon-provider-api-1.0-alpha-2-SNAPSHOT.jar",
+        "maven/jars/wagon-file-1.0-alpha-2-SNAPSHOT.jar",
+        "maven/jars/wagon-http-lightweight-1.0-alpha-2-SNAPSHOT.jar"
+    };
 
     // ----------------------------------------------------------------------
     // These are modello's runtime dependencies
@@ -79,9 +94,13 @@ public class MBoot
     {
         "maven-model",
         "maven-plugin",
-        "maven-plugin-tools",
         "maven-artifact",
         "maven-core",
+//        "maven-script/maven-script-marmalade",
+        "maven-plugin-tools/maven-plugin-tools-api",
+        "maven-plugin-tools/maven-plugin-tools-java",
+        "maven-plugin-tools/maven-plugin-tools-pluggy",
+//        "maven-plugin-tools/maven-plugin-tools-marmalade",
         "maven-core-it-verifier"
     };
 
@@ -262,11 +281,8 @@ public class MBoot
             System.out.println( "--------------------------------------------------------------------" );
         }
 
-        cl.addURL( new File( repoLocal, "maven/jars/maven-plugin-2.0-SNAPSHOT.jar" ).toURL() );
-
-        cl.addURL( new File( repoLocal, "maven/jars/maven-plugin-tools-2.0-SNAPSHOT.jar" ).toURL() );
-
-
+        addPluginGeneratorDependencies();
+        
         for ( int i = 0; i < pluginBuilds.length; i++ )
         {
             String directory = new File( basedir, pluginBuilds[i] ).getAbsolutePath();
@@ -603,17 +619,36 @@ public class MBoot
             cl.addURL( f.toURL() );
         }
     }
+    
+    private void addPluginGeneratorDependencies() throws Exception
+    {
+        for ( int i=0; i<pluginGeneratorDeps.length; i++ )
+        {
+            String dependency = pluginGeneratorDeps[i];
+
+            File f = new File( repoLocal, dependency );
+            if ( !f.exists() )
+            {
+                throw new FileNotFoundException( "Missing dependency: " + dependency +
+                                                 ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
+            }
+
+            cl.addURL( f.toURL() );
+        }
+    }
 
     private void generatePluginDescriptor( String sourceDirectory, String outputDirectory, String pom )
         throws Exception
     {
-        Class c = cl.loadClass( "org.apache.maven.plugin.generator.PluginDescriptorGenerator" );
-
-        Object generator = c.newInstance();
-
-        Method m = c.getMethod( "execute", new Class[]{String.class, String.class, String.class} );
-
-        m.invoke( generator, new Object[]{sourceDirectory, outputDirectory, pom} );
+        Class cls = cl.loadClass("org.apache.maven.tools.plugin.pluggy.Main");
+        
+        Method m = cls.getMethod( "main", new Class[]{String[].class} );
+        
+        String[] args = {
+            "descriptor", sourceDirectory, outputDirectory, pom, repoLocal
+        };
+        
+        m.invoke( null, new Object[]{args} );
     }
 
     private void generateSources( String model, String mode, String dir, String modelVersion, String packageWithVersion )

@@ -1,0 +1,17 @@
+<component-set>
+  <components>
+
+    <!--
+     |
+     | MarmaladeMojoDescriptorExtractor, a MojoDescriptor extractor to read
+     | descriptors from marmalade-mojo's.
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.plugin.extractor.MojoDescriptorExtrator</role>
+      <role-hint>marmalade</role-hint>
+      <implementation>org.apache.maven.tools.plugin.extractor.MarmaladeMojoDescriptorExtrator</implementation>
+    </component>
+    
+  </components>
+</component-set>

@@ -49,7 +49,7 @@ public class PluginDescriptorBuilder
 
         List dependencies = new ArrayList();
 
-        for ( int i = 0; i < dependencyConfigurations.length; i++ )
+        for( int i = 0; i < dependencyConfigurations.length; i++ )
         {
             PlexusConfiguration d = dependencyConfigurations[i];
 
@@ -62,7 +62,7 @@ public class PluginDescriptorBuilder
             cd.setType( d.getChild( "type" ).getValue() );
 
             cd.setVersion( d.getChild( "version" ).getValue() );
-
+            
             dependencies.add( cd );
         }
 
@@ -79,6 +79,13 @@ public class PluginDescriptorBuilder
         mojo.setId( c.getChild( "id" ).getValue() );
 
         mojo.setImplementation( c.getChild( "implementation" ).getValue() );
+
+        PlexusConfiguration langConfig = c.getChild( "language" );
+        
+        if( langConfig != null )
+        {
+            mojo.setLanguage( langConfig.getValue() );
+        }
 
         mojo.setInstantiationStrategy( c.getChild( "instantiationStrategy" ).getValue() );
 
@@ -109,7 +116,7 @@ public class PluginDescriptorBuilder
 
             parameter.setType( d.getChild( "type" ).getValue() );
 
-            String s = c.getChild( "required" ).getValue();
+            String s = d.getChild( "required" ).getValue();
 
             if ( s != null )
             {

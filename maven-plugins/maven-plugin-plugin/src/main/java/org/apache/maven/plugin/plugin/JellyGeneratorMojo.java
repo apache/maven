@@ -1,6 +1,10 @@
 package org.apache.maven.plugin.plugin;
 
-import org.apache.maven.plugin.generator.jelly.JellyHarnessGenerator;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.tools.plugin.generator.jelly.JellyHarnessGenerator;
+
+import java.util.Set;
+
 
 /**
  * @goal jelly
@@ -8,26 +12,26 @@ import org.apache.maven.plugin.generator.jelly.JellyHarnessGenerator;
  * @description Goal for generating a plugin descriptor.
  *
  * @parameter
- *  name="sourceDirectory"
- *  type="String"
+ *  name="mojoScanner"
+ *  type="org.apache.maven.tools.plugin.scanner.MojoScanner"
  *  required="true"
  *  validator=""
- *  expression="#project.build.sourceDirectory"
- *  description="x"
+ *  expression="#component.org.apache.maven.tools.plugin.scanner.MojoScanner"
+ *  description="Scanner used to discover mojo descriptors from this project"
+ * @parameter
+ *  name="project"
+ *  type="org.apache.maven.project.MavenProject"
+ *  required="true"
+ *  validator=""
+ *  expression="#project"
+ *  description=""
  * @parameter
  *  name="outputDirectory"
  *  type="String"
  *  required="true" 
  *  validator=""
- *  expression="#project.build.output"
- *  description="x"
- * @parameter
- *  name="pom"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.file.path"
- *  description="x"
+ *  expression="#project.build.directory/generated-sources"
+ *  description=""
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -35,11 +39,11 @@ import org.apache.maven.plugin.generator.jelly.JellyHarnessGenerator;
 public class JellyGeneratorMojo
     extends AbstractGeneratorMojo
 {
-    protected void generate( String sourceDirectory, String outputDirectory, String pom )
+    protected void generate( String outputDirectory, Set mavenMojoDescriptors, MavenProject project )
         throws Exception
     {
         JellyHarnessGenerator generator = new JellyHarnessGenerator();
 
-        generator.execute( sourceDirectory, outputDirectory, pom );
+        generator.execute( outputDirectory, mavenMojoDescriptors, project );
     }
 }

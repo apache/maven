@@ -1,0 +1,98 @@
+package org.apache.maven.tools.plugin.util;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.XMLWriter;
+
+import java.util.Iterator;
+
+/**
+ * @author jdcasey
+ */
+public final class PluginUtils
+{
+
+    private PluginUtils()
+    {
+    }
+
+    public static String pluginId( MavenProject project )
+    {
+        // ----------------------------------------------------------------------
+        // We will take the id from the artifactId of the POM. The artifactId is
+        // always of the form maven-<pluginId>-plugin so we can extract the
+        // pluginId from the artifactId.
+        // ----------------------------------------------------------------------
+
+        String artifactId = project.getArtifactId();
+
+        int firstHyphen = artifactId.indexOf( "-" );
+
+        int lastHyphen = artifactId.lastIndexOf( "-" );
+
+        String pluginId = artifactId.substring( firstHyphen + 1, lastHyphen );
+
+        return pluginId;
+    }
+
+    public static String[] findSources( String basedir, String include )
+    {
+        return PluginUtils.findSources( basedir, include, null );
+    }
+
+    public static String[] findSources( String basedir, String include, String exclude )
+    {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir( basedir );
+        scanner.setIncludes( new String[] { include } );
+        if ( !StringUtils.isEmpty( exclude ) )
+        {
+            scanner.setExcludes( new String[] { exclude } );
+        }
+
+        scanner.scan();
+
+        return scanner.getIncludedFiles();
+    }
+
+    public static void writeDependencies( XMLWriter w, MavenProject project ) throws Exception
+    {
+
+        w.startElement( "dependencies" );
+
+        for ( Iterator it = project.getDependencies().iterator(); it.hasNext(); )
+        {
+            Dependency dep = (Dependency) it.next();
+            w.startElement( "dependency" );
+
+            PluginUtils.element( w, "groupId", dep.getGroupId() );
+
+            PluginUtils.element( w, "artifactId", dep.getArtifactId() );
+
+            PluginUtils.element( w, "type", dep.getType() );
+
+            PluginUtils.element( w, "version", dep.getVersion() );
+
+            w.endElement();
+        }
+
+        w.endElement();
+    }
+
+    private static void element( XMLWriter w, String name, String value )
+    {
+        w.startElement( name );
+
+        if ( value == null )
+        {
+            value = "";
+        }
+
+        w.writeText( value );
+
+        w.endElement();
+    }
+    
+}

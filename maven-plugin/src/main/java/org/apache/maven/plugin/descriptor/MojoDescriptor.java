@@ -28,6 +28,8 @@ public class MojoDescriptor
 
     public static final String MULTI_PASS_EXEC_STRATEGY = "always";
 
+    private static final String DEFAULT_LANGUAGE = "java";
+
     private String implementation;
 
     private String description;
@@ -53,6 +55,8 @@ public class MojoDescriptor
     private boolean requiresDependencyResolution = false;
 
     private boolean requiresProject = true;
+
+    private String language = DEFAULT_LANGUAGE;
 
     // ----------------------------------------------------------------------
     //
@@ -91,6 +95,16 @@ public class MojoDescriptor
     public void setInstantiationStrategy( String instantiationStrategy )
     {
         this.instantiationStrategy = instantiationStrategy;
+    }
+
+    public String getLanguage()
+    {
+        return language;
+    }
+
+    public void setLanguage( String language )
+    {
+        this.language = language;
     }
 
     public String getId()

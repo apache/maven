@@ -26,16 +26,13 @@ Marmalade Support
         - a marmalade-based mojo should look something like:
         
 +---+
-        <mojo xmlns="m2:mojo" xmlns:doco="marmalade:doco">
+        <mojo xmlns="m2:mojo" xmlns:marmalade-control="marmalade:marmalade-control" marmalade-control:el="none">
         
           <metadata>
             <id>mmld</id>
             <name>mmldCompile</name>
             <lifecyclePhase>compile</lifecyclePhase>
-            
-            <doco:description>
-              Used to compile marmalade scripts into java beans.
-            </doco:description>
+            <description>Used to compile marmalade scripts into java beans.</description>
             
             <requiresDependencyResolution/>
             <instantiationStrategy/>
@@ -65,6 +62,7 @@ Marmalade Support
           
         </mojo>
 +---+
+[NOTE] All empty elements above signify optional elements, usage specification.
 
   [[2]] <<Marmalade mojo packager.>>
   
@@ -72,26 +70,36 @@ Marmalade Support
         
         [[a]] Locate all *.mmld files within the scripts directory of the project.
         
+              The scripts directory should be tied to the script language within
+              the POM. Until we have multiple language support in the POM, we'll
+              use something like: <<<xpath(build/marmaladeSourceDirectory)>>>.
+        
         [[b]] For each script found:
         
               [[i]]   Execute the script with "gatherMetadata=true" in the context.
               
-              [[ii]]  Retrieve the mojo descriptor from the "descriptor" variable
-                      in the context.
+              [[ii]]  Retrieve the mojo descriptor from the resulting "metadata" 
+                      variable in the context.
                      
-              [[iii]] Add the relative script path to the mojo descriptor.
+              [[iii]] Cache the mojo descriptor in aggregator for subsequent
+                      output to plugin descriptor file.
+                      
+        [[c]] Copy all scripts to the target directory. Preserve relative paths.
+        
+        [[d]] <<Process Disjoint:>> <Allow other mojo-descriptor collectors to
+              run, aggregating their descriptors in similar fashion to [b.iii]
+              above.>
               
-              [[iv]]  Cache the mojo descriptor for later aggregation.
-              
-        [[c]] Use the project's dependencies and other info to form the plugin
+        [[e]] Use the project's dependencies and other info to form the plugin
               descriptor's header (non-mojo-specific info).
               
-        [[d]] Use the PluginGenerator from maven-plugin-tools to generate a
+        [[f]] Use the PluginGenerator from maven-plugin-tools to generate a
               META-INF/plexus/plugin.xml to the target directory.
               
-        [[e]] Copy all scripts to the target directory. Preserve relative paths.
+        [[g]] Continue with lifecycle.
         
-        [[f]] Package into a jar and deploy to the repo.
+              This may include compilation of java helper classes, etc. and 
+              plugin-artifact packaging, presumably via 'jar:jar' or similar.
         
   [[3]] <<Marmalade mojo loader.>>
   
@@ -137,30 +145,22 @@ Marmalade Support
         scalable or extensible enough to accommodate future expansion into the
         realms of jython, groovy, etc...
         
+        <<UPDATE:07-FEB-2005>>
+        
+        We'll plan on using some sort of language specification in the mojo
+        descriptor to determine which mojo loader to use, then we'll populate
+        the PluginLoader/PluginManager with a map of known languages->loaders.
+        
   [[2]] How do we make the plugin:install process smart enough to switch 
         generator implementations based on some sub-type of maven-plugin?
         
         This is closely related to [1] above.
         
-  [[3]] We should probably look into enforcing <<<org/apache/maven/plugins/$pluginId>>>
-        namespacing for plugin generation, to avoid the case where two plugins
-        are script-based, load from the context classloader, depend on one 
-        another's APIs, and have script names that collide.
+        <<UPDATE:07-FEB-2005>>
         
-        <<Example:>> An aspectWerkz plugin which provides a "/compile.mmld" and 
-        depends on an eclipseCompiler plugin, which also happens to provide a
-        "/compile.mmld". The AW plugin might require a java compiler to outsource
-        the actual java code compilation, and want to use the Eclipse compiler
-        APIs to do this. Maybe the eclipseCompiler plugin has additional 
-        convenience APIs that the AW plugin wants to use...anyway, the mojo
-        loader for marmalade scripts is based on classpath resources, so when
-        it looks up "/compile.mmld" in the classloader for the plugin's realm, 
-        will it come up with the correct script (the AW one)? This doesn't seem
-        to be deterministic. It's simple to avoid this, in the same way that
-        java source code does. Placing a naming constraint on scripts within a
-        plugin would allow us to enforce compatibility to some extent.
+        See update in [3].
         
-  [[4]] Do we want to allow mixed-bag plugin implementations? 
+  [[3]] Do we want to allow mixed-bag plugin implementations? 
   
         These might include a mix of standard-java and marmalade mojos. It 
         strikes me that many  marmalade-based mojos may use beans/tags that are 
@@ -170,3 +170,10 @@ Marmalade Support
         compile it and bundle it with the plugin scripts; but what if this source
         also has mojo annotations? This will have implications for [1] and [2] 
         above.
+        
+        <<UPDATE:07-FEB-2005>>
+        
+        We will plan on allowing this sort of implementation, and simply start
+        by applying all known generators which have a source directory set in
+        the POM (or later, have a <language/> section, maybe). At any rate, 
+        helper classes will be allowed for script-based mojos.
