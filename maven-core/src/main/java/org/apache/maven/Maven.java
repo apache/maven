@@ -19,14 +19,6 @@ package org.apache.maven;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.lifecycle.goal.GoalNotFoundException;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reactor.ReactorException;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -34,8 +26,6 @@ import java.util.Map;
  */
 public interface Maven
 {
-    public static final String AUTOGEN_POMS_SYSPROP = "maven.pom.autogen";
-    
     static String ROLE = Maven.class.getName();
 
     MavenExecutionResponse execute( MavenExecutionRequest request )
