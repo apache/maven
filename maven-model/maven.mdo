@@ -544,6 +544,12 @@
           <description>Url for the continuous integration system use by the project.</description>
           <type>String</type>
         </field>
+        <field>
+          <name>nagEmailAddress</name>
+          <version>4.0.0</version>
+          <description>Email address for the party to be notified on unsuccessful builds.</description>
+          <type>String</type>
+        </field>
       </fields>
     </class>
     <class>
