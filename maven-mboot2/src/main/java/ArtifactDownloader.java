@@ -119,7 +119,7 @@ public class ArtifactDownloader
 
         if ( repositories.isEmpty() )
         {
-            remoteRepos.add( "http://www.ibiblio.org/maven/" );
+            remoteRepos.add( "http://repo1.maven.org" );
         }
     }
 
