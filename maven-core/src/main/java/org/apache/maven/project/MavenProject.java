@@ -533,5 +533,19 @@ public class MavenProject
     {
         this.wagonLocalRepository = repository;
     }
+
+    // ----------------------------------------------------------------------
+    // Decorators
+    // ----------------------------------------------------------------------
+
+    public List getPreGoals()
+    {
+        return model.getPreGoals();
+    }
+
+    public List getPostGoals()
+    {
+        return model.getPostGoals();
+    }
 }
 
