@@ -83,7 +83,7 @@ public class DefaultMavenProjectBuilder
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    private final Map projectCache = new HashMap();
+    private final Map modelCache = new HashMap();
 
     public void initialize()
     {
@@ -151,7 +151,15 @@ public class DefaultMavenProjectBuilder
                                               boolean resolveDependencies, boolean sourceProject )
         throws ProjectBuildingException, ModelInterpolationException, ArtifactResolutionException
     {
-        Model model = modelInterpolator.interpolate( project.getModel() );
+        Model model = project.getModel();
+        String key = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
+        Model cachedModel = (Model) modelCache.get( key );
+        if ( cachedModel == null || sourceProject )
+        {
+            modelCache.put( key, model );
+        }
+
+        model = modelInterpolator.interpolate( model );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
@@ -168,13 +176,6 @@ public class DefaultMavenProjectBuilder
         project.setFile( projectDescriptor );
         project.setParent( parentProject );
         project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
-
-        String key = createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-        MavenProject cachedProject = (MavenProject) projectCache.get( key );
-        if ( cachedProject == null || sourceProject )
-        {
-            projectCache.put( key, project );
-        }
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -200,7 +201,7 @@ public class DefaultMavenProjectBuilder
             project.getArtifacts().addAll( result.getArtifacts().values() );
         }
 
-        ModelValidationResult validationResult = validator.validate( project.getModel() );
+        ModelValidationResult validationResult = validator.validate( model );
 
         if ( validationResult.getMessageCount() > 0 )
         {
@@ -219,14 +220,22 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
+        MavenProject project = assembleLineage( model, localRepository, lineage, aggregatedRemoteWagonRepositories );
+        project.setFile( projectDescriptor );
 
+        return project;
+
+    }
+
+    private MavenProject assembleLineage( Model model, ArtifactRepository localRepository, LinkedList lineage,
+                                          List aggregatedRemoteWagonRepositories )
+        throws ProjectBuildingException
+    {
         MavenProject project = new MavenProject( model );
 
         lineage.addFirst( project );
 
-        project.setFile( projectDescriptor );
-
-        Parent parentModel = model.getParent();
+        Parent parentModel = project.getModel().getParent();
 
         if ( parentModel != null )
         {
@@ -252,15 +261,21 @@ public class DefaultMavenProjectBuilder
             // as we go in order to do this.
             // ----------------------------------------------------------------------
 
-            aggregatedRemoteWagonRepositories.addAll( buildArtifactRepositories( model.getRepositories() ) );
+            aggregatedRemoteWagonRepositories.addAll(
+                buildArtifactRepositories( project.getModel().getRepositories() ) );
 
-            MavenProject parent = getCachedProject( parentModel.getGroupId(), parentModel.getArtifactId(),
-                                                    parentModel.getVersion() );
-            if ( parent == null )
+            MavenProject parent;
+            Model cachedModel = getCachedModel( parentModel.getGroupId(), parentModel.getArtifactId(),
+                                                parentModel.getVersion() );
+            if ( cachedModel == null )
             {
                 File parentPom = findParentModel( parentModel, aggregatedRemoteWagonRepositories, localRepository );
 
                 parent = assembleLineage( parentPom, localRepository, lineage, aggregatedRemoteWagonRepositories );
+            }
+            else
+            {
+                parent = assembleLineage( cachedModel, localRepository, lineage, aggregatedRemoteWagonRepositories );
             }
             project.setParent( parent );
         }
@@ -352,9 +367,9 @@ public class DefaultMavenProjectBuilder
         return artifact.getFile();
     }
 
-    public MavenProject getCachedProject( String groupId, String artifactId, String version )
+    public Model getCachedModel( String groupId, String artifactId, String version )
     {
-        return (MavenProject) projectCache.get( createCacheKey( groupId, artifactId, version ) );
+        return (Model) modelCache.get( createCacheKey( groupId, artifactId, version ) );
     }
 
     private static String createCacheKey( String groupId, String artifactId, String version )

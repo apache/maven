@@ -75,12 +75,11 @@ public class MavenMetadataSource
 
             if ( mavenProjectBuilder != null )
             {
-                MavenProject project = mavenProjectBuilder.getCachedProject( artifact.getGroupId(),
-                                                                             artifact.getArtifactId(),
-                                                                             artifact.getVersion() );
-                if ( project != null )
+                Model model = mavenProjectBuilder.getCachedModel( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                  artifact.getVersion() );
+                if ( model != null )
                 {
-                    dependencies = project.getDependencies();
+                    dependencies = model.getDependencies();
                 }
             }
 

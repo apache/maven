@@ -19,6 +19,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Model;
 
 import java.io.File;
 
@@ -38,5 +39,5 @@ public interface MavenProjectBuilder
     MavenProject buildSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject getCachedProject( String groupId, String artifactId, String version );
+    Model getCachedModel( String groupId, String artifactId, String version );
 }
