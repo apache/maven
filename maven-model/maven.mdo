@@ -416,7 +416,7 @@
             plugins it uses.
           </description>
           <type>Properties</type>
-          <association mapStyle="inline">
+          <association xml.mapStyle="inline">
             <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
@@ -845,7 +845,7 @@
             <code>WEB-INF/lib</code>. For example syntax, check the war plugin docs.
           </description>
           <type>Properties</type>
-          <association mapStyle="inline">
+          <association xml.mapStyle="inline">
             <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
