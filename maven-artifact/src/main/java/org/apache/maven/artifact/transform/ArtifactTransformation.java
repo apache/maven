@@ -49,7 +49,8 @@ public interface ArtifactTransformation
      * @param artifact        Artifact to be transformed.
      * @param localRepository the local repository it will be stored in
      */
-    void transformForInstall( Artifact artifact, ArtifactRepository localRepository );
+    void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException;
 
     /**
      * Take in a artifact and return the transformed artifact for distributing toa remote repository. If no

@@ -144,7 +144,7 @@ public class SnapshotTransformation
             else
             {
                 String version = localMetadata.constructVersion();
-                
+
                 if ( getLogger().isInfoEnabled() )
                 {
                     if ( !version.equals( artifact.getBaseVersion() ) && !alreadyResolved )
@@ -197,8 +197,26 @@ public class SnapshotTransformation
     }
 
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException
     {
-        // Nothing to do
+        try
+        {
+            SnapshotArtifactMetadata metadata = SnapshotArtifactMetadata.readFromLocalRepository( artifact,
+                                                                                                  localRepository );
+            if ( metadata.getLastModified() == 0 )
+            {
+                // doesn't exist - create to avoid an old snapshot download later
+                metadata.storeInLocalRepository( localRepository );
+            }
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Error getting existing metadata", e );
+        }
+        catch ( IOException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Error getting existing metadata", e );
+        }
     }
 
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
