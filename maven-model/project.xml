@@ -1,70 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project>
-  <pomVersion>3</pomVersion>
+  <extend>../project.xml</extend>
   <name>Maven Model</name>
   <groupId>maven</groupId>
   <id>maven-model</id>
   <artifactId>maven-model</artifactId>
   <currentVersion>2.0-SNAPSHOT</currentVersion>
   <gumpRepositoryId>jakarta</gumpRepositoryId>
-  <description>Maven is a project management and project comprehension tool. Maven is based on the concept of a project object model: builds, documentation creation, site publication, and distribution publication are all controlled from the project object model. Maven also provides tools to create source metrics, change logs based directly on source repository, and source cross-references.</description>
-  <shortDescription>Java Project Management Tools</shortDescription>
-  
-  <versions/>
-  <branches/>
-
-  <developers>
-    <developer>
-      <name>Jason van Zyl</name>
-      <id>jvanzyl</id>
-      <email>jason@zenplex.com</email>
-      <organization>Zenplex</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Brett Porter</name>
-      <id>brett</id>
-      <email>brett@apache.org</email>
-      <organization>f2 network</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-      <timezone>+10</timezone>
-    </developer>
-  </developers>
-  
-  <contributors/>
-
-  <dependencies>
-    <dependency>
-      <groupId>xpp3</groupId>
-      <artifactId>xpp3</artifactId>
-      <version>1.1.3.3</version>
-    </dependency>
-  </dependencies>
-  
-  <build>
-    <nagEmailAddress>dev@maven.apache.org</nagEmailAddress>
-    <sourceDirectory>src/main/java</sourceDirectory>
-    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
-    <unitTest>
-      <includes>
-        <include>**/*Test.java</include>
-      </includes>
-    </unitTest>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
-  </build>
-
-  <reports>
-    <report>maven-changelog-plugin</report>
-    <report>maven-javadoc-plugin</report>
-    <report>maven-jxr-plugin</report>
-  </reports>
+  <description>Maven Model</description>
+  <shortDescription>Maven Model</shortDescription>
 </project>
