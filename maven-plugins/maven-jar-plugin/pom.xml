@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <project>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>maven</groupId>
     <artifactId>maven-plugin-parent</artifactId>
@@ -12,7 +13,6 @@
   <name>Maven Jar Plugin</name>
   <version>1.0-SNAPSHOT</version>
   <package>org.apache.maven.plugin.jar</package>
-
   <dependencies>
     <dependency>
       <groupId>maven</groupId>
@@ -20,6 +20,4 @@
       <version>2.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
-
-
 </project>
