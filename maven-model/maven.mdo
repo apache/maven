@@ -588,32 +588,33 @@
       <codeSegments>
         <codeSegment>
           <version>3.0.0</version>
-          <code>
-            public void setVersion(String version)
-            {
-                this.currentVersion = version;
-            }
-
-            public String getVersion()
-            {
-                return currentVersion;
-            }
-
-            // We need this because we can't use package as a field name.
-            public void setPackage(String packageName)
-            {
-                this.packageName = packageName;
-            }
-
-            public String getPackage()
-            {
-                return packageName;
-            }
-          </code>
+          <code><![CDATA[
+          
+              public void setVersion(String version)
+              {
+                  this.currentVersion = version;
+              } 
+              
+              public String getVersion() 
+              {
+                  return currentVersion;
+              } 
+              
+              /* We need this because we can't use package as a field name.*/ 
+              public void setPackage(String packageName) 
+              {
+                  this.packageName = packageName;
+              } 
+              
+              public String getPackage() 
+              {
+                  return packageName;
+              } 
+          ]]></code>
         </codeSegment>
         <codeSegment>
           <version>4.0.0</version>
-          <code>
+          <code><![CDATA[
             public String getId()
             {
                 StringBuffer id = new StringBuffer();
@@ -628,7 +629,7 @@
 
                 return id.toString();
             }
-          </code>
+          ]]></code>
         </codeSegment>
       </codeSegments>
     </class>
@@ -722,6 +723,29 @@
             The unit tests must use the JUnit test framework.
             The path given is relative to the project descriptor.
           ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>aspectSourceDirectory</name>
+          <version>3.0.0</version>
+          <description><![CDATA[ 	 
+             This element specifies a directory containing Aspect 	 
+             sources of the project.  The generated build system will 	 
+             compile the Aspects in this directory when the project is 	 
+             built if Aspects have been enabled (see the 	 
+             <a 	 
+               href="plugins/aspectj/goals.html">Aspectj goals</a> document). 	 
+             The path given is relative to the project descriptor. 	 
+           ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>integrationUnitTestSourceDirectory</name>
+          <version>3.0.0</version>
+          <description><![CDATA[ 	 
+             This element specifies a directory containing integration test 	 
+             sources of the project. 	 
+           ]]></description>
           <type>String</type>
         </field>
         <field>
@@ -1080,16 +1104,16 @@
       <codeSegments>
         <codeSegment>
           <version>3.0.0+</version>
-          <code>
+          <code><![CDATA[
             public String toString()
             {
                 return groupId + "/" + type + "s:" + artifactId + "-" + version;
             }
-          </code>
+          ]]></code>
         </codeSegment>
         <codeSegment>
           <version>4.0.0</version>
-          <code>
+          <code><![CDATA[
             public String getId()
             {
                 return groupId + ":" + artifactId + ":" + type + ":" + version;
@@ -1099,7 +1123,7 @@
             {
                 return groupId + ":" + artifactId + ":" + type;
             }
-          </code>
+          ]]></code>
         </codeSegment>
         <codeSegment>
           <version>3.0.0</version>
@@ -1452,37 +1476,38 @@
         <codeSegment>
           <version>3.0.0+</version>
           <!-- @todo: should these be built somewhere so they are only created once, and can be modified? -->
-          <code>
-            public List getDefaultExcludes()
-            {
-                List defaultExcludes = new ArrayList();
-                defaultExcludes.add( "**/*~" );
-                defaultExcludes.add( "**/#*#" );
-                defaultExcludes.add( "**/.#*" );
-                defaultExcludes.add( "**/%*%" );
-                defaultExcludes.add( "**/._*" );
-
-                // CVS
-                defaultExcludes.add( "**/CVS" );
-                defaultExcludes.add( "**/CVS/**" );
-                defaultExcludes.add( "**/.cvsignore" );
-
-                // SCCS
-                defaultExcludes.add( "**/SCCS" );
-                defaultExcludes.add( "**/SCCS/**" );
-
-                // Visual SourceSafe
-                defaultExcludes.add( "**/vssver.scc" );
-
-                // Subversion
-                defaultExcludes.add( "**/.svn" );
-                defaultExcludes.add( "**/.svn/**" );
-
-                // Mac
-                defaultExcludes.add( "**/.DS_Store" );
-                return defaultExcludes;
-            }
-          </code>
+          <code><![CDATA[
+              public List getDefaultExcludes() 
+              {
+                  List defaultExcludes = new ArrayList(); 
+			            defaultExcludes.add( "**/*~" ); 
+                  defaultExcludes.add( "**/#*#" ); 
+                  defaultExcludes.add( "**/.#*" ); 
+                  defaultExcludes.add( "**/%*%" ); 
+                  defaultExcludes.add( "**/._*" ); 
+                  
+                  // CVS 
+			            defaultExcludes.add( "**/CVS" ); 
+                  defaultExcludes.add( "**/CVS/**" ); 
+      			      defaultExcludes.add( "**/.cvsignore" ); 
+                  
+                  // SCCS 
+                  defaultExcludes.add( "**/SCCS" ); 
+            			defaultExcludes.add( "**/SCCS/**" ); 
+                  
+                  // Visual SourceSafe 
+                  defaultExcludes.add( "**/vssver.scc" ); 
+                  
+                  // Subversion 
+                  defaultExcludes.add( "**/.svn" ); 
+                  defaultExcludes.add( "**/.svn/**" ); 
+                  
+                  // Mac 
+                  defaultExcludes.add( "**/.DS_Store" ); 
+                  
+                  return defaultExcludes; 
+              }
+            ]]></code>
         </codeSegment>
       </codeSegments>
     </class>
@@ -1795,12 +1820,12 @@
       <codeSegments>
         <codeSegment>
           <version>3.0.0</version>
-          <code>
+          <code><![CDATA[
               public String toString()
               {
                   return getId();
               }
-          </code>
+          ]]></code>
         </codeSegment>
       </codeSegments>
     </class>
@@ -1841,7 +1866,7 @@
       <codeSegments>
         <codeSegment>
           <version>4.0.0</version>
-          <code>
+          <code><![CDATA[
             public boolean equals( Object obj )
             {
                 Repository other =  ( Repository ) obj;
@@ -1855,7 +1880,7 @@
 
                 return retValue;
             }
-          </code>
+          ]]></code>
         </codeSegment>
       </codeSegments>
     </class>
