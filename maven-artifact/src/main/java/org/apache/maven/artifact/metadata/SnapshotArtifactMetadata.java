@@ -58,6 +58,9 @@ public class SnapshotArtifactMetadata
 
     private static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
+    // TODO: very quick and nasty hack to get the same timestamp across a build - not embedder friendly
+    private static String sessionTimestamp = null;
+
     public SnapshotArtifactMetadata( Artifact artifact )
     {
         super( artifact, artifact.getArtifactId() + "-" + artifact.getBaseVersion() + "." + SNAPSHOT_VERSION_FILE );
@@ -83,7 +86,7 @@ public class SnapshotArtifactMetadata
         {
             if ( timestamp == null )
             {
-                timestamp = getUtcDateFormatter().format( new Date() );
+                timestamp = getSessionTimestamp();
             }
             String path = getLocalRepositoryLocation( localRepository ).getPath();
             File file = new File( path );
@@ -201,7 +204,16 @@ public class SnapshotArtifactMetadata
     public void update()
     {
         this.buildNumber++;
-        timestamp = getUtcDateFormatter().format( new Date() );
+        timestamp = getSessionTimestamp();
+    }
+
+    private static String getSessionTimestamp()
+    {
+        if ( sessionTimestamp == null )
+        {
+            sessionTimestamp = getUtcDateFormatter().format( new Date() );
+        }
+        return sessionTimestamp;
     }
 
 
