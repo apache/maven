@@ -1,5 +1,8 @@
 package org.apache.maven.util;
 
+import org.apache.maven.model.user.DefaultProfiles;
+import org.apache.maven.model.user.MavenProfile;
+import org.apache.maven.model.user.ProxyProfile;
 import org.apache.maven.model.user.ServerProfile;
 import org.apache.maven.model.user.UserModel;
 import org.apache.maven.model.user.io.xpp3.MavenUserModelXpp3Reader;
@@ -20,8 +23,96 @@ public final class UserModelUtils
 
     private static final String USER_MODEL_LOCATION = "/.m2/user.xml";
 
+    private static final String ACTIVE_MAVEN_PROFILE_ID_ENVAR = "maven.profile";
+
     private UserModelUtils()
     {
+    }
+
+    public static MavenProfile getActiveMavenProfile( UserModel userModel )
+    {
+        String activeProfileId = System.getProperty( ACTIVE_MAVEN_PROFILE_ID_ENVAR );
+        if ( activeProfileId == null || activeProfileId.trim().length() < 1 )
+        {
+            DefaultProfiles defaults = userModel.getDefaultProfiles();
+            if ( defaults != null )
+            {
+                activeProfileId = defaults.getMavenProfileId();
+            }
+        }
+
+        MavenProfile activeProfile = null;
+
+        if ( activeProfileId != null && activeProfileId.trim().length() > 0 )
+        {
+            activeProfile = UserModelUtils.getMavenProfile( userModel, activeProfileId );
+        }
+
+        return activeProfile;
+    }
+
+    public static ProxyProfile getActiveProxyProfile( UserModel userModel )
+    {
+        String activeProfileId = System.getProperty( ACTIVE_MAVEN_PROFILE_ID_ENVAR );
+        if ( activeProfileId == null || activeProfileId.trim().length() < 1 )
+        {
+            DefaultProfiles defaults = userModel.getDefaultProfiles();
+            if ( defaults != null )
+            {
+                activeProfileId = defaults.getProxyProfileId();
+            }
+        }
+
+        ProxyProfile activeProfile = null;
+
+        if ( activeProfileId != null && activeProfileId.trim().length() > 0 )
+        {
+            activeProfile = UserModelUtils.getProxyProfile( userModel, activeProfileId );
+        }
+
+        return activeProfile;
+    }
+
+    public static MavenProfile getMavenProfile( UserModel userModel, String mavenProfileId )
+    {
+        MavenProfile result = null;
+
+        List mavenProfiles = userModel.getMavenProfiles();
+        if ( mavenProfiles != null )
+        {
+            for ( Iterator it = mavenProfiles.iterator(); it.hasNext(); )
+            {
+                MavenProfile profile = (MavenProfile) it.next();
+                if ( mavenProfileId.equals( profile.getId() ) )
+                {
+                    result = profile;
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static ProxyProfile getProxyProfile( UserModel userModel, String proxyProfileId )
+    {
+        ProxyProfile result = null;
+
+        List proxyProfile = userModel.getProxyProfiles();
+        if ( proxyProfile != null )
+        {
+            for ( Iterator it = proxyProfile.iterator(); it.hasNext(); )
+            {
+                ProxyProfile profile = (ProxyProfile) it.next();
+                if ( proxyProfileId.equals( profile.getId() ) )
+                {
+                    result = profile;
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     public static ServerProfile getServerProfile( UserModel userModel, String serverProfileId )

@@ -42,10 +42,10 @@ extends AbstractMavenExecutionRequest
     private File baseDirectory;
 
     public MavenReactorExecutionRequest( ArtifactRepository localRepository, UserModel userModel, EventDispatcher eventDispatcher, 
-                                         Properties properties, List goals, String includes, 
+                                         List goals, String includes, 
                                          String excludes, File baseDirectory )
     {
-        super( localRepository, userModel, eventDispatcher, properties, goals );
+        super( localRepository, userModel, eventDispatcher, goals );
 
         this.includes = includes;
 
@@ -79,6 +79,6 @@ extends AbstractMavenExecutionRequest
 
     public MavenProjectExecutionRequest createProjectExecutionRequest( MavenProject project )
     {
-        return new MavenProjectExecutionRequest( localRepository, getUserModel(), getEventDispatcher(), parameters, goals, project.getFile() );
+        return new MavenProjectExecutionRequest( localRepository, getUserModel(), getEventDispatcher(), goals, project.getFile() );
     }
 }

@@ -26,6 +26,8 @@ import org.apache.maven.execution.MavenReactorExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.GoalNotFoundException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.model.user.ProxyProfile;
+import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginManager;
@@ -33,6 +35,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.ReactorException;
+import org.apache.maven.util.UserModelUtils;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -265,13 +268,8 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request )
     {
-        return new MavenSession( container,
-                                 pluginManager,
-                                 request.getUserModel(),
-                                 request.getLocalRepository(),
-                                 request.getEventDispatcher(),
-                                 request.getLog(),
-                                 request.getGoals() );
+        return new MavenSession( container, pluginManager, request.getUserModel(), request.getLocalRepository(),
+                                 request.getEventDispatcher(), request.getLog(), request.getGoals() );
     }
 
     /**
@@ -282,28 +280,17 @@ public class DefaultMaven
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
-        if ( request.getParameter( "maven.proxy.http.host" ) != null )
+        UserModel userModel = request.getUserModel();
+
+        ProxyProfile proxyProfile = UserModelUtils.getActiveProxyProfile( userModel );
+
+        if ( proxyProfile != null )
         {
-            String p = request.getParameter( "maven.proxy.http.port" );
-            int port = 8080;
-            if ( p != null )
-            {
-                try
-                {
-                    port = Integer.valueOf( p ).intValue();
-                }
-                catch ( NumberFormatException e )
-                {
-                    getLogger().warn( "maven.proxy.http.port was not valid" );
-                }
-            }
-            wagonManager.setProxy( "http",
-                                   request.getParameter( "maven.proxy.http.host" ),
-                                   port,
-                                   request.getParameter( "maven.proxy.http.username" ),
-                                   request.getParameter( "maven.proxy.http.password" ),
-                                   request.getParameter( "maven.proxy.http.nonProxyHosts" ) );
+            wagonManager.setProxy( proxyProfile.getProtocol(), proxyProfile.getHost(), proxyProfile.getPort(),
+                                   proxyProfile.getUsername(), proxyProfile.getPassword(),
+                                   proxyProfile.getNonProxyHosts() );
         }
+
     }
 
     // ----------------------------------------------------------------------
@@ -384,8 +371,9 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info( "Final Memory: " + ((r.totalMemory() - r.freeMemory()) / mb) + "M/" + (r.totalMemory() / mb)
-            + "M" );
+        getLogger().info(
+                          "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/"
+                              + ( r.totalMemory() / mb ) + "M" );
     }
 
     protected void line()

@@ -33,6 +33,7 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenInitializingExecutionRequest;
 import org.apache.maven.execution.MavenProjectExecutionRequest;
 import org.apache.maven.execution.MavenReactorExecutionRequest;
+import org.apache.maven.model.user.MavenProfile;
 import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
@@ -62,8 +63,7 @@ public class MavenCli
 
     public static File userDir = new File( System.getProperty( "user.dir" ) );
 
-    public static int main( String[] args, ClassWorld classWorld )
-        throws Exception
+    public static int main( String[] args, ClassWorld classWorld ) throws Exception
     {
         // ----------------------------------------------------------------------
         // Setup the command line parser
@@ -81,11 +81,11 @@ public class MavenCli
         //
         // ----------------------------------------------------------------------
 
-        File userConfigurationDirectory = getUserConfigurationDirectory();
+        //        File userConfigurationDirectory = getUserConfigurationDirectory();
 
-        Properties mavenProperties = getMavenProperties( userConfigurationDirectory );
+        //        Properties mavenProperties = getMavenProperties( userConfigurationDirectory );
 
-        ArtifactRepository localRepository = getLocalRepository( mavenProperties, userConfigurationDirectory );
+        ArtifactRepository localRepository = getLocalRepository();
 
         // ----------------------------------------------------------------------
         //
@@ -117,11 +117,11 @@ public class MavenCli
         MavenExecutionRequest request = null;
 
         File projectFile = new File( userDir, POMv4 );
-        
+
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
-        
+
         UserModel userModel = UserModelUtils.getUserModel();
-        
+
         if ( projectFile.exists() )
         {
             if ( commandLine.hasOption( CLIManager.REACTOR ) )
@@ -130,28 +130,19 @@ public class MavenCli
 
                 String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
-                request = new MavenReactorExecutionRequest( localRepository,
-                                                            userModel,
-                                                            eventDispatcher,
-                                                            mavenProperties,
-                                                            commandLine.getArgList(),
-                                                            includes,
-                                                            excludes,
-                                                            userDir );
+                request = new MavenReactorExecutionRequest( localRepository, userModel, eventDispatcher,
+                                                            commandLine.getArgList(), includes, excludes, userDir );
             }
             else
             {
-                request = new MavenProjectExecutionRequest( localRepository,
-                                                            userModel,
-                                                            eventDispatcher,
-                                                            mavenProperties,
-                                                            commandLine.getArgList(),
-                                                            projectFile );
+                request = new MavenProjectExecutionRequest( localRepository, userModel, eventDispatcher,
+                                                            commandLine.getArgList(), projectFile );
             }
         }
         else
         {
-            request = new MavenInitializingExecutionRequest( localRepository, userModel, eventDispatcher, mavenProperties, commandLine.getArgList() );
+            request = new MavenInitializingExecutionRequest( localRepository, userModel, eventDispatcher,
+                                                             commandLine.getArgList() );
         }
 
         // ----------------------------------------------------------------------
@@ -174,10 +165,10 @@ public class MavenCli
         if ( logger != null )
         {
             request.setLog( new DefaultLog( logger ) );
-            
+
             request.addEventMonitor( new DefaultEventMonitor( logger ) );
         }
-        
+
         // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place (likewise logger).
         WagonManager wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
         wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
@@ -273,48 +264,30 @@ public class MavenCli
         public CLIManager()
         {
             options = new Options();
-            options.addOption( OptionBuilder
-                               .withLongOpt( "nobanner" )
-                               .withDescription( "Suppress logo banner" )
-                               .create( NO_BANNER ) );
-            options.addOption( OptionBuilder
-                               .withLongOpt( "define" )
-                               .hasArg()
-                               .withDescription( "Define a system property" )
-                               .create( SET_SYSTEM_PROPERTY ) );
-            options.addOption( OptionBuilder
-                               .withLongOpt( "offline" )
-                               .hasArg()
-                               .withDescription( "Work offline" )
-                               .create( WORK_OFFLINE ) );
-            options.addOption( OptionBuilder
-                               .withLongOpt( "mojoDescriptors" )
-                               .withDescription( "Display available mojoDescriptors" )
-                               .create( LIST_GOALS ) );
-            options.addOption( OptionBuilder
-                               .withLongOpt( "help" )
-                               .withDescription( "Display help information" )
-                               .create( HELP ) );
-            options.addOption( OptionBuilder
-                               .withLongOpt( "offline" )
-                               .withDescription( "Build is happening offline" )
-                               .create( WORK_OFFLINE ) );
-            options.addOption( OptionBuilder
-                               .withLongOpt( "version" )
-                               .withDescription( "Display version information" )
-                               .create( VERSION ) );
-            options.addOption( OptionBuilder
-                               .withLongOpt( "debug" )
-                               .withDescription( "Produce execution debug output" )
-                               .create( DEBUG ) );
-            options.addOption( OptionBuilder
-                               .withLongOpt( "reactor" )
-                               .withDescription( "Execute goals for project found in the reactor" )
-                               .create( REACTOR ) );
+            options.addOption( OptionBuilder.withLongOpt( "nobanner" ).withDescription( "Suppress logo banner" )
+                                            .create( NO_BANNER ) );
+            options
+                   .addOption( OptionBuilder.withLongOpt( "define" ).hasArg()
+                                            .withDescription( "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
+            options.addOption( OptionBuilder.withLongOpt( "offline" ).hasArg().withDescription( "Work offline" )
+                                            .create( WORK_OFFLINE ) );
+            options
+                   .addOption( OptionBuilder.withLongOpt( "mojoDescriptors" )
+                                            .withDescription( "Display available mojoDescriptors" ).create( LIST_GOALS ) );
+            options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" )
+                                            .create( HELP ) );
+            options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Build is happening offline" )
+                                            .create( WORK_OFFLINE ) );
+            options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" )
+                                            .create( VERSION ) );
+            options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" )
+                                            .create( DEBUG ) );
+            options.addOption( OptionBuilder.withLongOpt( "reactor" )
+                                            .withDescription( "Execute goals for project found in the reactor" )
+                                            .create( REACTOR ) );
         }
 
-        public CommandLine parse( String[] args )
-            throws ParseException
+        public CommandLine parse( String[] args ) throws ParseException
         {
             CommandLineParser parser = new PosixParser();
             return parser.parse( options, args );
@@ -359,12 +332,20 @@ public class MavenCli
         return mavenProperties;
     }
 
-    protected static ArtifactRepository getLocalRepository( Properties mavenProperties,
-                                                            File userConfigurationDirectory )
+    protected static ArtifactRepository getLocalRepository() throws Exception
     {
-        String localRepository = mavenProperties.getProperty( MavenConstants.MAVEN_REPO_LOCAL );
+        UserModel userModel = UserModelUtils.getUserModel();
+        MavenProfile mavenProfile = UserModelUtils.getActiveMavenProfile( userModel );
+
+        String localRepository = null;
+        if ( mavenProfile != null )
+        {
+            localRepository = mavenProfile.getLocalRepository();
+        }
+
         if ( localRepository == null )
         {
+            String userConfigurationDirectory = System.getProperty( "user.home" );
             localRepository = new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
         }
 

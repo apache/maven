@@ -34,8 +34,6 @@ public interface MavenExecutionRequest
 {
     ArtifactRepository getLocalRepository();
 
-    String getParameter( String name );
-
     List getGoals();
 
     String getType();

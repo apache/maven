@@ -36,8 +36,6 @@ implements MavenExecutionRequest
     /** @todo [BP] is this required? This hands off to MavenSession, but could be passed through the handler.handle function (+ createSession). */
     protected ArtifactRepository localRepository;
 
-    protected final Properties parameters;
-
     protected List goals;
 
     protected String type;
@@ -50,13 +48,11 @@ implements MavenExecutionRequest
 
     private final UserModel userModel;
 
-    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, UserModel userModel, EventDispatcher eventDispatcher, Properties parameters, List goals )
+    public AbstractMavenExecutionRequest( ArtifactRepository localRepository, UserModel userModel, EventDispatcher eventDispatcher, List goals )
     {
         this.localRepository = localRepository;
         
         this.userModel = userModel;
-
-        this.parameters = parameters;
 
         this.goals = goals;
         
@@ -81,11 +77,6 @@ implements MavenExecutionRequest
     public String getType()
     {
         return type;
-    }
-
-    public String getParameter( String name )
-    {
-        return parameters.getProperty( name );
     }
 
     // ----------------------------------------------------------------------

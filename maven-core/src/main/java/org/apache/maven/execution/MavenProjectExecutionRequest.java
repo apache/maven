@@ -24,7 +24,6 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -38,11 +37,10 @@ extends AbstractMavenExecutionRequest
     public MavenProjectExecutionRequest( ArtifactRepository localRepository,
                                          UserModel userModel,
                                          EventDispatcher eventDispatcher,
-                                         Properties properties,
                                          List goals,
                                          File pom )
     {
-        super( localRepository, userModel, eventDispatcher, properties, goals );
+        super( localRepository, userModel, eventDispatcher, goals );
 
         this.pom = pom;
 

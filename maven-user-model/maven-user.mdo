@@ -11,11 +11,11 @@
   <classes>
     <class rootElement="true">
       <name>UserModel</name>
-      <version>4.0.0</version>
+      <version>1.0.0</version>
       <fields>
         <field>
           <name>jdkProfiles</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <description><![CDATA[Configuration for different java environment profiles.]]></description>
           <association>
             <type>JdkProfile</type>
@@ -23,8 +23,17 @@
           </association>
         </field>
         <field>
+          <name>proxyProfiles</name>
+          <version>1.0.0</version>
+          <description><![CDATA[Configuration for different proxy profiles.]]></description>
+          <association>
+            <type>ProxyProfile</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
           <name>serverProfiles</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <description><![CDATA[Server-access profiles.]]></description>
           <association>
             <type>ServerProfile</type>
@@ -33,7 +42,7 @@
         </field>
         <field>
           <name>mavenProfiles</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <description><![CDATA[Collection of runtime configurations for local repo, etc.]]></description>
           <association>
             <type>MavenProfile</type>
@@ -42,7 +51,7 @@
         </field>
         <field>
           <name>defaultProfiles</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <association>
             <type>DefaultProfiles</type>
           </association>
@@ -53,19 +62,19 @@
     <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
     <class>
       <name>JdkProfile</name>
-      <version>4.0.0</version>
+      <version>1.0.0</version>
       <description><![CDATA[Describes one Java environment]]></description>
       <fields>
         <field>
           <name>version</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <required>true</required>
           <description><![CDATA[The JDK major version (eg. '1.4').]]></description>
           <type>String</type>
         </field>
         <field>
           <name>javaHome</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <required>true</required>
           <description><![CDATA[The JDK home.]]></description>
           <type>String</type>
@@ -73,44 +82,92 @@
       </fields>
     </class>
     <class>
-      <name>ServerProfile</name>
-      <version>4.0.0</version>
+      <name>ProxyProfile</name>
+      <version>1.0.0</version>
       <fields>
         <field>
           <name>id</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
+          <description><![CDATA[The unique id for a proxy configuration.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>protocol</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The proxy protocol.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>username</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The proxy user.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>password</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The proxy password.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>port</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The proxy port.]]></description>
+          <type>int</type>
+        </field>
+        <field>
+          <name>host</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The proxy host.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>nonProxyHosts</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The non-proxied hosts.]]></description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ServerProfile</name>
+      <version>1.0.0</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0</version>
           <required>true</required>
           <description><![CDATA[The ID of this configuration for external reference.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>host</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <required>true</required>
           <description><![CDATA[The hostname for this configuration.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>username</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <description><![CDATA[The username used to access this server with this config.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>password</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <description><![CDATA[The password used to access this server with this config.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>privateKey</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <description><![CDATA[The private key location used to access this server with this config.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>passphrase</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <description><![CDATA[The passphrase used to access this server with a private key in this config.]]></description>
           <type>String</type>
         </field>
@@ -118,25 +175,25 @@
     </class>
     <class>
       <name>MavenProfile</name>
-      <version>4.0.0</version>
+      <version>1.0.0</version>
       <fields>
         <field>
           <name>id</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <required>true</required>
           <description><![CDATA[The ID of this configuration for external reference.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>localRepository</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <required>true</required>
           <description><![CDATA[The local repository to use for this runtime profile.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>passwordStore</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <required>true</required>
           <description><![CDATA[The keystore used to store passwords for this runtime profile.]]></description>
           <type>String</type>
@@ -145,23 +202,29 @@
     </class>
     <class>
       <name>DefaultProfiles</name>
-      <version>4.0.0</version>
+      <version>1.0.0</version>
       <fields>
         <field>
           <name>serverProfileId</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <required>false</required>
           <type>String</type>
         </field>
         <field>
           <name>mavenProfileId</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>jdkVersion</name>
-          <version>4.0.0</version>
+          <version>1.0.0</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>proxyProfileId</name>
+          <version>1.0.0</version>
           <required>false</required>
           <type>String</type>
         </field>

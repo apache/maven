@@ -1,21 +1,25 @@
 
-import compile.CompilerConfiguration;
-import compile.JavacCompiler;
-import download.ArtifactDownloader;
-import jar.JarMojo;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+
 import test.SurefirePlugin;
 import util.Commandline;
 import util.FileUtils;
 import util.IsolatedClassLoader;
 import util.Os;
 
+import compile.CompilerConfiguration;
+import compile.JavacCompiler;
+
+import download.ArtifactDownloader;
+import jar.JarMojo;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,10 +28,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class MBoot
 {
@@ -103,6 +109,25 @@ public class MBoot
         "maven-plugins/maven-resources-plugin",
         "maven-plugins/maven-surefire-plugin",
         "maven-plugins/maven-war-plugin" };
+    
+    private static final Map MODELLO_TARGET_VERSIONS;
+    
+    private static final Map MODELLO_MODEL_FILES;
+    
+    static
+    {
+        Map targetVersions = new TreeMap();
+        targetVersions.put( "maven-model", "4.0.0" );
+        targetVersions.put( "maven-user-model", "1.0.0" );
+        
+        MODELLO_TARGET_VERSIONS = Collections.unmodifiableMap( targetVersions );
+        
+        Map modelFiles = new TreeMap();
+        modelFiles.put( "maven-model", "maven.mdo" );
+        modelFiles.put( "maven-user-model", "maven-user.mdo" );
+        
+        MODELLO_MODEL_FILES = Collections.unmodifiableMap( modelFiles );
+    }
 
     // ----------------------------------------------------------------------
     // Standard locations for resources in Maven projects.
@@ -133,7 +158,7 @@ public class MBoot
     private ArtifactDownloader downloader;
 
     private ModelReader reader;
-
+    
     private String repoLocal;
 
     private List mbootDependencies;
@@ -157,18 +182,18 @@ public class MBoot
         catch ( InvocationTargetException e )
         {
             Throwable target = e.getTargetException();
-            
-            if(target instanceof RuntimeException)
+
+            if ( target instanceof RuntimeException )
             {
-                throw (RuntimeException)target;
+                throw (RuntimeException) target;
             }
-            else if(target instanceof Exception)
+            else if ( target instanceof Exception )
             {
-                throw (Exception)target;
+                throw (Exception) target;
             }
             else
             {
-                throw new RuntimeException(target);
+                throw new RuntimeException( target );
             }
         }
     }
@@ -181,26 +206,41 @@ public class MBoot
 
         if ( mavenRepoLocal == null )
         {
-            Properties p = new Properties();
+            UserModelReader userModelReader = new UserModelReader();
 
             try
             {
                 String userHome = System.getProperty( "user.home" );
 
-                p.load( new FileInputStream( new File( userHome, ".m2/maven.properties" ) ) );
+                userModelReader.parse( new File( userHome, ".m2/user.xml" ) );
+                
+                MavenProfile activeProfile = userModelReader.getActiveMavenProfile();
 
-                mavenRepoLocal = new File( p.getProperty( "maven.repo.local" ) ).getAbsolutePath();
+                mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
             }
             catch ( Exception e )
             {
+                e.printStackTrace();
             }
         }
 
         if ( mavenRepoLocal == null )
         {
-            System.out.println( "You must have a ~/.m2/maven.properties file and must contain the following entries:" );
+            System.out.println( "You must have a ~/.m2/user.xml file and must contain at least the following information:\n" );
 
-            System.out.println( "maven.repo.local = /path/to/your/repository" );
+            System.out.println( "<userModel>\n  " +
+                    "<mavenProfiles>\n    " +
+                    "<mavenProfile>\n      " +
+                    "<id>someId</id>\n      " +
+                    "<localRepository>/path/to/your/repository</localRepository>\n    " +
+                    "</mavenProfile>\n  " +
+                    "</mavenProfiles>\n  " +
+                    "<defaultProfiles>\n    " +
+                    "<mavenProfileId>someId</mavenProfileId>\n  " +
+                    "</defaultProfiles>\n" +
+                    "</userModel>\n" );
+            
+            System.out.println("where \'someId\' is just an id for matching within the file.");
 
             System.out.println();
 
@@ -277,7 +317,7 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            buildProject( directory );
+            buildProject( directory, builds[i] );
 
             if ( reader.artifactId.equals( "maven-core" ) )
             {
@@ -301,7 +341,7 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            buildProject( directory );
+            buildProject( directory, pluginBuilds[i] );
 
             reader.reset();
 
@@ -430,7 +470,7 @@ public class MBoot
         System.out.println( "Finished at: " + fullStop );
     }
 
-    public void buildProject( String basedir ) throws Exception
+    public void buildProject( String basedir, String projectId ) throws Exception
     {
         System.out.println( "Building project in " + basedir );
 
@@ -479,24 +519,27 @@ public class MBoot
         // Generating sources
         // ----------------------------------------------------------------------
 
-        File base = new File(basedir);
+        File base = new File( basedir );
         
-        String[] basedirFiles = base.list();
+        String modelFileName = (String)MODELLO_MODEL_FILES.get( projectId );
         
         File model = null;
-        for ( int i = 0; i < basedirFiles.length; i++ )
+        if(modelFileName != null && modelFileName.trim().length() > 0)
         {
-            if(basedirFiles[i].endsWith(".mdo"))
-            {
-                model = new File(base, basedirFiles[i]);
-                break;
-            }
+            model = new File(base, modelFileName);
         }
-
+        
         if ( model != null && model.exists() )
         {
             System.out.println( "Model exists!" );
 
+            String modelVersion = (String)MODELLO_TARGET_VERSIONS.get( projectId );
+            if(modelVersion == null || modelVersion.trim().length() < 1)
+            {
+                System.out.println("No model version configured. Using \'1.0.0\'...");
+                modelVersion = "1.0.0";
+            }
+            
             File generatedSourcesDirectory = new File( basedir, GENERATED_SOURCES );
 
             if ( !generatedSourcesDirectory.exists() )
@@ -510,23 +553,25 @@ public class MBoot
             {
                 generatedDocsDirectory.mkdirs();
             }
-
-            generateSources( model.getAbsolutePath(), "java", generatedSources, "4.0.0", "false" );
+            
+            System.out.println("Generating model bindings for version \'" + modelVersion + "\' in project: " + projectId);
+            
+            generateSources( model.getAbsolutePath(), "java", generatedSources, modelVersion, "false" );
 
             //generateSources( model.getAbsolutePath(), "java",
             // generatedSources, "3.0.0", "true" );
 
-            generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, "4.0.0", "false" );
+            generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, modelVersion, "false" );
 
             //generateSources( model.getAbsolutePath(), "xpp3-reader",
             // generatedSources, "3.0.0", "true" );
 
-            generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, "4.0.0", "false" );
+            generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, modelVersion, "false" );
 
             //generateSources( model.getAbsolutePath(), "xpp3-writer",
             // generatedSources, "3.0.0", "true" );
 
-            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, "4.0.0", "false" );
+            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, modelVersion, "false" );
 
             //generateSources( model.getAbsolutePath(), "xdoc", generatedDocs,
             // "3.0.0", "true" );
@@ -555,8 +600,7 @@ public class MBoot
         {
             System.out.println( "Generating maven plugin descriptor ..." );
 
-            generatePluginDescriptor( sources,
-                                      new File( classes, "META-INF/maven" ).getAbsolutePath(),
+            generatePluginDescriptor( sources, new File( classes, "META-INF/maven" ).getAbsolutePath(),
                                       new File( basedir, "pom.xml" ).getAbsolutePath() );
         }
 
@@ -634,7 +678,7 @@ public class MBoot
             if ( !f.exists() )
             {
                 throw new FileNotFoundException( "Missing dependency: " + dependency
-                    + (!online ? "; run again online" : "; there was a problem downloading it earlier") );
+                    + ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -651,7 +695,7 @@ public class MBoot
             if ( !f.exists() )
             {
                 throw new FileNotFoundException( "Missing dependency: " + dependency
-                    + (!online ? "; run again online" : "; there was a problem downloading it earlier") );
+                    + ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -683,7 +727,7 @@ public class MBoot
             if ( !f.exists() )
             {
                 throw new FileNotFoundException( "Missing dependency: " + dependency
-                    + (!online ? "; run again online" : "; there was a problem downloading it earlier") );
+                    + ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             modelloClassLoader.addURL( f.toURL() );
@@ -834,12 +878,7 @@ public class MBoot
             excludes.add( "**/*Abstract*.java" );
         }
 
-        boolean success = testRunner.execute( repoLocal,
-                                              basedir,
-                                              classes,
-                                              testClasses,
-                                              includes,
-                                              excludes,
+        boolean success = testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes,
                                               classpath( reader.getDependencies(), null ) );
 
         if ( !success )
@@ -887,7 +926,7 @@ public class MBoot
     }
 
     private void compile( List dependencies, String sourceDirectory, String outputDirectory, String extraClasspath,
-        String generatedSources ) throws Exception
+                         String generatedSources ) throws Exception
     {
         JavacCompiler compiler = new JavacCompiler();
 
@@ -984,9 +1023,62 @@ public class MBoot
     {
         return d.getArtifactDirectory() + pathSeparator + d.getType() + "s" + pathSeparator + d.getArtifact();
     }
+    
+    abstract class AbstractReader extends DefaultHandler
+    {
+        private File file;
+        private SAXParserFactory saxFactory;
+
+        public abstract void reset();
+        
+        public boolean parse( File file )
+        {
+            this.file = file;
+
+            try
+            {
+                saxFactory = SAXParserFactory.newInstance();
+
+                SAXParser parser = saxFactory.newSAXParser();
+
+                InputSource is = new InputSource( new FileInputStream( file ) );
+
+                parser.parse( is, this );
+
+                return true;
+            }
+            catch ( Exception e )
+            {
+                e.printStackTrace();
+
+                return false;
+            }
+        }
+
+        public void warning( SAXParseException spe )
+        {
+            printParseError( "Warning", spe );
+        }
+
+        public void error( SAXParseException spe )
+        {
+            printParseError( "Error", spe );
+        }
+
+        public void fatalError( SAXParseException spe )
+        {
+            printParseError( "Fatal Error", spe );
+        }
+
+        private final void printParseError( String type, SAXParseException spe )
+        {
+            System.err.println( type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: "
+                + spe.getMessage() );
+        }
+    }
 
     class ModelReader
-        extends DefaultHandler
+        extends AbstractReader
     {
         int depth = 0;
 
@@ -1016,8 +1108,6 @@ public class MBoot
 
         private Resource currentResource;
 
-        private SAXParserFactory saxFactory;
-
         private boolean insideParent = false;
 
         private boolean insideDependency = false;
@@ -1029,8 +1119,6 @@ public class MBoot
         private boolean insideRepository = false;
 
         private StringBuffer bodyText = new StringBuffer();
-
-        private File file;
 
         public void reset()
         {
@@ -1055,30 +1143,6 @@ public class MBoot
         public List getResources()
         {
             return resources;
-        }
-
-        public boolean parse( File file )
-        {
-            this.file = file;
-
-            try
-            {
-                saxFactory = SAXParserFactory.newInstance();
-
-                SAXParser parser = saxFactory.newSAXParser();
-
-                InputSource is = new InputSource( new FileInputStream( file ) );
-
-                parser.parse( is, this );
-
-                return true;
-            }
-            catch ( Exception e )
-            {
-                e.printStackTrace();
-
-                return false;
-            }
         }
 
         public void startElement( String uri, String localName, String rawName, Attributes attributes )
@@ -1109,7 +1173,7 @@ public class MBoot
 
                 insideResource = true;
             }
-            depth ++;
+            depth++;
         }
 
         public void characters( char buffer[], int start, int length )
@@ -1290,29 +1354,127 @@ public class MBoot
 
             bodyText = new StringBuffer();
 
-            depth --;
+            depth--;
+        }
+    }
+
+    class UserModelReader
+        extends AbstractReader
+    {
+
+        private Map mavenProfiles = new TreeMap();
+
+        private MavenProfile currentProfile = null;
+
+        private StringBuffer currentBody = new StringBuffer();
+
+        private String activeProfileId = null;
+
+        private MavenProfile activeMavenProfile = null;
+
+        public MavenProfile getActiveMavenProfile()
+        {
+            return activeMavenProfile;
         }
 
-        public void warning( SAXParseException spe )
+        public void characters( char[] ch, int start, int length ) throws SAXException
         {
-            printParseError( "Warning", spe );
+            currentBody.append( ch, start, length );
         }
 
-        public void error( SAXParseException spe )
+        public void endElement( String uri, String localName, String rawName ) throws SAXException
         {
-            printParseError( "Error", spe );
+            if ( "mavenProfile".equals( rawName ) )
+            {
+                if ( notEmpty( currentProfile.getId() ) && notEmpty( currentProfile.getLocalRepo() ) )
+                {
+                    mavenProfiles.put( currentProfile.getId(), currentProfile );
+                    currentProfile = null;
+                }
+                else
+                {
+                    throw new SAXException( "Invalid mavenProfile entry. Missing one or more "
+                        + "fields: {id,localRepository}." );
+                }
+            }
+            else if ( currentProfile != null )
+            {
+                if ( "id".equals( rawName ) )
+                {
+                    currentProfile.setId( currentBody.toString().trim() );
+                }
+                else if ( "localRepository".equals( rawName ) )
+                {
+                    currentProfile.setLocalRepo( currentBody.toString().trim() );
+                }
+                else
+                {
+                    throw new SAXException( "Illegal element inside mavenProfile: \'" + rawName + "\'" );
+                }
+            }
+            else if ( "userModel".equals( rawName ) )
+            {
+                this.activeMavenProfile = (MavenProfile) mavenProfiles.get( activeProfileId );
+            }
+            else if ( "mavenProfileId".equals( rawName ) )
+            {
+                this.activeProfileId = currentBody.toString().trim();
+            }
+            
+            currentBody = new StringBuffer();
         }
 
-        public void fatalError( SAXParseException spe )
+        private boolean notEmpty( String test )
         {
-            printParseError( "Fatal Error", spe );
+            return test != null && test.trim().length() > 0;
         }
 
-        private final void printParseError( String type, SAXParseException spe )
+        public void startElement( String uri, String localName, String rawName, Attributes attributes )
+            throws SAXException
         {
-            System.err.println( type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: "
-                + spe.getMessage() );
+            if ( "mavenProfile".equals( rawName ) )
+            {
+                currentProfile = new MavenProfile();
+            }
         }
+
+        public void reset()
+        {
+            this.currentBody = null;
+            this.activeMavenProfile = null;
+            this.activeProfileId = null;
+            this.currentProfile = null;
+            this.mavenProfiles.clear();
+        }
+    }
+
+    public static class MavenProfile
+    {
+
+        private String localRepo;
+
+        private String id;
+
+        public void setLocalRepo( String localRepo )
+        {
+            this.localRepo = localRepo;
+        }
+
+        public String getLocalRepo()
+        {
+            return localRepo;
+        }
+
+        public void setId( String id )
+        {
+            this.id = id;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
+
     }
 
     public static class Dependency
