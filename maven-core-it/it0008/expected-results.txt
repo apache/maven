@@ -1,1 +1,2 @@
 target/touch.txt
+target/test-basedir-alignment/touch.txt
