@@ -1305,7 +1305,7 @@
       </fields>
     </class>
     <class>
-      <name>Resource</name>
+      <name>FileSet</name>
       <version>3.0.0+</version>
       <superClass>PatternSet</superClass>
       <fields>
@@ -1318,6 +1318,13 @@
           ]]></description>
           <type>String</type>
         </field>
+      </fields>
+    </class>
+    <class>
+      <name>Resource</name>
+      <version>3.0.0+</version>
+      <superClass>FileSet</superClass>
+      <fields>
         <field>
           <name>targetPath</name>
           <version>3.0.0+</version>
@@ -1342,7 +1349,7 @@
     <class>
       <name>SourceModification</name>
       <version>3.0.0+</version>
-      <superClass>Resource</superClass>
+      <superClass>FileSet</superClass>
       <fields>
         <field>
           <name>className</name>
