@@ -23,6 +23,8 @@ import org.apache.maven.plugins.assemble.model.Assembly;
 import org.apache.maven.plugins.assemble.model.FileSet;
 import org.apache.maven.plugins.assemble.model.io.xpp3.AssemblyXpp3Reader;
 import org.codehaus.plexus.archiver.Archiver;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
+import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.archiver.tar.TarArchiver;
 
 import java.io.File;
@@ -56,6 +58,8 @@ public class AssembleMojo
 
         // TODO: include dependencies marked for distribution under certain formats
         // TODO: have a default set of descriptors that can be used instead of the file
+        // TODO: how, might we plugin this into an installer, such as NSIS?
+        // TODO: allow file mode specifications?
 
         String fullName = finalName + "-" + assembly.getId();
 
@@ -79,6 +83,15 @@ public class AssembleMojo
                     tarCompressionMethod.setValue( format.substring( index + 1 ) );
                     tarArchiver.setCompression( tarCompressionMethod );
                 }
+            }
+            else if ( format.startsWith( "zip" ) )
+            {
+                archiver = new ZipArchiver();
+            }
+            else if ( format.startsWith( "jar" ) )
+            {
+                // TODO: use MavenArchiver for manifest?
+                archiver = new JarArchiver();
             }
             else
             {
