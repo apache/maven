@@ -30,7 +30,7 @@ createMBootClasspath()
     
   if [ "$cygwin" = "true" ]
   then
-    MBOOT_CP=cygpath -pu "$MBOOT_CP"
+    MBOOT_CP=`cygpath -pu "$MBOOT_CP"`
   fi
 }
 
@@ -45,7 +45,7 @@ findAndSetMavenRepoLocal()
 
   if [ "$cygwin" = "true" ]
   then
-    repoLocal=cygpath -pu "$repoLocal"
+    repoLocal=`cygpath -pu "$repoLocal"`
   fi
 }
 
