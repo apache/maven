@@ -16,6 +16,10 @@
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
       </requirements>
     </component>
 
@@ -46,6 +50,10 @@
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
       </requirements>
     </component>
 
@@ -64,6 +72,10 @@
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
       </requirements>
     </component>
 
@@ -71,7 +83,7 @@
       <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout</implementation>
-			<requirements>
+      <requirements>
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
@@ -104,7 +116,7 @@
         </requirement>
       </requirements>
     </component>
-    
+
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ejb</role-hint>

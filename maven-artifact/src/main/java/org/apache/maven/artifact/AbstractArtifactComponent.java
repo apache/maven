@@ -23,23 +23,29 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
+import java.util.List;
+
 /**
- * @todo refactor away
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id: AbstractArtifactComponent.java,v 1.4 2005/03/08 05:34:52 brett
  *          Exp $
+ * @todo refactor away
  */
 public class AbstractArtifactComponent
     extends AbstractLogEnabled
 {
+    private List artifactTransformations;
+
     private ArtifactHandlerManager artifactHandlerManager;
 
-    protected ArtifactHandler getArtifactHandler( String type ) throws ArtifactHandlerNotFoundException
+    protected ArtifactHandler getArtifactHandler( String type )
+        throws ArtifactHandlerNotFoundException
     {
         return artifactHandlerManager.getArtifactHandler( type );
     }
 
-    protected String path( Artifact artifact, ArtifactRepository remoteRepository ) throws ArtifactPathFormatException
+    protected String path( Artifact artifact, ArtifactRepository remoteRepository )
+        throws ArtifactPathFormatException
     {
         return remoteRepository.pathOf( artifact );
     }

@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.transform;
+package org.apache.maven.artifact.transform;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -24,12 +24,12 @@ import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id: ArtifactRequestTransformation.java,v 1.1 2005/03/03 15:37:25
+ * @version $Id: ArtifactTransformation.java,v 1.1 2005/03/03 15:37:25
  *          jvanzyl Exp $
  */
-public interface ArtifactRequestTransformation
+public interface ArtifactTransformation
 {
-    static String ROLE = ArtifactRequestTransformation.class.getName();
+    static String ROLE = ArtifactTransformation.class.getName();
 
     /**
      * Take in a artifact and return the transformed artifact. If no

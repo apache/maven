@@ -54,8 +54,4 @@ public interface ArtifactResolver
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source,
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException;
-
-    void addArtifactRequestTransformation(
-        org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation requestTransformation );
-
 }

@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.transform;
+package org.apache.maven.artifact.transform;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -31,11 +31,11 @@ import java.util.TimeZone;
 
 /**
  * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka </a>
- * @version $Id: SnapshotRequestTransformation.java,v 1.1 2005/03/03 15:37:25
+ * @version $Id: SnapshotTransformation.java,v 1.1 2005/03/03 15:37:25
  *          jvanzyl Exp $
  */
-public class SnapshotRequestTransformation
-    implements ArtifactRequestTransformation
+public class SnapshotTransformation
+    implements ArtifactTransformation
 {
     private ArtifactResolver artifactResolver;
 

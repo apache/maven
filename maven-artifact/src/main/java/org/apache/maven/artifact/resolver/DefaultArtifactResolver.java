@@ -25,7 +25,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.Logger;
 
@@ -46,12 +45,6 @@ public class DefaultArtifactResolver
     extends AbstractArtifactComponent
     implements ArtifactResolver
 {
-    // ----------------------------------------------------------------------
-    // Fields
-    // ----------------------------------------------------------------------
-
-    private List requestTransformations;
-
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
@@ -330,10 +323,5 @@ public class DefaultArtifactResolver
         }
 
         conflicts.add( newArtifact );
-    }
-
-    public void addArtifactRequestTransformation( ArtifactRequestTransformation requestTransformation )
-    {
-
     }
 }
