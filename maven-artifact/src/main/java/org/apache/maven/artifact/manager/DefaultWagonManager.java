@@ -199,7 +199,7 @@ public class DefaultWagonManager
             }
             catch ( TransferFailedException e )
             {
-                getLogger().warn( "Failure getting artifact from repository '" + repository + "'" + e );
+                getLogger().warn( "Failure getting artifact from repository '" + repository + "': " + e );
                 getLogger().debug( "Stack trace", e );
                 continue;
             }
