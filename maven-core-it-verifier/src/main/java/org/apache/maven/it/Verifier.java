@@ -27,6 +27,8 @@ import java.util.Properties;
  */
 public class Verifier
 {
+    private static final String LOG_FILENAME = "log.txt";
+
     private static String localRepo;
 
     private final String basedir;
@@ -93,6 +95,18 @@ public class Verifier
             String line = ( String ) i.next();
 
             verifyExpectedResult( line );
+        }
+
+        lines = loadFile( basedir, LOG_FILENAME );
+
+        for ( Iterator i = lines.iterator(); i.hasNext(); )
+        {
+            String line = ( String ) i.next();
+
+            if ( line.indexOf( "[ERROR]" ) >= 0 )
+            {
+                throw new VerificationException( "Error in execution." );
+            }
         }
     }
 
@@ -348,7 +362,7 @@ public class Verifier
                 cli.createArgument().setValue( (String) i.next() );
             }
 
-            Writer logWriter = new FileWriter( new File( basedir, "log.txt" ) );
+            Writer logWriter = new FileWriter( new File( basedir, LOG_FILENAME ) );
 
             StreamConsumer out = new WriterStreamConsumer( logWriter );
 
@@ -376,7 +390,7 @@ public class Verifier
         System.out.println( "Log file contents:" );
         try
         {
-            BufferedReader reader = new BufferedReader( new FileReader( new File( basedir, "log.txt" ) ) );
+            BufferedReader reader = new BufferedReader( new FileReader( new File( basedir, LOG_FILENAME ) ) );
             String line = reader.readLine();
             while ( line != null )
             {
