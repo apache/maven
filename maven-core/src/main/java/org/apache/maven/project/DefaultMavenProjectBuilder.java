@@ -143,7 +143,7 @@ public class DefaultMavenProjectBuilder
                 Set repos = RepositoryUtils.mavenToWagon( project.getRepositories() );
 
                 MavenMetadataSource sourceReader = new MavenMetadataSource( repos, localRepository,
-                    artifactResolver );
+                    artifactResolver, this );
 
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( project
                     .getArtifacts(), repos, localRepository, sourceReader );

@@ -25,6 +25,7 @@ import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
 
 import java.util.Iterator;
 
@@ -70,16 +71,21 @@ public class DependencyResolutionPhase
         throws Exception
     {
         ArtifactResolver artifactResolver = null;
+        
+        MavenProjectBuilder projectBuilder = null;
 
         try
         {
             MavenProject project = context.getProject();
 
             artifactResolver = (ArtifactResolver) context.lookup( ArtifactResolver.ROLE );
+            
+            projectBuilder = (MavenProjectBuilder) context.lookup( MavenProjectBuilder.ROLE );
 
             MavenMetadataSource sourceReader = new MavenMetadataSource( context.getRemoteRepositories(),
                                                                         context.getLocalRepository(),
-                                                                        artifactResolver );
+                                                                        artifactResolver,
+                                                                        projectBuilder );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
                                                                                     context.getRemoteRepositories(),
@@ -91,6 +97,8 @@ public class DependencyResolutionPhase
         finally
         {
             context.release( artifactResolver );
+            
+            context.release( projectBuilder );
         }
     }
 }

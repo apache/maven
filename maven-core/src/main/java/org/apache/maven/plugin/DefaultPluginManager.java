@@ -29,6 +29,7 @@ import org.apache.maven.lifecycle.session.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -70,6 +71,8 @@ public class DefaultPluginManager
     protected Set remotePluginRepositories;
 
     protected ArtifactFilter artifactFilter;
+    
+    protected MavenProjectBuilder mavenProjectBuilder;
 
     public DefaultPluginManager()
     {
@@ -208,10 +211,13 @@ public class DefaultPluginManager
         throws Exception
     {
         artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
+        
+        mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
         MavenMetadataSource metadataSource = new MavenMetadataSource( remotePluginRepositories,
                                                                       session.getLocalRepository(),
-                                                                      artifactResolver );
+                                                                      artifactResolver,
+                                                                      mavenProjectBuilder );
 
         ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact,
                                                                artifactResolver,

@@ -23,11 +23,13 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+//import org.apache.maven.model.Model;
+//import org.apache.maven.model.Parent;
+//import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
 
-import java.io.FileReader;
+//import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +42,10 @@ import java.util.Set;
 public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
-    private MavenXpp3Reader reader = new MavenXpp3Reader();
+    
+    private MavenProjectBuilder mavenProjectBuilder;
+    
+//    private MavenXpp3Reader reader = new MavenXpp3Reader();
 
     private ArtifactRepository localRepository;
 
@@ -50,11 +55,14 @@ public class MavenMetadataSource
 
     public MavenMetadataSource( Set remoteRepositories,
                                 ArtifactRepository localRepository,
-                                ArtifactResolver artifactResolver )
+                                ArtifactResolver artifactResolver,
+                                MavenProjectBuilder projectBuilder )
     {
         this.localRepository = localRepository;
 
         this.artifactResolver = artifactResolver;
+        
+        this.mavenProjectBuilder = projectBuilder;
 
         this.remoteRepositories = remoteRepositories;
     }
@@ -73,9 +81,13 @@ public class MavenMetadataSource
         {
             artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
 
-            Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
+            // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable
+            // post-processing and inheritance calculation before retrieving the 
+            // associated artifacts. This should improve consistency.
+            MavenProject project = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
+//            Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
 
-            artifacts = createArtifacts( model, localRepository );
+            artifacts = createArtifacts( project.getDependencies(), localRepository );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -89,20 +101,10 @@ public class MavenMetadataSource
         return artifacts;
     }
 
-    public Set createArtifacts( Model model, ArtifactRepository localRepository )
+    public Set createArtifacts( List dependencies, ArtifactRepository localRepository )
     {
         Set projectArtifacts = new HashSet();
         
-        Parent parent = model.getParent();
-        if(parent != null)
-        {
-            projectArtifacts.add( new DefaultArtifact( parent.getGroupId(), 
-                                                       parent.getArtifactId(), 
-                                                       parent.getVersion(), 
-                                                       "pom" ) );
-        }
-
-        List dependencies = model.getDependencies();
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
