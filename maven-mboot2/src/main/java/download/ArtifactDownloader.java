@@ -107,8 +107,10 @@ public class ArtifactDownloader
 
         if ( repositories.isEmpty() )
         {
-            // TODO: configure layout
-            remoteRepos.add( new Repository( "http://repo1.maven.org", Repository.LAYOUT_LEGACY ) );
+            // TODO: use super POM?
+            Repository repository = new Repository();
+            repository.setBasedir( "http://repo1.maven.org" );
+            remoteRepos.add( repository );
         }
     }
 
@@ -122,7 +124,7 @@ public class ArtifactDownloader
 
             // The username and password parameters are not being
             // used here. Those are the "" parameters you see below.
-            String url = remoteRepo.getArtifactPath( dep );
+            String url = remoteRepo.getBasedir() + "/" + remoteRepo.getArtifactPath( dep );
 
             if ( !url.startsWith( "file" ) )
             {

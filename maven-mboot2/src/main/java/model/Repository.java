@@ -26,9 +26,11 @@ import java.io.File;
  */
 public class Repository
 {
-    private String basedir;
-
     public static final String LAYOUT_LEGACY = "legacy";
+
+    public static final String LAYOUT_DEFAULT = "default";
+
+    private String basedir;
 
     private String layout = LAYOUT_LEGACY;
 
@@ -65,6 +67,12 @@ public class Repository
             repositoryPath = dependency.getArtifactDirectory() + "/" + dependency.getType() + "s/" +
                 dependency.getArtifact();
         }
+        else if ( LAYOUT_DEFAULT.equals( layout ) )
+        {
+            String pathGroup = dependency.getGroupId().replace( '.', '/' );
+            repositoryPath = pathGroup + "/" + dependency.getArtifactId() + "/" + dependency.getVersion();
+            repositoryPath = repositoryPath + "/" + dependency.getArtifact();
+        }
         else
         {
             throw new IllegalStateException( "Unknown layout: " + layout );
@@ -74,12 +82,18 @@ public class Repository
 
     public File getMetadataFile( String groupId, String artifactId, String version, String type, String filename )
     {
-        Dependency d = new Dependency( groupId, artifactId, version, type );
+        Dependency dependency = new Dependency( groupId, artifactId, version, type );
 
         String repositoryPath;
         if ( LAYOUT_LEGACY.equals( layout ) )
         {
-            repositoryPath = d.getArtifactDirectory() + "/poms/" + filename;
+            repositoryPath = dependency.getArtifactDirectory() + "/poms/" + filename;
+        }
+        else if ( LAYOUT_DEFAULT.equals( layout ) )
+        {
+            String pathGroup = dependency.getGroupId().replace( '.', '/' );
+            repositoryPath = pathGroup + "/" + dependency.getArtifactId() + "/" + dependency.getVersion();
+            repositoryPath = repositoryPath + "/" + filename;
         }
         else
         {

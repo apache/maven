@@ -17,13 +17,16 @@ package util;
  */
 
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Parse an XML file.
@@ -35,26 +38,16 @@ public abstract class AbstractReader
 {
     private SAXParserFactory saxFactory;
 
-    public boolean parse( File file )
+    public void parse( File file )
+        throws ParserConfigurationException, SAXException, IOException
     {
-        try
-        {
-            saxFactory = SAXParserFactory.newInstance();
+        saxFactory = SAXParserFactory.newInstance();
 
-            SAXParser parser = saxFactory.newSAXParser();
+        SAXParser parser = saxFactory.newSAXParser();
 
-            InputSource is = new InputSource( new FileInputStream( file ) );
+        InputSource is = new InputSource( new FileInputStream( file ) );
 
-            parser.parse( is, this );
-
-            return true;
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-
-            return false;
-        }
+        parser.parse( is, this );
     }
 
     public void warning( SAXParseException spe )

@@ -254,20 +254,7 @@ public class MBoot
             }
         }
 
-        reader = new ModelReader( localRepository );
-
         String basedir = System.getProperty( "user.dir" );
-
-        reader.parse( new File( basedir, "maven-mboot2/pom.xml" ) );
-
-        ClassLoader bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies(), null,
-                                                                              localRepository );
-
-        reader = new ModelReader( localRepository );
-        reader.parse( new File( basedir, "maven-plugins/maven-surefire-plugin/pom.xml" ) );
-        List surefireDependencies = reader.getDependencies();
-
-        reader = new ModelReader( localRepository );
 
         // Install maven-components POM
         installPomFile( localRepository, new File( basedir, "pom.xml" ) );
@@ -283,6 +270,19 @@ public class MBoot
 
         // Install it-support POM
         installPomFile( localRepository, new File( basedir, "maven-core-it-support/pom.xml" ) );
+
+        reader = new ModelReader( localRepository );
+
+        reader.parse( new File( basedir, "maven-mboot2/pom.xml" ) );
+
+        ClassLoader bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies(), null,
+                                                                              localRepository );
+
+        reader = new ModelReader( localRepository );
+        reader.parse( new File( basedir, "maven-plugins/maven-surefire-plugin/pom.xml" ) );
+        List surefireDependencies = reader.getDependencies();
+
+        reader = new ModelReader( localRepository );
 
         List coreDeps = null;
         Dependency corePom = null;
@@ -452,12 +452,7 @@ public class MBoot
 
         ModelReader reader = new ModelReader( localRepository );
 
-        if ( !reader.parse( new File( basedir, "pom.xml" ) ) )
-        {
-            System.err.println( "Could not parse pom.xml" );
-
-            System.exit( 1 );
-        }
+        reader.parse( new File( basedir, "pom.xml" ) );
 
         String sources = new File( basedir, SOURCES ).getAbsolutePath();
 
@@ -711,12 +706,7 @@ public class MBoot
     {
         ModelReader reader = new ModelReader( localRepository );
 
-        if ( !reader.parse( pomIn ) )
-        {
-            System.err.println( "Could not parse pom.xml" );
-
-            System.exit( 1 );
-        }
+        reader.parse( pomIn );
 
         installPomFile( reader, localRepository, pomIn );
     }

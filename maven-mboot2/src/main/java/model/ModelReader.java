@@ -20,6 +20,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import util.AbstractReader;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,9 +171,17 @@ public class ModelReader
 
             ModelReader p = new ModelReader( localRepository );
 
-            if ( !p.parse( localRepository.getArtifactFile( parentGroupId, parentArtifactId, parentVersion, "pom" ) ) )
+            try
             {
-                throw new SAXException( "Could not parse parent pom.xml" );
+                p.parse( localRepository.getArtifactFile( parentGroupId, parentArtifactId, parentVersion, "pom" ) );
+            }
+            catch ( ParserConfigurationException e )
+            {
+                throw new SAXException( "Error getting parent POM", e );
+            }
+            catch ( IOException e )
+            {
+                throw new SAXException( "Error getting parent POM", e );
             }
 
             dependencies.addAll( p.getDependencies() );

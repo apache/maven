@@ -13,26 +13,26 @@
   <dependencies>
     <dependency>
       <groupId>org.codehaus.modello</groupId>
-      <artifactId>modello</artifactId>
-      <version>core-1.0-alpha-1</version>
+      <artifactId>modello-core</artifactId>
+      <version>1.0-alpha-1</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.modello</groupId>
-      <artifactId>modello</artifactId>
-      <version>xdoc-plugin-1.0-alpha-1</version>
+      <artifactId>modello-xdoc-plugin</artifactId>
+      <version>1.0-alpha-1</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.modello</groupId>
-      <artifactId>modello</artifactId>
-      <version>xml-plugin-1.0-alpha-1</version>
+      <artifactId>modello-xml-plugin</artifactId>
+      <version>1.0-alpha-1</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.modello</groupId>
-      <artifactId>modello</artifactId>
-      <version>xpp3-plugin-1.0-alpha-1</version>
+      <artifactId>modello-xpp3-plugin</artifactId>
+      <version>1.0-alpha-1</version>
       <scope>runtime</scope>
     </dependency>
 

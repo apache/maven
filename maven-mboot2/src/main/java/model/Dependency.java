@@ -194,4 +194,9 @@ public class Dependency
 
         return false;
     }
+
+    public String toString()
+    {
+        return getId() + ":" + getVersion() + ":" + getType();
+    }
 }
