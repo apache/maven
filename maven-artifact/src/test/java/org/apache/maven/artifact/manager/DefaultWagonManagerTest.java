@@ -60,6 +60,7 @@ public class DefaultWagonManagerTest
         catch ( UnsupportedProtocolException e )
         {
             //ok
+            assertTrue( true );
         }
     }
 }

@@ -19,7 +19,6 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactComponentTestCase;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
@@ -139,20 +138,12 @@ public class ArtifactResolverTest
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
             public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
-                throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
 
                 if ( artifact.getArtifactId().equals( "g" ) )
                 {
-                    try
-                    {
-                        dependencies.add( new DefaultArtifact( "maven", "h", "1.0", "jar" ) );
-                    }
-                    catch ( Exception e )
-                    {
-                       throw new ArtifactMetadataRetrievalException( "Cannot retrieve metadata." );
-                    }
+                    dependencies.add( new DefaultArtifact( "maven", "h", "1.0", "jar" ) );
                 }
 
                 return dependencies;
@@ -187,20 +178,12 @@ public class ArtifactResolverTest
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
             public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
-                throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
 
                 if ( artifact.getArtifactId().equals( "i" ) )
                 {
-                    try
-                    {
-                        dependencies.add( new DefaultArtifact( "maven", "j", "1.0", "jar" ) );
-                    }
-                    catch ( Exception e )
-                    {
-                       throw new ArtifactMetadataRetrievalException( "Cannot retrieve metadata." );
-                    }
+                    dependencies.add( new DefaultArtifact( "maven", "j", "1.0", "jar" ) );
                 }
 
                 return dependencies;

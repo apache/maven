@@ -65,7 +65,7 @@ public class DefaultWagonManager
         }
         catch ( ComponentLookupException e )
         {
-            throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: " + protocol );
+            throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: " + protocol, e );
         }
 
         return wagon;
@@ -121,22 +121,13 @@ public class DefaultWagonManager
     public void get( Artifact artifact, File destination, Set repositories )
         throws TransferFailedException
     {
-        boolean transfered = false;
-
         File temp = null;
 
-        try
-        {
-            // TODO [BP]: do this handling in Wagon itself
-            temp = new File( destination + ".tmp" );
+        // TODO [BP]: do this handling in Wagon itself
+        temp = new File( destination + ".tmp" );
+        temp.deleteOnExit();
 
-            temp.deleteOnExit();
-        }
-        catch ( Exception e )
-        {
-            throw new TransferFailedException( "Could not create temporary file for transfering artificat: " + artifact );
-        }
-
+        // TODO [BP]: The exception handling here needs some work
         for ( Iterator iter = repositories.iterator(); iter.hasNext(); )
         {
             ArtifactRepository repository = (ArtifactRepository) iter.next();

@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @todo notions of snapshots should be dealt with in one single place.
@@ -64,7 +65,11 @@ public class DefaultArtifactInstaller
 
             FileUtils.copyFile( source, artifact.getFile() );
         }
-        catch ( Exception e )
+        catch ( IOException e )
+        {
+            throw new ArtifactInstallationException( "Error installing artifact: ", e );
+        }
+        catch ( ArtifactHandlerNotFoundException e )
         {
             throw new ArtifactInstallationException( "Error installing artifact: ", e );
         }
