@@ -50,7 +50,8 @@ public class MBoot
         "modello/jars/modello-1.0-SNAPSHOT.jar",
         "xpp3/jars/xpp3-1.1.3.3.jar",
         "xstream/jars/xstream-1.0-SNAPSHOT.jar",
-        "qdox/jars/qdox-1.2.jar"
+        "qdox/jars/qdox-1.2.jar",
+        "maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar"
     };
 
     String[] plexusDeps = new String[]
