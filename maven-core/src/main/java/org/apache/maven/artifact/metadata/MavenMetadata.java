@@ -59,6 +59,8 @@ public class MavenMetadata
             throw new ArtifactMetadataRetrievalException( "Unable to install POM", e );
         }
 
+        destination.getParentFile().mkdirs();
+
         FileReader reader = null;
         FileWriter writer = null;
         try
