@@ -166,6 +166,7 @@ public class DefaultMaven
 
             if ( project.getModules() != null && !project.getModules().isEmpty() && recursive )
             {
+                // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
                 project.setPackaging( "pom" );
 
                 String includes = StringUtils.join( project.getModules().iterator(), "/pom.xml," ) + "/pom.xml";
