@@ -328,6 +328,7 @@
             target.
           </description>
           <type>String</type>
+          <comment>This should be moved out of the build section. Vestigal for use with Gump.</comment>
         </field>
         <field>
           <name>sourceDirectory</name>
@@ -588,6 +589,12 @@
           <type>String</type>
         </field>
       </fields>
+      <comment>
+        We could probably have a specific element for a dev mailing list for
+        things like CI, and maybe even a specific element for the user and scm
+        mailing lists. Then leave the more lose structure for any other type
+        of mailing list.
+      </comment>
     </class>
     <class>
       <name>Organization</name>
