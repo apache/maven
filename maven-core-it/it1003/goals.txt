@@ -1,1 +1,1 @@
-jar:jar
+package
