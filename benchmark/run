@@ -2,12 +2,18 @@
 
 rm -rf target
 
-time ant jar
+echo Run with ant...
+
+time -p ant jar > /dev/null
 
 rm -rf target
 
-time m2 jar
+echo Run with m2...
+
+time -p m2 jar:jar > /dev/null
 
 rm -rf target
 
-time maven jar
+echo Run with maven...
+
+time -p maven jar > /dev/null
