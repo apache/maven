@@ -103,7 +103,7 @@ public class Verifier
 
             if ( !expectedFile.exists() )
             {
-                throw new VerificationException( "Expected file was not found: " + line );
+                throw new VerificationException( "Expected file was not found: " + expectedFile.getPath() );
             }
         }
     }
