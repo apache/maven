@@ -17,8 +17,8 @@
   </organization>
 
   <repository>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components/maven-core</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components/maven-core</developerConnection>
+    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components/${pom.artifactId}</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components/${pom.artifactId}</developerConnection>
     <url>http://cvs.apache.org/viewcvs.cgi/maven-components/${pom.artifactId}</url>
   </repository>
 
