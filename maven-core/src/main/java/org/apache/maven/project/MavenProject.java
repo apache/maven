@@ -16,8 +16,16 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
@@ -26,16 +34,9 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
-import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * The concern of the project is provide runtime values based on the model.
@@ -346,6 +347,16 @@ public class MavenProject
     public void setIssueManagement( IssueManagement issueManagement )
     {
         model.setIssueManagement( issueManagement );
+    }
+
+    public CiManagement getCiManagement()
+    {
+        return model.getCiManagement();
+    }
+
+    public void setCiManagement( CiManagement ciManagement )
+    {
+        model.setCiManagement( ciManagement );
     }
 
     public IssueManagement getIssueManagement()
