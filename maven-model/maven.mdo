@@ -179,7 +179,7 @@
           <name>repository</name>
           <description>the description</description>
           <type>Repository</type>
-          <comment>This element needs to be renamed as it conflicts with the existing notion of repositorys in Maven.</comment>
+          <comment>This element needs to be renamed as it conflicts with the existing notion of repositories in Maven.</comment>
         </field>
         <field>
           <name>build</name>
