@@ -22,6 +22,8 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
@@ -236,14 +238,21 @@ public class DefaultPluginManager
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            throw new GoalExecutionException( "Unable to execute goal: " + goalName, e );
         }
 
         PluginExecutionRequest request;
 
         PluginExecutionResponse response;
 
-        MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );;
+        MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );
+
+        if ( mojoDescriptor.requiresDependencyResolution() )
+        {
+            resolveTransitiveDependencies( session );
+
+            downloadDependencies( session );
+        }
 
         try
         {
@@ -442,5 +451,57 @@ public class DefaultPluginManager
         // TODO: needs to be configured from the POM element
         remotePluginRepositories.add( new ArtifactRepository( "plugin-repository", "http://repo1.maven.org" ) );
     }
+
+    // ----------------------------------------------------------------------
+    // Artifact resolution
+    // ----------------------------------------------------------------------
+
+    private void resolveTransitiveDependencies( MavenSession context )
+        throws GoalExecutionException
+    {
+        MavenProject project = context.getProject();
+
+        try
+        {
+            MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
+
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
+                                                                                    context.getRemoteRepositories(),
+                                                                                    context.getLocalRepository(),
+                                                                                    sourceReader );
+
+            project.getArtifacts().addAll( result.getArtifacts().values() );
+
+        }
+        catch ( Exception e )
+        {
+            throw new GoalExecutionException( "Error resolving transitive dependencies.", e );
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // Artifact downloading
+    // ----------------------------------------------------------------------
+
+    private void downloadDependencies( MavenSession context )
+        throws GoalExecutionException
+    {
+        try
+        {
+            for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
+            {
+                Artifact artifact = (Artifact) it.next();
+
+                artifactResolver.resolve( artifact,
+                                          context.getRemoteRepositories(),
+                                          context.getLocalRepository() );
+            }
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new GoalExecutionException( "Can't resolve artifact: ", e );
+        }
+    }
+
 }
 

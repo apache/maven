@@ -42,6 +42,8 @@ public class DefaultMavenSessionPhaseManager
     public void execute( MavenExecutionRequest request, MavenExecutionResponse response )
         throws Exception
     {
+        // TODO: no longer executed. Remove this, components, etc.
+
         for ( Iterator iterator = lifecyclePhases.iterator(); iterator.hasNext(); )
         {
             MavenSessionPhase phase = (MavenSessionPhase) iterator.next();

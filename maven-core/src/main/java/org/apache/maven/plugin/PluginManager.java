@@ -20,7 +20,6 @@ package org.apache.maven.plugin;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.execution.MavenSession;
 
 import java.util.Map;
 
@@ -38,8 +37,10 @@ public interface PluginManager
     void processPluginDescriptor( MavenPluginDescriptor pluginDescriptor )
         throws Exception;
 
+    // TODO: not currently used
     Map getMojoDescriptors();
 
+    // TODO: not currently used (usages are in the phases that are no longer used)
     MojoDescriptor getMojoDescriptor( String goalId );
 
     void verifyPluginForGoal( String pluginId, MavenSession session )

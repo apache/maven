@@ -17,16 +17,10 @@ package org.apache.maven.lifecycle;
  * ====================================================================
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.MavenMetadataSource;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
@@ -89,12 +83,6 @@ public class DefaultLifecycleExecutor
     protected void executePhase( String phase, MavenSession session )
         throws LifecycleExecutionException
     {
-        resolveTransitiveDependencies( session );
-
-        downloadDependencies( session );
-
-        System.out.println( "executing phase = " + phase );
-
         int i = phases.indexOf( phaseMap.get( phase ) );
 
         for ( int j = 0; j <= i; j++ )
@@ -103,14 +91,7 @@ public class DefaultLifecycleExecutor
 
             if ( p.getGoal() != null )
             {
-                try
-                {
-                    pluginManager.executeMojo( session, p.getGoal() );
-                }
-                catch ( GoalExecutionException e )
-                {
-                    throw new LifecycleExecutionException( "Problem executing " + p.getGoal(), e );
-                }
+                executeMojo( p.getGoal(), session );
             }
         }
     }
@@ -129,85 +110,11 @@ public class DefaultLifecycleExecutor
 
         try
         {
-            pluginManager.verifyPluginForGoal( id, session );
-        }
-        catch ( Exception e )
-        {
-            throw new LifecycleExecutionException( "Problem getting plugin for " + id, e );
-        }
-
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( id );
-        if ( mojoDescriptor == null )
-        {
-            // TODO: goal not found exception?
-            throw new LifecycleExecutionException( "Goal not found: " + id );
-        }
-
-        if ( mojoDescriptor.requiresDependencyResolution() )
-        {
-            resolveTransitiveDependencies( session );
-
-            downloadDependencies( session );
-        }
-
-        try
-        {
             pluginManager.executeMojo( session, id );
         }
         catch ( GoalExecutionException e )
         {
             throw new LifecycleExecutionException( "Problem executing " + id, e );
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    // Artifact resolution
-    // ----------------------------------------------------------------------
-
-    private void resolveTransitiveDependencies( MavenSession context )
-        throws LifecycleExecutionException
-    {
-        MavenProject project = context.getProject();
-
-        try
-        {
-            MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, projectBuilder );
-
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
-                                                                                    context.getRemoteRepositories(),
-                                                                                    context.getLocalRepository(),
-                                                                                    sourceReader );
-
-            project.getArtifacts().addAll( result.getArtifacts().values() );
-
-        }
-        catch ( Exception e )
-        {
-            throw new LifecycleExecutionException( "Error resolving transitive dependencies.", e );
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    // Artifact downloading
-    // ----------------------------------------------------------------------
-
-    public void downloadDependencies( MavenSession context )
-        throws LifecycleExecutionException
-    {
-        try
-        {
-            for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
-            {
-                Artifact artifact = (Artifact) it.next();
-
-                artifactResolver.resolve( artifact,
-                                          context.getRemoteRepositories(),
-                                          context.getLocalRepository() );
-            }
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new LifecycleExecutionException( "Can't resolve artifact: ", e );
         }
     }
 

@@ -20,24 +20,9 @@ package org.apache.maven.lifecycle.goal.phase;
 import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.Plugin;
-import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
-import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
-import org.apache.maven.plugin.DefaultPluginManager;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.CollectionUtils;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -51,6 +36,7 @@ public class GoalAttainmentPhase
     {
         PluginExecutionResponse response;
 
+        // TODO: remove - most likely empty as there are no prereqs and I don't think the pre/postGoals are being walked
         for ( Iterator it = context.getResolvedGoals().iterator(); it.hasNext(); )
         {
             String goalName = (String) it.next();
