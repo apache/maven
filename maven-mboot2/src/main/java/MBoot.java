@@ -84,7 +84,7 @@ public class MBoot
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-assemble-plugin", "maven-plugins/maven-clean-plugin",
                                          "maven-plugins/maven-compiler-plugin", "maven-plugins/maven-deploy-plugin",
-                                         "maven-plugins/maven-ejb-plugin", /*"maven-plugins/maven-idea-plugin",*/
+                                         "maven-plugins/maven-ejb-plugin", "maven-plugins/maven-idea-plugin",
                                          "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin",
                                          "maven-plugins/maven-plugin-plugin", "maven-plugins/maven-resources-plugin",
                                          "maven-plugins/maven-surefire-plugin", "maven-plugins/maven-war-plugin"};
@@ -686,9 +686,10 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException(
-                    "Missing dependency: " + dependency +
-                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException( "Missing dependency: " + dependency +
+                                                 ( !online
+                                                   ? "; run again online"
+                                                   : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -705,9 +706,10 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException(
-                    "Missing dependency: " + dependency +
-                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException( "Missing dependency: " + dependency +
+                                                 ( !online
+                                                   ? "; run again online"
+                                                   : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -739,9 +741,10 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException(
-                    "Missing dependency: " + dependency +
-                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException( "Missing dependency: " + dependency +
+                                                 ( !online
+                                                   ? "; run again online"
+                                                   : "; there was a problem downloading it earlier" ) );
             }
 
             modelloClassLoader.addURL( f.toURL() );
