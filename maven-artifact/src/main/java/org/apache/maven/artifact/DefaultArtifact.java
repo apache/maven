@@ -122,11 +122,6 @@ public class DefaultArtifact
     //
     // ----------------------------------------------------------------------
 
-    public String toString()
-    {
-        return getId();
-    }
-
     public String getId()
     {
         return getGroupId() + ":" +
@@ -140,5 +135,29 @@ public class DefaultArtifact
         return getGroupId() + ":" +
             getArtifactId() + ":" +
             getType();
+    }
+
+    // ----------------------------------------------------------------------
+    // Object overrides
+    // ----------------------------------------------------------------------
+
+    public String toString()
+    {
+        return getId();
+    }
+
+    public int hashCode()
+    {
+        return getId().hashCode();
+    }
+
+    public boolean equals( Object o )
+    {
+        Artifact other = (Artifact) o;
+
+        return this.groupId.equals( other.getGroupId() ) &&
+               this.artifactId.equals( other.getArtifactId() ) &&
+               this.version.equals( other.getVersion() ) &&
+               this.type.equals( other.getType() );
     }
 }
