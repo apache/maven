@@ -35,8 +35,8 @@ import org.apache.maven.project.MavenProject;
  * expression="#localRepository"
  * description=""
  *
- * @prereq jar:jar
  * @prereq plugin:descriptor
+ * @prereq jar:jar
  */
 public class PluginInstallMojo
     extends AbstractPlugin
