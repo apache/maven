@@ -43,11 +43,12 @@ public class Dependency
     {
     }
 
-    public Dependency( String groupId, String artifactId, String version )
+    public Dependency( String groupId, String artifactId, String version, String type )
     {
         this.version = version;
         this.artifactId = artifactId;
         this.groupId = groupId;
+        this.type = type;
     }
 
     public void setId( String id )
@@ -192,15 +193,5 @@ public class Dependency
         }
 
         return false;
-    }
-
-    public String getRepositoryPath()
-    {
-        return getArtifactDirectory() + "/" + getType() + "s/" + getArtifact();
-    }
-
-    public String toString()
-    {
-        return getRepositoryPath();
     }
 }

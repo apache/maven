@@ -1,6 +1,7 @@
 package download;
 
 import model.Dependency;
+import model.Repository;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,8 +14,6 @@ import java.util.Set;
 public class ArtifactDownloader
 {
     public static final String SNAPSHOT_SIGNATURE = "-SNAPSHOT";
-
-    private File mavenRepoLocal;
 
     private List remoteRepos;
 
@@ -30,7 +29,9 @@ public class ArtifactDownloader
 
     private String proxyPassword;
 
-    public ArtifactDownloader( String localRepository, List remoteRepositories )
+    private Repository localRepository;
+
+    public ArtifactDownloader( Repository localRepository, List remoteRepositories )
         throws Exception
     {
         setRemoteRepos( remoteRepositories );
@@ -42,32 +43,10 @@ public class ArtifactDownloader
             System.exit( 1 );
         }
 
-        mavenRepoLocal = new File( localRepository );
+        this.localRepository = localRepository;
 
-        if ( !mavenRepoLocal.exists() )
-        {
-            if ( !mavenRepoLocal.mkdirs() )
-            {
-                System.err.println( "Cannot create the specified local repository: " + mavenRepoLocal );
-
-                System.exit( 1 );
-            }
-        }
-
-        if ( !mavenRepoLocal.canWrite() )
-        {
-            System.err.println( "Can't write to " + mavenRepoLocal.getAbsolutePath() );
-
-            System.exit( 1 );
-        }
-
-        System.out.println( "Using the following for your local repository: " + mavenRepoLocal );
+        System.out.println( "Using the following for your local repository: " + localRepository );
         System.out.println( "Using the following for your remote repositories: " + remoteRepos );
-    }
-
-    public File getMavenRepoLocal()
-    {
-        return mavenRepoLocal;
     }
 
     private Set downloadedArtifacts = new HashSet();
@@ -90,8 +69,7 @@ public class ArtifactDownloader
 
             if ( !downloadedArtifacts.contains( dep.getId() ) )
             {
-                String repositoryPath = dep.getRepositoryPath();
-                File destinationFile = new File( mavenRepoLocal, repositoryPath );
+                File destinationFile = localRepository.getArtifactFile( dep );
                 // The directory structure for this project may
                 // not exists so create it if missing.
                 File directory = destinationFile.getParentFile();
@@ -106,7 +84,7 @@ public class ArtifactDownloader
                     continue;
                 }
 
-                getRemoteArtifact( repositoryPath, destinationFile );
+                getRemoteArtifact( dep, destinationFile );
 
                 if ( !destinationFile.exists() )
                 {
@@ -129,26 +107,22 @@ public class ArtifactDownloader
 
         if ( repositories.isEmpty() )
         {
-            remoteRepos.add( "http://repo1.maven.org" );
+            // TODO: configure layout
+            remoteRepos.add( new Repository( "http://repo1.maven.org", Repository.LAYOUT_LEGACY ) );
         }
     }
 
-    private List getRemoteRepos()
-    {
-        return remoteRepos;
-    }
-
-    private boolean getRemoteArtifact( String file, File destinationFile )
+    private boolean getRemoteArtifact( Dependency dep, File destinationFile )
     {
         boolean fileFound = false;
 
-        for ( Iterator i = getRemoteRepos().iterator(); i.hasNext(); )
+        for ( Iterator i = remoteRepos.iterator(); i.hasNext(); )
         {
-            String remoteRepo = (String) i.next();
+            Repository remoteRepo = (Repository) i.next();
 
             // The username and password parameters are not being
             // used here. Those are the "" parameters you see below.
-            String url = remoteRepo + "/" + file;
+            String url = remoteRepo.getArtifactPath( dep );
 
             if ( !url.startsWith( "file" ) )
             {

@@ -5,6 +5,7 @@ import download.ArtifactDownloader;
 import jar.JarMojo;
 import model.Dependency;
 import model.ModelReader;
+import model.Repository;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import test.SurefirePlugin;
@@ -18,6 +19,7 @@ import util.Os;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -91,10 +93,6 @@ public class MBoot
 
     private ArtifactDownloader downloader;
 
-    private String repoLocal;
-
-    private List coreDeps;
-
     private boolean online = true;
 
     private static final String SCOPE_TEST = "test";
@@ -138,8 +136,6 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
-        ModelReader reader = new ModelReader( downloader );
-
         String mavenRepoLocal = System.getProperty( "maven.repo.local" );
 
         SettingsReader userModelReader = new SettingsReader();
@@ -202,7 +198,16 @@ public class MBoot
             System.out.println( "HOWEVER, since you did not specify a repository path, maven will use: " +
                                 repoDir.getAbsolutePath() + " to store artifacts locally." );
         }
-        repoLocal = mavenRepoLocal;
+
+        File repoLocalFile = new File( mavenRepoLocal );
+        repoLocalFile.mkdirs();
+
+        if ( !repoLocalFile.canWrite() )
+        {
+            System.err.println( "Can't write to " + mavenRepoLocal );
+
+            System.exit( 1 );
+        }
 
         String mavenHome = null;
 
@@ -235,9 +240,13 @@ public class MBoot
             online = false;
         }
 
+        Repository localRepository = new Repository( mavenRepoLocal, Repository.LAYOUT_LEGACY );
+
+        ModelReader reader = new ModelReader( localRepository );
+
         if ( online )
         {
-            downloader = new ArtifactDownloader( repoLocal, reader.getRemoteRepositories() );
+            downloader = new ArtifactDownloader( localRepository, reader.getRemoteRepositories() );
             if ( userModelReader.getActiveProxy() != null )
             {
                 Proxy proxy = userModelReader.getActiveProxy();
@@ -245,34 +254,38 @@ public class MBoot
             }
         }
 
-        reader = new ModelReader( downloader );
+        reader = new ModelReader( localRepository );
 
         String basedir = System.getProperty( "user.dir" );
 
         reader.parse( new File( basedir, "maven-mboot2/pom.xml" ) );
 
-        ClassLoader bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies(), null );
+        ClassLoader bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies(), null,
+                                                                              localRepository );
 
-        reader = new ModelReader( downloader );
+        reader = new ModelReader( localRepository );
         reader.parse( new File( basedir, "maven-plugins/maven-surefire-plugin/pom.xml" ) );
         List surefireDependencies = reader.getDependencies();
 
-        reader = new ModelReader( downloader );
+        reader = new ModelReader( localRepository );
 
         // Install maven-components POM
-        installPomFile( repoLocal, new File( basedir, "pom.xml" ) );
+        installPomFile( localRepository, new File( basedir, "pom.xml" ) );
 
         // Install plugin-parent POM
-        installPomFile( repoLocal, new File( basedir, "maven-plugins/pom.xml" ) );
+        installPomFile( localRepository, new File( basedir, "maven-plugins/pom.xml" ) );
 
         // Install plugin-tools-parent POM
-        installPomFile( repoLocal, new File( basedir, "maven-plugin-tools/pom.xml" ) );
+        installPomFile( localRepository, new File( basedir, "maven-plugin-tools/pom.xml" ) );
 
         // Install maven-script-parent POM
-        installPomFile( repoLocal, new File( basedir, "maven-script/pom.xml" ) );
+        installPomFile( localRepository, new File( basedir, "maven-script/pom.xml" ) );
 
         // Install it-support POM
-        installPomFile( repoLocal, new File( basedir, "maven-core-it-support/pom.xml" ) );
+        installPomFile( localRepository, new File( basedir, "maven-core-it-support/pom.xml" ) );
+
+        List coreDeps = null;
+        Dependency corePom = null;
 
         for ( int i = 0; i < builds.length; i++ )
         {
@@ -284,21 +297,25 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            reader = buildProject( directory, builds[i], bootstrapClassLoader, surefireDependencies );
+            reader = buildProject( directory, builds[i], bootstrapClassLoader, surefireDependencies, localRepository );
 
             if ( reader.getArtifactId().equals( "maven-core" ) )
             {
                 coreDeps = reader.getDependencies();
+                corePom = new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion(),
+                                          reader.getPackaging() );
             }
 
             System.out.println( "--------------------------------------------------------------------" );
         }
 
-        reader = new ModelReader( downloader );
+        reader = new ModelReader( localRepository );
         reader.parse( new File( basedir, "maven-plugin-tools/maven-plugin-tools-pluggy/pom.xml" ) );
         List dependencies = new ArrayList( reader.getDependencies() );
-        dependencies.add( new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion() ) );
-        IsolatedClassLoader cl = createClassloaderFromDependencies( dependencies, bootstrapClassLoader );
+        dependencies.add(
+            new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion(), reader.getPackaging() ) );
+        IsolatedClassLoader cl = createClassloaderFromDependencies( dependencies, bootstrapClassLoader,
+                                                                    localRepository );
 
         for ( int i = 0; i < pluginBuilds.length; i++ )
         {
@@ -310,7 +327,7 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            reader = buildProject( directory, pluginBuilds[i], cl, surefireDependencies );
+            reader = buildProject( directory, pluginBuilds[i], cl, surefireDependencies, localRepository );
 
             System.out.println( "--------------------------------------------------------------------" );
         }
@@ -370,7 +387,7 @@ public class MBoot
         {
             Dependency d = (Dependency) i.next();
 
-            File source = new File( repoLocal, d.getRepositoryPath() );
+            File source = localRepository.getArtifactFile( d );
             if ( d.getArtifactId().equals( "classworlds" ) )
             {
                 FileUtils.copyFileToDirectory( source, boot );
@@ -386,9 +403,7 @@ public class MBoot
         }
 
         // Copy maven itself
-
-        // TODO: create a dependency object
-        FileUtils.copyFileToDirectory( new File( repoLocal, "org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar" ), lib );
+        FileUtils.copyFileToDirectory( localRepository.getArtifactFile( corePom ), lib );
 
         System.out.println();
 
@@ -429,13 +444,13 @@ public class MBoot
         System.out.println( "Finished at: " + fullStop );
     }
 
-    public ModelReader buildProject( String basedir, String projectId, ClassLoader classLoader,
-                                     List surefireDependencies )
+    private ModelReader buildProject( String basedir, String projectId, ClassLoader classLoader,
+                                      List surefireDependencies, Repository localRepository )
         throws Exception
     {
         System.out.println( "Building project in " + basedir );
 
-        ModelReader reader = new ModelReader( downloader );
+        ModelReader reader = new ModelReader( localRepository );
 
         if ( !reader.parse( new File( basedir, "pom.xml" ) ) )
         {
@@ -532,11 +547,12 @@ public class MBoot
 
         if ( new File( generatedSources ).exists() )
         {
-            compile( reader.getDependencies(), sources, classes, null, generatedSources, SCOPE_COMPILE );
+            compile( reader.getDependencies(), sources, classes, null, generatedSources, SCOPE_COMPILE,
+                     localRepository );
         }
         else
         {
-            compile( reader.getDependencies(), sources, classes, null, null, SCOPE_COMPILE );
+            compile( reader.getDependencies(), sources, classes, null, null, SCOPE_COMPILE, localRepository );
         }
 
         // ----------------------------------------------------------------------
@@ -548,7 +564,7 @@ public class MBoot
             System.out.println( "Generating maven plugin descriptor ..." );
 
             generatePluginDescriptor( sources, new File( classes, "META-INF/maven" ).getAbsolutePath(),
-                                      new File( basedir, "pom.xml" ).getAbsolutePath(), classLoader );
+                                      new File( basedir, "pom.xml" ).getAbsolutePath(), classLoader, localRepository );
         }
 
         // ----------------------------------------------------------------------
@@ -567,7 +583,7 @@ public class MBoot
 
         List testDependencies = reader.getDependencies();
 
-        compile( testDependencies, testSources, testClasses, classes, null, SCOPE_TEST );
+        compile( testDependencies, testSources, testClasses, classes, null, SCOPE_TEST, localRepository );
 
         // ----------------------------------------------------------------------
         // Test resources
@@ -581,7 +597,7 @@ public class MBoot
         // Run tests
         // ----------------------------------------------------------------------
 
-        runTests( basedir, classes, testClasses, reader, surefireDependencies );
+        runTests( basedir, classes, testClasses, reader, surefireDependencies, localRepository );
 
         // ----------------------------------------------------------------------
         // Create JAR
@@ -589,30 +605,32 @@ public class MBoot
 
         createJar( classes, buildDir, reader );
 
-        installPom( basedir, repoLocal, reader );
+        installPom( basedir, localRepository, reader );
 
         String artifactId = reader.getArtifactId();
 
         if ( !artifactId.equals( "maven-plugin" ) && artifactId.endsWith( "plugin" ) )
         {
-            install( basedir, repoLocal, reader, "maven-plugin" );
+            install( basedir, localRepository, reader, "maven-plugin" );
         }
         else
         {
-            install( basedir, repoLocal, reader, "jar" );
+            install( basedir, localRepository, reader, "jar" );
         }
 
         return reader;
     }
 
-    private void generatePluginDescriptor( String sourceDirectory, String outputDirectory, String pom, ClassLoader cl )
+    private void generatePluginDescriptor( String sourceDirectory, String outputDirectory, String pom, ClassLoader cl,
+                                           Repository localRepository )
         throws Exception
     {
         Class cls = cl.loadClass( "org.apache.maven.tools.plugin.pluggy.Main" );
 
         Method m = cls.getMethod( "main", new Class[]{String[].class} );
 
-        String[] args = {"descriptor", sourceDirectory, outputDirectory, pom, repoLocal};
+        // Can pluggy really cope with the layout?
+        String[] args = {"descriptor", sourceDirectory, outputDirectory, pom, localRepository.getBasedir()};
 
         m.invoke( null, new Object[]{args} );
     }
@@ -638,7 +656,8 @@ public class MBoot
         Thread.currentThread().setContextClassLoader( old );
     }
 
-    private IsolatedClassLoader createClassloaderFromDependencies( List dependencies, ClassLoader parent )
+    private IsolatedClassLoader createClassloaderFromDependencies( List dependencies, ClassLoader parent,
+                                                                   Repository localRepository )
         throws Exception
     {
         if ( online )
@@ -662,7 +681,7 @@ public class MBoot
         {
             Dependency dependency = (Dependency) i.next();
 
-            File f = new File( repoLocal, dependency.getRepositoryPath() );
+            File f = localRepository.getArtifactFile( dependency );
             if ( !f.exists() )
             {
                 String msg = ( !online ? "; run again online" : "; there was a problem downloading it earlier" );
@@ -687,10 +706,10 @@ public class MBoot
         jarMojo.execute( new File( classes ), buildDir, artifactId + "-" + version );
     }
 
-    private void installPomFile( String repoLocal, File pomIn )
+    private void installPomFile( Repository localRepository, File pomIn )
         throws Exception
     {
-        ModelReader reader = new ModelReader( downloader );
+        ModelReader reader = new ModelReader( localRepository );
 
         if ( !reader.parse( pomIn ) )
         {
@@ -699,21 +718,18 @@ public class MBoot
             System.exit( 1 );
         }
 
-        String artifactId = reader.getArtifactId();
-
-        String version = reader.getVersion();
-
-        String groupId = reader.getGroupId();
-
-        File pom = new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" );
-
-        System.out.println( "Installing POM: " + pom );
-
-        FileUtils.copyFile( pomIn, pom );
+        installPomFile( reader, localRepository, pomIn );
     }
 
-    private void installPom( String basedir, String repoLocal, ModelReader reader )
+    private void installPom( String basedir, Repository localRepository, ModelReader reader )
         throws Exception
+    {
+        installPomFile( reader, localRepository, new File( basedir, "pom.xml" ) );
+
+    }
+
+    private void installPomFile( ModelReader reader, Repository localRepository, File source )
+        throws IOException
     {
         String artifactId = reader.getArtifactId();
 
@@ -721,14 +737,14 @@ public class MBoot
 
         String groupId = reader.getGroupId();
 
-        File pom = new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" );
+        File pom = localRepository.getArtifactFile( groupId, artifactId, version, "pom" );
 
         System.out.println( "Installing POM: " + pom );
 
-        FileUtils.copyFile( new File( basedir, "pom.xml" ), pom );
+        FileUtils.copyFile( source, pom );
     }
 
-    private void install( String basedir, String repoLocal, ModelReader reader, String type )
+    private void install( String basedir, Repository localRepository, ModelReader reader, String type )
         throws Exception
     {
         String artifactId = reader.getArtifactId();
@@ -739,22 +755,24 @@ public class MBoot
 
         String finalName = artifactId + "-" + version;
 
-        File file = new File( repoLocal, "/" + groupId + "/" + type + "s/" + finalName + ".jar" );
+        File file = localRepository.getArtifactFile( groupId, artifactId, version, type );
 
         System.out.println( "Installing: " + file );
 
-        FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + finalName + ".jar" ), file );
-
         if ( version.indexOf( "SNAPSHOT" ) >= 0 )
         {
-            File metadata = new File( repoLocal, "/" + groupId + "/poms/" + finalName + ".version.txt" );
+            File metadata = localRepository.getMetadataFile( groupId, artifactId, version, type,
+                                                             finalName + ".version.txt" );
 
             IOUtil.copy( new StringReader( version ), new FileWriter( metadata ) );
         }
+
+        FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + finalName + ".jar" ), file );
+
     }
 
     private void runTests( String basedir, String classes, String testClasses, ModelReader reader,
-                           List surefireDependencies )
+                           List surefireDependencies, Repository localRepository )
         throws Exception
     {
         SurefirePlugin testRunner = new SurefirePlugin();
@@ -776,7 +794,7 @@ public class MBoot
         List depList = new ArrayList( reader.getDependencies() );
         depList.addAll( surefireDependencies );
 
-        List classpath = classpath( depList, null, SCOPE_TEST );
+        List classpath = classpath( depList, null, SCOPE_TEST, localRepository );
         classpath.add( classes );
         classpath.add( testClasses );
         boolean success = testRunner.execute( basedir, includes, excludes, classpath, reportsDir );
@@ -791,7 +809,7 @@ public class MBoot
     // Compile
     // ----------------------------------------------------------------------
 
-    private List classpath( List dependencies, String extraClasspath, String scope )
+    private List classpath( List dependencies, String extraClasspath, String scope, Repository localRepository )
     {
         List classpath = new ArrayList( dependencies.size() + 1 );
 
@@ -799,7 +817,7 @@ public class MBoot
         {
             Dependency d = (Dependency) dependencies.get( i );
 
-            String element = repoLocal + "/" + d.getRepositoryPath();
+            String element = localRepository.getArtifactFile( d ).getAbsolutePath();
 
             if ( SCOPE_COMPILE.equals( scope ) )
             {
@@ -827,7 +845,7 @@ public class MBoot
     }
 
     private void compile( List dependencies, String sourceDirectory, String outputDirectory, String extraClasspath,
-                          String generatedSources, String scope )
+                          String generatedSources, String scope, Repository localRepository )
         throws Exception
     {
         JavacCompiler compiler = new JavacCompiler();
@@ -861,7 +879,8 @@ public class MBoot
             CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
             compilerConfiguration.setOutputLocation( outputDirectory );
-            compilerConfiguration.setClasspathEntries( classpath( dependencies, extraClasspath, scope ) );
+            compilerConfiguration.setClasspathEntries(
+                classpath( dependencies, extraClasspath, scope, localRepository ) );
             compilerConfiguration.setSourceLocations( Arrays.asList( sourceDirectories ) );
 
             /* Compile with debugging info */

@@ -16,12 +16,10 @@ package model;
  * limitations under the License.
  */
 
-import download.ArtifactDownloader;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import util.AbstractReader;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +49,7 @@ public class ModelReader
 
     private List dependencies = new ArrayList();
 
-    private List remoteRepositories = new ArrayList();
+    private List repositories = new ArrayList();
 
     private List resources = new ArrayList();
 
@@ -71,16 +69,18 @@ public class ModelReader
 
     private StringBuffer bodyText = new StringBuffer();
 
-    private final ArtifactDownloader downloader;
+    private final Repository localRepository;
 
-    public ModelReader( ArtifactDownloader downloader )
+    private Repository currentRepository;
+
+    public ModelReader( Repository downloader )
     {
-        this.downloader = downloader;
+        this.localRepository = downloader;
     }
 
     public List getRemoteRepositories()
     {
-        return remoteRepositories;
+        return repositories;
     }
 
     public List getDependencies()
@@ -101,6 +101,8 @@ public class ModelReader
         }
         else if ( rawName.equals( "repository" ) )
         {
+            currentRepository = new Repository();
+
             insideRepository = true;
         }
         else if ( rawName.equals( "dependency" ) )
@@ -140,8 +142,6 @@ public class ModelReader
         // support both v3 <extend> and v4 <parent>
         if ( rawName.equals( "parent" ) )
         {
-            File f;
-
             if ( parentArtifactId == null || parentArtifactId.trim().length() == 0 )
             {
                 throw new SAXException( "Missing required element in <parent>: artifactId." );
@@ -167,12 +167,9 @@ public class ModelReader
                 version = parentVersion;
             }
 
-            f = new File( downloader.getMavenRepoLocal(), parentGroupId + "/poms/" + parentArtifactId + "-" +
-                                                          parentVersion + ".pom" );
+            ModelReader p = new ModelReader( localRepository );
 
-            ModelReader p = new ModelReader( downloader );
-
-            if ( !p.parse( f ) )
+            if ( !p.parse( localRepository.getArtifactFile( parentGroupId, parentArtifactId, parentVersion, "pom" ) ) )
             {
                 throw new SAXException( "Could not parse parent pom.xml" );
             }
@@ -200,6 +197,12 @@ public class ModelReader
             testResources.add( currentResource );
 
             insideResource = false;
+        }
+        else if ( rawName.equals( "repository" ) )
+        {
+            repositories.add( currentRepository );
+
+            insideRepository = false;
         }
         else if ( insideParent )
         {
@@ -262,6 +265,17 @@ public class ModelReader
                 currentResource.addExclude( getBodyText() );
             }
         }
+        else if ( insideRepository )
+        {
+            if ( rawName.equals( "url" ) )
+            {
+                currentRepository.setBasedir( getBodyText() );
+            }
+            else if ( rawName.equals( "layout" ) )
+            {
+                currentRepository.setLayout( getBodyText() );
+            }
+        }
         else if ( depth == 2 )
         {
             if ( rawName.equals( "artifactId" ) )
@@ -279,17 +293,6 @@ public class ModelReader
             else if ( rawName.equals( "packaging" ) )
             {
                 packaging = getBodyText();
-            }
-            else if ( rawName.equals( "repository" ) )
-            {
-                insideRepository = false;
-            }
-        }
-        else if ( insideRepository )
-        {
-            if ( rawName.equals( "url" ) )
-            {
-                remoteRepositories.add( getBodyText() );
             }
         }
 
