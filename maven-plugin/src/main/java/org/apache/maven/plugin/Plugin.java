@@ -26,9 +26,16 @@ public interface Plugin
 {
     String ROLE = Plugin.class.getName();
 
+    void execute()
+        throws PluginExecutionException;
+
+    /** @deprecated */
     void execute( PluginExecutionRequest request )
         throws PluginExecutionException;
 
     // TODO: not sure about this here, and may want a getLog on here as well/instead
     void setLog( Log log );
+
+    /** @deprecated */
+    boolean supportsNewMojoParadigm();
 }

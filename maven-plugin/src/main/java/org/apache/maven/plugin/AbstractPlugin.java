@@ -29,6 +29,7 @@ public abstract class AbstractPlugin
 
     /**
      * Default behaviour to mimic old behaviour.
+     *
      * @deprecated
      */
     public void execute( PluginExecutionRequest request )
@@ -64,14 +65,26 @@ public abstract class AbstractPlugin
 
     public Log getLog()
     {
-        synchronized(this)
+        synchronized ( this )
         {
-            if(log == null)
+            if ( log == null )
             {
                 log = new SystemStreamLog();
             }
         }
 
         return log;
+    }
+
+    public void execute()
+        throws PluginExecutionException
+    {
+        if ( supportsNewMojoParadigm() )
+            throw new PluginExecutionException( "You must override execute() if you implement the new paradigm" );
+    }
+
+    public boolean supportsNewMojoParadigm()
+    {
+        return false;
     }
 }

@@ -329,9 +329,7 @@ public class DefaultPluginManager
             throw new PluginExecutionException( "Unable to execute goal: " + goalName, e );
         }
 
-        PluginExecutionRequest request;
-
-        PluginExecutionResponse response;
+        PluginExecutionRequest request = null;
 
         MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );
         if ( mojoDescriptor == null )
@@ -374,15 +372,6 @@ public class DefaultPluginManager
             throw new PluginExecutionException( "Unable to resolve required dependencies for goal", e );
         }
 
-        try
-        {
-            request = new PluginExecutionRequest( createParameters( mojoDescriptor, session ) );
-        }
-        catch ( PluginConfigurationException e )
-        {
-            throw new PluginExecutionException( "Error configuring plugin for execution.", e );
-        }
-
         Plugin plugin = null;
 
         try
@@ -390,6 +379,15 @@ public class DefaultPluginManager
             plugin = (Plugin) container.lookup( Plugin.ROLE, goalName );
 
             plugin.setLog( session.getLog() );
+
+            if ( plugin.supportsNewMojoParadigm() )
+            {
+                // TODO: construct request
+            }
+            else
+            {
+                request = new PluginExecutionRequest( createParameters( mojoDescriptor, session ) );
+            }
 
             // !! This is ripe for refactoring to an aspect.
             // Event monitoring.
@@ -399,7 +397,14 @@ public class DefaultPluginManager
             dispatcher.dispatchStart( event, goalName );
             try
             {
-                plugin.execute( request );
+                if ( plugin.supportsNewMojoParadigm() )
+                {
+                    plugin.execute();
+                }
+                else
+                {
+                    plugin.execute( request );
+                }
 
                 dispatcher.dispatchEnd( event, goalName );
             }
@@ -410,6 +415,10 @@ public class DefaultPluginManager
             }
             // End event monitoring.
 
+        }
+        catch ( PluginConfigurationException e )
+        {
+            throw new PluginExecutionException( "Error configuring plugin for execution.", e );
         }
         catch ( ComponentLookupException e )
         {
