@@ -1,0 +1,5 @@
+#!/bin/sh
+
+umask 002
+
+rsync -rvl --size-only --rsh="ssh -l rsync" jetty.mortbay.org:maven/ /public/html/maven
