@@ -1,0 +1,7 @@
+#!/bin/sh
+
+repoLocal=`cat $HOME/build.properties | grep "maven.repo.local" | sed 's/^.*= *//'`
+
+echo "Removing maven-it-support-1.0.jar from the local repository so we can verify its downloading ..."
+
+rm -f $repoLocal/maven/jars/maven-it-support-1.0.jar > /dev/null 2>&1
