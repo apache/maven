@@ -76,4 +76,8 @@ findAndSetMavenRepoLocal
 
 CP=$repoLocal/modello/jars/modello-1.0-SNAPSHOT.jar:$repoLocal/xstream/jars/xstream-1.0-SNAPSHOT.jar:$repoLocal/xpp3/jars/xpp3-1.1.3.3.jar
 
-java -classpath $CP org.codehaus.modello.Modello $model $mode $dir $model_version
+if $cygwin; then
+  CP=`cygpath -pw "$CP"`
+fi
+
+java -classpath "$CP" org.codehaus.modello.Modello $model $mode "$dir" $model_version
