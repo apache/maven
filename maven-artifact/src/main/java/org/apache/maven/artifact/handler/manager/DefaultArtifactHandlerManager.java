@@ -66,7 +66,7 @@ public class DefaultArtifactHandlerManager
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
         {
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
-            // TODO: perform transformation
+            artifact = transform.transformRemoteArtifact( artifact, remoteRepository );
         }
 
         return remoteRepository.pathOf( artifact );
@@ -79,7 +79,6 @@ public class DefaultArtifactHandlerManager
         {
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
             artifact = transform.transformLocalArtifact( artifact, localRepository );
-            // TODO: perform transformation
         }
 
         return localRepository.getBasedir() + "/" + localRepository.pathOf( artifact );

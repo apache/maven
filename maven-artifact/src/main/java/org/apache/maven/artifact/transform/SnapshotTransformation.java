@@ -30,7 +30,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 public class SnapshotTransformation
     implements ArtifactTransformation
 {
-/*
+/* TODO: use and remove
     public Artifact transform( Artifact artifact, ArtifactRepository localRepository, List repositories,
                                Map parameters )
         throws Exception
@@ -187,13 +187,27 @@ public class SnapshotTransformation
     */
     public Artifact transformLocalArtifact( Artifact artifact, ArtifactRepository localRepository )
     {
-        if ( isSnapshot( artifact ) && "pom".equals( artifact.getType() ) )
+        if ( shouldProcessArtifact( artifact ) )
         {
             // only store the snapshot-version-local.txt file for POMs as every file has an associated POM
             ArtifactMetadata metadata = SnapshotArtifactMetadata.createLocalSnapshotMetadata( artifact );
             artifact.addMetadata( metadata );
         }
         return artifact;
+    }
+
+    public Artifact transformRemoteArtifact( Artifact artifact, ArtifactRepository remoteRepository )
+    {
+        if ( shouldProcessArtifact( artifact ) )
+        {
+            // TODO: implement
+        }
+        return artifact;
+    }
+
+    private static boolean shouldProcessArtifact( Artifact artifact )
+    {
+        return isSnapshot( artifact ) && "pom".equals( artifact.getType() );
     }
 
     private static boolean isSnapshot( Artifact artifact )
