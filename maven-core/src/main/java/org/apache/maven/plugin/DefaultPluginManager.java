@@ -43,10 +43,14 @@ import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
+import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -55,6 +59,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -493,37 +498,60 @@ public class DefaultPluginManager
 
         List parameters = mojoDescriptor.getParameters();
 
+        Xpp3Dom dom = new Xpp3Dom( mojoDescriptor.getId() );
+
         for ( Iterator i = parameters.iterator(); i.hasNext(); )
         {
             Parameter param = (Parameter) i.next();
             String name = param.getName();
             Object value = values.get( name );
 
-            Class clazz = plugin.getClass();
-            try
+            // TODO:Still not complete robust - need to merge in the processing in createParameters
+            if ( value instanceof String )
             {
-                Field f = clazz.getDeclaredField( name );
-                boolean accessible = f.isAccessible();
-                if ( !accessible )
+                Xpp3Dom d = new Xpp3Dom( name );
+                d.setValue( (String) value );
+                dom.addChild( d );
+            }
+            else
+            {
+                Class clazz = plugin.getClass();
+                try
                 {
-                    f.setAccessible( true );
+                    Field f = clazz.getDeclaredField( name );
+                    boolean accessible = f.isAccessible();
+                    if ( !accessible )
+                    {
+                        f.setAccessible( true );
+                    }
+
+                    f.set( plugin, value );
+
+                    if ( !accessible )
+                    {
+                        f.setAccessible( false );
+                    }
                 }
-
-                f.set( plugin, value );
-
-                if ( !accessible )
+                catch ( NoSuchFieldException e )
                 {
-                    f.setAccessible( false );
+                    throw new PluginConfigurationException( "Unable to set field '" + name + "' on '" + clazz + "'" );
+                }
+                catch ( IllegalAccessException e )
+                {
+                    throw new PluginConfigurationException( "Unable to set field '" + name + "' on '" + clazz + "'" );
                 }
             }
-            catch ( NoSuchFieldException e )
-            {
-                throw new PluginConfigurationException( "Unable to set field '" + name + "' on '" + clazz + "'" );
-            }
-            catch ( IllegalAccessException e )
-            {
-                throw new PluginConfigurationException( "Unable to set field '" + name + "' on '" + clazz + "'" );
-            }
+        }
+
+        // TODO: should be a component
+        ComponentConfigurator configurator = new BasicComponentConfigurator();
+        try
+        {
+            configurator.configureComponent( plugin, new XmlPlexusConfiguration( dom ) );
+        }
+        catch ( ComponentConfigurationException e )
+        {
+            throw new PluginConfigurationException( "Unable to parse the created DOM for plugin configuration", e );
         }
     }
 
