@@ -43,7 +43,10 @@ public class DefaultArtifact
 
     private String path;
 
-    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type, 
+    /**
+     * @todo this should be replaced by type handler
+     */
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
                             String extension )
     {
         this.groupId = groupId;
@@ -54,15 +57,9 @@ public class DefaultArtifact
         this.extension = extension;
     }
 
-    /** @todo this should be replaced by type handler */
-    public DefaultArtifact( String groupId, String artifactId, String version, String type, String extension )
-    {
-        this( groupId, artifactId, version, SCOPE_COMPILE, type, extension );
-    }
-
     public DefaultArtifact( String groupId, String artifactId, String version, String type )
     {
-        this( groupId, artifactId, version, type, type );
+        this( groupId, artifactId, version, null, type, type );
     }
 
     public String getScope()
@@ -135,17 +132,12 @@ public class DefaultArtifact
 
     public String getId()
     {
-        return getGroupId() + ":" +
-            getArtifactId() + ":" +
-            getType() + ":" +
-            getVersion();
+        return getGroupId() + ":" + getArtifactId() + ":" + getType() + ":" + getVersion();
     }
 
     public String getConflictId()
     {
-        return getGroupId() + ":" +
-            getArtifactId() + ":" +
-            getType();
+        return getGroupId() + ":" + getArtifactId() + ":" + getType();
     }
 
     // ----------------------------------------------------------------------
@@ -166,9 +158,7 @@ public class DefaultArtifact
     {
         Artifact other = (Artifact) o;
 
-        return this.groupId.equals( other.getGroupId() ) &&
-               this.artifactId.equals( other.getArtifactId() ) &&
-               this.version.equals( other.getVersion() ) &&
-               this.type.equals( other.getType() );
+        return this.groupId.equals( other.getGroupId() ) && this.artifactId.equals( other.getArtifactId() ) && this.version.equals(
+            other.getVersion() ) && this.type.equals( other.getType() );
     }
 }

@@ -16,23 +16,8 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -50,13 +35,26 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositoryUtils;
-
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @version $Id$
@@ -130,7 +128,7 @@ public class DefaultMavenProjectBuilder
             project = new MavenProject( model );
             project.setFile( projectDescriptor );
             project.setParent( parentProject );
-            project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository ) );
+            project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
 
             // ----------------------------------------------------------------------
             // Typically when the project builder is being used from maven proper
@@ -242,7 +240,8 @@ public class DefaultMavenProjectBuilder
         }
         catch ( Exception e )
         {
-            throw new ProjectBuildingException( "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
+            throw new ProjectBuildingException(
+                "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
         }
     }
 
@@ -266,8 +265,8 @@ public class DefaultMavenProjectBuilder
     private File findParentModel( Parent parent, Set remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), parent.getVersion(),
-                                                 "pom" );
+        Artifact artifact = artifactFactory.createArtifact( parent.getGroupId(), parent.getArtifactId(),
+                                                            parent.getVersion(), null, "pom", "pom", null );
 
         try
         {

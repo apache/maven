@@ -16,21 +16,19 @@ package org.apache.maven.artifact;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
 import java.io.FileReader;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -42,6 +40,9 @@ public class MavenMetadataSource
 {
     private MavenProjectBuilder mavenProjectBuilder;
     private ArtifactResolver artifactResolver;
+
+    // TODO: configure?
+    protected ArtifactFactory artifactFactory = new DefaultArtifactFactory();
 
     /**
      * @todo remove.
@@ -66,8 +67,9 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         Set artifacts;
-        Artifact metadataArtifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                         artifact.getVersion(), "pom" );
+        Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                    artifact.getVersion(), artifact.getScope(), "pom",
+                                                                    "pom", null );
         try
         {
             artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
@@ -78,12 +80,14 @@ public class MavenMetadataSource
             if ( mavenProjectBuilder != null )
             {
                 MavenProject project = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
-                artifacts = createArtifacts( project.getDependencies(), artifact.getScope(), localRepository );
+                artifacts =
+                    artifactFactory.createArtifacts( project.getDependencies(), localRepository, artifact.getScope() );
             }
             else
             {
                 Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
-                artifacts = createArtifacts( model.getDependencies(), artifact.getScope(), localRepository );
+                artifacts =
+                    artifactFactory.createArtifacts( model.getDependencies(), localRepository, artifact.getScope() );
             }
         }
         catch ( ArtifactResolutionException e )
@@ -96,40 +100,5 @@ public class MavenMetadataSource
                                                           e );
         }
         return artifacts;
-    }
-
-    protected Set createArtifacts( List dependencies, String scope, ArtifactRepository localRepository )
-    {
-        Set projectArtifacts = new HashSet();
-        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-        {
-            Dependency d = (Dependency) i.next();
-            Artifact artifact = createArtifact( d, scope, localRepository );
-            if ( artifact != null )
-            {
-                projectArtifacts.add( artifact );
-            }
-        }
-        return projectArtifacts;
-    }
-
-    protected Artifact createArtifact( Dependency dependency, String scope, ArtifactRepository localRepository )
-    {
-        // TODO: can refactor
-        String requestedScope = dependency.getScope();
-        if ( Artifact.SCOPE_TEST.equals( scope ) && Artifact.SCOPE_TEST.equals( requestedScope ) )
-        {
-            return null;
-        }
-
-        // TODO: duplicated with the ArtifactFactory, localRepository not used (should be used here to resolve path?
-        // TODO: scope handler
-        String desiredScope = Artifact.SCOPE_RUNTIME;
-        if ( Artifact.SCOPE_TEST.equals( requestedScope ) || Artifact.SCOPE_TEST.equals( scope ) )
-        {
-            desiredScope = Artifact.SCOPE_TEST;
-        }
-        return new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
-                                    desiredScope, dependency.getType(), dependency.getType() );
     }
 }

@@ -33,9 +33,11 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import java.io.InputStreamReader;
 import java.util.Set;
 
-public class ProjectClasspathArtifactResolver extends DefaultArtifactResolver
+public class ProjectClasspathArtifactResolver
+    extends DefaultArtifactResolver
 {
-    private static class Source extends MavenMetadataSource
+    private static class Source
+        extends MavenMetadataSource
     {
         public Source( ArtifactResolver artifactResolver )
         {
@@ -57,7 +59,7 @@ public class ProjectClasspathArtifactResolver extends DefaultArtifactResolver
             {
                 throw new ArtifactMetadataRetrievalException( e );
             }
-            return createArtifacts( model.getDependencies(), artifact.getScope(), localRepository );
+            return artifactFactory.createArtifacts( model.getDependencies(), localRepository, artifact.getScope() );
         }
     }
 

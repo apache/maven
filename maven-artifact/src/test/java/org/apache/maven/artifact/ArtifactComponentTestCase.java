@@ -16,17 +16,17 @@
 
 package org.apache.maven.artifact;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -47,8 +47,11 @@ public abstract class ArtifactComponentTestCase
 
     protected abstract String component();
 
-    /** Return an existing file, not a directory - causes creation to fail. */
-    protected ArtifactRepository badLocalRepository() throws IOException
+    /**
+     * Return an existing file, not a directory - causes creation to fail.
+     */
+    protected ArtifactRepository badLocalRepository()
+        throws IOException
     {
         ArtifactRepository localRepository = new ArtifactRepository();
 
@@ -225,7 +228,12 @@ public abstract class ArtifactComponentTestCase
 
     protected Artifact createArtifact( String artifactId, String version, String type )
     {
-        return new DefaultArtifact( "maven", artifactId, version, type );
+        return createArtifact( "maven", artifactId, version, type );
+    }
+
+    protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
+    {
+        return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type, type );
     }
 
     protected void deleteLocalArtifact( Artifact artifact )

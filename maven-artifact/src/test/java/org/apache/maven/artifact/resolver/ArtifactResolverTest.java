@@ -18,17 +18,11 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactComponentTestCase;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.HashSet;
 import java.util.Set;
-
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
- */
 
 // It would be cool if there was a hook that i could use to setup a test environment.
 // I want to setup a local/remote repositories for testing but i don't want to have
@@ -36,6 +30,10 @@ import java.util.Set;
 // the structure i want to test by using the artifact handler manager which dictates
 // the layout used for a particular artifact type.
 
+/**
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @version $Id$
+ */
 public class ArtifactResolverTest
     extends ArtifactComponentTestCase
 {
@@ -127,6 +125,11 @@ public class ArtifactResolverTest
         assertTrue( resolvedArtifacts.contains( f ) );
     }
 
+    protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
+    {
+        // for the anonymous classes
+        return super.createArtifact( groupId, artifactId, version, type );
+    }
 
     public void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository()
         throws Exception
@@ -143,17 +146,15 @@ public class ArtifactResolverTest
 
                 if ( artifact.getArtifactId().equals( "g" ) )
                 {
-                    dependencies.add( new DefaultArtifact( "maven", "h", "1.0", "jar" ) );
+                    dependencies.add( createArtifact( "maven", "h", "1.0", "jar" ) );
                 }
 
                 return dependencies;
             }
         };
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( g,
-                                                                                remoteRepositories(),
-                                                                                localRepository(),
-                                                                                mds );
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( g, remoteRepositories(),
+                                                                                localRepository(), mds );
 
         assertEquals( 2, result.getArtifacts().size() );
 
@@ -183,17 +184,15 @@ public class ArtifactResolverTest
 
                 if ( artifact.getArtifactId().equals( "i" ) )
                 {
-                    dependencies.add( new DefaultArtifact( "maven", "j", "1.0", "jar" ) );
+                    dependencies.add( createArtifact( "maven", "j", "1.0", "jar" ) );
                 }
 
                 return dependencies;
             }
         };
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( i,
-                                                                                remoteRepositories(),
-                                                                                localRepository(),
-                                                                                mds );
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( i, remoteRepositories(),
+                                                                                localRepository(), mds );
 
         assertEquals( 2, result.getArtifacts().size() );
 

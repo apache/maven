@@ -29,30 +29,25 @@ import java.io.File;
 
 /**
  * @goal install
- *
  * @description installs project's main artifact in local repository
- *
  * @parameter name="project"
  * type="org.apache.maven.project.MavenProject"
  * required="true"
  * validator=""
  * expression="#project"
  * description=""
- *
  * @parameter name="installer"
  * type="org.apache.maven.artifact.installer.ArtifactInstaller"
  * required="true"
  * validator=""
  * expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
  * description=""
- *
  * @parameter name="localRepository"
  * type="org.apache.maven.artifact.repository.ArtifactRepository"
  * required="true"
  * validator=""
  * expression="#localRepository"
  * description=""
- *
  */
 public class PomInstallMojo
     extends AbstractPlugin
@@ -66,9 +61,7 @@ public class PomInstallMojo
 
         ArtifactRepository localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
 
-        Artifact artifact = new DefaultArtifact( project.getGroupId(),
-                                                 project.getArtifactId(),
-                                                 project.getVersion(),
+        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
                                                  "pom" );
 
         File pom = new File( project.getFile().getParentFile(), "pom.xml" );
