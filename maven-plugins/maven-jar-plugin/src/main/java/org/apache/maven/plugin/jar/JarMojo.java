@@ -21,9 +21,11 @@ import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -148,7 +150,29 @@ public class JarMojo
 
     private Manifest createManifest()
     {
-        Manifest manifest = new Manifest();
+        Manifest manifest = null;
+        
+        try
+        {
+            // Construct a string version of a manifest
+            StringBuffer sbuf = new StringBuffer();
+
+            sbuf.append("Manifest-Version: 1.0\n");
+
+            sbuf.append("Created-By: Apache Maven\n");
+
+            sbuf.append("Built-By: " + System.getProperty("user.name") + "\n");
+
+            // Convert the string to a input stream
+            InputStream is = new ByteArrayInputStream(sbuf.toString().getBytes("UTF-8"));
+
+            // Create the manifest
+            manifest = new Manifest(is);
+        }
+        catch ( IOException e )
+        {
+            manifest = new Manifest();
+        }
 
         return manifest;
     }
