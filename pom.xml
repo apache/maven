@@ -31,8 +31,8 @@
   </ciManagement>
     
   <scm>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components/</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components/</developerConnection>
+    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components</developerConnection>
     <url>http://cvs.apache.org/viewcvs.cgi/maven-components/</url>
   </scm>
 
