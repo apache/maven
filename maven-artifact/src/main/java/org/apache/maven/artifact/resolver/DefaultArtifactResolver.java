@@ -16,12 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// ArtifactSourceReader to ArtifactMetadataReader
-// Possibly give the resolver the metadata reader
-// resolver.setMetadataReader( foo )
-// resolver.setRepositories( Set )
-// resolveTransitively instead of parameter
-
 public class DefaultArtifactResolver
     extends AbstractArtifactComponent
     implements ArtifactResolver
@@ -56,26 +50,27 @@ public class DefaultArtifactResolver
         }
         catch ( TransferFailedException e )
         {
-            throw new ArtifactResolutionException( artifactNotFound( artifact,
-                                                                     remoteRepositories,
-                                                                     localRepository ), e );
+            throw new ArtifactResolutionException( artifactNotFound( artifact, remoteRepositories ), e );
         }
 
         return artifact;
     }
 
-    private String artifactNotFound( Artifact artifact,
-                                     Set remoteRepositories,
-                                     ArtifactRepository localRepository )
+    private String LS = System.getProperty( "line.separator" );
+
+    private String artifactNotFound( Artifact artifact, Set remoteRepositories )
     {
         StringBuffer sb = new StringBuffer();
 
         sb.append( "The artifact is not present locally as:" )
-            .append( "\n" )
+            .append( LS )
+            .append( LS )
             .append( artifact.getPath() )
-            .append( "\n" )
+            .append( LS )
+            .append( LS )
             .append( "or in any of the specified remote repositories:" )
-            .append( "\n" );
+            .append( LS )
+            .append( LS );
 
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
