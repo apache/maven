@@ -169,13 +169,12 @@ public class DefaultArtifact
 
     public String getId()
     {
-        return getConflictId() + ":" + getVersion();
+        return getConflictId() + ( hasClassifier() ? ( ":" + getClassifier() ) : "" ) + ":" + getVersion();
     }
 
     public String getConflictId()
     {
-        return getGroupId() + ":" + getArtifactId() + ":" + getType()
-            + ( hasClassifier() ? ( ":" + getClassifier() ) : "" );
+        return getGroupId() + ":" + getArtifactId() + ":" + getType();
     }
 
     // ----------------------------------------------------------------------
