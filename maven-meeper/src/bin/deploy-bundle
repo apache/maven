@@ -36,11 +36,11 @@ cp $BUNDLE $WORKDIR
     fi
   fi
 
-  artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<artifactId>' | sed -e 's#^.*<artifactId>##;s#</artifactId>.*$##'`
+  artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<contributors>.*</contributors>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<artifactId>' | sed -e 's#^.*<artifactId>##;s#</artifactId>.*$##'`
 
   if [ -z $artifactId ]
   then
-    artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<developers>.*</developers>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<id>' | sed -e 's#^.*<id>##;s#</id>.*$##'`
+    artifactId=`cat ${POM} | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<developers>.*</developers>##' | sed 's#<dependencies>.*</dependencies>##' | sed 's#<contributors>.*</contributors>##' | grep '<id>' | sed -e 's#^.*<id>##;s#</id>.*$##'`
   fi
   
   groupId=`cat ${POM} | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<groupId>' | sed -e 's#^.*<groupId>##;s#</groupId>.*$##'`  
