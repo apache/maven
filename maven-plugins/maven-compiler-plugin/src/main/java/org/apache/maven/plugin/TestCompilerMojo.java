@@ -7,6 +7,8 @@ package org.apache.maven.plugin;
  *
  * @description Compiles test sources
  *
+ * @requiresDependencyResolution
+ *
  * @parameter
  *  name="compileSourceRootsList"
  *  type="java.util.List"
@@ -24,10 +26,10 @@ package org.apache.maven.plugin;
  *  description=""
  * @parameter
  *  name="classpathElements"
- *  type="String[]"
+ *  type="List"
  *  required="true"
  *  validator=""
- *  expression="#project.classpathElements"
+ *  expression="#project.testClasspathElements"
  *  description=""
  * @parameter
  *  name="debug"

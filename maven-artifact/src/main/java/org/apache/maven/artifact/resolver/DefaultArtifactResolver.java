@@ -2,13 +2,13 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation;
 import org.apache.maven.wagon.TransferFailedException;
 
 import java.util.HashMap;
@@ -187,11 +187,11 @@ public class DefaultArtifactResolver
     //
     // ----------------------------------------------------------------------
 
-    protected ArtifactResolutionResult collect( Set artifacts,
-                                                ArtifactRepository localRepository,
-                                                Set remoteRepositories,
-                                                ArtifactMetadataSource source,
-                                                ArtifactFilter filter )
+    private ArtifactResolutionResult collect( Set artifacts,
+                                              ArtifactRepository localRepository,
+                                              Set remoteRepositories,
+                                              ArtifactMetadataSource source,
+                                              ArtifactFilter filter )
         throws TransitiveArtifactResolutionException
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
@@ -242,6 +242,7 @@ public class DefaultArtifactResolver
 
                     try
                     {
+                        // TODO: need to convert scope compile -> runtime using scope handler
                         referencedDependencies = source.retrieve( newArtifact, localRepository, remoteRepositories );
                     }
                     catch ( ArtifactMetadataRetrievalException e )

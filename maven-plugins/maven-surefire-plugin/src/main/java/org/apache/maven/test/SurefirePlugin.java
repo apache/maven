@@ -1,18 +1,15 @@
 package org.apache.maven.test;
 
-import org.codehaus.surefire.SurefireBooter;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
+import org.codehaus.surefire.SurefireBooter;
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
-import java.lang.reflect.Array;
 
 /**
  * @goal test
@@ -71,7 +68,7 @@ import java.lang.reflect.Array;
  *  type="String[]"
  *  required="true"
  *  validator=""
- *  expression="#project.classpathElements"
+ *  expression="#project.testClasspathElements"
  *  description=""
  * @parameter
  *  name="reportsDirectory"
@@ -112,7 +109,7 @@ public class SurefirePlugin
 
         String testClassesDirectory = (String) request.getParameter( "testClassesDirectory" );
 
-        String[] classpathElements = (String[]) request.getParameter( "classpathElements" );
+        List testClasspathElements = (List) request.getParameter( "classpathElements" );
 
         String reportsDirectory = (String) request.getParameter( "reportsDirectory" );
 
@@ -171,12 +168,9 @@ public class SurefirePlugin
 
         surefireBooter.addClassPathUrl( new File( testClassesDirectory ).getPath() );
 
-        for ( int i = 0; i < classpathElements.length; i++ )
+        for ( Iterator i = testClasspathElements.iterator(); i.hasNext(); )
         {
-            if(classpathElements[i] != null)
-            {
-                surefireBooter.addClassPathUrl( classpathElements[i] );
-            }
+            surefireBooter.addClassPathUrl( (String) i.next() );
         }
 
         surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReporter" );

@@ -209,35 +209,51 @@ public class MavenProject
         return list;
     }
 
-    /* TODO: remove - should be using a type handler - is being used by introspection in plugins. */
-    public String[] getClasspathElements()
+    public List getCompileClasspathElements()
     {
-        int size = getArtifacts().size();
+        List list = new ArrayList( getArtifacts().size() );
 
-        String[] classpathElements = new String[size + 1];
-
-        int i = 0;
-
-        for ( Iterator it = getArtifacts().iterator(); it.hasNext(); )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
-            Artifact artifact = (Artifact) it.next();
+            Artifact a = (Artifact) i.next();
 
-            if ( isAddedToClasspath( artifact ) )
+            // TODO: let the scope handler deal with this
+            if ( a.getScope() == null || "compile".equals( a.getScope() ) )
             {
-                classpathElements[i++] = artifact.getPath();
+                list.add( a.getPath() );
             }
         }
-
-        classpathElements[i] = getBuild().getOutput();
-
-        return classpathElements;
+        return list;
     }
 
-    public boolean isAddedToClasspath( Artifact artifact )
+    public List getTestClasspathElements()
     {
-        String type = artifact.getType().trim();
+        List list = new ArrayList( getArtifacts().size() + 1 );
 
-        if ( type.equals( "jar" ) || type.equals( "ejb" ) || type.equals( "test" ) )
+        list.add( getBuild().getOutput() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            if ( isAddedToClasspath( a ) )
+            {
+                // TODO: let the scope handler deal with this
+                if ( a.getScope() == null || "test".equals( a.getScope() ) || "compile".equals( a.getScope() ) || "runtime".equals( a.getScope() ) )
+                {
+                    list.add( a.getPath() );
+                }
+            }
+        }
+        return list;
+    }
+
+    private static boolean isAddedToClasspath( Artifact artifact )
+    {
+        String type = artifact.getType();
+
+        // TODO: utilise type handler
+        if ( "jar".equals( type ) || "ejb".equals( type ) )
         {
             return true;
         }

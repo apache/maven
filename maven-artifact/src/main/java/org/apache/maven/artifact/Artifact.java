@@ -26,6 +26,8 @@ public interface Artifact
 
     String getVersion();
 
+    String getScope();
+
     String getType();
 
     String getExtension();

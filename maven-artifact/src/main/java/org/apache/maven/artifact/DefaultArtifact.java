@@ -37,26 +37,37 @@ public class DefaultArtifact
 
     private String type;
 
+    private String scope;
+
     private String extension;
 
     private String path;
 
-    public DefaultArtifact( String groupId, String artifactId, String version, String type, String extension )
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type, 
+                            String extension )
     {
         this.groupId = groupId;
-
         this.artifactId = artifactId;
-
         this.version = version;
-
         this.type = type;
-
+        this.scope = scope;
         this.extension = extension;
+    }
+
+    /** @todo this should be replaced by type handler */
+    public DefaultArtifact( String groupId, String artifactId, String version, String type, String extension )
+    {
+        this( groupId, artifactId, version, null, type, extension );
     }
 
     public DefaultArtifact( String groupId, String artifactId, String version, String type )
     {
         this( groupId, artifactId, version, type, type );
+    }
+
+    public String getScope()
+    {
+        return scope;
     }
 
     public String getGroupId()

@@ -7,7 +7,6 @@ import org.codehaus.plexus.compiler.javac.JavacCompiler;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,10 +35,10 @@ import java.util.List;
  *
  * @parameter
  *  name="classpathElements"
- *  type="String[]"
+ *  type="List"
  *  required="true"
  *  validator=""
- *  expression="#project.classpathElements"
+ *  expression="#project.compileClasspathElements"
  *  description=""
  *
  * @parameter
@@ -73,7 +72,7 @@ public class CompilerMojo
 
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
-        String[] classpathElements = (String[]) request.getParameter( "classpathElements" );
+        List classpathElements = (List) request.getParameter( "classpathElements" );
 
         // ----------------------------------------------------------------------
         //
@@ -88,7 +87,7 @@ public class CompilerMojo
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
         
         compilerConfiguration.setOutputLocation(outputDirectory);
-        compilerConfiguration.setClasspathEntries(Arrays.asList(classpathElements));
+        compilerConfiguration.setClasspathEntries( classpathElements );
         compilerConfiguration.setSourceLocations( compileSourceRootsList );
         
         /* Compile with debugging info */
@@ -106,11 +105,12 @@ public class CompilerMojo
 
         if ( debug )
         {
-            for ( int i = 0; i < classpathElements.length; i++ )
+            for ( Iterator i = classpathElements.iterator(); i.hasNext(); )
             {
                 String message;
 
-                if ( new File( classpathElements[i] ).exists() )
+                String classpathElement = (String) i.next();
+                if ( new File( classpathElement ).exists() )
                 {
                     message = "present in repository.";
                 }
@@ -119,8 +119,7 @@ public class CompilerMojo
                     message = "Warning! not present in repository!";
                 }
 
-//                System.out.println( "classpathElements[ "+ i +" ] = " + classpathElements[i] + ": " + message );
-                request.getLog().debug( "classpathElements[ "+ i +" ] = " + classpathElements[i] + ": " + message );
+                request.getLog().debug( "classpathElements[ "+ i +" ] = " + classpathElement + ": " + message );
             }
         }
 

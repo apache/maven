@@ -51,6 +51,8 @@ public class DefaultArtifactFactory
         Artifact artifact = new DefaultArtifact( dependency.getGroupId(),
                                                  dependency.getArtifactId(),
                                                  dependency.getVersion(),
+                                                 dependency.getScope(),
+                                                 dependency.getType(),
                                                  dependency.getType() );
 
         return artifact;
