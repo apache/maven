@@ -27,8 +27,11 @@
   </dependencies>
   <build>
     <unitTest>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
       <excludes>
-        <exclude>**/ResourcesPluginTest.java</exclude>
+        <exclude>**/ResourcesMojoTest.java</exclude>
       </excludes>
     </unitTest>
   </build>
