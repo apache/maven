@@ -611,7 +611,16 @@ public class MBoot
 
         if ( reader.getUnitTests() != null )
         {
-            includes = reader.getUnitTests().getIncludes();
+            if ( reader.getUnitTests().getIncludes().size() != 0 )
+            {
+                includes = reader.getUnitTests().getIncludes();
+            }
+            else
+            {
+                includes = new ArrayList();
+
+                includes.add( "**/*Test.java" );
+            }
 
             excludes = reader.getUnitTests().getExcludes();
         }
