@@ -147,10 +147,16 @@ BUILD_REQUIRED=`cat $HOME_DIR/build_required`
 ## Build the verifier
 
 ( 
+  echo
+  
+  echo "Building the verifier ..."
+  
+  echo
+  
   cd $DIR/maven-components/maven-core-it-verifier
   
   mboot
-)
+) >> log 2>&1
 
 (
   cd $DIR/maven-components/maven-core-it
