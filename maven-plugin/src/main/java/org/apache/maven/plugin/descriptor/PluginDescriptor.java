@@ -16,6 +16,7 @@ package org.apache.maven.plugin.descriptor;
  * limitations under the License.
  */
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,6 +41,10 @@ public class PluginDescriptor
     {
         return mojos;
     }
+    
+    public void setMojos(List mojos) {
+        this.mojos = new LinkedList(mojos);
+    }
 
     public String getId()
     {
@@ -58,6 +63,10 @@ public class PluginDescriptor
     public List getDependencies()
     {
         return dependencies;
+    }
+    
+    public void setDependencies(List dependencies) {
+        this.dependencies = new LinkedList(dependencies);
     }
 
     public boolean isIsolatedRealm()
