@@ -46,7 +46,7 @@ public class MBoot
     {
         "junit/jars/junit-3.8.1.jar",
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
-//        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
+        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
         "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
@@ -62,7 +62,7 @@ public class MBoot
         "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
         "plexus/jars/plexus-0.17-SNAPSHOT.jar",
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
-//        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
+        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
         "xpp3/jars/xpp3-1.1.3.3.jar",
@@ -125,6 +125,8 @@ public class MBoot
     private static final String TEST_CLASSES = BUILD_DIR + "/test-classes";
 
     private static final String GENERATED_SOURCES = BUILD_DIR + "/generated-sources";
+
+    private static final String GENERATED_DOCS = BUILD_DIR + "/generated-docs";
 
     // ----------------------------------------------------------------------
     // Per-session entities which we can reuse while building many projects.
@@ -422,6 +424,8 @@ public class MBoot
 
         String generatedSources = new File( basedir, GENERATED_SOURCES ).getAbsolutePath();
 
+        String generatedDocs = new File( basedir, GENERATED_DOCS ).getAbsolutePath();
+
         File buildDirFile = new File( basedir, BUILD_DIR );
         String buildDir = buildDirFile.getAbsolutePath();
 
@@ -457,6 +461,13 @@ public class MBoot
                 generatedSourcesDirectory.mkdirs();
             }
 
+            File generatedDocsDirectory = new File( basedir, GENERATED_DOCS );
+
+            if ( !generatedDocsDirectory.exists() )
+            {
+                generatedDocsDirectory.mkdirs();
+            }
+
             generateSources( model.getAbsolutePath(), "java", generatedSources, "4.0.0", "false" );
 
             generateSources( model.getAbsolutePath(), "java", generatedSources, "3.0.0", "true" );
@@ -468,6 +479,10 @@ public class MBoot
             generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, "4.0.0", "false" );
 
             generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, "3.0.0", "true" );
+
+            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, "4.0.0", "false" );
+
+            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, "3.0.0", "true" );
         }
 
         // ----------------------------------------------------------------------
