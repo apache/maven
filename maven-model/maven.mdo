@@ -1,0 +1,558 @@
+<model>
+  <name>Maven</name>
+  <description>the description</description>
+  <packageName>org.apache.maven.model</packageName>
+  <classes>
+    <class>
+      <name>Model</name>
+      <fields>
+        <field>
+          <name>extend</name>
+          <description>The model you wish this model to extend.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>modelVersion</name>
+          <description>The version of this model.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>name</name>
+          <description>Human readable name of the project.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>shortDescription</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>description</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>type</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>logo</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>issueTrackingUrl</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>inceptionYear</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>gumpRepositoryId</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>siteAddress</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>siteDirectory</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <!-- This naming is inconsistent -->
+        <field>
+          <name>distributionSite</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distributionDirectory</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>mailingLists</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>developers</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>contributors</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>dependencies</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>licenses</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>versions</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>branches</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>packageGroups</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>reports</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>versionMap</name>
+          <description>the description</description>
+          <type>java.util.Map</type>
+          <defaultValue>new HashMap()</defaultValue>
+        </field>
+        <field>
+          <name>repository</name>
+          <description>the description</description>
+          <type>Repository</type>
+        </field>
+        <field>
+          <name>build</name>
+          <description>the description</description>
+          <type>Build</type>
+        </field>
+        <field>
+          <name>organization</name>
+          <description>the description</description>
+          <type>Organization</type>
+        </field>
+      </fields>
+      <!-- We need this because we can't use package as a field name. -->
+      <code>
+        private String packageName;
+
+        public void setPackage(String packageName)
+        {
+            this.packageName = packageName;
+        }
+
+        public String getPackage()
+        {
+            return packageName;
+        }
+
+        public String getId()
+        {
+            StringBuffer id = new StringBuffer();
+            id.append( getGroupId() );
+            id.append( ":" );
+            id.append( getArtifactId() );
+            id.append( ":" );
+            id.append( getType() );
+            return id.toString();
+        }
+
+        public void setId( String id )
+        {
+            int i = id.indexOf( "+" );
+            int j = id.indexOf( ":" );
+
+            if ( i > 0 )
+            {
+                setGroupId( id.substring( 0, i ) );
+                setArtifactId( id.replace( '+', '-' ) );
+            }
+            else if ( j > 0 )
+            {
+                setGroupId( id.substring( 0, j ) );
+                setArtifactId( id.substring( j + 1 ) );
+            }
+            else
+            {
+                setGroupId( id );
+                setArtifactId( id );
+            }
+        }
+      </code>
+    </class>
+    <class>
+      <name>Branch</name>
+      <fields>
+        <field>
+          <name>tag</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Build</name>
+      <fields>
+        <field>
+          <name>nagEmailAddress</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>sourceDirectory</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>unitTestSourceDirectory</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>aspectSourceDirectory</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>sourceModifications</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>unitTest</name>
+          <description>the description</description>
+          <type>UnitTest</type>
+          <defaultValue>new UnitTest()</defaultValue>
+        </field>
+        <field>
+          <name>resources</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Contributor</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>email</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>organization</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>roles</name>
+          <description>the description</description>
+          <type>java.util.SortedSet</type>
+          <defaultValue>new TreeSet()</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Dependency</name>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifact</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>type</name>
+          <description>The type of dependency.</description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+        <field>
+          <name>properties</name>
+          <description>Properties for this dependency.</description>
+          <type>java.util.Properties</type>
+          <defaultValue>new Properties()</defaultValue>
+        </field>
+      </fields>
+      <code>
+        public String getId()
+        {
+            return groupId + ":" + artifactId;
+        }
+      </code>
+    </class>
+    <class>
+      <superClass>Contributor</superClass>
+      <name>Developer</name>
+      <fields>
+        <field>
+          <name>id</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>License</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distribution</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>comments</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>MailingList</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>subscribe</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>unsubscribe</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>archive</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Organization</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>logo</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PackageGroup</name>
+      <fields>
+        <field>
+          <name>title</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>packages</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PatternSet</name>
+      <fields>
+        <field>
+          <name>includes</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+        <field>
+          <name>excludes</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Repository</name>
+      <fields>
+        <field>
+          <name>connection</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>developerConnection</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Resource</name>
+      <superClass>PatternSet</superClass>
+      <fields>
+        <field>
+          <name>directory</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>targetPath</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>filtering</name>
+          <description>the description</description>
+          <type>boolean</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>SourceModification</name>
+      <superClass>Resource</superClass>
+      <fields>
+        <field>
+          <name>className</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>property</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>UnitTest</name>
+      <superClass>PatternSet</superClass>
+      <fields>
+        <field>
+          <name>resources</name>
+          <description>the description</description>
+          <type>java.util.List</type>
+          <defaultValue>new ArrayList()</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Version</name>
+      <fields>
+        <field>
+          <name>name</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>tag</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>id</name>
+          <description>the description</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>

@@ -1,0 +1,9 @@
+*.log
+target
+.classpath
+.project
+default.lst
+test.out
+default.ajsym
+*.ipr
+*.iws
