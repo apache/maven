@@ -23,9 +23,14 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.embed.Embedder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
@@ -40,6 +45,10 @@ public class ResourcesMojoTest
     private static final String TEST_DIRECTORY = "target/tests/test-data";
     private static final String OUTPUT_DIRECTORY = "target/tests/output";
 
+    private static final String RESOURCE_COPY_TEST_KEYSTORE = "resourceCopyTest.jks";
+    
+    private byte[] testFileData;
+    
     public ResourcesMojoTest( String s )
     {
         super( s );
@@ -58,6 +67,12 @@ public class ResourcesMojoTest
         w.println( ":local:/cvs/root" );
         w.close();
 
+        this.testFileData = "This is a test".getBytes("MS949");
+
+        FileOutputStream outstream = new FileOutputStream( new File( basedir, TEST_DIRECTORY + "/test.bin" ) );
+        outstream.write(testFileData);
+        outstream.close();
+
         w = new PrintWriter( new FileWriter( new File( basedir, TEST_DIRECTORY + "/test.txt" ) ) );
         w.println( "test data" );
         w.close();
@@ -67,6 +82,8 @@ public class ResourcesMojoTest
         f.delete();
         f.getParentFile().delete();
         f = new File( basedir, OUTPUT_DIRECTORY + "/test.txt" );
+        f.delete();
+        f = new File( basedir, OUTPUT_DIRECTORY + "/test.bin" );
         f.delete();
         f.getParentFile().delete();
     }
@@ -95,6 +112,8 @@ public class ResourcesMojoTest
         assertTrue( "sanity check creation of CVS file " + f, f.exists() );
         f = new File( directory, "test.txt" );
         assertTrue( "sanity check creation of file " + f, f.exists() );
+        f = new File( directory, "test.bin" );
+        assertTrue( "sanity check creation of binary file " + f, f.exists() );
 
         Resource r = new Resource();
         r.setDirectory( TEST_DIRECTORY );
@@ -116,5 +135,23 @@ public class ResourcesMojoTest
         assertFalse( "check no creation of CVS directory " + f, f.getParentFile().exists() );
         f = new File( basedir + "/" + OUTPUT_DIRECTORY, "test.txt" );
         assertTrue( "check creation of resource " + f, f.exists() );
+        
+        f = new File( basedir + "/" + OUTPUT_DIRECTORY, "test.bin" );
+        assertTrue( "check creation of binary resource " + f, f.exists() );
+        
+        FileInputStream testInput = new FileInputStream(f);
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int read = -1;
+        byte[] buffer = new byte[512];
+        
+        while((read = testInput.read(buffer)) > -1)
+        {
+            baos.write(buffer, 0, read);
+        }
+        testInput.close();
+        
+        assertTrue(Arrays.equals(testFileData, baos.toByteArray()));
+        fail("Sanity check!");
     }
 }
