@@ -25,5 +25,11 @@
       <artifactId>maven-artifact</artifactId>
       <version>2.0-SNAPSHOT</version>
     </dependency>
+    <!-- for the benefit of mboot... -->
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>
