@@ -710,7 +710,8 @@ public class MavenProject
                                                                                     existing.getVersion(),
                                                                                     a.getScope(), existing.getType() );
 
-                    artifact.setFile( existing.getFile() );
+                    // TODO: should copy files if it is set
+//                    artifact.setFile( existing.getFile() );
 
                     artifacts.put( id, artifact );
                 }

@@ -31,6 +31,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
+import java.io.File;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Set;
@@ -70,6 +71,7 @@ public class ProjectClasspathArtifactResolver
     public Artifact resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
+        artifact.setFile( new File( "dummy" ) );
         return artifact;
     }
 
