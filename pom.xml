@@ -82,4 +82,11 @@
       <url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url>
     </repository>
   </distributionManagement>
+  <modules>
+    <module>maven-artifact</module>
+    <module>maven-model</module>
+    <module>maven-monitor</module>
+    <module>maven-core</module>
+    <module>maven-settings</module>
+  </modules>
 </project>
