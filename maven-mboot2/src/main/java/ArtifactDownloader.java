@@ -31,16 +31,12 @@ public class ArtifactDownloader
 
     private String proxyPassword;
 
-    public ArtifactDownloader( Properties properties ) throws Exception
+    public ArtifactDownloader( Properties properties )
+        throws Exception
     {
         setRemoteRepo( properties.getProperty( "maven.repo.remote" ) );
 
         String mavenRepoLocalProperty = properties.getProperty( "maven.repo.local" );
-
-        if ( mavenRepoLocalProperty == null )
-        {
-            mavenRepoLocalProperty = System.getProperty( "user.home" ) + "/.maven/repository";
-        }
 
         mavenRepoLocal = new File( mavenRepoLocalProperty );
 
@@ -61,19 +57,7 @@ public class ArtifactDownloader
             System.exit( 1 );
         }
 
-        writeFile( "bootstrap.repo", mavenRepoLocal.getPath() );
-
         System.out.println( "Using the following for your maven.repo.local: " + mavenRepoLocal );
-    }
-
-    private void writeFile( String name, String contents )
-        throws Exception
-    {
-        Writer writer = new FileWriter( name );
-
-        writer.write( contents );
-
-        writer.close();
     }
 
     public File getMavenRepoLocal()

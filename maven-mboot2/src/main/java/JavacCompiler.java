@@ -25,6 +25,13 @@ public class JavacCompiler
     public List compile( String[] classpathElements, String[] sourceDirectories, String destinationDirectory )
         throws Exception
     {
+        /*
+        for ( int i = 0; i < classpathElements.length; i++ )
+        {
+            System.out.println( "classpathElement = " + classpathElements[i] );
+        }
+        */
+
         File destinationDir = new File( destinationDirectory );
 
         if ( !destinationDir.exists() )

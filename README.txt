@@ -14,3 +14,5 @@ java -jar mboot.jar
 
 Should do the trick to produce a working installation of Maven
 in ${maven.home}.
+
+NOTE: You must run these instructions from this directory!

@@ -120,11 +120,31 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
+        File mavenPropertiesFile =  new File( System.getProperty( "user.home" ), "maven.properties" );
+
+        if ( !mavenPropertiesFile.exists() )
+        {
+            System.out.println( "You must have a ~/maven.properties file and must contain the following entries:" );
+
+            System.out.println( "maven.home = /path/to/m2/installtion" );
+
+            System.out.println( "maven.repo.local = /path/to/m2/repository" );
+
+            System.exit( 1 );
+        }
+
         Date fullStop;
 
         Date fullStart = new Date();
 
-        properties = loadProperties( new File( System.getProperty( "user.home" ), "build.properties" ) );
+        properties = loadProperties( mavenPropertiesFile );
+
+        for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
+        {
+            String key = (String) i.next();
+
+            properties.setProperty( key, StringUtils.interpolate( properties.getProperty(key), System.getProperties() ) );
+        }
 
         downloader = new ArtifactDownloader( properties );
 
@@ -136,16 +156,11 @@ public class MBoot
 
         checkMBootDeps();
 
-        if ( !reader.parse( new File( basedir, "pom.xml" ) ) )
-        {
-            System.err.println( "Could not parse pom.xml" );
+        // Install maven-components POM
+        installPomFile( repoLocal,  new File( basedir, "pom.xml" ) );
 
-            System.exit( 1 );
-        }
-
-        installPom( basedir, repoLocal );
-
-        reader.reset();
+        // Install plugin-parent POM
+        installPomFile( repoLocal,  new File( basedir, "maven-plugins/pom.xml" ) );
 
         for ( int i = 0; i < builds.length; i++ )
         {
@@ -179,9 +194,7 @@ public class MBoot
         }
         else
         {
-            mavenHome = System.getProperty( "M2_HOME" );
-
-            System.out.println( "mavenHome = " + mavenHome );
+            mavenHome = properties.getProperty( "maven.home" );
 
             if ( mavenHome == null )
             {
@@ -518,6 +531,31 @@ public class MBoot
         jarMojo.execute( new File( classes ), buildDir, artifactId + "-" + version );
     }
 
+    private void installPomFile( String repoLocal, File pomIn )
+        throws Exception
+    {
+        if ( !reader.parse( pomIn ) )
+        {
+            System.err.println( "Could not parse pom.xml" );
+
+            System.exit( 1 );
+        }
+
+        String artifactId = reader.artifactId;
+
+        String version = reader.version;
+
+        String groupId = reader.groupId;
+
+        File pom = new File( repoLocal, "/" + groupId + "/poms/" + artifactId + "-" + version + ".pom" );
+
+        System.out.println( "Installing POM: " + pom );
+
+        FileUtils.copyFile( pomIn, pom );
+
+        reader.reset();
+    }
+
     private void installPom( String basedir, String repoLocal )
         throws Exception
     {
@@ -543,8 +581,11 @@ public class MBoot
 
         String groupId = reader.groupId;
 
-        FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + artifactId + "-" + version + ".jar" ),
-                            new File( repoLocal, "/" + groupId + "/jars/" + artifactId + "-" + version + ".jar" ) );
+        File jar = new File( repoLocal, "/" + groupId + "/jars/" + artifactId + "-" + version + ".jar" );
+
+        System.out.println( "Installing JAR: " + jar );
+
+        FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + artifactId + "-" + version + ".jar" ), jar );
     }
 
     private void runTests( String basedir, String classes, String testClasses )
