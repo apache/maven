@@ -109,6 +109,14 @@ public class MBoot
 
     private IsolatedClassLoader bootstrapClassLoader;
 
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
+    private static final String SCOPE_TEST = "test";
+
+    private static final String SCOPE_COMPILE = "compile";
+
+    private static final String SCOPE_RUNTIME = "runtime";
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -463,13 +471,9 @@ public class MBoot
         System.out.println( "Cleaning " + buildDirFile + "..." );
         FileUtils.forceDelete( buildDirFile );
 
-        // ----------------------------------------------------------------------
-        // Download bootstrapDeps
-        // ----------------------------------------------------------------------
-
         if ( online )
         {
-            System.out.println( "Downloading dependencies ..." );
+            System.out.println( "Downloading project dependencies ..." );
 
             downloader.downloadDependencies( reader.getDependencies() );
         }
@@ -534,11 +538,11 @@ public class MBoot
 
         if ( new File( generatedSources ).exists() )
         {
-            compile( reader.getDependencies(), sources, classes, null, generatedSources );
+            compile( reader.getDependencies(), sources, classes, null, generatedSources, SCOPE_COMPILE );
         }
         else
         {
-            compile( reader.getDependencies(), sources, classes, null, null );
+            compile( reader.getDependencies(), sources, classes, null, null, SCOPE_COMPILE );
         }
 
         // ----------------------------------------------------------------------
@@ -569,17 +573,7 @@ public class MBoot
 
         List testDependencies = reader.getDependencies();
 
-        Dependency junitDep = new Dependency();
-
-        junitDep.setGroupId( "junit" );
-
-        junitDep.setArtifactId( "junit" );
-
-        junitDep.setVersion( "3.8.1" );
-
-        testDependencies.add( junitDep );
-
-        compile( testDependencies, testSources, testClasses, classes, null );
+        compile( testDependencies, testSources, testClasses, classes, null, SCOPE_TEST );
 
         // ----------------------------------------------------------------------
         // Test resources
@@ -629,9 +623,9 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency + ( !online
-                                                                                         ? "; run again online"
-                                                                                         : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException(
+                    "Missing dependency: " + dependency +
+                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -681,7 +675,7 @@ public class MBoot
             downloader.downloadDependencies( dependencies );
         }
 
-        IsolatedClassLoader modelloClassLoader = new IsolatedClassLoader();
+        IsolatedClassLoader cl = new IsolatedClassLoader();
 
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
@@ -694,10 +688,10 @@ public class MBoot
                 throw new FileNotFoundException( "Missing dependency: " + dependency + msg );
             }
 
-            modelloClassLoader.addURL( f.toURL() );
+            cl.addURL( f.toURL() );
         }
 
-        return modelloClassLoader;
+        return cl;
     }
 
     private void createJar( String classes, String buildDir, ModelReader reader )
@@ -797,8 +791,9 @@ public class MBoot
 
         String reportsDir = new File( basedir, "target/surefire-reports" ).getAbsolutePath();
 
-        boolean success = testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes,
-                                              classpath( reader.getDependencies(), null ), reportsDir );
+        String[] cp = (String[]) classpath( reader.getDependencies(), null, SCOPE_TEST ).toArray( EMPTY_STRING_ARRAY );
+        boolean success = testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes, cp,
+                                              reportsDir );
 
         if ( !success )
         {
@@ -810,24 +805,43 @@ public class MBoot
     // Compile
     // ----------------------------------------------------------------------
 
-    private String[] classpath( List dependencies, String extraClasspath )
+    private List classpath( List dependencies, String extraClasspath, String scope )
     {
-        String classpath[] = new String[dependencies.size() + 1];
+        List classpath = new ArrayList( dependencies.size() + 1 );
 
         for ( int i = 0; i < dependencies.size(); i++ )
         {
             Dependency d = (Dependency) dependencies.get( i );
 
-            classpath[i] = repoLocal + "/" + d.getRepositoryPath();
+            String element = repoLocal + "/" + d.getRepositoryPath();
+
+            if ( SCOPE_COMPILE.equals( scope ) )
+            {
+                if ( d.getScope().equals( SCOPE_COMPILE ) )
+                {
+                    classpath.add( element );
+                }
+            }
+            else if ( SCOPE_RUNTIME.equals( scope ) )
+            {
+                if ( d.getScope().equals( SCOPE_COMPILE ) || d.getScope().equals( SCOPE_RUNTIME ) )
+                {
+                    classpath.add( element );
+                }
+            }
+            else if ( SCOPE_TEST.equals( scope ) )
+            {
+                classpath.add( element );
+            }
         }
 
-        classpath[classpath.length - 1] = extraClasspath;
+        classpath.add( extraClasspath );
 
         return classpath;
     }
 
     private void compile( List dependencies, String sourceDirectory, String outputDirectory, String extraClasspath,
-                          String generatedSources )
+                          String generatedSources, String scope )
         throws Exception
     {
         JavacCompiler compiler = new JavacCompiler();
@@ -861,7 +875,7 @@ public class MBoot
             CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
             compilerConfiguration.setOutputLocation( outputDirectory );
-            compilerConfiguration.setClasspathEntries( Arrays.asList( classpath( dependencies, extraClasspath ) ) );
+            compilerConfiguration.setClasspathEntries( classpath( dependencies, extraClasspath, scope ) );
             compilerConfiguration.setSourceLocations( Arrays.asList( sourceDirectories ) );
 
             /* Compile with debugging info */

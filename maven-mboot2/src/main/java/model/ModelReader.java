@@ -242,6 +242,10 @@ public class ModelReader
             {
                 currentDependency.setArtifactId( getBodyText() );
             }
+            else if ( rawName.equals( "scope" ) )
+            {
+                currentDependency.setScope( getBodyText() );
+            }
         }
         else if ( insideResource )
         {

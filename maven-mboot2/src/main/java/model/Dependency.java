@@ -37,6 +37,8 @@ public class Dependency
 
     private String type = "jar";
 
+    private String scope = "compile";
+
     public Dependency()
     {
     }
@@ -143,6 +145,16 @@ public class Dependency
     public String getJar()
     {
         return jar;
+    }
+
+    public String getScope()
+    {
+        return scope;
+    }
+
+    public void setScope( String scope )
+    {
+        this.scope = scope;
     }
 
     public void setUrl( String url )
