@@ -255,12 +255,12 @@
           <!-- 14 -->
           <phase>
             <id>install</id>
-            <goal>jar:install</goal>
+            <goal>install:install</goal>
           </phase>
           <!-- 15 -->
           <phase>
             <id>deploy</id>
-            <goal>jar:deploy</goal>
+            <goal>deploy:deploy</goal>
           </phase>
         </phases>
         <!-- END SNIPPET: lifecycle -->
