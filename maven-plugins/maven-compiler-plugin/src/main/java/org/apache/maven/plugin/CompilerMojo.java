@@ -57,6 +57,8 @@ import java.util.List;
  * expression="#maven.compiler.debug"
  * description="Whether to include debugging information in the compiled class files; the default value is false"
  * @todo change debug parameter type to Boolean
+ * @parameter name="source" type="String" required="false" expression="#source" validator="" description="The -source argument for the Java compiler"
+ * @parameter name="target" type="String" required="false" expression="#target" validator="" description="The -target argument for the Java compiler"
  */
 
 public class CompilerMojo
@@ -95,6 +97,18 @@ public class CompilerMojo
         compilerConfiguration.setOutputLocation( outputDirectory );
         compilerConfiguration.setClasspathEntries( classpathElements );
         compilerConfiguration.setSourceLocations( compileSourceRoots );
+
+        String source = ( String ) request.getParameter( "source" );
+        if ( source != null )
+        {
+            compilerConfiguration.addCompilerOption( "-source", source );
+        }
+        
+        String target = ( String ) request.getParameter( "target" );
+        if ( target != null )
+        {
+            compilerConfiguration.addCompilerOption( "-target", target );
+        }
         
         /* Compile with debugging info */
         String debugAsString = (String) request.getParameter( "debug" );
