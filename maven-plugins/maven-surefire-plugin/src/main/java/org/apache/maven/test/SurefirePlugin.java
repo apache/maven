@@ -16,11 +16,6 @@ import java.util.StringTokenizer;
  *
  * @description Run tests using surefire
  *
- * @prereq compiler:compile
- * @prereq compiler:testCompile
- * @prereq resources:resources
- * @prereq resources:testResources
- *
  * @parameter
  *  name="mavenRepoLocal"
  *  type="String"
@@ -181,7 +176,7 @@ public class SurefirePlugin
 
         if ( !success )
         {
-            response.setExecutionFailure( true, new SurefireFailureResponse( null ) );
+            response.setExecutionFailure( new SurefireFailureResponse( null ) );
         }
     }
 
