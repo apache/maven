@@ -1,11 +1,4 @@
 
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -19,11 +12,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 public class Bootstrapper
 {
     private ArtifactDownloader downloader;
 
     private BootstrapPomParser bootstrapPomParser;
+
+    private int pomVersion;
 
     private List dependencies;
 
@@ -48,7 +52,11 @@ public class Bootstrapper
 
         bootstrapPomParser = new BootstrapPomParser();
 
-        bootstrapPomParser.parse( new File( "project.xml" ) );
+        if( ! bootstrapPomParser.parse( new File( "project.xml" ) ) )
+        {
+            System.err.println( "Could not parse project.xml" );
+            System.exit( 1 );
+        }
 
         dependencies = bootstrapPomParser.getDependencies();
 
@@ -377,6 +385,12 @@ public class Bootstrapper
     class BootstrapPomParser
         extends DefaultHandler
     {
+        private String parentGroupId;
+
+        private String parentArtifactId;
+
+        private String parentVersion;
+
         private List dependencies = new ArrayList();
 
         private UnitTests unitTests;
@@ -388,6 +402,8 @@ public class Bootstrapper
         private Resource currentResource;
 
         private SAXParserFactory saxFactory;
+
+        private boolean insideParent = false;
 
         private boolean insideDependency = false;
 
@@ -414,7 +430,7 @@ public class Bootstrapper
             return resources;
         }
 
-        public void parse( File file )
+        public boolean parse( File file )
         {
             this.file = file;
 
@@ -427,16 +443,24 @@ public class Bootstrapper
                 InputSource is = new InputSource( new FileInputStream( file ) );
 
                 parser.parse( is, this );
+
+                return true;
             }
             catch ( Exception e )
             {
                 e.printStackTrace();
+
+                return false;
             }
         }
 
         public void startElement( String uri, String localName, String rawName, Attributes attributes )
         {
-            if ( rawName.equals( "unitTest" ) )
+            if ( rawName.equals( "parent" ) )
+            {
+                insideParent = true;
+            }
+            else if ( rawName.equals( "unitTest" ) )
             {
                 unitTests = new UnitTests();
 
@@ -467,22 +491,45 @@ public class Bootstrapper
         }
 
         public void endElement( String uri, String localName, String rawName )
+            throws SAXException
         {
-            if ( rawName.equals( "extend" ) )
+            if ( rawName.equals( "parent" ) )
             {
-                String extend = interpolate( getBodyText(), properties );
+                File f;
 
-                File f = new File( file.getParentFile(), extend );
+                // support both v3 <extend> and v4 <parent>
+                if( getBodyText() == null )
+                {
+                    String extend = interpolate( getBodyText(), properties );
+
+                    f = new File( file.getParentFile(), extend );
+                }
+                else
+                {
+                    if ( parentArtifactId == null || parentArtifactId.trim().length() == 0 )
+                        throw new SAXException( "Missing required element in <parent>: artifactId." );
+
+                    if ( parentGroupId == null || parentGroupId.trim().length() == 0 )
+                        throw new SAXException( "Missing required element in <parent>: groupId." );
+
+                    if ( parentVersion == null || parentVersion.trim().length() == 0 )
+                        throw new SAXException( "Missing required element in <parent>: version." );
+
+                    f = new File( downloader.getMavenRepoLocal(), parentGroupId + "/poms/" + parentArtifactId + "-" + parentVersion + ".pom" );
+                }
 
                 BootstrapPomParser p = new BootstrapPomParser();
 
-                p.parse( f );
+                if ( ! p.parse( f ) )
+                    throw new SAXException( "Could not parse parent project.xml" );
 
                 dependencies.addAll( p.getDependencies() );
 
                 unitTests = p.getUnitTests();
 
                 resources.addAll( p.getResources() );
+
+                insideParent = false;
             }
             else if ( rawName.equals( "unitTest" ) )
             {
@@ -506,6 +553,21 @@ public class Bootstrapper
                 }
 
                 insideResource = false;
+            }
+            else if ( insideParent )
+            {
+                if ( rawName.equals( "groupId" ) )
+                {
+                    parentGroupId = getBodyText();
+                }
+                else if ( rawName.equals( "artifactId" ) )
+                {
+                    parentArtifactId = getBodyText();
+                }
+                else if ( rawName.equals( "version" ) )
+                {
+                    parentVersion = getBodyText();
+                }
             }
             else if ( insideDependency )
             {

@@ -4,7 +4,7 @@ VERSION=1.0
 
 usage () 
 {
-  echo "usage: `basename $0` [--dir=<directory>] [--jar=<name>] [--leave-boot-files] [--version] [--help]" >&2
+  echo "usage: `basename $0` [--dir=<directory>] [--jar=<name>] [--install] [--pom-install] [-v] [--leave-boot-files] [--version] [--help]" >&2
   echo "" >&2
   echo "       (ex: `basename $0` --dir=../builds/plexus --jar=plexus.jar)" >&2
   exit 1
@@ -14,6 +14,7 @@ dir="."
 jar="default"
 leaveBootFiles="0"
 install="0"
+pomInstall="0"
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -49,6 +50,9 @@ while [ $# -gt 0 ]; do
 	--install)
 	    install=1;
 	    ;;
+	--pom-install)
+	    pomInstall=1;
+	    ;;
     esac
 
     shift
@@ -62,4 +66,4 @@ export MBOOT_HOME=`dirname $0`
 
 [ ! -f $dir/project.xml ] && echo "No project.xml in specified directory!" && exit
 
-buildMavenProject $dir $jar $install $leaveBootFiles
+buildMavenProject $dir $jar $install $pomInstall $leaveBootFiles

@@ -35,14 +35,14 @@ while [ $# -gt 0 ]; do
 		shift
 	    fi		    
 	    ;;
-	--model-version*)
-	    if echo $1 | grep -q '=' ; then
-	    	model_version=`echo $1 | sed 's/^--model-version=//'`
-	    else
-		model_version=$2
-		shift
-	    fi		    
-	    ;;
+#	--model-version*)
+#	    if echo $1 | grep -q '=' ; then
+#	    	model_version=`echo $1 | sed 's/^--model-version=//'`
+#	    else
+#		model_version=$2
+#		shift
+#	    fi		    
+#	    ;;
 	--model*)
 	    if echo $1 | grep -q '=' ; then
 	    	model=`echo $1 | sed 's/^--model=//'`
@@ -80,4 +80,5 @@ if $cygwin; then
   CP=`cygpath -pw "$CP"`
 fi
 
-java -classpath "$CP" org.codehaus.modello.Modello $model $mode "$dir" $model_version
+java -classpath "$CP" org.codehaus.modello.Modello $model $mode "$dir"
+# $model_version
