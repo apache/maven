@@ -18,8 +18,9 @@ package org.apache.maven.plugin.ejb;
 
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.jar.Manifest;
 
 import java.io.File;
 
@@ -49,7 +50,7 @@ import java.io.File;
  * expression="#maven.ejb.index"
  * default="false"
  * description=""
- * @parameter name="package"
+ * @parameter name="packageName"
  * type="String"
  * required="false"
  * validator=""
@@ -110,27 +111,60 @@ import java.io.File;
 public class EjbMojo
     extends AbstractPlugin
 {
+    // TODO: will null work instead?
+    private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
+
+    private static final String[] DEFAULT_EXCLUDES = new String[]{"**/*Bean.class", "**/*CMP.class",
+                                                                  "**/*Session.class", "**/package.html"};
+
+    /**
+     * @todo File instead
+     */
+    private String basedir;
+
+    private String outputDirectory;
+
+    private String jarName;
+
+    /**
+     * @todo boolean instead
+     */
+    private String generateClient;
+
+    private MavenProject project;
+
+    private String mainClass;
+
+    private String packageName;
+
+    private String manifest;
+
+    /**
+     * @todo boolean instead
+     */
+    private String addClasspath;
+
+    /**
+     * @todo boolean instead
+     */
+    private String addExtensions;
+
+    /**
+     * @todo boolean instead
+     */
+    private String index;
+
+    /**
+     * @todo boolean instead
+     */
+    private String compress;
+
     /**
      * @todo Add license files in META-INF directory.
      */
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
+    public void execute()
+        throws PluginExecutionException
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        File basedir = new File( (String) request.getParameter( "basedir" ) );
-
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        String jarName = (String) request.getParameter( "jarName" );
-
-        boolean generateClient = new Boolean( (String) request.getParameter( "generateClient" ) ).booleanValue();
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
         getLog().info( "Building ejb " + jarName );
 
         File jarFile = new File( basedir, jarName + ".jar" );
@@ -141,35 +175,50 @@ public class EjbMojo
 
         String ejbJarXmlFile = "META-INF/ejb-jar.xml";
 
-        archiver.getArchiver().addDirectory( new File( outputDirectory ), new String[] { "**/**" },
-                                             new String[] { ejbJarXmlFile, "**/package.html" } );
-
-        archiver.getArchiver().addFile( new File( outputDirectory, ejbJarXmlFile ), ejbJarXmlFile );
-
-        // create archive
-        archiver.createArchive( request );
-
-        if ( generateClient )
+        try
         {
-            getLog().info( "Building ejb client " + jarName + "-client" );
+            archiver.getArchiver().addDirectory( new File( outputDirectory ), DEFAULT_INCLUDES,
+                                                 new String[]{ejbJarXmlFile, "**/package.html"} );
 
-            File clientJarFile = new File( basedir, jarName + "-client.jar" );
-
-            MavenArchiver clientArchiver = new MavenArchiver();
-
-            clientArchiver.setOutputFile( jarFile );
-
-            clientArchiver.getArchiver().addDirectory(
-                                                       new File( outputDirectory ),
-                                                       new String[] { "**/**" },
-                                                       new String[] {
-                                                           "**/*Bean.class",
-                                                           "**/*CMP.class",
-                                                           "**/*Session.class",
-                                                           "**/package.html" } );
+            archiver.getArchiver().addFile( new File( outputDirectory, ejbJarXmlFile ), ejbJarXmlFile );
 
             // create archive
-            clientArchiver.createArchive( request );
+            Manifest configuredManifest = archiver.getManifest( project, mainClass, packageName,
+                                                                convertBoolean( addClasspath ),
+                                                                convertBoolean( addExtensions ) );
+            archiver.createArchive( project, manifest, convertBoolean( compress ), convertBoolean( index ),
+                                    configuredManifest );
+
+            if ( convertBoolean( generateClient ) )
+            {
+                getLog().info( "Building ejb client " + jarName + "-client" );
+
+                File clientJarFile = new File( basedir, jarName + "-client.jar" );
+
+                MavenArchiver clientArchiver = new MavenArchiver();
+
+                clientArchiver.setOutputFile( clientJarFile );
+
+                clientArchiver.getArchiver().addDirectory( new File( outputDirectory ), DEFAULT_INCLUDES,
+                                                           DEFAULT_EXCLUDES );
+
+                // create archive
+                configuredManifest =
+                    clientArchiver.getManifest( project, mainClass, packageName, convertBoolean( addClasspath ),
+                                                convertBoolean( addExtensions ) );
+                clientArchiver.createArchive( project, manifest, convertBoolean( compress ), convertBoolean( index ),
+                                              configuredManifest );
+            }
         }
+        catch ( Exception e )
+        {
+            // TODO: improve error handling
+            throw new PluginExecutionException( "Error assembling EJB", e );
+        }
+    }
+
+    private static boolean convertBoolean( String s )
+    {
+        return new Boolean( s ).booleanValue();
     }
 }

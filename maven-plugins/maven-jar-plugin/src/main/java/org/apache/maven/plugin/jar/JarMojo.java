@@ -18,8 +18,9 @@ package org.apache.maven.plugin.jar;
 
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.jar.Manifest;
 
 import java.io.File;
 
@@ -49,7 +50,7 @@ import java.io.File;
  * expression="#maven.jar.index"
  * default="false"
  * description=""
- * @parameter name="package"
+ * @parameter name="packageName"
  * type="String"
  * required="false"
  * validator=""
@@ -104,35 +105,78 @@ public class JarMojo
     extends AbstractPlugin
 {
     /**
+     * @todo File
+     */
+    private String basedir;
+
+    private String jarName;
+
+    private String outputDirectory;
+
+    private static final String[] DEFAULT_EXCLUDES = new String[]{"**/package.html"};
+
+    private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
+
+    private MavenProject project;
+
+    private String manifest;
+
+    private String mainClass;
+
+    private String packageName;
+
+    /**
+     * @todo boolean instead
+     */
+    private String addClasspath;
+
+    /**
+     * @todo boolean instead
+     */
+    private String addExtensions;
+
+    /**
+     * @todo boolean instead
+     */
+    private String index;
+
+    /**
+     * @todo boolean instead
+     */
+    private String compress;
+
+    /**
      * @todo Add license files in META-INF directory.
      */
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute()
+        throws PluginExecutionException
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        File basedir = new File( (String) request.getParameter( "basedir" ) );
-
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        String jarName = (String) request.getParameter( "jarName" );
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
         File jarFile = new File( basedir, jarName + ".jar" );
 
         MavenArchiver archiver = new MavenArchiver();
 
         archiver.setOutputFile( jarFile );
 
-        archiver.getArchiver().addDirectory( new File( outputDirectory ), new String[]{"**/**"},
-                                             new String[]{"**/package.html"} );
+        try
+        {
+            archiver.getArchiver().addDirectory( new File( outputDirectory ), DEFAULT_INCLUDES, DEFAULT_EXCLUDES );
 
-        // create archive
-        archiver.createArchive( request );
+            // create archive
+            Manifest configuredManifest = archiver.getManifest( project, mainClass, packageName,
+                                                                convertBoolean( addClasspath ),
+                                                                convertBoolean( addExtensions ) );
+            archiver.createArchive( project, manifest, convertBoolean( compress ), convertBoolean( index ),
+                                    configuredManifest );
+        }
+        catch ( Exception e )
+        {
+            // TODO: improve error handling
+            throw new PluginExecutionException( "Error assembling EJB", e );
+        }
+    }
+
+    private static boolean convertBoolean( String s )
+    {
+        return Boolean.valueOf( s ).booleanValue();
     }
 }

@@ -19,9 +19,11 @@ package org.apache.maven.plugin.war;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.jar.Manifest;
+import org.codehaus.plexus.archiver.jar.ManifestException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -56,7 +58,7 @@ import java.util.Set;
  * expression="#maven.jar.index"
  * default="false"
  * description=""
- * @parameter name="package"
+ * @parameter name="packageName"
  * type="String"
  * required="false"
  * validator=""
@@ -144,21 +146,34 @@ import java.util.Set;
 public class WarMojo
     extends AbstractPlugin
 {
-    public static final String WEB_INF = "WEB-INF";
+    private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
 
-    private PluginExecutionRequest request;
+    private static final String[] DEFAULT_EXCLUDES = new String[]{"**/WEB-INF/web.xml"};
+
+    public static final String WEB_INF = "WEB-INF";
 
     private String mode;
 
     private MavenProject project;
 
-    private File classesDirectory;
+    private String basedir;
+
+    /**
+     * @todo File
+     */
+    private String classesDirectory;
 
     private String outputDirectory;
 
-    private File webappDirectory;
+    /**
+     * @todo File
+     */
+    private String webappDirectory;
 
-    private File warSourceDirectory;
+    /**
+     * @todo File
+     */
+    private String warSourceDirectory;
 
     private String warSourceIncludes;
 
@@ -166,7 +181,33 @@ public class WarMojo
 
     private String webXml;
 
-    private File warFile;
+    private String warName;
+
+    private String mainClass;
+
+    private String packageName;
+
+    private String manifest;
+
+    /**
+     * @todo boolean instead
+     */
+    private String addClasspath;
+
+    /**
+     * @todo boolean instead
+     */
+    private String addExtensions;
+
+    /**
+     * @todo boolean instead
+     */
+    private String index;
+
+    /**
+     * @todo boolean instead
+     */
+    private String compress;
 
     public void copyResources( File sourceDirectory, File webappDirectory, String includes, String excludes,
                                String webXml )
@@ -176,7 +217,7 @@ public class WarMojo
         {
             getLog().info( "Copy webapp resources to " + webappDirectory.getAbsolutePath() );
 
-            if ( warSourceDirectory.exists() )
+            if ( new File( warSourceDirectory ).exists() )
             {
                 //TODO : Use includes and excludes
                 FileUtils.copyDirectoryStructure( sourceDirectory, webappDirectory );
@@ -195,7 +236,7 @@ public class WarMojo
     public void buildWebapp( MavenProject project )
         throws IOException
     {
-        getLog().info( "Assembling webapp " + project.getArtifactId() + " in " + webappDirectory.getAbsolutePath() );
+        getLog().info( "Assembling webapp " + project.getArtifactId() + " in " + webappDirectory );
 
         File libDirectory = new File( webappDirectory, WEB_INF + "/lib" );
 
@@ -203,6 +244,7 @@ public class WarMojo
 
         File webappClassesDirectory = new File( webappDirectory, WEB_INF + "/classes" );
 
+        File classesDirectory = new File( this.classesDirectory );
         if ( classesDirectory.exists() )
         {
             FileUtils.copyDirectoryStructure( classesDirectory, webappClassesDirectory );
@@ -228,13 +270,14 @@ public class WarMojo
     public void generateExplodedWebapp()
         throws IOException
     {
+        File webappDirectory = new File( this.webappDirectory );
         webappDirectory.mkdirs();
 
         File webinfDir = new File( webappDirectory, WEB_INF );
 
         webinfDir.mkdirs();
 
-        copyResources( warSourceDirectory, webappDirectory, warSourceIncludes, warSourceExcludes, webXml );
+        copyResources( new File( warSourceDirectory ), webappDirectory, warSourceIncludes, warSourceExcludes, webXml );
 
         buildWebapp( project );
     }
@@ -247,19 +290,25 @@ public class WarMojo
         generateExplodedWebapp();
     }
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute()
+        throws PluginExecutionException
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
+        File warFile = new File( outputDirectory, warName + ".war" );
 
-        parseRequest( request );
+        try
+        {
+            performPackaging( warFile );
+        }
+        catch ( Exception e )
+        {
+            // TODO: improve error handling
+            throw new PluginExecutionException( "Error assembling EJB", e );
+        }
+    }
 
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
+    private void performPackaging( File warFile )
+        throws IOException, ArchiverException, ManifestException
+    {
         if ( "inplace".equals( mode ) )
         {
             generateInPlaceWebapp();
@@ -281,38 +330,22 @@ public class WarMojo
 
                 archiver.setOutputFile( warFile );
 
-                warArchiver.addDirectory( webappDirectory, new String[]{"**/**"}, new String[]{"**/WEB-INF/web.xml"} );
+                warArchiver.addDirectory( new File( webappDirectory ), DEFAULT_INCLUDES, DEFAULT_EXCLUDES );
 
                 warArchiver.setWebxml( new File( webappDirectory, "WEB-INF/web.xml" ) );
 
                 // create archive
-                archiver.createArchive( request );
+                Manifest configuredManifest = archiver.getManifest( project, mainClass, packageName,
+                                                                    convertBoolean( addClasspath ),
+                                                                    convertBoolean( addExtensions ) );
+                archiver.createArchive( project, manifest, convertBoolean( compress ), convertBoolean( index ),
+                                        configuredManifest );
             }
         }
     }
 
-    public void parseRequest( PluginExecutionRequest request )
+    private static boolean convertBoolean( String s )
     {
-        this.request = request;
-
-        project = (MavenProject) request.getParameter( "project" );
-
-        classesDirectory = new File( (String) request.getParameter( "classesDirectory" ) );
-
-        outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        webappDirectory = new File( (String) request.getParameter( "webappDirectory" ) );
-
-        warSourceDirectory = new File( (String) request.getParameter( "warSourceDirectory" ) );
-
-        warSourceIncludes = (String) request.getParameter( "warSourceIncludes" );
-
-        warSourceExcludes = (String) request.getParameter( "warSourceExcludes" );
-
-        webXml = (String) request.getParameter( "webXml" );
-
-        mode = (String) request.getParameter( "mode" );
-
-        warFile = new File( outputDirectory, (String) request.getParameter( "warName" ) + ".war" );
+        return Boolean.valueOf( s ).booleanValue();
     }
 }

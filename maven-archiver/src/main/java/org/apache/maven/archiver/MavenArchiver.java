@@ -1,62 +1,53 @@
 package org.apache.maven.archiver;
 
-/* ====================================================================
- *   Copyright 2001-2005 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
+import org.codehaus.plexus.archiver.jar.ManifestException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
+ * @todo improve the use of this now that plugin fields are used instead of a request object - add an <archive> element to configuration?
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Revision$ $Date$
  */
 public class MavenArchiver
 {
-    JarArchiver archiver = new JarArchiver();
+    private JarArchiver archiver = new JarArchiver();
 
-    File archiveFile;
+    private File archiveFile;
 
     /**
      * Return a pre-configured manifest
      *
      * @todo Add user attributes list and user groups list
      */
-    public Manifest getManifest( PluginExecutionRequest request )
-        throws Exception
+    public Manifest getManifest( MavenProject project, String mainClass, String packageName, boolean addClasspath,
+                                 boolean addExtensions )
+        throws ManifestException
     {
-        MavenProject project = (MavenProject) request.getParameter( "project" );
-
-        String mainClass = (String) request.getParameter( "mainClass" );
-
-        String packageName = (String) request.getParameter( "package" );
-
-        boolean addClasspath = new Boolean( (String) request.getParameter( "addClasspath" ) ).booleanValue();
-
-        boolean addExtensions = new Boolean( (String) request.getParameter( "addExtensions" ) ).booleanValue();
-
         // Added basic entries
         Manifest m = new Manifest();
         Manifest.Attribute buildAttr = new Manifest.Attribute( "Built-By", System.getProperty( "user.name" ) );
@@ -88,7 +79,7 @@ public class MavenArchiver
                         classpath.append( " " );
                     }
 
-                    classpath.append( artifact.getArtifactId() + "-" + artifact.getVersion() + ".jar");
+                    classpath.append( artifact.getArtifactId() + "-" + artifact.getVersion() + ".jar" );
                 }
             }
 
@@ -168,13 +159,13 @@ public class MavenArchiver
                                                                                  "-Extension-Name",
                                                                                  artifact.getArtifactId() );
                     m.addConfiguredAttribute( archExtNameAttr );
-                    Manifest.Attribute archImplVersionAttr = new Manifest.Attribute( artifact.getArtifactId() +
-                                                                                     "-Implementation-Version",
-                                                                                     artifact.getVersion() );
+                    String name = artifact.getArtifactId() + "-Implementation-Version";
+                    Manifest.Attribute archImplVersionAttr = new Manifest.Attribute( name, artifact.getVersion() );
                     m.addConfiguredAttribute( archImplVersionAttr );
-                    Manifest.Attribute archImplUrlAttr = new Manifest.Attribute( artifact.getArtifactId() +
-                                                                                 "-Implementation-URL", "http://www.ibiblio.org/maven/" +
-                                                                                                        artifact.toString() );
+                    // TODO: make repo configurable
+                    name = artifact.getArtifactId() + "-Implementation-URL";
+                    String url = "http://www.ibiblio.org/maven/" + artifact.toString();
+                    Manifest.Attribute archImplUrlAttr = new Manifest.Attribute( name, url );
                     m.addConfiguredAttribute( archImplUrlAttr );
                 }
             }
@@ -198,35 +189,23 @@ public class MavenArchiver
         archiveFile = outputFile;
     }
 
-    public void createArchive( PluginExecutionRequest request )
-        throws Exception
+    public void createArchive( MavenProject project, String manifestFile, boolean compress, boolean index,
+                               Manifest manifest )
+        throws ArchiverException, ManifestException, IOException
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        MavenProject project = (MavenProject) request.getParameter( "project" );
-
-        String manifest = (String) request.getParameter( "manifest" );
-
-        boolean compress = new Boolean( (String) request.getParameter( "compress" ) ).booleanValue();
-
-        boolean index = new Boolean( (String) request.getParameter( "index" ) ).booleanValue();
-
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
         archiver.addFile( project.getFile(), "META-INF/maven/pom.xml" );
 
-        if ( manifest != null && !"".equals( manifest ) )
+        if ( manifestFile != null && !"".equals( manifestFile ) )
         {
-            File manifestFile = new File( manifest );
-            archiver.setManifest( manifestFile );
+            archiver.setManifest( new File( manifestFile ) );
         }
 
         // Configure the jar
-        archiver.addConfiguredManifest( getManifest( request ) );
+        archiver.addConfiguredManifest( manifest );
 
         archiver.setCompress( compress );
         archiver.setIndex( index );
