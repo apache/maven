@@ -159,6 +159,12 @@ public class DefaultModelInheritanceAssembler
             }
         }
 
+        // ciManagement
+        if ( child.getCiManagement() == null )
+        {
+            child.setCiManagement( parent.getCiManagement() );
+        }
+
         // developers
         if ( child.getDevelopers().size() == 0 )
         {
