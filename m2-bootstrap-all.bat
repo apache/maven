@@ -115,7 +115,7 @@ cd ..
 
 echo Rebuilding maven2 plugins
 cd maven-plugins
-m2 clean:clean install
+call m2 clean:clean install
 cd ..
 
 echo Running integration tests
