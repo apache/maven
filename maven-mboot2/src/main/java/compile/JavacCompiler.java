@@ -68,11 +68,6 @@ public class JavacCompiler
 
         List args = new ArrayList( sources.length + 5 + compilerOptions.size() * 2 );
 
-        if ( config.isDebug() )
-        {
-            args.add( "-g" );
-        }
-
         args.add( "-d" );
 
         args.add( destinationDir.getAbsolutePath() );
@@ -82,6 +77,11 @@ public class JavacCompiler
         args.add( "-classpath" );
 
         args.add( getClasspathString( config.getClasspathEntries() ) );
+
+        if ( config.isDebug() )
+        {
+            args.add( "-g" );
+        }
 
         Iterator it = compilerOptions.entrySet().iterator();
 
@@ -116,12 +116,13 @@ public class JavacCompiler
 
         Boolean ok = (Boolean) compile.invoke( compiler, new Object[] { args.toArray( new String[0] ) } );
 
-        if ( !ok.booleanValue() )
-        {
-            throw new Exception( "Failure executing javac: \n\n'javac " + args + "'\n\n" + err.toString() );
-        }
-
         List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
+
+        if ( !ok.booleanValue() && messages.isEmpty() )
+        {
+            // TODO: don't throw exception
+            throw new Exception( "Failure executing javac, but could not parse the error:\n\n" + err.toString() );
+        }
 
         return messages;
     }
@@ -147,10 +148,18 @@ public class JavacCompiler
                     return errors;
                 }
 
-                buffer.append( line );
+                if ( buffer.length() == 0 && line.startsWith( "error: " ) )
+                {
+                    errors.add( new CompilerError( line ) );
+                }
+                else
+                {
+                    buffer.append( line );
 
-                buffer.append( '\n' );
-            } while ( !line.endsWith( "^" ) );
+                    buffer.append( '\n' );
+                }
+            }
+            while ( !line.endsWith( "^" ) );
 
             // add the error bean
             errors.add( parseModernError( buffer.toString() ) );
@@ -187,7 +196,7 @@ public class JavacCompiler
                 endcolumn = context.length();
             }
 
-            return new CompilerError( file, false, line, startcolumn, line, endcolumn, message );
+            return new CompilerError( file, true, line, startcolumn, line, endcolumn, message );
         }
         catch ( NoSuchElementException nse )
         {
