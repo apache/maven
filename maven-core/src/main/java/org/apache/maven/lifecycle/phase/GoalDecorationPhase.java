@@ -19,7 +19,7 @@ package org.apache.maven.lifecycle.phase;
 import org.apache.maven.decoration.GoalDecorationParser;
 import org.apache.maven.decoration.GoalDecoratorBindings;
 import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -40,7 +40,7 @@ public class GoalDecorationPhase extends AbstractMavenLifecyclePhase
     private GoalDecoratorBindings decorators;
     private boolean decoratorsInitialized = false;
 
-    public void execute( MavenLifecycleContext context )
+    public void execute( MavenGoalExecutionContext context )
         throws Exception
     {
         synchronized ( this )
@@ -54,7 +54,7 @@ public class GoalDecorationPhase extends AbstractMavenLifecyclePhase
         context.setGoalDecoratorBindings(decorators);
     }
 
-    private void initializeDecorators( MavenLifecycleContext context )
+    private void initializeDecorators( MavenGoalExecutionContext context )
         throws XmlPullParserException, IOException
     {
         MavenProject project = context.getProject(  );

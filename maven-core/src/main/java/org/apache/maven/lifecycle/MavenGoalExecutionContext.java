@@ -18,7 +18,7 @@ import java.util.Set;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class MavenLifecycleContext
+public class MavenGoalExecutionContext
 {
     private String failedGoal;
 
@@ -44,7 +44,7 @@ public class MavenLifecycleContext
 
     private String goalName;
 
-    public MavenLifecycleContext( PlexusContainer container,
+    public MavenGoalExecutionContext( PlexusContainer container,
                                   MavenProject project,
                                   MojoDescriptor goal,
                                   ArtifactRepository localRepository )

@@ -2,7 +2,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
@@ -19,7 +19,7 @@ public class OgnlProjectValueExtractorTest
 
     private MavenProjectBuilder builder;
 
-    private MavenLifecycleContext context;
+    private MavenGoalExecutionContext context;
 
     protected void setUp()
         throws Exception
@@ -34,7 +34,7 @@ public class OgnlProjectValueExtractorTest
 
         project.setProperty( "foo", "bar" );
 
-        context = new MavenLifecycleContext( getContainer(), project, null, new ArtifactRepository( "foo", "http://bar" ) );
+        context = new MavenGoalExecutionContext( getContainer(), project, null, new ArtifactRepository( "foo", "http://bar" ) );
     }
 
     public void testPropertyValueExtraction()

@@ -17,7 +17,7 @@ package org.apache.maven.lifecycle.phase;
  */
 
 import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.plugin.OgnlProjectValueExtractor;
 import org.apache.maven.plugin.Plugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
@@ -37,7 +37,7 @@ import java.util.Map;
 public class GoalAttainmentPhase
     extends AbstractMavenLifecyclePhase
 {
-    public void execute( MavenLifecycleContext context )
+    public void execute( MavenGoalExecutionContext context )
         throws Exception
     {
         PluginExecutionResponse response;
@@ -82,7 +82,7 @@ public class GoalAttainmentPhase
         }
     }
 
-    private Map createParameters( MojoDescriptor goal, MavenLifecycleContext context )
+    private Map createParameters( MojoDescriptor goal, MavenGoalExecutionContext context )
     {
         Map map = null;
 
@@ -115,7 +115,7 @@ public class GoalAttainmentPhase
         return map;
     }
 
-    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request, MavenLifecycleContext context )
+    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request, MavenGoalExecutionContext context )
     {
         if ( request != null && request.getParameters() != null )
         {

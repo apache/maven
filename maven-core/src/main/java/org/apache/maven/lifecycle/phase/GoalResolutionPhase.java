@@ -21,7 +21,7 @@ import org.apache.maven.GoalNotFoundException;
 import org.apache.maven.decoration.GoalDecorator;
 import org.apache.maven.decoration.GoalDecoratorBindings;
 import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
@@ -38,7 +38,7 @@ import java.util.Set;
  */
 public class GoalResolutionPhase extends AbstractMavenLifecyclePhase
 {
-    public void execute( MavenLifecycleContext context )
+    public void execute( MavenGoalExecutionContext context )
         throws Exception
     {
         PluginManager pluginManager = null;
@@ -65,7 +65,7 @@ public class GoalResolutionPhase extends AbstractMavenLifecyclePhase
         }
     }
 
-    private List resolveTopLevel( String goal, Set includedGoals, List results, MavenLifecycleContext context, PluginManager pluginManager )
+    private List resolveTopLevel( String goal, Set includedGoals, List results, MavenGoalExecutionContext context, PluginManager pluginManager )
     {
 
         // Retrieve the prereqs-driven execution path for this goal, using the DAG.
@@ -77,7 +77,7 @@ public class GoalResolutionPhase extends AbstractMavenLifecyclePhase
         return resolveWithPrereqs( work, includedGoals, results, context, pluginManager );
     }
 
-    private List resolveWithPrereqs( List work, Set includedGoals, List results, MavenLifecycleContext context, PluginManager pluginManager )
+    private List resolveWithPrereqs( List work, Set includedGoals, List results, MavenGoalExecutionContext context, PluginManager pluginManager )
     {
         if ( !work.isEmpty() )
         {
@@ -109,7 +109,7 @@ public class GoalResolutionPhase extends AbstractMavenLifecyclePhase
         return results;
     }
 
-    private List resolveGoalDecorators( List preGoals, Set includedGoals, List results, MavenLifecycleContext context, PluginManager pluginManager )
+    private List resolveGoalDecorators( List preGoals, Set includedGoals, List results, MavenGoalExecutionContext context, PluginManager pluginManager )
     {
         for ( Iterator it = preGoals.iterator(); it.hasNext(); )
         {

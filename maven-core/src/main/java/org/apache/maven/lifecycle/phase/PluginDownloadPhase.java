@@ -17,7 +17,7 @@ package org.apache.maven.lifecycle.phase;
  */
 
 import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
@@ -34,7 +34,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 public class PluginDownloadPhase
     extends AbstractMavenLifecyclePhase
 {
-    public void execute( MavenLifecycleContext context )
+    public void execute( MavenGoalExecutionContext context )
         throws Exception
     {
         PluginManager pluginManager = (PluginManager) context.lookup( PluginManager.ROLE );

@@ -18,7 +18,7 @@ package org.apache.maven.plugin;
 
 import ognl.Ognl;
 import ognl.OgnlException;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
@@ -27,7 +27,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  */
 public class OgnlProjectValueExtractor
 {
-    public static Object evaluate( String expression, MavenLifecycleContext context )
+    public static Object evaluate( String expression, MavenGoalExecutionContext context )
     {
         Object value = null;
 

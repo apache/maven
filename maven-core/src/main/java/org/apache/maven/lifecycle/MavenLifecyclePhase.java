@@ -27,7 +27,7 @@ public interface MavenLifecyclePhase
 {
     String ROLE = MavenLifecyclePhase.class.getName();
 
-    void execute( MavenLifecycleContext context )
+    void execute( MavenGoalExecutionContext context )
         throws Exception;
 
     void enableLogging( Logger logger );

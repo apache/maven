@@ -17,7 +17,7 @@ package org.apache.maven;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.lifecycle.MavenLifecycleManager;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -105,13 +105,13 @@ public class DefaultMaven
             }
             */
 
-            MavenLifecycleContext context;
+            MavenGoalExecutionContext context;
 
             try
             {
                 //!! we may not know anything about the plugin at this point.
 
-                context = new MavenLifecycleContext( container,
+                context = new MavenGoalExecutionContext( container,
                                                      project,
                                                      getMojoDescriptor( goal ),
                                                      getLocalRepository() );

@@ -26,6 +26,6 @@ public abstract class AbstractMavenLifecyclePhase
     extends AbstractLogEnabled
     implements MavenLifecyclePhase
 {
-    public abstract void execute( MavenLifecycleContext context )
+    public abstract void execute( MavenGoalExecutionContext context )
         throws Exception;
 }

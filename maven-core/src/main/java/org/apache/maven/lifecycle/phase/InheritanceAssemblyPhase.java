@@ -17,7 +17,7 @@ package org.apache.maven.lifecycle.phase;
  */
 
 import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -26,7 +26,7 @@ import org.apache.maven.lifecycle.MavenLifecycleContext;
 public class InheritanceAssemblyPhase
     extends AbstractMavenLifecyclePhase
 {
-    public void execute( MavenLifecycleContext context )
+    public void execute( MavenGoalExecutionContext context )
         throws Exception
     {
     }

@@ -36,7 +36,7 @@ public class DefaultMavenLifecycleManager
         return lifecyclePhases;
     }
 
-    public void execute( MavenLifecycleContext context )
+    public void execute( MavenGoalExecutionContext context )
         throws Exception
     {
         for ( Iterator iterator = lifecyclePhases.iterator(); iterator.hasNext(); )

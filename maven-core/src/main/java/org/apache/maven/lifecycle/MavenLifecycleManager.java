@@ -26,7 +26,7 @@ public interface MavenLifecycleManager
 {
     String ROLE = MavenLifecycleManager.class.getName();
 
-    void execute( MavenLifecycleContext context )
+    void execute( MavenGoalExecutionContext context )
         throws Exception;
 
     List getLifecyclePhases();

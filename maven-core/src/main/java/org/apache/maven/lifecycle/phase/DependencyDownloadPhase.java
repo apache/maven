@@ -19,7 +19,7 @@ package org.apache.maven.lifecycle.phase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 
 import java.util.Iterator;
 
@@ -30,7 +30,7 @@ import java.util.Iterator;
 public class DependencyDownloadPhase
     extends AbstractMavenLifecyclePhase
 {
-    public void execute( MavenLifecycleContext context )
+    public void execute( MavenGoalExecutionContext context )
         throws Exception
     {
         ArtifactResolver artifactResolver = null;

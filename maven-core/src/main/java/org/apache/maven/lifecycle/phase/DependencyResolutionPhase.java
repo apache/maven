@@ -20,7 +20,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.lifecycle.AbstractMavenLifecyclePhase;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.project.MavenProject;
 
 import java.util.Iterator;
@@ -32,7 +32,7 @@ import java.util.Iterator;
 public class DependencyResolutionPhase
     extends AbstractMavenLifecyclePhase
 {
-    public void execute( MavenLifecycleContext context )
+    public void execute( MavenGoalExecutionContext context )
         throws Exception
     {
         for ( Iterator iterator = context.getResolvedGoals().iterator(); iterator.hasNext(); )
@@ -48,7 +48,7 @@ public class DependencyResolutionPhase
         }
     }
 
-    private void resolveTransitiveDependencies( MavenLifecycleContext context )
+    private void resolveTransitiveDependencies( MavenGoalExecutionContext context )
         throws Exception
     {
         ArtifactResolver artifactResolver = null;

@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.decoration.DefaultGoalDecorator;
 import org.apache.maven.decoration.GoalDecoratorBindings;
-import org.apache.maven.lifecycle.MavenLifecycleContext;
+import org.apache.maven.lifecycle.MavenGoalExecutionContext;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -292,7 +292,7 @@ public class GoalResolutionPhaseTest extends TestCase
 
         ArtifactRepository localRepository = new ArtifactRepository();
 
-         MavenLifecycleContext context = new MavenLifecycleContext( embedder.getContainer(),
+         MavenGoalExecutionContext context = new MavenGoalExecutionContext( embedder.getContainer(),
                                                                     project,
                                                                     descriptor,
                                                                     localRepository );
