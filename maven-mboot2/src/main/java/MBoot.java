@@ -142,13 +142,25 @@ public class MBoot
         File userPomFile = new File( System.getProperty( "user.home" ), ".m2/pom.xml" );
 
         reader = new ModelReader();
-        if ( !reader.parse( userPomFile ) )
+
+        if ( userPomFile.exists() && !reader.parse( userPomFile ) )
+        {
+            System.err.println( "Error reading user POM file" );
+
+            System.exit( 1 );
+        }
+
+        String mavenRepoLocal = System.getProperty( "maven.repo.local", reader.getLocal().getRepository() );
+
+        if ( mavenRepoLocal == null )
         {
             System.out.println( "You must have a ~/.m2/pom.xml file and must contain the following entries:" );
-            System.out.println( "<local>\n" );
-            System.out.println( "  <repository>/path/to/m2/repository</repository> (required)\n" );
-            System.out.println( "  <online>true</online> (optional)\n" );
+            System.out.println( "<local>" );
+            System.out.println( "  <repository>/path/to/m2/repository</repository> (required)" );
+            System.out.println( "  <online>true</online> (optional)" );
             System.out.println( "</local>" );
+            System.out.println();
+            System.out.println( "Alternatively, you can specify -Dmaven.repo.local=/path/to/m2/repository" );
 
             System.exit( 1 );
         }
@@ -183,8 +195,6 @@ public class MBoot
         {
             online = false;
         }
-
-        String mavenRepoLocal = System.getProperty( "maven.repo.local", reader.getLocal().getRepository() );
 
         downloader = new ArtifactDownloader( mavenRepoLocal, reader.getRemoteRepositories() );
 
