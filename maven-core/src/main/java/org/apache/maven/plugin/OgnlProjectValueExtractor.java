@@ -35,6 +35,8 @@ public class OgnlProjectValueExtractor
         {
             String role = expression.substring( 11 );
 
+            System.out.println( "role = " + role );
+
             try
             {
                 value = context.lookup( role );

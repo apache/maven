@@ -254,7 +254,8 @@ public class DefaultPluginManager
         }
     }
 
-    public void addPlugin( Artifact pluginArtifact ) throws Exception
+    public void addPlugin( Artifact pluginArtifact )
+        throws Exception
     {
         artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
 
@@ -268,12 +269,14 @@ public class DefaultPluginManager
             excludes );
     }
 
-    public void contextualize( Context context ) throws ContextException
+    public void contextualize( Context context )
+        throws ContextException
     {
         container = (ArtifactEnabledContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    public void initialize() throws Exception
+    public void initialize()
+        throws Exception
     {
         // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new HashSet();
