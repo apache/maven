@@ -1,3 +1,20 @@
+<!--
+ |
+ | o add specification element to a field, this would be more a technical description of
+ |   what is allowed in the field.
+ |
+ | o validators: there could be several levels of validation. Simple type validation could
+ |   be done with a regex, but we need inter-field validation and rules which could be
+ |   dealt with by something like drools.
+ |
+ | o i18n: would be good to be able to have names/descriptions/specifications
+ |   in as many languages as possible.
+ |
+ | o versioning of individual elements on the class level and the field level so that
+ |   different versions of the model can be output.
+ |
+ | o annotation mechanism so that changes to the model can be accurately tracked.
+ -->
 <model>
   <name>Maven</name>
   <description>the description</description>
