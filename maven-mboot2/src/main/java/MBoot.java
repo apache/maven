@@ -101,13 +101,13 @@ public class MBoot
 
     private static final String TEST_RESOURCES = "src/test/resources";
 
-    private static final String CLASSES = "target/classes";
-
-    private static final String TEST_CLASSES = "target/test-classes";
-
     private static final String BUILD_DIR = "target";
 
-    private static final String GENERATED_SOURCES = "target/generated-sources";
+    private static final String CLASSES = BUILD_DIR + "/classes";
+
+    private static final String TEST_CLASSES = BUILD_DIR + "/test-classes";
+
+    private static final String GENERATED_SOURCES = BUILD_DIR + "/generated-sources";
 
     // ----------------------------------------------------------------------
     // Per-session entities which we can reuse while building many projects.
@@ -397,7 +397,12 @@ public class MBoot
 
         String generatedSources = new File( basedir, GENERATED_SOURCES ).getAbsolutePath();
 
-        String buildDir = new File( basedir, BUILD_DIR ).getAbsolutePath();
+        File buildDirFile = new File( basedir, BUILD_DIR );
+        String buildDir = buildDirFile.getAbsolutePath();
+
+        // clean
+        System.out.println( "Cleaning " + buildDirFile + "..." );
+        FileUtils.forceDelete( buildDirFile );
 
         // ----------------------------------------------------------------------
         // Download deps
@@ -420,20 +425,20 @@ public class MBoot
         {
             System.out.println( "Model exists!" );
 
-            File generatedSourcesDirectory = new File( basedir, "target/generated-sources" );
+            File generatedSourcesDirectory = new File( basedir, GENERATED_SOURCES );
 
             if ( !generatedSourcesDirectory.exists() )
             {
                 generatedSourcesDirectory.mkdirs();
             }
 
-            generateSources( model.getAbsolutePath(), "java", generatedSourcesDirectory.getAbsolutePath(), "4.0.0", "false" );
+            generateSources( model.getAbsolutePath(), "java", generatedSources, "4.0.0", "false" );
 
-            generateSources( model.getAbsolutePath(), "java", generatedSourcesDirectory.getAbsolutePath(), "3.0.0", "true" );
+            generateSources( model.getAbsolutePath(), "java", generatedSources, "3.0.0", "true" );
 
-            generateSources( model.getAbsolutePath(), "xpp3", generatedSourcesDirectory.getAbsolutePath(), "4.0.0", "false" );
+            generateSources( model.getAbsolutePath(), "xpp3", generatedSources, "4.0.0", "false" );
 
-            generateSources( model.getAbsolutePath(), "xpp3", generatedSourcesDirectory.getAbsolutePath(), "3.0.0", "true" );
+            generateSources( model.getAbsolutePath(), "xpp3", generatedSources, "3.0.0", "true" );
         }
 
         // ----------------------------------------------------------------------
@@ -490,7 +495,7 @@ public class MBoot
 
         testDependencies.add( junitDep );
 
-        compile( testDependencies, testSources, testClasses, basedir + "/target/classes", null );
+        compile( testDependencies, testSources, testClasses, classes, null );
 
         // ----------------------------------------------------------------------
         // Test resources
