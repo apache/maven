@@ -301,6 +301,7 @@ public class Verifier
         allGoals.add( "clean:clean" );
         allGoals.addAll( goals );
 
+        int ret = 0;
         try 
         {
             String prevUserDir = System.getProperty( "user.dir" );
@@ -309,13 +310,20 @@ public class Verifier
             URL classWorldsUrl = new URL( "file:" + mavenHome + "/core/classworlds-1.1-SNAPSHOT.jar" );
             ClassLoader cl = URLClassLoader.newInstance( new URL[] { classWorldsUrl } );
             Class c = Class.forName( "org.codehaus.classworlds.Launcher", true, cl );
-            Method m = c.getMethod( "main", new Class[] { String[].class } );
-            m.invoke( null, new Object[] { allGoals.toArray( new String[0] ) } );
+            Method m = c.getMethod( "mainWithExitCode", new Class[] { String[].class } );
+            Object o = m.invoke( null, new Object[] { allGoals.toArray( new String[0] ) } );
             System.setProperty( "user.dir", prevUserDir );
+            ret = ( ( Integer ) o ).intValue();
         }
         catch ( Exception e )
         {
             throw new VerificationException( e );
+        }
+
+        if ( ret > 0 )
+        {
+            System.err.println( "Exit code: " + ret );
+            throw new VerificationException();
         }
     }
 

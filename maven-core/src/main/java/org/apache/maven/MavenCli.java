@@ -45,7 +45,7 @@ public class MavenCli
 
     public static final String POMv4 = "pom.xml";
 
-    public static void main( String[] args, ClassWorld classWorld )
+    public static int main( String[] args, ClassWorld classWorld )
         throws Exception
     {
         CLIManager cliManager = new CLIManager();
@@ -85,7 +85,7 @@ public class MavenCli
         {
             cliManager.displayHelp();
 
-            return;
+            return 0;
         }
 
         if ( commandLine.hasOption( CLIManager.VERSION ) )
@@ -100,7 +100,7 @@ public class MavenCli
             //  the manifest in plain text and read that back.
             System.out.println( "Maven version: " );
 
-            return;
+            return 0;
         }
 
         if ( commandLine.hasOption( CLIManager.LIST_GOALS ) )
@@ -116,7 +116,7 @@ public class MavenCli
                 System.out.println( "    " + goal.getId() );
             }
 
-            return;
+            return 0;
         }
 
         ExecutionResponse response = null;
@@ -151,6 +151,16 @@ public class MavenCli
         else
         {
             response = maven.execute( projectFile, commandLine.getArgList() );
+        }
+
+        // @todo we may wish for more types of error codes - perhaps letting the response define them?
+        if ( response.isExecutionFailure() )
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
         }
     }
 
