@@ -98,7 +98,7 @@ public class ArtifactDownloader
                     directory.mkdirs();
                 }
 
-                if ( destinationFile.exists() && !file.endsWith( SNAPSHOT_SIGNATURE ) )
+                if ( destinationFile.exists() && file.indexOf( SNAPSHOT_SIGNATURE ) < 0 )
                 {
                     continue;
                 }
