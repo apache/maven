@@ -28,7 +28,12 @@
       <fields>
         <field>
           <name>extend</name>
-          <description>The model you wish your model to extend.</description>
+          <description>
+            The location of the parent project, if one exists. Values from the parent project will be
+            the default for this project if they are left unspecified.
+            The path may be absolute, or relative to the current project.xml file.
+            <source><![CDATA[<extend>${basedir}/../project.xml</extend>]]></source>
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -65,7 +70,13 @@
         </field>
         <field>
           <name>description</name>
-          <description>A full description of the project.</description>
+          <description>
+            A detailed description of the project.  This element is
+            usually specified as CDATA to enable the use of HTML tags
+            within the description.  This description is used to
+            generate the <a href="plugins/site/index.html">front page</a>
+            of the project's web site.
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -130,13 +141,25 @@
         </field>
         <field>
           <name>developers</name>
-          <description>The developers working on the project.</description>
+          <description>
+            This element describes all of the developers associated with a
+            project.  Each developer is described by a
+            <code>developer</code> element, which is then described by
+            additional elements (described below).  The auto-generated site
+            documentation references this information.
+          </description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>contributors</name>
-          <description>People who have contributed to the project.</description>
+          <description>
+            This element describes all of the contributors associated with a
+            project who are not developers.  Each contributor is described by a
+            <code>contributor</code> element, which is then describe by additional
+            elements (described below).  The auto-generated site documentation
+            references this information.
+          </description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
@@ -149,7 +172,13 @@
         </field>
         <field>
           <name>licenses</name>
-          <description>The project's licenses.</description>
+          <description>
+            This element describes all of the licenses for this project.  Each license is described by a
+            <code>license</code> element, which is then describe by additional
+            elements (described below).  The auto-generated site documentation
+            references this information.  Projects should only list the license(s) that
+            applies to the project and not the licenses that apply to dependencies.
+          </description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
@@ -173,7 +202,13 @@
         </field>
         <field>
           <name>reports</name>
-          <description>Reports to be generated for the project.</description>
+          <description>
+            This element includes the specification of reports to be
+            included in a Maven-generated site.  These reports will be run
+            when a user executes <code>maven site</code>.  All of the
+            reports will be included in the navigation bar for browsing in
+            the order they are specified.
+          </description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
@@ -271,39 +306,76 @@
       <fields>
         <field>
           <name>nagEmailAddress</name>
-          <description>the description</description>
+          <description>
+            An address to which notifications regarding the status of builds
+            for this project can be sent. This is intended for use by tools
+            which do unattended builds, for example those providing for
+            continuous integration. Currently this is used by the
+            <a href="build-file.html#maven:gump-descriptor">maven:gump-descriptor</a>
+            target.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>sourceDirectory</name>
-          <description>the description</description>
+          <description>
+            This element specifies a directory containing the source
+            of the project. The generated build system will compile
+            the source in this directory when the project is built.
+            The path given is relative to the project descriptor.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>unitTestSourceDirectory</name>
-          <description>the description</description>
+          <description>
+            This element specifies a directory containing the unit test
+            source of the project. The generated build system will
+            compile these directories when the project is being tested.
+            The unit tests must use the JUnit test framework.
+            The path given is relative to the project descriptor.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>aspectSourceDirectory</name>
-          <description>the description</description>
+          <description>
+            This element specifies a directory containing Aspect
+            sources of the project.  The generated build system will
+            compile the Aspects in this directory when the project is
+            built if Aspects have been enabled (see the <a
+            href="plugins/aspectj/goals.html">Aspectj goals</a> document).
+            The path given is relative to the project descriptor.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>sourceModifications</name>
-          <description>the description</description>
+          <description>
+            This element describes all of the sourceModifications associated with a
+            project.  Each source modification is described by a
+            <code>sourceModification</code> element, which is then described by
+            additional elements (described below).  These modifications are used
+            to exclude or include various source depending on the environment
+            the build is running in.
+          </description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
         <field>
           <name>unitTest</name>
-          <description>the description</description>
+          <description>This element specifies unit tests associated with the project.</description>
           <type>UnitTest</type>
           <defaultValue>new UnitTest()</defaultValue>
         </field>
         <field>
           <name>resources</name>
-          <description>the description</description>
+          <description>
+            This element describes all of the resources associated with a project or unit tests.
+            Each resource is described by a resource element, which is then described by additional
+            elements (described <a href="#resource">below</a>). These resources are used to
+            complete the jar file or to run unit test.
+          </description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
         </field>
@@ -314,29 +386,40 @@
       <fields>
         <field>
           <name>name</name>
-          <description>the description</description>
+          <description>The full name of the contributor.</description>
           <type>String</type>
         </field>
         <field>
           <name>email</name>
-          <description>the description</description>
+          <description>The email address of the contributor.</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
-          <description>the description</description>
+          <description>The URL for the homepage of the contributor.</description>
           <type>String</type>
         </field>
         <field>
           <name>organization</name>
-          <description>the description</description>
+          <description>The organization to which the contributor belongs.</description>
           <type>String</type>
         </field>
         <field>
           <name>roles</name>
-          <description>the description</description>
+          <description>
+            The roles the contributor plays in the project.  Each role is
+            describe by a <code>role</code> element, the body of which is a
+            role name.
+          </description>
           <type>java.util.SortedSet</type>
           <defaultValue>new TreeSet()</defaultValue>
+        </field>
+        <field>
+          <name>timezone</name>
+          <description>
+            The timezone the contributor is in. This is a number in the range -14 to 14.
+          </description>
+          <type>String</type>
         </field>
       </fields>
     </class>
@@ -395,7 +478,7 @@
       <fields>
         <field>
           <name>id</name>
-          <description>the description</description>
+          <description>The username of the developer.</description>
           <type>String</type>
         </field>
       </fields>
@@ -405,17 +488,25 @@
       <fields>
         <field>
           <name>name</name>
-          <description>the description</description>
+          <description>The full legal name of the license.</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
-          <description>the description</description>
+          <description>The official url for the license text.</description>
           <type>String</type>
         </field>
         <field>
           <name>distribution</name>
-          <description>the description</description>
+          <description>
+              The primary method by which this project may be distributed.
+              <dl>
+                <dt>repo</dt>
+                <dd>may be downloaded from the Maven repository</dd>
+                <dt>manual</dt>
+                <dd>user must manually download and install the dependency.</dd>
+              </dl>
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -550,17 +641,24 @@
       <fields>
         <field>
           <name>directory</name>
-          <description>the description</description>
+          <description>
+            Describe the directory where the resource is stored.
+            The path may be absolute, or relative to the project.xml file.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>targetPath</name>
-          <description>the description</description>
+          <description>
+            Describe the resource target path. For example, if you want that resource
+            appear into a specific package (<code>org.apache.maven.messages</code>), you must specify this
+            element with this value : <code>org/apache/maven/messages</code>
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>filtering</name>
-          <description>the description</description>
+          <description>Describe if resources are filtered or not.</description>
           <type>boolean</type>
         </field>
       </fields>
@@ -571,7 +669,12 @@
       <fields>
         <field>
           <name>className</name>
-          <description>the description</description>
+          <description>
+            If the class with this name can <strong>not</strong> be
+            loaded, then the includes and excludes specified below
+            will be applied to the contents of the
+            <a href="#sourceDirectory">sourceDirectory</a>
+          </description>
           <type>String</type>
         </field>
         <field>
