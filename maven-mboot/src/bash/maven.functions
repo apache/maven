@@ -267,6 +267,7 @@ buildMavenProject()
       then
         rm -f bootstrap.classpath > /dev/null 2>&1
         rm -f bootstrap.libs > /dev/null 2>&1
+        rm -f bootstrap.deps > /dev/null 2>&1
         rm -f bootstrap.resources > /dev/null 2>&1
         rm -f bootstrap.repo > /dev/null 2>&1
         rm -f bootstrap.tests.includes > /dev/null 2>&1

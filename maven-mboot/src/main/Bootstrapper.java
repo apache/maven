@@ -86,6 +86,8 @@ public class Bootstrapper
 
         StringBuffer libs = new StringBuffer();
 
+        StringBuffer deps = new StringBuffer();
+
         String repoLocal = replace(downloader.getMavenRepoLocal().getPath(), "\\", "/");
         String classpathSeparator;
         if (repoLocal.indexOf(":") != -1) //Windows
@@ -104,11 +106,15 @@ public class Bootstrapper
             classPath.append( repoLocal + "/" + getArtifactPath( d, "/" ) + classpathSeparator );
 
             libs.append( repoLocal + "/" + getArtifactPath( d, "/" ) + "\n" );
+
+            deps.append( getArtifactPath( d, "/" ) + "\n" );
         }
 
         writeFile( "bootstrap.classpath", classPath.toString() );
 
         writeFile( "bootstrap.libs", libs.toString() );
+
+        writeFile( "bootstrap.deps", deps.toString() );
     }
 
     private void writeUnitTest()
