@@ -152,7 +152,7 @@ public class PluginDescriptorGenerator
 
             element( w, "description", parameter.getDescription() );
 
-            element( w, "defaultValue", parameter.getDescription() );
+            element( w, "defaultValue", parameter.getDefaultValue() );
 
             w.endElement();
         }
