@@ -1,7 +1,8 @@
-maven
-maven2
-ibiblio
 target
-maven2.tar.gz
-poms.tar.gz
-reaper.tar.gz
+*~
+*.log
+.classpath
+.project
+*.ipr
+*.iws
+*.iml

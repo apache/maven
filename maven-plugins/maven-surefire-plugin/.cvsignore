@@ -1,7 +1,8 @@
 target
-velocity.log
-maven.log
+*~
+*.log
 .classpath
 .project
 *.ipr
 *.iws
+*.iml
