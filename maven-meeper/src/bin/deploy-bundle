@@ -1,24 +1,31 @@
 #!/bin/sh
 
-BUNDLE=$1
+BUNDLEURL=$1
 VERSION=$2
 
-[ "${BUNDLE}" = "" ] && echo && echo "You must specify a bundle!" && echo && exit
+[ "${BUNDLEURL}" = "" ] && echo && echo "You must specify a bundle URL!" && echo && exit
 
 WORKDIR=bundle.tmp
+# repo dir relative to WORKDIR
+REPODIR=../repository
 
 rm -rf $WORKDIR > /dev/null 2>&1
 
 mkdir $WORKDIR
 
-cp $BUNDLE $WORKDIR
+cd $WORKDIR
+
+wget $BUNDLEURL
+BUNDLE=`echo $BUNDLEURL | sed -e 's#^.*/##;'`
+
+echo $BUNDLE
 
 (
-  cd $WORKDIR
 
   jar xf $BUNDLE
 
   POM=project.xml
+  less $POM
 
   ../d2u ${POM}
 
@@ -60,6 +67,10 @@ cp $BUNDLE $WORKDIR
   echo "artifactId: [${artifactId}]"
   echo
 
+  echo
+  echo -n Hit Enter to continue or Ctrl-C to abort...
+  read
+
   LIC=LICENSE.txt
 
   # A little help for manually created upload bundles
@@ -72,18 +83,22 @@ cp $BUNDLE $WORKDIR
 
   ../d2u $LIC
 
-  ../deploy-lic $LIC ${groupId}
-  
-  ../deploy-pom ${artifactId}-${version}.pom ${groupId}
-  
+  mkdir -p $REPODIR/${groupId}/licenses
+  cp $LIC $REPODIR/${groupId}/licenses/${artifactId}-${version}.license  
+
+  mkdir -p $REPODIR/${groupId}/poms
+  cp ${artifactId}-${version}.pom $REPODIR/${groupId}/poms
+
   artifactType=`echo ${artifactId} | sed -e 's/maven-.*-plugin//'`
   
   if [ -z ${artifactType} ]
   then
     echo "Deploying Plugin ..."
-    ../deploy-plugin ${artifactId}-${version}.jar ${groupId}        
+     mkdir -p $REPODIR/${groupId}/plugins
+     cp ${artifactId}-${version}.jar $REPODIR/${groupId}/plugins
   else
     echo "Deploying JAR ..."
-    ../deploy-jar ${artifactId}-${version}.jar ${groupId}        
+    mkdir -p $REPODIR/${groupId}/jars
+    cp ${artifactId}-${version}.jar $REPODIR/${groupId}/jars
   fi    
 )  
