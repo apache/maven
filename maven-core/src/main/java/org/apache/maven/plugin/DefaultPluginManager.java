@@ -28,6 +28,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.GoalExecutionException;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -545,7 +546,25 @@ public class DefaultPluginManager
                 // TODO: groupID not handled
                 if ( pluginId.equals( plugin.getArtifactId() ) )
                 {
-                    return CollectionUtils.mergeMaps( plugin.getConfiguration(), map );
+                    map = CollectionUtils.mergeMaps( plugin.getConfiguration(), map );
+
+                    // TODO: much less of this magic is needed - make the mojoDescriptor just store the first and second part
+                    int index = goalId.indexOf( ':' );
+                    if ( index >= 0 )
+                    {
+                        String goalName = goalId.substring( index + 1 );
+                        for ( Iterator j = plugin.getGoals().iterator(); j.hasNext(); )
+                        {
+                            Goal goal = (Goal) j.next();
+                            if ( goal.getId().equals( goalName ) )
+                            {
+                                map = CollectionUtils.mergeMaps( goal.getConfiguration(), map );
+                                break;
+                            }
+                        }
+                    }
+
+                    return map;
                 }
             }
         }
