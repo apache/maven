@@ -112,6 +112,11 @@ cd ..
 
 %MAVEN_JAVA_EXE% %MAVEN_CMD_LINE_ARGS% -jar mboot.jar
 
+echo Running integration tests
+cd maven-core-it
+call maven-core-it
+cd ..
+
 :end
 @REM set local scope for the variables with windows NT shell
 if "%OS%"=="Windows_NT" goto endNT
