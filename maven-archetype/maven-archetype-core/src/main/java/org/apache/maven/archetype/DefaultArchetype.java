@@ -1,27 +1,45 @@
 package org.apache.maven.archetype;
 
-import org.apache.maven.archetype.descriptor.ArchetypeDescriptor;
-import org.apache.maven.archetype.descriptor.ArchetypeDescriptorBuilder;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.context.Context;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.velocity.VelocityComponent;
+/*
+ * Copyright 2001-2004 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.net.URLClassLoader;
-import java.net.URL;
+
+import org.apache.maven.archetype.descriptor.ArchetypeDescriptor;
+import org.apache.maven.archetype.descriptor.ArchetypeDescriptorBuilder;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.context.Context;
+
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.velocity.VelocityComponent;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -48,19 +66,29 @@ public class DefaultArchetype
     // artifactId = maven-foo-archetype
     // version = latest
 
-    public void createArchetype( String archetypeId, ArtifactRepository localRepository, Set remoteRepositories, Map parameters )
+    public void createArchetype( String archetypeGroupId, String archetypeArtifactId, String archetypeVersion,
+                                 ArtifactRepository localRepository, Set remoteRepositories, Map parameters )
         throws ArchetypeNotFoundException, ArchetypeDescriptorException, ArchetypeTemplateProcessingException
     {
-        Artifact archetypeJar = wagonManager.createArtifact( "maven", "maven-archetype-" + archetypeId, "1.0-alpha-1-SNAPSHOT", "jar" );
+        // ----------------------------------------------------------------------
+        // Download the archetype
+        // ----------------------------------------------------------------------
+
+        Artifact archetypeJar =
+            wagonManager.createArtifact( archetypeGroupId, archetypeArtifactId, archetypeVersion, "jar" );
 
         try
         {
             artifactResolver.resolve( archetypeJar, remoteRepositories, localRepository );
         }
-        catch ( Exception e )
+        catch ( ArtifactResolutionException e )
         {
             throw new ArchetypeNotFoundException( "Cannot download archetype.", e );
         }
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
 
         String outputDirectory = (String) parameters.get( "outputDirectory" );
 
@@ -109,25 +137,31 @@ public class DefaultArchetype
             context.put( key, value );
         }
 
+        ClassLoader old = Thread.currentThread().getContextClassLoader();
+
+        Thread.currentThread().setContextClassLoader( archetypeJarLoader );
+
         try
         {
-            ClassLoader old = Thread.currentThread().getContextClassLoader();
-
-            Thread.currentThread().setContextClassLoader( archetypeJarLoader );
-
             processTemplate( outputDirectory, context, ARCHETYPE_POM, null );
 
             processSources( outputDirectory, context, descriptor.getSources(), packageName );
 
             processSources( outputDirectory, context, descriptor.getTestSources(), packageName );
-
-            Thread.currentThread().setContextClassLoader( old );
         }
         catch ( Exception e )
         {
             throw new ArchetypeTemplateProcessingException( "Error processing templates.", e );
         }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( old );
+        }
     }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     protected void processSources( String outputDirectory, Context context, List sources, String packageName )
         throws Exception

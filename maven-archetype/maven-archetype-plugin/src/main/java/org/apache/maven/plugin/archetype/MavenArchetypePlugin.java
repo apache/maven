@@ -1,5 +1,21 @@
 package org.apache.maven.plugin.archetype;
 
+/*
+ * Copyright 2001-2004 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.archetype.Archetype;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
@@ -28,6 +44,33 @@ import java.util.Set;
  *   required="true"
  *   validator=""
  *   expression="#localRepository"
+ *   description=""
+ *
+ * @parameter
+ *   name="archetypeGroupId"
+ *   type="String"
+ *   required="true"
+ *   validator=""
+ *   expression="#archetypeGroupId"
+ *   default="maven"
+ *   description=""
+ *
+ * @parameter
+ *   name="archetypeArtifactId"
+ *   type="String"
+ *   required="true"
+ *   validator=""
+ *   expression="#archetypeArtifactId"
+ *   default="maven"
+ *   description=""
+ *
+ * @parameter
+ *   name="archetypeVersion"
+ *   type="String"
+ *   required="true"
+ *   validator=""
+ *   expression="#archetypeVersion"
+ *   default="maven"
  *   description=""
  *
  * @parameter
@@ -73,7 +116,10 @@ public class MavenArchetypePlugin
         throws Exception
     {
         // ----------------------------------------------------------------------
-        // archetypeId
+        // archetypeGroupId
+        // archetypeArtifactId
+        // archetypeVersion
+        //
         // localRepository
         // remoteRepository
         // parameters
@@ -91,12 +137,17 @@ public class MavenArchetypePlugin
 
         remoteRepositories.add( remoteRepository );
 
-        String archetypeId = (String) request.getParameter( "archetypeId" );
+        String archetypeGroupId = (String) request.getParameter( "archetypeGroupId" );
+
+        String archetypeArtifactId = (String) request.getParameter( "archetypeArtifactId" );
+
+        String archetypeVersion = (String) request.getParameter( "archetypeVersion" );
 
         Archetype archetype = (Archetype) request.getParameter( "archetype" );
 
         request.getParameters().put( "outputDirectory", System.getProperty( "user.dir" ) );
 
-        archetype.createArchetype( "quickstart", localRepository, remoteRepositories, request.getParameters() );
+        archetype.createArchetype( archetypeGroupId, archetypeArtifactId, archetypeVersion,
+                                   localRepository, remoteRepositories, request.getParameters() );
     }
 }
