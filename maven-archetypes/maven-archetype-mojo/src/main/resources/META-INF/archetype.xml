@@ -1,6 +1,0 @@
-<archetype>
-  <id>plugin</id>
-  <sources>
-    <source>src/main/java/MyMojo.java</source>
-  </sources>
-</archetype>
