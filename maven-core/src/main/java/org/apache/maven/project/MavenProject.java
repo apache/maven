@@ -21,6 +21,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
@@ -33,12 +34,17 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reports;
 import org.apache.maven.model.Scm;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.codehaus.plexus.util.dag.DAG;
+import org.codehaus.plexus.util.dag.TopologicalSorter;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -568,6 +574,75 @@ public class MavenProject
     public void setCollectedProjects( List collectedProjects )
     {
         this.collectedProjects = collectedProjects;
+    }
+
+    /**
+     * Sort a list of projects.
+     * <ul>
+     * <li>collect all the vertices for the projects that we want to build.</li>
+     * <li>iterate through the deps of each project and if that dep is within
+     * the set of projects we want to build then add an edge, otherwise throw
+     * the edge away because that dependency is not within the set of projects
+     * we are trying to build. we assume a closed set.</li>
+     * <li>do a topo sort on the graph that remains.</li>
+     * </ul>
+     */
+    public static List getSortedProjects( List projects )
+        throws CycleDetectedException
+    {
+        DAG dag = new DAG();
+
+        Map projectMap = new HashMap();
+
+        for ( Iterator i = projects.iterator(); i.hasNext(); )
+        {
+            MavenProject project = (MavenProject) i.next();
+
+            String artifactId = project.getArtifactId();
+
+            dag.addVertex( artifactId );
+
+            projectMap.put( artifactId, project );
+        }
+
+        for ( Iterator i = projects.iterator(); i.hasNext(); )
+        {
+            MavenProject project = (MavenProject) i.next();
+
+            String artifactId = project.getArtifactId();
+
+            for ( Iterator j = project.getDependencies().iterator(); j.hasNext(); )
+            {
+                Dependency dependency = (Dependency) j.next();
+
+                String dependencyArtifactId = dependency.getArtifactId();
+
+                if ( dag.getVertex( dependencyArtifactId ) != null )
+                {
+                    dag.addEdge( artifactId, dependencyArtifactId );
+                }
+            }
+
+            MavenProject parent = project.getParent();
+            if ( parent != null )
+            {
+                if ( dag.getVertex( parent.getArtifactId() ) != null )
+                {
+                    dag.addEdge( artifactId, parent.getArtifactId() );
+                }
+            }
+        }
+
+        List sortedProjects = new ArrayList();
+
+        for ( Iterator i = TopologicalSorter.sort( dag ).iterator(); i.hasNext(); )
+        {
+            String artifactId = (String) i.next();
+
+            sortedProjects.add( projectMap.get( artifactId ) );
+        }
+
+        return sortedProjects;
     }
 }
 

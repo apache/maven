@@ -18,10 +18,8 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
-import java.util.List;
 
 public interface MavenProjectBuilder
 {
@@ -35,11 +33,6 @@ public interface MavenProjectBuilder
 
     MavenProject buildSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
-
-    // take this out
-
-    List getSortedProjects( List projects )
-        throws CycleDetectedException;
 
     MavenProject getCachedProject( String groupId, String artifactId, String version );
 }
