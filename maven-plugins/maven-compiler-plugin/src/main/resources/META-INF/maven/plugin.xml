@@ -12,10 +12,22 @@
     <goal>
       <name>compile</name>
       <parameters>
-        <sourceDirectory>#project.build.sourceDirectory</sourceDirectory>
-        <outputDirectory>#maven.build.dest</outputDirectory>
-        <classpathElements>#project.classpathElements</classpathElements>
-        <compiler>javac</compiler>
+        <parameter>
+          <name>sourceDirectory</name>
+          <expression>#project.build.sourceDirectory</expression>
+        </parameter>
+        <parameter>
+          <name>outputDirectory</name>
+          <expression>#maven.build.dest</expression>
+        </parameter>
+        <parameter>
+          <name>classpathElements</name>
+          <expression>#project.classpathElements</expression>
+        </parameter>
+        <parameter>
+          <name>compiler</name>
+          <expression>javac</expression>
+        </parameter>
       </parameters>
     </goal>
     <goal>
@@ -24,10 +36,22 @@
         <prereq>compile</prereq>
       </prereqs>
       <parameters>
-        <sourceDirectory>#project.build.unitTestSourceDirectory</sourceDirectory>
-        <outputDirectory>#maven.test.dest</outputDirectory>
-        <classpathElements>#project.classpathElements</classpathElements>
-        <compiler>javac</compiler>
+        <parameter>
+          <name>sourceDirectory</name>
+          <expression>#project.build.unitTestSourceDirectory</expression>
+        </parameter>
+        <parameter>
+          <name>outputDirectory</name>
+          <expression>#maven.test.dest</expression>
+        </parameter>
+        <parameter>
+          <name>classpathElements</name>
+          <expression>#project.classpathElements</expression>
+        </parameter>
+        <parameter>
+          <name>compiler</name>
+          <expression>javac</expression>
+        </parameter>
       </parameters>
     </goal>
   </goals>

@@ -13,11 +13,26 @@
       <method>
         <name>execute</name>
         <parameters>
-          <mavenRepoLocal>#maven.repo.local</mavenRepoLocal>
-          <basedir>#basedir</basedir>
-          <includes>#project.build.unitTest.includes</includes>
-          <excludes>#project.build.unitTest.excludes</excludes>
-          <classpathElements>#project.classpathElements</classpathElements>
+          <parameter>
+            <name>mavenRepoLocal</name>
+            <expression>#maven.repo.local</expression>
+          </parameter>
+          <parameter>
+            <name>basedir</name>
+            <expression>#basedir</expression>
+          </parameter>
+          <parameter>
+            <name>includes</name>
+            <expression>#project.build.unitTest.includes</expression>
+          </parameter>
+          <parameter>
+            <name>excludes</name>
+            <expression>#project.build.unitTest.excludes</expression>
+          </parameter>
+          <parameter>
+            <name>classpathElements</name>
+            <expression>#project.classpathElements</expression>
+          </parameter>
         </parameters>
       </method>
     </goal>

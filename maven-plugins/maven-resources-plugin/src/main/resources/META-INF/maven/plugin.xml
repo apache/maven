@@ -5,17 +5,29 @@
   <goals>
     <goal>
       <name>resources</name>
-      <fields>
-        <outputDirectory>#maven.build.dest</outputDirectory>
-        <resources>#project.build.resources</resources>
-      </fields>
+      <parameters>
+        <parameter>
+          <name>outputDirectory</name>
+          <expression>#maven.build.dest</expression>
+        </parameter>
+        <parameter>
+          <name>resources</name>
+          <expression>#project.build.resources</expression>
+        </parameter>
+      </parameters>
     </goal>
     <goal>
       <name>test:resources</name>
-      <fields>
-        <outputDirectory>#maven.test.dest</outputDirectory>
-        <resources>#project.build.unitTest.resources</resources>
-      </fields>
+      <parameters>
+        <parameter>
+          <name>outputDirectory</name>
+          <expression>#maven.test.dest</expression>
+        </parameter>
+        <parameter>
+          <name>resources</name>
+          <expression>#project.build.unitTeset.resources</expression>
+        </parameter>
+      </parameters>
     </goal>
   </goals>
 </plugin>

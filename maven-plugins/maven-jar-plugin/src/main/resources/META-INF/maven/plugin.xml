@@ -9,11 +9,20 @@
         <prereq>test</prereq>
         <prereq>resources</prereq>
       </prereqs>
-      <fields>
-        <jarName>#maven.final.name</jarName>
-        <outputDirectory>#maven.build.dir</outputDirectory>
-        <basedir>#maven.build.dest</basedir>
-      </fields>
+      <parameters>
+        <parameter>
+          <name>jarName</name>
+          <expression>#maven.final.name</expression>
+        </parameter>
+        <parameter>
+          <name>outputDirectory</name>
+          <expression>#maven.build.dir</expression>
+        </parameter>
+        <parameter>
+          <name>basedir</name>
+          <expression>#maven.build.dest</expression>
+        </parameter>
+      </parameters>
     </goal>
   </goals>
 </plugin>
