@@ -2,4 +2,4 @@
 
 umask 002
 
-rsync -rvl --size-only --ignore-existing --rsh="ssh -l rsync" beaver.codehaus.org:/dist/ /public/html/maven
+rsync -rvl --size-only --rsh="ssh -l rsync" beaver.codehaus.org:/dist/ /public/html/maven
