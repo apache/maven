@@ -148,7 +148,7 @@ public class DefaultMavenProjectBuilder
                                                     superModel.getRepositories() );
 
             Model previous = superModel;
-
+            
             for ( Iterator i = lineage.iterator(); i.hasNext(); )
             {
                 Model current = ( (MavenProject) i.next() ).getModel();

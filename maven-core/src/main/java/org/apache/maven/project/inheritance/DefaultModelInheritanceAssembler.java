@@ -18,6 +18,8 @@ package org.apache.maven.project.inheritance;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.PostGoal;
+import org.apache.maven.model.PreGoal;
 import org.apache.maven.model.Repository;
 
 import java.util.Iterator;
@@ -225,6 +227,28 @@ public class DefaultModelInheritanceAssembler
             Dependency dependency = (Dependency) iterator.next();
 
             child.addDependency( dependency );
+
+        }
+
+        // PreGoals :: aggregate
+        List preGoals = parent.getPreGoals();
+
+        for ( Iterator iterator = preGoals.iterator(); iterator.hasNext(); )
+        {
+            PreGoal preGoal = (PreGoal) iterator.next();
+
+            child.addPreGoal( preGoal );
+
+        }
+
+        // PostGoals :: aggregate
+        List postGoals = parent.getPostGoals();
+
+        for ( Iterator iterator = postGoals.iterator(); iterator.hasNext(); )
+        {
+            PostGoal postGoal = (PostGoal) iterator.next();
+
+            child.addPostGoal( postGoal );
 
         }
 

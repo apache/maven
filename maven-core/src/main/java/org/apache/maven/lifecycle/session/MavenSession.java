@@ -160,7 +160,7 @@ public class MavenSession
 
     private void initGoalDecoratorMappings()
     {
-        List allPreGoals = project.getModel().getPreGoals();
+        List allPreGoals = project.getPreGoals();
         for ( Iterator it = allPreGoals.iterator(); it.hasNext(); )
         {
             PreGoal preGoal = (PreGoal) it.next();
@@ -175,7 +175,7 @@ public class MavenSession
             preGoalList.add( preGoal.getAttain() );
         }
 
-        List allPostGoals = project.getModel().getPostGoals();
+        List allPostGoals = project.getPostGoals();
         for ( Iterator it = allPostGoals.iterator(); it.hasNext(); )
         {
             PostGoal postGoal = (PostGoal) it.next();

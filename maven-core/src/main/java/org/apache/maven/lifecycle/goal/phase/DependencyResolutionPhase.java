@@ -22,6 +22,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.lifecycle.goal.AbstractMavenGoalPhase;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 
 import java.util.Iterator;
