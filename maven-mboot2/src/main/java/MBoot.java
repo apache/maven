@@ -40,13 +40,14 @@ public class MBoot
     // These are the bootstrap processes' dependencies
     // ----------------------------------------------------------------------
 
-    String[] bootstrapDeps = new String[]{"junit/jars/junit-3.8.1.jar", "modello/jars/modello-core-1.0-SNAPSHOT.jar",
-                                          "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
-                                          "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
-                                          "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
+    String[] bootstrapDeps = new String[]{"junit/jars/junit-3.8.1.jar",
+                                          "org.codehaus.modello/jars/modello-core-1.0-alpha-1.jar",
+                                          "org.codehaus.modello/jars/modello-xdoc-plugin-1.0-alpha-1.jar",
+                                          "org.codehaus.modello/jars/modello-xml-plugin-1.0-alpha-1.jar",
+                                          "org.codehaus.modello/jars/modello-xpp3-plugin-1.0-alpha-1.jar",
                                           "plexus/jars/plexus-utils-1.0-alpha-2.jar",
-                                          "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
-                                          "surefire/jars/surefire-1.2-SNAPSHOT.jar", "qdox/jars/qdox-1.2.jar"};
+                                          "surefire/jars/surefire-booter-1.2.jar", "surefire/jars/surefire-1.2.jar",
+                                          "qdox/jars/qdox-1.2.jar"};
 
     // ----------------------------------------------------------------------
     // These are plexus' runtime dependencies
@@ -64,17 +65,6 @@ public class MBoot
                                                 "org.apache.maven/jars/maven-plugin-tools-java-2.0-SNAPSHOT.jar",
                                                 "org.apache.maven/jars/maven-plugin-tools-pluggy-2.0-SNAPSHOT.jar"};
 
-    // ----------------------------------------------------------------------
-    // These are modello's runtime dependencies
-    // ----------------------------------------------------------------------
-
-    String[] modelloDeps = new String[]{"classworlds/jars/classworlds-1.1-alpha-1.jar",
-                                        "plexus/jars/plexus-container-default-1.0-alpha-2.jar",
-                                        "modello/jars/modello-core-1.0-SNAPSHOT.jar",
-                                        "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
-                                        "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
-                                        "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar"};
-
     String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin", "maven-artifact",
                                    "maven-script/maven-script-marmalade", "maven-core", "maven-archiver",
                                    "maven-plugin-tools/maven-plugin-tools-api",
@@ -87,6 +77,13 @@ public class MBoot
                                          "maven-plugins/maven-jar-plugin", "maven-plugins/maven-plugin-plugin",
                                          "maven-plugins/maven-resources-plugin", "maven-plugins/maven-surefire-plugin"};
 
+    String[] modelloDeps = new String[]{"classworlds/jars/classworlds-1.1-alpha-1.jar",
+                                        "plexus/jars/plexus-container-default-1.0-alpha-2.jar",
+                                        "org.codehaus.modello/jars/modello-core-1.0-alpha-1.jar",
+                                        "org.codehaus.modello/jars/modello-xdoc-plugin-1.0-alpha-1.jar",
+                                        "org.codehaus.modello/jars/modello-xml-plugin-1.0-alpha-1.jar",
+                                        "org.codehaus.modello/jars/modello-xpp3-plugin-1.0-alpha-1.jar"};
+
     private static final Map MODELLO_TARGET_VERSIONS;
 
     private static final Map MODELLO_MODEL_FILES;
@@ -96,14 +93,12 @@ public class MBoot
         Map targetVersions = new TreeMap();
         targetVersions.put( "maven-model", "4.0.0" );
         targetVersions.put( "maven-settings", "1.0.0" );
-        targetVersions.put( "maven-plugins/maven-assemble-plugin", "1.0.0" );
 
         MODELLO_TARGET_VERSIONS = Collections.unmodifiableMap( targetVersions );
 
         Map modelFiles = new TreeMap();
         modelFiles.put( "maven-model", "maven.mdo" );
         modelFiles.put( "maven-settings", "settings.mdo" );
-        modelFiles.put( "maven-plugins/maven-assemble-plugin", "src/main/mdo/descriptor.mdo" );
 
         MODELLO_MODEL_FILES = Collections.unmodifiableMap( modelFiles );
     }
@@ -684,9 +679,10 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency + ( !online
-                                                                                         ? "; run again online"
-                                                                                         : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException( "Missing dependency: " + dependency +
+                                                 ( !online
+                                                   ? "; run again online"
+                                                   : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -703,9 +699,10 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency + ( !online
-                                                                                         ? "; run again online"
-                                                                                         : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException( "Missing dependency: " + dependency +
+                                                 ( !online
+                                                   ? "; run again online"
+                                                   : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -737,9 +734,8 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency + ( !online
-                                                                                         ? "; run again online"
-                                                                                         : "; there was a problem downloading it earlier" ) );
+                String msg = ( !online ? "; run again online" : "; there was a problem downloading it earlier" );
+                throw new FileNotFoundException( "Missing dependency: " + dependency + msg );
             }
 
             modelloClassLoader.addURL( f.toURL() );
