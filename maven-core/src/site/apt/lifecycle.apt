@@ -1,0 +1,23 @@
+ -----
+ Maven Lifecycle
+ -----
+ Maven Team
+ -----
+
+Maven Lifecycle
+
+ * Single goal
+ 
+ * Multiple goals
+ 
+ * Reactor with a single goal
+ 
+ * Reactor with multiple goals
+ 
+ Use Cases
+  
+  * where one goal needs to use and modify another goal
+    eg jcoverage:report does jcoverage:instrument [compiler:compile], 
+    then calls surefire:test (adding classpath entries and changing the test
+    classes directory parameter)
+    the does the report
