@@ -32,6 +32,15 @@
         <role>Release Manager</role>
       </roles>
     </developer>
+    <developer>
+      <name>Emmanuel Venisse</name>
+      <id>evenisse</id>
+      <email>evenisse@apache.org</email>
+      <organization>Maven</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
   </developers>
 
   <build>
