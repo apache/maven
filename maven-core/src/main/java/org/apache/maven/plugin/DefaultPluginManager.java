@@ -683,14 +683,21 @@ public class DefaultPluginManager
                     if ( index >= 0 )
                     {
                         String goalName = goalId.substring( index + 1 );
-                        for ( Iterator j = plugin.getGoals().iterator(); j.hasNext(); )
+                        for ( Iterator j = plugin.getGoals().iterator(); j.hasNext() && dom == null; )
                         {
                             Goal goal = (Goal) j.next();
                             if ( goal.getId().equals( goalName ) )
                             {
                                 Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
-                                dom = Xpp3DomUtils.mergeXpp3Dom( Xpp3DomUtils.copyXpp3Dom( goalConfiguration ), dom );
-                                break;
+                                if ( goalConfiguration != null )
+                                {
+                                    dom =
+                                        Xpp3DomUtils.mergeXpp3Dom( Xpp3DomUtils.copyXpp3Dom( goalConfiguration ), dom );
+                                }
+                                else
+                                {
+                                    dom = new Xpp3Dom( "configuration" );
+                                }
                             }
                         }
                     }
