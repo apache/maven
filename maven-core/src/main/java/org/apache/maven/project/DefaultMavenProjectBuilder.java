@@ -101,9 +101,6 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            // TODO: rename to super-pom.xml so it is not used by the reactor
-            superModel = modelReader.read( new InputStreamReader( DefaultMavenProjectBuilder.class.getResourceAsStream( "pom.xml" ) ) );
-
             Model userModel = null;
             // TODO: use maven home local instead of user.home/.m2
             File userModelFile = new File( System.getProperty( "user.home" ) + "/.m2", "override.xml" );
@@ -119,6 +116,12 @@ public class DefaultMavenProjectBuilder
                 {
                     localRepositoryValue = userModel.getLocal().getRepository();
                 }
+                
+                validateLeafModel(userModel);
+                
+                // TODO: rename to super-pom.xml so it is not used by the reactor
+                superModel = modelReader.read( new InputStreamReader( DefaultMavenProjectBuilder.class.getResourceAsStream( "pom-" + userModel.getModelVersion() + ".xml" ) ) );
+                
                 superModel.getRepositories().addAll( userModel.getRepositories() );
             }
 
@@ -216,6 +219,34 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( "Error building project from " + projectDescriptor, e );
         }
+    }
+
+    private void validateLeafModel( Model userModel )
+    {
+        String modelVersion = userModel.getModelVersion();
+        if ( modelVersion == null || modelVersion.length() < 1 )
+        {
+            throw new IllegalStateException( "POM element \'modelVersion\' must be specified; it may not be inherited" );
+        }
+
+        String name = userModel.getName();
+        if ( name == null || name.length() < 1 )
+        {
+            throw new IllegalStateException( "POM element \'name\' must be specified; it may not be inherited" );
+        }
+
+        String artifactId = userModel.getArtifactId();
+        if ( artifactId == null || artifactId.length() < 1 )
+        {
+            throw new IllegalStateException( "POM element \'artifactId\' must be specified; it may not be inherited" );
+        }
+
+        String version = userModel.getVersion();
+        if ( version == null || version.length() < 1 )
+        {
+            throw new IllegalStateException( "POM element \'version\' must be specified; it may not be inherited" );
+        }
+
     }
 
     private MavenProject assembleLineage( File projectDescriptor, 

@@ -18,6 +18,7 @@ package org.apache.maven.plugin.jar;
 
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -52,6 +53,13 @@ import java.util.Map;
  *  validator=""
  *  expression="#project.build.directory"
  *  description=""
+ * @parameter
+ *  name="project"
+ *  type="org.apache.maven.project.MavenProject"
+ *  required="true"
+ *  validator=""
+ *  expression="#project"
+ *  description="current MavenProject instance"
  *
  * @author <a href="michal@codehaus">Michal Maczka</a>
  * @version $Id$
@@ -82,6 +90,9 @@ public class JarMojo
         Map includes = new LinkedHashMap();
         
         addDirectory(includes, "**/**", "**/package.html", "", new File( outputDirectory ) );
+        
+        MavenProject project = (MavenProject)request.getParameter("project");
+        includes.put("META-INF/maven/pom.xml", project.getFile());
         
         createJar( jarFile, includes );
     }
