@@ -62,7 +62,7 @@
           <version>3.0.0</version>
           <required>true</required>
           <description>
-            The id of the dependency.
+            The id of the project.
           </description>
           <type>String</type>
         </field>
@@ -394,6 +394,20 @@
       <!-- @todo this means it is undocumented. Should we instead provide an optional field name so package can be mapped to the field packageName? -->
       <codeSegments>
         <codeSegment>
+          <version>3.0.0</version>
+          <code>
+            public void setVersion(String version)
+            {
+                this.currentVersion = version;
+            }
+
+            public String getVersion()
+            {
+                return currentVersion;
+            }
+          </code>
+        </codeSegment>
+        <codeSegment>
           <version>3.0.0+</version>
           <code>
             private String packageName;
@@ -690,6 +704,15 @@
       <version>3.0.0+</version>
       <fields>
         <field>
+          <name>id</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <description>
+            The id of the project.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
           <name>groupId</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -785,42 +808,6 @@
         <codeSegment>
           <version>3.0.0</version>
           <code><![CDATA[
-            public void setId( String id )
-            {
-                int i = id.indexOf( "+" );
-                int j = id.indexOf( ":" );
-        
-                if ( i > 0 )
-                {
-                    // We have something like 'ant+optional' where the
-                    // group id is 'ant' and the artifact id is
-                    // 'ant-optional'.
-                    setGroupId( id.substring( 0, i ) );
-                    setArtifactId( id.replace( '+', '-' ) );
-                }
-                else if ( j > 0 )
-                {
-                    // We have something like 'ant:my-poorly-name.jar' where the
-                    // group id is 'ant' and the artifact id is
-                    // 'my-poorly-named.jar'.
-                    setGroupId( id.substring( 0, j ) );
-                    setArtifactId( id.substring( j + 1 ) );
-                }
-                else
-                {
-                    // We have something like 'ant' where the
-                    // the project id is 'ant' and the artifact name
-                    // is 'ant'.
-                    setGroupId( id );
-                    setArtifactId( id );
-                }
-            }
-        
-            public String getId()
-            {
-                return getGroupId() + ":" + getArtifactId();
-            }
-        
             public String getArtifactDirectory()
             {
                 return getGroupId();
