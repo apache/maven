@@ -146,9 +146,12 @@ BUILD_REQUIRED=`cat $HOME_DIR/build_required`
 
 # Only send mail to the list if a build was required.
 
+host=`hostname`
+
 if [ "$BUILD_REQUIRED" = "true" ]
 then
-
-  /usr/sbin/sendmail -t < log
-  
+  if [ "$hostname" = "beaver.codehaus.org" ]
+  then
+    /usr/sbin/sendmail -t < log
+  fi  
 fi
