@@ -112,17 +112,25 @@ compile()
   # $1 == classpath
   # $2 == destination for compiled classes
   # $3 == source directory
-  # $4 == any extra sources
+  # $4 == generated source directory
   
-  if [ -d $3 ]
+  if [ -d $3 ] || [ -d $4 ]
   then
   
     if [ ! -d $2 ]
     then
       mkdir -p $2 
     fi
-  
-    SOURCES=`find $3 -name '*.java'`
+    
+    if [ ! -z $3 ] && [ -d $3 ] 
+    then
+      sources=`find $3 -name '*.java'`
+    fi
+
+    if [ ! -z $4 ] && [ -d $4 ]
+    then
+      generatedSources=`find $4 -name '*.java'`
+    fi
 
     if $cygwin; then
       CP=`cygpath -pw "$1"`
@@ -130,7 +138,7 @@ compile()
       CP=$1
     fi
   
-    "${JAVAC}" -classpath "$CP" -d $2 ${SOURCES} $4
+    "${JAVAC}" -classpath "$CP" -d $2 ${sources} ${generatedSources}
   fi
 }
 
@@ -215,22 +223,12 @@ buildMavenProject()
       fi
       
       projectDependencyClassPath=$bootstrapClasspath:.
-      
-      if [ ! -z $sourceDirectory ] && [ -d $sourceDirectory ]
-      then
+
+      generatedSourceDirectory=target/generated-sources
         
-        generatedSourceDirectory=target/generated-sources
-        
-        if [ -d $generatedSourceDirectory ]
-        then
-          generatedSources=`find $generatedSourceDirectory -name '*.java'`
-        fi
-        
-        compile "$projectDependencyClassPath" $buildDest $sourceDirectory $generatedSources
+      compile "$projectDependencyClassPath" $buildDest $sourceDirectory $generatedSourceDirectory
       
-        isCommandSuccessful $? "Failed compiling classes!"
-      
-      fi
+      isCommandSuccessful $? "Failed compiling classes!"
       
       echo "Building tests in `pwd`"
         
@@ -241,14 +239,12 @@ buildMavenProject()
       fi
 
       createMBootClasspath
-      
+
       if [ ! -z $unitTestSourceDirectory ] && [ -d $unitTestSourceDirectory ]
-      then
-        
+      then                    
         compile "$buildDest:$projectDependencyClassPath:${MBOOT_CP}" $buildTestDest $unitTestSourceDirectory
         
         isCommandSuccessful $? "Failed compiling test classes!"
-      
       fi
       
       copyResources bootstrap.resources target/classes
