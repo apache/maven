@@ -25,6 +25,8 @@ import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -61,8 +63,31 @@ public class JarDeployMojo
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
 
+        
+        //@todo this will be duplicated in case of every mojo which implements deploy goal
+        // this should be pushed into the ArtifactDeployer component
+        DistributionManagement distributionManagement = project.getDistributionManagement();
+        
+        if ( distributionManagement == null )
+        {
+            String msg = "Deployment failed: distributionManagement element" + 
+                            " was not specified in the pom";
+            throw new Exception( msg );
+        }
+        
+        Repository repository = distributionManagement.getRepository();
+        
+        if ( repository == null )
+        {
+            String msg = "Deployment failed: repository element" + 
+                            " was not specified in the pom inside" + 
+                            " distributionManagement element";
+            throw new Exception( msg );
+         }
+        
+        
         ArtifactRepository deploymentRepository =
-            RepositoryUtils.mavenRepositoryToWagonRepository( project.getDistributionManagement().getRepository() );
+            RepositoryUtils.mavenRepositoryToWagonRepository( repository );
 
         Artifact artifact = new DefaultArtifact( project.getGroupId(),
                                                  project.getArtifactId(),
