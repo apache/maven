@@ -514,7 +514,7 @@
     <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
     <class>
       <name>Branch</name>
-      <version>3.0.0+</version>
+      <version>3.0.0</version>
       <description><![CDATA[
         This element describes each of the branches of the
         project. Each branch is described by a
@@ -524,31 +524,13 @@
       <fields>
         <field>
           <name>tag</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[
             The branch tag in the version control system
             (e.g. cvs) used by the project for the source
             code associated with this branch of the
             project.
-          ]]></description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>description</name>
-          <version>4.0.0</version>
-          <description><![CDATA[
-            A description of the branch and its strategy.
-          ]]></description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>lastMergeTag</name>
-          <version>4.0.0</version>
-          <description><![CDATA[
-            This is the tag in the version control system that was last used
-            to merge from the branch to the current codebase. Future merges
-            should merge only the changes from this tag to the next.
           ]]></description>
           <type>String</type>
         </field>
