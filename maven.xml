@@ -1,7 +1,0 @@
-<project default="multiproject:install">
-
-<goal name="mm">
-   <echo>${java.home}</echo>
-</goal>
-
-</project>
