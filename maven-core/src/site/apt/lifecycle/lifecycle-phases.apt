@@ -34,7 +34,7 @@ Maven Lifecycle Phases
  
  * package [jar or making a dist]
 
- * integration tests which required the entire app/assembly to be finished
+ * package tests which required the entire app/assembly to be finished [integration and more]
 
  * install
  
