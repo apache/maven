@@ -19,12 +19,14 @@ package org.apache.maven.plugin.jar;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 
 /**
- * @goalXX install
+ * @goal jar:install
  *
  * @description install a jar in local repository
  *
@@ -37,55 +39,31 @@ import java.io.File;
  *  validator=""
  *  expression="#maven.final.name"
  *  description=""
+ *
  * @parameter
- *  name="outputDirectory"
- *  type="String"
+ *   name="outputDirectory"
+ *   type="String"
+ *   required="true"
+ *   validator=""
+ *   expression="#maven.build.dir"
+ *   description=""
+ *
+ * @parameter
+ *  name="project"
+ *  type="org.apache.maven.project.MavenProject"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory"
+ *  expression="#project"
  *  description=""
+ *
  * @parameter
- *  name="basedir"
- *  type="String"
+ *  name="installer"
+ *  type="org.apache.maven.artifact.installer.ArtifactInstaller"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory"
+ *  expression="#component.org.apache.maven.artifact.installer.ArtifactInstaller"
  *  description=""
- * @parameter
- *  name="groupId"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.groupId"
- *  description=""
- * @parameter
- *  name="artifactId"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.artifactId"
- *  description=""
- * @parameter
- *  name="version"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.version"
- *  description=""
- * @parameter
- *  name="localRepository"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.localRepository"
- *  description=""
- * @parameter
- *  name="pomFile"
- *  type="java.io.File"
- *  required="true"
- *  validator=""
- *  expression="#project.file"
- *  description=""
+ *
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @version $Id$
@@ -96,99 +74,19 @@ public class JarInstallMojo
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
             throws Exception
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
 
         String outputDirectory = ( String ) request.getParameter( "outputDirectory" );
 
         String jarName = ( String ) request.getParameter( "jarName" );
 
-        String groupId = ( String ) request.getParameter( "groupId" );
+        File jarFile = new File( outputDirectory , jarName + ".jar" );
 
-        String artifactId = ( String ) request.getParameter( "artifactId" );
+        MavenProject project = ( MavenProject ) request.getParameter( "project"  );
 
-        //@todo if we have SNAPSHOT version should we do something special?
+        ArtifactInstaller artifactInstaller = ( ArtifactInstaller ) request.getParameter( "component.org.apache.maven.artifact.installer.ArtifactInstaller"  );
 
-        String version = ( String ) request.getParameter( "version" );
-
-        File pomFile = ( File ) request.getParameter( "pomFile" );
-
-        String localRepository = ( String ) request.getParameter( "localRepository" );
-
-        File jarFile = new File( outputDirectory, jarName + ".jar" );
-
-        try
-        {
-            String jarPath = groupId + "/poms/" + artifactId + "-" + version + ".pom";
-
-            //here I imagine that also something like this can be made
-            //
-            //  Dependecy = new Dependecy();
-            //  dependecy.setGroupid( groupId )
-            //     ....
-            // MavenArtifact artifact = artifactFactory.createArtifact( dependecy )
-            //
-            // so maven artifact factory will be centralized service for creating
-            // repository paths
-            //
-            // I am not sure if this is good option but it is something which might be considered  
-            installArtifact( jarPath, jarFile, localRepository );
-
-        }
-        catch ( Exception e )
-        {
-            response.setException( e );
-
-            return;
-        }
-
-        try
-        {
-            String pomPath = groupId + "/poms/" + artifactId + "-" + version + ".pom";
-
-            installArtifact( pomPath, pomFile, localRepository );
-        }
-        catch ( Exception e )
-        {
-            // @todo what shall we do when jar was installed but we failed to install pom?
-
-            // response.setException ( e );
-
-        }
-
+        artifactInstaller.install( jarFile, "jar", project );
 
     }
-
-    //@todo do we need to crate md5 checksums in local repsitory?
-    //I think it would be nice if any local repository could be
-    // and at any moment in time used as remote repository
-    // so content of both repositories should be symetrical
-    private void installArtifact( String path, File source, String localRepository ) throws Exception
-    {
-
-        File destination = new File( localRepository, path );
-
-
-        // @todo should we use plexus classes?
-        FileUtils.fileCopy( source.getPath(), destination.getPath() );
-
-        // @todo we can use as well file wagon here.
-
-//        FileWagon wagon = new FileWagon();
-//
-//        TransferObserver observer = new ChecksumObserver()
-//
-//        wagon.addTransferObserver( observer );
-//
-//        Repository repository = new Repository( "file://xxxx" );
-//
-//        wagon.connect( repository );
-//
-//        wagon.put( path, file );
-
-        // and wagon has also built-in support for <<artifacts>> which is not used
-    }
-
 
 }
