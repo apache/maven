@@ -32,19 +32,19 @@ public class DefaultArtifact
     // These are the only things i need to specify
     // ----------------------------------------------------------------------
 
-    private String groupId;
+    private final String groupId;
 
-    private String artifactId;
+    private final String artifactId;
 
-    private String version;
+    private final String version;
 
-    private String type;
+    private final String type;
 
-    private String classifier;
+    private final String classifier;
 
-    private String scope;
+    private final String scope;
 
-    private String extension;
+    private final String extension;
 
     private String path;
 
@@ -52,7 +52,7 @@ public class DefaultArtifact
      * @todo this should be replaced by type handler
      */
     public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
-                           String extension )
+                            String extension )
     {
         this( groupId, artifactId, version, scope, type, null, extension );
     }
@@ -62,7 +62,7 @@ public class DefaultArtifact
      * only. Classifier is for specifying derived artifacts, like ejb-client.
      */
     public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
-                           String classifier, String extension )
+                            String classifier, String extension )
     {
         if ( type == null )
         {
@@ -81,7 +81,14 @@ public class DefaultArtifact
 
         this.classifier = classifier;
 
-        this.extension = extension;
+        if ( extension == null )
+        {
+            this.extension = type;
+        }
+        else
+        {
+            this.extension = extension;
+        }
     }
 
     public DefaultArtifact( String groupId, String artifactId, String version, String type )
@@ -126,12 +133,7 @@ public class DefaultArtifact
 
     public String getExtension()
     {
-        if ( extension != null )
-        {
-            return extension;
-        }
-
-        return type;
+        return extension;
     }
 
     // ----------------------------------------------------------------------

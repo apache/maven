@@ -1,11 +1,7 @@
 package org.apache.maven.artifact.handler.manager;
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
-
-import java.util.Set;
-
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +16,10 @@ import java.util.Set;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.handler.ArtifactHandler;
+
+import java.util.Set;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -28,7 +28,8 @@ public interface ArtifactHandlerManager
 {
     String ROLE = ArtifactHandlerManager.class.getName();
 
-    ArtifactHandler getArtifactHandler( String type ) throws ArtifactHandlerNotFoundException;
+    ArtifactHandler getArtifactHandler( String type )
+        throws ArtifactHandlerNotFoundException;
 
     //    String localRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
     //         throws ArtifactHandlerNotFoundException;
