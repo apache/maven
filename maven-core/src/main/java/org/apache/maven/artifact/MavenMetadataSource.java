@@ -79,12 +79,12 @@ public class MavenMetadataSource
             if ( mavenProjectBuilder != null )
             {
                 MavenProject project = mavenProjectBuilder.build( metadataArtifact.getFile(), localRepository );
-                artifacts = createArtifacts( project.getDependencies(), localRepository );
+                artifacts = createArtifacts( project.getDependencies(), artifact.getScope(), localRepository );
             }
             else
             {
                 Model model = reader.read( new FileReader( metadataArtifact.getFile() ) );
-                artifacts = createArtifacts( model.getDependencies(), localRepository );
+                artifacts = createArtifacts( model.getDependencies(), artifact.getScope(), localRepository );
             }
         }
         catch ( ArtifactResolutionException e )
@@ -99,27 +99,40 @@ public class MavenMetadataSource
         return artifacts;
     }
 
-    public Set createArtifacts( List dependencies, ArtifactRepository localRepository )
+    protected Set createArtifacts( List dependencies, String scope, ArtifactRepository localRepository )
     {
         Set projectArtifacts = new HashSet();
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
-            Artifact artifact = createArtifact( d, localRepository );
+            Artifact artifact = createArtifact( d, scope, localRepository );
             projectArtifacts.add( artifact );
         }
         return projectArtifacts;
     }
 
-    public Artifact createArtifact( Dependency dependency, ArtifactRepository localRepository )
+    protected Artifact createArtifact( Dependency dependency, String scope, ArtifactRepository localRepository )
     {
         // TODO: duplicated with the ArtifactFactory, localRepository not used (should be used here to resolve path?
         Artifact artifact = new DefaultArtifact( dependency.getGroupId(),
                                                  dependency.getArtifactId(),
                                                  dependency.getVersion(),
-                                                 dependency.getScope(),
+                                                 transitiveScope( dependency.getScope(), scope ),
                                                  dependency.getType(),
                                                  dependency.getType() );
         return artifact;
+    }
+
+    private String transitiveScope( String desiredScope, String artifactScope )
+    {
+        // TODO: scope handler
+        if ( Artifact.SCOPE_TEST.equals( artifactScope ) || Artifact.SCOPE_TEST.equals( desiredScope ) )
+        {
+            return Artifact.SCOPE_TEST;
+        }
+        else
+        {
+            return Artifact.SCOPE_RUNTIME;
+        }
     }
 }

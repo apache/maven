@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <groupId>maven</groupId>
+  <artifactId>maven-project-test</artifactId>
+  <name>Maven</name>
+  <version>1.0-beta-9</version>
+  <dependencies>
+
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>scope-default</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>scope-test</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>scope-runtime</artifactId>
+      <version>1.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>scope-compile</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>

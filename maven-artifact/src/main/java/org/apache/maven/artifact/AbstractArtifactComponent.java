@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
+ * @todo refactor away
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */

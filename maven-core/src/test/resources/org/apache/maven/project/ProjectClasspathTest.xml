@@ -1,0 +1,8 @@
+<plexus>
+  <components>
+    <component>
+      <role>org.apache.maven.artifact.ArtifactResolver</role>
+      <implementation>org.apache.maven.project.ProjectClasspathArtifactResolver</implementation>
+    </component>
+  </components>
+</plexus>

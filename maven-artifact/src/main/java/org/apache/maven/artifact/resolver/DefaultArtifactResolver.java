@@ -11,6 +11,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.transform.ArtifactRequestTransformation;
 import org.apache.maven.wagon.TransferFailedException;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @todo get rid of {@link AbstractArtifactComponent} and then create an AbstractArtifactResolver that does the transitive boilerplate
+ */
 public class DefaultArtifactResolver
     extends AbstractArtifactComponent
     implements ArtifactResolver
@@ -175,11 +179,7 @@ public class DefaultArtifactResolver
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
-        Set s = new HashSet();
-
-        s.add( artifact );
-
-        return resolveTransitively( s, remoteRepositories, localRepository, source );
+        return resolveTransitively( Collections.singleton( artifact ), remoteRepositories, localRepository, source );
     }
 
 
@@ -242,7 +242,6 @@ public class DefaultArtifactResolver
 
                     try
                     {
-                        // TODO: need to convert scope compile -> runtime using scope handler
                         referencedDependencies = source.retrieve( newArtifact, localRepository, remoteRepositories );
                     }
                     catch ( ArtifactMetadataRetrievalException e )

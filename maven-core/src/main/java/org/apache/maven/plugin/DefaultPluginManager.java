@@ -209,7 +209,8 @@ public class DefaultPluginManager
 
             String version = "1.0-SNAPSHOT";
 
-            Artifact pluginArtifact = new DefaultArtifact( "maven", artifactId, version, "plugin", "jar" );
+            Artifact pluginArtifact = new DefaultArtifact( "maven", artifactId, version, DefaultArtifact.SCOPE_RUNTIME,
+                                                           "plugin", "jar" );
 
             addPlugin( pluginArtifact, session );
         }
