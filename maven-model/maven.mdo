@@ -792,16 +792,20 @@
       </fields>
       <codeSegments>
         <codeSegment>
+          <version>3.0.0+</version>
+          <code>
+            public String toString()
+            {
+                return groupId + "/" + type + "s:" + artifactId + "-" + version;
+            }
+          </code>
+        </codeSegment>
+        <codeSegment>
           <version>4.0.0</version>
           <code>
             public String getId()
             {
                 return groupId + ":" + artifactId + ":" + type + ":" + version;
-            }
-
-            public String toString()
-            {
-                return groupId + "/" + type + "s:" + artifactId + "-" + version;
             }
           </code>
         </codeSegment>
@@ -848,36 +852,23 @@
 
             public boolean equals( Object o )
             {
-                if ( o == null )
+                if ( this == o )
+                {
+                    return true;
+                }
+            
+                if ( !( o instanceof Dependency ) )
                 {
                     return false;
                 }
             
-                if ( getClass() != o.getClass() )
-                {
-                    return false;
-                }
-            
-                if ( getId() != null )
-                {
-                    return getId().equals( ( (Dependency) o ).getId() );
-                }
-                else
-                {
-                    return ( (Dependency) o ).getId() == null;
-                }
+                Dependency d  = (Dependency) o;
+                return getId().equals( d.getId() );
             }
             
             public int hashCode()
             {
-                if ( getId() != null )
-                {
-                    return getId().hashCode();
-                }
-                else
-                {
-                    return super.hashCode();
-                }
+                return getId().hashCode();
             }
           ]]></code>
         </codeSegment>
