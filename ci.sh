@@ -16,7 +16,7 @@
 export JAVA_HOME=/usr/local/java
 export MBOOT_HOME=$HOME/mboot
 export MAVEN_HOME=$HOME/maven
-export PATH=$PATH:$MBOOT_HOME:$MAVEN_HOME/bin
+export PATH=$PATH:$MBOOT_HOME:$MAVEN_HOME/bin:$JAVA_HOME/bin
 
 # ----------------------------------------------------------------------------------
 
