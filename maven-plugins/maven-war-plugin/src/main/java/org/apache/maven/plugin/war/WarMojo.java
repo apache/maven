@@ -123,6 +123,13 @@ import org.codehaus.plexus.util.FileUtils;
  *  default="war"
  *  description=""
  * @parameter
+ *  name="classesDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator=""
+ *  expression="#project.build.output"
+ *  description=""
+ * @parameter
  *  name="outputDirectory"
  *  type="String"
  *  required="true"
@@ -166,6 +173,8 @@ public class WarMojo
     private MavenProject project;
 
     private ArtifactRepository localRepository;
+
+    private File classesDirectory;
 
     private String outputDirectory;
 
@@ -214,7 +223,12 @@ public class WarMojo
 
         File tldDirectory = new File( webappDirectory, WEB_INF + "/tld" );
 
-        File classesDirectory = new File( webappDirectory, WEB_INF + "/classes" );
+        File webappClassesDirectory = new File( webappDirectory, WEB_INF + "/classes" );
+
+        if ( classesDirectory.exists() )
+        {
+            FileUtils.copyDirectoryStructure( classesDirectory, webappClassesDirectory );
+        }
 
         Set artifacts = project.getArtifacts();
 
@@ -243,7 +257,7 @@ public class WarMojo
 
         copyResources( warSourceDirectory, webappDirectory, warSourceIncludes, warSourceExcludes, webXml );
 
-        //buildWebapp( project );
+        buildWebapp( project );
     }
 
     public void generateInPlaceWebapp()
@@ -305,6 +319,8 @@ public class WarMojo
         project = (MavenProject) request.getParameter( "project" );
 
         localRepository = (ArtifactRepository) request.getParameter( "localRepository" );
+
+        classesDirectory = new File( (String) request.getParameter( "classesDirectory" ) );
 
         outputDirectory = (String) request.getParameter( "outputDirectory" );
 
