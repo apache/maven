@@ -16,7 +16,7 @@ do
   (
     cd $integration_test
    
-    m2 clean jar
+    m2 clean:clean jar:jar
     
     java -cp $cp $verifier `pwd`
   )
