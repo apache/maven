@@ -1,2 +1,2 @@
-target/pluginItem.txt
-target/goalItem.txt
+target/pluginItem
+target/goalItem
