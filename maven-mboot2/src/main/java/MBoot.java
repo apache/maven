@@ -937,7 +937,7 @@ public class MBoot
 
     private String getArtifactPath( Dependency d, String pathSeparator )
     {
-        return d.getArtifactDirectory() + pathSeparator + "jars" + pathSeparator + d.getArtifact();
+        return d.getArtifactDirectory() + pathSeparator + d.getType() + "s" + pathSeparator + d.getArtifact();
     }
 
     class ModelReader
@@ -1344,14 +1344,26 @@ public class MBoot
                 return jar;
             }
 
+            String artifact;
+
             if ( isValid( getArtifactId() ) )
             {
-                return getArtifactId() + "-" + getVersion() + "." + getType();
+                artifact = getArtifactId() + "-" + getVersion() + ".";
             }
             else
             {
-                return getId() + "-" + getVersion() + "." + getType();
+                artifact = getId() + "-" + getVersion() + ".";
             }
+
+            if ( "jar".equals( getType() ) || "plugin".equals( getType() ) )
+            {
+                artifact += "jar";
+            }
+            else
+            {
+                artifact += getType();
+            }
+            return artifact;
         }
 
         public void setVersion( String version )
