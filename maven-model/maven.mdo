@@ -42,6 +42,10 @@
           <type>String</type>
         </field>
         <field>
+          <name>pomVersion</name>
+          <delegateTo>modelVersion</delegateTo>
+        </field>
+        <field>
           <name>groupId</name>
           <version>??? used post 3.0.0</version>
           <description>The primary grouping for your project.</description>
