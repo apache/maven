@@ -33,5 +33,12 @@
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
     </dependency>
+    <!-- Possibly temporary provider registration -->
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>wagon-ssh</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>
