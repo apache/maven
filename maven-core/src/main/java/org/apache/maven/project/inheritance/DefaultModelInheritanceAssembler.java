@@ -45,22 +45,10 @@ public class DefaultModelInheritanceAssembler
 {
     public void assembleModelInheritance( Model child, Model parent )
     {
-        // Pom version
-        if ( child.getModelVersion() == null )
-        {
-            child.setModelVersion( parent.getModelVersion() );
-        }
-
         // Group id
         if ( child.getGroupId() == null )
         {
             child.setGroupId( parent.getGroupId() );
-        }
-
-        // artifactId
-        if ( child.getArtifactId() == null )
-        {
-            child.setArtifactId( parent.getArtifactId() );
         }
 
         // currentVersion
