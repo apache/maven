@@ -28,6 +28,7 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.model.Site;
 import org.apache.maven.model.UnitTest;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Goal;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.MavenTestCase;
 
@@ -76,6 +77,20 @@ public class CanonicalProjectBuilderTest
         assertEquals( "src/conf/plexus.properties", properties.getProperty( "plexusConfigurationPropertiesFile" ) );
 
         assertEquals( "Continuum", properties.getProperty( "plexusApplicationName" ) );
+
+        // ----------------------------------------------------------------------
+        // Goal specific configuration
+        // ----------------------------------------------------------------------
+
+        List goals = plugin.getGoals();
+
+        Goal g0 = (Goal) goals.get( 0 );
+
+        assertEquals( "plexus:runtime", g0.getId() );
+
+        Properties goalProperties = g0.getConfiguration();
+
+        assertEquals( "ContinuumPro", goalProperties.getProperty( "plexusApplicationName" ) );
 
         // Plugin1 [antlr]
     }
