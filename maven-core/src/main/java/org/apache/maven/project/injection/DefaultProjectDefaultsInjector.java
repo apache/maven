@@ -1,4 +1,4 @@
-package org.apache.maven.project;
+package org.apache.maven.project.injection;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -18,6 +18,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.project.MavenProject;
 
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.TreeMap;
  * @author jdcasey Created on Feb 1, 2005
  */
 public class DefaultProjectDefaultsInjector
-implements ProjectDefaultsInjector
+    implements ProjectDefaultsInjector
 {
 
     public void injectDefaults( MavenProject project )

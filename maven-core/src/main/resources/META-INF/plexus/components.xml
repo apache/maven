@@ -86,8 +86,8 @@
      |
      -->
     <component>
-      <role>org.apache.maven.project.ProjectDefaultsInjector</role>
-      <implementation>org.apache.maven.project.DefaultProjectDefaultsInjector</implementation>
+      <role>org.apache.maven.project.injection.ProjectDefaultsInjector</role>
+      <implementation>org.apache.maven.project.injection.DefaultProjectDefaultsInjector</implementation>
     </component>
     <!--
      |
@@ -99,7 +99,7 @@
       <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.project.ProjectDefaultsInjector</role>
+          <role>org.apache.maven.project.injection.ProjectDefaultsInjector</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.interpolation.ProjectInterpolator</role>
@@ -255,12 +255,12 @@
           <!-- 14 -->
           <phase>
             <id>install</id>
-            <goal>install:install</goal>
+            <goal>jar:install</goal>
           </phase>
           <!-- 15 -->
           <phase>
             <id>deploy</id>
-            <goal>deploy:deploy</goal>
+            <goal>jar:deploy</goal>
           </phase>
         </phases>
         <!-- END SNIPPET: lifecycle -->

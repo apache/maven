@@ -17,7 +17,6 @@ package org.apache.maven.project;
  * ====================================================================
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -34,7 +33,6 @@ import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -203,6 +201,7 @@ public class MavenProject
         return list;
     }
 
+/* TODO: remove - should be using a type handler
     public String[] getClasspathElements()
     {
         int size = getArtifacts().size();
@@ -238,6 +237,7 @@ public class MavenProject
         return false;
     }
 
+*/
     // ----------------------------------------------------------------------
     // Delegate to the model
     // ----------------------------------------------------------------------

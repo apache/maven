@@ -1,4 +1,4 @@
-package org.apache.maven.project;
+package org.apache.maven.project.injection;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,7 +16,7 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-/**
+import org.apache.maven.project.MavenProject; /**
  * @author jdcasey Created on Feb 1, 2005
  */
 public interface ProjectDefaultsInjector

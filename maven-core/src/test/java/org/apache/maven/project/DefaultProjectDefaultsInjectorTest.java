@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.project.injection.DefaultProjectDefaultsInjector;
 
 import java.util.List;
 import java.util.Properties;

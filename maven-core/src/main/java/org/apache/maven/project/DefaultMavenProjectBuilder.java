@@ -31,6 +31,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
+import org.apache.maven.project.injection.ProjectDefaultsInjector;
 import org.apache.maven.project.interpolation.ProjectInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
