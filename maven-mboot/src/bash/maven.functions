@@ -49,7 +49,6 @@ runTests()
   
   if [ -f $5 ]
   then
-    echo ">>> $CP"
     "${JAVACMD}" -classpath "$CP" org.codehaus.surefire.SureFire "$2" "$3" $4 $5 $6
   fi
 }
