@@ -18,11 +18,11 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.MavenSettings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -63,18 +63,18 @@ public class MavenSession
 
     private Log log;
 
-    private final UserModel userModel;
+    private final MavenSettings settings;
 
     private List remoteArtifactRepos = Collections.EMPTY_LIST;
 
-    public MavenSession( PlexusContainer container, PluginManager pluginManager, UserModel userModel,
+    public MavenSession( PlexusContainer container, PluginManager pluginManager, MavenSettings settings,
         ArtifactRepository localRepository, EventDispatcher eventDispatcher, Log log, List goals )
     {
         this.container = container;
 
         this.pluginManager = pluginManager;
 
-        this.userModel = userModel;
+        this.settings = settings;
 
         this.localRepository = localRepository;
 
@@ -151,9 +151,9 @@ public class MavenSession
         return log;
     }
 
-    public UserModel getUserModel()
+    public MavenSettings getSettings()
     {
-        return userModel;
+        return settings;
     }
 
     public void addImpliedExecution( String goal, String implied ) throws CycleDetectedException

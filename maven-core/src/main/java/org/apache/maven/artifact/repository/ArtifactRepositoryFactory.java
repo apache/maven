@@ -18,7 +18,7 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.user.UserModel;
+import org.apache.maven.settings.MavenSettings;
 
 /**
  * @author jdcasey
@@ -28,6 +28,6 @@ public interface ArtifactRepositoryFactory
 
     public static final String ROLE = ArtifactRepositoryFactory.class.getName();
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository, UserModel userModel );
+    public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings );
 
 }

@@ -1,4 +1,4 @@
-package org.apache.maven.model.user;
+package org.apache.maven.settings;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -17,7 +17,7 @@ package org.apache.maven.model.user;
  * ====================================================================
  */
 
-import org.apache.maven.model.user.io.xpp3.MavenUserModelXpp3Reader;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.File;
@@ -27,30 +27,31 @@ import java.io.IOException;
 /**
  * @author jdcasey
  */
-public class DefaultUserModelBuilder
+public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled
-    implements UserModelBuilder
+    implements MavenSettingsBuilder
 {
 
-    private static final String DEFAULT_USER_MODEL_PATH = "${user.home}/.m2/user.xml";
+    private static final String DEFAULT_SETTINGS_PATH = "${user.home}/.m2/settings.xml";
     
-    private String userModelPath = DEFAULT_USER_MODEL_PATH;
+    private String settingsPath = DEFAULT_SETTINGS_PATH;
 
     // TODO: don't throw Exception.
-    public UserModel buildUserModel() throws Exception
+    public MavenSettings buildSettings() throws Exception
     {
-        UserModel model = null;
-
-        File modelFile = getUserModelFile();
+        MavenSettings settings = null;
+        
+        File modelFile = getSettingsFile();
         if ( modelFile.exists() && modelFile.isFile() )
         {
-            MavenUserModelXpp3Reader modelReader = new MavenUserModelXpp3Reader();
+            SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
             FileReader reader = null;
             try
             {
                 reader = new FileReader( modelFile );
 
-                model = modelReader.read( reader );
+                Settings model = modelReader.read( reader );
+                settings = new MavenSettings( model );
             }
             finally
             {
@@ -67,58 +68,20 @@ public class DefaultUserModelBuilder
             }
         }
 
-        if ( model == null )
+        if ( settings == null )
         {
-            getLogger().debug( "UserModel not found. Creating empty instance." );
-            model = new UserModel();
+            getLogger().debug( "Settings model not found. Creating empty instance of MavenSettings." );
+            settings = new MavenSettings();
         }
 
-        return model;
+        return settings;
     }
 
-    // TODO: don't throw Exception.
-//    public static void setUserModel( UserModel userModel ) throws Exception
-//    {
-//        File modelFile = getUserModelFile();
-//
-//        File modelDir = modelFile.getParentFile();
-//        if ( !modelDir.exists() )
-//        {
-//            modelDir.mkdirs();
-//        }
-//
-//        MavenUserModelXpp3Writer modelWriter = new MavenUserModelXpp3Writer();
-//
-//        FileWriter writer = null;
-//        try
-//        {
-//            writer = new FileWriter( modelFile );
-//
-//            modelWriter.write( writer, userModel );
-//
-//            writer.flush();
-//        }
-//        finally
-//        {
-//            if ( writer != null )
-//            {
-//                try
-//                {
-//                    writer.close();
-//                }
-//                catch ( IOException e )
-//                {
-//                }
-//            }
-//        }
-//
-//    }
-
-    private File getUserModelFile()
+    private File getSettingsFile()
     {
         String userDir = System.getProperty( "user.home" );
         
-        String path = userModelPath;
+        String path = settingsPath;
         
         path = path.replaceAll( "\\$\\{user.home\\}", userDir );
         path = path.replaceAll( "\\\\", "/" );

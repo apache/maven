@@ -6,9 +6,9 @@
     <version>2.0-SNAPSHOT</version>
   </parent>
   <groupId>maven</groupId>
-  <artifactId>maven-user-model</artifactId>
+  <artifactId>maven-settings</artifactId>
   <version>2.0-SNAPSHOT</version>
-  <name>Maven User Configuration Model</name>
+  <name>Maven Local Settings Model</name>
   <build>
     <plugins>
       <plugin>
@@ -17,19 +17,8 @@
         <version>1.0-SNAPSHOT</version>
         <configuration>
           <version>1.0.0</version>
-          <model>maven-user.mdo</model>
+          <model>settings.mdo</model>
         </configuration>
-        <goals>
-          <goal>
-            <id>xpp3-writer</id>
-          </goal>
-          <goal>
-            <id>xpp3-reader</id>
-          </goal>
-          <goal>
-            <id>java</id>
-          </goal>
-        </goals>
       </plugin>
     </plugins>
   </build>

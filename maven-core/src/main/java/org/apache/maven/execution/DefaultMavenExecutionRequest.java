@@ -18,10 +18,10 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.monitor.logging.Log;
+import org.apache.maven.settings.MavenSettings;
 
 import java.util.List;
 
@@ -47,18 +47,18 @@ public class DefaultMavenExecutionRequest
 
     private final EventDispatcher eventDispatcher;
 
-    private final UserModel userModel;
+    private final MavenSettings settings;
 
     private final String baseDirectory;
 
     private boolean recursive = true;
 
-    public DefaultMavenExecutionRequest( ArtifactRepository localRepository, UserModel userModel,
+    public DefaultMavenExecutionRequest( ArtifactRepository localRepository, MavenSettings settings,
                                          EventDispatcher eventDispatcher, List goals, List files, String baseDirectory )
     {
         this.localRepository = localRepository;
 
-        this.userModel = userModel;
+        this.settings = settings;
 
         this.goals = goals;
 
@@ -69,9 +69,9 @@ public class DefaultMavenExecutionRequest
         this.baseDirectory = baseDirectory;
     }
 
-    public UserModel getUserModel()
+    public MavenSettings getSettings()
     {
-        return userModel;
+        return settings;
     }
 
     public String getBaseDirectory()
@@ -106,6 +106,11 @@ public class DefaultMavenExecutionRequest
     public MavenSession getSession()
     {
         return session;
+    }
+
+    public List getProjectFiles()
+    {
+        return files;
     }
 
     public void setSession( MavenSession session )

@@ -29,8 +29,6 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.GoalExecutionException;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.user.UserModel;
-import org.apache.maven.model.user.UserModelBuilder;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -40,6 +38,8 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.path.PathTranslator;
+import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -85,8 +85,8 @@ public class DefaultPluginManager
     protected PathTranslator pathTranslator;
 
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    protected UserModelBuilder userModelBuilder;
+    
+    protected MavenSettingsBuilder mavenSettingsBuilder;
 
     public DefaultPluginManager()
     {
@@ -581,7 +581,7 @@ public class DefaultPluginManager
     {
         // TODO: configure this from bootstrap or scan lib
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
-                                                              "maven-user-model", "maven-monitor", "maven-plugin",
+                                                              "maven-settings", "maven-monitor", "maven-plugin",
                                                               "plexus-container-api", "plexus-container-default",
                                                               "plexus-artifact-container", "wagon-provider-api",
                                                               "classworlds"} );
@@ -591,23 +591,22 @@ public class DefaultPluginManager
 
         // TODO: needs to be configured from the POM element
         
-        UserModel userModel = null;
+        MavenSettings settings = null;
         try
         {
-            userModel = userModelBuilder.buildUserModel();
+            settings = mavenSettingsBuilder.buildSettings();
         }
         catch ( Exception e )
         {
-            // TODO: Warn about this failure.
-            userModel = new UserModel();
+            getLogger().error( "Failed to build MavenSettings from xml file. Using defaults.", e );
+            settings = new MavenSettings();
         }
 
         Repository pluginRepo = new Repository();
         pluginRepo.setId( "plugin-repository" );
         pluginRepo.setUrl( "http://repo1.maven.org" );
-
-        ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo,
-                                                                                                  userModel );
+        
+        ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo, settings );
 
         remotePluginRepositories.add( pluginRepository );
     }

@@ -18,10 +18,10 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.monitor.logging.Log;
+import org.apache.maven.settings.MavenSettings;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public interface MavenExecutionRequest
 
     EventDispatcher getEventDispatcher();
 
-    UserModel getUserModel();
+    MavenSettings getSettings();
 
     String getBaseDirectory();
 

@@ -46,11 +46,11 @@ package org.apache.maven.plugin.deploy;
  *  description=""
  *
  * @parameter
- *  name="userModel"
- *  type="org.apache.maven.model.user.UserModel"
+ *  name="settings"
+ *  type="org.apache.maven.settings.MavenSettings"
  *  required="true"
  *  validator=""
- *  expression="#userModel"
+ *  expression="#settings"
  *  description=""
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>

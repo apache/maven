@@ -1,4 +1,4 @@
-package org.apache.maven.model.user;
+package org.apache.maven.settings;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -20,12 +20,12 @@ package org.apache.maven.model.user;
 /**
  * @author jdcasey
  */
-public interface UserModelBuilder
+public interface MavenSettingsBuilder
 {
     
-    public static final String ROLE = UserModelBuilder.class.getName();
+    public static final String ROLE = MavenSettingsBuilder.class.getName();
     
     // TODO: Don't throw Exception.
-    UserModel buildUserModel() throws Exception;
+    MavenSettings buildSettings() throws Exception;
 
 }

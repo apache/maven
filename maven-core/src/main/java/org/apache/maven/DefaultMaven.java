@@ -25,9 +25,6 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.user.ProxyProfile;
-import org.apache.maven.model.user.UserModel;
-import org.apache.maven.model.user.UserModelUtils;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginManager;
@@ -35,6 +32,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.ReactorException;
+import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -195,8 +194,8 @@ public class DefaultMaven
         MavenSession session = createSession( request );
 
         session.setProject( project );
-
-        session.setRemoteRepositories( getArtifactRepositories( project, request.getUserModel() ) );
+        
+        session.setRemoteRepositories( getArtifactRepositories( project, request.getSettings() ) );
 
         resolveParameters( request );
 
@@ -243,13 +242,13 @@ public class DefaultMaven
         return response;
     }
 
-    private List getArtifactRepositories( MavenProject project, UserModel userModel )
+    private List getArtifactRepositories( MavenProject project, MavenSettings settings )
     {
         List remoteRepos = new ArrayList();
         for ( Iterator it = project.getRepositories().iterator(); it.hasNext(); )
         {
             Repository modelRepo = (Repository) it.next();
-            remoteRepos.add( artifactRepositoryFactory.createArtifactRepository( modelRepo, userModel ) );
+            remoteRepos.add( artifactRepositoryFactory.createArtifactRepository( modelRepo, settings ) );
         }
 
         return remoteRepos;
@@ -280,7 +279,7 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request )
     {
-        return new MavenSession( container, pluginManager, request.getUserModel(), request.getLocalRepository(),
+        return new MavenSession( container, pluginManager, request.getSettings(), request.getLocalRepository(),
                                  request.getEventDispatcher(), request.getLog(), request.getGoals() );
     }
 
@@ -293,15 +292,15 @@ public class DefaultMaven
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
-        UserModel userModel = request.getUserModel();
+        MavenSettings settings = request.getSettings();
 
-        ProxyProfile proxyProfile = UserModelUtils.getActiveProxyProfile( userModel );
+        Proxy proxy = settings.getActiveProxy();
 
-        if ( proxyProfile != null )
+        if ( proxy != null )
         {
-            wagonManager.setProxy( proxyProfile.getProtocol(), proxyProfile.getHost(), proxyProfile.getPort(),
-                                   proxyProfile.getUsername(), proxyProfile.getPassword(),
-                                   proxyProfile.getNonProxyHosts() );
+            wagonManager.setProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
+                                   proxy.getUsername(), proxy.getPassword(),
+                                   proxy.getNonProxyHosts() );
         }
 
     }

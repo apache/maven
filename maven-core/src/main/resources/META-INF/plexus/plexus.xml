@@ -28,7 +28,7 @@
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.model.user.UserModelBuilder</role>
+          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
         </requirement>
       </requirements>
     </component>
@@ -41,8 +41,8 @@
       <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
     </component>
     <component>
-      <role>org.apache.maven.model.user.UserModelBuilder</role>
-      <implementation>org.apache.maven.model.user.DefaultUserModelBuilder</implementation>
+      <role>org.apache.maven.settings.MavenSettingsBuilder</role>
+      <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
     </component>
   </components>
 </plexus>

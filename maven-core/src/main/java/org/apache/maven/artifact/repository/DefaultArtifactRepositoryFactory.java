@@ -18,9 +18,8 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.user.ServerProfile;
-import org.apache.maven.model.user.UserModel;
-import org.apache.maven.model.user.UserModelUtils;
+import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Server;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -33,15 +32,15 @@ public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository, UserModel userModel )
+    public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings )
     {
-        ServerProfile repoProfile = null;
+        Server repoProfile = null;
 
         String repoId = modelRepository.getId();
 
         if ( repoId != null && repoId.length() > 0 )
         {
-            repoProfile = UserModelUtils.getServerProfile( userModel, modelRepository.getId() );
+            repoProfile = settings.getServer( modelRepository.getId() );
         }
         else
         {

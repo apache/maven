@@ -1,6 +1,6 @@
 <model>
-  <id>mavenUserModel</id>
-  <name>MavenUserModel</name>
+  <id>settings</id>
+  <name>Settings</name>
   <description><![CDATA[
     User-specific configuration for maven. Includes things that should not 
     be distributed with the pom.xml file, such as developer identity, along with 
@@ -8,17 +8,17 @@
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.model.user</value>
+      <value>org.apache.maven.settings</value>
     </default>
   </defaults>
   <classes>
-    <class rootElement="true" xml.tagName="userModel">
-      <name>UserModel</name>
+    <class rootElement="true" xml.tagName="settings">
+      <name>Settings</name>
       <version>1.0.0</version>
       <description>Root element of the user configuration file.</description>
       <fields>
         <field>
-          <name>jdkProfiles</name>
+          <name>jdks</name>
           <version>1.0.0</version>
           <description><![CDATA[
           	Configuration for different java environment profiles. One good use
@@ -28,12 +28,12 @@
             the command line.
           ]]></description>
           <association>
-            <type>JdkProfile</type>
+            <type>Jdk</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
         <field>
-          <name>proxyProfiles</name>
+          <name>proxies</name>
           <version>1.0.0</version>
           <description><![CDATA[
           	Configuration for different proxy profiles. Multiple proxy profiles
@@ -43,12 +43,12 @@
             the command line or from the defaults section below.
           ]]></description>
           <association>
-            <type>ProxyProfile</type>
+            <type>Proxy</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
         <field>
-          <name>serverProfiles</name>
+          <name>servers</name>
           <version>1.0.0</version>
           <description><![CDATA[
           	Configuration of server-specific settings, mainly authentication
@@ -56,12 +56,12 @@
             basis.
           ]]></description>
           <association>
-            <type>ServerProfile</type>
+            <type>Server</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
         <field>
-          <name>mavenProfiles</name>
+          <name>profiles</name>
           <version>1.0.0</version>
           <description><![CDATA[
           	Configuration for different runtime profiles for maven itself. For
@@ -72,16 +72,8 @@
             or the command line (read: system properties).
           ]]></description>
           <association>
-            <type>MavenProfile</type>
+            <type>Profile</type>
             <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
-          <name>defaultProfiles</name>
-          <description>Contains the ids for active profiles.</description>
-          <version>1.0.0</version>
-          <association>
-            <type>DefaultProfiles</type>
           </association>
         </field>
       </fields>
@@ -89,10 +81,18 @@
     </class>
     <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
     <class>
-      <name>JdkProfile</name>
+      <name>Jdk</name>
       <version>1.0.0</version>
       <description><![CDATA[Describes one Java environment]]></description>
       <fields>
+        <field>
+          <name>active</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <defaultValue>false</defaultValue>
+          <description><![CDATA[Whether this JDK is the active one.]]></description>
+          <type>boolean</type>
+        </field>
         <field>
           <name>version</name>
           <version>1.0.0</version>
@@ -110,14 +110,16 @@
       </fields>
     </class>
     <class>
-      <name>ProxyProfile</name>
+      <name>Proxy</name>
       <version>1.0.0</version>
       <fields>
         <field>
-          <name>id</name>
+          <name>active</name>
           <version>1.0.0</version>
-          <description><![CDATA[The unique id for a proxy configuration.]]></description>
-          <type>String</type>
+          <required>false</required>
+          <defaultValue>false</defaultValue>
+          <description><![CDATA[Whether this proxy configuration is the active one.]]></description>
+          <type>boolean</type>
         </field>
         <field>
           <name>protocol</name>
@@ -161,7 +163,7 @@
       </fields>
     </class>
     <class>
-      <name>ServerProfile</name>
+      <name>Server</name>
       <version>1.0.0</version>
       <fields>
         <field>
@@ -205,17 +207,16 @@
       </fields>
     </class>
     <class>
-      <name>MavenProfile</name>
+      <name>Profile</name>
       <version>1.0.0</version>
       <fields>
         <field>
-          <name>id</name>
+          <name>active</name>
           <version>1.0.0</version>
-          <required>true</required>
-          <description><![CDATA[
-          	The ID of this profile used to specify the active configuration.
-          ]]></description>
-          <type>String</type>
+          <required>false</required>
+          <defaultValue>false</defaultValue>
+          <description><![CDATA[Whether this is the active maven profile.]]></description>
+          <type>boolean</type>
         </field>
         <field>
           <name>localRepository</name>
@@ -229,43 +230,6 @@
           <version>1.0.0</version>
           <required>true</required>
           <description><![CDATA[The keystore used to store passwords.]]></description>
-          <type>String</type>
-        </field>
-      </fields>
-    </class>
-    <class>
-      <name>DefaultProfiles</name>
-      <version>1.0.0</version>
-      <fields>
-        <field>
-          <name>serverProfileId</name>
-          <description>
-            The active server profile for any usage that does not specify a 
-            server id.
-          </description>
-          <version>1.0.0</version>
-          <required>false</required>
-          <type>String</type>
-        </field>
-        <field>
-          <name>mavenProfileId</name>
-          <description>The active runtime profile.</description>
-          <version>1.0.0</version>
-          <required>true</required>
-          <type>String</type>
-        </field>
-        <field>
-          <name>jdkVersion</name>
-          <description>The active JDK configuration.</description>
-          <version>1.0.0</version>
-          <required>false</required>
-          <type>String</type>
-        </field>
-        <field>
-          <name>proxyProfileId</name>
-          <description>The active proxy configuration.</description>
-          <version>1.0.0</version>
-          <required>false</required>
           <type>String</type>
         </field>
       </fields>

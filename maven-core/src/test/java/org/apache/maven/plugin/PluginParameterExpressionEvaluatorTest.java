@@ -5,10 +5,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.MavenSettings;
 import org.codehaus.plexus.PlexusContainer;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class PluginParameterExpressionEvaluatorTest
         PlexusContainer container = getContainer();
         MavenSession session = new MavenSession( container,
                                                  mgr,
-                                                 new UserModel(),
+                                                 new MavenSettings(),
                                                  repo,
                                                  new DefaultEventDispatcher(),
                                                  new DefaultLog( container.getLogger() ),
@@ -80,7 +80,7 @@ public class PluginParameterExpressionEvaluatorTest
         PlexusContainer container = getContainer();
         MavenSession session = new MavenSession( container,
                                                  mgr,
-                                                 new UserModel(),
+                                                 new MavenSettings(),
                                                  repo,
                                                  new DefaultEventDispatcher(),
                                                  new DefaultLog( container.getLogger() ),
@@ -98,7 +98,7 @@ public class PluginParameterExpressionEvaluatorTest
         PlexusContainer container = getContainer();
         MavenSession session = new MavenSession( container,
                                                  mgr,
-                                                 new UserModel(),
+                                                 new MavenSettings(),
                                                  repo,
                                                  new DefaultEventDispatcher(),
                                                  new DefaultLog( container.getLogger() ),

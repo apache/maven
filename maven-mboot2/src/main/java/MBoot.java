@@ -73,7 +73,7 @@ public class MBoot
                                         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
                                         "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar"};
 
-    String[] builds = new String[]{"maven-model", "maven-user-model", "maven-monitor", "maven-plugin",
+    String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin",
                                    "maven-artifact", "maven-script/maven-script-marmalade", "maven-core",
                                    "maven-archiver", "maven-plugin-tools/maven-plugin-tools-api",
                                    "maven-plugin-tools/maven-plugin-tools-java",
@@ -96,13 +96,13 @@ public class MBoot
     {
         Map targetVersions = new TreeMap();
         targetVersions.put( "maven-model", "4.0.0" );
-        targetVersions.put( "maven-user-model", "1.0.0" );
+        targetVersions.put( "maven-settings", "1.0.0" );
 
         MODELLO_TARGET_VERSIONS = Collections.unmodifiableMap( targetVersions );
 
         Map modelFiles = new TreeMap();
         modelFiles.put( "maven-model", "maven.mdo" );
-        modelFiles.put( "maven-user-model", "maven-user.mdo" );
+        modelFiles.put( "maven-settings", "settings.mdo" );
 
         MODELLO_MODEL_FILES = Collections.unmodifiableMap( modelFiles );
     }
@@ -186,19 +186,19 @@ public class MBoot
 
         if ( mavenRepoLocal == null )
         {
-            UserModelReader userModelReader = new UserModelReader();
+            SettingsReader userModelReader = new SettingsReader();
 
             try
             {
                 String userHome = System.getProperty( "user.home" );
 
-                File userXml = new File( userHome, ".m2/user.xml" );
+                File settingsXml = new File( userHome, ".m2/settings.xml" );
 
-                if ( userXml.exists() )
+                if ( settingsXml.exists() )
                 {
-                    userModelReader.parse( userXml );
+                    userModelReader.parse( settingsXml );
 
-                    MavenProfile activeProfile = userModelReader.getActiveMavenProfile();
+                    Profile activeProfile = userModelReader.getActiveMavenProfile();
 
                     mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
                 }
@@ -223,14 +223,12 @@ public class MBoot
             mavenRepoLocal = repoDir.getAbsolutePath();
 
             System.out
-                      .println( "You SHOULD have a ~/.m2/user.xml file and must contain at least the following information:\n" );
+                      .println( "You SHOULD have a ~/.m2/settings.xml file and must contain at least the following information:\n" );
 
-            System.out.println( "<userModel>\n  " + "<mavenProfiles>\n    " + "<mavenProfile>\n      "
-                + "<id>someId</id>\n      " + "<localRepository>/path/to/your/repository</localRepository>\n    "
-                + "</mavenProfile>\n  " + "</mavenProfiles>\n  " + "<defaultProfiles>\n    "
-                + "<mavenProfileId>someId</mavenProfileId>\n  " + "</defaultProfiles>\n" + "</userModel>\n" );
-
-            System.out.println( "where \'someId\' is just an id for matching within the file." );
+            System.out.println( "<settings>\n  " + "<profiles>\n    " + "<profile>\n      "
+                + "<localRepository>/path/to/your/repository</localRepository>\n    "
+                + "</profile>\n  " + "</profiles>\n"
+                + "</settings>\n" );
 
             System.out.println();
 
@@ -1331,21 +1329,19 @@ public class MBoot
         }
     }
 
-    class UserModelReader
+    class SettingsReader
         extends AbstractReader
     {
 
-        private Map mavenProfiles = new TreeMap();
+        private List profiles = new ArrayList();
 
-        private MavenProfile currentProfile = null;
+        private Profile currentProfile = null;
 
         private StringBuffer currentBody = new StringBuffer();
 
-        private String activeProfileId = null;
+        private Profile activeMavenProfile = null;
 
-        private MavenProfile activeMavenProfile = null;
-
-        public MavenProfile getActiveMavenProfile()
+        public Profile getActiveMavenProfile()
         {
             return activeMavenProfile;
         }
@@ -1359,24 +1355,24 @@ public class MBoot
         public void endElement( String uri, String localName, String rawName )
             throws SAXException
         {
-            if ( "mavenProfile".equals( rawName ) )
+            if ( "profile".equals( rawName ) )
             {
-                if ( notEmpty( currentProfile.getId() ) && notEmpty( currentProfile.getLocalRepo() ) )
+                if ( notEmpty( currentProfile.getLocalRepo() ) )
                 {
-                    mavenProfiles.put( currentProfile.getId(), currentProfile );
+                    profiles.add( currentProfile );
                     currentProfile = null;
                 }
                 else
                 {
-                    throw new SAXException( "Invalid mavenProfile entry. Missing one or more " +
-                                            "fields: {id,localRepository}." );
+                    throw new SAXException( "Invalid profile entry. Missing one or more " +
+                                            "fields: {localRepository}." );
                 }
             }
             else if ( currentProfile != null )
             {
-                if ( "id".equals( rawName ) )
+                if ( "active".equals( rawName ) )
                 {
-                    currentProfile.setId( currentBody.toString().trim() );
+                    currentProfile.setActive( Boolean.valueOf(currentBody.toString().trim()).booleanValue() );
                 }
                 else if ( "localRepository".equals( rawName ) )
                 {
@@ -1384,16 +1380,26 @@ public class MBoot
                 }
                 else
                 {
-                    throw new SAXException( "Illegal element inside mavenProfile: \'" + rawName + "\'" );
+                    throw new SAXException( "Illegal element inside profile: \'" + rawName + "\'" );
                 }
             }
-            else if ( "userModel".equals( rawName ) )
+            else if ( "settings".equals( rawName ) )
             {
-                this.activeMavenProfile = (MavenProfile) mavenProfiles.get( activeProfileId );
-            }
-            else if ( "mavenProfileId".equals( rawName ) )
-            {
-                this.activeProfileId = currentBody.toString().trim();
+                if(profiles.size() == 1)
+                {
+                    activeMavenProfile = (Profile) profiles.get(0);
+                }
+                else
+                {
+                    for ( Iterator it = profiles.iterator(); it.hasNext(); )
+                    {
+                        Profile profile = (Profile) it.next();
+                        if(profile.isActive())
+                        {
+                            activeMavenProfile = profile;
+                        }
+                    }
+                }
             }
 
             currentBody = new StringBuffer();
@@ -1407,9 +1413,9 @@ public class MBoot
         public void startElement( String uri, String localName, String rawName, Attributes attributes )
             throws SAXException
         {
-            if ( "mavenProfile".equals( rawName ) )
+            if ( "profile".equals( rawName ) )
             {
-                currentProfile = new MavenProfile();
+                currentProfile = new Profile();
             }
         }
 
@@ -1417,37 +1423,36 @@ public class MBoot
         {
             this.currentBody = null;
             this.activeMavenProfile = null;
-            this.activeProfileId = null;
             this.currentProfile = null;
-            this.mavenProfiles.clear();
+            this.profiles.clear();
         }
     }
 
-    public static class MavenProfile
+    public static class Profile
     {
 
         private String localRepo;
 
-        private String id;
+        private boolean active = false;
 
         public void setLocalRepo( String localRepo )
         {
             this.localRepo = localRepo;
         }
 
+        public boolean isActive()
+        {
+            return active;
+        }
+
+        public void setActive( boolean active )
+        {
+            this.active = active;
+        }
+
         public String getLocalRepo()
         {
             return localRepo;
-        }
-
-        public void setId( String id )
-        {
-            this.id = id;
-        }
-
-        public String getId()
-        {
-            return id;
         }
 
     }

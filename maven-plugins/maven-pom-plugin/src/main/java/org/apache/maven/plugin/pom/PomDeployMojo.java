@@ -22,11 +22,11 @@ import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.user.UserModel;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.MavenSettings;
 
 import java.io.File;
 
@@ -58,11 +58,11 @@ import java.io.File;
  * validator=""
  * expression="#component.org.apache.maven.artifact.repository.ArtifactRepositoryFactory"
  * description=""
- * @parameter name="userModel"
- * type="org.apache.maven.model.user.UserModel"
+ * @parameter name="settings"
+ * type="org.apache.maven.settings.MavenSettings"
  * required="true"
  * validator=""
- * expression="#userModel"
+ * expression="#settings"
  * description=""
  */
 public class PomDeployMojo
@@ -78,7 +78,7 @@ public class PomDeployMojo
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) request.getParameter(
             "artifactRepositoryFactory" );
 
-        UserModel userModel = (UserModel) request.getParameter( "userModel" );
+        MavenSettings settings = (MavenSettings) request.getParameter( "settings" );
 
         // TODO: validation instead
         if ( project.getDistributionManagement() == null )
@@ -88,7 +88,7 @@ public class PomDeployMojo
         }
         Repository repository = project.getDistributionManagement().getRepository();
         ArtifactRepository deploymentRepository = artifactRepositoryFactory.createArtifactRepository( repository,
-                                                                                                      userModel );
+                                                                                                      settings );
 
         if ( deploymentRepository.getAuthenticationInfo() == null )
         {

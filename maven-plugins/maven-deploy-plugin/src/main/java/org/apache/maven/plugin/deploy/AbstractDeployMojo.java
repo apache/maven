@@ -23,11 +23,11 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.user.UserModel;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.MavenSettings;
 
 import java.io.File;
 
@@ -59,11 +59,11 @@ import java.io.File;
  *  description=""
  *
  * @parameter
- *  name="userModel"
- *  type="org.apache.maven.model.user.UserModel"
+ *  name="settings"
+ *  type="org.apache.maven.settings.MavenSettings"
  *  required="true"
  *  validator=""
- *  expression="#userModel"
+ *  expression="#settings"
  *  description=""
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse </a>
@@ -82,7 +82,7 @@ public abstract class AbstractDeployMojo
         
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) request.getParameter( "artifactRepositoryFactory" );
         
-        UserModel userModel = (UserModel) request.getParameter( "userModel" );
+        MavenSettings settings = (MavenSettings) request.getParameter( "settings" );
 
         DistributionManagement distributionManagement = project.getDistributionManagement();
 
@@ -101,7 +101,7 @@ public abstract class AbstractDeployMojo
             throw new Exception( msg );
         }
 
-        ArtifactRepository deploymentRepository = artifactRepositoryFactory.createArtifactRepository( repository, userModel );
+        ArtifactRepository deploymentRepository = artifactRepositoryFactory.createArtifactRepository( repository, settings );
         
         if(deploymentRepository.getAuthenticationInfo() == null)
         {

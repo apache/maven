@@ -33,15 +33,14 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.user.MavenProfile;
-import org.apache.maven.model.user.UserModel;
-import org.apache.maven.model.user.UserModelBuilder;
-import org.apache.maven.model.user.UserModelUtils;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Plugin;
+import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.MavenSettingsBuilder;
+import org.apache.maven.settings.Profile;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.logging.Logger;
@@ -132,14 +131,13 @@ public class MavenCli
 
         embedder.start( classWorld );
 
-        UserModelBuilder userModelBuilder = (UserModelBuilder) embedder.lookup( UserModelBuilder.ROLE );
+        MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
+        
+        MavenSettings settings = settingsBuilder.buildSettings();
+        
+        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup( ArtifactRepositoryFactory.ROLE );
 
-        UserModel userModel = userModelBuilder.buildUserModel();
-
-        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
-            ArtifactRepositoryFactory.ROLE );
-
-        ArtifactRepository localRepository = getLocalRepository( userModel, artifactRepositoryFactory );
+        ArtifactRepository localRepository = getLocalRepository( settings, artifactRepositoryFactory );
 
         if ( commandLine.hasOption( CLIManager.REACTOR ) )
         {
@@ -149,7 +147,7 @@ public class MavenCli
             String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
             request =
-                new DefaultMavenExecutionRequest( localRepository, userModel, eventDispatcher,
+                new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
                                                   commandLine.getArgList(),
                                                   FileUtils.getFiles( userDir, includes, excludes ), userDir.getPath() );
         }
@@ -160,7 +158,7 @@ public class MavenCli
             {
                 files = Collections.singletonList( projectFile );
             }
-            request = new DefaultMavenExecutionRequest( localRepository, userModel, eventDispatcher,
+            request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
                                                         commandLine.getArgList(), files, userDir.getPath() );
 
             if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
@@ -349,15 +347,15 @@ public class MavenCli
         return mavenProperties;
     }
 
-    protected static ArtifactRepository getLocalRepository( UserModel userModel, ArtifactRepositoryFactory repoFactory )
+    protected static ArtifactRepository getLocalRepository( MavenSettings settings, ArtifactRepositoryFactory repoFactory )
         throws Exception
     {
-        MavenProfile mavenProfile = UserModelUtils.getActiveMavenProfile( userModel );
+        Profile profile = settings.getActiveProfile();
 
         String localRepository = null;
-        if ( mavenProfile != null )
+        if ( profile != null )
         {
-            localRepository = mavenProfile.getLocalRepository();
+            localRepository = profile.getLocalRepository();
         }
 
         if ( localRepository == null )
@@ -376,6 +374,6 @@ public class MavenCli
 
         repo.setUrl( "file://" + localRepository );
 
-        return repoFactory.createArtifactRepository( repo, userModel );
+        return repoFactory.createArtifactRepository( repo, settings );
     }
 }

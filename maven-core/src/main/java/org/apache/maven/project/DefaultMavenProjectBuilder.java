@@ -29,8 +29,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.user.UserModel;
-import org.apache.maven.model.user.UserModelBuilder;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -38,6 +36,8 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
+import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
@@ -78,8 +78,8 @@ public class DefaultMavenProjectBuilder
     private ModelDefaultsInjector modelDefaultsInjector;
 
     private ModelInterpolator modelInterpolator;
-
-    private UserModelBuilder userModelBuilder;
+    
+    private MavenSettingsBuilder mavenSettingsBuilder;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
@@ -271,15 +271,15 @@ public class DefaultMavenProjectBuilder
     private List buildArtifactRepositories( List repositories )
         throws ProjectBuildingException
     {
-        UserModel userModel = null;
+        MavenSettings settings = null;
 
         try
         {
-            userModel = userModelBuilder.buildUserModel();
+            settings = mavenSettingsBuilder.buildSettings();
         }
         catch ( Exception e )
         {
-            throw new ProjectBuildingException( "Cannot read user-model.", e );
+            throw new ProjectBuildingException( "Cannot read settings.", e );
         }
 
         List repos = new ArrayList();
@@ -287,7 +287,7 @@ public class DefaultMavenProjectBuilder
         {
             Repository mavenRepo = (Repository) i.next();
 
-            ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo, userModel );
+            ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo, settings );
 
             if ( !repos.contains( artifactRepo ) )
             {

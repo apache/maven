@@ -90,9 +90,9 @@ public class PluginParameterExpressionEvaluator
                 throw new PluginConfigurationException( "Error evaluating plugin parameter expression: " + expression, e );
             }
         }
-        else if ( expression.startsWith( "#userModel" ) )
+        else if ( "#settings".equals( expression ) )
         {
-            value = context.getUserModel();
+            value = context.getSettings();
         }
         else if ( expression.equals( "#basedir" ) )
         {
