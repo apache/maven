@@ -25,6 +25,26 @@ Maven Lifecycle
          
        - goal execution
 
++-----+
+
+                          goal0
+                            |
+                            |
+                       is the plugin for
+                       goal0 present?
+                            |
+                            |
+                     yes ---+--- no
+                                 |
+                                 v
+                             download the plugin which
+                             contains code for this goal
+                                 |
+                                 v
+                             process the plugin descriptor
+                     
++-----+
+
  * Multiple goals
  
    - session lifecycle+
