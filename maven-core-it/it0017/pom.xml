@@ -1,0 +1,7 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven</groupId>
+  <artifactId>maven-core-it0017</artifactId>
+  <packaging>ejb</packaging>
+  <version>1.0</version>
+</model>

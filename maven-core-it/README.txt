@@ -45,6 +45,8 @@ it0015: Test marmalade-driven mojo support. This will compile supporting java
         install the plugin, and finally use the new plugin.
 
 it0016: Test a WAR generation
+
+it0017: Test an EJB generation
 -------------------------------------------------------------------------------
 
 - generated sources

@@ -88,6 +88,12 @@
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>ejb</role-hint>
+      <implementation>org.apache.maven.artifact.handler.EjbHandler</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>jar</role-hint>
       <implementation>org.apache.maven.artifact.handler.JarHandler</implementation>
     </component>

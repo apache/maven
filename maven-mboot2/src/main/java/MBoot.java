@@ -81,10 +81,11 @@ public class MBoot
                                    "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-verifier"};
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-clean-plugin", "maven-plugins/maven-compiler-plugin",
-                                         "maven-plugins/maven-deploy-plugin", "maven-plugins/maven-install-plugin",
-                                         "maven-plugins/maven-jar-plugin", "maven-plugins/maven-plugin-plugin",
-                                         "maven-plugins/maven-pom-plugin", "maven-plugins/maven-resources-plugin",
-                                         "maven-plugins/maven-surefire-plugin", "maven-plugins/maven-war-plugin"};
+                                         "maven-plugins/maven-deploy-plugin", "maven-plugins/maven-ejb-plugin",
+                                         "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin",
+                                         "maven-plugins/maven-plugin-plugin", "maven-plugins/maven-pom-plugin",
+                                         "maven-plugins/maven-resources-plugin", "maven-plugins/maven-surefire-plugin",
+                                         "maven-plugins/maven-war-plugin"};
 
     private static final Map MODELLO_TARGET_VERSIONS;
 

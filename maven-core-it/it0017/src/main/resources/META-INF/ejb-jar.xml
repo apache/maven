@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar>
+  <enterprise-beans>
+    <session>
+      <ejb-name>Hello</ejb-name>
+      <home>org.apache.maven.it0017.HelloHome</home>
+      <remote>org.apache.maven.it0017.Hello</remote>
+      <ejb-class>org.apache.maven.it0017.HelloBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>
+  </enterprise-beans>
+  <assembly-descriptor>
+    <container-transaction>
+      <method>
+        <ejb-name>Hello</ejb-name>
+        <method-name>*</method-name>
+      </method>
+      <trans-attribute>Required</trans-attribute>
+    </container-transaction>
+  </assembly-descriptor>
+</ejb-jar>
