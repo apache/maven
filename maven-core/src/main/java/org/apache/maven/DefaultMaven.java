@@ -190,7 +190,9 @@ public class DefaultMaven
                 }
 
                 List moduleFiles = FileUtils.getFiles( project.getFile().getParentFile(), includes, null );
-                projects.addAll( collectProjects( moduleFiles, localRepository ) );
+                List collectedProjects = collectProjects( moduleFiles, localRepository );
+                projects.addAll( collectedProjects );
+                project.setCollectedProjects( collectedProjects );
             }
             projects.add( project );
         }

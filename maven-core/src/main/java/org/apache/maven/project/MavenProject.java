@@ -36,6 +36,7 @@ import org.apache.maven.model.Scm;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -62,6 +63,8 @@ public class MavenProject
     private File file;
 
     private Set artifacts;
+
+    private List collectedProjects = Collections.EMPTY_LIST;
 
     public MavenProject( Model model )
     {
@@ -555,6 +558,16 @@ public class MavenProject
         }
 
         build.addPlugin( plugin );
+    }
+
+    public List getCollectedProjects()
+    {
+        return collectedProjects;
+    }
+
+    public void setCollectedProjects( List collectedProjects )
+    {
+        this.collectedProjects = collectedProjects;
     }
 }
 
