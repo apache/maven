@@ -1,41 +1,6 @@
 I have tried to separate each of the components by concern. We have the
 following:
 
-maven-model:
-
-This is strictly the model for Maven, so really just plain objects. Eventually
-I would like to be able to generate these from a UML model but that can
-come later. In addition to generating the sources from a UML model I would
-like to generate the XSD or any other artifacts that may be required. This way
-we can keep things up-to-date instead of the disaster we have with the
-current incarnation of Maven.
-
-maven-model-tools:
-
-There are two components in here. A model marshaller and unmarshaller. These
-components simply do the mapping there are no notions of interpolation or
-inheritance in these components.
-
-maven-project:
-
-The maven Project is really the runtime entity that people are used to
-working with. The Project is created with a component called the
-ProjectBuilder which is responsible for creating a Project which does carry
-with it the notions of inheritance and interpolation. The Project contains a
-copy of the model and a copy of the interpolated model. I did this because
-the contents of the model cannot be contaminated with runtime notions. For
-example you don't want interpolated values finding their way into the model
-because when you write it to disk again you've obviously lost the real
-values. The same goes with inherited values i.e. you do not want to write
-back to disk the dependencies inherited from a parent project as that's
-implicit using the <extend> element.
-
-The project also carries any runtime notions like artifacts (Michal this is
-where your artifact tools will come in, the ProjectBuilder will use the
-artifact component to create the list of artifacts), dependency maps, source
-roots created by generative processes. Currrently in maven all those notions
-are baked into the project and it's created a horrible mess.
-
 maven:
 
 This is the actual maven thingy itself. Currently is very small but the
