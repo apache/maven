@@ -35,7 +35,6 @@ public class MBoot
         "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
         "surefire/jars/surefire-booter-1.2-SNAPSHOT.jar",
         "surefire/jars/surefire-1.2-SNAPSHOT.jar",
-        "xpp3/jars/xpp3-1.1.3.3.jar",
         "qdox/jars/qdox-1.2.jar"
     };
 
@@ -48,8 +47,7 @@ public class MBoot
         "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
         "plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
         "plexus/jars/plexus-container-default-1.0-alpha-1-SNAPSHOT.jar",
-        "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
-        "xpp3/jars/xpp3-1.1.3.3.jar"
+        "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar"
     };
 
     // ----------------------------------------------------------------------
@@ -65,8 +63,7 @@ public class MBoot
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
-        "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar",
-        "xpp3/jars/xpp3-1.1.3.3.jar"
+        "modello/jars/modello-xpp3-plugin-1.0-SNAPSHOT.jar"
     };
 
     String[] builds = new String[]
@@ -315,7 +312,7 @@ public class MBoot
 
         for ( int i = 0; i < plexusDeps.length; i++ )
         {
-            if ( plexusDeps[i].startsWith( "classworlds") )
+            if ( plexusDeps[i].startsWith( "classworlds" ) )
             {
                 FileUtils.copyFileToDirectory( repoLocal + "/" + plexusDeps[i], boot );
             }
@@ -338,10 +335,10 @@ public class MBoot
             Dependency d = (Dependency) i.next();
 
             if ( d.getArtifactId().equals( "classworlds" ) ||
-                 d.artifactId.equals( "plexus" ) ||
-                 d.artifactId.equals( "xstream" ) ||
-                 d.artifactId.equals( "xpp3" ) ||
-                 d.artifactId.equals( "junit" ) )
+                d.artifactId.equals( "plexus-container-api" ) ||
+                d.artifactId.equals( "plexus-container-default" ) ||
+                d.artifactId.equals( "plexus-utils" ) ||
+                d.artifactId.equals( "junit" ) )
             {
                 continue;
             }
@@ -581,8 +578,8 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency + 
-                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException( "Missing dependency: " + dependency +
+                                                 ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             cl.addURL( f.toURL() );
@@ -613,8 +610,8 @@ public class MBoot
             File f = new File( repoLocal, dependency );
             if ( !f.exists() )
             {
-                throw new FileNotFoundException( "Missing dependency: " + dependency + 
-                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
+                throw new FileNotFoundException( "Missing dependency: " + dependency +
+                                                 ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
             }
 
             modelloClassLoader.addURL( f.toURL() );
@@ -769,7 +766,7 @@ public class MBoot
 
         if ( !success )
         {
-            throw new Exception ( "Tests error" );
+            throw new Exception( "Tests error" );
         }
     }
 
@@ -1207,7 +1204,7 @@ public class MBoot
                 {
                     local.repository = getBodyText();
                 }
-                else 
+                else
                 {
                     insideRepository = false;
                 }
@@ -1522,8 +1519,8 @@ public class MBoot
         public void setRepository( String repository )
         {
             this.repository = repository;
-        }   
-    
+        }
+
         public String getOnline()
         {
             return this.online;
@@ -1532,6 +1529,6 @@ public class MBoot
         public void setOnline( String online )
         {
             this.online = online;
-        }   
+        }
     }
 }
