@@ -535,6 +535,24 @@
       </fields>
     </class>
     <class>
+      <name>IssueManagement</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>system</name>
+          <version>4.0.0</version>
+          <description>The name of the issue management system i.e. Bugzilla</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0</version>
+          <description>Url for the issue management system use by the project.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
       <name>License</name>
       <fields>
         <field>
