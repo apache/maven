@@ -318,7 +318,12 @@
           </description>
           <type>Organization</type>
         </field>
-        
+        <field>
+          <name>distributionManagement</name>
+          <version>4.0.0</version>
+          <description>Distribution information for a project.</description>
+          <type>DistributionManagement</type>
+        </field>
       </fields>
       <!-- We need this because we can't use package as a field name. -->
       <codeSegments>
@@ -721,6 +726,27 @@
           <name>url</name>
           <version>4.0.0</version>
           <description>Url for the issue management system use by the project.</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>DistributionManagement</name>
+      <version>4.0.0</version>
+      <description>
+        This elements describes all that pertains to distribution for a project.
+      </description>
+      <fields>
+        <field>
+          <name>host</name>
+          <version>4.0.0</version>
+          <description>The FQDN of the host where the site resides.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>directory</name>
+          <description>The directory on the host where the site resides.</description>
+          <version>4.0.0</version>
           <type>String</type>
         </field>
       </fields>
