@@ -1,0 +1,11 @@
+Trying to get a large set of use cases that we can use to help drive
+development in the right direction. I would like to collect some here and then
+post them to the wiki as examples users can template to express what their
+use cases are. So my first example is something I chatted about with Aslak
+this morning. So they are brief and possibly naive but a huge collection
+of these would help I think.
+
+----------------------------------------------------------------------------
+
+- Being able to write artifact handler that would operate to install an
+xdoclet plugin correctly when an xdoclet plugin is state as a dependency.
