@@ -21,8 +21,14 @@ runJava()
   # $1 == classpath
   # $2 == Main class
   # $3 == Mail args
+
+  if $cygwin; then
+    CP=`cygpath -pw $1`
+  else
+    CP=$1
+  fi
   
-  "${JAVACMD}" -classpath $1 $2 "$3"
+  "${JAVACMD}" -classpath $CP $2 "$3"
 }
 
 compile()
@@ -42,7 +48,13 @@ compile()
   
     SOURCES=`find $3 -name '*.java'`
 
-    "${JAVAC}" -classpath $1 -d $2 ${SOURCES} $4
+    if $cygwin; then
+      CP=`cygpath -pw $1`
+    else
+      CP=$1
+    fi
+  
+    "${JAVAC}" -classpath $CP -d $2 ${SOURCES} $4
   
   fi
 }
@@ -55,7 +67,13 @@ buildJar()
   (
     dir=`pwd`
     cd $1
-    ${JAVA_HOME}/bin/jar -cf ${dir}/$2 * 
+    if $cygwin; then
+      JARFILE=`cygpath -pw ${dir}/$2`
+    else
+      JARFILE=${dir}/$2
+    fi
+  
+    ${JAVA_HOME}/bin/jar -cf $JARFILE * 
   )
 }
 
@@ -92,6 +110,10 @@ buildMavenProject()
       
       echo "Building project in `pwd`"
         
+      if $cygwin = true; then
+        home=`cygpath -pw $home`
+      fi
+
       runJava ${MBOOT_HOME}/classes Bootstrapper ${home}
       
       isCommandSuccessful $? "Failed running project parser!"
@@ -131,15 +153,18 @@ getJarName()
 {
   # $1 == project.xml
   
-  version=`grep currentVersion $1 | sed -e 's/^ *//;s/<currentVersion>//;s/<\/currentVersion>//'`
+  version=`cat $1 | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<version>' | sed -e 's#^.*<version>##;s#</version>.*$##'`
 
-  artifactId=`grep artifactId $1 | sed -e 's/^ *//;s/<artifactId>//;s/<\/artifactId>//' | awk 'BEGIN { FS = "\n"; RS="" } { print $1 }'`
+  if [ -z $version ]
+  then
+    version=`grep currentVersion $1 | sed -e 's/^ *//;s/<currentVersion>//;s/<\/currentVersion>//'`
+  fi
+
+  artifactId=`cat $1 | tr '\n' ' ' | sed 's#<dependencies>.*</dependencies>##' | grep '<artifactId>' | sed -e 's#^.*<artifactId>##;s#</artifactId>.*$##'`
 
   if [ -z $artifactId ]
   then
-    
-    artifactId=`grep id  $1 | sed -e 's/^ *//;s/<id>//;s/<\/id>//' | awk 'BEGIN { FS = "\n"; RS="" } { print $1 }'`    
-  
+    artifactId=`cat $1 | tr '\n' ' ' | sed 's#<versions>.*</versions>##' | sed 's#<developers>.*</developers>##' | sed 's#<dependencies>.*</dependencies>##' | grep '<id>' | sed -e 's#^.*<id>##;s#</id>.*$##'`
   fi
   
   jarName="${artifactId}-${version}.jar"
