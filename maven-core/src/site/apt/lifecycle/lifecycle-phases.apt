@@ -27,7 +27,9 @@ Maven Lifecycle Phases
  * process test resources
  
  * test compile
- 
+
+ * process test classes
+
  * test [surefire, testNG, dbunit ...]
  
  * package [jar or making a dist]
