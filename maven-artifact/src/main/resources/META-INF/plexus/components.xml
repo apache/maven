@@ -36,7 +36,7 @@
         </requirement>
       </requirements>
     </component>
-    
+
     <!--
      |
      | ArtifactInstaller
@@ -90,6 +90,12 @@
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ejb</role-hint>
       <implementation>org.apache.maven.artifact.handler.EjbHandler</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>plexus-service</role-hint>
+      <implementation>org.apache.maven.artifact.handler.PlexusServiceHandler</implementation>
     </component>
 
     <component>
