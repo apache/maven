@@ -17,7 +17,6 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.wagon.repository.Repository;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * This class is an abstraction of the location from/to resources

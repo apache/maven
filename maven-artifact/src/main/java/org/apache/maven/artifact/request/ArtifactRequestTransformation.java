@@ -1,12 +1,5 @@
 package org.apache.maven.artifact.request;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
-import java.util.Map;
-import java.util.Set;
-
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -22,6 +15,12 @@ import java.util.Set;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

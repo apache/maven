@@ -1,9 +1,5 @@
 package org.apache.maven.artifact.handler;
 
-import org.apache.maven.artifact.Artifact;
-
-import java.io.File;
-
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
  *

@@ -16,9 +16,8 @@ package org.apache.maven.artifact.installer;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.ArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.ArtifactComponentTestCase;
 
 import java.io.File;
 

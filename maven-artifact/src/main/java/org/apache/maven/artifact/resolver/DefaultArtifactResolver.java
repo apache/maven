@@ -62,7 +62,7 @@ public class DefaultArtifactResolver
         return artifact;
     }
 
-    private String LS = System.getProperty( "line.separator" );
+    private static final String LS = System.getProperty( "line.separator" );
 
     private String artifactNotFound( Artifact artifact, Set remoteRepositories )
     {

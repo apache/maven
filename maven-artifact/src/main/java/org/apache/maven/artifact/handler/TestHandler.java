@@ -16,10 +16,6 @@ package org.apache.maven.artifact.handler;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
-import java.io.File;
-
 /**
  * @todo [BP] should be removed and replaced with scope if other design is approved
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

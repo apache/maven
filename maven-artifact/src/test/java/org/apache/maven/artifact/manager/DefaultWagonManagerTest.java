@@ -35,30 +35,21 @@ public class DefaultWagonManagerTest
 
         Wagon wagon = null;
 
-        try
-        {
-            wagon = (Wagon) wagonManager.getWagon( "a" );
+        wagon = (Wagon) wagonManager.getWagon( "a" );
 
-            assertNotNull( wagon );
+        assertNotNull( wagon );
 
-            wagon = (Wagon) wagonManager.getWagon( "b1" );
+        wagon = (Wagon) wagonManager.getWagon( "b1" );
 
-            assertNotNull( wagon );
+        assertNotNull( wagon );
 
-            wagon = (Wagon) wagonManager.getWagon( "b2" );
+        wagon = (Wagon) wagonManager.getWagon( "b2" );
 
-            assertNotNull( wagon );
+        assertNotNull( wagon );
 
-            wagon = (Wagon) wagonManager.getWagon( "c" );
+        wagon = (Wagon) wagonManager.getWagon( "c" );
 
-            assertNotNull( wagon );
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-
-            fail( e.getMessage() );
-        }
+        assertNotNull( wagon );
 
         try
         {

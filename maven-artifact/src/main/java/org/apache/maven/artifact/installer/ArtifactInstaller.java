@@ -18,7 +18,6 @@ package org.apache.maven.artifact.installer;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.io.File;
 
