@@ -62,7 +62,8 @@ public class PluginResolutionPhase
             this.pluginManager = pluginManager;
         }
 
-        public void preVisit( String goal, MavenSession session ) throws GraphTraversalException
+        public void preVisit( String goal, MavenSession session )
+            throws GraphTraversalException
         {
             try
             {
@@ -78,11 +79,9 @@ public class PluginResolutionPhase
             }
         }
 
-        public boolean shouldVisit( String goal, MavenSession session ) throws GraphTraversalException
+        public boolean shouldVisit( String goal, MavenSession session ) 
         {
-            boolean result = !resolved.contains( goal );
-
-            return result;
+            return !resolved.contains( goal );
         }
 
         public void visitPostGoal( String goal, String postGoal, MavenSession session )

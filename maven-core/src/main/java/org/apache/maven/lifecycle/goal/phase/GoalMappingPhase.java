@@ -40,7 +40,7 @@ public class GoalMappingPhase
     public void execute( MavenGoalExecutionContext context )
         throws GoalExecutionException
     {
-        GoalMappingVisitor visitor = new GoalMappingVisitor( context.getSession().getPluginManager() );
+        GoalMappingVisitor visitor = new GoalMappingVisitor();
 
         try
         {
@@ -56,14 +56,7 @@ public class GoalMappingPhase
     public static final class GoalMappingVisitor
         extends AbstractGoalVisitor
     {
-        private PluginManager pluginManager;
-
         private Set visited = new HashSet();
-
-        GoalMappingVisitor( PluginManager pluginManager )
-        {
-            this.pluginManager = pluginManager;
-        }
 
         public void visitPrereq( String goal, String prereq, MavenSession session )
             throws GraphTraversalException
@@ -103,9 +96,7 @@ public class GoalMappingPhase
 
         public boolean shouldVisit( String goal, MavenSession session )
         {
-            boolean result = !visited.contains( goal );
-
-            return result;
+            return !visited.contains( goal );
         }
     }
 }
