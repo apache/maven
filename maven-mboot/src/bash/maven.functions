@@ -17,7 +17,7 @@ downloadMBootDependencies()
     if [ "$snapshot" = "0" ] || [ ! -f $repoLocal/$i ]
     then
       mkdir -p `dirname $repoLocal/$i` > /dev/null 2>&1
-      wget http://www.ibiblio.org/maven/$i -O $repoLocal/$i
+      wget -O $repoLocal/$i http://www.ibiblio.org/maven/$i
     fi
   done
 }
