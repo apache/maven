@@ -26,7 +26,9 @@ import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -121,20 +123,57 @@ public class GoalAttainmentPhase
 
                 Object value = OgnlProjectValueExtractor.evaluate( expression, context );
 
-                // ----------------------------------------------------------------------
-                // We will perform a basic check here for parameters values that are
-                // required. Required parameters can't be null so we throw an
-                // Exception in the case where they are. We probably want some pluggable
-                // mechanism here but this will catch the most obvious of
-                // misconfigurations.
-                // ----------------------------------------------------------------------
-
-                if ( value == null && parameter.isRequired() )
-                {
-                    throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
-                }
-
                 map.put( key, value );
+            }
+
+            map = mergeProjectDefinedPluginConfiguration( context.getProject(), goal.getId(), map );
+        }
+
+        for ( int i = 0; i < parameters.size(); i++ )
+        {
+            Parameter parameter = (Parameter) parameters.get( i );
+
+            String key = parameter.getName();
+
+            Object value = map.get( key );
+
+            // ----------------------------------------------------------------------
+            // We will perform a basic check here for parameters values that are
+            // required. Required parameters can't be null so we throw an
+            // Exception in the case where they are. We probably want some pluggable
+            // mechanism here but this will catch the most obvious of
+            // misconfigurations.
+            // ----------------------------------------------------------------------
+
+            if ( value == null && parameter.isRequired() )
+            {
+                throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
+            }
+        }
+
+        return map;
+    }
+
+    private Map mergeProjectDefinedPluginConfiguration( MavenProject project, String goalId, Map map )
+    {
+        // ----------------------------------------------------------------------
+        // I would like to be able to lookup the Plugin object using a key but
+        // we have a limitation in modello that will be remedied shortly. So
+        // for now I have to iterate through and see what we have.
+        // ----------------------------------------------------------------------
+
+        if ( project.getPlugins() != null )
+        {
+            String pluginId = goalId.substring( 0, goalId.indexOf( ":" ) );
+
+            for ( Iterator iterator = project.getPlugins().iterator(); iterator.hasNext(); )
+            {
+                org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) iterator.next();
+
+                if ( pluginId.equals( plugin.getId() ) )
+                {
+                    return CollectionUtils.mergeMaps( plugin.getConfiguration(), map );
+                }
             }
         }
 
@@ -146,9 +185,9 @@ public class GoalAttainmentPhase
         StringBuffer message = new StringBuffer();
 
         message.append( "The '" + parameter.getName() ).
-                append( "' parameter is required for the execution of the " ).
-                append( mojo.getId() ).
-                append( " mojo and cannot be null." );
+            append( "' parameter is required for the execution of the " ).
+            append( mojo.getId() ).
+            append( " mojo and cannot be null." );
 
         return message.toString();
     }
