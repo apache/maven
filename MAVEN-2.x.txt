@@ -1,4 +1,3 @@
-
 I have tried to separate each of the components by concern. We have the
 following:
 
