@@ -88,6 +88,28 @@ public class OgnlProjectValueExtractor
         {
             value = context.getProject().getFile().getParentFile().getAbsolutePath();
         }
+        else if ( expression.startsWith( "#basedir" ) )
+        {
+            try
+            {
+                int pathSeparator = expression.indexOf( "/" );
+
+                if ( pathSeparator > 0 )
+                {
+                    value = context.getProject().getFile().getParentFile().getAbsolutePath()
+                        + expression.substring( pathSeparator );
+                }
+                else
+                {
+                    new Exception( "Got expression '" + expression + "' that was not recognised" ).printStackTrace();
+                }
+            }
+            catch ( OgnlException e )
+            {
+                // do nothing
+                e.printStackTrace(); // TODO: should log? should ignore as previously?
+            }
+        }
         else if ( expression.startsWith( "#" ) )
         {
             new Exception( "Got expression '" + expression + "' that was not recognised" ).printStackTrace();
