@@ -286,7 +286,7 @@ public class MBoot
         for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
-            if ( d.getGroupId().equals( "surefire" ) )
+            if ( d.getGroupId().equals( "surefire" ) || d.getGroupId().equals( "junit" ) )
             {
                 surefireDependencies.add( d );
             }

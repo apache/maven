@@ -13,16 +13,12 @@
     <dependency>
       <groupId>surefire</groupId>
       <artifactId>surefire</artifactId>
-      <version>1.2-SNAPSHOT</version>
-      <type>jar</type>
-      <scope>compile</scope>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>surefire</groupId>
       <artifactId>surefire-booter</artifactId>
-      <version>1.2-SNAPSHOT</version>
-      <type>jar</type>
-      <scope>compile</scope>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
