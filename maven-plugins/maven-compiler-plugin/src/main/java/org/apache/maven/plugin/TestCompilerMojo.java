@@ -13,6 +13,8 @@ import java.util.List;
  *
  * @description Compiles test sources
  *
+ * @prereq compiler:compile
+ *
  * @parameter
  *  name="sourceDirectory"
  *  type="String"
