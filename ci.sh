@@ -116,8 +116,10 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
   
       ./bootstrap-all.sh
     )    
-    
+
+    echo
     echo "Creating m2 distribution for public consumption ... "
+    echo
     
     (
       cd $DIR/maven-components/maven-core/dist
