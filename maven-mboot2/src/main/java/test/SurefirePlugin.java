@@ -11,7 +11,8 @@ public class SurefirePlugin
                             String testClassesDirectory,
                             List includes,
                             List excludes,
-                            String[] classpathElements )
+                            String[] classpathElements,
+                            String reportsDirectory )
         throws Exception
     {
         System.setProperty( "basedir", basedir );
@@ -32,8 +33,12 @@ public class SurefirePlugin
         {
             surefireBooter.addClassPathUrl( classpathElements[i] );
         }
+        
+        surefireBooter.setReportsDirectory( reportsDirectory );
 
         surefireBooter.addReport( "org.codehaus.surefire.report.ConsoleReporter" );
+
+        surefireBooter.addReport( "org.codehaus.surefire.report.FileReporter" );
 
         return surefireBooter.run();
     }

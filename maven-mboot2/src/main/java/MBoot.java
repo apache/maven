@@ -78,7 +78,8 @@ public class MBoot
                                    "maven-archiver", "maven-plugin-tools/maven-plugin-tools-api",
                                    "maven-plugin-tools/maven-plugin-tools-java",
                                    "maven-plugin-tools/maven-plugin-tools-pluggy",
-                                   "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-verifier"};
+                                   "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-support", 
+                                   "maven-core-it-verifier"};
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-clean-plugin", "maven-plugins/maven-compiler-plugin",
                                          "maven-plugins/maven-deploy-plugin", "maven-plugins/maven-ejb-plugin",
@@ -299,6 +300,9 @@ public class MBoot
 
         // Install maven-script-parent POM
         installPomFile( repoLocal, new File( basedir, "maven-script/pom.xml" ) );
+
+        // Install it-support POM
+        installPomFile( repoLocal, new File( basedir, "maven-core-it-support/pom.xml" ) );
 
         createToolsClassLoader();
 
@@ -871,9 +875,11 @@ public class MBoot
         excludes = new ArrayList();
 
         excludes.add( "**/*Abstract*.java" );
-
+        
+        String reportsDir = new File(basedir, "target/test-reports").getAbsolutePath();
+        
         boolean success = testRunner.execute( repoLocal, basedir, classes, testClasses, includes, excludes,
-                                              classpath( reader.getDependencies(), null ) );
+                                              classpath( reader.getDependencies(), null ), reportsDir );
 
         if ( !success )
         {

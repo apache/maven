@@ -19,9 +19,16 @@ public class
     private List reports = new ArrayList();
 
     private List classpathUrls = new ArrayList();
+    
+    private String reportsDir;
 
     public SurefireBooter()
     {
+    }
+    
+    public void setReportsDirectory( String reportsDirectory )
+    {
+        this.reportsDir = reportsDirectory;
     }
 
     public void addBattery( String battery, Object[] params )
@@ -72,7 +79,7 @@ public class
 
         Thread.currentThread().setContextClassLoader( surefireClassLoader );
 
-        Boolean result = (Boolean) run.invoke( batteryExecutor, new Object[]{ reports, batteries, surefireClassLoader, "dummy" } );
+        Boolean result = (Boolean) run.invoke( batteryExecutor, new Object[]{ reports, batteries, surefireClassLoader, reportsDir } );
 
         Thread.currentThread().setContextClassLoader( oldContextClassLoader );
 
