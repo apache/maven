@@ -15,6 +15,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class Bootstrapper
@@ -285,8 +286,57 @@ public class Bootstrapper
         return properties;
     }
 
+    private String interpolate( String text, Map namespace )
+    {
+        Iterator keys = namespace.keySet().iterator();
 
-    static class BootstrapPomParser
+        while ( keys.hasNext() )
+        {
+            String key = keys.next().toString();
+
+            Object obj = namespace.get( key );
+
+            String value = obj.toString();
+
+            text = replace( text, "${" + key + "}", value );
+
+            if ( key.indexOf( " " ) == -1 )
+            {
+                text = replace( text, "$" + key, value );
+            }
+        }
+        return text;
+    }
+
+    private String replace( String text, String repl, String with )
+    {
+        return replace( text, repl, with, -1 );
+    }
+
+    private String replace( String text, String repl, String with, int max )
+    {
+        if ( text == null || repl == null || with == null || repl.length() == 0 )
+        {
+            return text;
+        }
+
+        StringBuffer buf = new StringBuffer( text.length() );
+        int start = 0, end = 0;
+        while ( ( end = text.indexOf( repl, start ) ) != -1 )
+        {
+            buf.append( text.substring( start, end ) ).append( with );
+            start = end + repl.length();
+
+            if ( --max == 0 )
+            {
+                break;
+            }
+        }
+        buf.append( text.substring( start ) );
+        return buf.toString();
+    }
+
+    class BootstrapPomParser
         extends DefaultHandler
     {
         private List dependencies = new ArrayList();
@@ -299,7 +349,7 @@ public class Bootstrapper
 
         private Resource currentResource;
 
-        private static SAXParserFactory saxFactory;
+        private SAXParserFactory saxFactory;
 
         private boolean insideDependency = false;
 
@@ -382,7 +432,7 @@ public class Bootstrapper
         {
             if ( rawName.equals( "extend" ) )
             {
-                String extend = getBodyText();
+                String extend = interpolate( getBodyText(), properties ) ;
 
                 File f = new File( file.getParentFile(), extend );
 
