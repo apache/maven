@@ -1,24 +1,18 @@
 package org.apache.maven.it;
 
-import org.apache.xpath.XPathAPI;
-import org.apache.maven.it.cli.Commandline;
 import org.apache.maven.it.cli.CommandLineUtils;
+import org.apache.maven.it.cli.Commandline;
 import org.apache.maven.it.cli.StreamConsumer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Writer;
-import java.io.FileWriter;
-import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
