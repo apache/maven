@@ -71,7 +71,7 @@ public class MBoot
         "maven-plugin",
         "maven-plugin-tools",
         "maven-artifact",
-        "maven-1.x-integration",
+        // "maven-1.x-integration",
         "maven-core",
         "maven-core-it-verifier"
     };
