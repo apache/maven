@@ -265,6 +265,10 @@ public class DefaultPluginManager
         PluginExecutionResponse response;
 
         MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );
+        if ( mojoDescriptor == null )
+        {
+            throw new GoalExecutionException( "Unable to find goal: " + goalName );            
+        }
 
         if ( mojoDescriptor.requiresDependencyResolution() )
         {
