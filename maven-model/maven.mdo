@@ -19,7 +19,7 @@
 <model>
   <id>maven</id>
   <name>Maven</name>
-  <version>3.0.0</version>
+  <version>4.0.0</version>
   <description>Maven's model for Java project.</description>
   <packageName>org.apache.maven.model</packageName>
   <root>Model</root>
@@ -31,10 +31,16 @@
           <name>extend</name>
           <description>
             The location of the parent project, if one exists. Values from the parent project will be
-            the default for this project if they are left unspecified.
+            the default for this project if they are left unspecified. 
             The path may be absolute, or relative to the current project.xml file.
           </description>
           <type>String</type>
+        </field>
+        <field>
+          <name>parent</name>
+          <description>Specified which project to extend.</description>
+          <type>Parent</type>
+          <comment></comment>
         </field>
         <field>
           <name>modelVersion</name>
@@ -651,6 +657,26 @@
           <description>the description</description>
           <type>java.util.List</type>
           <defaultValue>new ArrayList()</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Parent</name>
+      <fields>
+        <field>
+          <name>artifactId</name>
+          <description>The artifact id of the project to extend.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <description>The group id of the project to extend.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <description>The version of the project to extend.</description>
+          <type>String</type>
         </field>
       </fields>
     </class>
