@@ -18,18 +18,18 @@ import java.util.List;
  * @parameter excludes String required validator
  * @parameter classpathElements String[] required validator
  *
- * @goal.name test
- * @goal.test.description Run tests using surefire
+ * @goal test
+ * @goal.description Run tests using surefire
  *
- * @goal.test.prereq test:compile
- * @goal.test.prereq resources
- * @goal.test.prereq test:resources
+ * @goal.prereq test:compile
+ * @goal.prereq resources
+ * @goal.prereq test:resources
  *
- * @goal.test.parameter mavenRepoLocal #maven.repo.local
- * @goal.test.parameter basedir #basedir
- * @goal.test.parameter includes #project.build.unitTest.includes
- * @goal.test.parameter excludes #project.build.unitTest.excludes
- * @goal.test.parameter classpathElements #project.classpathElements
+ * @goal.parameter mavenRepoLocal #maven.repo.local
+ * @goal.parameter basedir #basedir
+ * @goal.parameter includes #project.build.unitTest.includes
+ * @goal.parameter excludes #project.build.unitTest.excludes
+ * @goal.parameter classpathElements #project.classpathElements
 
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$

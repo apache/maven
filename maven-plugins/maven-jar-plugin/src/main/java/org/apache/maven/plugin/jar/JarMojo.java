@@ -38,13 +38,13 @@ import java.util.jar.Manifest;
  * @parameter outputDirectory String true validator description
  * @parameter basedir String true validator description
  *
- * @goal.name jar
- * @goal.jar.description build a jar
- * @goal.jar.prereq test
- * @goal.jar.prereq resources
- * @goal.jar.parameter jarName #maven.final.name
- * @goal.jar.parameter outputDirectory #maven.build.dir
- * @goal.jar.parameter basedir #maven.build.dest
+ * @goal jar
+ * @goal.description build a jar
+ * @goal.prereq test
+ * @goal.prereq resources
+ * @goal.parameter jarName #maven.final.name
+ * @goal.parameter outputDirectory #project.build.directory
+ * @goal.parameter basedir #project.build.directory/classes
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @version $Id$

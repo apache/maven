@@ -39,18 +39,18 @@ import java.io.File;
  * @parameter localRepository String true validator description
  * @parameter pomFile java.io.File true validator description
  * *
- * @goal.name jar:install
- * @goal.jar:install.description install a jar in local repository
+ * @goal jar:install
+ * @goal.description install a jar in local repository
  *
- * @goal.jar:install.prereq jar
- * @goal.jar:install.parameter jarName #maven.final.name
- * @goal.jar:install.parameter outputDirectory #maven.build.dir
- * @goal.jar:install.parameter basedir #maven.build.dest
- * @goal.jar:install.parameter pomFile #project.file
- * @goal.jar:install.parameter groupId #project.groupId
- * @goal.jar:install.parameter artifactId #project.artifactId
- * @goal.jar:install.parameter version #project.version
- * @goal.jar:install.parameter localRepository #project.localRepository
+ * @goal.prereq jar
+ * @goal.parameter jarName #maven.final.name
+ * @goal.parameter outputDirectory #project.build.directory
+ * @goal.parameter basedir #project.build.directory/classes
+ * @goal.parameter pomFile #project.file
+ * @goal.parameter groupId #project.groupId
+ * @goal.parameter artifactId #project.artifactId
+ * @goal.parameter version #project.version
+ * @goal.parameter localRepository #project.localRepository
  */
 public class JarInstallMojo
         extends AbstractPlugin

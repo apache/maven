@@ -10,11 +10,11 @@ import org.apache.maven.plugin.generator.PluginDescriptorGenerator;
  * @parameter outputDirectory String true validator description
  * @parameter pom String true validator description
  *
- * @goal.name descriptor
- * @goal.descriptor.description Goal for generating a plugin descriptor.
- * @goal.descriptor.parameter sourceDirectory #project.build.sourceDirectory
- * @goal.descriptor.parameter outputDirectory #maven.build.dest/META-INF/maven
- * @goal.descriptor.parameter pom #project.getFile().getPath()
+ * @goal descriptor
+ * @goal.description Goal for generating a plugin descriptor.
+ * @goal.parameter sourceDirectory #project.build.sourceDirectory
+ * @goal.parameter outputDirectory #project.build.directory/classes/META-INF/maven
+ * @goal.parameter pom #project.getFile().getPath()
 
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$

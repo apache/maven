@@ -74,15 +74,10 @@ import java.util.List;
  * @parameter outputDirectory String true validator description
  * @parameter resources List true validator description
  *
- * @goal.name resources
- * @goal.resources.description copy application resources
- * @goal.resources.parameter outputDirectory #maven.build.dest
- * @goal.resources.parameter resources #project.build.resources
- *
- * @goal.name test:resources
- * @goal.test:resources.description copy test resources
- * @goal.test:resources.parameter outputDirectory #maven.test.dest
- * @goal.test:resources.parameter resources #project.build.unitTest.resources
+ * @goal resources
+ * @goal.description copy application resources
+ * @goal.parameter outputDirectory #project.build.directory/classes
+ * @goal.parameter resources #project.build.resources
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -90,7 +85,7 @@ import java.util.List;
  * @version $Id$
  *
  */
-public class ResourcesPlugin
+public class ResourcesMojo
     extends AbstractPlugin
 {
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
