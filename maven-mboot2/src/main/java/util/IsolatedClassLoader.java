@@ -6,11 +6,17 @@ import java.net.URLClassLoader;
 public class IsolatedClassLoader
     extends URLClassLoader
 {
-    private ClassLoader parent = ClassLoader.getSystemClassLoader();
+    private ClassLoader parent;
 
     public IsolatedClassLoader()
     {
-        super( new URL[0], null );
+        this( ClassLoader.getSystemClassLoader() );
+    }
+
+    public IsolatedClassLoader( ClassLoader parent )
+    {
+        super( new URL[0] );
+        this.parent = parent;
     }
 
     public void addURL( URL url )

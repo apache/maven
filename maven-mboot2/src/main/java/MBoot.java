@@ -32,16 +32,6 @@ import java.util.TreeMap;
 
 public class MBoot
 {
-    String[] pluginGeneratorDeps = new String[]{"plexus/jars/plexus-container-default-1.0-alpha-2.jar",
-                                                "qdox/jars/qdox-1.2.jar",
-                                                "org.apache.maven/jars/maven-core-2.0-SNAPSHOT.jar",
-                                                "org.apache.maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
-                                                "org.apache.maven/jars/maven-model-2.0-SNAPSHOT.jar",
-                                                "org.apache.maven/jars/maven-plugin-2.0-SNAPSHOT.jar",
-                                                "org.apache.maven/jars/maven-plugin-tools-api-2.0-SNAPSHOT.jar",
-                                                "org.apache.maven/jars/maven-plugin-tools-java-2.0-SNAPSHOT.jar",
-                                                "org.apache.maven/jars/maven-plugin-tools-pluggy-2.0-SNAPSHOT.jar"};
-
     String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin", "maven-artifact",
                                    "maven-script/maven-script-marmalade", "maven-core", "maven-archiver",
                                    "maven-plugin-tools/maven-plugin-tools-api",
@@ -106,8 +96,6 @@ public class MBoot
     private List coreDeps;
 
     private boolean online = true;
-
-    private IsolatedClassLoader bootstrapClassLoader;
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
@@ -264,7 +252,8 @@ public class MBoot
         String basedir = System.getProperty( "user.dir" );
 
         reader.parse( new File( basedir, "maven-mboot2/pom.xml" ) );
-        bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies() );
+
+        ClassLoader bootstrapClassLoader = createClassloaderFromDependencies( reader.getDependencies(), null );
 
         reader = new ModelReader( downloader );
 
@@ -293,7 +282,7 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            reader = buildProject( directory, builds[i] );
+            reader = buildProject( directory, builds[i], bootstrapClassLoader );
 
             if ( reader.getArtifactId().equals( "maven-core" ) )
             {
@@ -303,7 +292,11 @@ public class MBoot
             System.out.println( "--------------------------------------------------------------------" );
         }
 
-        addPluginGeneratorDependencies( bootstrapClassLoader );
+        reader = new ModelReader( downloader );
+        reader.parse( new File( basedir, "maven-plugin-tools/maven-plugin-tools-pluggy/pom.xml" ) );
+        List dependencies = new ArrayList( reader.getDependencies() );
+        dependencies.add( new Dependency( reader.getGroupId(), reader.getArtifactId(), reader.getVersion() ) );
+        IsolatedClassLoader cl = createClassloaderFromDependencies( dependencies, bootstrapClassLoader );
 
         for ( int i = 0; i < pluginBuilds.length; i++ )
         {
@@ -315,7 +308,7 @@ public class MBoot
 
             System.setProperty( "basedir", directory );
 
-            reader = buildProject( directory, pluginBuilds[i] );
+            reader = buildProject( directory, pluginBuilds[i], cl );
 
             System.out.println( "--------------------------------------------------------------------" );
         }
@@ -434,7 +427,7 @@ public class MBoot
         System.out.println( "Finished at: " + fullStop );
     }
 
-    public ModelReader buildProject( String basedir, String projectId )
+    public ModelReader buildProject( String basedir, String projectId, ClassLoader classLoader )
         throws Exception
     {
         System.out.println( "Building project in " + basedir );
@@ -520,14 +513,12 @@ public class MBoot
             System.out.println(
                 "Generating model bindings for version \'" + modelVersion + "\' in project: " + projectId );
 
-            generateSources( model.getAbsolutePath(), "java", generatedSources, modelVersion, "false",
-                             bootstrapClassLoader );
+            generateSources( model.getAbsolutePath(), "java", generatedSources, modelVersion, "false", classLoader );
             generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, modelVersion, "false",
-                             bootstrapClassLoader );
+                             classLoader );
             generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, modelVersion, "false",
-                             bootstrapClassLoader );
-            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, modelVersion, "false",
-                             bootstrapClassLoader );
+                             classLoader );
+            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, modelVersion, "false", classLoader );
         }
 
         // ----------------------------------------------------------------------
@@ -554,7 +545,7 @@ public class MBoot
             System.out.println( "Generating maven plugin descriptor ..." );
 
             generatePluginDescriptor( sources, new File( classes, "META-INF/maven" ).getAbsolutePath(),
-                                      new File( basedir, "pom.xml" ).getAbsolutePath(), bootstrapClassLoader );
+                                      new File( basedir, "pom.xml" ).getAbsolutePath(), classLoader );
         }
 
         // ----------------------------------------------------------------------
@@ -611,27 +602,6 @@ public class MBoot
         return reader;
     }
 
-    private void addPluginGeneratorDependencies( IsolatedClassLoader cl )
-        throws Exception
-    {
-        // TODO: create a separate class loader
-
-        for ( int i = 0; i < pluginGeneratorDeps.length; i++ )
-        {
-            String dependency = pluginGeneratorDeps[i];
-
-            File f = new File( repoLocal, dependency );
-            if ( !f.exists() )
-            {
-                throw new FileNotFoundException(
-                    "Missing dependency: " + dependency +
-                    ( !online ? "; run again online" : "; there was a problem downloading it earlier" ) );
-            }
-
-            cl.addURL( f.toURL() );
-        }
-    }
-
     private void generatePluginDescriptor( String sourceDirectory, String outputDirectory, String pom, ClassLoader cl )
         throws Exception
     {
@@ -665,7 +635,7 @@ public class MBoot
         Thread.currentThread().setContextClassLoader( old );
     }
 
-    private IsolatedClassLoader createClassloaderFromDependencies( List dependencies )
+    private IsolatedClassLoader createClassloaderFromDependencies( List dependencies, ClassLoader parent )
         throws Exception
     {
         if ( online )
@@ -675,7 +645,15 @@ public class MBoot
             downloader.downloadDependencies( dependencies );
         }
 
-        IsolatedClassLoader cl = new IsolatedClassLoader();
+        IsolatedClassLoader cl;
+        if ( parent == null )
+        {
+            cl = new IsolatedClassLoader();
+        }
+        else
+        {
+            cl = new IsolatedClassLoader( parent );
+        }
 
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {

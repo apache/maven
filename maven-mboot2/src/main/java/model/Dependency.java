@@ -43,6 +43,13 @@ public class Dependency
     {
     }
 
+    public Dependency( String groupId, String artifactId, String version )
+    {
+        this.version = version;
+        this.artifactId = artifactId;
+        this.groupId = groupId;
+    }
+
     public void setId( String id )
     {
         this.id = id;
