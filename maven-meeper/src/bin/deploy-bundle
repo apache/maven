@@ -58,13 +58,19 @@ cp $BUNDLE $WORKDIR
   echo "artifactId: [${artifactId}]"
   echo
 
-  [ ! -f LICENSE.txt ] && echo && echo "Cannot deploy without the LICENSE.txt file!" && echo && exit
+  LIC=LICENSE.txt
+
+  # A little help for manually created upload bundles
+  [ -f license.txt ] && mv license.txt $LIC
+  [ -f licence.txt ] && mv licence.txt $LIC
+
+  [ ! -f $LIC ] && echo && echo "Cannot deploy without the $LIC file!" && echo && exit
 
   cp project.xml ${artifactId}-${version}.pom
 
-  ../d2u LICENSE.txt
+  ../d2u $LIC
 
-  ../deploy-lic LICENSE.txt ${groupId}
+  ../deploy-lic $LIC ${groupId}
   
   ../deploy-pom ${artifactId}-${version}.pom ${groupId}
   
