@@ -59,7 +59,7 @@ public class RepositoryCleaner
     public static final String ROLE = RepositoryCleaner.class.getName();
 
     private ArtifactDigestVerifier artifactDigestVerifier;
-    
+
     private MailSender mailSender;
 
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
@@ -74,7 +74,7 @@ public class RepositoryCleaner
         File sourceRepositoryBase = normalizeSourceRepositoryBase( configuration.getSourceRepositoryPath() );
 
         File targetRepositoryBase = normalizeTargetRepositoryBase( configuration.getTargetRepositoryPath() );
-        
+
         boolean mailReport = false;
 
         // do not proceed if we cannot produce reports, or if the repository is
@@ -93,14 +93,15 @@ public class RepositoryCleaner
                 List artifacts = null;
                 try
                 {
-                    artifactDiscoverer = (ArtifactDiscoverer) container.lookup( ArtifactDiscoverer.ROLE,
+                    artifactDiscoverer = (ArtifactDiscoverer) container.lookup(
+                                                                                ArtifactDiscoverer.ROLE,
                                                                                 configuration.getSourceRepositoryLayout() );
 
                     if ( logger.isInfoEnabled() )
                     {
                         logger.info( "Discovering artifacts." );
                     }
-                    
+
                     try
                     {
                         artifacts = artifactDiscoverer.discoverArtifacts( sourceRepositoryBase, repoReporter );
@@ -143,7 +144,7 @@ public class RepositoryCleaner
                         {
                             logger.info( "Rewriting POMs and artifact files." );
                         }
-                        
+
                         rewriteArtifactsAndPoms( artifacts, sourceRepo, targetRepo, configuration, reportsBase,
                                                  sourceRepositoryBase, targetRepositoryBase, repoReporter );
                     }
@@ -170,59 +171,62 @@ public class RepositoryCleaner
                 {
                     logger.warn( "Warning encountered while rewriting one or more artifacts from source repository to target repository." );
                 }
-                
-                if(repoReporter.hasError())
+
+                if ( repoReporter.hasError() )
                 {
                     mailReport = true;
                 }
             }
             finally
             {
-                if(repoReporter != null)
+                if ( repoReporter != null )
                 {
                     repoReporter.close();
                 }
             }
-            
-            if(mailReport)
+
+            if ( mailReport && configuration.mailErrorReport() )
             {
-                String reportContents = readReportFile(repoReporter.getReportFile());
-                
+                String reportContents = readReportFile( repoReporter.getReportFile() );
+
                 MailMessage message = new MailMessage();
-                message.setContent(reportContents);
-                message.setSubject("[REPOCLEAN] Error converting repository.");
-                message.setFromName("Repoclean");
-                message.setFromAddress("jdcasey@codehaus.org");
-                message.setSendDate(new Date());
-                message.addTo("Maven-2 Developers List", "m2-dev@maven.apache.org");
-                
-                mailSender.send(message);
+                message.setContent( reportContents );
+                message.setSubject( configuration.getErrorReportSubject() );
+                message.setFromName( configuration.getErrorReportFromName() );
+                message.setFromAddress( configuration.getErrorReportFromAddress() );
+                message.setSendDate( new Date() );
+                message.addTo( configuration.getErrorReportToName(), configuration.getErrorReportToAddress() );
+
+                mailSender.setSmtpHost( configuration.getErrorReportSmtpHost() );
+
+                mailSender.send( message );
             }
         }
-        
+
     }
 
-    private String readReportFile( File reportFile ) throws IOException
+    private String readReportFile( File reportFile )
+        throws IOException
     {
         FileReader reader = null;
         try
         {
-            reader = new FileReader(reportFile);
-            
+            reader = new FileReader( reportFile );
+
             StringBuffer reportContent = new StringBuffer();
             char[] buffer = new char[512];
             int read = -1;
-            
-            while((read = reader.read(buffer)) > -1)
+
+            while ( ( read = reader.read( buffer ) ) > -1 )
             {
-                reportContent.append(buffer, 0, read);
+                reportContent.append( buffer, 0, read );
             }
-            
+
             return reportContent.toString();
         }
         finally
         {
-            IOUtil.close(reader);
+            IOUtil.close( reader );
         }
     }
 
@@ -237,13 +241,14 @@ public class RepositoryCleaner
 
         try
         {
-            logger.info("Rewriting " + artifacts.size() + " artifacts (Should be " + (artifacts.size() * 2) + " rewrites including POMs).");
+            logger.info( "Rewriting " + artifacts.size() + " artifacts (Should be " + ( artifacts.size() * 2 )
+                + " rewrites including POMs)." );
             for ( Iterator it = artifacts.iterator(); it.hasNext(); )
             {
                 Artifact artifact = (Artifact) it.next();
 
-                String artifactReportPath = buildArtifactReportPath(artifact);
-                
+                String artifactReportPath = buildArtifactReportPath( artifact );
+
                 Reporter artifactReporter = null;
                 try
                 {
@@ -255,17 +260,18 @@ public class RepositoryCleaner
                     File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
 
                     artifact.setFile( artifactSource );
-                    
-                    boolean targetMissingOrOlder = !artifactTarget.exists() || artifactTarget.lastModified() < artifactSource.lastModified();
-                    
-                    if(artifactSource.exists() && targetMissingOrOlder)
+
+                    boolean targetMissingOrOlder = !artifactTarget.exists()
+                        || artifactTarget.lastModified() < artifactSource.lastModified();
+
+                    if ( artifactSource.exists() && targetMissingOrOlder )
                     {
-                        
+
                         try
                         {
                             if ( !configuration.reportOnly() )
                             {
-                                if(logger.isDebugEnabled())
+                                if ( logger.isDebugEnabled() )
                                 {
                                     logger.debug( "sourceRepo basedir is: \'" + sourceRepo.getBasedir() + "\'" );
                                     logger.debug( "targetRepo basedir is: \'" + targetRepo.getBasedir() + "\'" );
@@ -299,8 +305,8 @@ public class RepositoryCleaner
                         {
                             if ( logger.isDebugEnabled() )
                             {
-                                logger.debug( "working on digest for artifact[" + artifact.getId() + "] with groupId: \'"
-                                    + artifact.getGroupId() + "\'" );
+                                logger.debug( "working on digest for artifact[" + artifact.getId()
+                                    + "] with groupId: \'" + artifact.getGroupId() + "\'" );
                             }
 
                             try
@@ -317,8 +323,9 @@ public class RepositoryCleaner
                         if ( !errorOccurred )
                         {
                             ArtifactMetadata pom = new ProjectMetadata( artifact );
-                            
-                            artifactPomRewriter = (ArtifactPomRewriter) container.lookup( ArtifactPomRewriter.ROLE,
+
+                            artifactPomRewriter = (ArtifactPomRewriter) container.lookup(
+                                                                                          ArtifactPomRewriter.ROLE,
                                                                                           configuration.getSourcePomVersion() );
 
                             File sourcePom = new File( sourceRepositoryBase, sourceRepo.pathOfMetadata( pom ) );
@@ -340,18 +347,20 @@ public class RepositoryCleaner
                     }
                     else
                     {
-                        artifactReporter.error("Cannot find source file for artifact: \'" + artifact.getId() + "\' under path: \'" + artifactSource + "\'");
+                        artifactReporter.error( "Cannot find source file for artifact: \'" + artifact.getId()
+                            + "\' under path: \'" + artifactSource + "\'" );
                     }
-                    
+
                     if ( artifactReporter.hasError() )
                     {
                         repoReporter.warn( "Error(s) occurred while rewriting artifact: \'" + artifact.getId()
                             + "\' or its POM." );
                     }
                 }
-                catch(Exception e)
+                catch ( Exception e )
                 {
-                    artifactReporter.error("Error while rewriting file or POM for artifact: \'" + artifact.getId() + "\'. See report at: \'" + artifactReportPath + "\'.", e);
+                    artifactReporter.error( "Error while rewriting file or POM for artifact: \'" + artifact.getId()
+                        + "\'. See report at: \'" + artifactReportPath + "\'.", e );
                 }
                 finally
                 {
@@ -374,15 +383,16 @@ public class RepositoryCleaner
     private String buildArtifactReportPath( Artifact artifact )
     {
         String classifier = artifact.getClassifier();
-        
-        return artifact.getGroupId().replace('.', '/') + "/" + artifact.getArtifactId() + "/" + artifact.getType() + "/" + ((classifier != null)?(classifier + "-"):("")) + artifact.getVersion() + ".report.txt";
+
+        return artifact.getGroupId().replace( '.', '/' ) + "/" + artifact.getArtifactId() + "/" + artifact.getType()
+            + "/" + ( ( classifier != null ) ? ( classifier + "-" ) : ( "" ) ) + artifact.getVersion() + ".report.txt";
     }
 
     private void copyArtifact( Artifact artifact, File artifactTarget, Reporter reporter )
         throws IOException
     {
         File artifactSource = artifact.getFile();
-        
+
         InputStream inStream = null;
         OutputStream outStream = null;
         try

@@ -101,6 +101,14 @@ public class Main
         config.setReportsPath( props.getProperty( "reportsPath" ) );
         config.setReportOnly( Boolean.valueOf( props.getProperty( "reportOnly" ) ).booleanValue() );
 
+        config.setMailErrorReport( Boolean.valueOf( props.getProperty( "errorReport.mailOnError", "false") ).booleanValue() );
+        config.setErrorReportFromAddress( props.getProperty( "errorReport.fromAddress" ) );
+        config.setErrorReportFromName( props.getProperty( "errorReport.fromName" ) );
+        config.setErrorReportSmtpHost( props.getProperty( "errorReport.smtpHost", "localhost" ) );
+        config.setErrorReportSubject( props.getProperty( "errorReport.subject" ) );
+        config.setErrorReportToAddress( props.getProperty( "errorReport.toAddress" ) );
+        config.setErrorReportToName( props.getProperty( "errorReport.toName" ) );
+
         return config;
     }
 
@@ -108,26 +116,39 @@ public class Main
     {
         System.out.println( "repoclean: Repository Cleaner/Converter.\n\n"
             + "Usage: repoclean -h|-template|<configuration-properties-file>\n\n"
-            + "Where the configuration properfies file can contain the following options:\n"
             + "---------------------------------------------------------------------------\n"
-            + "sourceRepositoryPath=/path/to/repository/root #[REQUIRED]\n"
-            + "sourceRepositoryLayout=[legacy|default] #[DEFAULT: legacy]\n" + "sourcePomType=[v3|v4] #[DEFAULT: v3]\n"
-            + "targetRepositoryPath=/path/to/repository/root #[REQUIRED]\n"
-            + "targetRepositoryLayout=[legacy|default] #[DEFAULT: default]\n"
-            + "reportsPath=/path/to/reports/directory #[REQUIRED]\n" + "reportOnly=[true|false] #[REQUIRED]\n" + "\n" );
+            + "  Use the '-template' option to see sample configuration file options.\n"
+            + "\n" );
     }
 
     private static void printTemplate()
     {
         System.out.println( "# ---------------------------------------------------------------------------\n"
-            + "# repoclean: Repository Cleaner/Converter.\n" + "# This configuration auto-generated on: "
-            + new java.util.Date() + "\n"
+            + "# repoclean: Repository Cleaner/Converter.\n" 
+            + "# This configuration auto-generated on: " + new java.util.Date() + "\n"
             + "# ---------------------------------------------------------------------------\n\n"
-            + "# [REQUIRED OPTIONS]\n" + "sourceRepositoryPath=/path/to/repository/root\n"
-            + "targetRepositoryPath=/path/to/repository/root\n" + "reportsPath=/path/to/reports/directory\n"
-            + "reportOnly=[true|false]\n\n" + "# [DEFAULT VALUE: legacy]\n"
-            + "#sourceRepositoryLayout=[legacy|default]\n\n" + "# [DEFAULT VALUE: v3]\n" + "#sourcePomType=[v3|v4]\n\n"
-            + "# [DEFAULT VALUE: default]\n" + "#targetRepositoryLayout=[legacy|default]\n" + "\n" );
+            + "# [REQUIRED OPTIONS]\n" 
+            + "sourceRepositoryPath=/path/to/repository/root\n"
+            + "targetRepositoryPath=/path/to/repository/root\n" 
+            + "reportsPath=/path/to/reports/directory\n"
+            + "reportOnly=[true|false]\n"
+            + "\n" 
+            + "errorReport.mailOnError=[true|false]\n"
+            + "errorReport.fromAddress=admin@somewhere.com\n"
+            + "errorReport.fromName=Admin\n"
+            + "errorReport.subject=[REPOCLEAN] Error!\n"
+            + "errorReport.toAddress=dev@somewhere.com\n"
+            + "errorReport.toName=Developers List\n"
+            + "\n"
+            + "# [DEFAULT VALUE: legacy]\n"
+            + "#sourceRepositoryLayout=[legacy|default]\n\n" 
+            + "# [DEFAULT VALUE: v3]\n" 
+            + "#sourcePomType=[v3|v4]\n\n"
+            + "# [DEFAULT VALUE: default]\n" 
+            + "#targetRepositoryLayout=[legacy|default]\n" 
+            + "# [DEFAULT VALUE: localhost]\n"
+            + "#errorReport.smtpHost=<hostname>\n"
+            + "\n" );
     }
 
     private static void printUsage()

@@ -37,6 +37,20 @@ public class RepositoryCleanerConfiguration
 
     private boolean reportOnly;
 
+    private String errorReportSubject;
+
+    private String errorReportFromName;
+
+    private String errorReportFromAddress;
+
+    private String errorReportToName;
+
+    private String errorReportToAddress;
+
+    private String errorReportSmtpHost;
+
+    private boolean mailErrorReport;
+
     public void setSourceRepositoryPath( String sourceRepositoryPath )
     {
         this.sourceRepositoryPath = sourceRepositoryPath;
@@ -107,4 +121,73 @@ public class RepositoryCleanerConfiguration
         return reportOnly;
     }
 
+    public void setErrorReportSubject( String errorReportSubject )
+    {
+        this.errorReportSubject = errorReportSubject;
+    }
+
+    public String getErrorReportSubject()
+    {
+        return errorReportSubject;
+    }
+
+    public String getErrorReportFromAddress()
+    {
+        return errorReportFromAddress;
+    }
+
+    public void setErrorReportFromAddress( String errorReportFromAddress )
+    {
+        this.errorReportFromAddress = errorReportFromAddress;
+    }
+
+    public String getErrorReportFromName()
+    {
+        return errorReportFromName;
+    }
+
+    public void setErrorReportFromName( String errorReportFromName )
+    {
+        this.errorReportFromName = errorReportFromName;
+    }
+
+    public String getErrorReportSmtpHost()
+    {
+        return errorReportSmtpHost;
+    }
+
+    public void setErrorReportSmtpHost( String errorReportSmtpHost )
+    {
+        this.errorReportSmtpHost = errorReportSmtpHost;
+    }
+
+    public String getErrorReportToAddress()
+    {
+        return errorReportToAddress;
+    }
+
+    public void setErrorReportToAddress( String errorReportToAddress )
+    {
+        this.errorReportToAddress = errorReportToAddress;
+    }
+
+    public String getErrorReportToName()
+    {
+        return errorReportToName;
+    }
+
+    public void setErrorReportToName( String errorReportToName )
+    {
+        this.errorReportToName = errorReportToName;
+    }
+
+    public void setMailErrorReport( boolean mailErrorReport )
+    {
+        this.mailErrorReport = mailErrorReport;
+    }
+
+    public boolean mailErrorReport()
+    {
+        return mailErrorReport;
+    }
 }
