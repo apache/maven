@@ -36,6 +36,13 @@ import java.util.List;
  *  validator=""
  *  expression="#project.classpathElements"
  *  description=""
+ * @parameter
+ *  name="debug"
+ *  type="String"
+ *  required="false"
+ *  validator=""
+ *  expression="#maven.compiler.debug"
+ *  description="Whether to include debugging information in the compiled class files; the default value is false"
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
