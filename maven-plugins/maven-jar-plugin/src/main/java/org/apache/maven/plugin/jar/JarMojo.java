@@ -159,7 +159,15 @@ public class JarMojo
 
         try
         {
-            archiver.getArchiver().addDirectory( new File( outputDirectory ), DEFAULT_INCLUDES, DEFAULT_EXCLUDES );
+            File contentDirectory = new File( outputDirectory );
+            if ( !contentDirectory.exists() )
+            {
+                getLog().warn( "JAR will be empty - no content was marked for inclusion!" );
+            }
+            else
+            {
+                archiver.getArchiver().addDirectory( contentDirectory, DEFAULT_INCLUDES, DEFAULT_EXCLUDES );
+            }
 
             // create archive
             Manifest configuredManifest = archiver.getManifest( project, mainClass, packageName,
