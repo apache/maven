@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+## Note: codehaus has a JIRA version which doesn't support xmlrpc
+##       so we can just scrape the screen or use the jelly interface
+##       on the codehaus box.
+
 import sys
 import xmlrpclib
 
