@@ -1,0 +1,5 @@
+target/classes/org/apache/maven/it0003/Person.class
+target/test-classes/org/apache/maven/it0003/PersonTest.class
+target/maven-core-it0003-1.0.jar
+target/maven-core-it0003-1.0.jar!/it0003.properties
+${maven.repo.local}/maven/jars/maven-core-it0003-1.0.jar
