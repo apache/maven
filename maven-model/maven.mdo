@@ -505,6 +505,22 @@
           </description>
           <type>String</type>
         </field>
+        <field>
+          <name>output</name>
+          <version>4.0.0</version>
+          <description>
+            The directory where compiled application classes are placed.
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>testOutput</name>
+          <version>4.0.0</version>
+          <description>
+            The directory where compiled test classes are placed.
+          </description>
+          <type>String</type>
+        </field>
       </fields>
     </class>
     <class>
