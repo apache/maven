@@ -74,7 +74,7 @@ public class Main
             {
                 if ( !backup.exists() )
                 {
-                    System.err.println( "skipping... backup exists" );
+                    System.err.println( "skipping... backup does not exist" );
                     continue;
                 }
                 FileUtils.copyFile( backup, file );
