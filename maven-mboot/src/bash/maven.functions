@@ -49,7 +49,8 @@ runTests()
   
   if [ -f $5 ]
   then
-    "${JAVACMD}" -classpath "$CP" TestRunnerBooter "$2" "$3" $4 $5 $6
+    echo ">>> $CP"
+    "${JAVACMD}" -classpath "$CP" org.codehaus.surefire.SureFire "$2" "$3" $4 $5 $6
   fi
 }
 
@@ -173,11 +174,13 @@ buildMavenProject()
       
       fi
       
-      copyResources
+      copyResources bootstrap.resources target/classes
+      
+      copyResources bootstrap.test.resources target/test-classes
       
       echo "Running tests in `pwd`"
         
-      runTests ".:${MBOOT_HOME}/classes:$repoLocal/junit/jars/junit-3.8.1.jar:$repoLocal/maven/jars/surefire-runner-1.0.jar:$repoLocal/plexus/jars/plexus-utils-1.0-beta-1.jar" "$home" "$repoLocal" bootstrap.libs bootstrap.tests.includes bootstrap.tests.excludes
+      runTests ".:${MBOOT_HOME}/classes:$repoLocal/surefire/jars/surefire-0.5.jar" "$home" "$repoLocal" bootstrap.libs bootstrap.tests.includes bootstrap.tests.excludes
       
       if [ "$2" = "default" ]
       then
@@ -227,7 +230,10 @@ getJarName()
 
 copyResources()
 {
-  resources=`cat bootstrap.resources`
+  # $1 == resourcesfile
+  # $2 == target directory
+  
+  resources=`cat $1`
   
   for i in $resources
   do
@@ -250,7 +256,7 @@ copyResources()
         # path into the target directory.
         path=`echo $tmpFile | sed "s/$tmpDirectory//;s/\@/\//g;s/^\///"`
 
-        targetDirectory="target/classes"
+        targetDirectory=$2
 
         [ ! -z $MBOOT_DEBUG ] && echo "path = $path"
 

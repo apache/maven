@@ -8,29 +8,8 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
 
-/**
- * Http utils for retrieving files.
- *
- * @author costin@dnt.ro
- * @author gg@grtmail.com (Added Java 1.1 style HTTP basic auth)
- * @author <a href="mailto:jason@zenplex.com">Jason van Zyl</a>
- *
- * @todo Need to add a timeout so we can flip to a backup repository.
- * @todo Download everything in a single session.
- * @todo Throw meaningful exception when authentication fails.
- */
 public class HttpUtils
 {
-    /**
-     * Use a proxy to bypass the firewall with or without authentication
-     *
-     * @param proxyHost Proxy Host (if proxy is required), or null
-     * @param proxyPort Proxy Port (if proxy is required), or null
-     * @param proxyUserName Proxy Username (if authentification is required),
-     *        or null
-     * @param proxyPassword Proxy Password (if authentification is required),
-     *        or null
-     */
     public static void useProxyUser( final String proxyHost,
                                      final String proxyPort,
                                      final String proxyUserName,
@@ -56,25 +35,6 @@ public class HttpUtils
         }
     }
 
-    /**
-     * Retrieve a remote file.  Returns true if the file was successfully
-     * retrieved or if it is up to date (when the useTimestamp flag is set).
-     *
-     * @param url the of the file to retrieve
-     * @param destinationFile where to store it
-     * @param ignoreErrors whether to ignore errors during I/O or throw an
-     *      exception when they happen
-     * @param useTimestamp whether to check the modified timestamp on the
-     *      <code>destinationFile</code> against the remote <code>source</code>
-     * @param proxyHost Proxy Host (if proxy is required), or null
-     * @param proxyPort Proxy Port (if proxy is required), or null
-     * @param proxyUserName Proxy Username (if authentification is required),
-     *        or null.
-     * @param proxyPassword Proxy Password (if authentification is required),
-     *        or null.
-     * @param useChecksum Flag to indicate the use of the checksum for the retrieved
-     *        artifact if it is available.
-     */
     public static void getFile( String url,
                                 File destinationFile,
                                 boolean ignoreErrors,
@@ -120,23 +80,6 @@ public class HttpUtils
         }
     }
 
-    /**
-     * Retrieve a remote file.  Returns true if the file was successfully
-     * retrieved or if it is up to date (when the useTimestamp flag is set).
-     *
-     * @param url the of the file to retrieve
-     * @param destinationFile where to store it
-     * @param ignoreErrors whether to ignore errors during I/O or throw an
-     *      exception when they happen
-     * @param useTimestamp whether to check the modified timestamp on the
-     *      <code>destinationFile</code> against the remote <code>source</code>
-     * @param proxyHost Proxy Host (if proxy is required), or null
-     * @param proxyPort Proxy Port (if proxy is required), or null
-     * @param proxyUserName Proxy Username (if authentification is required),
-     *        or null
-     * @param proxyPassword Proxy Password (if authentification is required),
-     *        or null
-     */
     public static void getFile( String url,
                                 File destinationFile,
                                 boolean ignoreErrors,
@@ -272,14 +215,6 @@ public class HttpUtils
         }
     }
 
-    /**
-     * Parse an url which might contain a username and password. If the
-     * given url doesn't contain a username and password then return the
-     * origin url unchanged.
-     *
-     * @param url The url to parse.
-     * @return The username, password and url.
-     */
     static String[] parseUrl( String url )
     {
         String[] parsedUrl = new String[3];
@@ -306,16 +241,6 @@ public class HttpUtils
         return parsedUrl;
     }
 
-    /**
-     * set the timestamp of a named file to a specified time.
-     *
-     * @param file the file to touch
-     * @param timemillis in milliseconds since the start of the era
-     * @return true if it succeeded. False means that this is a java1.1 system
-     *      and that file times can not be set
-     * @exception Exception Thrown in unrecoverable error. Likely this
-     *      comes from file access failures.
-     */
     private static boolean touchFile( File file, long timemillis )
         throws Exception
     {
@@ -331,6 +256,7 @@ public class HttpUtils
         }
 
         file.setLastModified( modifiedTime );
+
         return true;
     }
 }

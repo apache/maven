@@ -1,4 +1,3 @@
-
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
@@ -38,8 +37,6 @@ public class Bootstrapper
     public void execute( String[] args )
         throws Exception
     {
-        String basedir = args[0];
-
         downloader = new ArtifactDownloader();
 
         bootstrapPomParser = new BootstrapPomParser();
@@ -48,6 +45,20 @@ public class Bootstrapper
 
         dependencies = bootstrapPomParser.getDependencies();
 
+        downloadDependencies();
+
+        writeClasspath();
+
+        writeUnitTest();
+
+        writeResources( bootstrapPomParser.getResources(), "bootstrap.resources" );
+
+        writeFile( "bootstrap.repo", downloader.getMavenRepoLocal().getPath() );
+    }
+
+    private void downloadDependencies()
+        throws Exception
+    {
         List list = new ArrayList();
 
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
@@ -58,7 +69,11 @@ public class Bootstrapper
         }
 
         downloader.downloadDependencies( list );
+    }
 
+    private void writeClasspath()
+        throws Exception
+    {
         StringBuffer classPath = new StringBuffer();
 
         StringBuffer libs = new StringBuffer();
@@ -75,7 +90,11 @@ public class Bootstrapper
         writeFile( "bootstrap.classpath", classPath.toString() );
 
         writeFile( "bootstrap.libs", libs.toString() );
+    }
 
+    private void writeUnitTest()
+        throws Exception
+    {
         int size;
 
         unitTests = bootstrapPomParser.getUnitTests();
@@ -84,13 +103,13 @@ public class Bootstrapper
         {
             StringBuffer tests = new StringBuffer();
 
-            tests.append( unitTests.getDirectory() );
+            tests.append( "target/test-classes" );
 
             tests.append( "@" );
 
             size = unitTests.getIncludes().size();
 
-            // If there are no includes specified then we want it all.
+            // If there are no unitTestIncludes specified then we want it all.
             if ( size == 0 )
             {
                 tests.append( "'*'" );
@@ -114,7 +133,7 @@ public class Bootstrapper
 
             tests = new StringBuffer();
 
-            tests.append( unitTests.getDirectory() );
+            tests.append( "target/test-classes" );
 
             tests.append( "@" );
 
@@ -135,11 +154,17 @@ public class Bootstrapper
             tests.append( "\n" );
 
             writeFile( "bootstrap.tests.excludes", tests.toString() );
+
+            writeResources( unitTests.getResources(), "bootstrap.test.resources" );
         }
+    }
 
-        resources = bootstrapPomParser.getResources();
-
+    private void writeResources( List resources, String file )
+        throws Exception
+    {
         StringBuffer res = new StringBuffer();
+
+        int size;
 
         for ( Iterator i = resources.iterator(); i.hasNext(); )
         {
@@ -162,7 +187,7 @@ public class Bootstrapper
 
             size = r.getIncludes().size();
 
-            // If there are no includes specified then we want it all.
+            // If there are no unitTestIncludes specified then we want it all.
             if ( size == 0 )
             {
                 res.append( "'*'" );
@@ -188,9 +213,7 @@ public class Bootstrapper
             res.append( "\n" );
         }
 
-        writeFile( "bootstrap.resources", res.toString() );
-
-        writeFile( "bootstrap.repo", downloader.getMavenRepoLocal().getPath() );
+        writeFile( file, res.toString() );
     }
 
     private void writeFile( String name, String contents )
@@ -270,17 +293,10 @@ public class Bootstrapper
 
         public void startElement( String uri, String localName, String rawName, Attributes attributes )
         {
-            if ( insideUnitTest )
-            {
-                return;
-            }
-            else if ( rawName.equals( "unitTestSourceDirectory" ) )
+            if ( rawName.equals( "unitTest" ) )
             {
                 unitTests = new UnitTests();
-            }
-            else if ( rawName.equals( "unitTest" ) )
-            {
-                unitTests = new UnitTests();
+
                 insideUnitTest = true;
             }
             else if ( rawName.equals( "dependency" ) )
@@ -323,10 +339,6 @@ public class Bootstrapper
 
                 resources.addAll( p.getResources() );
             }
-            else if ( rawName.equals( "unitTestSourceDirectory" ) )
-            {
-                unitTests.setDirectory( getBodyText() );
-            }
             else if ( rawName.equals( "unitTest" ) )
             {
                 insideUnitTest = false;
@@ -339,7 +351,14 @@ public class Bootstrapper
             }
             else if ( rawName.equals( "resource" ) )
             {
-                resources.add( currentResource );
+                if ( insideUnitTest )
+                {
+                    unitTests.addResource( currentResource );
+                }
+                else
+                {
+                    resources.add( currentResource );
+                }
 
                 insideResource = false;
             }
@@ -369,18 +388,6 @@ public class Bootstrapper
                 {
                     currentDependency.setArtifactId( getBodyText() );
                 }
-
-            }
-            else if ( insideUnitTest )
-            {
-                if ( rawName.equals( "include" ) )
-                {
-                    unitTests.addInclude( getBodyText() );
-                }
-                else if ( rawName.equals( "exclude" ) )
-                {
-                    unitTests.addExclude( getBodyText() );
-                }
             }
             else if ( insideResource )
             {
@@ -399,6 +406,17 @@ public class Bootstrapper
                 else if ( rawName.equals( "exclude" ) )
                 {
                     currentResource.addExclude( getBodyText() );
+                }
+            }
+            else if ( ! insideResource && insideUnitTest )
+            {
+                if ( rawName.equals( "include" ) )
+                {
+                    unitTests.addInclude( getBodyText() );
+                }
+                else if ( rawName.equals( "exclude" ) )
+                {
+                    unitTests.addExclude( getBodyText() );
                 }
             }
 
@@ -458,14 +476,6 @@ public class Bootstrapper
             if ( isValid( getGroupId() )
                 && isValid( getArtifactId() ) )
             {
-                // We have something like:
-                //
-                // <dependency>
-                //   <groupId>commons-jelly</groupId>
-                //   <artifactId>commons-jelly-tags-velocity</artifactId>
-                //   <version>SNAPSHOT</version>
-                //  </dependency>
-
                 return getGroupId() + ":" + getArtifactId();
             }
 
@@ -586,28 +596,40 @@ public class Bootstrapper
     {
         private String directory;
 
-        private List includes = new ArrayList();
+        private List unitTestIncludes = new ArrayList();
 
-        private List excludes = new ArrayList();
+        private List unitTestExcludes = new ArrayList();
+
+        private List unitTestResources = new ArrayList();
 
         public void addInclude( String pattern )
         {
-            this.includes.add( pattern );
+            unitTestIncludes.add( pattern );
         }
 
         public void addExclude( String pattern )
         {
-            this.excludes.add( pattern );
+            unitTestExcludes.add( pattern );
+        }
+
+        public void addResource( Resource resource )
+        {
+            unitTestResources.add( resource );
         }
 
         public List getIncludes()
         {
-            return this.includes;
+            return unitTestIncludes;
         }
 
         public List getExcludes()
         {
-            return this.excludes;
+            return unitTestExcludes;
+        }
+
+        public List getResources()
+        {
+            return unitTestResources;
         }
 
         public void setDirectory( String directory )
