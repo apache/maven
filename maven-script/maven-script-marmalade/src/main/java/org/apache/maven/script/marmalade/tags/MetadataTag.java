@@ -112,6 +112,8 @@ public class MetadataTag
             }
             
             String implementationPath = getTagInfo().getSourceFile().substring( basePath.length() );
+            
+            implementationPath = implementationPath.replace('\\', '/');
 
             descriptor.setImplementation( implementationPath );
         }
