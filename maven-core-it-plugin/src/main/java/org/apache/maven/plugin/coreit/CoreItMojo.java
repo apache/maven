@@ -25,6 +25,7 @@ import java.io.FileWriter;
 
 /**
  * @goal touch
+ * @phase process-sources
  *
  * @description Goal which cleans the build
  *

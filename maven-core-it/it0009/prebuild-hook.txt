@@ -1,1 +1,0 @@
-rm ${localRepository}/maven/plugins/maven-core-it-plugin-1.0-SNAPSHOT.jar

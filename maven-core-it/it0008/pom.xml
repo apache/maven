@@ -12,11 +12,10 @@
     </dependency>
   </dependencies>  
   
-  <preGoals>
-    <preGoal>
-       <name>compiler:compile</name>
-       <attain>core-it:touch</attain>
-    </preGoal>
-  </preGoals>
+  <plugins>
+    <plugin>
+      <id>core-it</id>
+    </plugin>
+  </plugins>
   
 </project>

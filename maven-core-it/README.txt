@@ -25,11 +25,8 @@ it0006: Simple goal decoration. We introduce a preGoal and a postGoal to the
 it0007: We specify a parent in the POM and make sure that it is downloaded as
         part of the process.        
 
-it0008: Simple goal decoration where a preGoal belongs to a plugin that must
+it0008: Simple goal decoration where a plugin binds to a phase and the plugin must
         be downloaded from a remote repository before it can be executed.
-        
-it0009: Simple goal decoration where a postGoal belongs to a plugin that must
-        be downloaded from a remote repository before it can be executed.        
         
 it0010: Since the artifact resolution does not use the project builder, we must
         ensure that the full hierarchy of all dependencies is resolved. This
