@@ -20,6 +20,7 @@ package org.apache.maven.execution.initialize;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestHandler;
 import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.AbstractMavenExecutionRequestHandler;
 import org.apache.maven.execution.project.MavenProjectExecutionRequestHandler;
 
 /**
@@ -27,7 +28,6 @@ import org.apache.maven.execution.project.MavenProjectExecutionRequestHandler;
  * @version $Id$
  */
 public class MavenInitializingExecutionRequestHandler
-    extends MavenProjectExecutionRequestHandler
-    implements MavenExecutionRequestHandler
+    extends AbstractMavenExecutionRequestHandler
 {
 }

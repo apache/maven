@@ -70,6 +70,25 @@
         </requirement>
       </requirements>
     </component>
+1    <component>
+      <role>org.apache.maven.execution.MavenExecutionRequestHandler</role>
+      <role-hint>initializing</role-hint>
+      <implementation>org.apache.maven.execution.initialize.MavenInitializingExecutionRequestHandler</implementation>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.i18n.I18N</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.PluginManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.session.MavenSessionPhaseManager</role>
+        </requirement>
+      </requirements>
+    </component>
     <!--
      |
      |

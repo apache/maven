@@ -18,6 +18,6 @@ public class MavenExecutionRequestHandlerManagerTest
 
         assertNotNull( manager );
 
-        assertEquals( 2, manager.managedCount() );
+        assertEquals( 3, manager.managedCount() );
     }
 }

@@ -35,8 +35,8 @@ import java.util.Set;
 public class PluginResolutionPhase
     extends AbstractMavenGoalPhase
 {
-
-    public void execute( MavenGoalExecutionContext context ) throws GoalExecutionException
+    public void execute( MavenGoalExecutionContext context )
+        throws GoalExecutionException
     {
         PluginResolutionVisitor visitor = new PluginResolutionVisitor( context.getSession().getPluginManager() );
 
@@ -48,7 +48,6 @@ public class PluginResolutionPhase
         {
             throw new GoalExecutionException( "Cannot resolve plugins required for goal execution chain", e );
         }
-
     }
 
     public static final class PluginResolutionVisitor
@@ -86,21 +85,22 @@ public class PluginResolutionPhase
             return result;
         }
 
-        public void visitPostGoal( String goal, String postGoal, MavenSession session ) throws GraphTraversalException
+        public void visitPostGoal( String goal, String postGoal, MavenSession session )
+            throws GraphTraversalException
         {
             GoalWalker.walk( postGoal, session, this );
         }
 
-        public void visitPreGoal( String goal, String preGoal, MavenSession session ) throws GraphTraversalException
+        public void visitPreGoal( String goal, String preGoal, MavenSession session )
+            throws GraphTraversalException
         {
             GoalWalker.walk( preGoal, session, this );
         }
 
-        public void visitPrereq( String goal, String prereq, MavenSession session ) throws GraphTraversalException
+        public void visitPrereq( String goal, String prereq, MavenSession session )
+            throws GraphTraversalException
         {
             GoalWalker.walk( prereq, session, this );
         }
-
     }
-
 }

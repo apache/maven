@@ -29,7 +29,7 @@ import java.util.List;
  */
 public final class GoalWalker
 {
-    public static void walk( String goal, MavenSession session, GoalVisitor visitor ) 
+    public static void walk( String goal, MavenSession session, GoalVisitor visitor )
         throws GraphTraversalException
     {
         if ( visitor.shouldVisit( goal, session ) )
