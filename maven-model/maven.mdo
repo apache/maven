@@ -915,6 +915,42 @@
           <defaultValue>new ArrayList()</defaultValue>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>3.0.0+</version>
+          <code>
+            public List getDefaultExcludes()
+            {
+                List defaultExcludes = new ArrayList();
+                defaultExcludes.add( "**/*~" );
+                defaultExcludes.add( "**/#*#" );
+                defaultExcludes.add( "**/.#*" );
+                defaultExcludes.add( "**/%*%" );
+                defaultExcludes.add( "**/._*" );
+
+                // CVS
+                defaultExcludes.add( "**/CVS" );
+                defaultExcludes.add( "**/CVS/**" );
+                defaultExcludes.add( "**/.cvsignore" );
+
+                // SCCS
+                defaultExcludes.add( "**/SCCS" );
+                defaultExcludes.add( "**/SCCS/**" );
+
+                // Visual SourceSafe
+                defaultExcludes.add( "**/vssver.scc" );
+
+                // Subversion
+                defaultExcludes.add( "**/.svn" );
+                defaultExcludes.add( "**/.svn/**" );
+
+                // Mac
+                defaultExcludes.add( "**/.DS_Store" );
+                return defaultExcludes;
+            }
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Parent</name>
