@@ -19,13 +19,13 @@ package org.apache.maven.plugin.jar;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
 
 /**
  * @goal jar
+ * @phase package
  *
  * @description build a jar
  *
