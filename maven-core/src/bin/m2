@@ -3,8 +3,6 @@
 #   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
 #   reserved.
 
-CLASSWORLDS_VERSION=1.1-SNAPSHOT
-
 if [ -z "$MAVEN_OPTS" ] ; then
   MAVEN_OPTS="-Xmx256m"
 fi
@@ -65,9 +63,6 @@ if [ -z "$M2_HOME" ]; then
   M2_HOME=`dirname $BIN_DIR`
 fi
 
-CLASSWORLDS_CONF="${M2_HOME}/bin/classworlds.conf"
-CP=${M2_HOME}/core/boot/classworlds-${CLASSWORLDS_VERSION}.jar
-
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
   [ -n "$CP" ] && CP=`cygpath --path --windows "$CP"`
@@ -76,12 +71,10 @@ if $cygwin; then
   [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --windows "$M2_HOME"`
 fi
 
-MAIN_CLASS=org.codehaus.classworlds.Launcher
-
 $JAVACMD \
   $MAVEN_OPTS \
-  -classpath "$CP" \
-  "-Dclassworlds.conf=$CLASSWORLDS_CONF"  \
+  -classpath ${M2_HOME}/core/boot/classworlds-*.jar \
+  "-Dclassworlds.conf=${M2_HOME}/bin/classworlds.conf"  \
   "-Dmaven.home=$M2_HOME"  \
-  $MAIN_CLASS $@
+  org.codehaus.classworlds.Launcher $@
 
