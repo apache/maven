@@ -19,7 +19,8 @@ it0004: The simplest of pom installation. We have a pom and we install it in
 it0005: The simplest of pom installation. We have a snapshot pom and we install
         it in local repository.
 
-it0006:
+it0006: Simple goal decoration. We introduce a preGoal and a postGoal to the
+		'compiler:compile' goal.
 
 it0007: We specify a parent in the POM and make sure that it is downloaded as
         part of the process.        
