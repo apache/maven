@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
 import java.io.File;
 
 /**
- * @goalXX install
+ * @goal install
  *
  * @description install a jar in local repository
  *
