@@ -55,7 +55,7 @@
           <name>pomVersion</name>
           <version>3.0.0</version>
           <required>true</required>
-          <delegateTo>modelVersion</delegateTo>
+          <type>String</type>
         </field>
         <field>
           <name>groupId</name>
@@ -89,7 +89,7 @@
           <name>currentVersion</name>
           <version>3.0.0</version>
           <required>true</required>
-          <delegateTo>version</delegateTo>
+          <type>String</type>
         </field>
         <field>
           <name>version</name>
