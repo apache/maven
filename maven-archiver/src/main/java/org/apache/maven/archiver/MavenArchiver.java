@@ -51,6 +51,8 @@ public class MavenArchiver
 
         String mainClass = (String) request.getParameter( "mainClass" );
 
+        String packageName = (String) request.getParameter( "package" );
+
         boolean addClasspath = new Boolean( (String) request.getParameter( "addClasspath" ) ).booleanValue();
 
         boolean addExtensions = new Boolean( (String) request.getParameter( "addExtensions" ) ).booleanValue();
@@ -61,10 +63,13 @@ public class MavenArchiver
         m.addConfiguredAttribute( buildAttr );
         Manifest.Attribute createdAttr = new Manifest.Attribute( "Created-By", "Apache Maven" );
         m.addConfiguredAttribute( createdAttr );
-/* TODO: need to add jar plugin config
-        Manifest.Attribute packageAttr = new Manifest.Attribute( "Package", project.getPackage() );
-        m.addConfiguredAttribute( packageAttr );
-*/
+
+        if ( packageName != null )
+        {
+            Manifest.Attribute packageAttr = new Manifest.Attribute( "Package", packageName );
+            m.addConfiguredAttribute( packageAttr );
+        }
+
         Manifest.Attribute buildJdkAttr = new Manifest.Attribute( "Build-Jdk", System.getProperty( "java.version" ) );
         m.addConfiguredAttribute( buildJdkAttr );
 

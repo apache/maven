@@ -17,6 +17,7 @@ package org.apache.maven.plugin.jar;
  */
 
 import org.apache.maven.archiver.MavenArchiver;
+import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 
@@ -47,6 +48,12 @@ import java.io.File;
  * validator=""
  * expression="#maven.jar.index"
  * default="false"
+ * description=""
+ * @parameter name="package"
+ * type="String"
+ * required="false"
+ * validator=""
+ * expression="#maven.jar.package"
  * description=""
  * @parameter name="manifest"
  * type="String"
@@ -94,7 +101,7 @@ import java.io.File;
  * description="current MavenProject instance"
  */
 public class JarMojo
-    extends AbstractJarMojo
+    extends AbstractPlugin
 {
     /**
      * @todo Add license files in META-INF directory.
