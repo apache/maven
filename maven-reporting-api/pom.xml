@@ -1,0 +1,26 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>maven</groupId>
+    <artifactId>maven-component</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+  <groupId>maven</groupId>
+  <artifactId>maven-reporting-api</artifactId>
+  <version>2.0-SNAPSHOT</version>
+  <inceptionYear>2005</inceptionYear>
+  <package>org.apache.maven.reporting</package>
+
+  <dependencies>
+    <dependency>
+      <groupId>doxia</groupId>
+      <artifactId>doxia-core</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+  </dependencies>
+</project>
