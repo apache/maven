@@ -413,17 +413,6 @@
             <type>DependencyManagement</type>
           </association>
         </field>
-        <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
-         | plugins to be used in sub-projects. -->
-        <field>
-          <name>pluginManagement</name>
-          <version>4.0.0</version>
-          <required>false</required>
-          <description><![CDATA[Default plugin information for grouped projects inheriting from this one.]]></description>
-          <association>
-            <type>PluginManagement</type>
-          </association>
-        </field>
         <field>
           <name>properties</name>
           <version>3.0.0</version>
@@ -680,6 +669,17 @@
           <association>
             <type>Plugin</type>
             <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
+         | plugins to be used in sub-projects. -->
+        <field>
+          <name>pluginManagement</name>
+          <version>4.0.0</version>
+          <required>false</required>
+          <description><![CDATA[Default plugin information for grouped projects inheriting from this one.]]></description>
+          <association>
+            <type>PluginManagement</type>
           </association>
         </field>
       </fields>

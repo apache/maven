@@ -219,66 +219,83 @@ public class DefaultModelInheritanceAssembler
 
     private void assemblePluginManagementInheritance( Model child, Model parent )
     {
-        PluginManagement parentPluginMgmt = parent.getPluginManagement();
+        Build parentBuild = parent.getBuild();
+        Build childBuild = parent.getBuild();
 
-        PluginManagement childPluginMgmt = child.getPluginManagement();
-
-        if ( parentPluginMgmt != null )
+        if ( childBuild == null )
         {
-            if ( childPluginMgmt == null )
+            if ( parentBuild != null )
             {
-                child.setPluginManagement( parentPluginMgmt );
+                child.setBuild( parentBuild );
             }
             else
             {
-                List childPlugins = childPluginMgmt.getPlugins();
+                childBuild = new Build();
+            }
+        }
+        else
+        {
+            PluginManagement parentPluginMgmt = parentBuild.getPluginManagement();
 
-                Map mappedChildPlugins = new TreeMap();
-                for ( Iterator it = childPlugins.iterator(); it.hasNext(); )
+            PluginManagement childPluginMgmt = childBuild.getPluginManagement();
+
+            if ( parentPluginMgmt != null )
+            {
+                if ( childPluginMgmt == null )
                 {
-                    Plugin plugin = (Plugin) it.next();
-                    mappedChildPlugins.put( constructPluginKey( plugin ), plugin );
+                    childBuild.setPluginManagement( parentPluginMgmt );
                 }
-
-                for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
+                else
                 {
-                    Plugin plugin = (Plugin) it.next();
-                    if ( !mappedChildPlugins.containsKey( constructPluginKey( plugin ) ) )
+                    List childPlugins = childPluginMgmt.getPlugins();
+
+                    Map mappedChildPlugins = new TreeMap();
+                    for ( Iterator it = childPlugins.iterator(); it.hasNext(); )
                     {
-                        childPluginMgmt.addPlugin( plugin );
+                        Plugin plugin = (Plugin) it.next();
+                        mappedChildPlugins.put( constructPluginKey( plugin ), plugin );
                     }
-                    else
+
+                    for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
                     {
-                        Plugin childPlugin = (Plugin) mappedChildPlugins.get( constructPluginKey( plugin ) );
-
-                        Map mappedChildGoals = new TreeMap();
-                        for ( Iterator itGoals = childPlugin.getGoals().iterator(); itGoals.hasNext(); )
+                        Plugin plugin = (Plugin) it.next();
+                        if ( !mappedChildPlugins.containsKey( constructPluginKey( plugin ) ) )
                         {
-                            Goal goal = (Goal) itGoals.next();
-                            mappedChildGoals.put( goal.getId(), goal );
+                            childPluginMgmt.addPlugin( plugin );
                         }
-
-                        for ( Iterator itGoals = plugin.getGoals().iterator(); itGoals.hasNext(); )
+                        else
                         {
-                            Goal parentGoal = (Goal) itGoals.next();
-                            Goal childGoal = (Goal) mappedChildGoals.get( parentGoal.getId() );
+                            Plugin childPlugin = (Plugin) mappedChildPlugins.get( constructPluginKey( plugin ) );
 
-                            if ( childGoal == null )
+                            Map mappedChildGoals = new TreeMap();
+                            for ( Iterator itGoals = childPlugin.getGoals().iterator(); itGoals.hasNext(); )
                             {
-                                childPlugin.addGoal( parentGoal );
+                                Goal goal = (Goal) itGoals.next();
+                                mappedChildGoals.put( goal.getId(), goal );
                             }
-                            else
+
+                            for ( Iterator itGoals = plugin.getGoals().iterator(); itGoals.hasNext(); )
                             {
-                                Boolean disabled = childGoal.isDisabled();
-                                if ( disabled == null )
+                                Goal parentGoal = (Goal) itGoals.next();
+                                Goal childGoal = (Goal) mappedChildGoals.get( parentGoal.getId() );
+
+                                if ( childGoal == null )
                                 {
-                                    childGoal.setDisabled( parentGoal.isDisabled() );
+                                    childPlugin.addGoal( parentGoal );
+                                }
+                                else
+                                {
+                                    Boolean disabled = childGoal.isDisabled();
+                                    if ( disabled == null )
+                                    {
+                                        childGoal.setDisabled( parentGoal.isDisabled() );
 
-                                    Properties conf = new Properties( childGoal.getConfiguration() );
+                                        Properties conf = new Properties( childGoal.getConfiguration() );
 
-                                    conf.putAll( parentGoal.getConfiguration() );
+                                        conf.putAll( parentGoal.getConfiguration() );
 
-                                    childGoal.setConfiguration( conf );
+                                        childGoal.setConfiguration( conf );
+                                    }
                                 }
                             }
                         }

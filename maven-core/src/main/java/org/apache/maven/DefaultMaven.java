@@ -97,7 +97,17 @@ public class DefaultMaven
     {
         MavenSession session = createSession( request );
 
-        MavenProject project = getProject( (File) request.getProjectFiles().get( 0 ), request.getLocalRepository() );
+        List projectFiles = request.getProjectFiles();
+        
+        MavenProject project = null;
+        if(projectFiles != null && !projectFiles.isEmpty())
+        {
+            project = getProject( (File) request.getProjectFiles().get( 0 ), request.getLocalRepository() );
+        }
+        else
+        {
+            project = projectBuilder.buildSuperProject( request.getLocalRepository() );
+        }
 
         session.setProject( project );
 

@@ -31,6 +31,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
@@ -118,56 +119,10 @@ public class DefaultMavenProjectBuilder
                 previous = current;
             }
 
-            Model model = modelInterpolator.interpolate( project.getModel() );
-
-            // interpolation is before injection, because interpolation is off-limits in the injected variables
-            modelDefaultsInjector.injectDefaults( model );
-
-            MavenProject parentProject = project.getParent();
-
-            project = new MavenProject( model );
-            project.setFile( projectDescriptor );
-            project.setParent( parentProject );
-            project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
-
-            // ----------------------------------------------------------------------
-            // Typically when the project builder is being used from maven proper
-            // the transitive dependencies will not be resolved here because this
-            // requires a lot of work when we may only be interested in running
-            // something simple like 'm2 clean'. So the artifact collector is used
-            // in the dependency resolution phase if it is required by any of the
-            // goals being executed. But when used as a component in another piece
-            // of code people may just want to build maven projects and have the
-            // dependencies resolved for whatever reason: this is why we keep
-            // this snippet of code here.
-            // ----------------------------------------------------------------------
-
-            if ( resolveDependencies )
-            {
-                List repos = buildArtifactRepositories( project.getRepositories() );
-
-                MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
-
-                ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(), repos,
-                                                                                        localRepository, sourceReader );
-
-                project.getArtifacts().addAll( result.getArtifacts().values() );
-            }
-
-            ModelValidationResult validationResult = validator.validate( project.getModel() );
-
-            if ( validationResult.getMessageCount() > 0 )
-            {
-                throw new ProjectBuildingException( "Exception while building project: " + validationResult.toString() );
-            }
+            project = processProjectLogic( project, localRepository, resolveDependencies );
 
             project.setFile( projectDescriptor );
-
             pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
-
-            project.addCompileSourceRoot( project.getBuild().getSourceDirectory() );
-            project.addScriptSourceRoot( project.getBuild().getScriptSourceDirectory() );
-            project.addTestCompileSourceRoot( project.getBuild().getTestSourceDirectory() );
 
             return project;
         }
@@ -177,8 +132,61 @@ public class DefaultMavenProjectBuilder
         }
     }
 
+    private MavenProject processProjectLogic( MavenProject project, ArtifactRepository localRepository,
+                                             boolean resolveDependencies )
+        throws ProjectBuildingException, ModelInterpolationException, ArtifactResolutionException
+    {
+        Model model = modelInterpolator.interpolate( project.getModel() );
+
+        // interpolation is before injection, because interpolation is off-limits in the injected variables
+        modelDefaultsInjector.injectDefaults( model );
+
+        MavenProject parentProject = project.getParent();
+
+        project = new MavenProject( model );
+        project.setParent( parentProject );
+        project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
+
+        // ----------------------------------------------------------------------
+        // Typically when the project builder is being used from maven proper
+        // the transitive dependencies will not be resolved here because this
+        // requires a lot of work when we may only be interested in running
+        // something simple like 'm2 clean'. So the artifact collector is used
+        // in the dependency resolution phase if it is required by any of the
+        // goals being executed. But when used as a component in another piece
+        // of code people may just want to build maven projects and have the
+        // dependencies resolved for whatever reason: this is why we keep
+        // this snippet of code here.
+        // ----------------------------------------------------------------------
+
+        if ( resolveDependencies )
+        {
+            List repos = buildArtifactRepositories( project.getRepositories() );
+
+            MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
+
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(), repos,
+                                                                                    localRepository, sourceReader );
+
+            project.getArtifacts().addAll( result.getArtifacts().values() );
+        }
+
+        ModelValidationResult validationResult = validator.validate( project.getModel() );
+
+        if ( validationResult.getMessageCount() > 0 )
+        {
+            throw new ProjectBuildingException( "Exception while building project: " + validationResult.toString() );
+        }
+
+        project.addCompileSourceRoot( project.getBuild().getSourceDirectory() );
+        project.addScriptSourceRoot( project.getBuild().getScriptSourceDirectory() );
+        project.addTestCompileSourceRoot( project.getBuild().getTestSourceDirectory() );
+
+        return project;
+    }
+
     private MavenProject assembleLineage( File projectDescriptor, ArtifactRepository localRepository,
-                                          LinkedList lineage, List aggregatedRemoteWagonRepositories )
+                                         LinkedList lineage, List aggregatedRemoteWagonRepositories )
         throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
@@ -245,8 +253,7 @@ public class DefaultMavenProjectBuilder
         return repos;
     }
 
-    private Model readModel( File file )
-        throws ProjectBuildingException
+    private Model readModel( File file ) throws ProjectBuildingException
     {
         try
         {
@@ -259,12 +266,12 @@ public class DefaultMavenProjectBuilder
         catch ( Exception e )
         {
             throw new ProjectBuildingException(
-                "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
+                                                "Error while reading model from file '" + file.getAbsolutePath() + "'.",
+                                                e );
         }
     }
 
-    private Model readModel( URL url )
-        throws ProjectBuildingException
+    private Model readModel( URL url ) throws ProjectBuildingException
     {
         try
         {
@@ -293,8 +300,8 @@ public class DefaultMavenProjectBuilder
         catch ( ArtifactResolutionException e )
         {
             // @todo use parent.toString() if modello could generate it, or specify in a code segment
-            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":" +
-                                                parent.getArtifactId() + "-" + parent.getVersion(), e );
+            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":"
+                + parent.getArtifactId() + "-" + parent.getVersion(), e );
         }
 
         return artifact.getFile();
@@ -311,8 +318,7 @@ public class DefaultMavenProjectBuilder
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
      */
-    public List getSortedProjects( List projects )
-        throws CycleDetectedException
+    public List getSortedProjects( List projects ) throws CycleDetectedException
     {
         DAG dag = new DAG();
 
@@ -360,12 +366,42 @@ public class DefaultMavenProjectBuilder
         return sortedProjects;
     }
 
+    public MavenProject buildSuperProject( ArtifactRepository localRepository )
+    throws ProjectBuildingException
+    {
+            return buildSuperProject( localRepository, false );
+    }
+    
+    public MavenProject buildSuperProject( ArtifactRepository localRepository, boolean resolveDependencies )
+        throws ProjectBuildingException
+    {
+        MavenProject project = new MavenProject( getSuperModel() );
+
+        try
+        {
+            project = processProjectLogic( project, localRepository, resolveDependencies );
+            
+            File projectFile = new File( ".", "pom.xml" );
+            project.setFile( projectFile );
+            pathTranslator.alignToBaseDirectory( project.getModel(), projectFile );
+
+            return project;
+        }
+        catch ( ModelInterpolationException e )
+        {
+            throw new ProjectBuildingException( "Error building super-project", e );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new ProjectBuildingException( "Error building super-project", e );
+        }
+    }
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    private Model getSuperModel()
-        throws ProjectBuildingException
+    private Model getSuperModel() throws ProjectBuildingException
     {
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" );
 

@@ -42,7 +42,7 @@ public class DefaultModelDefaultsInjector
         injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );
         if ( model.getBuild() != null )
         {
-            injectPluginDefaults( model.getBuild().getPlugins(), model.getPluginManagement() );
+            injectPluginDefaults( model.getBuild().getPlugins(), model.getBuild().getPluginManagement() );
         }
     }
 

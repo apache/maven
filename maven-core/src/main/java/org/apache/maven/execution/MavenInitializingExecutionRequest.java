@@ -21,6 +21,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,6 +40,6 @@ extends AbstractMavenExecutionRequest
 
     public List getProjectFiles()
     {
-        return null;
+        return Collections.EMPTY_LIST;
     }
 }

@@ -22,6 +22,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionResponse;
@@ -81,9 +82,11 @@ public class DefaultLifecycleExecutor
 
         try
         {
+            MavenProject project = session.getProject();
+            
             // TODO: should enrich this with the type handler, but for now just
             // use "type" as is
-            ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( session.getProject().getPackaging() );
+            ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
 
             if ( handler != null )
             {
@@ -96,6 +99,11 @@ public class DefaultLifecycleExecutor
                 }
                 if ( handler.additionalPlugin() != null )
                 {
+                    String additionalPluginGroupId = "maven";
+                    String additionalPluginArtifactId = "maven-" + handler.additionalPlugin() + "-plugin";
+
+                    injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
+
                     processPluginPhases( "maven", "maven-" + handler.additionalPlugin() + "-plugin", session );
                 }
             }
@@ -137,6 +145,31 @@ public class DefaultLifecycleExecutor
         }
 
         return response;
+    }
+
+    private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId )
+    {
+        PluginManagement mgmt = project.getPluginManagement();
+        if( mgmt != null )
+        {
+            List pluginList = mgmt.getPlugins();
+
+            Plugin handlerPlugin = null;
+            for ( Iterator it = pluginList.iterator(); it.hasNext(); )
+            {
+                Plugin plugin = (Plugin) it.next();
+                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                {
+                    handlerPlugin = plugin;
+                    break;
+                }
+            }
+
+            if ( handlerPlugin != null )
+            {
+                project.addPlugin( handlerPlugin );
+            }
+        }
     }
 
     // TODO: don't throw Exception

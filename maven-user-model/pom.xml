@@ -12,6 +12,7 @@
       <plugin>
         <groupId>maven</groupId>
         <artifactId>maven-modello-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
         <configuration>
           <version>4.0.0</version>
           <model>maven-user.mdo</model>

@@ -29,6 +29,8 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reports;
 import org.apache.maven.model.Scm;
 
@@ -521,6 +523,33 @@ public class MavenProject
             return null;
         }
         return model.getBuild().getPlugins();
+    }
+
+    public PluginManagement getPluginManagement()
+    {
+        PluginManagement pluginMgmt = null;
+
+        Build build = model.getBuild();
+        if ( build != null )
+        {
+            pluginMgmt = build.getPluginManagement();
+        }
+
+        return pluginMgmt;
+    }
+
+    public void addPlugin( Plugin plugin )
+    {
+        Build build = model.getBuild();
+
+        if ( build == null )
+        {
+            build = new Build();
+
+            model.setBuild( build );
+        }
+
+        build.addPlugin( plugin );
     }
 }
 
