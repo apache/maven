@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# This process assumes that maven-core-it-verifier has been built.
+
 home=`pwd`
 
 cp=`pwd`/../maven-core-it-verifier/target/maven-core-it-verifier-1.0.jar
