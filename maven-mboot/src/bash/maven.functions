@@ -13,8 +13,8 @@ downloadMBootDependencies()
   do
     if [ ! -f $repoLocal/$i ]
     then
-      mkdir -p $repoLocal/$i > /dev/null 2>&1
-      wget http://www.ibiblio.org/maven/$i $repoLocal/$i > /dev/null 2>&1
+      mkdir -p `dirname $repoLocal/$i` > /dev/null 2>&1
+      wget http://www.ibiblio.org/maven/$i -O $repoLocal/$i 
     fi
   done
 }
