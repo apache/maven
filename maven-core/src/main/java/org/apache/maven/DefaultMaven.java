@@ -20,11 +20,9 @@ package org.apache.maven;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.GoalNotFoundException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.user.ProxyProfile;
@@ -78,7 +76,7 @@ public class DefaultMaven
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
-    
+
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
 
     // ----------------------------------------------------------------------
@@ -86,7 +84,7 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
 
     public MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws GoalNotFoundException, Exception
+        throws ReactorException
     {
         EventDispatcher dispatcher = request.getEventDispatcher();
         String event = MavenEvents.REACTOR_EXECUTION;
@@ -95,20 +93,11 @@ public class DefaultMaven
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
         try
         {
-            List projects = new ArrayList();
+            List projects;
 
             try
             {
-                List files = request.getProjectFiles();
-
-                for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
-                {
-                    File file = (File) iterator.next();
-
-                    MavenProject project = getProject( file, request.getLocalRepository() );
-
-                    projects.add( project );
-                }
+                projects = collectProjects( request.getFiles(), request.getLocalRepository() );
 
                 projects = projectBuilder.getSortedProjects( projects );
 
@@ -142,49 +131,21 @@ public class DefaultMaven
 
                 try
                 {
-                    boolean isPom = "pom".equals( project.getPackaging() );
-                    if ( isPom )
+                    List goals;
+                    if ( "pom".equals( project.getPackaging() ) )
                     {
                         // TODO: not required if discovered and cached
-                        MavenExecutionResponse response = processProject( request, project, dispatcher,
-                                                                          Collections.singletonList( "pom:install" ) );
-                        if ( response.isExecutionFailure() )
-                        {
-                            return response;
-                        }
+                        goals = Collections.singletonList( "pom:install" );
+                    }
+                    else
+                    {
+                        goals = request.getGoals();
                     }
 
-                    if ( project.getModules() != null && !project.getModules().isEmpty() )
+                    MavenExecutionResponse response = processProject( request, project, dispatcher, goals );
+                    if ( response.isExecutionFailure() )
                     {
-                        String includes = StringUtils.join( project.getModules().iterator(), "/pom.xml," ) + "/pom.xml";
-
-                        File baseDir = project.getFile().getParentFile();
-
-                        MavenExecutionRequest reactorRequest = new DefaultMavenExecutionRequest(
-                            request.getLocalRepository(),
-                            request.getUserModel(),
-                            request.getEventDispatcher(),
-                            request.getGoals(),
-                            FileUtils.getFiles( baseDir, includes, null ),
-                            baseDir.getPath() );
-
-                        MavenExecutionResponse response = execute( reactorRequest );
-
-                        if ( response != null && response.isExecutionFailure() )
-                        {
-                            return response;
-                        }
-                    }
-
-                    if ( !isPom )
-                    {
-                        MavenExecutionResponse response = processProject( request, project, dispatcher,
-                                                                          request.getGoals() );
-
-                        if ( response.isExecutionFailure() )
-                        {
-                            return response;
-                        }
+                        return response;
                     }
                 }
                 catch ( Exception e )
@@ -206,6 +167,37 @@ public class DefaultMaven
         }
     }
 
+    private List collectProjects( List files, ArtifactRepository localRepository )
+        throws ProjectBuildingException, ReactorException, IOException
+    {
+        List projects = new ArrayList( files.size() );
+
+        for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
+        {
+            File file = (File) iterator.next();
+
+            MavenProject project = getProject( file, localRepository );
+
+            if ( project.getModules() != null && !project.getModules().isEmpty() )
+            {
+                project.setPackaging( "pom" );
+
+                String includes = StringUtils.join( project.getModules().iterator(), "/pom.xml," ) + "/pom.xml";
+
+                if ( includes.indexOf( ".." ) >= 0 )
+                {
+                    throw new ReactorException( "Modules may not include '..'" );
+                }
+
+                List moduleFiles = FileUtils.getFiles( project.getFile().getParentFile(), includes, null );
+                projects.addAll( collectProjects( moduleFiles, localRepository ) );
+            }
+            projects.add( project );
+        }
+
+        return projects;
+    }
+
     private MavenExecutionResponse processProject( MavenExecutionRequest request, MavenProject project,
                                                    EventDispatcher dispatcher, List goals )
         throws ComponentLookupException
@@ -213,7 +205,7 @@ public class DefaultMaven
         MavenSession session = createSession( request );
 
         session.setProject( project );
-        
+
         session.setRemoteRepositories( getArtifactRepositories( project, request.getUserModel() ) );
 
         resolveParameters( request );

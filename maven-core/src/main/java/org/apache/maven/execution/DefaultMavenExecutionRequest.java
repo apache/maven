@@ -96,11 +96,6 @@ public class DefaultMavenExecutionRequest
         return session;
     }
 
-    public List getProjectFiles()
-    {
-        return files;
-    }
-
     public void setSession( MavenSession session )
     {
         this.session = session;

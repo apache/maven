@@ -18,7 +18,7 @@ package org.apache.maven;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
-import org.apache.maven.lifecycle.GoalNotFoundException;
+import org.apache.maven.reactor.ReactorException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -28,5 +28,5 @@ public interface Maven
 {
     static String ROLE = Maven.class.getName();
 
-    MavenExecutionResponse execute( MavenExecutionRequest request ) throws GoalNotFoundException, Exception;
+    MavenExecutionResponse execute( MavenExecutionRequest request ) throws ReactorException;
 }
