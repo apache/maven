@@ -12,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +37,37 @@ public class MBoot
     // maven-plugin
     // maven-plugins
 
+    // ----------------------------------------------------------------------
+    // 
+    // ----------------------------------------------------------------------
+    
+    String[] deps = new String[]
+    {
+        "junit/jars/junit-3.8.1.jar",
+        "surefire/jars/surefire-booter-1.1.jar",
+        "surefire/jars/surefire-1.1.jar",
+        "modello/jars/modello-1.0-SNAPSHOT.jar",
+        "xpp3/jars/xpp3-1.1.3.3.jar",
+        "xstream/jars/xstream-1.0-SNAPSHOT.jar",
+        "qdox/jars/qdox-1.2.jar",
+        "maven/jars/maven-plugin-2.0-SNAPSHOT.jar"
+    };
+
+    String[] builds = new String[]
+    {
+        "maven-model",
+        "maven-plugin",
+        "maven-core",
+        "maven-plugins/maven-clean-plugin",
+        "maven-plugins/maven-compiler-plugin",
+        "maven-plugins/maven-install-plugin",
+        "maven-plugins/maven-jar-plugin",
+        "maven-plugins/maven-plugin-plugin",
+        "maven-plugins/maven-pom-plugin",
+        "maven-plugins/maven-resources-plugin",
+        "maven-plugins/maven-surefire-plugin"
+    };
+    
     // ----------------------------------------------------------------------
     // Standard locations for resources in Maven projects.
     // ----------------------------------------------------------------------
@@ -101,154 +131,137 @@ public class MBoot
 
         checkMBootDeps();
 
-        File instructions = new File( basedir, "mboot.txt" );
-
-        if ( instructions.exists() )
+        for ( int i = 0; i < builds.length; i++ )
         {
-            FileInputStream is = new FileInputStream( instructions );
+            String directory = new File( basedir, builds[i] ).getAbsolutePath();
 
-            StringWriter w = new StringWriter();
+            System.out.println( "Building project in " + directory + " ..." );
 
-            IOUtil.copy( is, w );
+            System.out.println( "--------------------------------------------------------------------" );
 
-            String[] deps = StringUtils.split( w.toString(), "\n" );
+            System.setProperty( "basedir", directory );
 
-            for ( int i = 0; i < deps.length; i++ )
+            buildProject( directory );
+
+            if ( reader.artifactId.equals( "maven-core" ) )
             {
-                String directory = new File( basedir, deps[i] ).getAbsolutePath();
-
-                System.out.println( "Building project in " + directory + " ..." );
-
-                System.out.println( "--------------------------------------------------------------------" );
-
-                System.setProperty( "basedir", directory );
-
-                buildProject( directory );
-
-                if ( reader.artifactId.equals( "maven-core" ) )
-                {
-                    coreDeps = reader.getDependencies();
-                }
-
-                reader.reset();
-
-                System.out.println( "--------------------------------------------------------------------" );
+                coreDeps = reader.getDependencies();
             }
 
-            // build the installation
+            reader.reset();
 
-            String mavenHome;
+            System.out.println( "--------------------------------------------------------------------" );
+        }
 
-            if ( args.length == 1 )
-            {
-                mavenHome = args[0];
-            }
-            else
-            {
-                mavenHome = System.getProperty( "M2_HOME" );
+        // build the installation
 
-                System.out.println( "mavenHome = " + mavenHome );
+        String mavenHome;
 
-                if ( mavenHome == null )
-                {
-                    mavenHome = new File( System.getProperty( "user.home" ), "m2" ).getAbsolutePath();
-                }
-            }
-
-            File dist = new File( mavenHome );
-
-            FileUtils.deleteDirectory( dist );
-
-            // ----------------------------------------------------------------------
-            // bin
-            // ----------------------------------------------------------------------
-
-            String bin = new File( dist, "bin" ).getAbsolutePath();
-
-            FileUtils.mkdir( new File( bin ).getPath() );
-
-            FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/m2" ).getAbsolutePath(), bin );
-
-            FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/m2.bat" ).getAbsolutePath(), bin );
-
-            FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/classworlds.conf" ).getAbsolutePath(), bin );
-
-            if ( Os.isFamily( "unix" ) )
-            {
-                Commandline cli = new Commandline();
-
-                cli.setExecutable( "chmod" );
-
-                cli.createArgument().setValue( "+x" );
-
-                cli.createArgument().setValue( new File( dist, "bin/m2" ).getAbsolutePath() );
-
-                cli.execute();
-            }
-
-            // ----------------------------------------------------------------------
-            // core
-            // ----------------------------------------------------------------------
-
-            String core = new File( dist, "core" ).getAbsolutePath();
-
-            FileUtils.mkdir( new File( core ).getPath() );
-
-            FileUtils.copyFileToDirectory( repoLocal + "/classworlds/jars/classworlds-1.1-SNAPSHOT.jar", core );
-
-            FileUtils.copyFileToDirectory( repoLocal + "/plexus/jars/plexus-0.14-SNAPSHOT.jar", core );
-
-            FileUtils.copyFileToDirectory( repoLocal + "/xpp3/jars/xpp3-1.1.3.3.jar", core );
-
-            FileUtils.copyFileToDirectory( repoLocal + "/xstream/jars/xstream-1.0-SNAPSHOT.jar", core );
-
-            // ----------------------------------------------------------------------
-            // lib
-            // ----------------------------------------------------------------------
-
-            String lib = new File( dist, "lib" ).getAbsolutePath();
-
-            FileUtils.mkdir( new File( lib ).getPath() );
-
-            for ( Iterator i = coreDeps.iterator(); i.hasNext(); )
-            {
-                Dependency d = (Dependency) i.next();
-
-                if ( d.getArtifactId().equals( "classworlds" ) ||
-                    d.artifactId.equals( "plexus" ) ||
-                    d.artifactId.equals( "xstream" ) ||
-                    d.artifactId.equals( "xpp3" ) )
-                {
-                    continue;
-                }
-
-                FileUtils.copyFileToDirectory( repoLocal + "/" + getArtifactPath( d, "/" ), lib );
-            }
-
-            // Copy maven itself
-
-            FileUtils.copyFileToDirectory( repoLocal + "/maven/jars/maven-core-2.0-SNAPSHOT.jar", lib );
-
-            // ----------------------------------------------------------------------
-            // plugins
-            // ----------------------------------------------------------------------
-
-            String plugins = new File( dist, "plugins" ).getAbsolutePath();
-
-            FileUtils.mkdir( new File( plugins ).getPath() );
-
-            List libs = FileUtils.getFiles( new File( basedir, "maven-plugins" ), "**/target/*.jar", null );
-
-            for ( Iterator i = libs.iterator(); i.hasNext(); )
-            {
-                File f = (File) i.next();
-
-                FileUtils.copyFileToDirectory( f.getAbsolutePath(), plugins );
-            }
+        if ( args.length == 1 )
+        {
+            mavenHome = args[0];
         }
         else
         {
-            buildProject( basedir );
+            mavenHome = System.getProperty( "M2_HOME" );
+
+            System.out.println( "mavenHome = " + mavenHome );
+
+            if ( mavenHome == null )
+            {
+                mavenHome = new File( System.getProperty( "user.home" ), "m2" ).getAbsolutePath();
+            }
+        }
+
+        File dist = new File( mavenHome );
+
+        FileUtils.deleteDirectory( dist );
+
+        // ----------------------------------------------------------------------
+        // bin
+        // ----------------------------------------------------------------------
+
+        String bin = new File( dist, "bin" ).getAbsolutePath();
+
+        FileUtils.mkdir( new File( bin ).getPath() );
+
+        FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/m2" ).getAbsolutePath(), bin );
+
+        FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/m2.bat" ).getAbsolutePath(), bin );
+
+        FileUtils.copyFileToDirectory( new File( basedir, "maven-core/src/bin/classworlds.conf" ).getAbsolutePath(), bin );
+
+        if ( Os.isFamily( "unix" ) )
+        {
+            Commandline cli = new Commandline();
+
+            cli.setExecutable( "chmod" );
+
+            cli.createArgument().setValue( "+x" );
+
+            cli.createArgument().setValue( new File( dist, "bin/m2" ).getAbsolutePath() );
+
+            cli.execute();
+        }
+
+        // ----------------------------------------------------------------------
+        // core
+        // ----------------------------------------------------------------------
+
+        String core = new File( dist, "core" ).getAbsolutePath();
+
+        FileUtils.mkdir( new File( core ).getPath() );
+
+        FileUtils.copyFileToDirectory( repoLocal + "/classworlds/jars/classworlds-1.1-SNAPSHOT.jar", core );
+
+        FileUtils.copyFileToDirectory( repoLocal + "/plexus/jars/plexus-0.14-SNAPSHOT.jar", core );
+
+        FileUtils.copyFileToDirectory( repoLocal + "/xpp3/jars/xpp3-1.1.3.3.jar", core );
+
+        FileUtils.copyFileToDirectory( repoLocal + "/xstream/jars/xstream-1.0-SNAPSHOT.jar", core );
+
+        // ----------------------------------------------------------------------
+        // lib
+        // ----------------------------------------------------------------------
+
+        String lib = new File( dist, "lib" ).getAbsolutePath();
+
+        FileUtils.mkdir( new File( lib ).getPath() );
+
+        for ( Iterator i = coreDeps.iterator(); i.hasNext(); )
+        {
+            Dependency d = (Dependency) i.next();
+
+            if ( d.getArtifactId().equals( "classworlds" ) ||
+                d.artifactId.equals( "plexus" ) ||
+                d.artifactId.equals( "xstream" ) ||
+                d.artifactId.equals( "xpp3" ) )
+            {
+                continue;
+            }
+
+            FileUtils.copyFileToDirectory( repoLocal + "/" + getArtifactPath( d, "/" ), lib );
+        }
+
+        // Copy maven itself
+
+        FileUtils.copyFileToDirectory( repoLocal + "/maven/jars/maven-core-2.0-SNAPSHOT.jar", lib );
+
+        // ----------------------------------------------------------------------
+        // plugins
+        // ----------------------------------------------------------------------
+
+        String plugins = new File( dist, "plugins" ).getAbsolutePath();
+
+        FileUtils.mkdir( new File( plugins ).getPath() );
+
+        List libs = FileUtils.getFiles( new File( basedir, "maven-plugins" ), "**/target/*.jar", null );
+
+        for ( Iterator i = libs.iterator(); i.hasNext(); )
+        {
+            File f = (File) i.next();
+
+            FileUtils.copyFileToDirectory( f.getAbsolutePath(), plugins );
         }
     }
 
@@ -441,14 +454,6 @@ public class MBoot
         throws Exception
     {
         System.out.println( "Checking for MBoot's dependencies ..." );
-
-        InputStream is = MBoot.class.getClassLoader().getResourceAsStream( "mboot.deps" );
-
-        StringWriter w = new StringWriter();
-
-        IOUtil.copy( is, w );
-
-        String[] deps = StringUtils.split( w.toString(), "\n" );
 
         mbootDependencies = Arrays.asList( deps );
 
