@@ -124,4 +124,4 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 
 ) >> log 2>&1
 
-#/usr/sbin/sendmail -t < log
+/usr/sbin/sendmail -t < log
