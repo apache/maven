@@ -62,6 +62,7 @@ each of the plugin executions would be different.
       <name>test</name>
       <prereqs>
         <prereq>test:compile</prereq>
+        <prereq>resources</prereq>
         <prereq>test:resources</prereq>
       </prereqs>
       <configuration>
