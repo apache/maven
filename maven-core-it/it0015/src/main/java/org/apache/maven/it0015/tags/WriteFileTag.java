@@ -28,6 +28,9 @@ public class WriteFileTag
         String content = (String) getBody(context, String.class);
         String filename = (String) requireTagAttribute(FILE_ATTR, String.class, context);
         
+        System.out.println("Attempting to write to file: \'" + filename + "\' contents:");
+        System.out.println(content);
+        
         File file = new File(filename);
         File dir = file.getParentFile();
         if(dir != null && !dir.exists())
