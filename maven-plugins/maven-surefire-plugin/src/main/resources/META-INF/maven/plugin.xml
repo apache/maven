@@ -1,6 +1,7 @@
 <plugin>
   <id>surefire</id>
   <implementation>org.apache.maven.test.SurefirePlugin</implementation>
+  <instantiation-strategy>singleton</instantiation-strategy>
   <mode>singleton</mode>
   <goals>
     <goal>
