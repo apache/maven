@@ -17,9 +17,9 @@ package org.apache.maven.plugin.install;
  */
 
 /**
- * @goal install
+ * @goal pom
  *
- * @description installs project's main artifact in local repository
+ * @description installs pom in local repository
  *
  * @parameter name="project"
  * type="org.apache.maven.project.MavenProject"
@@ -45,7 +45,11 @@ package org.apache.maven.plugin.install;
  * @prereq build
  *
  */
-public class InstallMojo
+public class InstallPomMojo
     extends AbstractInstallMojo
 {
+    protected boolean isPom()
+    {
+        return true;
+    }
 }
