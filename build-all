@@ -1,0 +1,6 @@
+#!/bin/sh
+
+( cd maven-model ; maven clean jar:install )
+( cd maven-model-xpp3 ; maven clean jar:install )
+( cd maven-project ; maven clean jar:install )
+( cd maven-core ; maven clean jar:install )
