@@ -58,6 +58,11 @@
       <artifactId>wagon-api</artifactId>
       <version>1.0-alpha-1-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>wagon-http-lightweight</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <distributionManagement>
     <site>
