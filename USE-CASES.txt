@@ -29,7 +29,8 @@ their source trees set up in the same way as their collegues.
   (e.g pdf, html, rtf) and this format can be also choosen for group of reports.
   
 - groupId
- - Let's assume that there exists an artifact type "web-component" which is a zip file containg css/js/gifs/jpegs etc
+ - Let's assume that there exists an artifact type "web-component" 
+   which is a zip file containg css/js/gifs/jpegs etc
    Example of such artifact is for example distribution of tigris style.
    
    Say an user has declared the following dependency:
@@ -48,7 +49,7 @@ their source trees set up in the same way as their collegues.
    
 
 - Maven is Java Build Tool. It should be well defined what does it mean to "build java project".
-  It mean stages of the process should be well defined.
+  It means that stages of the process should be well defined.
   
   pre-compile (this is when tools like JAXB, XDoclet)
   compile (javac, aspectj)
@@ -58,10 +59,11 @@ their source trees set up in the same way as their collegues.
   etc
   
   It should e.g be possible to use Castor, JAXB plugin, XDoclet plugin without writing a single line  
-  of build script. In the ideal case it should b ejust to plug XDoclet just by "checking the checkbox in IDE". 
+  of build script. In the ideal case it should be just enough to plug-in XDoclet into process simply 
+  by "checking the checkbox in IDE". 
   This is someting what Vincent Massol started in maven-caller plugin. It will be nice to explore this idea. 
    
-- Reorganization of repoistory layout - are we going to map groupId : "a.b.c.d"  to path "a/b/c/d"?
+- Reorganization of repository layout - are we going to map groupId : "a.b.c.d"  to path "a/b/c/d"?
   Are there some better alternatives?
   
 - (Michal)  I have tried to implement "platform dependend dependecies".
