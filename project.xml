@@ -16,11 +16,11 @@
     <logo>/images/apache-maven-project.png</logo>
   </organization>
 
-  <repository>
+  <scm>
     <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components/${pom.artifactId}</connection>
     <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components/${pom.artifactId}</developerConnection>
     <url>http://cvs.apache.org/viewcvs.cgi/maven-components/${pom.artifactId}</url>
-  </repository>
+  </scm>
 
   <mailingLists>
     <mailingList>
