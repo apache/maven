@@ -232,5 +232,10 @@
         <!-- END SNIPPET: lifecycle -->
       </configuration>
     </component>
+    <!-- I realize this is duplicated but allows the project builder to work by itself -->
+    <component>
+      <role>org.apache.maven.project.path.PathTranslator</role>
+      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
+    </component>
   </components>
 </component-set>
