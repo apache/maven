@@ -39,6 +39,18 @@ DEPLOY_DIR=$HOME_DIR/public_html/m2
 DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2
 
 # ----------------------------------------------------------------------------------
+# Check if ~/maven.properties exists
+# ----------------------------------------------------------------------------------
+if [ ! -f ~/maven.properties ]
+then
+  echo 
+  echo "maven.properties doesn't exists. I create it."
+  echo "maven.home=$M2_HOME" > ~/maven.properties
+  echo "maven.repo.local=$REPO" >> ~/maven.properties
+  echo
+fi
+
+# ----------------------------------------------------------------------------------
 
 # Wipe out the working directory and the repository and start entirely
 # from scratch.
