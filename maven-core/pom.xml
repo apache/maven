@@ -55,7 +55,7 @@
     <dependency>
       <groupId>maven</groupId>
       <artifactId>wagon-api</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
+      <version>0.9-SNAPSHOT</version>
     </dependency>    
   </dependencies>
   <distributionManagement>
