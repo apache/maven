@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.lifecycle.session.MavenSession;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -29,31 +30,13 @@ public interface PluginManager
 {
     String ROLE = PluginManager.class.getName();
 
-    // ----------------------------------------------------------------------
-    // Plugin processing
-    // ----------------------------------------------------------------------
-
     void processPluginDescriptor( MavenPluginDescriptor pluginDescriptor )
         throws Exception;
-
-    // ----------------------------------------------------------------------
-    //  Mojo descriptors
-    // ----------------------------------------------------------------------
 
     Map getMojoDescriptors();
 
     MojoDescriptor getMojoDescriptor( String goalId );
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    void verifyPluginForGoal( String pluginId )
+    void verifyPluginForGoal( String pluginId, MavenSession session )
         throws Exception;
-
-    void setLocalRepository( ArtifactRepository localRepository );
 }

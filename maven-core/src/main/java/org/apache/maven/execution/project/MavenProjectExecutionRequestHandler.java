@@ -1,24 +1,11 @@
 package org.apache.maven.execution.project;
 
-import org.apache.maven.lifecycle.session.MavenSession;
-import org.apache.maven.lifecycle.session.MavenSessionPhaseManager;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.project.MavenProjectExecutionRequest;
 import org.apache.maven.execution.AbstractMavenExecutionRequestHandler;
-import org.apache.maven.execution.MavenExecutionRequestHandler;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
-import org.codehaus.plexus.ArtifactEnabledContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.i18n.I18N;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.File;
 import java.util.Date;
@@ -29,19 +16,8 @@ import java.util.Date;
  */
 public class MavenProjectExecutionRequestHandler
     extends AbstractMavenExecutionRequestHandler
-    implements MavenExecutionRequestHandler, Contextualizable
 {
     private boolean logResults = true;
-
-    protected MavenProjectBuilder projectBuilder;
-
-    protected PluginManager pluginManager;
-
-    protected PlexusContainer container;
-
-    protected MavenSessionPhaseManager lifecycleManager;
-
-    protected I18N i18n;
 
     public void handle( MavenExecutionRequest request, MavenExecutionResponse response )
         throws Exception
@@ -52,17 +28,9 @@ public class MavenProjectExecutionRequestHandler
 
         Date fullStart = new Date();
 
-        pluginManager.setLocalRepository( request.getLocalRepository() );
-
-        MavenSession session = new MavenSession( container,
-                                                 pluginManager,
-                                                 project,
-                                                 request.getLocalRepository(),
-                                                 request.getGoals() );
-
         try
         {
-            response = lifecycleManager.execute( session );
+            response = lifecycleManager.execute( createSession( request, project ) );
         }
         catch ( Exception e )
         {
@@ -183,14 +151,5 @@ public class MavenProjectExecutionRequestHandler
         }
 
         return projectBuilder.build( pom, localRepository );
-    }
-
-    // ----------------------------------------------------------------------
-    // Lifecylce Management
-    // ----------------------------------------------------------------------
-
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (ArtifactEnabledContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

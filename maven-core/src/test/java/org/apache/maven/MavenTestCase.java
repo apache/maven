@@ -130,8 +130,6 @@ public class MavenTestCase
 
         MavenSession session = new MavenSession( getContainer(), pluginManager, project, localRepository, goals );
 
-        pluginManager.setLocalRepository( localRepository );
-
         MavenGoalExecutionContext context = new MavenGoalExecutionContext( session, goal );
 
         return context;

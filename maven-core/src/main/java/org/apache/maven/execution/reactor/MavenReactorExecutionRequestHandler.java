@@ -1,12 +1,11 @@
 package org.apache.maven.execution.reactor;
 
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.reactor.ReactorException;
-import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
-import org.apache.maven.execution.project.MavenProjectExecutionRequestHandler;
-import org.apache.maven.execution.MavenExecutionRequestHandler;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.project.MavenProjectExecutionRequest;
+import org.apache.maven.execution.project.MavenProjectExecutionRequestHandler;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.reactor.ReactorException;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -20,7 +19,6 @@ import java.util.List;
  */
 public class MavenReactorExecutionRequestHandler
     extends MavenProjectExecutionRequestHandler
-    implements MavenExecutionRequestHandler
 {
     public void handle( MavenExecutionRequest request, MavenExecutionResponse response )
         throws Exception
@@ -32,8 +30,8 @@ public class MavenReactorExecutionRequestHandler
         try
         {
             List files = FileUtils.getFiles( new File( System.getProperty( "user.dir" ) ),
-                                             ((MavenReactorExecutionRequest)request).getIncludes(),
-                                             ((MavenReactorExecutionRequest)request).getExcludes() );
+                                             ( (MavenReactorExecutionRequest) request ).getIncludes(),
+                                             ( (MavenReactorExecutionRequest) request ).getExcludes() );
 
             for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
             {
@@ -72,11 +70,10 @@ public class MavenReactorExecutionRequestHandler
 
             line();
 
-            //MavenProjectExecutionRequest r = new MavenProjectExecutionRequest();
+            MavenProjectExecutionRequest projectExecutionRequest =
+                new MavenProjectExecutionRequest( request.getLocalRepository(), request.getGoals(), project.getFile() );
 
-            super.handle( null, null );
-
-            //response = execute( new MavenProjectExecutionRequest( request.getLocalRepository(), request.getGoals(), project ) );
+            super.handle( projectExecutionRequest, response );
 
             if ( response.isExecutionFailure() )
             {

@@ -66,7 +66,7 @@ public class PluginResolutionPhase
         {
             try
             {
-                pluginManager.verifyPluginForGoal( goal );
+                pluginManager.verifyPluginForGoal( goal, session );
             }
             catch ( Exception e )
             {

@@ -22,6 +22,7 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.lifecycle.session.MavenSession;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -61,8 +62,6 @@ public class DefaultPluginManager
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
     protected Set remotePluginRepositories;
-
-    protected ArtifactRepository localRepository;
 
     protected ArtifactFilter artifactFilter;
 
@@ -163,7 +162,8 @@ public class DefaultPluginManager
         return goalName;
     }
 
-    public void verifyPluginForGoal( String goalName ) throws Exception
+    public void verifyPluginForGoal( String goalName, MavenSession session )
+        throws Exception
     {
         String pluginId = getPluginId( goalName );
 
@@ -179,7 +179,7 @@ public class DefaultPluginManager
 
             Artifact pluginArtifact = new DefaultArtifact( "maven", artifactId, version, "plugin", "jar" );
 
-            addPlugin( pluginArtifact );
+            addPlugin( pluginArtifact, session );
 
             // Now, we need to resolve the plugins for this goal's prereqs.
             MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );
@@ -192,25 +192,25 @@ public class DefaultPluginManager
                 {
                     String prereq = (String) it.next();
 
-                    verifyPluginForGoal( prereq );
+                    verifyPluginForGoal( prereq, session );
                 }
             }
         }
     }
 
-    public void addPlugin( Artifact pluginArtifact )
+    protected void addPlugin( Artifact pluginArtifact, MavenSession session )
         throws Exception
     {
         artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
 
         MavenMetadataSource metadataSource = new MavenMetadataSource( remotePluginRepositories, 
-                                                                      localRepository,
+                                                                      session.getLocalRepository(),
                                                                       artifactResolver );
 
         ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact,
                                                                artifactResolver,
                                                                remotePluginRepositories,
-                                                               localRepository,
+                                                               session.getLocalRepository(),
                                                                metadataSource,
                                                                artifactFilter );
     }
@@ -242,18 +242,6 @@ public class DefaultPluginManager
 
         // TODO: needs to be configured from the POM element
         remotePluginRepositories.add( new ArtifactRepository( "plugin-repository", "http://repo1.maven.org" ) );
-    }
-
-    // TODO: is this needed or can it be found from the session?
-    public ArtifactRepository getLocalRepository()
-    {
-        return localRepository;
-    }
-
-    // TODO: is this needed or can it be found from the session? It is currently set from the session
-    public void setLocalRepository( ArtifactRepository localRepository )
-    {
-        this.localRepository = localRepository;
     }
 }
 

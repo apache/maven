@@ -60,8 +60,11 @@ public class MavenSession
 
     private Map postGoalMappings;
 
-    public MavenSession( PlexusContainer container, PluginManager pluginManager, MavenProject project,
-        ArtifactRepository localRepository, List goals )
+    public MavenSession( PlexusContainer container,
+                         PluginManager pluginManager,
+                         MavenProject project,
+                         ArtifactRepository localRepository,
+                         List goals )
     {
         this.container = container;
 
@@ -161,14 +164,17 @@ public class MavenSession
     private void initGoalDecoratorMappings()
     {
         List allPreGoals = project.getPreGoals();
+
         for ( Iterator it = allPreGoals.iterator(); it.hasNext(); )
         {
             PreGoal preGoal = (PreGoal) it.next();
 
             List preGoalList = (List) preGoalMappings.get( preGoal.getName() );
+
             if ( preGoalList == null )
             {
                 preGoalList = new LinkedList();
+
                 preGoalMappings.put( preGoal.getName(), preGoalList );
             }
 
@@ -176,14 +182,17 @@ public class MavenSession
         }
 
         List allPostGoals = project.getPostGoals();
+
         for ( Iterator it = allPostGoals.iterator(); it.hasNext(); )
         {
             PostGoal postGoal = (PostGoal) it.next();
 
             List postGoalList = (List) postGoalMappings.get( postGoal.getName() );
+
             if ( postGoalList == null )
             {
                 postGoalList = new LinkedList();
+
                 postGoalMappings.put( postGoal.getName(), postGoalList );
             }
 
@@ -213,5 +222,4 @@ public class MavenSession
         
         return chainToHere;
     }
-
 }

@@ -123,7 +123,7 @@ public class MavenCli
 
             if ( !projectFile.exists() )
             {
-                    System.err.println( "Could not find either a project descriptor." );
+                    System.err.println( "Could not find a project descriptor." );
 
                     return 1;
             }
