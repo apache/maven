@@ -16,78 +16,58 @@ package org.apache.maven.plugin.jar;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.deployer.ArtifactDeployer;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.apache.maven.artifact.deployer.ArtifactDeployer;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.repository.RepositoryUtils;
-import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
 
 /**
  * @goal deploy
- *
  * @description deploys a JAR to remote repository
- *
- * @parameter
- *  name="project"
- *  type="org.apache.maven.project.MavenProject"
- *  required="true"
- *  validator=""
- *  expression="#project"
- *  description=""
- *
- * @parameter
- *  name="deployer"
- *  type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- *  required="true"
- *  validator=""
- *  expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
- *  description=""
+ * @parameter name="project" type="org.apache.maven.project.MavenProject"
+ *            required="true" validator="" expression="#project" description=""
+ * @parameter name="deployer"
+ *            type="org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *            required="true" validator=""
+ *            expression="#component.org.apache.maven.artifact.deployer.ArtifactDeployer"
+ *            description=""
  */
 public class JarDeployMojo
     extends AbstractPlugin
 {
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
     {
         MavenProject project = (MavenProject) request.getParameter( "project" );
 
         ArtifactDeployer artifactDeployer = (ArtifactDeployer) request.getParameter( "deployer" );
 
-        
-        //@todo this will be duplicated in case of every mojo which implements deploy goal
+        //@todo this will be duplicated in case of every mojo which implements
+        // deploy goal
         // this should be pushed into the ArtifactDeployer component
         DistributionManagement distributionManagement = project.getDistributionManagement();
-        
+
         if ( distributionManagement == null )
         {
-            String msg = "Deployment failed: distributionManagement element" + 
-                            " was not specified in the pom";
+            String msg = "Deployment failed: distributionManagement element" + " was not specified in the pom";
             throw new Exception( msg );
         }
-        
+
         Repository repository = distributionManagement.getRepository();
-        
+
         if ( repository == null )
         {
-            String msg = "Deployment failed: repository element" + 
-                            " was not specified in the pom inside" + 
-                            " distributionManagement element";
+            String msg = "Deployment failed: repository element" + " was not specified in the pom inside"
+                + " distributionManagement element";
             throw new Exception( msg );
-         }
-        
-        
-        ArtifactRepository deploymentRepository =
-            RepositoryUtils.mavenRepositoryToWagonRepository( repository );
+        }
+
+        ArtifactRepository deploymentRepository = new ArtifactRepository( repository.getId(), repository.getUrl() );
 
         Artifact artifact = new DefaultArtifact( project.getGroupId(),
                                                  project.getArtifactId(),

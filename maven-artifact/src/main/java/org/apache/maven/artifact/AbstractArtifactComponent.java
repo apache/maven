@@ -24,22 +24,21 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
  * @todo refactor away
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: AbstractArtifactComponent.java,v 1.4 2005/03/08 05:34:52 brett
+ *          Exp $
  */
 public class AbstractArtifactComponent
     extends AbstractLogEnabled
 {
     private ArtifactHandlerManager artifactHandlerManager;
 
-    protected ArtifactHandler getArtifactHandler( String type )
-        throws ArtifactHandlerNotFoundException
+    protected ArtifactHandler getArtifactHandler( String type ) throws ArtifactHandlerNotFoundException
     {
         return artifactHandlerManager.getArtifactHandler( type );
     }
 
-    protected String path( Artifact artifact )
-        throws ArtifactHandlerNotFoundException
+    protected String path( Artifact artifact ) throws ArtifactHandlerNotFoundException
     {
         return artifactHandlerManager.path( artifact );
     }
@@ -47,6 +46,8 @@ public class AbstractArtifactComponent
     protected void setLocalRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactHandlerNotFoundException
     {
-        artifact.setPath( artifactHandlerManager.localRepositoryPath( artifact, localRepository ) );
+        String artifactPath = artifactHandlerManager.localRepositoryPath( artifact, localRepository );
+
+        artifact.setPath( artifactPath );
     }
 }

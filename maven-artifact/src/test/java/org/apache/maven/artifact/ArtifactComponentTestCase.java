@@ -25,20 +25,20 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: ArtifactComponentTestCase.java,v 1.5 2004/10/23 13:33:59
+ *          jvanzyl Exp $
  */
 public abstract class ArtifactComponentTestCase
     extends PlexusTestCase
 {
     protected ArtifactHandlerManager artifactHandlerManager;
 
-    protected void setUp()
-        throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
 
@@ -47,62 +47,50 @@ public abstract class ArtifactComponentTestCase
 
     protected abstract String component();
 
-    /**
-     * Return an existing file, not a directory - causes creation to fail.
-     */
-    protected ArtifactRepository badLocalRepository()
-        throws IOException
+    /** Return an existing file, not a directory - causes creation to fail. */
+    protected ArtifactRepository badLocalRepository() throws IOException
     {
-        ArtifactRepository localRepository = new ArtifactRepository();
-
         String path = "target/test-classes/repositories/" + component() + "/bad-local-repository";
 
         File f = new File( getBasedir(), path );
 
         f.createNewFile();
 
-        localRepository.setUrl( "file://" + f.getPath() );
+        ArtifactRepository localRepository = new ArtifactRepository( "test", "file://" + f.getPath() );
 
         return localRepository;
     }
 
     protected ArtifactRepository localRepository()
     {
-        ArtifactRepository localRepository = new ArtifactRepository();
-
         String path = "target/test-classes/repositories/" + component() + "/local-repository";
 
         File f = new File( getBasedir(), path );
 
-        localRepository.setUrl( "file://" + f.getPath() );
+        ArtifactRepository localRepository = new ArtifactRepository( "local", "file://" + f.getPath() );
 
         return localRepository;
     }
 
     protected ArtifactRepository remoteRepository()
     {
-        ArtifactRepository repository = new ArtifactRepository();
-
         String path = "target/test-classes/repositories/" + component() + "/remote-repository";
 
         File f = new File( getBasedir(), path );
 
-        repository.setUrl( "file://" + f.getPath() );
+        ArtifactRepository repository = new ArtifactRepository( "test", "file://" + f.getPath() );
 
         return repository;
     }
 
     protected ArtifactRepository badRemoteRepository()
     {
-        ArtifactRepository repository = new ArtifactRepository();
-
-        repository.setUrl( "http://foo.bar/repository" );
+        ArtifactRepository repository = new ArtifactRepository( "test", "http://foo.bar/repository" );
 
         return repository;
     }
 
-    protected void assertRemoteArtifactPresent( Artifact artifact )
-        throws ArtifactHandlerNotFoundException
+    protected void assertRemoteArtifactPresent( Artifact artifact ) throws ArtifactHandlerNotFoundException
     {
         String path = artifactHandlerManager.path( artifact );
 
@@ -114,8 +102,7 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertLocalArtifactPresent( Artifact artifact )
-        throws ArtifactHandlerNotFoundException
+    protected void assertLocalArtifactPresent( Artifact artifact ) throws ArtifactHandlerNotFoundException
     {
         String path = artifactHandlerManager.path( artifact );
 
@@ -127,8 +114,7 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertRemoteArtifactNotPresent( Artifact artifact )
-        throws ArtifactHandlerNotFoundException
+    protected void assertRemoteArtifactNotPresent( Artifact artifact ) throws ArtifactHandlerNotFoundException
     {
         String path = artifactHandlerManager.path( artifact );
 
@@ -140,8 +126,7 @@ public abstract class ArtifactComponentTestCase
         }
     }
 
-    protected void assertLocalArtifactNotPresent( Artifact artifact )
-        throws ArtifactHandlerNotFoundException
+    protected void assertLocalArtifactNotPresent( Artifact artifact ) throws ArtifactHandlerNotFoundException
     {
         String path = artifactHandlerManager.path( artifact );
 
@@ -157,9 +142,9 @@ public abstract class ArtifactComponentTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected Set remoteRepositories()
+    protected List remoteRepositories()
     {
-        Set remoteRepositories = new HashSet();
+        List remoteRepositories = new ArrayList();
 
         remoteRepositories.add( remoteRepository() );
 
@@ -170,8 +155,7 @@ public abstract class ArtifactComponentTestCase
     // Test artifact generation for unit tests
     // ----------------------------------------------------------------------
 
-    protected Artifact createLocalArtifact( String artifactId, String version )
-        throws Exception
+    protected Artifact createLocalArtifact( String artifactId, String version ) throws Exception
     {
         Artifact artifact = createArtifact( artifactId, version );
 
@@ -180,8 +164,7 @@ public abstract class ArtifactComponentTestCase
         return artifact;
     }
 
-    protected Artifact createRemoteArtifact( String artifactId, String version )
-        throws Exception
+    protected Artifact createRemoteArtifact( String artifactId, String version ) throws Exception
     {
         Artifact artifact = createArtifact( artifactId, version );
 
@@ -190,20 +173,17 @@ public abstract class ArtifactComponentTestCase
         return artifact;
     }
 
-    protected void createLocalArtifact( Artifact artifact )
-        throws Exception
+    protected void createLocalArtifact( Artifact artifact ) throws Exception
     {
         createArtifact( artifact, localRepository() );
     }
 
-    protected void createRemoteArtifact( Artifact artifact )
-        throws Exception
+    protected void createRemoteArtifact( Artifact artifact ) throws Exception
     {
         createArtifact( artifact, remoteRepository() );
     }
 
-    protected void createArtifact( Artifact artifact, ArtifactRepository repository )
-        throws Exception
+    protected void createArtifact( Artifact artifact, ArtifactRepository repository ) throws Exception
     {
         String path = artifactHandlerManager.path( artifact );
 
@@ -228,7 +208,7 @@ public abstract class ArtifactComponentTestCase
 
     protected Artifact createArtifact( String artifactId, String version, String type )
     {
-        return createArtifact( "maven", artifactId, version, type );
+        return new DefaultArtifact( "maven", artifactId, version, type );
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
@@ -236,14 +216,12 @@ public abstract class ArtifactComponentTestCase
         return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type, type );
     }
 
-    protected void deleteLocalArtifact( Artifact artifact )
-        throws Exception
+    protected void deleteLocalArtifact( Artifact artifact ) throws Exception
     {
         deleteArtifact( artifact, localRepository() );
     }
 
-    protected void deleteArtifact( Artifact artifact, ArtifactRepository repository )
-        throws Exception
+    protected void deleteArtifact( Artifact artifact, ArtifactRepository repository ) throws Exception
     {
         String path = artifactHandlerManager.path( artifact );
 

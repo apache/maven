@@ -9,23 +9,21 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 
 /**
- * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
- * @version $Id$
+ * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka </a>
+ * @version $Id: SnapshotRequestTransformation.java,v 1.1 2005/03/03 15:37:25
+ *          jvanzyl Exp $
  */
 public class SnapshotRequestTransformation
     implements ArtifactRequestTransformation
 {
     private ArtifactResolver artifactResolver;
 
-    public Artifact transform( Artifact artifact,
-                               ArtifactRepository localRepository,
-                               Set repositories,
-                               Map parameters )
+    public Artifact transform( Artifact artifact, ArtifactRepository localRepository, List repositories, Map parameters )
         throws Exception
     {
         Date localVersion = getLocalVersion( artifact, localRepository );
@@ -34,7 +32,7 @@ public class SnapshotRequestTransformation
 
         if ( remoteVersion != null )
         {
-            //if  local version is unknown (null) it means that
+            //if local version is unknown (null) it means that
             //we don't have this file locally. so we will be happy
             // to have any snapshot.
             // we wil download in two cases:
@@ -49,7 +47,8 @@ public class SnapshotRequestTransformation
                 // We can change the strategy which is used here later on
 
                 // @todo we will delete old file first.
-                //it is not really a right thing to do. Artifact Dowloader should
+                //it is not really a right thing to do. Artifact Dowloader
+                // should
                 // fetch to temprary file and replace the old file with the new
                 // one once download was finished
 
@@ -80,7 +79,7 @@ public class SnapshotRequestTransformation
         //return new File( localRepository.fullArtifactPath( artifact ) );
     }
 
-    private Date getRemoteVersion( Artifact artifact, Set remoteRepositories, ArtifactRepository localRepository )
+    private Date getRemoteVersion( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws Exception
     {
         Date retValue = null;
@@ -119,7 +118,8 @@ public class SnapshotRequestTransformation
 
         if ( retValue == null )
         {
-            //try "traditional method" used in maven1 for obtaining snapshot version
+            //try "traditional method" used in maven1 for obtaining snapshot
+            // version
 
             File file = artifact.getFile();
 
@@ -129,12 +129,10 @@ public class SnapshotRequestTransformation
 
                 //@todo we should "normalize" the time.
 
-                /*TimeZone gmtTimeZone = TimeZone.getTimeZone( "GMT" );
-
-                TimeZone userTimeZone = TimeZone.getDefault();
-
-                long diff =
-                */
+                /*
+                 * TimeZone gmtTimeZone = TimeZone.getTimeZone( "GMT" );
+                 * TimeZone userTimeZone = TimeZone.getDefault(); long diff =
+                 */
             }
         }
 
@@ -163,15 +161,14 @@ public class SnapshotRequestTransformation
         return retValue;
     }
 
-    public static Date parseTimestamp ( String timestamp )
-        throws ParseException
+    public static Date parseTimestamp( String timestamp ) throws ParseException
     {
         Date retValue = getFormatter().parse( timestamp );
 
         return retValue;
     }
 
-    public static String getTimestamp ( Date snapshotVersion )
+    public static String getTimestamp( Date snapshotVersion )
     {
         String retValue = getFormatter().format( snapshotVersion );
 

@@ -1,25 +1,22 @@
 package org.apache.maven.artifact.manager;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+/*
+ * ====================================================================
+ * Copyright 2001-2004 The Apache Software Foundation. Licensed under the Apache
+ * License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
+ * or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  * ====================================================================
  */
 
 import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -41,8 +38,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class DefaultWagonManager
     extends AbstractArtifactComponent
@@ -54,8 +51,9 @@ public class DefaultWagonManager
 
     private TransferListener downloadMonitor;
 
-    public Wagon getWagon( String protocol )
-        throws UnsupportedProtocolException
+    private AuthenticationInfoProvider authenticationInfoProvider;
+
+    public Wagon getWagon( String protocol ) throws UnsupportedProtocolException
     {
         Wagon wagon;
 
@@ -65,23 +63,24 @@ public class DefaultWagonManager
         }
         catch ( ComponentLookupException e )
         {
-            throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: " + protocol, e );
+            throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: "
+                + protocol, e );
         }
 
         return wagon;
     }
 
     // TODO: don't throw exception
-    public void releaseWagon( Wagon wagon )
-        throws Exception
+    public void releaseWagon( Wagon wagon ) throws Exception
     {
         container.release( wagon );
     }
 
     // TODO: don't throw exception
-    public void put( File source, Artifact artifact, ArtifactRepository repository )
-        throws Exception
+    public void put( File source, Artifact artifact, ArtifactRepository repository ) throws Exception
     {
+        authenticationInfoProvider.configureAuthenticationInfo( repository );
+
         Wagon wagon = getWagon( repository.getProtocol() );
 
         wagon.connect( repository, getProxy( repository.getProtocol() ) );
@@ -93,7 +92,7 @@ public class DefaultWagonManager
         releaseWagon( wagon );
     }
 
-    public void get( Artifact artifact, Set remoteRepositories, ArtifactRepository localRepository )
+    public void get( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws TransferFailedException
     {
         get( artifact, artifact.getFile(), remoteRepositories );
@@ -109,19 +108,18 @@ public class DefaultWagonManager
      * @param destination
      * @throws TransferFailedException
      * @todo I want to somehow plug artifact validators at such low level.
-     * Simply if artifact was downloaded but it was rejected by validator(s)
-     * the loop should continue. Some of the validators can be feeded directly using events
-     * so number of i/o operation could be limited.
-     * <p/>
-     * If we won't plug validation process here the question is what we can do afterwards?
-     * We don't know from which ArtifactRepository artifact was fetched and where we should restart.
-     * We should be also fetching md5 sums and such from the same exact directory then artifacts
-     * <p/>
+     *       Simply if artifact was downloaded but it was rejected by
+     *       validator(s) the loop should continue. Some of the validators can
+     *       be feeded directly using events so number of i/o operation could be
+     *       limited. <p/>If we won't plug validation process here the question
+     *       is what we can do afterwards? We don't know from which
+     *       ArtifactRepository artifact was fetched and where we should
+     *       restart. We should be also fetching md5 sums and such from the same
+     *       exact directory then artifacts <p/>
      * @todo probably all exceptions should just be logged and continue
      * @todo is the exception for warnings logged at debug level correct?
      */
-    public void get( Artifact artifact, File destination, Set repositories )
-        throws TransferFailedException
+    public void get( Artifact artifact, File destination, List repositories ) throws TransferFailedException
     {
         File temp = null;
 
@@ -136,10 +134,13 @@ public class DefaultWagonManager
 
             try
             {
+                authenticationInfoProvider.configureAuthenticationInfo( repository );
+
                 Wagon wagon = getWagon( repository.getProtocol() );
 
                 // ----------------------------------------------------------------------
-                // These can certainly be configurable ... registering listeners ...
+                // These can certainly be configurable ... registering listeners
+                // ...
 
                 //ChecksumObserver md5SumObserver = new ChecksumObserver();
 
@@ -203,10 +204,14 @@ public class DefaultWagonManager
                 destination.getParentFile().mkdirs();
             }
 
-            // The temporary file is named destination + ".tmp" and is done this way to ensure
-            // that the temporary file is in the same file system as the destination because the
-            // File.renameTo operation doesn't really work across file systems. So we will attempt
-            // to do a File.renameTo for efficiency and atomicity, if this fails then we will use
+            // The temporary file is named destination + ".tmp" and is done this
+            // way to ensure
+            // that the temporary file is in the same file system as the
+            // destination because the
+            // File.renameTo operation doesn't really work across file systems.
+            // So we will attempt
+            // to do a File.renameTo for efficiency and atomicity, if this fails
+            // then we will use
             // a brute force copy and delete the temporary file.
 
             if ( !temp.renameTo( destination ) )
@@ -236,19 +241,23 @@ public class DefaultWagonManager
 
     /**
      * Set the proxy used for a particular protocol.
-     *
+     * 
      * @todo [BP] would be nice to configure this via plexus in some way
-     *
-     * @param protocol the protocol (required)
-     * @param host the proxy host name (required)
-     * @param port the proxy port (required)
-     * @param username the username for the proxy, or null if there is none
-     * @param password the password for the proxy, or null if there is none
-     * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system property format:
-     *  <code>*.foo.com|localhost</code>.
+     * @param protocol
+     *            the protocol (required)
+     * @param host
+     *            the proxy host name (required)
+     * @param port
+     *            the proxy port (required)
+     * @param username
+     *            the username for the proxy, or null if there is none
+     * @param password
+     *            the password for the proxy, or null if there is none
+     * @param nonProxyHosts
+     *            the set of hosts not to use the proxy for. Follows Java system
+     *            property format: <code>*.foo.com|localhost</code>.
      */
-    public void setProxy( String protocol, String host, int port, String username, String password,
-                          String nonProxyHosts )
+    public void setProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )
     {
         ProxyInfo proxyInfo = new ProxyInfo();
         proxyInfo.setHost( host );
@@ -261,8 +270,7 @@ public class DefaultWagonManager
         proxies.put( protocol, proxyInfo );
     }
 
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }

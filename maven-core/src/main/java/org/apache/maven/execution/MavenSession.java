@@ -18,12 +18,12 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.user.UserModel;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -31,6 +31,9 @@ import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 import org.codehaus.plexus.util.dag.Vertex;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,13 +68,13 @@ public class MavenSession
 
     private final UserModel userModel;
 
-    public MavenSession( PlexusContainer container, PluginManager pluginManager, UserModel userModel, ArtifactRepository localRepository,
-        EventDispatcher eventDispatcher, Log log, List goals )
+    public MavenSession( PlexusContainer container, PluginManager pluginManager, UserModel userModel,
+        ArtifactRepository localRepository, EventDispatcher eventDispatcher, Log log, List goals )
     {
         this.container = container;
 
         this.pluginManager = pluginManager;
-        
+
         this.userModel = userModel;
 
         this.localRepository = localRepository;
@@ -84,7 +87,7 @@ public class MavenSession
 
         this.goals = goals;
     }
-    
+
     public PlexusContainer getContainer()
     {
         return container;
@@ -110,14 +113,26 @@ public class MavenSession
         return localRepository;
     }
 
-    public Set getRemoteRepositories()
+    public List getRemoteRepositories()
     {
-        if ( remoteRepositories == null )
+        List result = null;
+
+        if ( project != null )
         {
-            remoteRepositories = RepositoryUtils.mavenToWagon( project.getRepositories() );
+            List repos = project.getRepositories();
+            result = new ArrayList( repos.size() );
+            for ( Iterator it = repos.iterator(); it.hasNext(); )
+            {
+                Repository repo = (Repository) it.next();
+                result.add( new ArtifactRepository( repo.getId(), repo.getUrl() ) );
+            }
+        }
+        else
+        {
+            result = Collections.EMPTY_LIST;
         }
 
-        return remoteRepositories;
+        return result;
     }
 
     public List getGoals()
@@ -148,7 +163,7 @@ public class MavenSession
     {
         return log;
     }
-    
+
     public UserModel getUserModel()
     {
         return userModel;

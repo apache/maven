@@ -29,16 +29,20 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
 import java.io.FileReader;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
     private MavenProjectBuilder mavenProjectBuilder;
+
     private ArtifactResolver artifactResolver;
 
     // TODO: configure?
@@ -63,7 +67,7 @@ public class MavenMetadataSource
         this.mavenProjectBuilder = projectBuilder;
     }
 
-    public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
+    public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         Set artifacts;
@@ -96,7 +100,7 @@ public class MavenMetadataSource
         }
         catch ( Exception e )
         {
-            throw new ArtifactMetadataRetrievalException( "Cannot read artifact source: " + metadataArtifact.getFile(),
+            throw new ArtifactMetadataRetrievalException( "Cannot read artifact source: " + metadataArtifact.getPath(),
                                                           e );
         }
         return artifacts;

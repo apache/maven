@@ -27,6 +27,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
@@ -34,7 +35,6 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
@@ -54,10 +54,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * @version $Id$
+ * @version $Id: DefaultMavenProjectBuilder.java,v 1.37 2005/03/08 01:55:22
+ *          trygvis Exp $
  */
 public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
@@ -103,8 +103,10 @@ public class DefaultMavenProjectBuilder
 
             LinkedList lineage = new LinkedList();
 
-            Set aggregatedRemoteWagonRepositories = RepositoryUtils.mavenToWagon( superModel.getRepositories() );
-            MavenProject project = assembleLineage( projectDescriptor, localRepository, lineage,
+            List aggregatedRemoteWagonRepositories = buildArtifactRepositories( superModel.getRepositories() );
+            MavenProject project = assembleLineage( projectDescriptor,
+                                                    localRepository,
+                                                    lineage,
                                                     aggregatedRemoteWagonRepositories );
 
             Model previous = superModel;
@@ -144,7 +146,7 @@ public class DefaultMavenProjectBuilder
 
             if ( resolveDependencies )
             {
-                Set repos = RepositoryUtils.mavenToWagon( project.getRepositories() );
+                List repos = buildArtifactRepositories( project.getRepositories() );
 
                 MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
 
@@ -177,7 +179,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject assembleLineage( File projectDescriptor, ArtifactRepository localRepository,
-                                          LinkedList lineage, Set aggregatedRemoteWagonRepositories )
+                                          LinkedList lineage, List aggregatedRemoteWagonRepositories )
         throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
@@ -214,7 +216,7 @@ public class DefaultMavenProjectBuilder
             // as we go in order to do this.
             // ----------------------------------------------------------------------
 
-            aggregatedRemoteWagonRepositories.addAll( RepositoryUtils.mavenToWagon( model.getRepositories() ) );
+            aggregatedRemoteWagonRepositories.addAll( buildArtifactRepositories( model.getRepositories() ) );
 
             File parentPom = findParentModel( parentModel, aggregatedRemoteWagonRepositories, localRepository );
 
@@ -227,8 +229,24 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private Model readModel( File file )
-        throws ProjectBuildingException
+    private List buildArtifactRepositories( List repositories )
+    {
+        List repos = new ArrayList();
+        for ( Iterator i = repositories.iterator(); i.hasNext(); )
+        {
+            Repository mavenRepo = (Repository) i.next();
+
+            ArtifactRepository artifactRepo = new ArtifactRepository( mavenRepo.getId(), mavenRepo.getUrl() );
+
+            if ( !repos.contains( artifactRepo ) )
+            {
+                repos.add( artifactRepo );
+            }
+        }
+        return repos;
+    }
+
+    private Model readModel( File file ) throws ProjectBuildingException
     {
         try
         {
@@ -262,7 +280,7 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private File findParentModel( Parent parent, Set remoteArtifactRepositories, ArtifactRepository localRepository )
+    private File findParentModel( Parent parent, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         Artifact artifact = artifactFactory.createArtifact( parent.getGroupId(), parent.getArtifactId(),

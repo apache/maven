@@ -1,0 +1,8 @@
+<plexus>
+  <components>
+    <component>
+      <role>org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider</role>
+      <implementation>org.apache.maven.artifact.repository.authentication.DummyAuthenticationInfoProvider</implementation>
+    </component>
+  </components>
+</plexus>

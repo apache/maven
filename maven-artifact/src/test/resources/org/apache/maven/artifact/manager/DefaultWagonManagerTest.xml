@@ -20,5 +20,9 @@
       <role-hint>c</role-hint>
       <implementation>org.apache.maven.artifact.manager.WagonC</implementation>
     </component>
+    <component>
+      <role>org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider</role>
+      <implementation>org.apache.maven.artifact.repository.authentication.DummyAuthenticationInfoProvider</implementation>
+    </component>
   </components>
 </plexus>

@@ -1,7 +1,5 @@
 package org.apache.maven.util;
 
-import org.apache.maven.model.user.JdkProfile;
-import org.apache.maven.model.user.MavenProfile;
 import org.apache.maven.model.user.ServerProfile;
 import org.apache.maven.model.user.UserModel;
 import org.apache.maven.model.user.io.xpp3.MavenUserModelXpp3Reader;
@@ -20,88 +18,31 @@ import java.util.List;
 public final class UserModelUtils
 {
 
-    public static final String JDK_PROFILE_ENVAR = "maven.jdkVersion";
-
-    public static final String MAVEN_PROFILE_ENVAR = "maven.mavenProfileId";
-
-    public static final String SERVER_PROFILE_ENVAR = "maven.serverProfileId";
-
     private static final String USER_MODEL_LOCATION = "/.m2/user.xml";
 
     private UserModelUtils()
     {
     }
 
-    public static ServerProfile getActiveServer( UserModel userModel )
+    public static ServerProfile getServerProfile( UserModel userModel, String serverProfileId )
     {
-        List servers = userModel.getServerProfiles();
+        ServerProfile result = null;
 
-        String serverId = System.getProperty( SERVER_PROFILE_ENVAR );
-        if ( serverId == null || serverId.trim().length() < 1 )
+        List serverProfiles = userModel.getServerProfiles();
+        if ( serverProfiles != null )
         {
-            serverId = userModel.getDefaultProfiles().getServerProfileId();
-        }
-
-        ServerProfile active = null;
-        for ( Iterator it = servers.iterator(); it.hasNext(); )
-        {
-            ServerProfile server = (ServerProfile) it.next();
-            if ( serverId.equals( server.getId() ) )
+            for ( Iterator it = serverProfiles.iterator(); it.hasNext(); )
             {
-                active = server;
-                break;
+                ServerProfile profile = (ServerProfile) it.next();
+                if ( serverProfileId.equals( profile.getId() ) )
+                {
+                    result = profile;
+                    break;
+                }
             }
         }
 
-        return active;
-    }
-
-    public static JdkProfile getActiveJdk( UserModel userModel )
-    {
-        List jdks = userModel.getJdkProfiles();
-
-        String jdkId = System.getProperty( JDK_PROFILE_ENVAR );
-        if ( jdkId == null || jdkId.trim().length() < 1 )
-        {
-            jdkId = userModel.getDefaultProfiles().getJdkVersion();
-        }
-
-        JdkProfile active = null;
-        for ( Iterator it = jdks.iterator(); it.hasNext(); )
-        {
-            JdkProfile jdk = (JdkProfile) it.next();
-            if ( jdkId.equals( jdk.getVersion() ) )
-            {
-                active = jdk;
-                break;
-            }
-        }
-
-        return active;
-    }
-
-    public static MavenProfile getActiveRuntimeProfile( UserModel userModel )
-    {
-        List mavenProfiles = userModel.getMavenProfiles();
-
-        String mavenProfileId = System.getProperty( MAVEN_PROFILE_ENVAR );
-        if ( mavenProfileId == null || mavenProfileId.trim().length() < 1 )
-        {
-            mavenProfileId = userModel.getDefaultProfiles().getMavenProfileId();
-        }
-
-        MavenProfile active = null;
-        for ( Iterator it = mavenProfiles.iterator(); it.hasNext(); )
-        {
-            MavenProfile mavenProfile = (MavenProfile) it.next();
-            if ( mavenProfileId.equals( mavenProfile.getId() ) )
-            {
-                active = mavenProfile;
-                break;
-            }
-        }
-
-        return active;
+        return result;
     }
 
     // TODO: don't throw Exception.
@@ -133,6 +74,11 @@ public final class UserModelUtils
                     }
                 }
             }
+        }
+
+        if ( model == null )
+        {
+            model = new UserModel();
         }
 
         return model;

@@ -19,6 +19,7 @@ package org.apache.maven.artifact.metadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.util.List;
 import java.util.Set;
 
 // Currently the only thing we need from the artifact metadata source is the
@@ -27,11 +28,11 @@ import java.util.Set;
 // the artifact we may wish to provide in this layer. jvz.
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public interface ArtifactMetadataSource
 {
-    Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
+    Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 }

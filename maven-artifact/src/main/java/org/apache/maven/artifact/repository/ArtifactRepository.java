@@ -19,71 +19,39 @@ package org.apache.maven.artifact.repository;
 import org.apache.maven.wagon.repository.Repository;
 
 /**
- * This class is an abstraction of the location from/to resources
- * can be transfered.
- *
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
+ * This class is an abstraction of the location from/to resources can be
+ * transfered.
+ * 
+ * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
  */
 public class ArtifactRepository
     extends Repository
 {
-    public ArtifactRepository()
-    {
-    }
+    //    public ArtifactRepository()
+    //    {
+    //    }
 
-    public ArtifactRepository( String id, String url)
+    public ArtifactRepository( String id, String url )
     {
         super( id, url );
     }
 
     /*
-    private String layout;
-
-    public String getLayout()
-    {
-        if ( layout == null )
-        {
-            return "${groupId}/${type}s/${artifactId}-${version}.${extension}";
-        }
-
-        return layout;
-    }
-
-    public String artifactPath( Artifact artifact )
-    {
-        return interpolateLayout( artifact.getGroupId(),
-                                  artifact.getArtifactId(),
-                                  artifact.getVersion(),
-                                  artifact.getType(),
-                                  artifact.getExtension() );
-    }
-
-    public String fullArtifactPath( Artifact artifact )
-    {
-        return getBasedir() + "/" + artifactPath( artifact );
-    }
-
-    public String artifactUrl( Artifact artifact )
-    {
-        return getUrl() + "/" + artifactPath( artifact );
-    }
-
-    private String interpolateLayout( String groupId, String artifactId, String version, String type, String extension )
-    {
-        String layout = getLayout();
-
-        layout = StringUtils.replace( layout, "${groupId}", groupId );
-
-        layout = StringUtils.replace( layout, "${artifactId}", artifactId );
-
-        layout = StringUtils.replace( layout, "${type}", type );
-
-        layout = StringUtils.replace( layout, "${version}", version );
-
-        layout = StringUtils.replace( layout, "${extension}", extension );
-
-        return layout;
-    }
-    */
+     * private String layout; public String getLayout() { if ( layout == null ) {
+     * return "${groupId}/${type}s/${artifactId}-${version}.${extension}"; }
+     * return layout; } public String artifactPath( Artifact artifact ) { return
+     * interpolateLayout( artifact.getGroupId(), artifact.getArtifactId(),
+     * artifact.getVersion(), artifact.getType(), artifact.getExtension() ); }
+     * public String fullArtifactPath( Artifact artifact ) { return getBasedir() +
+     * "/" + artifactPath( artifact ); } public String artifactUrl( Artifact
+     * artifact ) { return getUrl() + "/" + artifactPath( artifact ); } private
+     * String interpolateLayout( String groupId, String artifactId, String
+     * version, String type, String extension ) { String layout = getLayout();
+     * layout = StringUtils.replace( layout, "${groupId}", groupId ); layout =
+     * StringUtils.replace( layout, "${artifactId}", artifactId ); layout =
+     * StringUtils.replace( layout, "${type}", type ); layout =
+     * StringUtils.replace( layout, "${version}", version ); layout =
+     * StringUtils.replace( layout, "${extension}", extension ); return layout; }
+     */
 }

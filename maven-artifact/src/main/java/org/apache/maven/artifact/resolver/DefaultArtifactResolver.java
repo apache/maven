@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @todo get rid of {@link AbstractArtifactComponent} and then create an AbstractArtifactResolver that does the transitive boilerplate
+ * @todo get rid of {@link AbstractArtifactComponent}and then create an
+ *       AbstractArtifactResolver that does the transitive boilerplate
  */
 public class DefaultArtifactResolver
     extends AbstractArtifactComponent
@@ -32,7 +33,7 @@ public class DefaultArtifactResolver
     // ----------------------------------------------------------------------
 
     private List requestTransformations;
-    
+
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
@@ -43,9 +44,7 @@ public class DefaultArtifactResolver
     // Implementation
     // ----------------------------------------------------------------------
 
-    public Artifact resolve( Artifact artifact,
-                             Set remoteRepositories,
-                             ArtifactRepository localRepository )
+    public Artifact resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         // ----------------------------------------------------------------------
@@ -54,7 +53,8 @@ public class DefaultArtifactResolver
 
         // ----------------------------------------------------------------------
         // Check for the existence of the artifact in the specified local
-        // ArtifactRepository. If it is present then simply return as the request
+        // ArtifactRepository. If it is present then simply return as the
+        // request
         // for resolution has been satisfied.
         // ----------------------------------------------------------------------
 
@@ -83,19 +83,19 @@ public class DefaultArtifactResolver
 
     private static final String LS = System.getProperty( "line.separator" );
 
-    private String artifactNotFound( Artifact artifact, Set remoteRepositories )
+    private String artifactNotFound( Artifact artifact, List remoteRepositories )
     {
         StringBuffer sb = new StringBuffer();
 
         sb.append( "The artifact is not present locally as:" )
-            .append( LS )
-            .append( LS )
-            .append( artifact.getPath() )
-            .append( LS )
-            .append( LS )
-            .append( "or in any of the specified remote repositories:" )
-            .append( LS )
-            .append( LS );
+          .append( LS )
+          .append( LS )
+          .append( artifact.getPath() )
+          .append( LS )
+          .append( LS )
+          .append( "or in any of the specified remote repositories:" )
+          .append( LS )
+          .append( LS );
 
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
@@ -111,9 +111,7 @@ public class DefaultArtifactResolver
         return sb.toString();
     }
 
-    public Set resolve( Set artifacts,
-                        Set remoteRepositories,
-                        ArtifactRepository localRepository )
+    public Set resolve( Set artifacts, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         Set resolvedArtifacts = new HashSet();
@@ -134,22 +132,15 @@ public class DefaultArtifactResolver
     // Transitive modes
     // ----------------------------------------------------------------------
 
-    public ArtifactResolutionResult resolveTransitively( Set artifacts,
-                                                         Set remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source,
-                                                         ArtifactFilter filter )
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
+        ArtifactRepository localRepository, ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         ArtifactResolutionResult artifactResolutionResult;
 
         try
         {
-            artifactResolutionResult = collect( artifacts,
-                                                localRepository,
-                                                remoteRepositories,
-                                                source,
-                                                filter );
+            artifactResolutionResult = collect( artifacts, localRepository, remoteRepositories, source, filter );
         }
         catch ( TransitiveArtifactResolutionException e )
         {
@@ -164,34 +155,24 @@ public class DefaultArtifactResolver
         return artifactResolutionResult;
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set artifacts,
-                                                         Set remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
-        throws ArtifactResolutionException
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
+        ArtifactRepository localRepository, ArtifactMetadataSource source ) throws ArtifactResolutionException
     {
         return resolveTransitively( artifacts, remoteRepositories, localRepository, source, null );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Artifact artifact,
-                                                         Set remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
-        throws ArtifactResolutionException
+    public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
+        ArtifactRepository localRepository, ArtifactMetadataSource source ) throws ArtifactResolutionException
     {
         return resolveTransitively( Collections.singleton( artifact ), remoteRepositories, localRepository, source );
     }
-
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    private ArtifactResolutionResult collect( Set artifacts,
-                                              ArtifactRepository localRepository,
-                                              Set remoteRepositories,
-                                              ArtifactMetadataSource source,
-                                              ArtifactFilter filter )
+    private ArtifactResolutionResult collect( Set artifacts, ArtifactRepository localRepository,
+        List remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter )
         throws TransitiveArtifactResolutionException
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
@@ -246,10 +227,12 @@ public class DefaultArtifactResolver
                     }
                     catch ( ArtifactMetadataRetrievalException e )
                     {
-                        throw new TransitiveArtifactResolutionException( "Error retrieving metadata [" + newArtifact + "] : ", e );
+                        throw new TransitiveArtifactResolutionException( "Error retrieving metadata [" + newArtifact
+                            + "] : ", e );
                     }
 
-                    // the pom for given dependency exisit we will add it to the queue
+                    // the pom for given dependency exisit we will add it to the
+                    // queue
                     queue.add( referencedDependencies );
                 }
             }
@@ -257,7 +240,8 @@ public class DefaultArtifactResolver
 
         // ----------------------------------------------------------------------
         // the dependencies list is keyed by groupId+artifactId+type
-        // so it must be 'rekeyed' to the complete id: groupId+artifactId+type+version
+        // so it must be 'rekeyed' to the complete id:
+        // groupId+artifactId+type+version
         // ----------------------------------------------------------------------
 
         Map artifactResult = result.getArtifacts();

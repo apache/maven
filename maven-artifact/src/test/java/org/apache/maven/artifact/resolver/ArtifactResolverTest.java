@@ -18,11 +18,19 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactComponentTestCase;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+/**
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id$
+ */
 
 // It would be cool if there was a hook that i could use to setup a test environment.
 // I want to setup a local/remote repositories for testing but i don't want to have
@@ -39,8 +47,7 @@ public class ArtifactResolverTest
 {
     private ArtifactResolver artifactResolver;
 
-    protected void setUp()
-        throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
 
@@ -52,8 +59,7 @@ public class ArtifactResolverTest
         return "resolver";
     }
 
-    public void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository()
-        throws Exception
+    public void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository() throws Exception
     {
         Artifact a = createLocalArtifact( "a", "1.0" );
 
@@ -73,8 +79,7 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( b );
     }
 
-    public void testResolutionOfASetOfArtifactsWhereTheArtifactsArePresentInTheLocalRepository()
-        throws Exception
+    public void testResolutionOfASetOfArtifactsWhereTheArtifactsArePresentInTheLocalRepository() throws Exception
     {
         Set artifacts = new HashSet();
 
@@ -140,7 +145,7 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
+            public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             {
                 Set dependencies = new HashSet();
 
@@ -178,7 +183,7 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
+            public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             {
                 Set dependencies = new HashSet();
 
@@ -226,7 +231,7 @@ public class ArtifactResolverTest
         Artifact l = createRemoteArtifact( "l", "1.0" );
         deleteLocalArtifact( l );
 
-        Set repositories = new HashSet();
+        List repositories = new ArrayList();
         repositories.add( remoteRepository() );
         repositories.add( badRemoteRepository() );
 

@@ -25,31 +25,27 @@ import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.events.TransferListener;
 
 import java.io.File;
-import java.util.Set;
-
+import java.util.List;
 
 /**
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
+ * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
  */
 public interface WagonManager
 {
     String ROLE = WagonManager.class.getName();
 
-    Wagon getWagon( String protocol )
-        throws UnsupportedProtocolException;
+    Wagon getWagon( String protocol ) throws UnsupportedProtocolException;
 
     // TODO: don't throw exception
-    void releaseWagon( Wagon wagon )
-        throws Exception;
+    void releaseWagon( Wagon wagon ) throws Exception;
 
-    void get( Artifact artifact, Set remoteRepositories, ArtifactRepository localRepository )
+    void get( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws TransferFailedException;
 
     // TODO: don't throw exception
-    void put( File source, Artifact artifact, ArtifactRepository deploymentRepository )
-        throws Exception;
-    
+    void put( File source, Artifact artifact, ArtifactRepository deploymentRepository ) throws Exception;
+
     void setProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
 
     void setDownloadMonitor( TransferListener downloadMonitor );

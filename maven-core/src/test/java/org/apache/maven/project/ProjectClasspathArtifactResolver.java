@@ -18,6 +18,8 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -31,6 +33,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Set;
 
 public class ProjectClasspathArtifactResolver
@@ -39,12 +42,14 @@ public class ProjectClasspathArtifactResolver
     private static class Source
         extends MavenMetadataSource
     {
+        private ArtifactFactory artifactFactory = new DefaultArtifactFactory();
+        
         public Source( ArtifactResolver artifactResolver )
         {
             super( artifactResolver );
         }
 
-        public Set retrieve( Artifact artifact, ArtifactRepository localRepository, Set remoteRepositories )
+        public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             MavenXpp3Reader reader = new MavenXpp3Reader();
@@ -63,7 +68,7 @@ public class ProjectClasspathArtifactResolver
         }
     }
 
-    public Artifact resolve( Artifact artifact, Set remoteRepositories, ArtifactRepository localRepository )
+    public Artifact resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         return artifact;
@@ -74,26 +79,21 @@ public class ProjectClasspathArtifactResolver
     {
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set artifacts, Set remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source, ArtifactFilter filter )
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
+        ArtifactRepository localRepository, ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( this ), filter );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set artifacts, Set remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
-        throws ArtifactResolutionException
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
+        ArtifactRepository localRepository, ArtifactMetadataSource source ) throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( this ) );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Artifact artifact, Set remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
-        throws ArtifactResolutionException
+    public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
+        ArtifactRepository localRepository, ArtifactMetadataSource source ) throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifact, remoteRepositories, localRepository, new Source( this ) );
     }

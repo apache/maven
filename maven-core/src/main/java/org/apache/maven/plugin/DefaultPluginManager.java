@@ -50,6 +50,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -73,7 +74,7 @@ public class DefaultPluginManager
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
-    protected Set remotePluginRepositories;
+    protected List remotePluginRepositories;
 
     protected ArtifactFilter artifactFilter;
 
@@ -528,7 +529,7 @@ public class DefaultPluginManager
                                                               "wagon-provider-api", "classworlds"} );
 
         // TODO: move this to be configurable from the Maven component
-        remotePluginRepositories = new HashSet();
+        remotePluginRepositories = new ArrayList();
 
         // TODO: needs to be configured from the POM element
         remotePluginRepositories.add( new ArtifactRepository( "plugin-repository", "http://repo1.maven.org" ) );

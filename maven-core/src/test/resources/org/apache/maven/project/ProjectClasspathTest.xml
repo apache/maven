@@ -3,6 +3,15 @@
     <component>
       <role>org.apache.maven.artifact.ArtifactResolver</role>
       <implementation>org.apache.maven.project.ProjectClasspathArtifactResolver</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+          <field-name>artifactHandlerManager</field-name>
+        </requirement>
+      </requirements>
     </component>
   </components>
 </plexus>

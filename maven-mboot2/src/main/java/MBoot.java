@@ -51,7 +51,7 @@ public class MBoot
     // ----------------------------------------------------------------------
 
     String[] plexusDeps = new String[] {
-        "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
+        "classworlds/jars/classworlds-1.1-alpha-1.jar",
         "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar" };
 
     String[] pluginGeneratorDeps = new String[] {
@@ -68,7 +68,7 @@ public class MBoot
     // ----------------------------------------------------------------------
 
     String[] modelloDeps = new String[] {
-        "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
+        "classworlds/jars/classworlds-1.1-alpha-1.jar",
         //"plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
         "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
         //"plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
@@ -253,6 +253,7 @@ public class MBoot
         if ( online )
         {
             checkMBootDeps();
+            checkModelloDeps();
         }
 
         // Install maven-components POM
@@ -710,6 +711,13 @@ public class MBoot
         System.out.println( "Checking for MBoot's dependencies ..." );
 
         downloader.downloadDependencies( mbootDependencies );
+    }
+
+    private void checkModelloDeps() throws Exception
+    {
+        System.out.println( "Checking for Modello's dependencies ..." );
+
+        downloader.downloadDependencies( Arrays.asList( modelloDeps ) );
     }
 
     private void createJar( String classes, String buildDir ) throws Exception

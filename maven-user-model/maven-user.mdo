@@ -97,15 +97,21 @@
           <type>String</type>
         </field>
         <field>
-          <name>passphrase</name>
+          <name>password</name>
           <version>4.0.0</version>
-          <description><![CDATA[The passphrase used to access this server with this config.]]></description>
+          <description><![CDATA[The password used to access this server with this config.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>privateKey</name>
           <version>4.0.0</version>
           <description><![CDATA[The private key location used to access this server with this config.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>passphrase</name>
+          <version>4.0.0</version>
+          <description><![CDATA[The passphrase used to access this server with a private key in this config.]]></description>
           <type>String</type>
         </field>
       </fields>
