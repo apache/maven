@@ -812,6 +812,11 @@
         <codeSegment>
           <version>3.0.0</version>
           <code><![CDATA[
+            public String getKey()
+            {
+                return getId() + ":" + getType();
+            }
+
             public String getArtifactDirectory()
             {
                 return getGroupId();
