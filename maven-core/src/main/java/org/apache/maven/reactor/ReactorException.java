@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.reactor;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -17,19 +17,28 @@ package org.apache.maven;
  */
 
 /**
- * This will be the place where we track anything that can possibly go wrong with a
- * Maven build and try to provide as much help to the user as possible when
- * something does go wrong. This will force us to get specific with exception
- * handling because we should be able to point a user to a spot in the documentation
- * which explains why a particular exception happened.
- *
- * o poorly formed XML POMs (make an error handler for xpp3)
- * o missing artifacts
- * o non existent goals
- *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class MavenExceptionHandler
+public class ReactorException
+    extends Exception
 {
+    public ReactorException()
+    {
+    }
+
+    public ReactorException( String message )
+    {
+        super( message );
+    }
+
+    public ReactorException( Throwable cause )
+    {
+        super( cause );
+    }
+
+    public ReactorException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }

@@ -6,6 +6,9 @@
 
 Installing maven2
 
+ * 
+
+
  * Download m2 {{{http://www.apache.org/~jvanzyl/m2/m2.tgz}here}}.
  
  * Unpack in your home directory. In will expand in a directory called <<<m2>>>.

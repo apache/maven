@@ -1,7 +1,15 @@
 #!/bin/sh
 
-#   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
-#   reserved.
+# -----------------------------------------------------------------------------
+# Copyright (c) 2001-2005 The Apache Software Foundation.
+# All rights reserved.
+# -----------------------------------------------------------------------------
+
+#@#
+CLASSWORLDS_JAR=${M2_HOME}/core/boot/classworlds-*.jar
+CLASSWORLDS_CONF=${M2_HOME}/bin/m2.conf
+CLASSWORLDS_LAUNCHER=org.codehaus.classworlds.Launcher
+#@#
 
 if [ -z "$MAVEN_OPTS" ] ; then
   MAVEN_OPTS="-Xmx256m"
@@ -73,8 +81,8 @@ fi
 
 $JAVACMD \
   $MAVEN_OPTS \
-  -classpath ${M2_HOME}/core/boot/classworlds-*.jar \
-  "-Dclassworlds.conf=${M2_HOME}/bin/classworlds.conf"  \
-  "-Dmaven.home=$M2_HOME"  \
-  org.codehaus.classworlds.Launcher $@
+  -classpath ${CLASSWORLDS_JAR} \
+  "-Dclassworlds.conf=${CLASSWORLDS_CONF}"  \
+  "-Dmaven.home=${M2_HOME}"  \
+  ${CLASSWORLDS_LAUNCHER} $@
 

@@ -59,6 +59,7 @@ public class MavenTestCase
         }
 
         testRepoUrl = testRepoLocation.toURL().toExternalForm();
+
         testRepoUrl = testRepoUrl.substring( 0, testRepoUrl.length() - 1 );
 
         pluginManager = (PluginManager) lookup( PluginManager.ROLE );

@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.exception;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,8 +16,25 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-public class MavenConstants
+/**
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @version $Id$
+ */
+public class MavenHomeNotDefinedException
+    extends Exception
 {
-    // TODO: remove? only used in CLI for now - once set, never used
-    public static final String DEBUG_ON = "maven.debug.on";
+    public MavenHomeNotDefinedException( String message )
+    {
+        super( message );
+    }
+
+    public MavenHomeNotDefinedException( Throwable cause )
+    {
+        super( cause );
+    }
+
+    public MavenHomeNotDefinedException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }

@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.cli;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -28,6 +28,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.Maven;
+import org.apache.maven.ExecutionResponse;
 
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;

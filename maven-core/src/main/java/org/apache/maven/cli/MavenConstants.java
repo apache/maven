@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.cli;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -16,29 +16,8 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
- */
-public class ReactorException
-    extends Exception
+public class MavenConstants
 {
-    public ReactorException()
-    {
-    }
-
-    public ReactorException( String message )
-    {
-        super( message );
-    }
-
-    public ReactorException( Throwable cause )
-    {
-        super( cause );
-    }
-
-    public ReactorException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+    // TODO: remove? only used in CLI for now - once set, never used
+    public static final String DEBUG_ON = "maven.debug.on";
 }

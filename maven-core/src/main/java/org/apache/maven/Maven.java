@@ -20,6 +20,7 @@ import org.apache.maven.lifecycle.goal.GoalNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.reactor.ReactorException;
 
 import java.io.File;
 import java.util.List;
