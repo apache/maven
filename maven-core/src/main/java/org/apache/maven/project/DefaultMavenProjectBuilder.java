@@ -110,7 +110,7 @@ public class DefaultMavenProjectBuilder
 
             Model userModel = null;
             // TODO: use maven home local instead of user.home/.m2
-            File userModelFile = new File( System.getProperty( "user.home" ) + "/.m2", "pom.xml" );
+            File userModelFile = new File( System.getProperty( "user.home" ) + "/.m2", "override.xml" );
             if ( userModelFile.exists() )
             {
                 userModel = modelReader.read( new FileReader( userModelFile ) );

@@ -71,6 +71,7 @@ public class MBoot
         "maven-plugin",
         "maven-plugin-tools",
         "maven-artifact",
+        "maven-1.x-integration",
         "maven-core",
         "maven-core-it-verifier"
     };
@@ -139,7 +140,7 @@ public class MBoot
     public void run( String[] args )
         throws Exception
     {
-        File userPomFile = new File( System.getProperty( "user.home" ), ".m2/pom.xml" );
+        File userPomFile = new File( System.getProperty( "user.home" ), ".m2/override.xml" );
 
         reader = new ModelReader();
 
@@ -154,7 +155,7 @@ public class MBoot
 
         if ( mavenRepoLocal == null )
         {
-            System.out.println( "You must have a ~/.m2/pom.xml file and must contain the following entries:" );
+            System.out.println( "You must have a ~/.m2/override.xml file and must contain the following entries:" );
             System.out.println( "<local>" );
             System.out.println( "  <repository>/path/to/m2/repository</repository> (required)" );
             System.out.println( "  <online>true</online> (optional)" );
