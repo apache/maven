@@ -52,6 +52,8 @@ public class SnapshotArtifactMetadata
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
+    private long lastModified = 0;
+
     public SnapshotArtifactMetadata( Artifact artifact )
     {
         super( artifact, artifact.getArtifactId() + "-" + artifact.getBaseVersion() + "." + SNAPSHOT_VERSION_FILE );
@@ -81,6 +83,7 @@ public class SnapshotArtifactMetadata
             }
             String path = getLocalRepositoryLocation( localRepository ).getPath();
             FileUtils.fileWrite( path, constructVersion() );
+            lastModified = new File( path ).lastModified();
         }
         catch ( IOException e )
         {
@@ -101,7 +104,7 @@ public class SnapshotArtifactMetadata
     public String constructVersion()
     {
         String version = artifact.getBaseVersion();
-        if ( timestamp != null )
+        if ( timestamp != null && buildNumber > 0 )
         {
             String newVersion = timestamp + "-" + buildNumber;
             if ( version != null )
@@ -157,15 +160,23 @@ public class SnapshotArtifactMetadata
         return snapshotMetadata;
     }
 
-    private void readFromFile( File destination )
+    private void readFromFile( File file )
         throws IOException
     {
-        String version = FileUtils.fileRead( destination );
+        String version = FileUtils.fileRead( file );
+        lastModified = file.lastModified();
+
+        if ( version.indexOf( "SNAPSHOT" ) >= 0 )
+        {
+            timestamp = null;
+            buildNumber = 0;
+            return;
+        }
 
         int index = version.lastIndexOf( "-" );
         timestamp = version.substring( 0, index );
         buildNumber = Integer.valueOf( version.substring( index + 1 ) ).intValue();
-        index = version.indexOf( "-" );
+        index = timestamp.lastIndexOf( "-" );
         if ( index >= 0 )
         {
             // ignore starting version part, will be prepended later
@@ -196,6 +207,9 @@ public class SnapshotArtifactMetadata
     {
         SnapshotArtifactMetadata metadata = (SnapshotArtifactMetadata) o;
 
+        // TODO: probably shouldn't test timestamp - except that it may be used do differentiate for a build number of 0
+        //  in the local repository. check, then remove from here and just compare the build numbers
+
         if ( buildNumber > metadata.buildNumber )
         {
             return 1;
@@ -208,5 +222,10 @@ public class SnapshotArtifactMetadata
         {
             return timestamp.compareTo( metadata.timestamp );
         }
+    }
+
+    public long getLastModified()
+    {
+        return lastModified;
     }
 }

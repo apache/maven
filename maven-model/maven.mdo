@@ -1850,6 +1850,16 @@
           ]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>snapshotPolicy</name>
+          <version>4.0.0</version>
+          <description>
+            The policy for downloading snapshots - can be "always", "daily" (default), "interval:XXX" (in minutes) or
+            "never".
+          </description>
+          <type>String</type>
+          <defaultValue>daily</defaultValue>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

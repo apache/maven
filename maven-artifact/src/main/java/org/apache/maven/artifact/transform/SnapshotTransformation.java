@@ -25,6 +25,8 @@ import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -50,9 +52,7 @@ public class SnapshotTransformation
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        // TODO: remove hack
-        if ( isSnapshot( artifact ) &&
-            !Boolean.valueOf( System.getProperty( "maven.debug.snapshot.disabled", "true" ) ).booleanValue() )
+        if ( isSnapshot( artifact ) )
         {
             // TODO: this mostly works, however...
             //  - we definitely need the manual/daily check as this is quite slow given the large number of snapshots inside m2 presently
@@ -72,31 +72,65 @@ public class SnapshotTransformation
             }
 
             String version = localMetadata.constructVersion();
-            if ( !alreadyResolved( artifact ) )
+            // TODO: remove hack
+            if ( !alreadyResolved( artifact ) &&
+                !Boolean.valueOf( System.getProperty( "maven.debug.snapshot.disabled", "false" ) ).booleanValue() )
             {
-                boolean foundRemote = false;
+                boolean checkedUpdates = false;
                 for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
                 {
                     ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
 
-                    getLogger().info(
-                        artifact.getArtifactId() + ": checking for updates from " + remoteRepository.getId() );
-
-                    SnapshotArtifactMetadata remoteMetadata = SnapshotArtifactMetadata.retrieveFromRemoteRepository(
-                        artifact, remoteRepository, wagonManager );
-
-                    if ( remoteMetadata.compareTo( localMetadata ) > 0 )
+                    String snapshotPolicy = remoteRepository.getSnapshotPolicy();
+                    // TODO: should be able to calculate this less often
+                    boolean checkForUpdates = false;
+                    if ( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS.equals( snapshotPolicy ) )
                     {
-                        artifact.setRepository( remoteRepository );
+                        checkForUpdates = true;
+                    }
+                    else if ( ArtifactRepository.SNAPSHOT_POLICY_DAILY.equals( snapshotPolicy ) )
+                    {
+                        // Note that if last modified is 0, it didn't exist, so this will be true
+                        if ( getMidnightBoundary().after( new Date( localMetadata.getLastModified() ) ) )
+                        {
+                            checkForUpdates = true;
+                        }
+                    }
+                    else if ( snapshotPolicy.startsWith( ArtifactRepository.SNAPSHOT_POLICY_INTERVAL ) )
+                    {
+                        String s = snapshotPolicy.substring( ArtifactRepository.SNAPSHOT_POLICY_INTERVAL.length() + 1 );
+                        int minutes = Integer.valueOf( s ).intValue();
+                        Calendar cal = Calendar.getInstance();
+                        cal.add( Calendar.MINUTE, -minutes );
+                        // Note that if last modified is 0, it didn't exist, so this will be true
+                        if ( cal.getTime().after( new Date( localMetadata.getLastModified() ) ) )
+                        {
+                            checkForUpdates = true;
+                        }
+                    }
+                    // else assume "never"
 
-                        localMetadata = remoteMetadata;
-                        foundRemote = true;
+                    if ( checkForUpdates )
+                    {
+                        getLogger().info(
+                            artifact.getArtifactId() + ": checking for updates from " + remoteRepository.getId() );
+
+                        SnapshotArtifactMetadata remoteMetadata = SnapshotArtifactMetadata.retrieveFromRemoteRepository(
+                            artifact, remoteRepository, wagonManager );
+
+                        if ( remoteMetadata.compareTo( localMetadata ) > 0 )
+                        {
+                            artifact.setRepository( remoteRepository );
+
+                            localMetadata = remoteMetadata;
+                        }
+                        checkedUpdates = true;
                     }
                 }
 
-                if ( foundRemote )
+                if ( checkedUpdates )
                 {
-                    artifact.addMetadata( localMetadata );
+                    localMetadata.storeInLocalRepository( localRepository );
                 }
 
                 if ( getLogger().isInfoEnabled() )
@@ -104,7 +138,7 @@ public class SnapshotTransformation
                     if ( !version.equals( artifact.getBaseVersion() ) )
                     {
                         String message = artifact.getArtifactId() + ": resolved to version " + version;
-                        if ( foundRemote )
+                        if ( artifact.getRepository() != null )
                         {
                             message += " from repository " + artifact.getRepository().getId();
                         }
@@ -120,6 +154,16 @@ public class SnapshotTransformation
             }
             artifact.setVersion( version );
         }
+    }
+
+    private Date getMidnightBoundary()
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.set( Calendar.HOUR_OF_DAY, 0 );
+        cal.set( Calendar.MINUTE, 0 );
+        cal.set( Calendar.SECOND, 0 );
+        cal.set( Calendar.MILLISECOND, 0 );
+        return cal.getTime();
     }
 
     private boolean alreadyResolved( Artifact artifact )

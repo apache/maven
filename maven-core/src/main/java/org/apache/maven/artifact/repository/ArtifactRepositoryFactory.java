@@ -31,4 +31,5 @@ public interface ArtifactRepositoryFactory
     public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings,
                                                         ArtifactRepositoryLayout repositoryLayout );
 
+    void setGlobalSnapshotPolicy( String snapshotPolicy );
 }

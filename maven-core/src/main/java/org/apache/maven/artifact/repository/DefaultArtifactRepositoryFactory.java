@@ -31,6 +31,7 @@ public class DefaultArtifactRepositoryFactory
     extends AbstractLogEnabled
     implements ArtifactRepositoryFactory
 {
+    private String globalSnapshotPolicy = null;
 
     public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings,
                                                         ArtifactRepositoryLayout repositoryLayout )
@@ -55,6 +56,12 @@ public class DefaultArtifactRepositoryFactory
 
         ArtifactRepository repo = null;
 
+        String snapshotPolicy = globalSnapshotPolicy;
+        if ( snapshotPolicy == null )
+        {
+            snapshotPolicy = modelRepository.getSnapshotPolicy();
+        }
+
         if ( repoProfile != null )
         {
             AuthenticationInfo authInfo = new AuthenticationInfo();
@@ -68,14 +75,20 @@ public class DefaultArtifactRepositoryFactory
             authInfo.setPassphrase( repoProfile.getPassphrase() );
 
             repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl(), authInfo,
-                                           repositoryLayout );
+                                           repositoryLayout, snapshotPolicy );
         }
         else
         {
-            repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl(), repositoryLayout );
+            repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl(), repositoryLayout,
+                                           snapshotPolicy );
         }
 
         return repo;
+    }
+
+    public void setGlobalSnapshotPolicy( String snapshotPolicy )
+    {
+        this.globalSnapshotPolicy = snapshotPolicy;
     }
 
 }

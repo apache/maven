@@ -33,21 +33,46 @@ import org.apache.maven.wagon.repository.Repository;
 public class ArtifactRepository
     extends Repository
 {
+    private final String snapshotPolicy;
 
     private final ArtifactRepositoryLayout layout;
 
+    public static final String SNAPSHOT_POLICY_NEVER = "never";
+
+    public static final String SNAPSHOT_POLICY_ALWAYS = "always";
+
+    public static final String SNAPSHOT_POLICY_DAILY = "daily";
+
+    public static final String SNAPSHOT_POLICY_INTERVAL = "interval";
+
     public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
+    {
+        this( id, url, layout, null );
+    }
+
+    public ArtifactRepository( String id, String url, AuthenticationInfo authenticationInfo,
+                               ArtifactRepositoryLayout layout )
+    {
+        this( id, url, authenticationInfo, layout, null );
+    }
+
+    public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, String snapshotPolicy )
     {
         super( id, url );
 
         this.layout = layout;
+
+        this.snapshotPolicy = snapshotPolicy;
     }
 
-    public ArtifactRepository( String id, String url, AuthenticationInfo authInfo, ArtifactRepositoryLayout layout )
+    public ArtifactRepository( String id, String url, AuthenticationInfo authInfo, ArtifactRepositoryLayout layout,
+                               String snapshotPolicy )
     {
         super( id, url, authInfo );
 
         this.layout = layout;
+
+        this.snapshotPolicy = snapshotPolicy;
     }
 
     public String pathOf( Artifact artifact )
@@ -62,4 +87,8 @@ public class ArtifactRepository
         return layout.pathOfMetadata( artifactMetadata );
     }
 
+    public String getSnapshotPolicy()
+    {
+        return snapshotPolicy;
+    }
 }
