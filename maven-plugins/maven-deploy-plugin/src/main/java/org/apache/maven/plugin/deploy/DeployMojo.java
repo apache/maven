@@ -16,6 +16,17 @@ package org.apache.maven.plugin.deploy;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.deployer.ArtifactDeployer;
+import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.AbstractPlugin;
+import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.project.MavenProject;
+
+import java.io.File;
+
 /**
  * @goal deploy
  *
@@ -49,6 +60,54 @@ package org.apache.maven.plugin.deploy;
  * @version $Id$
  */
 public class DeployMojo
-    extends AbstractDeployMojo
+    extends AbstractPlugin
 {
+    private MavenProject project;
+
+    private ArtifactDeployer deployer;
+
+    private ArtifactRepository deploymentRepository;
+
+    public void execute()
+        throws PluginExecutionException
+    {
+        if ( deploymentRepository == null )
+        {
+            String msg = "Deployment failed: repository element was not specified in the pom inside"
+                + " distributionManagement element";
+            throw new PluginExecutionException( msg );
+        }
+
+        if ( deploymentRepository.getAuthenticationInfo() == null )
+        {
+            getLog().warn(
+                           "Deployment repository {id: \'" + deploymentRepository.getId()
+                               + "\'} has no associated authentication info!" );
+        }
+
+        // Deploy the POM
+        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                    project.getVersion(), "pom" );
+
+        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+
+        try
+        {
+            deployer.deploy( pom, pomArtifact, deploymentRepository );
+
+            //Deploy artifact
+            if ( !"pom".equals( project.getPackaging() ) )
+            {
+                Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                                                         project.getVersion(), project.getPackaging() );
+
+                deployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository );
+            }
+        }
+        catch ( ArtifactDeploymentException e )
+        {
+            // TODO: deployment exception that does not give a trace
+            throw new PluginExecutionException( "Error deploying artifact", e );
+        }
+    }
 }
