@@ -14,9 +14,9 @@ import java.util.List;
  * @description Run tests using surefire
  *
  * @prereq compiler:compile
- * @prereq compiler:test:compile
+ * @prereq compiler:testCompile
  * @prereq resources:resources
- * @prereq resources:test:resources
+ * @prereq resources:testResources
  *
  * @parameter
  *  name="mavenRepoLocal"

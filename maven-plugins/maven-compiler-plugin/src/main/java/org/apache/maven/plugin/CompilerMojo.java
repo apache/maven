@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @goal compile
  *
- * @requiresDependencyResolution
+ * @requiresDependencyResolutionXX
  *
  * @description Compiles application sources
  *

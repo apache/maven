@@ -13,21 +13,21 @@ import org.apache.maven.plugin.generator.jelly.JellyHarnessGenerator;
  *  required="true"
  *  validator=""
  *  expression="#project.build.sourceDirectory"
- *  description=""
+ *  description="x"
  * @parameter
  *  name="outputDirectory"
  *  type="String"
  *  required="true" 
  *  validator=""
  *  expression="#project.build.output
- *  description=""
+ *  description="x"
  * @parameter
  *  name="pom"
  *  type="String"
  *  required="true"
  *  validator=""
  *  expression="#project.getFile().getPath()"
- *  description=""
+ *  description="x"
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$

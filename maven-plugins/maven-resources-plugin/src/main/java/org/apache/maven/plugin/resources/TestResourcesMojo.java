@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @goal test:resources
+ * @goal testResources
  *
  * @description copy test resources
  *

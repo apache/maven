@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @goal test:compile
+ * @goal testCompile
  *
  * @description Compiles test sources
  *
