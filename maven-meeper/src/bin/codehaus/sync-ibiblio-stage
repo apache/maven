@@ -2,4 +2,4 @@
 
 umask 002
 
-rsync -rvl --size-only --rsh="ssh -l maven" beaver.codehaus.org:~/ibiblio-sync/repository /public/html/maven
+rsync -rvl --size-only --rsh="ssh -l maven" beaver.codehaus.org:~/ibiblio-sync/repository/ /public/html/maven
