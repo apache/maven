@@ -222,7 +222,7 @@ public class DefaultPluginManager
         remotePluginRepositories = new HashSet();
 
         // TODO: needs to be configured from the POM element
-        remotePluginRepositories.add( new ArtifactRepository( "plugin-repository", "http://www.ibiblio.org/maven" ) );
+        remotePluginRepositories.add( new ArtifactRepository( "plugin-repository", "http://repo1.maven.org" ) );
     }
 
     // TODO: is this needed or can it be found from the session?
