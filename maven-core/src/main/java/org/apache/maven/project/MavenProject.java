@@ -198,8 +198,32 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( a.getScope() == null || Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
-                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                if ( a.getScope() == null || Artifact.SCOPE_TEST.equals( a.getScope() ) ||
+                    Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
+                    Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                {
+                    list.add( a.getPath() );
+                }
+            }
+        }
+        return list;
+    }
+
+    public List getRuntimeClasspathElements()
+    {
+        List list = new ArrayList( getArtifacts().size() + 1 );
+
+        list.add( getBuild().getOutput() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            if ( isAddedToClasspath( a ) )
+            {
+                // TODO: let the scope handler deal with this
+                if ( a.getScope() == null || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
+                    Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
                     list.add( a.getPath() );
                 }
