@@ -17,6 +17,14 @@
       <directory>src/bin</directory>
       <outputDirectory>bin</outputDirectory>
     </fileSet>
+    <fileSet>
+      <!-- TODO: use expressions instead: ${project.build.directory}, ${project.build.finalName}, or have a <build /> tag to include the built artifact -->
+      <directory>target</directory>
+      <outputDirectory>lib</outputDirectory>
+      <includes>
+        <include>maven-core-*.jar</include>
+      </includes>
+    </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>
