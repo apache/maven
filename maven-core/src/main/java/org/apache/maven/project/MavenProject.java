@@ -27,6 +27,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
@@ -36,9 +37,11 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reports;
 import org.apache.maven.model.Scm;
+import org.apache.maven.util.Xpp3DomUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -744,5 +747,49 @@ public class MavenProject
         return distMgmtArtifactRepository;
     }
 
+    public Xpp3Dom getGoalConfiguration( String pluginId, String goalName )
+    {
+        Xpp3Dom dom = null;
+
+        // ----------------------------------------------------------------------
+        // I would like to be able to lookup the Plugin object using a key but
+        // we have a limitation in modello that will be remedied shortly. So
+        // for now I have to iterate through and see what we have.
+        // ----------------------------------------------------------------------
+
+        if ( getPlugins() != null )
+        {
+            for ( Iterator iterator = getPlugins().iterator(); iterator.hasNext(); )
+            {
+                Plugin plugin = (Plugin) iterator.next();
+
+                // TODO: groupID not handled
+                if ( pluginId.equals( plugin.getArtifactId() ) )
+                {
+                    dom = (Xpp3Dom) plugin.getConfiguration();
+
+                    if ( goalName != null )
+                    {
+                        for ( Iterator j = plugin.getGoals().iterator(); j.hasNext(); )
+                        {
+                            Goal goal = (Goal) j.next();
+                            if ( goal.getId().equals( goalName ) )
+                            {
+                                Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
+                                if ( goalConfiguration != null )
+                                {
+                                    Xpp3Dom newDom = Xpp3DomUtils.copyXpp3Dom( goalConfiguration );
+                                    dom = Xpp3DomUtils.mergeXpp3Dom( newDom, dom );
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return dom;
+    }
 }
 

@@ -26,7 +26,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Goal;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -37,7 +36,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.util.Xpp3DomUtils;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -386,9 +384,27 @@ public class DefaultPluginManager
             // TODO: remove
             boolean newMojoTechnique = checkMojoTechnique( plugin.getClass() );
 
+            String goalId = null;
+
+            // TODO: much less of this magic is needed - make the mojoDescriptor just store the first and second part
+            int index = goalName.indexOf( ':' );
+            if ( index >= 0 )
+            {
+                goalId = goalName.substring( index + 1 );
+            }
+
             // TODO: can probable refactor these a little when only the new plugin technique is in place
-            PlexusConfiguration configuration = getProjectDefinedPluginConfiguration( session.getProject(),
-                                                                                      mojoDescriptor.getId() );
+            Xpp3Dom dom = session.getProject().getGoalConfiguration( getPluginId( goalName ), goalId );
+
+            PlexusConfiguration configuration;
+            if ( dom == null )
+            {
+                configuration = new XmlPlexusConfiguration( "configuration" );
+            }
+            else
+            {
+                configuration = new XmlPlexusConfiguration( dom );
+            }
 
             Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session );
 
@@ -655,67 +671,6 @@ public class DefaultPluginManager
             }
         }
         return map;
-    }
-
-    private static PlexusConfiguration getProjectDefinedPluginConfiguration( MavenProject project, String goalId )
-    {
-        Xpp3Dom dom = null;
-
-        // ----------------------------------------------------------------------
-        // I would like to be able to lookup the Plugin object using a key but
-        // we have a limitation in modello that will be remedied shortly. So
-        // for now I have to iterate through and see what we have.
-        // ----------------------------------------------------------------------
-
-        if ( project.getPlugins() != null )
-        {
-            String pluginId = getPluginId( goalId );
-
-            for ( Iterator iterator = project.getPlugins().iterator(); iterator.hasNext(); )
-            {
-                org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) iterator.next();
-
-                // TODO: groupID not handled
-                if ( pluginId.equals( plugin.getArtifactId() ) )
-                {
-                    dom = (Xpp3Dom) plugin.getConfiguration();
-
-                    // TODO: much less of this magic is needed - make the mojoDescriptor just store the first and second part
-                    int index = goalId.indexOf( ':' );
-                    if ( index >= 0 )
-                    {
-                        String goalName = goalId.substring( index + 1 );
-                        for ( Iterator j = plugin.getGoals().iterator(); j.hasNext(); )
-                        {
-                            Goal goal = (Goal) j.next();
-                            if ( goal.getId().equals( goalName ) )
-                            {
-                                Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
-                                if ( goalConfiguration != null )
-                                {
-                                    Xpp3Dom newDom = Xpp3DomUtils.copyXpp3Dom( goalConfiguration );
-                                    dom = Xpp3DomUtils.mergeXpp3Dom( newDom, dom );
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        PlexusConfiguration configuration;
-        if ( dom == null )
-        {
-            configuration = new XmlPlexusConfiguration( "configuration" );
-        }
-        else
-        {
-            configuration = new XmlPlexusConfiguration( dom );
-        }
-
-        return configuration;
     }
 
     public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter )
