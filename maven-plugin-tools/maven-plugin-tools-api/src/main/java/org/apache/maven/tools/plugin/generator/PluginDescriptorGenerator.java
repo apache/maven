@@ -32,12 +32,13 @@ import java.util.Set;
 /**
  * @todo add example usage tag that can be shown in the doco
  * @todo need to add validation directives so that systems embedding maven2 can
- *       get validation directives to help users in IDEs.
+ * get validation directives to help users in IDEs.
  */
 public class PluginDescriptorGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project ) throws Exception
+    public void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project )
+        throws Exception
     {
         File f = new File( destinationDirectory, "plugin.xml" );
 
@@ -94,9 +95,9 @@ public class PluginDescriptorGenerator
         //
         // ----------------------------------------------------------------------
 
-        if ( mojoDescriptor.requiresDependencyResolution() )
+        if ( mojoDescriptor.getRequiresDependencyResolution() != null )
         {
-            element( w, "requiresDependencyResolution", "true" );
+            element( w, "requiresDependencyResolution", mojoDescriptor.getRequiresDependencyResolution() );
         }
 
         // ----------------------------------------------------------------------

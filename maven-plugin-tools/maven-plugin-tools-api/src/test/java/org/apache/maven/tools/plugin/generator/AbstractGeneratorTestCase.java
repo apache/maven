@@ -16,6 +16,7 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
+import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -27,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -42,12 +41,14 @@ public abstract class AbstractGeneratorTestCase
 
     protected String basedir;
 
-    protected void setUp() throws Exception
+    protected void setUp()
+        throws Exception
     {
         basedir = System.getProperty( "basedir" );
     }
 
-    public void testGenerator() throws Exception
+    public void testGenerator()
+        throws Exception
     {
         setupGenerator();
 
@@ -61,7 +62,7 @@ public abstract class AbstractGeneratorTestCase
         mojoDescriptor.setGoal( "testGoal" );
         mojoDescriptor.setId( "test" );
         mojoDescriptor.setImplementation( "org.apache.maven.tools.plugin.generator.TestMojo" );
-        mojoDescriptor.setRequiresDependencyResolution( true );
+        mojoDescriptor.setRequiresDependencyResolution( "compile" );
 
         List params = new ArrayList();
 
@@ -101,7 +102,8 @@ public abstract class AbstractGeneratorTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected void setupGenerator() throws Exception
+    protected void setupGenerator()
+        throws Exception
     {
         String generatorClassName = getClass().getName();
 
@@ -115,9 +117,9 @@ public abstract class AbstractGeneratorTestCase
         }
         catch ( Exception e )
         {
-            throw new Exception( "Cannot find " + generatorClassName
-                + "! Make sure your test case is named in the form ${generatorClassName}Test "
-                + "or override the setupPlugin() method to instantiate the mojo yourself." );
+            throw new Exception( "Cannot find " + generatorClassName +
+                                 "! Make sure your test case is named in the form ${generatorClassName}Test " +
+                                 "or override the setupPlugin() method to instantiate the mojo yourself." );
         }
     }
 
@@ -125,7 +127,8 @@ public abstract class AbstractGeneratorTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected void validate() throws Exception
+    protected void validate()
+        throws Exception
     {
         // empty
     }

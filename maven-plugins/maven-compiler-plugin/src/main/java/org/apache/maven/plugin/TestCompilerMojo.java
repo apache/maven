@@ -21,7 +21,7 @@ package org.apache.maven.plugin;
  * @version $Id$
  * @goal testCompile
  * @description Compiles test sources
- * @requiresDependencyResolution
+ * @requiresDependencyResolution test
  * @parameter name="compileSourceRoots"
  * type="java.util.List"
  * required="true"

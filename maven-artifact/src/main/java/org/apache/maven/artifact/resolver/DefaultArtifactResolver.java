@@ -280,8 +280,6 @@ public class DefaultArtifactResolver
                                                                                         knownVersion,
                                                                                         newArtifact.getScope(),
                                                                                         knownArtifact.getType() );
-                        // don't copy file - these aren't resolved yet
-
                         resolvedArtifacts.put( artifact.getConflictId(), artifact );
                     }
                 }

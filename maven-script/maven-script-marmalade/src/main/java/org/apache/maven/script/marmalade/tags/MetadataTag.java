@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Aggregator tag for the actual meat of the mojo.
- * 
+ *
  * @author jdcasey Created on Feb 8, 2005
  */
 public class MetadataTag
@@ -39,7 +39,7 @@ public class MetadataTag
 
     private String goal;
 
-    private boolean requiresDependencyResolution = true;
+    private String requiresDependencyResolution = null;
 
     private boolean requiresProject = true;
 
@@ -58,7 +58,8 @@ public class MetadataTag
         return false;
     }
 
-    protected void doExecute( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
+    protected void doExecute( MarmaladeExecutionContext context )
+        throws MarmaladeExecutionException
     {
         processChildren( context );
 
@@ -66,7 +67,8 @@ public class MetadataTag
         context.setVariable( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR, descriptor, true );
     }
 
-    private MojoDescriptor buildDescriptor( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
+    private MojoDescriptor buildDescriptor( MarmaladeExecutionContext context )
+        throws MarmaladeExecutionException
     {
         MojoDescriptor descriptor = new MojoDescriptor();
 
@@ -146,7 +148,7 @@ public class MetadataTag
         this.description = description;
     }
 
-    public void setRequiresDependencyResolution( boolean requiresDependencyResolution )
+    public void setRequiresDependencyResolution( String requiresDependencyResolution )
     {
         this.requiresDependencyResolution = requiresDependencyResolution;
     }

@@ -25,6 +25,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -340,7 +341,7 @@ public class DefaultPluginManager
 
         try
         {
-            if ( mojoDescriptor.requiresDependencyResolution() )
+            if ( mojoDescriptor.getRequiresDependencyResolution() != null )
             {
 
                 ArtifactResolver artifactResolver = null;
@@ -351,7 +352,8 @@ public class DefaultPluginManager
                     artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
                     mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
-                    resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder );
+                    resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder,
+                                                   mojoDescriptor.getRequiresDependencyResolution() );
                     downloadDependencies( session, artifactResolver );
                 }
                 finally
@@ -700,10 +702,8 @@ public class DefaultPluginManager
         // TODO: configure this from bootstrap or scan lib
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
                                                               "maven-settings", "maven-monitor", "maven-plugin",
-                                                              "plexus-container-api", "plexus-container-default",
-                                                              "plexus-artifact-container", "wagon-provider-api",
-                                                              "classworlds"} );
-
+                                                              "plexus-container-default", "plexus-artifact-container",
+                                                              "wagon-provider-api", "classworlds"} );
     }
 
     // ----------------------------------------------------------------------
@@ -711,17 +711,19 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
-                                                MavenProjectBuilder mavenProjectBuilder )
+                                                MavenProjectBuilder mavenProjectBuilder, String scope )
         throws ArtifactResolutionException
     {
         MavenProject project = context.getProject();
 
         MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
+        ArtifactFilter filter = new ScopeArtifactFilter( scope );
+
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
                                                                                 context.getRemoteRepositories(),
                                                                                 context.getLocalRepository(),
-                                                                                sourceReader );
+                                                                                sourceReader, filter );
 
         project.addArtifacts( result.getArtifacts().values() );
     }

@@ -39,7 +39,8 @@ import java.util.List;
 public class PluginDescriptorGeneratorTest
     extends AbstractGeneratorTestCase
 {
-    protected void validate() throws Exception
+    protected void validate()
+        throws Exception
     {
         PluginDescriptorBuilder pdb = new PluginDescriptorBuilder();
 
@@ -69,7 +70,8 @@ public class PluginDescriptorGeneratorTest
         assertEquals( "0.0.0", dependency.getVersion() );
     }
 
-    private String readFile( File pluginDescriptorFile ) throws IOException
+    private String readFile( File pluginDescriptorFile )
+        throws IOException
     {
         StringWriter sWriter = new StringWriter();
         PrintWriter pWriter = new PrintWriter( sWriter );
@@ -77,7 +79,7 @@ public class PluginDescriptorGeneratorTest
         BufferedReader reader = new BufferedReader( new FileReader( pluginDescriptorFile ) );
 
         String line = null;
-        while ( (line = reader.readLine()) != null )
+        while ( ( line = reader.readLine() ) != null )
         {
             pWriter.println( line );
         }
@@ -96,7 +98,7 @@ public class PluginDescriptorGeneratorTest
         // The following should be defaults
         assertEquals( "per-lookup", mojoDescriptor.getInstantiationStrategy() );
 
-        assertTrue( mojoDescriptor.requiresDependencyResolution() );
+        assertNotNull( mojoDescriptor.getRequiresDependencyResolution() );
 
         // check the parameter.
         checkParameter( (Parameter) mojoDescriptor.getParameters().get( 0 ) );

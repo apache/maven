@@ -54,7 +54,7 @@ public class MojoDescriptor
 
     private List prereqs;
 
-    private boolean requiresDependencyResolution = false;
+    private String requiresDependencyResolution = null;
 
     private boolean requiresProject = true;
 
@@ -150,12 +150,12 @@ public class MojoDescriptor
     // Dependency requirement
     // ----------------------------------------------------------------------
 
-    public void setRequiresDependencyResolution( boolean requiresDependencyResolution )
+    public void setRequiresDependencyResolution( String requiresDependencyResolution )
     {
         this.requiresDependencyResolution = requiresDependencyResolution;
     }
 
-    public boolean requiresDependencyResolution()
+    public String getRequiresDependencyResolution()
     {
         return requiresDependencyResolution;
     }

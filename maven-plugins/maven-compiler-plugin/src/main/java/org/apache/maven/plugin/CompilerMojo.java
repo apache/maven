@@ -34,25 +34,25 @@ import java.util.Set;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  * @goal compile
- * @requiresDependencyResolution
+ * @requiresDependencyResolution compile
  * @description Compiles application sources
  * @parameter name="compileSourceRoots" type="java.util.List" required="true" validator=""
- *            expression="#project.compileSourceRoots" description=""
+ * expression="#project.compileSourceRoots" description=""
  * @parameter name="outputDirectory" type="String" required="true" validator=""
- *            expression="#project.build.outputDirectory" description=""
+ * expression="#project.build.outputDirectory" description=""
  * @parameter name="classpathElements" type="List" required="true" validator=""
- *            expression="#project.compileClasspathElements" description=""
+ * expression="#project.compileClasspathElements" description=""
  * @parameter name="debug" type="boolean" required="false" validator=""
- *            expression="#maven.compiler.debug" description="Whether to include debugging
- *            information in the compiled class files; the default value is false"
+ * expression="#maven.compiler.debug" description="Whether to include debugging
+ * information in the compiled class files; the default value is false"
  * @todo change debug parameter type to Boolean
  * @parameter name="source" type="String" required="false" expression="#source" validator=""
- *            description="The -source argument for the Java compiler"
+ * description="The -source argument for the Java compiler"
  * @parameter name="target" type="String" required="false" expression="#target" validator=""
- *            description="The -target argument for the Java compiler"
+ * description="The -target argument for the Java compiler"
  * @parameter name="staleMillis" type="long" required="false" expression="#lastModGranularityMs"
- *            validator="" description="The granularity in milliseconds of the last modification
- *            date for testing whether a source needs recompilation"
+ * validator="" description="The granularity in milliseconds of the last modification
+ * date for testing whether a source needs recompilation"
  * @todo change staleMillis parameter type to Long
  */
 
@@ -167,8 +167,8 @@ public class CompilerMojo
             }
             catch ( NumberFormatException e )
             {
-                throw new PluginExecutionException( "Invalid staleMillis plugin parameter value: \'" + staleMillis
-                    + "\'", e );
+                throw new PluginExecutionException( "Invalid staleMillis plugin parameter value: \'" + staleMillis +
+                                                    "\'", e );
             }
 
         }
@@ -194,8 +194,8 @@ public class CompilerMojo
             }
             catch ( InclusionScanException e )
             {
-                throw new PluginExecutionException( "Error scanning source root: \'" + sourceRoot
-                    + "\' for stale files to recompile.", e );
+                throw new PluginExecutionException( "Error scanning source root: \'" + sourceRoot +
+                                                    "\' for stale files to recompile.", e );
             }
         }
 
@@ -204,7 +204,7 @@ public class CompilerMojo
 
     /**
      * @todo also in ant plugin. This should be resolved at some point so that it does not need to
-     *       be calculated continuously - or should the plugins accept empty source roots as is?
+     * be calculated continuously - or should the plugins accept empty source roots as is?
      */
     private static List removeEmptyCompileSourceRoots( List compileSourceRootsList )
     {

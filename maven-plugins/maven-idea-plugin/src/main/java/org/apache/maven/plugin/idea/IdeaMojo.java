@@ -38,7 +38,7 @@ import java.util.Iterator;
 
 /**
  * @goal idea
- * @requiresDependencyResolution
+ * @requiresDependencyResolution test
  * @description Goal for generating IDEA files from a POM
  * @parameter name="project"
  * type="MavenProject"

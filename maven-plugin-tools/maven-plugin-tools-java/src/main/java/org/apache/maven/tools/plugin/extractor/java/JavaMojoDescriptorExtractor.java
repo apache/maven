@@ -180,7 +180,12 @@ public class JavaMojoDescriptorExtractor
 
         if ( requiresDependencyResolution != null )
         {
-            mojoDescriptor.setRequiresDependencyResolution( true );
+            String value = requiresDependencyResolution.getValue();
+            if ( value == null || value.length() == 0 )
+            {
+                value = "runtime";
+            }
+            mojoDescriptor.setRequiresDependencyResolution( value );
         }
 
         // ----------------------------------------------------------------------

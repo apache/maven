@@ -1,10 +1,10 @@
 package org.apache.maven.plugin.descriptor;
 
+import org.apache.maven.plugin.AbstractPlugin;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.apache.maven.plugin.AbstractPlugin;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -105,7 +105,7 @@ public class PluginDescriptorBuilder
 
         if ( dependencyResolution != null )
         {
-            mojo.setRequiresDependencyResolution( dependencyResolution.equals( "true" ) ? true : false );
+            mojo.setRequiresDependencyResolution( dependencyResolution );
         }
 
         // ----------------------------------------------------------------------
