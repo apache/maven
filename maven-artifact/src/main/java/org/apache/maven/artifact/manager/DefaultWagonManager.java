@@ -51,11 +51,8 @@ public class DefaultWagonManager
     private PlexusContainer container;
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String type )
-        throws ArtifactHandlerNotFoundException
     {
         Artifact artifact = new DefaultArtifact( groupId, artifactId, version, type );
-
-        artifact.setPath( path( artifact ) );
 
         return artifact;
     }
@@ -77,14 +74,6 @@ public class DefaultWagonManager
         return wagon;
     }
 
-    /**
-     * @param wagon
-     * @throws Exception
-     * @todo how we can handle exception here? Maybe we should just swallow it?
-     * Plexus exception handling is not very precise here (it sucks in short words:) )
-     * Maybe plexus should not throw any exception here as this is internal problem of plexus
-     * and any ingeration from outside or intelligent error handlig are rather excluded.
-     */
     public void releaseWagon( Wagon wagon )
         throws Exception
     {
@@ -105,15 +94,6 @@ public class DefaultWagonManager
         releaseWagon( wagon );
     }
 
-    /**
-     * Get the requested artifact from any of the remote repositories and place in
-     * the specified local ArtifactRepository.
-     *
-     * @param artifact
-     * @param remoteRepositories
-     * @param localRepository
-     * @throws TransferFailedException
-     */
     public void get( Artifact artifact, Set remoteRepositories, ArtifactRepository localRepository )
         throws TransferFailedException
     {
@@ -211,7 +191,9 @@ public class DefaultWagonManager
             catch ( TransferFailedException e )
             {
                 getLogger().warn( "Failure getting artifact from repository '" + repository + "': " + e );
+
                 getLogger().debug( "Stack trace", e );
+
                 continue;
             }
             catch ( Exception e )
