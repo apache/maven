@@ -33,6 +33,20 @@ import java.util.List;
  *  expression="#basedir"
  *  description=""
  * @parameter
+ *  name="classesDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator="validator"
+ *  expression="#project.build.output"
+ *  description=""
+ * @parameter
+ *  name="testClassesDirectory"
+ *  type="String"
+ *  required="true"
+ *  validator="validator"
+ *  expression="#project.build.testOutput"
+ *  description=""
+ * @parameter
  *  name="includes"
  *  type="String"
  *  required="true"
@@ -74,6 +88,10 @@ public class SurefirePlugin
 
         String basedir = (String) request.getParameter( "basedir" );
 
+        String classesDirectory = (String) request.getParameter( "classesDirectory" );
+
+        String testClassesDirectory = (String) request.getParameter( "testClassesDirectory" );
+
         List includes = (List) request.getParameter( "includes" );
 
         List excludes = (List) request.getParameter( "excludes" );
@@ -94,9 +112,9 @@ public class SurefirePlugin
 
         surefireBooter.addClassPathUrl( new File( mavenRepoLocal, "surefire/jars/surefire-1.0.jar" ).getPath() );
 
-        surefireBooter.addClassPathUrl( new File( basedir, "target/classes" ).getPath() );
+        surefireBooter.addClassPathUrl( new File( basedir, classesDirectory ).getPath() );
 
-        surefireBooter.addClassPathUrl( new File( basedir, "target/test-classes" ).getPath() );
+        surefireBooter.addClassPathUrl( new File( basedir, testClassesDirectory ).getPath() );
 
         for ( int i = 0; i < classpathElements.length; i++ )
         {
