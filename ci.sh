@@ -144,33 +144,6 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 
 BUILD_REQUIRED=`cat $HOME_DIR/build_required`
 
-## Build the verifier
-
-( 
-  echo
-  
-  echo "Building the verifier ..."
-  
-  echo
-  
-  cd $DIR/maven-components/maven-core-it-verifier
-  
-  mboot
-) >> log 2>&1
-
-(
-  cd $DIR/maven-components/maven-core-it
-
-  echo
-  
-  echo "Running maven-core integration tests ..."
-
-  echo ""
-  
-  ./maven-core-it.sh 
-
-) >> log 2>&1 
-
 # Only send mail to the list if a build was required.
 
 if [ "$BUILD_REQUIRED" = "true" ]
