@@ -57,6 +57,26 @@
       <artifactId>wagon-http-lightweight</artifactId>
       <version>1.0-alpha-2-SNAPSHOT</version>
     </dependency>        
+    <!-- Added to support marmalade-mojos.
+     | Currently plexus container cannot accommodate multiple plexus.xml files,
+     | so we have to include marmalade support here. Will remove when plexus
+     | container is fixed (post-alpha-1 m2 release). -->
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-marmalade-factory</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>marmalade</groupId>
+      <artifactId>marmalade-core</artifactId>
+      <version>1.0-alpha2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>xpp3</groupId>
+      <artifactId>xpp3</artifactId>
+      <version>1.1.3.3</version>
+    </dependency>
+    <!-- End marmalade support deps. -->
   </dependencies>
   <distributionManagement>
     <site>

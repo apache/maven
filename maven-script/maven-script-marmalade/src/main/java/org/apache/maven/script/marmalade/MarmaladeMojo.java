@@ -45,7 +45,7 @@ public class MarmaladeMojo
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response ) throws Exception
     {
 
-        MarmaladeExecutionContext context = new DefaultContext();
+        MarmaladeExecutionContext context = new DefaultContext( request.getParameters() );
 
         context.setVariable( MarmaladeMojoExecutionDirectives.REQUEST_INVAR, request );
         context.setVariable( MarmaladeMojoExecutionDirectives.RESPONSE_INVAR, response );
@@ -64,6 +64,7 @@ public class MarmaladeMojo
         for ( Iterator it = externalizedVars.entrySet().iterator(); it.hasNext(); )
         {
             Map.Entry entry = (Map.Entry) it.next();
+
             request.addContextValue( entry.getKey(), entry.getValue() );
         }
     }

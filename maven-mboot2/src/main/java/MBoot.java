@@ -51,7 +51,7 @@ public class MBoot
 
     String[] plexusDeps = new String[] {
         "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
-        "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar", };
+        "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar" };
 
     String[] pluginGeneratorDeps = new String[] {
         "plexus/jars/plexus-container-default-1.0-alpha-2-SNAPSHOT.jar",
@@ -61,12 +61,6 @@ public class MBoot
         "maven/jars/maven-plugin-tools-api-2.0-SNAPSHOT.jar",
         "maven/jars/maven-plugin-tools-java-2.0-SNAPSHOT.jar",
         "maven/jars/maven-plugin-tools-pluggy-2.0-SNAPSHOT.jar" };
-
-    String[] mojoSupportDeps = new String[] {
-        "marmalade/jars/marmalade-core-1.0-alpha2-SNAPSHOT.jar",
-        "xpp3/jars/xpp3-1.1.3.3.jar",
-        "plexus/jars/plexus-marmalade-factory-1.0-alpha-2-SNAPSHOT.jar",
-        "maven/jars/maven-script-marmalade-2.0-SNAPSHOT.jar", };
 
     // ----------------------------------------------------------------------
     // These are modello's runtime dependencies
@@ -366,14 +360,6 @@ public class MBoot
 
             FileUtils.copyFileToDirectory( repoLocal + "/" + getArtifactPath( d, "/" ), lib );
         }
-
-        // Copy in deps used for non-java mojo support.
-/* Causing issues
-        for ( int i = 0; i < mojoSupportDeps.length; i++ )
-        {
-            FileUtils.copyFileToDirectory( repoLocal + "/" + mojoSupportDeps[i], lib );
-        }
-*/
 
         // Copy maven itself
 

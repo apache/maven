@@ -71,22 +71,54 @@ public class MetadataTag
         MojoDescriptor descriptor = new MojoDescriptor();
 
         descriptor.setLanguage( "marmalade" );
-        descriptor.setId( id );
-        descriptor.setGoal( goal );
-        descriptor.setDescription( description );
-        descriptor.setExecutionStrategy( executionStrategy );
-        descriptor.setInstantiationStrategy( instantiationStrategy );
+
+        if ( notEmpty( id ) )
+        {
+            descriptor.setId( id );
+        }
+
+        if ( notEmpty( goal ) )
+        {
+            descriptor.setGoal( goal );
+        }
+
+        if ( notEmpty( description ) )
+        {
+            descriptor.setDescription( description );
+        }
+
+        if ( notEmpty( executionStrategy ) )
+        {
+            descriptor.setExecutionStrategy( executionStrategy );
+        }
+
+        if ( notEmpty( instantiationStrategy ) )
+        {
+            descriptor.setInstantiationStrategy( instantiationStrategy );
+        }
+
         descriptor.setParameters( parameters );
         descriptor.setRequiresDependencyResolution( requiresDependencyResolution );
         descriptor.setRequiresProject( requiresProject );
 
         String basePath = (String) context.getVariable( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR,
                                                         getExpressionEvaluator() );
+
+        if(basePath.endsWith("/"))
+        {
+            basePath = basePath.substring(0, basePath.length()-2);
+        }
+        
         String implementationPath = getTagInfo().getSourceFile().substring( basePath.length() );
 
         descriptor.setImplementation( implementationPath );
 
         return descriptor;
+    }
+
+    private boolean notEmpty( String test )
+    {
+        return test != null && test.trim().length() > 0;
     }
 
     public void setId( String id )

@@ -38,9 +38,17 @@ it0010: Since the artifact resolution does not use the project builder, we must
         maven-component, which is the parent of maven-plugin, which is an
         explicit dependency of this test.
         
-it0011: Test specification of dependency versions via <dependencyDefaults/>.
+it0011: Test specification of dependency versions via <dependencyManagement/>.
 
 it0012: Test simple POM interpolation
+
+it0013: Test plugin-plugin, which tests maven-plugin-tools-api and 
+        maven-plugin-tools-java. This will generate a plugin descriptor from 
+        java-based mojo sources, install the plugin, and then use it.
+
+it0015: Test marmalade-driven mojo support. This will compile supporting java
+        classes (mmld tag & taglib), generate plugin descriptor from mmld script,
+        install the plugin, and finally use the new plugin.
 
 -------------------------------------------------------------------------------
 

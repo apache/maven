@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<mojo xmlns="marmalade:mojo" xmlns:marmalade-control="marmalade-control">
+  <metadata marmalade-control:el="none">
+    <id>it0015</id>
+    <goal>it0015</goal>
+    <description>Output a file with specified contents to [outDir]</description>
+    <parameters>
+      <parameter>
+        <name>outDir</name>
+        <expression>#project.build.directory</expression>
+        <default>target</default>
+        <description>Output directory for files.</description>
+      </parameter>
+    </parameters>
+  </metadata>
+  <execute>
+    <writeFile xmlns="marmalade:it0015" path="${outDir}/out.txt">This is a test.</writeFile>
+  </execute>
+</mojo>

@@ -36,7 +36,7 @@ public class MarmaladeMojoTest
     extends TestCase
 {
 
-    private static final String TEST_SCRIPT = "<set xmlns=\"marmalade:core\" var=\"testvar\" value=\"testval\" extern=\"true\"/>";
+    private static final String TEST_SCRIPT = "<set xmlns=\"marmalade:core\" var=\"testvar\" value=\"${param}/testval\" extern=\"true\"/>";
 
     public void testShouldProduceOutputWithRequest_Dot_ToStringInline() throws Exception
     {
@@ -51,12 +51,15 @@ public class MarmaladeMojoTest
         MarmaladeMojo mojo = new MarmaladeMojo( script );
 
         PluginExecutionRequest request = new PluginExecutionRequest( Collections.EMPTY_MAP );
+        request.setParameters(Collections.singletonMap("param", "paramValue"));
+        
         PluginExecutionResponse response = new PluginExecutionResponse();
 
         mojo.execute( request, response );
 
         Object result = request.getContextValue( "testvar" );
-        System.out.println( "Result of script execution: " + result );
+        
+        assertEquals("paramValue/testval", result);
     }
 
 }

@@ -1,1 +1,1 @@
-target/classes/out.txt
+target/out.txt
