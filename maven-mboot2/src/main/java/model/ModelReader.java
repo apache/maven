@@ -92,6 +92,8 @@ public class ModelReader
 
     private Map transitiveDependencies = new HashMap();
 
+    private boolean insideDependencyManagement = false;
+
     public ModelReader( ArtifactDownloader downloader, boolean resolveTransitiveDependencies )
     {
         this.downloader = downloader;
@@ -132,9 +134,16 @@ public class ModelReader
         }
         else if ( rawName.equals( "dependency" ) )
         {
-            currentDependency = new Dependency();
+            if ( !insideDependencyManagement )
+            {
+                currentDependency = new Dependency();
 
-            insideDependency = true;
+                insideDependency = true;
+            }
+        }
+        else if ( rawName.equals( "dependencyManagement" ) )
+        {
+            insideDependencyManagement = true;
         }
         else if ( rawName.equals( "resource" ) )
         {
@@ -195,7 +204,7 @@ public class ModelReader
             // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way (marmalade, and currently m2)
             ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, false );
 
-            addDependencies( p.getDependencies(), parentDependencies );
+            addDependencies( p.getDependencies(), parentDependencies, null );
 
             resources.addAll( p.getResources() );
 
@@ -212,10 +221,14 @@ public class ModelReader
                     ModelReader p = retrievePom( currentDependency.getGroupId(), currentDependency.getArtifactId(),
                                                  currentDependency.getVersion(), resolveTransitiveDependencies );
 
-                    addDependencies( p.getDependencies(), transitiveDependencies );
+                    addDependencies( p.getDependencies(), transitiveDependencies, currentDependency.getScope() );
                 }
             }
             dependencies.put( currentDependency.getConflictId(), currentDependency );
+        }
+        else if ( rawName.equals( "dependencyManagement" ) )
+        {
+            insideDependencyManagement = false;
         }
         else if ( rawName.equals( "resource" ) )
         {
@@ -332,11 +345,17 @@ public class ModelReader
         depth--;
     }
 
-    private void addDependencies( Collection dependencies, Map target )
+    private void addDependencies( Collection dependencies, Map target, String inheritedScope )
     {
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
+
+            // Do we care about runtime here?
+            if ( "test".equals( inheritedScope ) )
+            {
+                d.setScope( "test" );
+            }
 
             if ( !hasDependency( d, target ) )
             {
