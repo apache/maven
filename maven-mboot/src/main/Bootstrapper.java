@@ -480,6 +480,8 @@ public class Bootstrapper
 
                 dependencies.addAll( p.getDependencies() );
 
+                unitTests = p.getUnitTests();
+
                 resources.addAll( p.getResources() );
             }
             else if ( rawName.equals( "unitTest" ) )
