@@ -19,9 +19,6 @@ package org.apache.maven.artifact.transform;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id: ArtifactTransformation.java,v 1.1 2005/03/03 15:37:25
@@ -32,12 +29,11 @@ public interface ArtifactTransformation
     static String ROLE = ArtifactTransformation.class.getName();
 
     /**
-     * Take in a artifact and return the transformed artifact. If no
+     * Take in a artifact and return the transformed artifact for locating in the local repository. If no
      * transformation has occured the original artifact is returned.
      *
      * @param artifact Artifact to be transformed.
      * @return The transformed Artifact
      */
-    Artifact transform( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories, Map parameters )
-        throws Exception;
+    Artifact transformLocalArtifact( Artifact artifact, ArtifactRepository localRepository );
 }

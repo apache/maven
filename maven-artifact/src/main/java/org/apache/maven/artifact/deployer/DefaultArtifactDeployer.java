@@ -16,8 +16,8 @@ package org.apache.maven.artifact.deployer;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -28,10 +28,11 @@ import java.io.File;
  * @todo snapshot notions need to be dealt with in one place.
  */
 public class DefaultArtifactDeployer
-    extends AbstractArtifactComponent
     implements ArtifactDeployer
 {
     private WagonManager wagonManager;
+
+    private ArtifactHandlerManager artifactHandlerManager;
 
     public void deploy( String basedir, Artifact artifact, ArtifactRepository deploymentRepository )
         throws ArtifactDeploymentException
@@ -40,7 +41,7 @@ public class DefaultArtifactDeployer
 
         try
         {
-            source = getArtifactHandler( artifact.getType() ).source( basedir, artifact );
+            source = artifactHandlerManager.getArtifactHandler( artifact.getType() ).source( basedir, artifact );
         }
         catch ( ArtifactHandlerNotFoundException e )
         {

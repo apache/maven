@@ -16,20 +16,23 @@ package org.apache.maven.artifact.installer;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 
 public class DefaultArtifactInstaller
-    extends AbstractArtifactComponent
+    extends AbstractLogEnabled
     implements ArtifactInstaller
 {
+    private ArtifactHandlerManager artifactHandlerManager;
+
     public void install( String basedir, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
@@ -37,7 +40,7 @@ public class DefaultArtifactInstaller
 
         try
         {
-            source = getArtifactHandler( artifact.getType() ).source( basedir, artifact );
+            source = artifactHandlerManager.getArtifactHandler( artifact.getType() ).source( basedir, artifact );
         }
         catch ( ArtifactHandlerNotFoundException e )
         {
@@ -52,7 +55,7 @@ public class DefaultArtifactInstaller
     {
         try
         {
-            artifact.setPath( getLocalRepositoryArtifactPath( artifact, localRepository ) );
+            artifact.setPath( artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository ) );
 
             if ( !artifact.getFile().getParentFile().exists() )
             {

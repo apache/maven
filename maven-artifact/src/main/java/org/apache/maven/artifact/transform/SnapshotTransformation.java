@@ -18,27 +18,17 @@ package org.apache.maven.artifact.transform;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
 
 /**
- * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka </a>
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
  * @version $Id: SnapshotTransformation.java,v 1.1 2005/03/03 15:37:25
  *          jvanzyl Exp $
  */
 public class SnapshotTransformation
     implements ArtifactTransformation
 {
-    private ArtifactResolver artifactResolver;
-
+/*
     public Artifact transform( Artifact artifact, ArtifactRepository localRepository, List repositories,
                                Map parameters )
         throws Exception
@@ -146,10 +136,10 @@ public class SnapshotTransformation
 
                 //@todo we should "normalize" the time.
 
-                /*
-                 * TimeZone gmtTimeZone = TimeZone.getTimeZone( "GMT" );
-                 * TimeZone userTimeZone = TimeZone.getDefault(); long diff =
-                 */
+                //
+                // TimeZone gmtTimeZone = TimeZone.getTimeZone( "GMT" );
+                // TimeZone userTimeZone = TimeZone.getDefault(); long diff =
+                //
             }
         }
 
@@ -191,5 +181,11 @@ public class SnapshotTransformation
         String retValue = getFormatter().format( snapshotVersion );
 
         return retValue;
+    }
+    */
+    public Artifact transformLocalArtifact( Artifact artifact, ArtifactRepository localRepository )
+    {
+        // TODO: implement
+        return artifact;
     }
 }

@@ -16,9 +16,9 @@ package org.apache.maven.artifact.resolver;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.wagon.TransferFailedException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.Collections;
@@ -38,11 +39,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @todo get rid of {@link AbstractArtifactComponent}and then create an
- * AbstractArtifactResolver that does the transitive boilerplate
+ * @todo create an AbstractArtifactResolver that does the transitive boilerplate
  */
 public class DefaultArtifactResolver
-    extends AbstractArtifactComponent
+    extends AbstractLogEnabled
     implements ArtifactResolver
 {
     // ----------------------------------------------------------------------
@@ -50,6 +50,8 @@ public class DefaultArtifactResolver
     // ----------------------------------------------------------------------
 
     private WagonManager wagonManager;
+
+    private ArtifactHandlerManager artifactHandlerManager;
 
     // ----------------------------------------------------------------------
     // Implementation
@@ -77,7 +79,7 @@ public class DefaultArtifactResolver
             logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository +
                           "}\n" + "{remoteRepositories: " + remoteRepositories + "}" );
 
-            artifact.setPath( getLocalRepositoryArtifactPath( artifact, localRepository ) );
+            artifact.setPath( artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository ) );
 
             if ( artifact.exists() )
             {
@@ -294,7 +296,7 @@ public class DefaultArtifactResolver
 
             try
             {
-                artifact.setPath( getLocalRepositoryArtifactPath( artifact, localRepository ) );
+                artifact.setPath( artifactHandlerManager.getLocalRepositoryArtifactPath( artifact, localRepository ) );
             }
             catch ( ArtifactPathFormatException e )
             {

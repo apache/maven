@@ -1,5 +1,6 @@
 <plexus>
   <components>
+    <!-- Due to PLX-108, have to work around it...
     <component>
       <role>org.apache.maven.artifact.ArtifactResolver</role>
       <implementation>org.apache.maven.project.ProjectClasspathArtifactResolver</implementation>
@@ -9,7 +10,19 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-          <field-name>artifactHandlerManager</field-name>
+        </requirement>
+      </requirements>
+    </component>
+    -->
+    <component>
+      <role>org.apache.maven.project.ProjectClasspathArtifactResolver</role>
+      <implementation>org.apache.maven.project.ProjectClasspathArtifactResolver</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
       </requirements>
     </component>

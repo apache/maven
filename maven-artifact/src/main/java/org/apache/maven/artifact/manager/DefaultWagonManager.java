@@ -16,8 +16,8 @@ package org.apache.maven.artifact.manager;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.AbstractArtifactComponent;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -33,6 +33,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -44,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultWagonManager
-    extends AbstractArtifactComponent
+    extends AbstractLogEnabled
     implements WagonManager, Contextualizable
 {
     private PlexusContainer container;
@@ -52,6 +53,8 @@ public class DefaultWagonManager
     private Map proxies = new HashMap();
 
     private TransferListener downloadMonitor;
+
+    private ArtifactHandlerManager artifactHandlerManager;
 
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
@@ -86,7 +89,7 @@ public class DefaultWagonManager
 
         wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
-        wagon.put( source, getRemoteRepositoryArtifactPath( artifact, repository ) );
+        wagon.put( source, artifactHandlerManager.getRemoteRepositoryArtifactPath( artifact, repository ) );
 
         wagon.disconnect();
 
@@ -155,7 +158,7 @@ public class DefaultWagonManager
 
                 wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
-                String remotePath = getRemoteRepositoryArtifactPath( artifact, repository );
+                String remotePath = artifactHandlerManager.getRemoteRepositoryArtifactPath( artifact, repository );
 
                 wagon.get( remotePath, temp );
 

@@ -73,29 +73,25 @@ public class ProjectClasspathArtifactResolver
         return artifact;
     }
 
-    protected void setLocalRepositoryPath( Artifact artifact, ArtifactRepository localRepository )
-    {
-    }
-
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-                                                        ArtifactRepository localRepository,
-                                                        ArtifactMetadataSource source, ArtifactFilter filter )
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( this ), filter );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-                                                        ArtifactRepository localRepository,
-                                                        ArtifactMetadataSource source )
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( this ) );
     }
 
     public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-                                                        ArtifactRepository localRepository,
-                                                        ArtifactMetadataSource source )
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifact, remoteRepositories, localRepository, new Source( this ) );
