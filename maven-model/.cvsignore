@@ -7,3 +7,4 @@ test.out
 default.ajsym
 *.ipr
 *.iws
+*.iml
