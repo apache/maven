@@ -43,14 +43,14 @@ import java.util.Map;
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.directory"
+ *  expression="#project.build.output"
  *  description=""
  * @parameter
  *  name="basedir"
  *  type="String"
  *  required="true"
  *  validator=""
- *  expression="#project.build.output"
+ *  expression="#project.build.directory"
  *  description=""
  *
  * @author <a href="michal@codehaus">Michal Maczka</a>
@@ -77,11 +77,11 @@ public class JarMojo
         // ----------------------------------------------------------------------
 
 
-        File jarFile = new File( new File( outputDirectory ), jarName + ".jar" );
+        File jarFile = new File( basedir, jarName + ".jar" );
 
         Map includes = new LinkedHashMap();
         
-        addDirectory(includes, "**/**", "**/package.html", "", basedir);
+        addDirectory(includes, "**/**", "**/package.html", "", new File( outputDirectory ) );
         
         createJar( jarFile, includes );
     }
