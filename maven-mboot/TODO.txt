@@ -1,5 +1,0 @@
-o obey jar overrides
-o transitive deps 
-o move all code for gathering pieces of the model to java, the mix of grabbing
-  some stuff with java and some from bash is crappy. It works, but it's still
-  crappy. Use the generated xpp3 reader.
