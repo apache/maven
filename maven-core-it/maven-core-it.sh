@@ -30,7 +30,7 @@ do
     if [ -f prebuild.hook ]
     then
       echo      
-      ./prebuild.hook
+       sh prebuild.hook
       echo
     fi
     
@@ -39,7 +39,7 @@ do
     if [ -f postbuild.hook ]
     then    
       echo
-      ./postbuild.hook
+      sh postbuild.hook
       echo
     fi
     
