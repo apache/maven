@@ -388,11 +388,6 @@ public class Verifier
     {
         String mavenHome = System.getProperty( "maven.home" );
 
-        if ( mavenHome == null )
-        {
-            throw new VerificationException( "maven.home has not been specified" );
-        }
-
         List goals = loadFile( basedir, filename );
 
         if ( goals.size() == 0 )
@@ -414,7 +409,17 @@ public class Verifier
 
             cli.setWorkingDirectory( basedir );
 
-            cli.setExecutable( "m2" );
+            String executable;
+            if ( mavenHome != null )
+            {
+                executable = mavenHome + "/bin/m2";
+            }
+            else
+            {
+                executable = "m2";
+            }
+
+            cli.setExecutable( executable );
 
             for ( Iterator i = allGoals.iterator(); i.hasNext(); )
             {
