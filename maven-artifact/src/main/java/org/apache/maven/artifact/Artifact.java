@@ -42,6 +42,8 @@ public interface Artifact
 
     String getVersion();
 
+    void setVersion( String version );
+
     /**
      * Get the scope of the artifact. If the artifact is a standalone rather than a dependency, it's scope will be
      * <code>null</code>. The scope may not be the same as it was declared on the original dependency, as this is the
@@ -64,6 +66,9 @@ public interface Artifact
 
     String getBaseVersion();
 
+    /**
+     * @todo would like to get rid of this - or at least only have one. Base version should be immutable.
+     */
     void setBaseVersion( String baseVersion );
 
     // ----------------------------------------------------------------------

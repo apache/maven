@@ -37,8 +37,9 @@ public class DefaultArtifact
 
     private final String artifactId;
 
-    private final String version;
+    private String version;
 
+    // TODO: should be final
     private String baseVersion;
 
     private final String type;
@@ -117,6 +118,11 @@ public class DefaultArtifact
     public String getVersion()
     {
         return version;
+    }
+
+    public void setVersion( String version )
+    {
+        this.version = version;
     }
 
     public String getType()

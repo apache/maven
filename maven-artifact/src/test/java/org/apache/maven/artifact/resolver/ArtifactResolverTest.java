@@ -26,16 +26,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id$
- */
-
 // It would be cool if there was a hook that i could use to setup a test environment.
 // I want to setup a local/remote repositories for testing but i don't want to have
 // to change them when i change the layout of the repositories. So i want to generate
 // the structure i want to test by using the artifact handler manager which dictates
 // the layout used for a particular artifact type.
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -45,7 +41,8 @@ public class ArtifactResolverTest
 {
     private ArtifactResolver artifactResolver;
 
-    protected void setUp() throws Exception
+    protected void setUp()
+        throws Exception
     {
         super.setUp();
 
@@ -57,7 +54,8 @@ public class ArtifactResolverTest
         return "resolver";
     }
 
-    public void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository() throws Exception
+    public void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository()
+        throws Exception
     {
         Artifact a = createLocalArtifact( "a", "1.0" );
 
@@ -77,70 +75,21 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( b );
     }
 
-    public void testResolutionOfASetOfArtifactsWhereTheArtifactsArePresentInTheLocalRepository() throws Exception
-    {
-        Set artifacts = new HashSet();
-
-        Artifact c = createLocalArtifact( "c", "1.0" );
-
-        Artifact d = createLocalArtifact( "d", "1.0" );
-
-        artifacts.add( c );
-
-        artifacts.add( d );
-
-        Set resolvedArtifacts = artifactResolver.resolve( artifacts, remoteRepositories(), localRepository() );
-
-        assertEquals( 2, resolvedArtifacts.size() );
-
-        // The artifacts have undergone no transformations and they are present so the original
-        // artifacts sent into the resolver should be returned as they were sent in.
-
-        assertTrue( resolvedArtifacts.contains( c ) );
-
-        assertTrue( resolvedArtifacts.contains( d ) );
-    }
-
-    public void testResolutionOfASetOfArtifactsWhereTheArtifactsAreNotPresentInTheLocalRepositoryAndMustBeRetrievedFromTheRemoteRepository()
-        throws Exception
-    {
-        Set artifacts = new HashSet();
-
-        Artifact e = createRemoteArtifact( "e", "1.0" );
-        deleteLocalArtifact( e );
-
-        Artifact f = createRemoteArtifact( "f", "1.0" );
-        deleteLocalArtifact( f );
-
-        artifacts.add( e );
-
-        artifacts.add( f );
-
-        Set resolvedArtifacts = artifactResolver.resolve( artifacts, remoteRepositories(), localRepository() );
-
-        assertEquals( 2, resolvedArtifacts.size() );
-
-        // The artifacts have undergone no transformations and they are present so the original
-        // artifacts sent into the resolver should be returned as they were sent in.
-
-        assertTrue( resolvedArtifacts.contains( e ) );
-
-        assertTrue( resolvedArtifacts.contains( f ) );
-    }
-
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
     {
         // for the anonymous classes
         return super.createArtifact( groupId, artifactId, version, type );
     }
 
-    public void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository() throws Exception
+    public void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository()
+        throws Exception
     {
         Artifact g = createLocalArtifact( "g", "1.0" );
 
         Artifact h = createLocalArtifact( "h", "1.0" );
 
-        ArtifactMetadataSource mds = new ArtifactMetadataSource() {
+        ArtifactMetadataSource mds = new ArtifactMetadataSource()
+        {
             public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             {
                 Set dependencies = new HashSet();
@@ -177,7 +126,8 @@ public class ArtifactResolverTest
         Artifact j = createRemoteArtifact( "j", "1.0" );
         deleteLocalArtifact( j );
 
-        ArtifactMetadataSource mds = new ArtifactMetadataSource() {
+        ArtifactMetadataSource mds = new ArtifactMetadataSource()
+        {
             public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             {
                 Set dependencies = new HashSet();
@@ -205,7 +155,8 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( j );
     }
 
-    public void testResolutionFailureWhenArtifactNotPresentInRemoteRepository() throws Exception
+    public void testResolutionFailureWhenArtifactNotPresentInRemoteRepository()
+        throws Exception
     {
         Artifact k = createArtifact( "k", "1.0" );
 
@@ -220,7 +171,8 @@ public class ArtifactResolverTest
         }
     }
 
-    public void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood() throws Exception
+    public void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood()
+        throws Exception
     {
         Artifact l = createRemoteArtifact( "l", "1.0" );
         deleteLocalArtifact( l );

@@ -36,14 +36,11 @@ public interface ArtifactResolver
 {
     static String ROLE = ArtifactResolver.class.getName();
 
-    Artifact resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException;
 
     ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source )
-        throws ArtifactResolutionException;
-
-    Set resolve( Set artifacts, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,

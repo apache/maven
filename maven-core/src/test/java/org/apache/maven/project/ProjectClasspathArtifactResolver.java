@@ -68,11 +68,10 @@ public class ProjectClasspathArtifactResolver
         }
     }
 
-    public Artifact resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         artifact.setFile( new File( "dummy" ) );
-        return artifact;
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,

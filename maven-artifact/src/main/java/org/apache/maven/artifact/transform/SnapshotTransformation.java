@@ -17,9 +17,7 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -47,8 +45,7 @@ public class SnapshotTransformation
      */
     private static Set resolvedArtifactCache = new HashSet();
 
-    public Artifact transformForResolve( Artifact artifact, List remoteRepositories,
-                                         ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
         // TODO: remove hack
@@ -56,11 +53,6 @@ public class SnapshotTransformation
             !Boolean.valueOf( System.getProperty( "maven.debug.snapshot.disabled", "true" ) ).booleanValue() )
         {
             // TODO: this mostly works, however...
-            //  - poms and jars are different, so both are checked individually
-            //  - when a pom is downloaded, it prevents the JAR getting downloaded because of the timestamp
-            //  - need to gather first, group them all up by groupId/artifactId, then go after them
-            //  - alternatively, keep the timestamp when downloading (as is done here), and use the SNAPSHOT file for install
-            //  - however, there is no mechanism to flip back and forward, and presently it keeps looking for 2.0-TIMESTAMP-0 instead as that is in the build file
             //  - we definitely need the manual/daily check as this is quite slow given the large number of snapshots inside m2 presently
 
             SnapshotArtifactMetadata localMetadata;
@@ -101,13 +93,11 @@ public class SnapshotTransformation
                 {
                     artifact.addMetadata( localMetadata );
                 }
+
+                resolvedArtifactCache.add( getCacheKey( artifact ) );
             }
-
-            artifact = createArtifactCopy( artifact, localMetadata );
-
-            resolvedArtifactCache.add( getCacheKey( artifact ) );
+            artifact.setVersion( localMetadata.constructVersion() );
         }
-        return artifact;
     }
 
     private boolean alreadyResolved( Artifact artifact )
@@ -121,7 +111,7 @@ public class SnapshotTransformation
         return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
-    public Artifact transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
     {
         // Nothing to do
 /* TODO: remove
@@ -132,10 +122,9 @@ public class SnapshotTransformation
             artifact.addMetadata( metadata );
         }
 */
-        return artifact;
     }
 
-    public Artifact transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
         if ( isSnapshot( artifact ) )
@@ -145,31 +134,10 @@ public class SnapshotTransformation
                                                                                                        wagonManager );
             metadata.update();
 
-            // TODO: note, we could currently transform this in place, as it is only used through the deploy mojo,
-            //   which creates the artifact and then disposes of it
-            artifact = createArtifactCopy( artifact, metadata );
+            artifact.setVersion( metadata.constructVersion() );
+
             artifact.addMetadata( metadata );
         }
-        return artifact;
-    }
-
-    private Artifact createArtifactCopy( Artifact artifact, SnapshotArtifactMetadata metadata )
-    {
-        Artifact newArtifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                    metadata.constructVersion(), artifact.getScope(),
-                                                    artifact.getType(), artifact.getClassifier() );
-        newArtifact.setBaseVersion( artifact.getBaseVersion() );
-
-        for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
-        {
-            ArtifactMetadata m = (ArtifactMetadata) i.next();
-            m.setArtifact( newArtifact );
-            newArtifact.addMetadata( m );
-        }
-
-        newArtifact.setRepository( artifact.getRepository() );
-
-        return newArtifact;
     }
 
     private static boolean isSnapshot( Artifact artifact )

@@ -92,7 +92,7 @@ public class MavenMetadataSource
 
             try
             {
-                metadataArtifact = artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
+                artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
             }
             catch ( ArtifactResolutionException e )
             {

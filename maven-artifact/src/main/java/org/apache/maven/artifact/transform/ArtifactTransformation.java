@@ -38,10 +38,8 @@ public interface ArtifactTransformation
      * @param artifact           Artifact to be transformed.
      * @param remoteRepositories the repositories to check
      * @param localRepository    the local repository
-     * @return The transformed Artifact
      */
-    public Artifact transformForResolve( Artifact artifact, List remoteRepositories,
-                                         ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException;
 
     /**
@@ -50,9 +48,8 @@ public interface ArtifactTransformation
      *
      * @param artifact        Artifact to be transformed.
      * @param localRepository the local repository it will be stored in
-     * @return The transformed Artifact
      */
-    Artifact transformForInstall( Artifact artifact, ArtifactRepository localRepository );
+    void transformForInstall( Artifact artifact, ArtifactRepository localRepository );
 
     /**
      * Take in a artifact and return the transformed artifact for distributing toa remote repository. If no
@@ -60,8 +57,7 @@ public interface ArtifactTransformation
      *
      * @param artifact         Artifact to be transformed.
      * @param remoteRepository the repository to deploy to
-     * @return The transformed Artifact
      */
-    Artifact transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+    void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
 }

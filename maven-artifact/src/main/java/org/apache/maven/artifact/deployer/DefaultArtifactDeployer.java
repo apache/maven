@@ -68,7 +68,7 @@ public class DefaultArtifactDeployer
             for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
             {
                 ArtifactTransformation transform = (ArtifactTransformation) i.next();
-                artifact = transform.transformForDeployment( artifact, deploymentRepository );
+                transform.transformForDeployment( artifact, deploymentRepository );
             }
 
             wagonManager.putArtifact( source, artifact, deploymentRepository );

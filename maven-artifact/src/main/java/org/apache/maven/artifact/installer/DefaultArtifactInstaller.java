@@ -66,7 +66,7 @@ public class DefaultArtifactInstaller
             for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
             {
                 ArtifactTransformation transform = (ArtifactTransformation) i.next();
-                artifact = transform.transformForInstall( artifact, localRepository );
+                transform.transformForInstall( artifact, localRepository );
             }
 
             String localPath = localRepository.pathOf( artifact );

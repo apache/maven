@@ -35,7 +35,6 @@ import org.codehaus.plexus.logging.Logger;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,8 +64,7 @@ public class DefaultArtifactResolver
     // Implementation
     // ----------------------------------------------------------------------
 
-    // TODO: would like to avoid the returning of a new artifact - is it ok to modify the original though?
-    public Artifact resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         // ----------------------------------------------------------------------
@@ -85,7 +83,7 @@ public class DefaultArtifactResolver
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
             try
             {
-                artifact = transform.transformForResolve( artifact, remoteRepositories, localRepository );
+                transform.transformForResolve( artifact, remoteRepositories, localRepository );
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
@@ -107,44 +105,40 @@ public class DefaultArtifactResolver
         File destination = new File( localRepository.getBasedir(), localPath );
         artifact.setFile( destination );
 
-        if ( destination.exists() )
+        if ( !destination.exists() )
         {
-            return artifact;
-        }
-
-        try
-        {
-            if ( artifact.getRepository() != null )
+            try
             {
-                // the transformations discovered the artifact - so use it exclusively
-                wagonManager.getArtifact( artifact, artifact.getRepository(), destination );
-            }
-            else
-            {
-                wagonManager.getArtifact( artifact, remoteRepositories, destination );
-            }
+                if ( artifact.getRepository() != null )
+                {
+                    // the transformations discovered the artifact - so use it exclusively
+                    wagonManager.getArtifact( artifact, artifact.getRepository(), destination );
+                }
+                else
+                {
+                    wagonManager.getArtifact( artifact, remoteRepositories, destination );
+                }
 
-            // must be after the artifact is downloaded
-            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+                // must be after the artifact is downloaded
+                for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+                {
+                    ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                    metadata.storeInLocalRepository( localRepository );
+                }
+            }
+            catch ( ResourceDoesNotExistException e )
             {
-                ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-                metadata.storeInLocalRepository( localRepository );
+                throw new ArtifactResolutionException( artifactNotFound( localPath, remoteRepositories ), e );
+            }
+            catch ( TransferFailedException e )
+            {
+                throw new ArtifactResolutionException( "Error downloading artifact " + artifact, e );
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                throw new ArtifactResolutionException( "Error downloading artifact " + artifact, e );
             }
         }
-        catch ( ResourceDoesNotExistException e )
-        {
-            throw new ArtifactResolutionException( artifactNotFound( localPath, remoteRepositories ), e );
-        }
-        catch ( TransferFailedException e )
-        {
-            throw new ArtifactResolutionException( "Error downloading artifact " + artifact, e );
-        }
-        catch ( ArtifactMetadataRetrievalException e )
-        {
-            throw new ArtifactResolutionException( "Error downloading artifact " + artifact, e );
-        }
-
-        return artifact;
     }
 
     private static final String LS = System.getProperty( "line.separator" );
@@ -177,23 +171,6 @@ public class DefaultArtifactResolver
         return sb.toString();
     }
 
-    public Set resolve( Set artifacts, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactResolutionException
-    {
-        Set resolvedArtifacts = new HashSet();
-
-        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
-        {
-            Artifact artifact = (Artifact) i.next();
-
-            Artifact resolvedArtifact = resolve( artifact, remoteRepositories, localRepository );
-
-            resolvedArtifacts.add( resolvedArtifact );
-        }
-
-        return resolvedArtifacts;
-    }
-
     // ----------------------------------------------------------------------
     // Transitive modes
     // ----------------------------------------------------------------------
@@ -214,18 +191,11 @@ public class DefaultArtifactResolver
             throw new ArtifactResolutionException( "Error transitively resolving artifacts: ", e );
         }
 
-        // TODO: this is unclean, but necessary as long as resolve may return a different artifact
-        Map collectedArtifacts = artifactResolutionResult.getArtifacts();
-        Map resolvedArtifacts = new HashMap( collectedArtifacts.size() );
-        for ( Iterator i = collectedArtifacts.keySet().iterator(); i.hasNext(); )
+        for ( Iterator i = artifactResolutionResult.getArtifacts().values().iterator(); i.hasNext(); )
         {
-            Object key = i.next();
-            resolvedArtifacts.put( key, resolve( (Artifact) collectedArtifacts.get( key ), remoteRepositories,
-                                                 localRepository ) );
+            Artifact artifact = (Artifact) i.next();
+            resolve( artifact, remoteRepositories, localRepository );
         }
-
-        collectedArtifacts.clear();
-        collectedArtifacts.putAll( resolvedArtifacts );
 
         return artifactResolutionResult;
     }

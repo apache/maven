@@ -42,8 +42,13 @@ public class MavenMetadata
 
     public MavenMetadata( Artifact artifact, File file )
     {
-        super( artifact, artifact.getArtifactId() + "-" + artifact.getVersion() + ".pom" );
+        super( artifact, null );
         this.file = file;
+    }
+
+    public String getFilename()
+    {
+        return getArtifact().getArtifactId() + "-" + getArtifact().getVersion() + ".pom";
     }
 
     public void storeInLocalRepository( ArtifactRepository localRepository )

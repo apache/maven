@@ -710,8 +710,8 @@ public class MavenProject
                                                                                     existing.getVersion(),
                                                                                     a.getScope(), existing.getType() );
 
-                    artifact.setFile( artifact.getFile() );
-                    artifact.setBaseVersion( artifact.getBaseVersion() );
+                    artifact.setFile( existing.getFile() );
+                    artifact.setBaseVersion( existing.getBaseVersion() );
 
                     artifacts.put( id, artifact );
                 }
