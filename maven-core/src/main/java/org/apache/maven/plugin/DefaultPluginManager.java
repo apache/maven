@@ -191,6 +191,7 @@ public class DefaultPluginManager
         return goalName;
     }
 
+    // TODO: don't throw Exception
     public boolean verifyPluginForGoal( String goalName, MavenSession session )
         throws Exception
     {
@@ -199,6 +200,7 @@ public class DefaultPluginManager
         return verifyPlugin( pluginId, session );
     }
 
+    // TODO: don't throw Exception
     public boolean verifyPlugin( String pluginId, MavenSession session )
         throws Exception
     {
@@ -224,6 +226,7 @@ public class DefaultPluginManager
         }
     }
 
+    // TODO: don't throw Exception
     protected void addPlugin( Artifact pluginArtifact, MavenSession session )
         throws Exception
     {
@@ -317,6 +320,7 @@ public class DefaultPluginManager
         return response;
     }
 
+    // TODO: don't throw Exception
     private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
         throws Exception
     {
@@ -455,7 +459,6 @@ public class DefaultPluginManager
     }
 
     public void initialize()
-        throws Exception
     {
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
                                                               "maven-plugin", "plexus-container-api",

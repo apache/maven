@@ -22,8 +22,6 @@ import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
-import java.util.Map;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -35,18 +33,13 @@ public interface PluginManager
     PluginExecutionResponse executeMojo( MavenSession session, String goalName )
          throws GoalExecutionException;
 
-    // TODO: not used - needs to be in interface?
-    void processPluginDescriptor( MavenPluginDescriptor pluginDescriptor )
-        throws Exception;
-
-    // TODO: not currently used - needs to be in interface?
-    Map getMojoDescriptors();
-
     MojoDescriptor getMojoDescriptor( String goalId );
 
+    // TODO: don't throw Exception
     boolean verifyPluginForGoal( String goalName, MavenSession session )
         throws Exception;
 
+    // TODO: don't throw Exception
     boolean verifyPlugin( String pluginId, MavenSession session )
         throws Exception;
 

@@ -1,6 +1,7 @@
 package org.apache.maven.plugin.descriptor;
 
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
@@ -16,7 +17,7 @@ import java.util.List;
 public class PluginDescriptorBuilder
 {
     public PluginDescriptor build( Reader reader )
-        throws Exception
+        throws PlexusConfigurationException
     {
         PlexusConfiguration c = buildConfiguration( reader );
 
@@ -72,7 +73,7 @@ public class PluginDescriptorBuilder
     }
 
     public MojoDescriptor buildComponentDescriptor( PlexusConfiguration c )
-        throws Exception
+        throws PlexusConfigurationException
     {
         MojoDescriptor mojo = new MojoDescriptor();
 
@@ -167,9 +168,17 @@ public class PluginDescriptorBuilder
     //
     // ----------------------------------------------------------------------
 
+    // TODO: catches Exception
     public PlexusConfiguration buildConfiguration( Reader configuration )
-        throws Exception
+        throws PlexusConfigurationException
     {
-        return new XmlPlexusConfiguration( Xpp3DomBuilder.build( configuration ) );
+        try
+        {
+            return new XmlPlexusConfiguration( Xpp3DomBuilder.build( configuration ) );
+        }
+        catch ( Exception e )
+        {
+            throw new PlexusConfigurationException( "Error creating configuration", e );
+        }
     }
 }

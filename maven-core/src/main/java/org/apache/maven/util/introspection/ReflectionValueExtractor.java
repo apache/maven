@@ -47,7 +47,9 @@ public class ReflectionValueExtractor
     {
     }
 
-    public static Object evaluate( String expression, Object root ) throws Exception
+    // TODO: don't throw Exception
+    public static Object evaluate( String expression, Object root )
+        throws Exception
     {
         // ----------------------------------------------------------------------
         // Remove the leading "project" token

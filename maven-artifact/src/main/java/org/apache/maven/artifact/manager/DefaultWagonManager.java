@@ -71,12 +71,14 @@ public class DefaultWagonManager
         return wagon;
     }
 
+    // TODO: don't throw exception
     public void releaseWagon( Wagon wagon )
         throws Exception
     {
         container.release( wagon );
     }
 
+    // TODO: don't throw exception
     public void put( File source, Artifact artifact, ArtifactRepository repository )
         throws Exception
     {

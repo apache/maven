@@ -18,7 +18,6 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.AbstractMavenExecutionRequest;
 
 import java.util.List;
 import java.util.Properties;
@@ -38,7 +37,6 @@ extends AbstractMavenExecutionRequest
     }
 
     public List getProjectFiles()
-        throws Exception
     {
         return null;
     }

@@ -91,6 +91,7 @@ public class DefaultMaven
         }
     }
 
+    // TODO: don't throw generic exception
     public MavenExecutionResponse handleProject( MavenExecutionRequest request )
         throws Exception
     {
@@ -230,7 +231,6 @@ public class DefaultMaven
     // or not.
 
     protected MavenSession createSession( MavenExecutionRequest request )
-        throws Exception
     {
         return new MavenSession( container, pluginManager, request.getLocalRepository(), request.getGoals() );
     }
@@ -378,7 +378,7 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
 
     public List getSortedProjects( List projects )
-        throws Exception
+        throws CycleDetectedException
     {
         return projectBuilder.getSortedProjects( projects );
     }

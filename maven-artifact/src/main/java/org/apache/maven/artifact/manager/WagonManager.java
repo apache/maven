@@ -39,12 +39,14 @@ public interface WagonManager
     Wagon getWagon( String protocol )
         throws UnsupportedProtocolException;
 
+    // TODO: don't throw exception
     void releaseWagon( Wagon wagon )
         throws Exception;
 
     void get( Artifact artifact, Set remoteRepositories, ArtifactRepository localRepository )
         throws TransferFailedException;
 
+    // TODO: don't throw exception
     void put( File source, Artifact artifact, ArtifactRepository deploymentRepository )
         throws Exception;
     

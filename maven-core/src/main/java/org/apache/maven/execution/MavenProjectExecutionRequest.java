@@ -18,12 +18,11 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.AbstractMavenExecutionRequest;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.ArrayList;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -52,7 +51,6 @@ extends AbstractMavenExecutionRequest
     }
 
     public List getProjectFiles()
-        throws Exception
     {
         List files = new ArrayList();
 

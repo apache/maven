@@ -79,7 +79,6 @@ public class DefaultMavenProjectBuilder
     private ModelInterpolator modelInterpolator;
 
     public void initialize()
-        throws Exception
     {
         modelReader = new MavenXpp3Reader();
     }
@@ -175,7 +174,7 @@ public class DefaultMavenProjectBuilder
 
     private MavenProject assembleLineage( File projectDescriptor, ArtifactRepository localRepository,
                                           LinkedList lineage, Set aggregatedRemoteWagonRepositories )
-        throws Exception
+        throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
 

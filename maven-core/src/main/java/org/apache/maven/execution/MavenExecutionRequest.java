@@ -18,8 +18,8 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.project.MavenProject;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -40,6 +40,5 @@ public interface MavenExecutionRequest
 
     MavenSession getSession();
 
-    List getProjectFiles()
-        throws Exception;
+    List getProjectFiles() throws IOException;
 }

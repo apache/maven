@@ -17,9 +17,9 @@ package org.apache.maven.lifecycle;
  * ====================================================================
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.goal.GoalExecutionException;
@@ -136,6 +136,7 @@ public class DefaultLifecycleExecutor
         return response;
     }
 
+    // TODO: don't throw Exception
     private void processPluginConfiguration( MavenProject project, MavenSession mavenSession )
         throws Exception
     {
@@ -152,6 +153,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
+    // TODO: don't throw Exception
     private void processPluginPhases( String pluginId, MavenSession mavenSession )
         throws Exception
     {
