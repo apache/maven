@@ -55,8 +55,12 @@ public abstract class AbstractPlugin
     /**
      * @deprecated
      */
-    public abstract void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception;
+    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
+        throws Exception
+    {
+        throw new UnsupportedOperationException(
+            "If you are using the old technioque, you must override execute(req,resp)" );
+    }
 
     public void setLog( Log log )
     {
@@ -80,7 +84,9 @@ public abstract class AbstractPlugin
         throws PluginExecutionException
     {
         if ( supportsNewMojoParadigm() )
+        {
             throw new PluginExecutionException( "You must override execute() if you implement the new paradigm" );
+        }
     }
 
     public boolean supportsNewMojoParadigm()

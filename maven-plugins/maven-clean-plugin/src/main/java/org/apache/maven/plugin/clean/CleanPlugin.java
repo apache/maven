@@ -17,26 +17,21 @@ package org.apache.maven.plugin.clean;
  */
 
 import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.PluginExecutionException;
 
 import java.io.File;
 
 /**
- * @goal clean
- *
- * @description Goal which cleans the build
- *
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.directory"
- *  description=""
- *
  * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
  * @version $Id$
+ * @goal clean
+ * @description Goal which cleans the build
+ * @parameter name="outputDirectory"
+ * type="String"
+ * required="true"
+ * validator=""
+ * expression="#project.build.directory"
+ * description=""
  */
 public class CleanPlugin
     extends AbstractPlugin
@@ -45,33 +40,32 @@ public class CleanPlugin
 
     private String outputDirectory;
 
-    private boolean failOnError;
-
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    // TODO: not in the descriptor previously
+//    private boolean failOnError;
+    public boolean supportsNewMojoParadigm()
     {
-        try
+        return true;
+    }
+
+    public void execute()
+        throws PluginExecutionException
+    {
+        if ( outputDirectory != null )
         {
-            outputDirectory = (String) request.getParameter( "outputDirectory" );
+            File dir = new File( outputDirectory );
 
-            failOnError = Boolean.valueOf( (String) request.getParameter( "failedOnError" ) ).booleanValue();
-            
-            if ( outputDirectory != null )
+            if ( dir.exists() && dir.isDirectory() )
             {
-                File dir = new File( outputDirectory );
-
-                if ( dir.exists() && dir.isDirectory() )
+                getLog().info( "Deleting directory " + dir.getAbsolutePath() );
+                try
                 {
-                    getLog().info( "Deleting directory " + dir.getAbsolutePath() );
                     removeDir( dir );
                 }
+                catch ( Exception e )
+                {
+                    throw new PluginExecutionException( "Unable to delete directory", e );
+                }
             }
-        }
-        finally
-        {
-            // clean up state.
-            failOnError = false;
-            outputDirectory = null;
         }
     }
 
@@ -106,7 +100,8 @@ public class CleanPlugin
      *
      * @param d the directory to delete
      */
-    protected void removeDir( File d ) throws Exception
+    protected void removeDir( File d )
+        throws Exception
     {
         String[] list = d.list();
         if ( list == null )
@@ -123,35 +118,34 @@ public class CleanPlugin
             }
             else
             {
-                //log("Deleting " + f.getAbsolutePath());
                 if ( !delete( f ) )
                 {
-                    String message = "Unable to delete file "
-                        + f.getAbsolutePath();
-                    if ( failOnError )
-                    {
-                        throw new Exception( message );
-                    }
-                    else
-                    {
+                    String message = "Unable to delete file " + f.getAbsolutePath();
+// TODO:...
+//                    if ( failOnError )
+//                    {
+//                        throw new Exception( message );
+//                    }
+//                    else
+//                    {
                         getLog().info( message );
-                    }
+//                    }
                 }
             }
         }
-        //log("Deleting directory " + d.getAbsolutePath());
+
         if ( !delete( d ) )
         {
-            String message = "Unable to delete directory "
-                + d.getAbsolutePath();
-            if ( failOnError )
-            {
-                throw new Exception( message );
-            }
-            else
-            {
+            String message = "Unable to delete directory " + d.getAbsolutePath();
+// TODO:...
+//            if ( failOnError )
+//            {
+//                throw new Exception( message );
+//            }
+//            else
+//            {
                 getLog().info( message );
-            }
+//            }
         }
     }
 

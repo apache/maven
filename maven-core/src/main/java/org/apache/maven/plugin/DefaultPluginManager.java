@@ -56,6 +56,7 @@ import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -382,7 +383,7 @@ public class DefaultPluginManager
 
             if ( plugin.supportsNewMojoParadigm() )
             {
-                // TODO: construct request
+                populateParameters( plugin, mojoDescriptor, session );
             }
             else
             {
@@ -467,6 +468,52 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
+
+    private void populateParameters( Plugin plugin, MojoDescriptor mojoDescriptor, MavenSession session )
+        throws PluginConfigurationException
+    {
+        // TODO: merge eventually, just to avoid reuse
+        // TODO: probably want to use the plexus component configurator... then do the additional processing in
+        //  createParameters afterwards. Not sure how we might find files that are nested in other objects... perhaps
+        //  we add a "needs translation" to the mojo so such types can be translated (implementing some interface) and
+        //  address their own file objects
+        Map values = createParameters( mojoDescriptor, session );
+
+        List parameters = mojoDescriptor.getParameters();
+
+        for ( Iterator i = parameters.iterator(); i.hasNext(); )
+        {
+            Parameter param = (Parameter) i.next();
+            String name = param.getName();
+            Object value = values.get( name );
+
+            Class clazz = plugin.getClass();
+            try
+            {
+                Field f = clazz.getDeclaredField( name );
+                boolean accessible = f.isAccessible();
+                if ( !accessible )
+                {
+                    f.setAccessible( true );
+                }
+
+                f.set( plugin, value );
+
+                if ( !accessible )
+                {
+                    f.setAccessible( false );
+                }
+            }
+            catch ( NoSuchFieldException e )
+            {
+                throw new PluginConfigurationException( "Unable to set field '" + name + "' on '" + clazz + "'" );
+            }
+            catch ( IllegalAccessException e )
+            {
+                throw new PluginConfigurationException( "Unable to set field '" + name + "' on '" + clazz + "'" );
+            }
+        }
+    }
 
     public Map createParameters( MojoDescriptor goal, MavenSession session )
         throws PluginConfigurationException
@@ -664,12 +711,12 @@ public class DefaultPluginManager
     private void downloadDependencies( MavenSession context, ArtifactResolver artifactResolver )
         throws ArtifactResolutionException
     {
-            for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
-            {
-                Artifact artifact = (Artifact) it.next();
+        for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
+        {
+            Artifact artifact = (Artifact) it.next();
 
-                artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
-            }
+            artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
+        }
     }
 
 }
