@@ -37,6 +37,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.settings.MavenSettingsBuilder;
+import org.apache.maven.util.Xpp3DomUtils;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -651,9 +652,8 @@ public class DefaultPluginManager
                             Goal goal = (Goal) j.next();
                             if ( goal.getId().equals( goalName ) )
                             {
-                                Xpp3Dom goalConfiguration = copyXpp3Dom( (Xpp3Dom) goal.getConfiguration() );
-                                mergeXpp3Dom( goalConfiguration, dom );
-                                dom = goalConfiguration;
+                                Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
+                                dom = Xpp3DomUtils.mergeXpp3Dom( Xpp3DomUtils.copyXpp3Dom( goalConfiguration ), dom );
                                 break;
                             }
                         }
@@ -675,54 +675,14 @@ public class DefaultPluginManager
         return configuration;
     }
 
-    private static void mergeXpp3Dom( Xpp3Dom dominant, Xpp3Dom recessive )
-    {
-        // TODO: how to merge lists rather than override?
-        // TODO: share this as some sort of assembler, implement a walk interface?
-        Xpp3Dom[] children = recessive.getChildren();
-        for ( int i = 0; i < children.length; i++ )
-        {
-            Xpp3Dom child = children[i];
-            Xpp3Dom childDom = dominant.getChild( child.getName() );
-            if ( childDom != null )
-            {
-                mergeXpp3Dom( childDom, child );
-            }
-            else
-            {
-                dominant.addChild( copyXpp3Dom( child ) );
-            }
-        }
-    }
-
-    private static Xpp3Dom copyXpp3Dom( Xpp3Dom src )
-    {
-        // TODO: into Xpp3Dom as a copy constructor
-        Xpp3Dom dom = new Xpp3Dom( src.getName() );
-        dom.setValue( src.getValue() );
-
-        String[] attributeNames = src.getAttributeNames();
-        for ( int i = 0; i < attributeNames.length; i++ )
-        {
-            String attributeName = attributeNames[i];
-            dom.setAttribute( attributeName, src.getAttribute( attributeName ) );
-        }
-
-        Xpp3Dom[] children = src.getChildren();
-        for ( int i = 0; i < children.length; i++ )
-        {
-            dom.addChild( copyXpp3Dom( children[i] ) );
-        }
-
-        return dom;
-    }
-
     public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter )
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " ).append(
-            mojo.getId() ).append( " mojo and cannot be null." );
+        message.append( "The '" + parameter.getName() );
+        message.append( "' parameter is required for the execution of the " );
+        message.append( mojo.getId() );
+        message.append( " mojo and cannot be null." );
 
         return message.toString();
     }

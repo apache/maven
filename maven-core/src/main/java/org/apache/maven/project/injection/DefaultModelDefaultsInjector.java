@@ -22,6 +22,8 @@ import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.util.Xpp3DomUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -118,22 +120,19 @@ public class DefaultModelDefaultsInjector
                 }
                 else
                 {
-                    // TODO: merge
-                    if ( localGoal.getConfiguration() == null )
-                    {
-                        localGoal.setConfiguration( defaultGoal.getConfiguration() );
-                    }
+                    Xpp3Dom goalConfiguration = (Xpp3Dom) localGoal.getConfiguration();
+                    Xpp3Dom defaultGoalConfiguration = (Xpp3Dom) defaultGoal.getConfiguration();
+                    localGoal.setConfiguration(
+                        Xpp3DomUtils.mergeXpp3Dom( goalConfiguration, defaultGoalConfiguration ) );
                 }
             }
         }
 
         plugin.setGoals( new ArrayList( goalMap.values() ) );
 
-        // TODO: merge
-        if ( plugin.getConfiguration() == null )
-        {
-            plugin.setConfiguration( def.getConfiguration() );
-        }
+        Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
+        Xpp3Dom defaultPluginConfiguration = (Xpp3Dom) def.getConfiguration();
+        plugin.setConfiguration( Xpp3DomUtils.mergeXpp3Dom( pluginConfiguration, defaultPluginConfiguration ) );
     }
 
     private void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )
