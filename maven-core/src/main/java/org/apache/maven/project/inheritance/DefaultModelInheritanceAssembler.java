@@ -18,6 +18,7 @@ package org.apache.maven.project.inheritance;
  */
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PostGoal;
@@ -26,8 +27,11 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -320,6 +324,39 @@ public class DefaultModelInheritanceAssembler
             if ( !childPlugins.contains( plugin ) )
             {
                 child.addPlugin( plugin );
+            }
+        }
+        
+        DependencyManagement parentDepMgmt = parent.getDependencyManagement();
+        DependencyManagement childDepMgmt = child.getDependencyManagement();
+        if(parentDepMgmt != null)
+        {
+            if(childDepMgmt == null)
+            {
+                child.setDependencyManagement(parentDepMgmt);
+            }
+            else
+            {
+                List parentDeps = parentDepMgmt.getDependencies();
+                
+                Map mappedParentDeps = new TreeMap();
+                for ( Iterator it = parentDeps.iterator(); it.hasNext(); )
+                {
+                    Dependency dep = (Dependency) it.next();
+                    mappedParentDeps.put(dep.getManagementKey(), dep);
+                }
+                
+                List deps = new ArrayList(parentDeps);
+                for ( Iterator it = childDepMgmt.getDependencies().iterator(); it.hasNext(); )
+                {
+                    Dependency dep = (Dependency) it.next();
+                    if(!mappedParentDeps.containsKey(dep.getManagementKey()))
+                    {
+                        deps.add(dep);
+                    }
+                }
+                
+                childDepMgmt.setDependencies(deps);
             }
         }
     }
