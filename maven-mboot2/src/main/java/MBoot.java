@@ -184,12 +184,10 @@ public class MBoot
 
         String mavenRepoLocal = System.getProperty( "maven.repo.local" );
 
-        SettingsReader userModelReader = null;
+        SettingsReader userModelReader = new SettingsReader();
 
         if ( mavenRepoLocal == null )
         {
-            userModelReader = new SettingsReader();
-
             try
             {
                 String userHome = System.getProperty( "user.home" );
