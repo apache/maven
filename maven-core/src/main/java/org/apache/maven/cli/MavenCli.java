@@ -29,8 +29,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.project.MavenProjectExecutionRequest;
-import org.apache.maven.execution.project.MavenProjectExecutionRequest;
-import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
 import org.apache.maven.execution.reactor.MavenReactorExecutionRequest;
 import org.apache.maven.repository.RepositoryUtils;
 import org.codehaus.classworlds.ClassWorld;
@@ -46,8 +44,6 @@ import java.util.Properties;
  */
 public class MavenCli
 {
-    public static final String POMv3 = "project.xml";
-
     public static final String POMv4 = "pom.xml";
 
     public static final String userHome = System.getProperty( "user.home" );
@@ -127,14 +123,9 @@ public class MavenCli
 
             if ( !projectFile.exists() )
             {
-                projectFile = new File( userDir, POMv3 );
-
-                if ( !projectFile.exists() )
-                {
-                    System.err.println( "Could not find either a " + POMv4 + " nor a " + POMv3 + " project descriptor." );
+                    System.err.println( "Could not find either a project descriptor." );
 
                     return 1;
-                }
             }
 
             request = new MavenProjectExecutionRequest( localRepository,
