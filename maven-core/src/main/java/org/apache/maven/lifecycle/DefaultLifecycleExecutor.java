@@ -133,10 +133,15 @@ public class DefaultLifecycleExecutor
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            throw new LifecycleExecutionException( "Problem getting plugin for " + id, e );
         }
 
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( id );
+        if ( mojoDescriptor == null )
+        {
+            // TODO: goal not found exception?
+            throw new LifecycleExecutionException( "Goal not found: " + id );
+        }
 
         if ( mojoDescriptor.requiresDependencyResolution() )
         {

@@ -25,15 +25,14 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
-import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -203,21 +202,6 @@ public class DefaultPluginManager
             Artifact pluginArtifact = new DefaultArtifact( "maven", artifactId, version, "plugin", "jar" );
 
             addPlugin( pluginArtifact, session );
-
-            // Now, we need to resolve the plugins for this goal's prereqs.
-            MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );
-
-            List prereqs = mojoDescriptor.getPrereqs();
-
-            if ( prereqs != null )
-            {
-                for ( Iterator it = prereqs.iterator(); it.hasNext(); )
-                {
-                    String prereq = (String) it.next();
-
-                    verifyPluginForGoal( prereq, session );
-                }
-            }
         }
     }
 
