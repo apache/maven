@@ -47,7 +47,7 @@ public class ArtifactInstallerTest
     public void testArtifactInstallation()
         throws Exception
     {
-        String artifactBasedir = new File( basedir, "src/test/resources/artifact-install" ).getAbsolutePath();
+        String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
 
         Artifact artifact = createArtifact( "artifact", "1.0" );
 

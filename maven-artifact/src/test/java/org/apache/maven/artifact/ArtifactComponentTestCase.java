@@ -54,10 +54,11 @@ public abstract class ArtifactComponentTestCase
 
         String path = "target/test-classes/repositories/" + component() + "/bad-local-repository";
 
-        File f = new File( path );
+        File f = new File( getBasedir(), path );
+
         f.createNewFile();
 
-        localRepository.setUrl( "file://" + path );
+        localRepository.setUrl( "file://" + f.getPath() );
 
         return localRepository;
     }
@@ -66,7 +67,11 @@ public abstract class ArtifactComponentTestCase
     {
         ArtifactRepository localRepository = new ArtifactRepository();
 
-        localRepository.setUrl( "file://" + "target/test-classes/repositories/" + component() + "/local-repository" );
+        String path = "target/test-classes/repositories/" + component() + "/local-repository";
+
+        File f = new File( getBasedir(), path );
+
+        localRepository.setUrl( "file://" + f.getPath() );
 
         return localRepository;
     }
@@ -75,7 +80,11 @@ public abstract class ArtifactComponentTestCase
     {
         ArtifactRepository repository = new ArtifactRepository();
 
-        repository.setUrl( "file://" + "target/test-classes/repositories/" + component() + "/remote-repository" );
+        String path = "target/test-classes/repositories/" + component() + "/remote-repository";
+
+        File f = new File( getBasedir(), path );
+
+        repository.setUrl( "file://" + f.getPath() );
 
         return repository;
     }
