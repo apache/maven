@@ -377,8 +377,6 @@ public class DefaultPluginManager
         try
         {
             request = new PluginExecutionRequest( createParameters( mojoDescriptor, session ) );
-
-            request.setLog( session.getLog() );
         }
         catch ( PluginConfigurationException e )
         {
@@ -390,6 +388,8 @@ public class DefaultPluginManager
         try
         {
             plugin = (Plugin) container.lookup( Plugin.ROLE, goalName );
+
+            plugin.setLog( session.getLog() );
 
             // !! This is ripe for refactoring to an aspect.
             // Event monitoring.

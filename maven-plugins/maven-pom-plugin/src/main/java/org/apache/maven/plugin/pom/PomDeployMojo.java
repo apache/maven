@@ -92,7 +92,7 @@ public class PomDeployMojo
 
         if ( deploymentRepository.getAuthenticationInfo() == null )
         {
-            request.getLog().warn(
+            getLog().warn(
                 "Deployment repository {id: \'" + repository.getId() + "\'} has no associated authentication info!" );
         }
 

@@ -16,6 +16,8 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.monitor.logging.Log;
+
 /**
  *
  * 
@@ -27,6 +29,8 @@ public class IntegratedPlugin
     extends AbstractTestPlugin
     implements Plugin
 {
+    private Log log;
+
     public void execute( PluginExecutionRequest request )
         throws PluginExecutionException
     {
@@ -37,5 +41,10 @@ public class IntegratedPlugin
         foo = (String) request.getParameter( "foo" );
 
         executed = true;
+    }
+
+    public void setLog( Log log )
+    {
+        this.log = log;
     }
 }

@@ -132,7 +132,7 @@ public class EjbMojo
         //
         // ----------------------------------------------------------------------
 
-        request.getLog().info( "Building ejb " + jarName );
+        getLog().info( "Building ejb " + jarName );
 
         File jarFile = new File( basedir, jarName + ".jar" );
 
@@ -152,7 +152,7 @@ public class EjbMojo
 
         if ( generateClient )
         {
-            request.getLog().info( "Building ejb client " + jarName + "-client" );
+            getLog().info( "Building ejb client " + jarName + "-client" );
 
             File clientJarFile = new File( basedir, jarName + "-client.jar" );
 

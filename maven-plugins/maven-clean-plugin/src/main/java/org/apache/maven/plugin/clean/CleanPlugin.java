@@ -16,7 +16,6 @@ package org.apache.maven.plugin.clean;
  * limitations under the License.
  */
 
-import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
@@ -48,8 +47,6 @@ public class CleanPlugin
 
     private boolean failOnError;
 
-    private Log log;
-
     public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception
     {
@@ -59,15 +56,13 @@ public class CleanPlugin
 
             failOnError = Boolean.valueOf( (String) request.getParameter( "failedOnError" ) ).booleanValue();
             
-            log = request.getLog();
-
             if ( outputDirectory != null )
             {
                 File dir = new File( outputDirectory );
 
                 if ( dir.exists() && dir.isDirectory() )
                 {
-                    log( "Deleting directory " + dir.getAbsolutePath() );
+                    getLog().info( "Deleting directory " + dir.getAbsolutePath() );
                     removeDir( dir );
                 }
             }
@@ -77,7 +72,6 @@ public class CleanPlugin
             // clean up state.
             failOnError = false;
             outputDirectory = null;
-            log = null;
         }
     }
 
@@ -140,7 +134,7 @@ public class CleanPlugin
                     }
                     else
                     {
-                        log( message );
+                        getLog().info( message );
                     }
                 }
             }
@@ -156,13 +150,9 @@ public class CleanPlugin
             }
             else
             {
-                log( message );
+                getLog().info( message );
             }
         }
     }
 
-    private void log( String message )
-    {
-        log.info( message );
-    }
 }

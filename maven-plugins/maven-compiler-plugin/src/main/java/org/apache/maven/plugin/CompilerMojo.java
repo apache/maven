@@ -88,7 +88,7 @@ public class CompilerMojo
         compileSourceRoots = removeEmptyCompileSourceRoots( compileSourceRoots );
         if ( compileSourceRoots.isEmpty() )
         {
-            request.getLog().info( "No sources to compile" );
+            getLog().info( "No sources to compile" );
             return;
         }
 
@@ -140,7 +140,7 @@ public class CompilerMojo
                     message = "Warning! not present in repository!";
                 }
 
-                request.getLog().debug( "classpathElements[ " + i + " ] = " + classpathElement + ": " + message );
+                getLog().debug( "classpathElements[ " + i + " ] = " + classpathElement + ": " + message );
             }
         }
 

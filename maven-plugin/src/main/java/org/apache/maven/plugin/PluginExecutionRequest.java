@@ -16,13 +16,11 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.monitor.logging.Log;
-import org.apache.maven.monitor.logging.SystemStreamLog;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * @deprecated
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
@@ -31,8 +29,6 @@ public class PluginExecutionRequest
     private Map parameters;
 
     private Map context;
-
-    private Log log;
 
     public PluginExecutionRequest( Map parameters )
     {
@@ -64,23 +60,5 @@ public class PluginExecutionRequest
     public Object getContextValue( String key )
     {
         return context.get( key );
-    }
-
-    public void setLog( Log log )
-    {
-        this.log = log;
-    }
-    
-    public Log getLog()
-    {
-        synchronized(this)
-        {
-            if(log == null)
-            {
-                log = new SystemStreamLog();
-            }
-        }
-        
-        return log;
     }
 }

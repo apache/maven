@@ -16,6 +16,8 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.monitor.logging.Log;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -24,7 +26,9 @@ public interface Plugin
 {
     String ROLE = Plugin.class.getName();
 
-    // TODO: make this throw PluginExecutionException instead of generic exception
     void execute( PluginExecutionRequest request )
         throws PluginExecutionException;
+
+    // TODO: not sure about this here, and may want a getLog on here as well/instead
+    void setLog( Log log );
 }

@@ -16,6 +16,8 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.monitor.logging.Log;
+
 /**
  *
  * 
@@ -33,6 +35,8 @@ public class TestPlugin
     protected String artifactId;
 
     protected String foo;
+
+    private Log log;
 
     public boolean hasExecuted()
     {
@@ -64,5 +68,10 @@ public class TestPlugin
         foo = (String) request.getParameter( "foo" );
 
         executed = true;
+    }
+
+    public void setLog( Log log )
+    {
+        this.log = log;
     }
 }

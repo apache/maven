@@ -105,7 +105,7 @@ public abstract class AbstractDeployMojo
         
         if(deploymentRepository.getAuthenticationInfo() == null)
         {
-            request.getLog().warn("Deployment repository {id: \'" + repository.getId() + "\'} has no associated authentication info!");
+            getLog().warn("Deployment repository {id: \'" + repository.getId() + "\'} has no associated authentication info!");
         }
 
         // Deploy the POM

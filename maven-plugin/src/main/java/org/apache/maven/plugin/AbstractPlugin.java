@@ -16,11 +16,20 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.monitor.logging.Log;
+import org.apache.maven.monitor.logging.SystemStreamLog;
+
+/**
+ * @version $Id$
+ */
 public abstract class AbstractPlugin
     implements Plugin
 {
+    private Log log;
+
     /**
      * Default behaviour to mimic old behaviour.
+     * @deprecated
      */
     public void execute( PluginExecutionRequest request )
         throws PluginExecutionException
@@ -48,4 +57,21 @@ public abstract class AbstractPlugin
     public abstract void execute( PluginExecutionRequest request, PluginExecutionResponse response )
         throws Exception;
 
+    public void setLog( Log log )
+    {
+        this.log = log;
+    }
+
+    public Log getLog()
+    {
+        synchronized(this)
+        {
+            if(log == null)
+            {
+                log = new SystemStreamLog();
+            }
+        }
+
+        return log;
+    }
 }

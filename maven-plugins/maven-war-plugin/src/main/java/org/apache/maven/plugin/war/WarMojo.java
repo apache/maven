@@ -174,7 +174,7 @@ public class WarMojo
     {
         if ( sourceDirectory != webappDirectory )
         {
-            request.getLog().info( "Copy webapp resources to " + webappDirectory.getAbsolutePath() );
+            getLog().info( "Copy webapp resources to " + webappDirectory.getAbsolutePath() );
 
             if ( warSourceDirectory.exists() )
             {
@@ -195,8 +195,7 @@ public class WarMojo
     public void buildWebapp( MavenProject project )
         throws IOException
     {
-        request.getLog().info(
-            "Assembling webapp " + project.getArtifactId() + " in " + webappDirectory.getAbsolutePath() );
+        getLog().info( "Assembling webapp " + project.getArtifactId() + " in " + webappDirectory.getAbsolutePath() );
 
         File libDirectory = new File( webappDirectory, WEB_INF + "/lib" );
 
@@ -272,7 +271,7 @@ public class WarMojo
             if ( !"exploded".equals( mode ) )
             {
                 //generate war file
-                request.getLog().info( "Generating war " + warFile.getAbsolutePath() );
+                getLog().info( "Generating war " + warFile.getAbsolutePath() );
 
                 MavenArchiver archiver = new MavenArchiver();
 
