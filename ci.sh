@@ -116,6 +116,16 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
   
       ./bootstrap-all.sh
     )    
+    
+    echo "Creating m2 distribution for public consumption ... "
+    
+    (
+      cd $DIR/maven-components/maven-core/dist
+      
+      tar czf m2-${TIMESTAMP}.tar.gz m2
+      
+      cp m2-${TIMESTAMP}.tar.gz $HOME_DIR
+    )
 
   else
   
