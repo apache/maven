@@ -1,0 +1,13 @@
+#!/bin/sh
+
+buildDir=target
+
+rm -rf ${buildDir} > /dev/null 2>&1
+
+mkdir ${buildDir}
+
+javac -d ${buildDir} @sources.txt
+
+cp src/main/resources/mboot.deps ${buildDir}/mboot.deps
+
+( cd ${buildDir} ; jar -cf ../mboot.jar -m ../manifest.txt * )
