@@ -5,6 +5,50 @@
 # @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
 # -----------------------------------------------------------------------------
 
+downloadMBootDependencies()
+{
+  findAndSetMavenRepoLocal()
+  
+  for i in `cat ${MBOOT_HOME}/bash/deps`
+  do
+    if [ ! -f $repoLocal/$i ]
+    then
+      mkdir -p $repoLocal/$i > /dev/null 2>&1
+      wget http://www.ibiblio.org/maven/$i $repoLocal/$i
+    fi
+  done
+}
+
+createMBootClasspath()
+{
+  findAndSetMavenRepoLocal()
+  
+  for i in `cat ${MBOOT_HOME}/bash/deps`
+  do
+    MBOOT_CP=${MBOOT_CP}:$i
+  done
+
+  if [ "$cygwin" = "true" ]
+  then
+    MBOOT_CP=cygpath -pu "$MBOOT_CP"
+  fi
+}
+
+findAndSetMavenRepoLocal()
+{
+  if [ -f $HOME/build.properties ]
+  then
+    repoLocal=`cat $HOME/build.properties | grep "maven.repo.local" | sed 's/^.*= *//'`
+  else
+    repoLocal=$HOME/.maven/repository
+  fi
+
+  if [ "$cygwin" = "true" ]
+  then
+    repoLocal=cygpath -pu "$repoLocal"
+  fi
+}
+
 isCommandSuccessful()
 {
   # $1 == $?
@@ -49,7 +93,7 @@ runTests()
   
   if [ -f $5 ]
   then
-    "${JAVACMD}" -classpath "$CP" org.codehaus.surefire.SureFire "$2" "$3" $4 $5 $6
+    "${JAVACMD}" -classpath "$CP" org.codehaus.surefire.SurefireBooter "$2" "$3" $4 $5 $6
   fi
 }
 
@@ -106,10 +150,6 @@ buildMavenProject()
     # 4. Move required resources into location
     # 5. Create JAR.
     
-    # I can use maven-model and I can detach maven-model-tools from
-    # Plexus so that I can use it for this tool. I can just use the 
-    # command line compiler for now.
-
     # $1 == directory where project lives
     # $4 == jar name
     # $5 == flag to leave mboot files
@@ -165,10 +205,13 @@ buildMavenProject()
         repoLocal=`cygpath -pu "$repoLocal"`
       fi
 
+      createMBootClasspath
+      
       if [ ! -z $unitTestSourceDirectory ] && [ -d $unitTestSourceDirectory ]
       then
         
-        compile "$buildDest:$projectDependencyClassPath:$repoLocal/junit/jars/junit-3.8.1.jar" $buildTestDest $unitTestSourceDirectory      
+        compile "$buildDest:$projectDependencyClassPath:${MBOOT_CP}" $buildTestDest $unitTestSourceDirectory
+        
         isCommandSuccessful $? "Failed compiling test classes!"
       
       fi
@@ -178,7 +221,9 @@ buildMavenProject()
       copyResources bootstrap.tests.resources target/test-classes
       
       echo "Running tests in `pwd`"
-        
+      
+      # We only need the booter jar in the classpath, it will load everything else.
+      
       runTests ".:${MBOOT_HOME}/classes:$repoLocal/surefire/jars/surefire-booter-1.0.jar" "$home" "$repoLocal" bootstrap.libs bootstrap.tests.includes bootstrap.tests.excludes
       
       if [ "$2" = "default" ]
