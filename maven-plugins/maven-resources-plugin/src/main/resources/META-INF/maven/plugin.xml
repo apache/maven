@@ -1,6 +1,7 @@
 <plugin>
   <id>resource-copier</id>
   <implementation>org.apache.maven.plugin.ResourcesPlugin</implementation>
+  <instantiation-strategy>per-lookup</instantiation-strategy>
   <mode>field</mode>
   <goals>
     <goal>

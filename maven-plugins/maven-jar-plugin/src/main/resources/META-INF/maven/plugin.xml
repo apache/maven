@@ -1,6 +1,7 @@
 <plugin>
   <id>jar</id>
   <implementation>org.apache.maven.plugin.JarPlugin</implementation>
+  <instantiation-strategy>singleton</instantiation-strategy>
   <mode>field</mode>
   <goals>
     <goal>

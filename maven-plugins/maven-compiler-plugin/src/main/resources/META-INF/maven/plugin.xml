@@ -1,6 +1,7 @@
 <plugin>
   <id>compiler</id>
   <implementation>org.apache.maven.plugin.CompilerPlugin</implementation>
+  <instantiation-strategy>singleton</instantiation-strategy>
   <mode>integrated</mode>
   <requirements>
     <requirement>
