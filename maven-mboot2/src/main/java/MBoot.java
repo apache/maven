@@ -11,6 +11,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import test.SurefirePlugin;
 import util.Commandline;
 import util.FileUtils;
+import util.IOUtil;
 import util.IsolatedClassLoader;
 import util.Os;
 
@@ -19,7 +20,9 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -81,10 +84,10 @@ public class MBoot
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-assemble-plugin", "maven-plugins/maven-clean-plugin",
                                          "maven-plugins/maven-compiler-plugin", "maven-plugins/maven-deploy-plugin",
-                                         "maven-plugins/maven-ejb-plugin", "maven-plugins/maven-install-plugin",
-                                         "maven-plugins/maven-jar-plugin", "maven-plugins/maven-plugin-plugin",
-                                         "maven-plugins/maven-resources-plugin", "maven-plugins/maven-surefire-plugin",
-                                         "maven-plugins/maven-war-plugin"};
+                                         "maven-plugins/maven-ejb-plugin", /*"maven-plugins/maven-idea-plugin",*/
+                                         "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin",
+                                         "maven-plugins/maven-plugin-plugin", "maven-plugins/maven-resources-plugin",
+                                         "maven-plugins/maven-surefire-plugin", "maven-plugins/maven-war-plugin"};
 
     private static final Map MODELLO_TARGET_VERSIONS;
 
@@ -659,11 +662,11 @@ public class MBoot
 
         if ( !reader.artifactId.equals( "maven-plugin" ) && reader.artifactId.endsWith( "plugin" ) )
         {
-            installPlugin( basedir, repoLocal, reader );
+            install( basedir, repoLocal, reader, "maven-plugin" );
         }
         else
         {
-            installJar( basedir, repoLocal, reader );
+            install( basedir, repoLocal, reader, "jar" );
         }
 
         return reader;
@@ -850,7 +853,7 @@ public class MBoot
         FileUtils.copyFile( new File( basedir, "pom.xml" ), pom );
     }
 
-    private void installJar( String basedir, String repoLocal, ModelReader reader )
+    private void install( String basedir, String repoLocal, ModelReader reader, String type )
         throws Exception
     {
         String artifactId = reader.artifactId;
@@ -869,37 +872,20 @@ public class MBoot
             version = reader.parentVersion;
         }
 
-        File jar = new File( repoLocal, "/" + groupId + "/jars/" + artifactId + "-" + version + ".jar" );
+        String finalName = artifactId + "-" + version;
 
-        System.out.println( "Installing JAR: " + jar );
+        File file = new File( repoLocal, "/" + groupId + "/" + type + "s/" + finalName + ".jar" );
 
-        FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + artifactId + "-" + version + ".jar" ), jar );
-    }
+        System.out.println( "Installing: " + file );
 
-    private void installPlugin( String basedir, String repoLocal, ModelReader reader )
-        throws Exception
-    {
-        String artifactId = reader.artifactId;
+        FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + finalName + ".jar" ), file );
 
-        String version = reader.version;
-
-        String groupId = reader.groupId;
-
-        if ( groupId == null )
+        if ( version.indexOf( "SNAPSHOT" ) >= 0 )
         {
-            groupId = reader.parentGroupId;
+            File metadata = new File( repoLocal, "/" + groupId + "/poms/" + finalName + ".version.txt" );
+
+            IOUtil.copy( new StringReader( version ), new FileWriter( metadata ) );
         }
-
-        if ( version == null )
-        {
-            version = reader.parentVersion;
-        }
-
-        File jar = new File( repoLocal, "/" + groupId + "/maven-plugins/" + artifactId + "-" + version + ".jar" );
-
-        System.out.println( "Installing Plugin: " + jar );
-
-        FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + artifactId + "-" + version + ".jar" ), jar );
     }
 
     private void runTests( String basedir, String classes, String testClasses, ModelReader reader )
