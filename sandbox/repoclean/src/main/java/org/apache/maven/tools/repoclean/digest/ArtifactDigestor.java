@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * @author jdcasey
@@ -27,10 +28,49 @@ public class ArtifactDigestor
     public void createArtifactDigest( File artifactFile, File digestFile, String algorithm )
         throws ArtifactDigestException
     {
+        byte[] digestData = generateArtifactDigest( artifactFile, algorithm );
+
+        try
+        {
+            writeDigestFile( digestFile, digestData );
+        }
+        catch ( IOException e )
+        {
+            throw new ArtifactDigestException( "Cannot write digest to file: \'" + digestFile + "\'", e );
+        }
+    }
+
+    public boolean verifyArtifactDigest( File artifactFile, File digestFile, String algorithm )
+        throws ArtifactDigestException
+    {
+        boolean result = false;
+        
+        if(artifactFile.exists() && digestFile.exists())
+        {
+            byte[] generatedDigest = generateArtifactDigest( artifactFile, algorithm );
+            byte[] digestFromFile = null;
+    
+            try
+            {
+                digestFromFile = readFile( digestFile );
+            }
+            catch ( Exception e )
+            {
+                throw new ArtifactDigestException( "Cannot read digest from file: \'" + digestFile + "\'", e );
+            }
+    
+            result = Arrays.equals( generatedDigest, digestFromFile );
+        }
+        
+        return result;
+    }
+    
+    private byte[] generateArtifactDigest( File artifactFile, String algorithm ) throws ArtifactDigestException
+    {
         byte[] data = null;
         try
         {
-            data = readArtifactFile( artifactFile );
+            data = readFile( artifactFile );
         }
         catch ( IOException e )
         {
@@ -48,16 +88,8 @@ public class ArtifactDigestor
         }
 
         digest.update( data );
-        byte[] digestData = digest.digest();
-
-        try
-        {
-            writeDigestFile( digestFile, digestData );
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactDigestException( "Cannot write digest to file: \'" + digestFile + "\'", e );
-        }
+        
+        return digest.digest();
     }
 
     private void writeDigestFile( File digestFile, byte[] digestData ) throws IOException
@@ -75,7 +107,7 @@ public class ArtifactDigestor
         }
     }
 
-    private byte[] readArtifactFile( File artifactFile ) throws IOException
+    private byte[] readFile( File artifactFile ) throws IOException
     {
         BufferedInputStream in = null;
         try
@@ -97,4 +129,5 @@ public class ArtifactDigestor
             IOUtil.close( in );
         }
     }
+
 }

@@ -25,7 +25,7 @@ public class DefaultRepositoryLayout
 
     protected String layoutPattern()
     {
-        return "${groupId}/${artifactId}/${version}/${artifactId}-${version}-${classifier}.${extension}";
+        return "${groupPath}/${artifactId}/${version}/${artifactId}-${version}-${classifier}.${extension}";
     }
 
     protected String groupIdAsPath( String groupId )

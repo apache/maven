@@ -6,23 +6,21 @@
      |
      -->
     <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>plugin</role-hint>
+      <implementation>org.apache.maven.tools.repoclean.artifact.LegacyPluginHandler</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
       <role>org.apache.maven.tools.repoclean.RepositoryCleaner</role>
       <implementation>org.apache.maven.tools.repoclean.RepositoryCleaner</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.tools.repoclean.correlate.ArtifactPomCorrelator</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.tools.repoclean.correlate.ArtifactMd5Correlator</role>
-        </requirement>
-        <requirement>
-		      <role>org.apache.maven.tools.repoclean.validate.V4ModelIndependenceValidator</role>
-        </requirement>
-        <requirement>
-		      <role>org.apache.maven.tools.repoclean.patch.V4ModelPatcher</role>
+          <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</role>
         </requirement>
       </requirements>
     </component>
@@ -32,8 +30,9 @@
      |
      -->
     <component>
-      <role>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</role>
-      <implementation>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</implementation>
+      <role>org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer</role>
+      <role-hint>legacy</role-hint>
+      <implementation>org.apache.maven.tools.repoclean.discover.LegacyArtifactDiscoverer</implementation>
     </component>
     <!--
      |
@@ -41,8 +40,18 @@
      |
      -->
     <component>
-      <role>org.apache.maven.tools.repoclean.correlate.ArtifactMd5Correlator</role>
-      <implementation>org.apache.maven.tools.repoclean.correlate.ArtifactMd5Correlator</implementation>
+      <role>org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.tools.repoclean.discover.DefaultArtifactDiscoverer</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</role>
+      <implementation>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</implementation>
       <requirements>
         <requirement>
           <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestor</role>
@@ -55,35 +64,42 @@
      |
      -->
     <component>
-      <role>org.apache.maven.tools.repoclean.correlate.ArtifactPomCorrelator</role>
-      <implementation>org.apache.maven.tools.repoclean.correlate.ArtifactPomCorrelator</implementation>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.tools.repoclean.validate.V4ModelIndependenceValidator</role>
-      <implementation>org.apache.maven.tools.repoclean.validate.V4ModelIndependenceValidator</implementation>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.tools.repoclean.patch.V4ModelPatcher</role>
-      <implementation>org.apache.maven.tools.repoclean.patch.V4ModelPatcher</implementation>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
       <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestor</role>
       <implementation>org.apache.maven.tools.repoclean.digest.ArtifactDigestor</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter</role>
+      <role-hint>v3</role-hint>
+      <implementation>org.apache.maven.tools.repoclean.rewrite.V3PomRewriter</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter</role>
+      <role-hint>v4</role-hint>
+      <implementation>org.apache.maven.tools.repoclean.rewrite.V4PomRewriter</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</role>
+      <implementation>org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator</implementation>
     </component>
   </components>
 </component-set>

@@ -20,12 +20,14 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author jdcasey
  */
 public abstract class AbstractArtifactRepositoryLayout
+    extends AbstractLogEnabled
     implements ArtifactRepositoryLayout
 {
 

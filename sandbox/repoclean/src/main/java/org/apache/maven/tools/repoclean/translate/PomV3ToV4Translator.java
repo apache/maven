@@ -1,27 +1,28 @@
 package org.apache.maven.tools.repoclean.translate;
 
-import org.apache.maven.model.v4_0_0.Build;
-import org.apache.maven.model.v4_0_0.CiManagement;
-import org.apache.maven.model.v4_0_0.Contributor;
-import org.apache.maven.model.v4_0_0.Dependency;
-import org.apache.maven.model.v4_0_0.Developer;
-import org.apache.maven.model.v4_0_0.DistributionManagement;
-import org.apache.maven.model.v4_0_0.Goal;
-import org.apache.maven.model.v4_0_0.IssueManagement;
-import org.apache.maven.model.v4_0_0.License;
-import org.apache.maven.model.v4_0_0.MailingList;
-import org.apache.maven.model.v4_0_0.Model;
-import org.apache.maven.model.v4_0_0.Notifier;
-import org.apache.maven.model.v4_0_0.Organization;
-import org.apache.maven.model.v4_0_0.Plugin;
-import org.apache.maven.model.v4_0_0.Reports;
-import org.apache.maven.model.v4_0_0.Repository;
-import org.apache.maven.model.v4_0_0.Resource;
-import org.apache.maven.model.v4_0_0.Scm;
-import org.apache.maven.model.v4_0_0.Site;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.CiManagement;
+import org.apache.maven.model.Contributor;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Goal;
+import org.apache.maven.model.IssueManagement;
+import org.apache.maven.model.License;
+import org.apache.maven.model.MailingList;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Notifier;
+import org.apache.maven.model.Organization;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Reports;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.Resource;
+import org.apache.maven.model.Scm;
+import org.apache.maven.model.Site;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,21 +31,19 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+/*
+ * ==================================================================== Copyright 2001-2004 The
+ * Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License. ====================================================================
  */
 
 /**
@@ -84,8 +83,11 @@ public class PomV3ToV4Translator
         PomKey pomKey = new PomKey( groupId, artifactId, version );
 
         StringBuffer logHeader = new StringBuffer();
-        logHeader.append( "Translation of POM {" ).append( v3Model.getGroupId() ).append( ":" )
-                 .append( v3Model.getArtifactId() ).append( ":" ).append( version ).append( "}\n" );
+        logHeader.append( "Translation of POM {" ).append( v3Model.getGroupId() ).append( ":" ).append(
+                                                                                                        v3Model.getArtifactId() ).append(
+                                                                                                                                          ":" ).append(
+                                                                                                                                                        version ).append(
+                                                                                                                                                                          "}" );
 
         reporter.info( "[START] " + logHeader.toString() );
 
@@ -258,11 +260,15 @@ public class PomV3ToV4Translator
 
                 StringBuffer info = new StringBuffer();
 
-                info.append( "Using some contrived information for report: \'" ).append( reportName ).append( "\'.\n" )
-                    .append( "\to groupId: \'maven\'\n" ).append( "\to artifactId: \'" ).append( reportPluginName )
-                    .append( "\'\n" ).append( "\to version: \'1.0-SNAPSHOT\'\n" ).append( "\to goal: \'report\'\n" )
-                    .append( "\n" )
-                    .append( "These values were extracted using the v3 report naming convention, but may be wrong." );
+                info.append( "Using some contrived information for report: \'" ).append( reportName ).append( "\'.\n" ).append(
+                                                                                                                                "\to groupId: \'maven\'\n" ).append(
+                                                                                                                                                                     "\to artifactId: \'" ).append(
+                                                                                                                                                                                                    reportPluginName ).append(
+                                                                                                                                                                                                                               "\'\n" ).append(
+                                                                                                                                                                                                                                                "\to version: \'1.0-SNAPSHOT\'\n" ).append(
+                                                                                                                                                                                                                                                                                            "\to goal: \'report\'\n" ).append(
+                                                                                                                                                                                                                                                                                                                               "\n" ).append(
+                                                                                                                                                                                                                                                                                                                                              "These values were extracted using the v3 report naming convention, but may be wrong." );
 
                 reporter.info( info.toString() );
 
@@ -279,9 +285,9 @@ public class PomV3ToV4Translator
         return reports;
     }
 
-    private org.apache.maven.model.v4_0_0.Organization translateOrganization(
-                                                                             org.apache.maven.model.v3_0_0.Organization v3Organization,
-                                                                             Reporter reporter )
+    private org.apache.maven.model.Organization translateOrganization(
+                                                                      org.apache.maven.model.v3_0_0.Organization v3Organization,
+                                                                      Reporter reporter )
     {
         Organization organization = null;
 
@@ -309,8 +315,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3MailingLists.iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.v3_0_0.MailingList v3List = (org.apache.maven.model.v3_0_0.MailingList) it
-                                                                                                                 .next();
+                org.apache.maven.model.v3_0_0.MailingList v3List = (org.apache.maven.model.v3_0_0.MailingList) it.next();
                 MailingList list = new MailingList();
                 list.setArchive( v3List.getArchive() );
                 list.setName( v3List.getName() );
@@ -420,7 +425,8 @@ public class PomV3ToV4Translator
                 repository.setName( "Default Repository" );
 
                 repository.setUrl( "file://" + distributionDirectory );
-                //                throw new Exception( "Missing 'distributionSite': Both distributionSite and distributionDirectory must be set." );
+                //                throw new Exception( "Missing 'distributionSite': Both distributionSite and
+                // distributionDirectory must be set." );
             }
         }
         else
@@ -458,8 +464,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3Developers.iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.v3_0_0.Developer v3Developer = (org.apache.maven.model.v3_0_0.Developer) it
-                                                                                                                  .next();
+                org.apache.maven.model.v3_0_0.Developer v3Developer = (org.apache.maven.model.v3_0_0.Developer) it.next();
 
                 Developer developer = new Developer();
 
@@ -510,8 +515,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3Contributors.iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.v3_0_0.Contributor v3Contributor = (org.apache.maven.model.v3_0_0.Contributor) it
-                                                                                                                        .next();
+                org.apache.maven.model.v3_0_0.Contributor v3Contributor = (org.apache.maven.model.v3_0_0.Contributor) it.next();
 
                 Contributor contributor = new Contributor();
 
@@ -560,23 +564,39 @@ public class PomV3ToV4Translator
                     plugin.setArtifactId( "surefire" );
                     plugin.setVersion( "1.0-SNAPSHOT" );
 
-                    Properties config = new Properties();
+                    Xpp3Dom config = new Xpp3Dom( "configuration" );
 
-                    String includes = pathPatternsToString( testIncludes );
-
-                    if ( StringUtils.isNotEmpty( includes ) )
+                    if ( notEmpty( testIncludes ) )
                     {
-                        config.setProperty( "includes", includes );
+                        Xpp3Dom includes = new Xpp3Dom( "includes" );
+                        for ( Iterator it = testIncludes.iterator(); it.hasNext(); )
+                        {
+                            String includePattern = (String) it.next();
+                            Xpp3Dom include = new Xpp3Dom( "include" );
+                            include.setValue( includePattern );
+
+                            includes.addChild( include );
+                        }
+
+                        config.addChild( includes );
                     }
 
-                    String excludes = pathPatternsToString( testExcludes );
-
-                    if ( StringUtils.isNotEmpty( excludes ) )
+                    if ( notEmpty( testExcludes ) )
                     {
-                        config.setProperty( "excludes", excludes );
+                        Xpp3Dom excludes = new Xpp3Dom( "excludes" );
+                        for ( Iterator it = testExcludes.iterator(); it.hasNext(); )
+                        {
+                            String excludePattern = (String) it.next();
+                            Xpp3Dom exclude = new Xpp3Dom( "exclude" );
+                            exclude.setValue( excludePattern );
+
+                            excludes.addChild( exclude );
+                        }
+
+                        config.addChild( excludes );
                     }
 
-                    if ( !config.isEmpty() )
+                    if ( config.getChildCount() > 0 )
                     {
                         plugin.setConfiguration( config );
                     }
@@ -619,8 +639,8 @@ public class PomV3ToV4Translator
                 Resource resource = new Resource();
 
                 resource.setDirectory( v3Resource.getDirectory() );
-                resource.setExcludes( pathPatternsToString( v3Resource.getExcludes() ) );
-                resource.setIncludes( pathPatternsToString( v3Resource.getIncludes() ) );
+                resource.setExcludes( v3Resource.getExcludes() );
+                resource.setIncludes( v3Resource.getIncludes() );
                 resource.setTargetPath( v3Resource.getTargetPath() );
 
                 resources.add( resource );
@@ -630,24 +650,24 @@ public class PomV3ToV4Translator
         return resources;
     }
 
-    private String pathPatternsToString( List patterns )
-    {
-        StringBuffer result = new StringBuffer();
-
-        if ( notEmpty( patterns ) )
-        {
-            for ( Iterator it = patterns.iterator(); it.hasNext(); )
-            {
-                String pattern = (String) it.next();
-
-                result.append( "," ).append( pattern );
-            }
-
-            result.setLength( result.length() - 1 );
-        }
-
-        return result.toString();
-    }
+//    private String pathPatternsToString( List patterns )
+//    {
+//        StringBuffer result = new StringBuffer();
+//
+//        if ( notEmpty( patterns ) )
+//        {
+//            for ( Iterator it = patterns.iterator(); it.hasNext(); )
+//            {
+//                String pattern = (String) it.next();
+//
+//                result.append( "," ).append( pattern );
+//            }
+//
+//            result.setLength( result.length() - 1 );
+//        }
+//
+//        return result.toString();
+//    }
 
     private boolean notEmpty( List test )
     {
