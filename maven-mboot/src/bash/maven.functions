@@ -23,12 +23,17 @@ runJava()
   # $3 == Mail args
 
   if $cygwin; then
-    CP=`cygpath -pw $1`
+    CP=`cygpath -pw "$1"`
   else
     CP=$1
   fi
   
-  "${JAVACMD}" -classpath $CP $2 "$3"
+  "${JAVACMD}" -classpath "$CP" $2 "$3"
+}
+
+runTests()
+{
+#  TO DO 
 }
 
 compile()
@@ -37,7 +42,7 @@ compile()
   # $2 == destination for compiled classes
   # $3 == source directory
   # $4 == any extra sources
-
+  
   if [ -d $3 ]
   then
   
@@ -49,13 +54,12 @@ compile()
     SOURCES=`find $3 -name '*.java'`
 
     if $cygwin; then
-      CP=`cygpath -pw $1`
+      CP=`cygpath -pw "$1"`
     else
       CP=$1
     fi
   
-    "${JAVAC}" -classpath $CP -d $2 ${SOURCES} $4
-  
+    "${JAVAC}" -classpath "$CP" -d $2 ${SOURCES} $4
   fi
 }
 
@@ -106,6 +110,13 @@ buildMavenProject()
       buildDir=target
       buildDest=target/classes
       
+      # Look for unit test source directory in project.xml
+      unitTestSourceDirectory=`grep unitTestSourceDirectory project.xml | sed -e 's/^*//;s/<unitTestSourceDirectory>//;s/<\/unitTestSourceDirectory>//;s/\${basedir}\///'`
+
+      [ -z $unitTestSourceDirectory ] && unitTestSourceDirectory=src/test
+      
+      buildTestDest=target/test-classes
+      
       [ -d $buildDir ] && rm -rf $buildDir
       
       echo "Building project in `pwd`"
@@ -129,7 +140,23 @@ buildMavenProject()
       
       fi
       
+      repoLocal=`cat bootstrap.repo`
+      
+      if $cygwin = true; then
+        repoLocal=`cygpath -pu "$repoLocal"`
+      fi
+
+      if [ ! -z $unitTestSourceDirectory ] && [ -d $unitTestSourceDirectory ]
+      then
+        
+        compile "$buildDest:$projectDependencyClassPath:$repoLocal/junit/jars/junit-3.8.1.jar" $buildTestDest $unitTestSourceDirectory      
+        isCommandSuccessful $? "Failed compiling test classes!"
+      
+      fi
+      
       copyResources
+      
+      runTests
       
       if [ "$2" = "default" ]
       then
