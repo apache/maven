@@ -16,6 +16,9 @@ package org.apache.maven.test;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.codehaus.surefire.SurefireBooter;
@@ -31,12 +34,6 @@ import java.util.StringTokenizer;
  * @version $Id$
  * @goal test
  * @description Run tests using surefire
- * @parameter name="mavenRepoLocal"
- * type="String"
- * required="true"
- * validator="validator"
- * expression="#maven.repo.local"
- * description=""
  * @parameter name="basedir"
  * type="String"
  * required="true"
@@ -85,14 +82,13 @@ import java.util.StringTokenizer;
  * validator=""
  * expression="#test"
  * description="Specify this parameter if you want to use the test regex notation to select tests to run."
+ * @parameter name="localRepository" type="ArtifactRepository" required="true" validator="" expression="#localRepository" description=""
  * @todo make version of junit and surefire configurable
  * @todo make report to be produced configurable
  */
 public class SurefirePlugin
     extends AbstractPlugin
 {
-    private String mavenRepoLocal;
-
     private String basedir;
 
     private String classesDirectory;
@@ -109,6 +105,8 @@ public class SurefirePlugin
 
     private List excludes;
 
+    private ArtifactRepository localRepository;
+
     public void execute()
         throws PluginExecutionException
     {
@@ -118,8 +116,7 @@ public class SurefirePlugin
 
         SurefireBooter surefireBooter = new SurefireBooter();
 
-        System.out.println( "Setting reports dir: " + reportsDirectory );
-        System.out.flush();
+        getLog().info( "Setting reports dir: " + reportsDirectory );
 
         surefireBooter.setReportsDirectory( reportsDirectory );
 
@@ -170,10 +167,20 @@ public class SurefirePlugin
 
         System.setProperty( "basedir", basedir );
 
-        surefireBooter.addClassPathUrl( new File( mavenRepoLocal, "junit/jars/junit-3.8.1.jar" ).getPath() );
-
-        surefireBooter.addClassPathUrl(
-            new File( mavenRepoLocal, "surefire/jars/surefire-1.2-SNAPSHOT.jar" ).getPath() );
+        // TODO: we should really just trust the plugin classloader?
+        try
+        {
+            DefaultArtifact artifact = new DefaultArtifact( "junit", "junit", "3.8.1", "jar" );
+            File file = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+            surefireBooter.addClassPathUrl( file.getAbsolutePath() );
+            artifact = new DefaultArtifact( "surefire", "surefire", "1.2", "jar" );
+            file = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+            surefireBooter.addClassPathUrl( file.getAbsolutePath() );
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            throw new PluginExecutionException( "Error finding surefire JAR", e );
+        }
 
         surefireBooter.addClassPathUrl( new File( classesDirectory ).getPath() );
 

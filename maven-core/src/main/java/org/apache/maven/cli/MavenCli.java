@@ -409,9 +409,6 @@ public class MavenCli
                 new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
         }
 
-        // TODO [BP]: this should not be necessary - grep for and remove
-        System.setProperty( MavenConstants.MAVEN_REPO_LOCAL, localRepository );
-
         Repository repo = new Repository();
 
         repo.setId( "local" );

@@ -55,11 +55,6 @@ public class PluginParameterExpressionEvaluator
         {
             value = context.getLocalRepository();
         }
-        else if ( expression.equals( "#maven.repo.local" ) )
-        {
-            // TODO: remove this alias: but note that it is a string instead of an ArtifactRepository
-            value = context.getLocalRepository().getUrl().substring( "file://".length() );
-        }
         else if ( expression.equals( "#maven.final.name" ) )
         {
             // TODO: remove this alias

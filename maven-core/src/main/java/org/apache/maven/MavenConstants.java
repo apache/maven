@@ -19,7 +19,7 @@ package org.apache.maven;
 
 public class MavenConstants
 {
-    public static final String MAVEN_VERSION = "2.0-alpha-1-SNAPSHOT";    
+    public static final String MAVEN_VERSION = "2.0-alpha-1-SNAPSHOT";
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
@@ -36,8 +36,6 @@ public class MavenConstants
     // ----------------------------------------------------------------------
     // maven.properties
     // ----------------------------------------------------------------------
-
-    public static final String MAVEN_REPO_LOCAL = "maven.repo.local";
 
     public static final String MAVEN_ONLINE = "maven.online";
 }
