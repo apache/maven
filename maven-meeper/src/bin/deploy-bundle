@@ -68,5 +68,14 @@ cp $BUNDLE $WORKDIR
   
   ../deploy-pom ${artifactId}-${version}.pom ${groupId}
   
-  ../deploy-jar ${artifactId}-${version}.jar ${groupId}
+  artifactType=`echo ${artifactId} | sed -e 's/maven-.*-plugin//'`
+  
+  if [ -z ${artifactType} ]
+  then
+    echo "Deploying Plugin ..."
+    ../deploy-plugin ${artifactId}-${version}.jar ${groupId}        
+  else
+    echo "Deploying JAR ..."
+    ../deploy-jar ${artifactId}-${version}.jar ${groupId}        
+  fi    
 )  
