@@ -119,7 +119,14 @@ public abstract class AbstractJarMojo
      * @param prefix value to be added to the front of jar entry names
      * @param baseDir  the directory to add
      */
-    protected void addDirectory(Map includes, String includesPattern, String excludesPattern, String prefix, File baseDir) throws IOException {
+    protected void addDirectory(Map includes, String includesPattern, String excludesPattern, String prefix, File baseDir)
+        throws IOException
+    {
+        if ( !baseDir.exists() )
+        {
+            return;
+        }
+
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(baseDir);
         if ( includesPattern != null )
