@@ -16,6 +16,11 @@
     <logo>/images/apache-maven-project.png</logo>
   </organization>
 
+  <issueManagement>
+    <system>jira<system/>
+    <url>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10500</url>
+  <issueManagement>
+
   <developers>
     <developer>
       <name>Jason van Zyl</name>
