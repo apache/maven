@@ -101,7 +101,7 @@ goto Win9xApp
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
-SET MAVEN_CMD_LINE_ARGS=%MAVEN_CMD_LINE_ARGS% -Dmaven.home=%M2_HOME%
+SET MAVEN_CMD_LINE_ARGS=%MAVEN_CMD_LINE_ARGS% -Dmaven.home="%M2_HOME%"
 
 @REM Build MBoot2
 cd maven-mboot2
