@@ -117,7 +117,8 @@ public class ArtifactDownloader
         if ( repositories.isEmpty() )
         {
             // TODO: use super POM?
-            Repository repository = new Repository( "http://repo1.maven.org/maven2", Repository.LAYOUT_LEGACY );
+            Repository repository = new Repository( "http://test.maven.codehaus.org/maven2", Repository.LAYOUT_DEFAULT );
+//            Repository repository = new Repository( "http://repo1.maven.org/maven2", Repository.LAYOUT_LEGACY );
             remoteRepos.add( repository );
         }
     }

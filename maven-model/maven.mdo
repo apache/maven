@@ -1860,6 +1860,13 @@
           <type>String</type>
           <defaultValue>daily</defaultValue>
         </field>
+        <field>
+          <name>layout</name>
+          <version>4.0.0</version>
+          <description>The type of layout this repository uses for locating and storing aritfacts - can be "legacy" or "default".</description>
+          <type>String</type>
+          <defaultValue>default</defaultValue>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

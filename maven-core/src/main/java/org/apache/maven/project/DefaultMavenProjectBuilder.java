@@ -129,7 +129,7 @@ public class DefaultMavenProjectBuilder
         try
         {
             Model superModel = getSuperModel();
-
+            
             LinkedList lineage = new LinkedList();
 
             List aggregatedRemoteWagonRepositories = buildArtifactRepositories( superModel.getRepositories() );
@@ -146,7 +146,7 @@ public class DefaultMavenProjectBuilder
 
                 previous = current;
             }
-
+            
             project = processProjectLogic( project, localRepository, aggregatedRemoteWagonRepositories,
                                            resolveDependencies, sourceProject );
 
@@ -334,24 +334,24 @@ public class DefaultMavenProjectBuilder
 
         List repos = new ArrayList();
 
-        // TODO: Replace with repository layout detection. This is a nasty hack.
-        String remoteRepoLayoutId = "legacy";
-
-        ArtifactRepositoryLayout remoteRepoLayout = null;
-        try
-        {
-            remoteRepoLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
-                                                                            remoteRepoLayoutId );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ProjectBuildingException( "Cannot find repository layout for: \'" + remoteRepoLayoutId + "\'.",
-                                                e );
-        }
         for ( Iterator i = repositories.iterator(); i.hasNext(); )
         {
             Repository mavenRepo = (Repository) i.next();
 
+            String layout = mavenRepo.getLayout();
+
+            ArtifactRepositoryLayout remoteRepoLayout = null;
+            try
+            {
+                remoteRepoLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                layout );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout + "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.",
+                                                    e );
+            }
+            
             ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo, settings,
                                                                                                   remoteRepoLayout );
 
@@ -367,38 +367,48 @@ public class DefaultMavenProjectBuilder
         throws Exception
     {
         List remotePluginRepositories = new ArrayList();
-
-        // TODO: needs to be configured from the POM element
-
+        
         MavenSettings settings = mavenSettingsBuilder.buildSettings();
 
-        Repository pluginRepo = new Repository();
-        pluginRepo.setId( "plugin-repository" );
-        pluginRepo.setUrl( "http://repo1.maven.org/maven2" );
+        for ( Iterator it = pluginRepositories.iterator(); it.hasNext(); )
+        {
+            Repository mavenRepo = (Repository) it.next();
+            
+            String layout = mavenRepo.getLayout();
 
-        // TODO: [jc] change this to detect the repository layout type somehow...
-        String repoLayoutId = "legacy";
+            ArtifactRepositoryLayout repositoryLayout = null;
+            try
+            {
+                repositoryLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                layout );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout + "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.",
+                                                    e );
+            }
+            
+            ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( mavenRepo, settings,
+                                                                                                      repositoryLayout );
 
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container.lookup(
-            ArtifactRepositoryLayout.ROLE, repoLayoutId );
+            remotePluginRepositories.add( pluginRepository );
 
-        ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( pluginRepo, settings,
-                                                                                                  repositoryLayout );
-
-        remotePluginRepositories.add( pluginRepository );
-
+        }
+        
         return remotePluginRepositories;
     }
 
     private ArtifactRepository buildDistributionManagementRepository( Repository dmRepo )
         throws Exception
     {
-        // TODO: needs to be configured from the POM element
-
+        if(dmRepo == null)
+        {
+            return null;
+        }
+        
         MavenSettings settings = mavenSettingsBuilder.buildSettings();
 
-        // TODO: [jc] change this to detect the repository layout type somehow...
-        String repoLayoutId = "legacy";
+        String repoLayoutId = dmRepo.getLayout();
 
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container.lookup(
             ArtifactRepositoryLayout.ROLE, repoLayoutId );

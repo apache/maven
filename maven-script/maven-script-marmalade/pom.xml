@@ -23,6 +23,11 @@
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0-alpha-2</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
       <artifactId>plexus-marmalade-factory</artifactId>
       <version>1.0-alpha-2</version>
     </dependency>

@@ -30,6 +30,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.mailsender.MailMessage;
+import org.codehaus.plexus.mailsender.MailSender;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.IOUtil;
 
@@ -38,9 +40,11 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -55,6 +59,8 @@ public class RepositoryCleaner
     public static final String ROLE = RepositoryCleaner.class.getName();
 
     private ArtifactDigestVerifier artifactDigestVerifier;
+    
+    private MailSender mailSender;
 
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
@@ -68,6 +74,8 @@ public class RepositoryCleaner
         File sourceRepositoryBase = normalizeSourceRepositoryBase( configuration.getSourceRepositoryPath() );
 
         File targetRepositoryBase = normalizeTargetRepositoryBase( configuration.getTargetRepositoryPath() );
+        
+        boolean mailReport = false;
 
         // do not proceed if we cannot produce reports, or if the repository is
         // invalid.
@@ -162,6 +170,11 @@ public class RepositoryCleaner
                 {
                     logger.warn( "Warning encountered while rewriting one or more artifacts from source repository to target repository." );
                 }
+                
+                if(repoReporter.hasError())
+                {
+                    mailReport = true;
+                }
             }
             finally
             {
@@ -170,6 +183,46 @@ public class RepositoryCleaner
                     repoReporter.close();
                 }
             }
+            
+            if(mailReport)
+            {
+                String reportContents = readReportFile(repoReporter.getReportFile());
+                
+                MailMessage message = new MailMessage();
+                message.setContent(reportContents);
+                message.setSubject("[REPOCLEAN] Error converting repository.");
+                message.setFromName("Repoclean");
+                message.setFromAddress("jdcasey@codehaus.org");
+                message.setSendDate(new Date());
+                message.addTo("Maven-2 Developers List", "m2-dev@maven.apache.org");
+                
+                mailSender.send(message);
+            }
+        }
+        
+    }
+
+    private String readReportFile( File reportFile ) throws IOException
+    {
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader(reportFile);
+            
+            StringBuffer reportContent = new StringBuffer();
+            char[] buffer = new char[512];
+            int read = -1;
+            
+            while((read = reader.read(buffer)) > -1)
+            {
+                reportContent.append(buffer, 0, read);
+            }
+            
+            return reportContent.toString();
+        }
+        finally
+        {
+            IOUtil.close(reader);
         }
     }
 

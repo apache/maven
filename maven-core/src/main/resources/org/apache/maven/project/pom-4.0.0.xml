@@ -6,9 +6,19 @@
     <repository>
       <id>central</id>
       <name>Maven Repository Switchboard</name>
-      <url>http://repo1.maven.org/maven2</url>
+      <url>http://test.maven.codehaus.org/maven2</url>
+      <layout>default</layout>
     </repository>
   </repositories>
+  
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <name>Maven Plugin Repository</name>
+      <url>http://test.maven.codehaus.org/maven2</url>
+      <layout>default</layout>
+    </pluginRepository>
+  </pluginRepositories>
 
   <build>
     <!-- This all may just fold into plugin parameters -->

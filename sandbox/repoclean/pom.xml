@@ -14,6 +14,18 @@
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
+      <artifactId>plexus-mail-sender-api</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-mail-sender-simple</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>1.0-alpha-2</version>
       <scope>compile</scope>
