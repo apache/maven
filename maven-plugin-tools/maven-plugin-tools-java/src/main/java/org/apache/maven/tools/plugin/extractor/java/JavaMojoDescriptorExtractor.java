@@ -16,17 +16,16 @@ package org.apache.maven.tools.plugin.extractor.java;
  * limitations under the License.
  */
 
+import com.thoughtworks.qdox.JavaDocBuilder;
+import com.thoughtworks.qdox.model.DocletTag;
+import com.thoughtworks.qdox.model.JavaClass;
+import com.thoughtworks.qdox.model.JavaSource;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.InvalidParameterException;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
 import org.apache.maven.tools.plugin.util.PluginUtils;
-
-import com.thoughtworks.qdox.JavaDocBuilder;
-import com.thoughtworks.qdox.model.DocletTag;
-import com.thoughtworks.qdox.model.JavaClass;
-import com.thoughtworks.qdox.model.JavaSource;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -53,6 +52,8 @@ public class JavaMojoDescriptorExtractor
     public static final String PARAMETER = "parameter";
 
     public static final String GOAL = "goal";
+
+    public static final String PHASE = "phase";
 
     public static final String DISPATCH = "dispatch";
 
@@ -158,6 +159,17 @@ public class JavaMojoDescriptorExtractor
         if ( goal != null )
         {
             mojoDescriptor.setGoal( goal.getValue() );
+        }
+
+        // ----------------------------------------------------------------------
+        // Phase name
+        // ----------------------------------------------------------------------
+
+        DocletTag phase = javaClass.getTagByName( PHASE );
+
+        if ( phase != null )
+        {
+            mojoDescriptor.setPhase( phase.getValue() );
         }
 
         // ----------------------------------------------------------------------

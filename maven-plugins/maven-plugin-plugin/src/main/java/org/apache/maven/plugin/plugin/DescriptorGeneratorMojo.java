@@ -8,6 +8,8 @@ import java.util.Set;
 /**
  * @goal descriptor
  *
+ * @phase process-sources
+ *
  * @description Goal for generating a plugin descriptor.
  *
  * @parameter
@@ -44,5 +46,6 @@ public class DescriptorGeneratorMojo
         PluginDescriptorGenerator generator = new PluginDescriptorGenerator();
 
         generator.execute( outputDirectory, mavenMojoDescriptors, project );
+
     }
 }

@@ -209,12 +209,16 @@
           <!-- 4 -->
           <phase>
             <id>process-resources</id>
-            <goal>resources:resources</goal>
+            <goals>
+              <goal implementation="java.lang.String">resources:resources</goal>
+            </goals>
           </phase>
           <!-- 5 -->
           <phase>
             <id>compile</id>
-            <goal>compiler:compile</goal>
+            <goals>
+              <goal implementation="java.lang.String">compiler:compile</goal>
+            </goals>
           </phase>
           <!-- 6 -->
           <phase>
@@ -235,32 +239,44 @@
           <!-- 10 -->
           <phase>
             <id>process-test-resources</id>
-            <goal>resources:testResources</goal>
+            <goals>
+              <goal implementation="java.lang.String">resources:testResources</goal>
+            </goals>
           </phase>
           <!-- 11 -->
           <phase>
             <id>test-compile</id>
-            <goal>compiler:testCompile</goal>
+            <goals>
+              <goal implementation="java.lang.String">compiler:testCompile</goal>
+            </goals>
           </phase>
           <!-- 12 -->
           <phase>
             <id>test</id>
-            <goal>surefire:test</goal>
+            <goals>
+              <goal implementation="java.lang.String">surefire:test</goal>
+            </goals>
           </phase>
           <!-- 13 -->
           <phase>
             <id>package</id>
-            <goal>jar:jar</goal>
+            <goals>
+              <goal implementation="java.lang.String">jar:jar</goal>
+            </goals>
           </phase>
           <!-- 14 -->
           <phase>
             <id>install</id>
-            <goal>install:install</goal>
+            <goals>
+              <goal implementation="java.lang.String">install:install</goal>
+            </goals>
           </phase>
           <!-- 15 -->
           <phase>
             <id>deploy</id>
-            <goal>deploy:deploy</goal>
+            <goals>
+              <goal implementation="java.lang.String">deploy:deploy</goal>
+            </goals>
           </phase>
         </phases>
         <!-- END SNIPPET: lifecycle -->

@@ -34,4 +34,6 @@ public interface LifecycleExecutor
         throws LifecycleExecutionException;
 
     List getPhases();
+
+    Phase getPhase( String id );    
 }

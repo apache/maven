@@ -103,6 +103,15 @@ public class PluginDescriptorGenerator
         //
         // ----------------------------------------------------------------------
 
+        if ( mojoDescriptor.getPhase() != null )
+        {
+            element( w, "phase", mojoDescriptor.getPhase() );
+        }
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
         w.startElement( "implementation" );
 
         w.writeText( mojoDescriptor.getImplementation() );
@@ -175,6 +184,8 @@ public class PluginDescriptorGenerator
         // ----------------------------------------------------------------------
         // Prereqs
         // ----------------------------------------------------------------------
+
+        // TODO: remove
 
         List prereqs = mojoDescriptor.getPrereqs();
 

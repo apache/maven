@@ -46,6 +46,8 @@ public class MojoDescriptor
 
     private String goal;
 
+    private String phase;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -190,6 +192,16 @@ public class MojoDescriptor
     //
     // ----------------------------------------------------------------------
 
+    public String getPhase()
+    {
+        return phase;
+    }
+
+    public void setPhase( String phase )
+    {
+        this.phase = phase;
+    }
+
     public String getGoal()
     {
         return goal;
@@ -223,6 +235,7 @@ public class MojoDescriptor
         }
         catch ( Exception e )
         {
+            // TODO: this needs better handling
         }
 
         return null;

@@ -87,6 +87,13 @@ public class PluginDescriptorBuilder
             mojo.setLanguage( langConfig.getValue() );
         }
 
+        String phase = c.getChild( "phase" ).getValue();
+
+        if ( phase != null )
+        {
+            mojo.setPhase( phase );
+        }
+
         mojo.setInstantiationStrategy( c.getChild( "instantiationStrategy" ).getValue() );
 
         mojo.setDescription( c.getChild( "description" ).getValue() );

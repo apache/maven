@@ -1,5 +1,8 @@
 package org.apache.maven.lifecycle;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -23,17 +26,21 @@ package org.apache.maven.lifecycle;
  */
 public class Phase
 {
-    String id;
+    private String id;
 
-    String goal;
+    private Set goals;
 
     public String getId()
     {
         return id;
     }
 
-    public String getGoal()
+    public Set getGoals()
     {
-        return goal;
+        if ( goals == null )
+        {
+            goals = new HashSet();
+        }
+        return goals;
     }
 }

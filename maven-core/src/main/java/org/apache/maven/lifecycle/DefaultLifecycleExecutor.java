@@ -28,9 +28,11 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -70,6 +72,7 @@ public class DefaultLifecycleExecutor
 
         response.setStart( new Date() );
 
+        Set seenPhases = new HashSet();
         try
         {
             for ( Iterator i = tasks.iterator(); i.hasNext(); )
@@ -109,20 +112,26 @@ public class DefaultLifecycleExecutor
     protected void executePhase( String phase, MavenSession session, MavenExecutionResponse response )
         throws LifecycleExecutionException
     {
-        int i = phases.indexOf( phaseMap.get( phase ) );
+        // only execute up to the given phase
+        int index = phases.indexOf( phaseMap.get( phase ) );
 
-        for ( int j = 0; j <= i; j++ )
+        for ( int j = 0; j <= index; j++ )
         {
             Phase p = (Phase) phases.get( j );
 
-            if ( p.getGoal() != null )
+            if ( p.getGoals() != null )
             {
-                PluginExecutionResponse pluginResponse = executeMojo( p.getGoal(), session );
-
-                if ( pluginResponse.isExecutionFailure() )
+                for ( Iterator i = p.getGoals().iterator(); i.hasNext(); )
                 {
-                    response.setExecutionFailure( p.getGoal(), pluginResponse.getFailureResponse() );
-                    break;
+                    String goal = (String) i.next();
+
+                    PluginExecutionResponse pluginResponse = executeMojo( goal, session );
+
+                    if ( pluginResponse.isExecutionFailure() )
+                    {
+                        response.setExecutionFailure( goal, pluginResponse.getFailureResponse() );
+                        break;
+                    }
                 }
             }
         }
@@ -157,6 +166,11 @@ public class DefaultLifecycleExecutor
     public List getPhases()
     {
         return phases;
+    }
+
+    public Phase getPhase( String id )
+    {
+        return (Phase) phaseMap.get( id );
     }
 
     // ----------------------------------------------------------------------

@@ -13,4 +13,13 @@
   <version>2.0-SNAPSHOT</version>
   <description>Maven Model</description>
   <shortDescription>Maven Model</shortDescription>
+  <plugins>
+    <plugin>
+      <id>modello</id>
+      <configuration>
+        <model>maven.mdo</model>
+        <version>4.0.0</version>
+      </configuration>
+    </plugin>
+  </plugins>
 </project>

@@ -37,6 +37,7 @@ import org.apache.maven.project.MavenProject;
  *
  * @prereq plugin:descriptor
  * @prereq jar:jar
+ * @todo should be replaced by install:install
  */
 public class PluginInstallMojo
     extends AbstractPlugin
@@ -52,7 +53,7 @@ public class PluginInstallMojo
 
         if ( ! "plugin".equals( project.getType() ) )
         {
-            response.setExecutionFailure( true, new PluginFailureResponse( "This project isn't a plugin." ) );
+            response.setExecutionFailure( new PluginFailureResponse( "This project isn't a plugin." ) );
 
             return;
         }
