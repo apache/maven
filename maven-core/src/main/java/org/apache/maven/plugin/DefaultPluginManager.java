@@ -385,16 +385,7 @@ public class DefaultPluginManager
             plugin.setLog( session.getLog() );
 
             // TODO: remove
-            boolean newMojoTechnique = false;
-            try
-            {
-                plugin.getClass().getDeclaredMethod( "execute", new Class[0] );
-                newMojoTechnique = true;
-            }
-            catch ( NoSuchMethodException e )
-            {
-                // intentionally ignored
-            }
+            boolean newMojoTechnique = checkMojoTechnique( plugin.getClass() );
 
             // TODO: can probable refactor these a little when only the new plugin technique is in place
             PlexusConfiguration configuration = getProjectDefinedPluginConfiguration( session.getProject(),
@@ -462,6 +453,30 @@ public class DefaultPluginManager
         }
     }
 
+    /**
+     * @deprecated
+     */
+    private static boolean checkMojoTechnique( Class aClass )
+    {
+        boolean newMojoTechnique = false;
+        try
+        {
+            aClass.getDeclaredMethod( "execute", new Class[0] );
+            newMojoTechnique = true;
+        }
+        catch ( NoSuchMethodException e )
+        {
+            // intentionally ignored
+
+            Class superclass = aClass.getSuperclass();
+            if ( superclass != AbstractPlugin.class )
+            {
+                return checkMojoTechnique( superclass );
+            }
+        }
+        return newMojoTechnique;
+    }
+
     // TODO: don't throw Exception
     private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
         throws Exception
@@ -524,7 +539,7 @@ public class DefaultPluginManager
         }
 
         // Configuration does not store objects, so the non-String fields are configured here
-        // TODO: we don't have converters, so something things that -are- strings are not configured properly (eg String -> File from an expression)
+        // TODO: we don't have converters, so "primitives" that -are- strings are not configured properly (eg String -> File from an expression)
         for ( Iterator i = map.keySet().iterator(); i.hasNext(); )
         {
             String key = (String) i.next();
@@ -533,7 +548,7 @@ public class DefaultPluginManager
             Class clazz = plugin.getClass();
             try
             {
-                Field f = clazz.getDeclaredField( key );
+                Field f = findPluginField( clazz, key );
                 boolean accessible = f.isAccessible();
                 if ( !accessible )
                 {
@@ -547,13 +562,34 @@ public class DefaultPluginManager
                     f.setAccessible( false );
                 }
             }
-            catch ( NoSuchFieldException e1 )
+            catch ( NoSuchFieldException e )
             {
                 throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
             }
-            catch ( IllegalAccessException e11 )
+            catch ( IllegalAccessException e )
             {
                 throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
+            }
+        }
+    }
+
+    private Field findPluginField( Class clazz, String key )
+        throws NoSuchFieldException
+    {
+        try
+        {
+            return clazz.getDeclaredField( key );
+        }
+        catch ( NoSuchFieldException e )
+        {
+            Class superclass = clazz.getSuperclass();
+            if ( superclass != Object.class )
+            {
+                return findPluginField( superclass, key );
+            }
+            else
+            {
+                throw e;
             }
         }
     }
