@@ -25,7 +25,7 @@
   <classes>
     <class>
       <name>Model</name>
-      <version>4.0.0</version>
+      <version>3.0.0+</version>
       <fields>
         <field>
           <name>extend</name>
@@ -574,7 +574,7 @@
         </field>
         <field>
           <name>groupId</name>
-          <version>4.0.0</version>
+          <version>3.0.0+</version>
           <required>true</required>
           <description>
             The project group that produced the dependency, e.g.
@@ -584,7 +584,7 @@
         </field>
         <field>
           <name>artifactId</name>
-          <version>4.0.0</version>
+          <version>3.0.0+</version>
           <required>true</required>
           <description>
             The unique id for an artifact produced by the project group, e.g.
@@ -652,7 +652,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>3.0.0+</version>
+          <version>4.0.0</version>
           <code>
             public String getId()
             {
