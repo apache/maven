@@ -379,7 +379,16 @@ public class DefaultMavenProjectBuilder
 
                 if ( dag.getVertex( dependencyArtifactId ) != null )
                 {
-                    dag.addEdge( artifactId, dependency.getArtifactId() );
+                    dag.addEdge( artifactId, dependencyArtifactId );
+                }
+            }
+
+            MavenProject parent = project.getParent();
+            if ( parent != null )
+            {
+                if ( dag.getVertex( parent.getArtifactId() ) != null )
+                {
+                    dag.addEdge( artifactId, parent.getArtifactId() );
                 }
             }
         }
