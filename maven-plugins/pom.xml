@@ -1,10 +1,10 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-plugin-parent</artifactId>
   <packaging>pom</packaging>
-  <name>Maven Plugin</name>
   <version>2.0-SNAPSHOT</version>
+  <name>Maven Plugin</name>
   <description>Maven plugin parent</description>
   <url>http://maven.apache.org</url>
   <issueManagement>
@@ -66,4 +66,17 @@
       <url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url>
     </repository>
   </distributionManagement>
-</model>
+  <modules>
+    <module>maven-assemble-plugin</module>
+    <module>maven-clean-plugin</module>
+    <module>maven-compiler-plugin</module>
+    <module>maven-deploy-plugin</module>
+    <module>maven-ejb-plugin</module>
+    <module>maven-install-plugin</module>
+    <module>maven-jar-plugin</module>
+    <module>maven-plugin-plugin</module>
+    <module>maven-resources-plugin</module>
+    <module>maven-surefire-plugin</module>
+    <module>maven-war-plugin</module>
+  </modules>
+</project>

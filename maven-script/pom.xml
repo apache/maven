@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-component</artifactId>
     <groupId>org.apache.maven</groupId>
@@ -6,9 +6,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-script-root</artifactId>
-  <packaging>jar</packaging>
-  <name>Maven Script Support Root</name>
   <version>2.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Maven Script Support Root</name>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -25,4 +25,7 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-</model>
+  <modules>
+    <module>maven-script-marmalade</module>
+  </modules>
+</project>
