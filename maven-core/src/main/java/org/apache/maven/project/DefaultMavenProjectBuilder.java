@@ -98,6 +98,7 @@ public class DefaultMavenProjectBuilder
 
     /** @todo can we move the super model reading to the initialize method? what about the user/site? Is it reused?
      *  @todo we should be passing in some more configuration here so that maven.home.local can be used for user properties. Then, the new stuff should be unit tested.
+     *  @todo the user model bit overwriting the super model seems a bit gross, but is needed so that any repositories given take affect
      */
     public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, boolean resolveDependencies )
         throws ProjectBuildingException
@@ -105,6 +106,20 @@ public class DefaultMavenProjectBuilder
         try
         {
             superModel = modelReader.read( new InputStreamReader( DefaultMavenProjectBuilder.class.getResourceAsStream( "pom.xml" ) ) );
+
+            Model userModel = null;
+            // TODO: use maven.home.local instead of user.home/.m2
+            File userModelFile = new File( System.getProperty( "user.home" ) + "/.m2", "pom.xml" );
+            if ( userModelFile.exists() )
+            {
+                userModel = modelReader.read( new FileReader( userModelFile ) );
+                if ( userModel.getParent() != null )
+                {
+                    throw new ProjectBuildingException( "Inheritence not supported in the user override POM" );
+                }
+
+                superModel.getRepositories().addAll( userModel.getRepositories() );
+            }
 
             LinkedList lineage = new LinkedList();
 
@@ -122,17 +137,9 @@ public class DefaultMavenProjectBuilder
                 previous = current;
             }
 
-            // TODO: use maven.home.local instead of user.home/.m2
-            File userModelFile = new File( System.getProperty( "user.home" ) + "/.m2", "pom.xml" );
-            if ( userModelFile.exists() )
+            if ( userModelFile != null )
             {
-                Model userModel = modelReader.read( new FileReader( userModelFile ) );
                 modelInheritanceAssembler.assembleModelInheritance( userModel, previous );
-
-                if ( userModel.getParent() != null )
-                {
-                    throw new ProjectBuildingException( "Inheritence not supported in the user override POM" );
-                }
 
                 MavenProject parent = project;
                 project = new MavenProject( userModel );
