@@ -20,6 +20,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ModelMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
@@ -85,23 +87,18 @@ public class DeployMojo
         }
 
         // Deploy the POM
-        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
-                                                    project.getVersion(), "pom" );
-
-        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
+                                                 project.getPackaging() );
+        if ( !"pom".equals( project.getPackaging() ) )
+        {
+            File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+            ArtifactMetadata metadata = new ModelMetadata( artifact, pom );
+            artifact.addMetadata( metadata );
+        }
 
         try
         {
-            deployer.deploy( pom, pomArtifact, deploymentRepository, localRepository );
-
-            //Deploy artifact
-            if ( !"pom".equals( project.getPackaging() ) )
-            {
-                Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
-                                                         project.getVersion(), project.getPackaging() );
-
-                deployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository, localRepository );
-            }
+            deployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository, localRepository );
         }
         catch ( ArtifactDeploymentException e )
         {

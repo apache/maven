@@ -24,6 +24,9 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
@@ -218,8 +221,15 @@ public class SnapshotTransformation
 
             // TODO: note, we could currently transform this in place, as it is only used through the deploy mojo,
             //   which creates the artifact and then disposes of it
+            List list = artifact.getMetadataList();
             artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), metadata.getVersion(),
                                             artifact.getScope(), artifact.getType(), artifact.getClassifier() );
+            for ( Iterator i = list.iterator(); i.hasNext(); )
+            {
+                ArtifactMetadata m = (ArtifactMetadata) i.next();
+                m.setArtifact( artifact );
+                artifact.addMetadata( m );
+            }
             artifact.addMetadata( metadata );
         }
         return artifact;

@@ -20,6 +20,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ModelMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
@@ -63,24 +65,19 @@ public class InstallMojo
     public void execute()
         throws PluginExecutionException
     {
-        // Install the POM
-        Artifact pomArtifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
-                                                    project.getVersion(), "pom" );
+        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
+                                                 project.getPackaging() );
 
-        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+        if ( !"pom".equals( project.getPackaging() ) )
+        {
+            File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+            ArtifactMetadata metadata = new ModelMetadata( artifact, pom );
+            artifact.addMetadata( metadata );
+        }
 
         try
         {
-            installer.install( pom, pomArtifact, localRepository );
-
-            //Install artifact
-            if ( !"pom".equals( project.getPackaging() ) )
-            {
-                Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
-                                                         project.getVersion(), project.getPackaging() );
-
-                installer.install( project.getBuild().getDirectory(), artifact, localRepository );
-            }
+            installer.install( project.getBuild().getDirectory(), artifact, localRepository );
         }
         catch ( ArtifactInstallationException e )
         {

@@ -30,7 +30,7 @@ public interface ArtifactInstaller
     String ROLE = ArtifactInstaller.class.getName();
 
     /**
-     * Install an artifact from a particular directory. The artifact handler is used to determine the filename
+     * Install an artifact from a particular directory. The artifact handler is used to determine the filenameSuffix
      * of the source file.
      *
      * @param basedir         the directory where the artifact is stored

@@ -30,7 +30,7 @@ public class DefaultRepositoryLayout
 
     protected String metadataLayoutPattern()
     {
-        return "${groupPath}/${artifactId}/${version}/${metadataFilename}";
+        return "${groupPath}/${artifactId}/${version}/${artifactId}-${version}.${metadataSuffix}";
     }
 
     protected String groupIdAsPath( String groupId )

@@ -56,9 +56,18 @@ public interface ArtifactMetadata
     Artifact getArtifact();
 
     /**
-     * Get the filename of this metadata.
+     * Get the filenameSuffix of this metadata.
      *
-     * @return the filename
+     * @return the filenameSuffix
      */
-    String getFilename();
+    String getFilenameSuffix();
+
+
+    /**
+     * Set the associated artifact.
+     *
+     * @param artifact the artifact
+     * @todo prefer not to have this, and just modify the artifacts as they are transformed
+     */
+    void setArtifact( Artifact artifact );
 }

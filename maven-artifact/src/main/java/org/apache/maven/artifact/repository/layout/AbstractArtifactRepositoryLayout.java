@@ -59,7 +59,7 @@ public abstract class AbstractArtifactRepositoryLayout
     {
         String path = basicPathOf( metadata.getArtifact(), metadataLayoutPattern() );
 
-        path = StringUtils.replace( path, "${metadataFilename}", metadata.getFilename() );
+        path = StringUtils.replace( path, "${metadataSuffix}", metadata.getFilenameSuffix() );
 
         return path;
     }
