@@ -57,7 +57,11 @@ public class CompilerMojo
 
         String sourceDirectory = (String) request.getParameter( "sourceDirectory" );
 
+        System.out.println( "sourceDirectory = " + sourceDirectory );
+
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
+
+        System.out.println( "outputDirectory = " + outputDirectory );
 
         String[] classpathElements = (String[]) request.getParameter( "classpathElements" );
 

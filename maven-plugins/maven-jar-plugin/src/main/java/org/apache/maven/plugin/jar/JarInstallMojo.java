@@ -23,9 +23,8 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 
-
 /**
- * @goal install
+ * @goalXX install
  *
  * @description install a jar in local repository
  *
@@ -100,7 +99,6 @@ public class JarInstallMojo
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
-
 
         String outputDirectory = ( String ) request.getParameter( "outputDirectory" );
 

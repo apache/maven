@@ -13,6 +13,7 @@ import java.util.List;
  *
  * @description Run tests using surefire
  *
+ * @prereq compiler:compile
  * @prereq compiler:test:compile
  * @prereq resources:resources
  * @prereq resources:test:resources
