@@ -11,6 +11,11 @@ Maven Lifecycle
    - session lifecycle
 
      - dep resolution (if POM present)
+     
+     - dep download
+       
+       - each downloaded dep is registered in MavenSession to track
+         snapshot downloads
 
      - goal lifecycle
        
