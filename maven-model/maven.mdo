@@ -310,6 +310,7 @@
           </description>
           <type>Organization</type>
         </field>
+        
       </fields>
       <!-- We need this because we can't use package as a field name. -->
       <codeSegments>
@@ -384,6 +385,7 @@
       <fields>
         <field>
           <name>tag</name>
+          <version>3.0.0</version>
           <description>
             The branch tag in the version control system
             (e.g. cvs) used by the project for the source
