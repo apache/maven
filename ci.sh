@@ -46,7 +46,7 @@ DEPLOY_SITE=http://www.codehaus.org/~jvanzyl/m2
 
 echo "From: $FROM" > log
 echo "To: $TO" >> log
-echo "Subject: Maven bootstrap on beaver [$DATE]" >> log
+echo "Subject: [maven2 build] $DATE" >> log
 echo "" >> log
 
 export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
