@@ -5,6 +5,7 @@ target
 default.lst
 test.out
 default.ajsym
+*.iml
 *.ipr
 *.iws
 *.iml
