@@ -1,0 +1,16 @@
+<component-set>
+  <components>
+
+    <!--
+     |
+     | Maven 1.x Integration Interface
+     |
+     -->
+    <component>
+      <role>org.apache.maven.legacy.Maven1xIntegration</role>
+      <implementation>org.apache.maven.legacy.DefaultMaven1xIntegration</implementation>
+    </component>
+
+  </components>
+</component-set>
+
