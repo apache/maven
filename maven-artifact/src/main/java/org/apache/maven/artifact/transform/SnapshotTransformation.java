@@ -24,6 +24,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,9 +55,6 @@ public class SnapshotTransformation
     {
         if ( isSnapshot( artifact ) )
         {
-            // TODO: this mostly works, however...
-            //  - we definitely need the manual/daily check as this is quite slow given the large number of snapshots inside m2 presently
-
             SnapshotArtifactMetadata localMetadata;
             try
             {
@@ -72,7 +70,8 @@ public class SnapshotTransformation
             }
 
             String version = localMetadata.constructVersion();
-            if ( !alreadyResolved( artifact ) )
+            boolean alreadyResolved = alreadyResolved( artifact );
+            if ( !alreadyResolved )
             {
                 boolean checkedUpdates = false;
                 for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
@@ -131,9 +130,23 @@ public class SnapshotTransformation
                     localMetadata.storeInLocalRepository( localRepository );
                 }
 
+                resolvedArtifactCache.add( getCacheKey( artifact ) );
+            }
+
+            // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
+            if ( artifact.getFile().exists() && artifact.getFile().lastModified() > localMetadata.getLastModified() )
+            {
+                if ( !alreadyResolved )
+                {
+                    // Locally installed file is newer, don't use the resolved version
+                    getLogger().info( artifact.getArtifactId() + ": using locally installed snapshot" );
+                }
+            }
+            else
+            {
                 if ( getLogger().isInfoEnabled() )
                 {
-                    if ( !version.equals( artifact.getBaseVersion() ) )
+                    if ( !version.equals( artifact.getBaseVersion() ) && !alreadyResolved )
                     {
                         String message = artifact.getArtifactId() + ": resolved to version " + version;
                         if ( artifact.getRepository() != null )
@@ -148,9 +161,16 @@ public class SnapshotTransformation
                     }
                 }
 
-                resolvedArtifactCache.add( getCacheKey( artifact ) );
+                artifact.setVersion( version );
+                try
+                {
+                    artifact.setFile( new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) ) );
+                }
+                catch ( ArtifactPathFormatException e )
+                {
+                    throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
+                }
             }
-            artifact.setVersion( version );
         }
     }
 

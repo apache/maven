@@ -82,6 +82,7 @@ public abstract class AbstractArtifactRepositoryLayout
         ArtifactHandler artifactHandler = null;
         try
         {
+            // TODO: this is a poor excuse to have this method throwing an exception. Validate the artifact first, perhaps associate the handler with it
             artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
         }
         catch ( ArtifactHandlerNotFoundException e )

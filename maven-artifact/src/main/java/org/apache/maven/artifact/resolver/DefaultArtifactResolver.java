@@ -77,6 +77,19 @@ public class DefaultArtifactResolver
         logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository + "}\n" +
                       "{remoteRepositories: " + remoteRepositories + "}" );
 
+        String localPath;
+
+        try
+        {
+            localPath = localRepository.pathOf( artifact );
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            throw new ArtifactResolutionException( "Error resolving artifact: ", e );
+        }
+
+        artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
+
         // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
         {
@@ -91,20 +104,7 @@ public class DefaultArtifactResolver
             }
         }
 
-        String localPath;
-
-        try
-        {
-            localPath = localRepository.pathOf( artifact );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new ArtifactResolutionException( "Error resolving artifact: ", e );
-        }
-
-        File destination = new File( localRepository.getBasedir(), localPath );
-        artifact.setFile( destination );
-
+        File destination = artifact.getFile();
         if ( !destination.exists() )
         {
             try
