@@ -51,7 +51,7 @@ import java.util.List;
  * expression="#project.compileClasspathElements"
  * description=""
  * @parameter name="debug"
- * type="String"
+ * type="boolean"
  * required="false"
  * validator=""
  * expression="#maven.compiler.debug"
@@ -66,21 +66,22 @@ public class CompilerMojo
 {
     private Compiler compiler = new JavacCompiler();
 
-    private boolean debug = false;
+    // TODO: use boolean when supported
+    private String debug = Boolean.FALSE.toString();
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    private List compileSourceRoots;
+
+    private List classpathElements;
+
+    private String outputDirectory;
+
+    private String source;
+
+    private String target;
+
+    public void execute()
+        throws PluginExecutionException
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        List compileSourceRoots = (List) request.getParameter( "compileSourceRoots" );
-
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        List classpathElements = (List) request.getParameter( "classpathElements" );
-
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
@@ -98,50 +99,30 @@ public class CompilerMojo
         compilerConfiguration.setClasspathEntries( classpathElements );
         compilerConfiguration.setSourceLocations( compileSourceRoots );
 
-        String source = ( String ) request.getParameter( "source" );
         if ( source != null )
         {
             compilerConfiguration.addCompilerOption( "-source", source );
         }
         
-        String target = ( String ) request.getParameter( "target" );
         if ( target != null )
         {
             compilerConfiguration.addCompilerOption( "-target", target );
         }
-        
-        /* Compile with debugging info */
-        String debugAsString = (String) request.getParameter( "debug" );
 
-        if ( debugAsString != null )
+        if ( debug != null && "true".equals( debug ) )
         {
-            if ( Boolean.valueOf( debugAsString ).booleanValue() )
-            {
-                compilerConfiguration.setDebug( true );
-            }
+            compilerConfiguration.setDebug( true );
         }
 
-        List messages = compiler.compile( compilerConfiguration );
-
-        // TODO: doesn't appear to be called
-        if ( debug )
+        List messages = null;
+        try
         {
-            for ( Iterator i = classpathElements.iterator(); i.hasNext(); )
-            {
-                String message;
-
-                String classpathElement = (String) i.next();
-                if ( new File( classpathElement ).exists() )
-                {
-                    message = "present in repository.";
-                }
-                else
-                {
-                    message = "Warning! not present in repository!";
-                }
-
-                getLog().debug( "classpathElements[ " + i + " ] = " + classpathElement + ": " + message );
-            }
+            messages = compiler.compile( compilerConfiguration );
+        }
+        catch ( Exception e )
+        {
+            // TODO: don't catch Exception
+            throw new PluginExecutionException( "Fatal error compiling", e );
         }
 
         boolean compilationError = false;
@@ -158,7 +139,7 @@ public class CompilerMojo
 
         if ( compilationError )
         {
-            response.setExecutionFailure( new CompilationFailureResponse( messages ) );
+            throw new CompilationFailureException( messages );
         }
     }
 

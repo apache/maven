@@ -2,33 +2,27 @@ package org.apache.maven.plugin;
 
 import org.codehaus.plexus.compiler.CompilerError;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class CompilationFailureResponse
-    extends FailureResponse
+public class CompilationFailureException
+    extends PluginExecutionException
 {
-    private String LS = System.getProperty( "line.separator" );
+    private static final String LS = System.getProperty( "line.separator" );
 
-    public CompilationFailureResponse( Object o )
+    public CompilationFailureException( List messages )
     {
-        super( o );
+        // TODO: this is a bit nasty
+        super( messages, "Compilation failure", longMessage( messages ) );
     }
 
-    public String shortMessage()
-    {
-        return "Compilation failure";
-    }
-
-    public String longMessage()
+    public static String longMessage( List messages )
     {
         StringBuffer sb = new StringBuffer();
-
-        List messages = (List)source;
 
         for ( Iterator it = messages.iterator(); it.hasNext() ; )
         {
