@@ -264,6 +264,8 @@ public abstract class AbstractGenerator
 
             pd.setDescription( parameter.getNamedParameter( "description" ) );
 
+            pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
+
             parameters.add( pd );
         }
 

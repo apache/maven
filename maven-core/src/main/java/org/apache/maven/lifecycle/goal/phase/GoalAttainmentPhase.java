@@ -124,6 +124,14 @@ public class GoalAttainmentPhase
 
                 Object value = PluginParameterExpressionEvaluator.evaluate( expression, context );
 
+                if ( value == null )
+                {
+                    if ( parameter.getDefaultValue() != null )
+                    {
+                        value = parameter.getDefaultValue();
+                    }
+                }
+
                 map.put( key, value );
             }
 
