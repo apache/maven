@@ -112,9 +112,9 @@ public class SurefirePlugin
 
         surefireBooter.addClassPathUrl( new File( mavenRepoLocal, "surefire/jars/surefire-1.0.jar" ).getPath() );
 
-        surefireBooter.addClassPathUrl( new File( basedir, classesDirectory ).getPath() );
+        surefireBooter.addClassPathUrl( new File( classesDirectory ).getPath() );
 
-        surefireBooter.addClassPathUrl( new File( basedir, testClassesDirectory ).getPath() );
+        surefireBooter.addClassPathUrl( new File( testClassesDirectory ).getPath() );
 
         for ( int i = 0; i < classpathElements.length; i++ )
         {
