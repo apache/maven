@@ -8,6 +8,6 @@ mkdir ${buildDir}
 
 javac -d ${buildDir} @sources.txt
 
-( cd ${buildDir} ; jar -cf ../mboot.jar -m ../manifest.txt * )
+( cd ${buildDir} ; jar -cfm ../mboot.jar ../manifest.txt * )
 
 cp mboot.jar ..
