@@ -18,30 +18,27 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.GoalExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public interface PluginManager
 {
     String ROLE = PluginManager.class.getName();
 
-    PluginExecutionResponse executeMojo( MavenSession session, String goalName )
-         throws GoalExecutionException;
+    PluginExecutionResponse executeMojo( MavenSession session, String goalName ) throws GoalExecutionException;
 
     MojoDescriptor getMojoDescriptor( String goalId );
 
     // TODO: don't throw Exception
-    void verifyPluginForGoal( String goalName, MavenSession session )
-        throws Exception;
+    void verifyPluginForGoal( String goalName, MavenSession session ) throws Exception;
 
     // TODO: don't throw Exception
-    void verifyPlugin( String pluginId, MavenSession session )
-        throws Exception;
+    void verifyPlugin( String pluginId, MavenSession session ) throws Exception;
 
     PluginDescriptor getPluginDescriptor( String pluginId );
 }

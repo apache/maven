@@ -16,22 +16,13 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.logging.DefaultLog;
-import org.apache.maven.monitor.logging.Log;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.execution.MavenSession;
-
 import org.codehaus.plexus.ArtifactEnabledPlexusTestCase;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -86,61 +77,4 @@ public class MavenTestCase
         return projectBuilder.build( pom, getLocalRepository() );
     }
 
-    // ----------------------------------------------------------------------
-    // Execution context
-    // ----------------------------------------------------------------------
-
-    protected MavenGoalExecutionContext createGoalExecutionContext()
-        throws Exception
-    {
-        return createGoalExecutionContext( null, null );
-    }
-
-    protected MavenGoalExecutionContext createGoalExecutionContext( File pom )
-        throws Exception
-    {
-        return createGoalExecutionContext( pom, null );
-    }
-
-    protected MavenGoalExecutionContext createGoalExecutionContext( String goal )
-        throws Exception
-    {
-        return createGoalExecutionContext( null, goal );
-    }
-
-    protected MavenGoalExecutionContext createGoalExecutionContext( File pom, String goal )
-        throws Exception
-    {
-        MavenProject project;
-
-        if ( pom != null )
-        {
-            project = getProject( pom );
-        }
-        else
-        {
-            File f = getTestFile( "target/test-classes/pom.xml" );
-
-            project = getProject( f );
-        }
-
-        return createGoalExecutionContext( project, getLocalRepository(), goal );
-    }
-
-    protected MavenGoalExecutionContext createGoalExecutionContext( MavenProject project,        
-                                                                    ArtifactRepository localRepository,
-                                                                    String goal )
-    {
-        List goals = new ArrayList();
-
-        Log log = new DefaultLog(getContainer().getLogger());
-        
-        MavenSession session = new MavenSession( getContainer(), pluginManager, localRepository, new DefaultEventDispatcher(), log, goals );
-
-        session.setProject( project );
-
-        MavenGoalExecutionContext context = new MavenGoalExecutionContext( session, goal );
-
-        return context;
-    }
 }

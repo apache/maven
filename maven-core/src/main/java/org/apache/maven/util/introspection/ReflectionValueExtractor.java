@@ -27,11 +27,11 @@ import java.util.StringTokenizer;
 /**
  * Using simple dotted expressions extract the values from a MavenProject
  * instance, For example we might want to extract a value like:
- *
  * project.build.sourceDirectory
- *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * 
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: ReflectionValueExtractor.java,v 1.2 2005/03/01 07:05:33 brett
+ *          Exp $
  */
 public class ReflectionValueExtractor
 {
@@ -48,8 +48,7 @@ public class ReflectionValueExtractor
     }
 
     // TODO: don't throw Exception
-    public static Object evaluate( String expression, Object root )
-        throws Exception
+    public static Object evaluate( String expression, Object root ) throws Exception
     {
         // ----------------------------------------------------------------------
         // Remove the leading "project" token
@@ -66,11 +65,11 @@ public class ReflectionValueExtractor
 
         StringTokenizer parser = new StringTokenizer( expression, "." );
 
-        while( parser.hasMoreTokens() )
+        while ( parser.hasMoreTokens() )
         {
-            classMap = getClassMap( value.getClass() );
-
             String token = parser.nextToken();
+
+            classMap = getClassMap( value.getClass() );
 
             String methodName = "get" + StringUtils.capitalizeFirstLetter( token );
 
@@ -86,7 +85,7 @@ public class ReflectionValueExtractor
     {
         classMap = (ClassMap) classMaps.get( clazz );
 
-        if( classMap == null )
+        if ( classMap == null )
         {
             classMap = new ClassMap( clazz );
         }

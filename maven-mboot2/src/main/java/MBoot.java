@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -146,9 +147,29 @@ public class MBoot
 
     public static void main( String[] args ) throws Exception
     {
-        MBoot mboot = new MBoot();
+        try
+        {
+            MBoot mboot = new MBoot();
 
-        mboot.run( args );
+            mboot.run( args );
+        }
+        catch ( InvocationTargetException e )
+        {
+            Throwable target = e.getTargetException();
+            
+            if(target instanceof RuntimeException)
+            {
+                throw (RuntimeException)target;
+            }
+            else if(target instanceof Exception)
+            {
+                throw (Exception)target;
+            }
+            else
+            {
+                throw new RuntimeException(target);
+            }
+        }
     }
 
     public void run( String[] args ) throws Exception

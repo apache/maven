@@ -18,8 +18,12 @@ package org.apache.maven.project.injection;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +40,99 @@ public class DefaultModelDefaultsInjector
     public void injectDefaults( Model model )
     {
         injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );
+        injectPluginDefaults( model.getPlugins(), model.getPluginManagement() );
     }
 
-    /**
-     * Added: Feb 1, 2005 by jdcasey
-     */
+    private void injectPluginDefaults( List plugins, PluginManagement pluginManagement )
+    {
+        if ( pluginManagement != null )
+        {
+            // a given project's plugins should be smaller than the
+            // group-defined defaults set...
+            // in other words, the project's plugins will probably be a subset
+            // of
+            // those specified in defaults.
+            Map pluginMap = new TreeMap();
+            for ( Iterator it = plugins.iterator(); it.hasNext(); )
+            {
+                Plugin plugin = (Plugin) it.next();
+                pluginMap.put( plugin.getId(), plugin );
+            }
+
+            List managedPlugins = pluginManagement.getPlugins();
+
+            for ( Iterator it = managedPlugins.iterator(); it.hasNext(); )
+            {
+                Plugin def = (Plugin) it.next();
+                String key = def.getId();
+
+                Plugin plugin = (Plugin) pluginMap.get( key );
+                if ( plugin != null )
+                {
+                    mergePluginWithDefaults( plugin, def );
+                }
+            }
+        }
+    }
+
+    private void mergePluginWithDefaults( Plugin plugin, Plugin def )
+    {
+        if ( plugin.getVersion() == null && def.getVersion() != null )
+        {
+            plugin.setVersion( def.getVersion() );
+        }
+
+        Boolean disabled = plugin.isDisabled();
+        if ( disabled == null )
+        {
+            plugin.setDisabled( def.isDisabled() );
+        }
+
+        Map goalMap = new TreeMap();
+
+        List pluginGoals = plugin.getGoals();
+        if ( pluginGoals != null )
+        {
+            for ( Iterator it = pluginGoals.iterator(); it.hasNext(); )
+            {
+                Goal goal = (Goal) it.next();
+
+                goalMap.put( goal.getId(), goal );
+            }
+        }
+
+        List defGoals = def.getGoals();
+        if ( defGoals != null )
+        {
+            for ( Iterator it = defGoals.iterator(); it.hasNext(); )
+            {
+                Goal defaultGoal = (Goal) it.next();
+
+                Goal localGoal = (Goal) goalMap.get( defaultGoal.getId() );
+                if ( localGoal == null )
+                {
+                    goalMap.put( defaultGoal.getId(), defaultGoal );
+                }
+                else
+                {
+                    Properties conf = defaultGoal.getConfiguration();
+
+                    conf.putAll( localGoal.getConfiguration() );
+
+                    localGoal.setConfiguration( conf );
+                }
+            }
+        }
+
+        plugin.setGoals( new ArrayList( goalMap.values() ) );
+
+        Properties props = new Properties( def.getConfiguration() );
+
+        props.putAll( plugin.getConfiguration() );
+
+        plugin.setConfiguration( props );
+    }
+
     private void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )
     {
         if ( dependencyManagement != null )
@@ -56,9 +148,9 @@ public class DefaultModelDefaultsInjector
                 depsMap.put( dep.getManagementKey(), dep );
             }
 
-            List dependencyDefaults = dependencyManagement.getDependencies();
+            List managedDependencies = dependencyManagement.getDependencies();
 
-            for ( Iterator it = dependencyDefaults.iterator(); it.hasNext(); )
+            for ( Iterator it = managedDependencies.iterator(); it.hasNext(); )
             {
                 Dependency def = (Dependency) it.next();
                 String key = def.getManagementKey();
@@ -66,16 +158,13 @@ public class DefaultModelDefaultsInjector
                 Dependency dep = (Dependency) depsMap.get( key );
                 if ( dep != null )
                 {
-                    mergeWithDefaults( dep, def );
+                    mergeDependencyWithDefaults( dep, def );
                 }
             }
         }
     }
 
-    /**
-     * Added: Feb 1, 2005 by jdcasey
-     */
-    private void mergeWithDefaults( Dependency dep, Dependency def )
+    private void mergeDependencyWithDefaults( Dependency dep, Dependency def )
     {
         if ( dep.getScope() == null && def.getScope() != null )
         {

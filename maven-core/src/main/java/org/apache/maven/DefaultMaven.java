@@ -24,9 +24,8 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenProjectExecutionRequest;
 import org.apache.maven.execution.MavenReactorExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.GoalNotFoundException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.lifecycle.goal.GoalNotFoundException;
-import org.apache.maven.lifecycle.session.MavenSessionPhaseManager;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginManager;
@@ -52,7 +51,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public class DefaultMaven
@@ -69,8 +68,6 @@ public class DefaultMaven
 
     protected PluginManager pluginManager;
 
-    protected MavenSessionPhaseManager sessionPhaseManager;
-
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
@@ -79,8 +76,7 @@ public class DefaultMaven
     // Project execution
     // ----------------------------------------------------------------------
 
-    public MavenExecutionResponse execute( MavenExecutionRequest request )
-        throws GoalNotFoundException, Exception
+    public MavenExecutionResponse execute( MavenExecutionRequest request ) throws GoalNotFoundException, Exception
     {
         // TODO: not happy about this:
         if ( request instanceof MavenReactorExecutionRequest )
@@ -94,8 +90,7 @@ public class DefaultMaven
     }
 
     // TODO: don't throw generic exception
-    public MavenExecutionResponse handleProject( MavenExecutionRequest request )
-        throws Exception
+    public MavenExecutionResponse handleProject( MavenExecutionRequest request ) throws Exception
     {
         MavenSession session = createSession( request );
 
@@ -109,18 +104,18 @@ public class DefaultMaven
         // Event monitoring.
         EventDispatcher dispatcher = request.getEventDispatcher();
         String event = MavenEvents.PROJECT_EXECUTION;
-        
+
         dispatcher.dispatchStart( event, project.getId() );
-        
+
         MavenExecutionResponse response = null;
         try
         {
             // Actual meat of the code.
             response = lifecycleExecutor.execute( request.getGoals(), session );
-            
+
             dispatcher.dispatchEnd( event, project.getId() );
         }
-        catch(Exception e)
+        catch ( Exception e )
         {
             dispatcher.dispatchError( event, project.getId(), e );
         }
@@ -131,8 +126,10 @@ public class DefaultMaven
         {
             if ( response.getException() != null )
             {
-                // TODO: this should be a "FATAL" exception, reported to the developers - however currently a LOT of
-                // "user" errors fall through the cracks (like invalid POMs, as one example)
+                // TODO: this should be a "FATAL" exception, reported to the
+                // developers - however currently a LOT of
+                // "user" errors fall through the cracks (like invalid POMs, as
+                // one example)
                 logError( response );
             }
             else
@@ -151,12 +148,11 @@ public class DefaultMaven
     // Reactor
     // ----------------------------------------------------------------------
 
-    public MavenExecutionResponse handleReactor( MavenReactorExecutionRequest request )
-        throws ReactorException
+    public MavenExecutionResponse handleReactor( MavenReactorExecutionRequest request ) throws ReactorException
     {
         EventDispatcher dispatcher = request.getEventDispatcher();
         String event = MavenEvents.REACTOR_EXECUTION;
-        
+
         dispatcher.dispatchStart( event, request.getBaseDirectory().getPath() );
         try
         {
@@ -231,7 +227,7 @@ public class DefaultMaven
                 }
 
             }
-            
+
             dispatcher.dispatchEnd( event, request.getBaseDirectory().getPath() );
 
             // TODO: not really satisfactory
@@ -240,13 +236,12 @@ public class DefaultMaven
         catch ( ReactorException e )
         {
             dispatcher.dispatchError( event, request.getBaseDirectory().getPath(), e );
-            
+
             throw e;
         }
     }
 
-    public MavenProject getProject( File pom, ArtifactRepository localRepository )
-        throws ProjectBuildingException
+    public MavenProject getProject( File pom, ArtifactRepository localRepository ) throws ProjectBuildingException
     {
         if ( pom.exists() )
         {
@@ -263,20 +258,26 @@ public class DefaultMaven
     // Methods used by all execution request handlers
     // ----------------------------------------------------------------------
 
-    //!! We should probably have the execution request handler create the session as
+    //!! We should probably have the execution request handler create the
+    // session as
     // the session type would be specific to the request i.e. having a project
     // or not.
 
     protected MavenSession createSession( MavenExecutionRequest request )
     {
-        return new MavenSession( container, pluginManager, request.getLocalRepository(), request.getEventDispatcher(), request.getLog(), request.getGoals() );
+        return new MavenSession( container,
+                                 pluginManager,
+                                 request.getLocalRepository(),
+                                 request.getEventDispatcher(),
+                                 request.getLog(),
+                                 request.getGoals() );
     }
 
     /**
-     * @todo [BP] this might not be required if there is a better way to pass them in. It doesn't feel quite right.
+     * @todo [BP] this might not be required if there is a better way to pass
+     *       them in. It doesn't feel quite right.
      */
-    private void resolveParameters( MavenExecutionRequest request )
-        throws ComponentLookupException
+    private void resolveParameters( MavenExecutionRequest request ) throws ComponentLookupException
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
@@ -295,7 +296,9 @@ public class DefaultMaven
                     getLogger().warn( "maven.proxy.http.port was not valid" );
                 }
             }
-            wagonManager.setProxy( "http", request.getParameter( "maven.proxy.http.host" ), port,
+            wagonManager.setProxy( "http",
+                                   request.getParameter( "maven.proxy.http.host" ),
+                                   port,
                                    request.getParameter( "maven.proxy.http.username" ),
                                    request.getParameter( "maven.proxy.http.password" ),
                                    request.getParameter( "maven.proxy.http.nonProxyHosts" ) );
@@ -380,7 +383,8 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" + ( r.totalMemory() / mb ) + "M" );
+        getLogger().info( "Final Memory: " + ((r.totalMemory() - r.freeMemory()) / mb) + "M/" + (r.totalMemory() / mb)
+            + "M" );
     }
 
     protected void line()
@@ -414,8 +418,7 @@ public class DefaultMaven
     // Reactor
     // ----------------------------------------------------------------------
 
-    public List getSortedProjects( List projects )
-        throws CycleDetectedException
+    public List getSortedProjects( List projects ) throws CycleDetectedException
     {
         return projectBuilder.getSortedProjects( projects );
     }

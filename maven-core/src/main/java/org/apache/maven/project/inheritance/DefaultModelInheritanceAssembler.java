@@ -17,20 +17,22 @@ package org.apache.maven.project.inheritance;
  * ====================================================================
  */
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PostGoal;
-import org.apache.maven.model.PreGoal;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
+import org.apache.maven.model.UnitTest;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -127,6 +129,275 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Scm
+        assembleScmInheritance( child, parent );
+
+        // ciManagement
+        if ( child.getCiManagement() == null )
+        {
+            child.setCiManagement( parent.getCiManagement() );
+        }
+
+        // developers
+        if ( child.getDevelopers().size() == 0 )
+        {
+            child.setDevelopers( parent.getDevelopers() );
+        }
+
+        // developers
+        if ( child.getContributors().size() == 0 )
+        {
+            child.setContributors( parent.getContributors() );
+        }
+
+        // mailingLists
+        if ( child.getMailingLists().size() == 0 )
+        {
+            child.setMailingLists( parent.getMailingLists() );
+        }
+
+        // reports
+        if ( child.getReports().size() == 0 )
+        {
+            child.setReports( parent.getReports() );
+        }
+
+        // Build
+        assembleBuildInheritance( child, parent );
+
+        // Dependencies :: aggregate
+        List dependencies = parent.getDependencies();
+
+        for ( Iterator iterator = dependencies.iterator(); iterator.hasNext(); )
+        {
+            Dependency dependency = (Dependency) iterator.next();
+
+            child.addDependency( dependency );
+
+        }
+
+        // Repositories :: aggregate
+        List parentRepositories = parent.getRepositories();
+
+        List childRepositories = child.getRepositories();
+
+        for ( Iterator iterator = parentRepositories.iterator(); iterator.hasNext(); )
+        {
+            Repository repository = (Repository) iterator.next();
+
+            if ( !childRepositories.contains( repository ) )
+            {
+                child.addRepository( repository );
+            }
+        }
+
+        // Plugins :: aggregate
+        List parentPlugins = parent.getPlugins();
+
+        List childPlugins = child.getPlugins();
+
+        for ( Iterator iterator = parentPlugins.iterator(); iterator.hasNext(); )
+        {
+            Plugin plugin = (Plugin) iterator.next();
+
+            if ( !childPlugins.contains( plugin ) )
+            {
+                child.addPlugin( plugin );
+            }
+        }
+
+        assembleDependencyManagementInheritance( child, parent );
+
+        assemblePluginManagementInheritance( child, parent );
+
+    }
+
+    private void assemblePluginManagementInheritance( Model child, Model parent )
+    {
+        PluginManagement parentPluginMgmt = parent.getPluginManagement();
+
+        PluginManagement childPluginMgmt = child.getPluginManagement();
+
+        if ( parentPluginMgmt != null )
+        {
+            if ( childPluginMgmt == null )
+            {
+                child.setPluginManagement( parentPluginMgmt );
+            }
+            else
+            {
+                List childPlugins = childPluginMgmt.getPlugins();
+
+                Map mappedChildPlugins = new TreeMap();
+                for ( Iterator it = childPlugins.iterator(); it.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) it.next();
+                    mappedChildPlugins.put( plugin.getId(), plugin );
+                }
+
+                for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) it.next();
+                    if ( !mappedChildPlugins.containsKey( plugin.getId() ) )
+                    {
+                        childPluginMgmt.addPlugin( plugin );
+                    }
+                    else
+                    {
+                        Plugin childPlugin = (Plugin) mappedChildPlugins.get( plugin.getId() );
+
+                        Map mappedChildGoals = new TreeMap();
+                        for ( Iterator itGoals = childPlugin.getGoals().iterator(); itGoals.hasNext(); )
+                        {
+                            Goal goal = (Goal) itGoals.next();
+                            mappedChildGoals.put( goal.getId(), goal );
+                        }
+
+                        for ( Iterator itGoals = plugin.getGoals().iterator(); itGoals.hasNext(); )
+                        {
+                            Goal parentGoal = (Goal) itGoals.next();
+                            Goal childGoal = (Goal) mappedChildGoals.get( parentGoal.getId() );
+
+                            if ( childGoal == null )
+                            {
+                                childPlugin.addGoal( parentGoal );
+                            }
+                            else
+                            {
+                                Boolean disabled = childGoal.isDisabled();
+                                if ( disabled == null )
+                                {
+                                    childGoal.setDisabled( parentGoal.isDisabled() );
+
+                                    Properties conf = new Properties( childGoal.getConfiguration() );
+
+                                    conf.putAll( parentGoal.getConfiguration() );
+
+                                    childGoal.setConfiguration( conf );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void assembleDependencyManagementInheritance( Model child, Model parent )
+    {
+        DependencyManagement parentDepMgmt = parent.getDependencyManagement();
+
+        DependencyManagement childDepMgmt = child.getDependencyManagement();
+
+        if ( parentDepMgmt != null )
+        {
+            if ( childDepMgmt == null )
+            {
+                child.setDependencyManagement( parentDepMgmt );
+            }
+            else
+            {
+                List childDeps = childDepMgmt.getDependencies();
+
+                Map mappedChildDeps = new TreeMap();
+                for ( Iterator it = childDeps.iterator(); it.hasNext(); )
+                {
+                    Dependency dep = (Dependency) it.next();
+                    mappedChildDeps.put( dep.getManagementKey(), dep );
+                }
+
+                for ( Iterator it = parentDepMgmt.getDependencies().iterator(); it.hasNext(); )
+                {
+                    Dependency dep = (Dependency) it.next();
+                    if ( !mappedChildDeps.containsKey( dep.getManagementKey() ) )
+                    {
+                        childDepMgmt.addDependency( dep );
+                    }
+                }
+            }
+        }
+    }
+
+    private void assembleBuildInheritance( Model child, Model parent )
+    {
+        Build childBuild = child.getBuild();
+        Build parentBuild = parent.getBuild();
+
+        if ( childBuild == null )
+        {
+            child.setBuild( parentBuild );
+        }
+        else
+        {
+            // The build has been set but we want to step in here and fill in
+            // values
+            // that have not been set by the child.
+
+            if ( childBuild.getDirectory() == null )
+            {
+                childBuild.setDirectory( parentBuild.getDirectory() );
+            }
+
+            if ( childBuild.getSourceDirectory() == null )
+            {
+                childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
+            }
+
+            if ( childBuild.getUnitTestSourceDirectory() == null )
+            {
+                childBuild.setUnitTestSourceDirectory( parentBuild.getUnitTestSourceDirectory() );
+            }
+
+            if ( childBuild.getOutput() == null )
+            {
+                childBuild.setOutput( parentBuild.getOutput() );
+            }
+
+            if ( childBuild.getTestOutput() == null )
+            {
+                childBuild.setTestOutput( parentBuild.getTestOutput() );
+            }
+
+            if ( childBuild.getFinalName() == null )
+            {
+                childBuild.setFinalName( parentBuild.getFinalName() );
+            }
+
+            List resources = childBuild.getResources();
+            if ( resources == null || resources.isEmpty() )
+            {
+                childBuild.setResources( parentBuild.getResources() );
+            }
+
+            UnitTest childUnitTest = childBuild.getUnitTest();
+            UnitTest parentUnitTest = parentBuild.getUnitTest();
+
+            if ( childUnitTest == null )
+            {
+                childBuild.setUnitTest( parentUnitTest );
+            }
+            else
+            {
+                if ( childUnitTest.getIncludes().size() == 0 )
+                {
+                    childUnitTest.setIncludes( parentUnitTest.getIncludes() );
+                }
+
+                if ( childUnitTest.getExcludes().size() == 0 )
+                {
+                    childUnitTest.setExcludes( parentUnitTest.getExcludes() );
+                }
+
+                List testResources = childUnitTest.getResources();
+                if ( testResources == null || testResources.isEmpty() )
+                {
+                    childUnitTest.setResources( parentUnitTest.getResources() );
+                }
+            }
+        }
+    }
+
+    private void assembleScmInheritance( Model child, Model parent )
+    {
         if ( parent.getScm() != null )
         {
             Scm parentScm = parent.getScm();
@@ -161,204 +432,6 @@ public class DefaultModelInheritanceAssembler
                 childScm.getBranches().addAll( parentScm.getBranches() );
             }
         }
-
-        // ciManagement
-        if ( child.getCiManagement() == null )
-        {
-            child.setCiManagement( parent.getCiManagement() );
-        }
-
-        // developers
-        if ( child.getDevelopers().size() == 0 )
-        {
-            child.setDevelopers( parent.getDevelopers() );
-        }
-
-        // developers
-        if ( child.getContributors().size() == 0 )
-        {
-            child.setContributors( parent.getContributors() );
-        }
-
-        // mailingLists
-        if ( child.getMailingLists().size() == 0 )
-        {
-            child.setMailingLists( parent.getMailingLists() );
-        }
-
-        // reports
-        if ( child.getReports().size() == 0 )
-        {
-            child.setReports( parent.getReports() );
-        }
-
-        // Build
-        if ( child.getBuild() == null )
-        {
-            child.setBuild( parent.getBuild() );
-        }
-        else
-        {
-            // The build has been set but we want to step in here and fill in
-            // values
-            // that have not been set by the child.
-
-            if ( child.getBuild().getDirectory() == null )
-            {
-                child.getBuild().setDirectory( parent.getBuild().getDirectory() );
-            }
-
-            if ( child.getBuild().getSourceDirectory() == null )
-            {
-                child.getBuild().setSourceDirectory( parent.getBuild().getSourceDirectory() );
-            }
-
-            if ( child.getBuild().getUnitTestSourceDirectory() == null )
-            {
-                child.getBuild().setUnitTestSourceDirectory( parent.getBuild().getUnitTestSourceDirectory() );
-            }
-
-            if ( child.getBuild().getOutput() == null )
-            {
-                child.getBuild().setOutput( parent.getBuild().getOutput() );
-            }
-
-            if ( child.getBuild().getTestOutput() == null )
-            {
-                child.getBuild().setTestOutput( parent.getBuild().getTestOutput() );
-            }
-
-            if ( child.getBuild().getFinalName() == null )
-            {
-                child.getBuild().setFinalName( parent.getBuild().getFinalName() );
-            }
-
-            List resources = child.getBuild().getResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                child.getBuild().setResources( parent.getBuild().getResources() );
-            }
-
-            if ( child.getBuild().getUnitTest() == null )
-            {
-                child.getBuild().setUnitTest( parent.getBuild().getUnitTest() );
-            }
-            else
-            {
-                if ( child.getBuild().getUnitTest().getIncludes().size() == 0 )
-                {
-                    child.getBuild().getUnitTest().setIncludes( parent.getBuild().getUnitTest().getIncludes() );
-                }
-
-                if ( child.getBuild().getUnitTest().getExcludes().size() == 0 )
-                {
-                    child.getBuild().getUnitTest().setExcludes( parent.getBuild().getUnitTest().getExcludes() );
-                }
-
-                List testResources = child.getBuild().getUnitTest().getResources();
-                if ( testResources == null || testResources.isEmpty() )
-                {
-                    child.getBuild().getUnitTest().setResources( parent.getBuild().getUnitTest().getResources() );
-                }
-            }
-        }
-
-        // Dependencies :: aggregate
-        List dependencies = parent.getDependencies();
-
-        for ( Iterator iterator = dependencies.iterator(); iterator.hasNext(); )
-        {
-            Dependency dependency = (Dependency) iterator.next();
-
-            child.addDependency( dependency );
-
-        }
-
-        // PreGoals :: aggregate
-        List preGoals = parent.getPreGoals();
-
-        for ( Iterator iterator = preGoals.iterator(); iterator.hasNext(); )
-        {
-            PreGoal preGoal = (PreGoal) iterator.next();
-
-            child.addPreGoal( preGoal );
-
-        }
-
-        // PostGoals :: aggregate
-        List postGoals = parent.getPostGoals();
-
-        for ( Iterator iterator = postGoals.iterator(); iterator.hasNext(); )
-        {
-            PostGoal postGoal = (PostGoal) iterator.next();
-
-            child.addPostGoal( postGoal );
-
-        }
-
-        // Repositories :: aggregate
-        List parentRepositories = parent.getRepositories();
-
-        List childRepositories = child.getRepositories();
-
-        for ( Iterator iterator = parentRepositories.iterator(); iterator.hasNext(); )
-        {
-            Repository repository = (Repository) iterator.next();
-
-            if ( !childRepositories.contains( repository ) )
-            {
-                child.addRepository( repository );
-            }
-        }
-
-        // Plugins :: aggregate
-        List parentPlugins = parent.getPlugins();
-
-        List childPlugins = child.getPlugins();
-
-        for ( Iterator iterator = parentPlugins.iterator(); iterator.hasNext(); )
-        {
-            Plugin plugin = (Plugin) iterator.next();
-
-            if ( !childPlugins.contains( plugin ) )
-            {
-                child.addPlugin( plugin );
-            }
-        }
-
-        DependencyManagement parentDepMgmt = parent.getDependencyManagement();
-
-        DependencyManagement childDepMgmt = child.getDependencyManagement();
-
-        if ( parentDepMgmt != null )
-        {
-            if ( childDepMgmt == null )
-            {
-                child.setDependencyManagement( parentDepMgmt );
-            }
-            else
-            {
-                List parentDeps = parentDepMgmt.getDependencies();
-
-                Map mappedParentDeps = new TreeMap();
-                for ( Iterator it = parentDeps.iterator(); it.hasNext(); )
-                {
-                    Dependency dep = (Dependency) it.next();
-                    mappedParentDeps.put( dep.getManagementKey(), dep );
-                }
-
-                List deps = new ArrayList( parentDeps );
-                for ( Iterator it = childDepMgmt.getDependencies().iterator(); it.hasNext(); )
-                {
-                    Dependency dep = (Dependency) it.next();
-                    if ( !mappedParentDeps.containsKey( dep.getManagementKey() ) )
-                    {
-                        deps.add( dep );
-                    }
-                }
-
-                childDepMgmt.setDependencies( deps );
-            }
-        }
     }
+
 }

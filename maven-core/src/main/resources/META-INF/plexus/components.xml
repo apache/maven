@@ -19,9 +19,6 @@
           <role>org.apache.maven.project.MavenProjectBuilder</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.lifecycle.session.MavenSessionPhaseManager</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
         </requirement>
       </requirements>
@@ -36,39 +33,6 @@
       <implementation>org.codehaus.plexus.i18n.DefaultI18N</implementation>
       <configuration>
         <default-bundle-name>org.apache.maven.messages.messages</default-bundle-name>
-      </configuration>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.lifecycle.session.MavenSessionPhaseManager</role>
-      <implementation>org.apache.maven.lifecycle.session.DefaultMavenSessionPhaseManager</implementation>
-      <configuration>
-        <lifecycle-phases>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.session.phase.GoalExecutionPhase"/>
-        </lifecycle-phases>
-      </configuration>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.lifecycle.goal.MavenGoalPhaseManager</role>
-      <implementation>org.apache.maven.lifecycle.goal.DefaultMavenGoalPhaseManager</implementation>
-      <configuration>
-        <lifecycle-phases>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.PluginResolutionPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalMappingPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalResolutionPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.DependencyResolutionPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.DependencyDownloadPhase"/>
-          <lifecycle-phase implementation="org.apache.maven.lifecycle.goal.phase.GoalAttainmentPhase"/>
-        </lifecycle-phases>
       </configuration>
     </component>
     <!--

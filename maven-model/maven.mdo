@@ -407,6 +407,17 @@
             <type>DependencyManagement</type>
           </association>
         </field>
+        <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
+         | plugins to be used in sub-projects. -->
+        <field>
+          <name>pluginManagement</name>
+          <version>4.0.0</version>
+          <required>false</required>
+          <description><![CDATA[Default plugin information for grouped projects inheriting from this one.]]></description>
+          <association>
+            <type>PluginManagement</type>
+          </association>
+        </field>
         <!-- @todo long run 4.0.0 may not need properties, with the parameters being specified
           for the plugin directly -->
         <field>
@@ -419,24 +430,6 @@
           <type>Properties</type>
           <association xml.mapStyle="inline">
             <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
-          <name>preGoals</name>
-          <version>4.0.0</version>
-          <description><![CDATA[Set of decorator(s) injected before the target goal(s).]]></description>
-          <association>
-            <type>PreGoal</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
-          <name>postGoals</name>
-          <version>4.0.0</version>
-          <description><![CDATA[Set of decorator(s) injected after the target goal(s).]]></description>
-          <association>
-            <type>PostGoal</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -1546,38 +1539,6 @@
         </field>
       </fields>
     </class>
-    <class>
-      <name>GoalDecorator</name>
-      <version>4.0.0</version>
-      <fields>
-        <field>
-          <name>name</name>
-          <version>4.0.0</version>
-          <description><![CDATA[The target goal which should be decorated.]]></description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>attain</name>
-          <version>4.0.0</version>
-          <description><![CDATA[
-            The goal which should be injected into the execution chain.
-          ]]></description>
-          <type>String</type>
-        </field>
-      </fields>
-    </class>
-    <class>
-      <superClass>GoalDecorator</superClass>
-      <name>PreGoal</name>
-      <version>4.0.0</version>
-      <fields></fields>
-    </class>
-    <class>
-      <superClass>GoalDecorator</superClass>
-      <name>PostGoal</name>
-      <version>4.0.0</version>
-      <fields></fields>
-    </class>
 
     <!--
 
@@ -1631,8 +1592,8 @@
         <field>
           <name>disabled</name>
           <version>4.0.0</version>
-          <type>boolean</type>
-          <defaultValue>false</defaultValue>
+          <type>Boolean</type>
+          <!-- defaultValue>false</defaultValue -->
         </field>
         <field>
           <name>configuration</name>
@@ -1664,8 +1625,8 @@
         <field>
           <name>disabled</name>
           <version>4.0.0</version>
-          <type>boolean</type>
-          <defaultValue>false</defaultValue>
+          <type>Boolean</type>
+          <!-- defaultValue>false</defaultValue -->
         </field>
         <field>
           <name>configuration</name>
@@ -1695,6 +1656,29 @@
           </description>
           <association>
             <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>PluginManagement</name>
+      <version>4.0.0</version>
+      <description>
+        Section for management of default plugin information for use in a group of POMs.
+      </description>
+      <fields>
+        <field>
+          <name>plugins</name>
+          <version>4.0.0</version>
+          <description>
+            The dependencies specified here are not validated until they
+            are referenced in a POM within the group. This allows the
+            specification of a "standard" version for a particular
+            dependency.
+          </description>
+          <association>
+            <type>Plugin</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>

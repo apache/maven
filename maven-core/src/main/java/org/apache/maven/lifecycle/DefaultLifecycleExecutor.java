@@ -22,7 +22,6 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.goal.GoalExecutionException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -41,8 +40,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: DefaultLifecycleExecutor.java,v 1.16 2005/03/04 09:04:25
+ *          jdcasey Exp $
  */
 public class DefaultLifecycleExecutor
     implements LifecycleExecutor, Initializable
@@ -68,9 +68,9 @@ public class DefaultLifecycleExecutor
     // ----------------------------------------------------------------------
 
     /**
-     * Execute a list of tasks. Each task may be a phase in the lifecycle
-     * or the execution of a mojo.
-     *
+     * Execute a list of tasks. Each task may be a phase in the lifecycle or the
+     * execution of a mojo.
+     * 
      * @param tasks
      * @param session
      */
@@ -82,12 +82,14 @@ public class DefaultLifecycleExecutor
 
         try
         {
-            // TODO: should enrich this with the type handler, but for now just use "type" as is
+            // TODO: should enrich this with the type handler, but for now just
+            // use "type" as is
             ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( session.getProject().getType() );
 
             if ( handler != null )
             {
-                // TODO: perhaps each type should define their own lifecycle completely, using the base as a default?
+                // TODO: perhaps each type should define their own lifecycle
+                // completely, using the base as a default?
                 // If so, remove both of these goals from type handler
                 if ( handler.packageGoal() != null )
                 {
@@ -139,15 +141,15 @@ public class DefaultLifecycleExecutor
     }
 
     // TODO: don't throw Exception
-    private void processPluginConfiguration( MavenProject project, MavenSession mavenSession )
-        throws Exception
+    private void processPluginConfiguration( MavenProject project, MavenSession mavenSession ) throws Exception
     {
         for ( Iterator i = project.getPlugins().iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
 
-            // TODO: should this flag be used in verifyPlugin, completely disabling the plugin?
-            if ( !plugin.isDisabled() )
+            // TODO: should this flag be used in verifyPlugin, completely
+            // disabling the plugin?
+            if ( Boolean.TRUE != plugin.isDisabled() )
             {
                 String pluginId = plugin.getId();
                 processPluginPhases( pluginId, mavenSession );
@@ -156,8 +158,7 @@ public class DefaultLifecycleExecutor
     }
 
     // TODO: don't throw Exception
-    private void processPluginPhases( String pluginId, MavenSession mavenSession )
-        throws Exception
+    private void processPluginPhases( String pluginId, MavenSession mavenSession ) throws Exception
     {
         pluginManager.verifyPlugin( pluginId, mavenSession );
         PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( pluginId );
@@ -165,7 +166,8 @@ public class DefaultLifecycleExecutor
         {
             MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
 
-            // TODO: check if the goal exists in the configuration and is disabled
+            // TODO: check if the goal exists in the configuration and is
+            // disabled
             if ( mojoDescriptor.getPhase() != null )
             {
                 Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
@@ -175,8 +177,7 @@ public class DefaultLifecycleExecutor
 
     }
 
-    private void processGoalChain( String task, MavenSession session )
-        throws Exception
+    private void processGoalChain( String task, MavenSession session ) throws Exception
     {
         if ( phaseMap.containsKey( task ) )
         {
@@ -204,8 +205,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void verifyMojoPhase( String task, MavenSession session )
-        throws Exception
+    private void verifyMojoPhase( String task, MavenSession session ) throws Exception
     {
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
         if ( mojoDescriptor == null )
@@ -232,11 +232,11 @@ public class DefaultLifecycleExecutor
         int index = phases.indexOf( phaseMap.get( phase ) );
 
         EventDispatcher dispatcher = session.getEventDispatcher();
-        
+
         for ( int j = 0; j <= index; j++ )
         {
             Phase p = (Phase) phases.get( j );
-            
+
             String event = MavenEvents.PHASE_EXECUTION;
 
             // !! This is ripe for refactoring to an aspect.
@@ -259,21 +259,20 @@ public class DefaultLifecycleExecutor
                         }
                     }
                 }
-                
+
                 dispatcher.dispatchEnd( event, p.getId() );
             }
             catch ( LifecycleExecutionException e )
             {
                 dispatcher.dispatchError( event, p.getId(), e );
-                
+
                 throw e;
             }
             // End event monitoring.
         }
     }
 
-    protected PluginExecutionResponse executeMojo( String id, MavenSession session )
-        throws LifecycleExecutionException
+    protected PluginExecutionResponse executeMojo( String id, MavenSession session ) throws LifecycleExecutionException
     {
         // ----------------------------------------------------------------------
         // We have something of the form <pluginId>:<mojoId>, so this might be
@@ -312,8 +311,7 @@ public class DefaultLifecycleExecutor
     // Lifecylce Management
     // ----------------------------------------------------------------------
 
-    public void initialize()
-        throws Exception
+    public void initialize() throws Exception
     {
         phaseMap = new HashMap();
 

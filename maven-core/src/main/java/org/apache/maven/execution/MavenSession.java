@@ -18,8 +18,6 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.PostGoal;
-import org.apache.maven.model.PreGoal;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.PluginManager;
@@ -32,12 +30,9 @@ import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 import org.codehaus.plexus.util.dag.Vertex;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -67,12 +62,8 @@ public class MavenSession
 
     private Log log;
 
-    public MavenSession( PlexusContainer container,
-                         PluginManager pluginManager,
-                         ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher,
-                         Log log,
-                         List goals )
+    public MavenSession( PlexusContainer container, PluginManager pluginManager, ArtifactRepository localRepository,
+        EventDispatcher eventDispatcher, Log log, List goals )
     {
         this.container = container;
 
@@ -81,7 +72,7 @@ public class MavenSession
         this.localRepository = localRepository;
 
         this.eventDispatcher = eventDispatcher;
-        
+
         this.log = log;
 
         this.dag = new DAG();
@@ -107,16 +98,6 @@ public class MavenSession
     public void setProject( MavenProject project )
     {
         this.project = project;
-
-        // ----------------------------------------------------------------------
-        // We only need these things to be done when we have a project.
-        // ----------------------------------------------------------------------
-
-        this.preGoalMappings = new TreeMap();
-
-        this.postGoalMappings = new TreeMap();
-
-        initGoalDecoratorMappings();
     }
 
     public ArtifactRepository getLocalRepository()
@@ -143,14 +124,12 @@ public class MavenSession
     //
     // ----------------------------------------------------------------------
 
-    public Object lookup( String role )
-        throws ComponentLookupException
+    public Object lookup( String role ) throws ComponentLookupException
     {
         return container.lookup( role );
     }
 
-    public Object lookup( String role, String roleHint )
-        throws ComponentLookupException
+    public Object lookup( String role, String roleHint ) throws ComponentLookupException
     {
         return container.lookup( role, roleHint );
     }
@@ -170,89 +149,22 @@ public class MavenSession
             }
         }
     }
-    
+
     public EventDispatcher getEventDispatcher()
     {
         return eventDispatcher;
     }
-    
+
     public Log getLog()
     {
         return log;
     }
 
-    //!! this should probably not be done here as there are request types that
-    // have no project
-
-    public List getPreGoals( String goal )
-    {
-        if ( project == null )
-        {
-            return null;
-        }
-
-        List result = (List) preGoalMappings.get( goal );
-
-        return result;
-    }
-
-    public List getPostGoals( String goal )
-    {
-        if ( project == null )
-        {
-            return null;
-        }
-
-        List result = (List) postGoalMappings.get( goal );
-
-        return result;
-    }
-
-    private void initGoalDecoratorMappings()
-    {
-        List allPreGoals = project.getPreGoals();
-
-        for ( Iterator it = allPreGoals.iterator(); it.hasNext(); )
-        {
-            PreGoal preGoal = (PreGoal) it.next();
-
-            List preGoalList = (List) preGoalMappings.get( preGoal.getName() );
-
-            if ( preGoalList == null )
-            {
-                preGoalList = new LinkedList();
-
-                preGoalMappings.put( preGoal.getName(), preGoalList );
-            }
-
-            preGoalList.add( preGoal.getAttain() );
-        }
-
-        List allPostGoals = project.getPostGoals();
-
-        for ( Iterator it = allPostGoals.iterator(); it.hasNext(); )
-        {
-            PostGoal postGoal = (PostGoal) it.next();
-
-            List postGoalList = (List) postGoalMappings.get( postGoal.getName() );
-
-            if ( postGoalList == null )
-            {
-                postGoalList = new LinkedList();
-
-                postGoalMappings.put( postGoal.getName(), postGoalList );
-            }
-
-            postGoalList.add( postGoal.getAttain() );
-        }
-    }
-
-    public void addImpliedExecution( String goal, String implied )
-        throws CycleDetectedException
+    public void addImpliedExecution( String goal, String implied ) throws CycleDetectedException
     {
         dag.addEdge( goal, implied );
     }
-    
+
     public void addSingleExecution( String goal )
     {
         dag.addVertex( goal );
@@ -261,13 +173,13 @@ public class MavenSession
     public List getExecutionChain( String goal )
     {
         Vertex vertex = dag.getVertex( goal );
-        
+
         List sorted = TopologicalSorter.sort( vertex );
-        
+
         int goalIndex = sorted.indexOf( goal );
-        
+
         List chainToHere = sorted.subList( 0, goalIndex + 1 );
-        
+
         return chainToHere;
     }
 

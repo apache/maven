@@ -2,11 +2,16 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.goal.MavenGoalExecutionContext;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.codehaus.plexus.PlexusContainer;
 
 import java.io.File;
+import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -17,8 +22,6 @@ public class PluginParameterExpressionEvaluatorTest
 {
     private MavenProject project;
 
-    private MavenGoalExecutionContext context;
-
     protected void setUp()
         throws Exception
     {
@@ -27,18 +30,36 @@ public class PluginParameterExpressionEvaluatorTest
         File f =  getTestFile( "src/test/resources/pom.xml" );
 
         project = getProject( f );
-
-        context = createGoalExecutionContext();
     }
 
     public void testValueExtractionWithAPomValueContainingAPath()
         throws Exception
     {
-        Object value = PluginParameterExpressionEvaluator.evaluate( "#project.build.directory/classes", context.getSession() );
-
         String expected = getTestFile( "target/test-classes/target/classes" ).getCanonicalPath();
 
+        ArtifactRepository repo = new ArtifactRepository("local", "here");
+        PluginManager mgr = (PluginManager)lookup(PluginManager.ROLE);
+        
+        PlexusContainer container = getContainer();
+        MavenSession session = new MavenSession(container, mgr, repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
+        
+        Build build = new Build();
+        build.setDirectory(expected.substring(0, expected.length() - "/classes".length()));
+        
+        Model model = new Model();
+        model.setBuild(build);
+        
+        MavenProject project = new MavenProject(model);
+        project.setFile(new File("pom.xml").getCanonicalFile());
+        
+        session.setProject(project);
+        
+        Object value = PluginParameterExpressionEvaluator.evaluate( "#project.build.directory/classes", session );
+
         String actual = new File( value.toString() ).getCanonicalPath();
+        
+        System.out.println("Expected value: " + expected);
+        System.out.println("Resolved value: " + actual);
 
         assertEquals( expected, actual );
     }
@@ -48,7 +69,12 @@ public class PluginParameterExpressionEvaluatorTest
     {
         String role = "#component.org.apache.maven.project.MavenProjectBuilder";
 
-        Object value = PluginParameterExpressionEvaluator.evaluate( role, context.getSession() );
+        ArtifactRepository repo = new ArtifactRepository();
+        PluginManager mgr = (PluginManager)lookup(PluginManager.ROLE);
+        
+        PlexusContainer container = getContainer();
+        MavenSession session = new MavenSession(container, mgr, repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
+        Object value = PluginParameterExpressionEvaluator.evaluate( role, session );
 
         assertNotNull( value );
     }
@@ -56,7 +82,13 @@ public class PluginParameterExpressionEvaluatorTest
     public void testLocalRepositoryExtraction()
         throws Exception
     {
-        Object value = PluginParameterExpressionEvaluator.evaluate( "#localRepository", context.getSession() );
+        ArtifactRepository repo = new ArtifactRepository("local", "target/repo");
+        PluginManager mgr = (PluginManager)lookup(PluginManager.ROLE);
+        
+        PlexusContainer container = getContainer();
+        MavenSession session = new MavenSession(container, mgr, repo, new DefaultEventDispatcher(), new DefaultLog(container.getLogger()), Collections.EMPTY_LIST);
+        
+        Object value = PluginParameterExpressionEvaluator.evaluate( "#localRepository", session );
 
         assertEquals( "local", ((ArtifactRepository)value).getId() );
     }

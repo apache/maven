@@ -19,8 +19,6 @@ package org.apache.maven.project.inheritance;
 import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.PostGoal;
-import org.apache.maven.model.PreGoal;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.UnitTest;
@@ -69,19 +67,6 @@ public class DefaultModelInheritanceAssemblerTest
         parentBuild.setUnitTest( parentUT );
         parent.setBuild( parentBuild );
         
-        PreGoal preGoal1 = new PreGoal();
-        preGoal1.setName("compiler:compile");
-        preGoal1.setAttain("clean:clean");
-        
-        parent.addPreGoal(preGoal1);
-        
-        // hehe...try getting anything done with this one in place!
-        PostGoal postGoal1 = new PostGoal();
-        postGoal1.setName("jar:jar");
-        postGoal1.setAttain("clean:clean");
-        
-        parent.addPostGoal(postGoal1);
-
         Model child = new Model();
 
         child.setType( "plugin" );
@@ -95,12 +80,6 @@ public class DefaultModelInheritanceAssemblerTest
         childBuild.setUnitTest( childUT );
         child.setBuild( childBuild );
         
-        PreGoal preGoal2 = new PreGoal();
-        preGoal2.setName("compiler:compile");
-        preGoal2.setAttain("qdox:generate");
-        
-        child.addPreGoal(preGoal2);
-
         assembler.assembleModelInheritance( child, parent );
 
         assertEquals( "source directory should be from parent", "src/main/java", child.getBuild().getSourceDirectory() );
@@ -128,12 +107,6 @@ public class DefaultModelInheritanceAssemblerTest
 
         assertEquals( "plugin", child.getType() );
         assertEquals( "jar", parent.getType() );
-        
-        assertEquals("merged child should have 2 preGoals", 2, child.getPreGoals().size());
-        assertTrue("preGoal should be inherited from parent", child.getPreGoals().contains(preGoal1));
-        assertTrue("preGoal should be preserved from child", child.getPreGoals().contains(preGoal2));
-        
-        assertEquals("1 postGoal should be inherited from parent", 1, child.getPostGoals().size());
     }
 
     /**

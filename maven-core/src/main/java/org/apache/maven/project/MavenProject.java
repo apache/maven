@@ -39,15 +39,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The concern of the project is provide runtime values based on the model.
- * <p/>
- * The values in the model remain untouched but during the process of building
- * a project notions like inheritance and interpolation can be added. This allows
- * to have an entity which is useful in a runtime while preserving the model so that
- * it can be marshalled and unmarshalled without being tainted by runtime
- * requirements.
- * <p/>
- * We need to leave the model intact because we don't want the following:
+ * The concern of the project is provide runtime values based on the model. <p/>
+ * The values in the model remain untouched but during the process of building a
+ * project notions like inheritance and interpolation can be added. This allows
+ * to have an entity which is useful in a runtime while preserving the model so
+ * that it can be marshalled and unmarshalled without being tainted by runtime
+ * requirements. <p/>We need to leave the model intact because we don't want
+ * the following:
  * <ol>
  * <li>We don't want interpolated values being written back into the model.
  * <li>We don't want inherited values being written back into the model.
@@ -67,6 +65,7 @@ public class MavenProject
     {
         this.model = model;
     }
+
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------
@@ -116,7 +115,7 @@ public class MavenProject
     {
         return model.getDependencies();
     }
-    
+
     public DependencyManagement getDependencyManagement()
     {
         return model.getDependencyManagement();
@@ -126,7 +125,8 @@ public class MavenProject
     // Test and compile sourceroots.
     // ----------------------------------------------------------------------
 
-    //!!! Refactor, collect the list of compile source roots and create a path1:path2
+    //!!! Refactor, collect the list of compile source roots and create a
+    // path1:path2
     // type construct from the list instead of the other way around. jvz.
 
     private String compileSourceRoots = "";
@@ -239,7 +239,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( a.getScope() == null || "test".equals( a.getScope() ) || "compile".equals( a.getScope() ) || "runtime".equals( a.getScope() ) )
+                if ( a.getScope() == null || "test".equals( a.getScope() ) || "compile".equals( a.getScope() )
+                    || "runtime".equals( a.getScope() ) )
                 {
                     list.add( a.getPath() );
                 }
@@ -327,7 +328,7 @@ public class MavenProject
 
     public void setType( String type )
     {
-         model.setType( type );
+        model.setType( type );
     }
 
     public void setInceptionYear( String inceptionYear )
@@ -541,23 +542,9 @@ public class MavenProject
     }
 
     // ----------------------------------------------------------------------
-    // Decorators
-    // ----------------------------------------------------------------------
-
-    public List getPreGoals()
-    {
-        return model.getPreGoals();
-    }
-
-    public List getPostGoals()
-    {
-        return model.getPostGoals();
-    }
-
-    // ----------------------------------------------------------------------
     // Plugins
     // ----------------------------------------------------------------------
-    
+
     public List getPlugins()
     {
         return model.getPlugins();

@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.session;
+package org.apache.maven.lifecycle;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -17,20 +17,26 @@ package org.apache.maven.lifecycle.session;
  * ====================================================================
  */
 
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResponse;
-import org.codehaus.plexus.logging.Logger;
-
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @version $Id: GoalExecutionException.java,v 1.3 2004/12/25 16:26:24 jvanzyl
+ *          Exp $
  */
-public interface MavenSessionPhase
+public class GoalExecutionException
+    extends Exception
 {
-    String ROLE = MavenSessionPhase.class.getName();
+    public GoalExecutionException( String message )
+    {
+        super( message );
+    }
 
-    void execute( MavenExecutionRequest request, MavenExecutionResponse response )
-        throws Exception;
+    public GoalExecutionException( Throwable cause )
+    {
+        super( cause );
+    }
 
-    void enableLogging( Logger logger );
+    public GoalExecutionException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }

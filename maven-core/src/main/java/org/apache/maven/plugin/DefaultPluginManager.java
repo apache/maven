@@ -1,19 +1,15 @@
 package org.apache.maven.plugin;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+/*
+ * ====================================================================
+ * Copyright 2001-2004 The Apache Software Foundation. Licensed under the Apache
+ * License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
+ * or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  * ====================================================================
  */
 
@@ -28,7 +24,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.goal.GoalExecutionException;
+import org.apache.maven.lifecycle.GoalExecutionException;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -103,9 +99,9 @@ public class DefaultPluginManager
 
     /**
      * Mojo descriptors are looked up using their id which is of the form
-     * <pluginId>:<mojoId>. So this might be archetype:create for example which
+     * <pluginId>: <mojoId>. So this might be archetype:create for example which
      * is the create mojo that resides in the archetype plugin.
-     *
+     * 
      * @param name
      * @return
      */
@@ -125,8 +121,7 @@ public class DefaultPluginManager
 
     private Set pluginsInProcess = new HashSet();
 
-    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor )
-        throws CycleDetectedException
+    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor ) throws CycleDetectedException
     {
         if ( pluginsInProcess.contains( mavenPluginDescriptor.getPluginId() ) )
         {
@@ -157,7 +152,7 @@ public class DefaultPluginManager
     {
         ComponentSetDescriptor componentSetDescriptor = event.getComponentSetDescriptor();
 
-        if ( !( componentSetDescriptor instanceof MavenPluginDescriptor ) )
+        if ( !(componentSetDescriptor instanceof MavenPluginDescriptor) )
         {
             return;
         }
@@ -194,8 +189,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPluginForGoal( String goalName, MavenSession session )
-        throws Exception
+    public void verifyPluginForGoal( String goalName, MavenSession session ) throws Exception
     {
         String pluginId = getPluginId( goalName );
 
@@ -203,8 +197,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    public void verifyPlugin( String pluginId, MavenSession session )
-        throws Exception
+    public void verifyPlugin( String pluginId, MavenSession session ) throws Exception
     {
         if ( !isPluginInstalled( pluginId ) )
         {
@@ -223,8 +216,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    protected void addPlugin( Artifact pluginArtifact, MavenSession session )
-        throws Exception
+    protected void addPlugin( Artifact pluginArtifact, MavenSession session ) throws Exception
     {
         // TODO: these should be configured, not instantiated here
 
@@ -234,17 +226,19 @@ public class DefaultPluginManager
 
         MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
-        ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact, artifactResolver,
-                                                               remotePluginRepositories, session.getLocalRepository(),
-                                                               metadataSource, artifactFilter );
+        ((ArtifactEnabledContainer) container).addComponent( pluginArtifact,
+                                                             artifactResolver,
+                                                             remotePluginRepositories,
+                                                             session.getLocalRepository(),
+                                                             metadataSource,
+                                                             artifactFilter );
     }
 
     // ----------------------------------------------------------------------
     // Plugin execution
     // ----------------------------------------------------------------------
 
-    public PluginExecutionResponse executeMojo( MavenSession session, String goalName )
-        throws GoalExecutionException
+    public PluginExecutionResponse executeMojo( MavenSession session, String goalName ) throws GoalExecutionException
     {
         try
         {
@@ -281,7 +275,7 @@ public class DefaultPluginManager
 
         try
         {
-//            getLogger().info( "[" + mojoDescriptor.getId() + "]" );
+            //            getLogger().info( "[" + mojoDescriptor.getId() + "]" );
 
             request = new PluginExecutionRequest( DefaultPluginManager.createParameters( mojoDescriptor, session ) );
 
@@ -299,7 +293,7 @@ public class DefaultPluginManager
         try
         {
             plugin = (Plugin) container.lookup( Plugin.ROLE, goalName );
-            
+
             // !! This is ripe for refactoring to an aspect.
             // Event monitoring.
             String event = MavenEvents.MOJO_EXECUTION;
@@ -309,10 +303,10 @@ public class DefaultPluginManager
             try
             {
                 plugin.execute( request, response );
-                
+
                 dispatcher.dispatchEnd( event, goalName );
             }
-            catch(Exception e)
+            catch ( Exception e )
             {
                 session.getEventDispatcher().dispatchError( event, goalName, e );
                 throw e;
@@ -336,8 +330,7 @@ public class DefaultPluginManager
     }
 
     // TODO: don't throw Exception
-    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
-        throws Exception
+    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request ) throws Exception
     {
         if ( request != null && request.getParameters() != null )
         {
@@ -363,8 +356,7 @@ public class DefaultPluginManager
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
 
-    public static Map createParameters( MojoDescriptor goal, MavenSession session )
-        throws PluginConfigurationException
+    public static Map createParameters( MojoDescriptor goal, MavenSession session ) throws PluginConfigurationException
     {
         Map map = null;
 
@@ -412,7 +404,8 @@ public class DefaultPluginManager
             // ----------------------------------------------------------------------
             // We will perform a basic check here for parameters values that are
             // required. Required parameters can't be null so we throw an
-            // Exception in the case where they are. We probably want some pluggable
+            // Exception in the case where they are. We probably want some
+            // pluggable
             // mechanism here but this will catch the most obvious of
             // misconfigurations.
             // ----------------------------------------------------------------------
@@ -456,8 +449,10 @@ public class DefaultPluginManager
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The '" + parameter.getName() ).append( "' parameter is required for the execution of the " ).append(
-            mojo.getId() ).append( " mojo and cannot be null." );
+        message.append( "The '" + parameter.getName() )
+               .append( "' parameter is required for the execution of the " )
+               .append( mojo.getId() )
+               .append( " mojo and cannot be null." );
 
         return message.toString();
     }
@@ -466,9 +461,7 @@ public class DefaultPluginManager
     // Lifecycle
     // ----------------------------------------------------------------------
 
-
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -476,10 +469,17 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
-                                                              "maven-monitor", "maven-plugin", "plexus-container-api",
-                                                              "plexus-container-default", "plexus-artifact-container",
-                                                              "wagon-provider-api", "classworlds"} );
+        artifactFilter = new ExclusionSetFilter( new String[] {
+            "maven-core",
+            "maven-artifact",
+            "maven-model",
+            "maven-monitor",
+            "maven-plugin",
+            "plexus-container-api",
+            "plexus-container-default",
+            "plexus-artifact-container",
+            "wagon-provider-api",
+            "classworlds" } );
 
         // TODO: move this to be configurable from the Maven component
         remotePluginRepositories = new HashSet();
@@ -492,8 +492,7 @@ public class DefaultPluginManager
     // Artifact resolution
     // ----------------------------------------------------------------------
 
-    private void resolveTransitiveDependencies( MavenSession context )
-        throws ArtifactResolutionException
+    private void resolveTransitiveDependencies( MavenSession context ) throws ArtifactResolutionException
     {
         MavenProject project = context.getProject();
 
@@ -511,8 +510,7 @@ public class DefaultPluginManager
     // Artifact downloading
     // ----------------------------------------------------------------------
 
-    private void downloadDependencies( MavenSession context )
-        throws GoalExecutionException
+    private void downloadDependencies( MavenSession context ) throws GoalExecutionException
     {
         try
         {
