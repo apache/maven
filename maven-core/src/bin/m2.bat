@@ -35,11 +35,6 @@
 @REM enable echoing my setting MAVEN_BATCH_ECHO to 'on'
 @if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
 
-@REM Setting default values
-set CLASSWORLDS_JAR=%M2_HOME%\core\boot\classworlds-*.jar
-set CLASSWORLDS_CONF=%M2_HOME%\bin\m2.conf
-set CLASSWORLDS_LAUNCHER=org.codehaus.classworlds.Launcher
-
 @REM Execute a user defined script before this one
 if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
 
@@ -70,7 +65,7 @@ goto end
 :chkMHome
 if not "%M2_HOME%"=="" goto valMHome
 
-if "%OS%"=="Windows_NT" SET M2_HOME=%~dp0\..
+if "%OS%"=="Windows_NT" SET M2_HOME=%~dps0\..
 if not "%M2_HOME%"=="" goto valMHome
 
 echo.
@@ -126,7 +121,7 @@ if "%MAVEN_OPTS%"=="" SET MAVEN_OPTS="-Xmx256m"
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
 @REM Start MAVEN2
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%M2_HOME%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %M2_HOME%\core\boot\classworlds-*.jar "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
 goto :end
 
 :end
