@@ -19,7 +19,7 @@ import org.apache.maven.plugin.generator.jelly.JellyHarnessGenerator;
  *  type="String"
  *  required="true" 
  *  validator=""
- *  expression="#project.build.output
+ *  expression="#project.build.output"
  *  description="x"
  * @parameter
  *  name="pom"
