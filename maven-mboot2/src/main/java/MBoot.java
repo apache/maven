@@ -10,40 +10,23 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Date;
 
 public class MBoot
 {
-    // I need:
-    // o pom install (done)
-    // o jar install (done)
-    // o bean generation - this is not entirely necessary
-    // o jelly generation - this is not entirely necessary
-    // o plugin descriptor (done)
-    // o xpp3/reader and writer (done)
-    // o compilation of generated sources in target/generated-sources (done)
-    // o need to run modello to generate the sources (done)
-    // o make this work over and over again (done)
-    // o hide the dependencies for mboot in the JAR (done)
-
-    // maven-core
-    // maven-plugin
-    // maven-plugins
-
     // ----------------------------------------------------------------------
-    //
+    // These are the bootstrap processes' dependencies
     // ----------------------------------------------------------------------
     
-    String[] deps = new String[]
+    String[] bootstrapDeps = new String[]
     {
+        "maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar",
         "junit/jars/junit-3.8.1.jar",
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
@@ -53,14 +36,33 @@ public class MBoot
         "surefire/jars/surefire-1.2-SNAPSHOT.jar",
         "xpp3/jars/xpp3-1.1.3.3.jar",
         "xstream/jars/xstream-1.0-SNAPSHOT.jar",
-        "qdox/jars/qdox-1.2.jar",
-        "maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar"
+        "qdox/jars/qdox-1.2.jar"
     };
+
+    // ----------------------------------------------------------------------
+    // These are plexus' runtime dependencies
+    // ----------------------------------------------------------------------
+
+    String[] plexusDeps = new String[]
+    {
+        "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
+        "plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
+        "plexus/jars/plexus-container-default-1.0-alpha-1-SNAPSHOT.jar",
+        "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
+        "xpp3/jars/xpp3-1.1.3.3.jar",
+        "xstream/jars/xstream-1.0-SNAPSHOT.jar",
+    };
+
+    // ----------------------------------------------------------------------
+    // These are modello's runtime dependencies
+    // ----------------------------------------------------------------------
 
     String[] modelloDeps = new String[]
     {
         "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
-        "plexus/jars/plexus-0.17-SNAPSHOT.jar",
+        "plexus/jars/plexus-container-api-1.0-alpha-1-SNAPSHOT.jar",
+        "plexus/jars/plexus-container-default-1.0-alpha-1-SNAPSHOT.jar",
+        "plexus/jars/plexus-utils-1.0-alpha-1-SNAPSHOT.jar",
         "modello/jars/modello-core-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xdoc-plugin-1.0-SNAPSHOT.jar",
         "modello/jars/modello-xml-plugin-1.0-SNAPSHOT.jar",
@@ -69,26 +71,12 @@ public class MBoot
         "xstream/jars/xstream-1.0-SNAPSHOT.jar"
     };
 
-    String[] plexusDeps = new String[]
-    {
-        "classworlds/jars/classworlds-1.1-SNAPSHOT.jar",
-        //"plexus/jars/plexus-0.17.jar",
-        "plexus/jars/plexus-0.17-SNAPSHOT.jar",
-        //"plexus/jars/plexus-artifact-container-1.0-alpha-1-SNAPSHOT.jar",
-        "xpp3/jars/xpp3-1.1.3.3.jar",
-        "xstream/jars/xstream-1.0-SNAPSHOT.jar",
-        //"maven/jars/maven-artifact-2.0-SNAPSHOT.jar",
-        //"maven/jars/wagon-api-1.0-alpha-1-SNAPSHOT.jar",
-        //"maven/jars/wagon-http-lightweight-1.0-alpha-1-SNAPSHOT.jar"
-    };
-
     String[] builds = new String[]
     {
         "maven-model",
         "maven-plugin",
         "maven-plugin-tools",
         "maven-artifact",
-        // "maven-1.x-integration",
         "maven-core",
         "maven-core-it-verifier"
     };
@@ -224,7 +212,7 @@ public class MBoot
 
         String basedir = System.getProperty( "user.dir" );
 
-        mbootDependencies = Arrays.asList( deps );
+        mbootDependencies = Arrays.asList( bootstrapDeps );
 
         if ( online )
         {
@@ -323,9 +311,20 @@ public class MBoot
 
         FileUtils.mkdir( new File( core ).getPath() );
 
+        String boot = new File( dist, "core/boot" ).getAbsolutePath();
+
+        FileUtils.mkdir( new File( boot ).getPath() );
+
         for ( int i = 0; i < plexusDeps.length; i++ )
         {
-            FileUtils.copyFileToDirectory( repoLocal + "/" + plexusDeps[i], core );
+            if ( plexusDeps[i].startsWith( "classworlds") )
+            {
+                FileUtils.copyFileToDirectory( repoLocal + "/" + plexusDeps[i], boot );
+            }
+            else
+            {
+                FileUtils.copyFileToDirectory( repoLocal + "/" + plexusDeps[i], core );
+            }
         }
 
         // ----------------------------------------------------------------------
@@ -344,10 +343,7 @@ public class MBoot
                  d.artifactId.equals( "plexus" ) ||
                  d.artifactId.equals( "xstream" ) ||
                  d.artifactId.equals( "xpp3" ) ||
-                 d.artifactId.equals( "junit" ) )// ||
-                 //d.artifactId.equals( "wagon-api" ) ||
-                 //d.artifactId.equals( "plexus-artifact-container" ) ||
-                 //d.artifactId.equals( "maven-artifact" ) )
+                 d.artifactId.equals( "junit" ) )
             {
                 continue;
             }
@@ -434,7 +430,7 @@ public class MBoot
         FileUtils.forceDelete( buildDirFile );
 
         // ----------------------------------------------------------------------
-        // Download deps
+        // Download bootstrapDeps
         // ----------------------------------------------------------------------
 
         if ( online )
@@ -470,19 +466,19 @@ public class MBoot
 
             generateSources( model.getAbsolutePath(), "java", generatedSources, "4.0.0", "false" );
 
-            generateSources( model.getAbsolutePath(), "java", generatedSources, "3.0.0", "true" );
+            //generateSources( model.getAbsolutePath(), "java", generatedSources, "3.0.0", "true" );
 
             generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, "4.0.0", "false" );
 
-            generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, "3.0.0", "true" );
+            //generateSources( model.getAbsolutePath(), "xpp3-reader", generatedSources, "3.0.0", "true" );
 
             generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, "4.0.0", "false" );
 
-            generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, "3.0.0", "true" );
+            //generateSources( model.getAbsolutePath(), "xpp3-writer", generatedSources, "3.0.0", "true" );
 
             generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, "4.0.0", "false" );
 
-            generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, "3.0.0", "true" );
+            //generateSources( model.getAbsolutePath(), "xdoc", generatedDocs, "3.0.0", "true" );
         }
 
         // ----------------------------------------------------------------------
