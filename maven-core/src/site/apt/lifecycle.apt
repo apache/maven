@@ -27,33 +27,36 @@ Maven Lifecycle
 
 +-----+
 
-                          goal0
-                            |
-                            |
-                       is the plugin for
-                       goal0 present?
-                            |
-                            |
-                     yes ---+--- no
-                      |          |
-                      |          v
-                      |      download the plugin which
-                      |      contains code for this goal
-                      |          |          
-                      |          |
-                      |          v
-                      |      process the plugin descriptor
-                      |      and cache the results
-                      |          |
-                      |          |
-                      |<---------+         
-                      |
-                      v
-                    does goal0 have any prereqs?
-                      |
-               yes ---+--- no
-                                 
-                     
+                +------------>  goalX
+                |                |
+                |                |
+                |           is the plugin for
+                |           goalX present?
+                |                |
+                |                |
+                |         yes ---+--- no
+                |          |          |
+                |          |          v
+                |          |      download the plugin which
+                |          |      contains code for this goal
+                |          |          |
+                |          |          |
+                |          |          v
+                |          |      process the plugin descriptor
+                |          |      and cache the results
+                |          |          |
+                |          |          |
+                |          |<---------+
+                |          |
+                |          v
+                |         does goal0 have any prereqs?
+                |           |
+                |    yes ---+--- no
+                |    |
+                |    |
+                | foreach(prereq)
+                |    |
+                +----+
 +-----+
 
  * Multiple goals
