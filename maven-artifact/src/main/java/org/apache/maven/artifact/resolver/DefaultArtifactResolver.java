@@ -77,6 +77,10 @@ public class DefaultArtifactResolver
             ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
 
             sb.append( remoteRepository.getUrl() );
+            if ( i.hasNext() )
+            {
+                sb.append( ", " );
+            }
         }
 
         return sb.toString();
