@@ -37,8 +37,6 @@ public class DefaultArtifact
 
     private String type;
 
-
-
     private String extension;
 
     private String path;
