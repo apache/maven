@@ -1,7 +1,7 @@
 <plugin>
   <id>compiler</id>
   <implementation>org.apache.maven.plugin.CompilerPlugin</implementation>
-  <instantiation-strategy>per-lookup</instantiation-strategy>
+  <mode>integrated</mode>
   <requirements>
     <requirement>
       <role>org.codehaus.plexus.compiler.Compiler</role>
@@ -11,24 +11,24 @@
   <goals>
     <goal>
       <name>compile</name>
-      <configuration>
+      <parameters>
         <sourceDirectory>#project.build.sourceDirectory</sourceDirectory>
         <outputDirectory>#maven.build.dest</outputDirectory>
         <classpathElements>#project.classpathElements</classpathElements>
         <compiler>javac</compiler>
-      </configuration>
+      </parameters>
     </goal>
     <goal>
       <name>test:compile</name>
       <prereqs>
         <prereq>compile</prereq>
       </prereqs>
-      <configuration>
+      <parameters>
         <sourceDirectory>#project.build.unitTestSourceDirectory</sourceDirectory>
         <outputDirectory>#maven.test.dest</outputDirectory>
         <classpathElements>#project.classpathElements</classpathElements>
         <compiler>javac</compiler>
-      </configuration>
+      </parameters>
     </goal>
   </goals>
 </plugin>

@@ -1,6 +1,7 @@
 <plugin>
   <id>jar</id>
   <implementation>org.apache.maven.plugin.JarPlugin</implementation>
+  <mode>field</mode>
   <goals>
     <goal>
       <name>jar</name>
@@ -8,11 +9,11 @@
         <prereq>test</prereq>
         <prereq>resources</prereq>
       </prereqs>
-      <configuration>
+      <fields>
         <jarName>#maven.final.name</jarName>
         <outputDirectory>#maven.build.dir</outputDirectory>
         <basedir>#maven.build.dest</basedir>
-      </configuration>
+      </fields>
     </goal>
   </goals>
 </plugin>

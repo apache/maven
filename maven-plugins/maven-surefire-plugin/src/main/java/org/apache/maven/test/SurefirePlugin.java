@@ -11,20 +11,13 @@ import java.util.List;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  *
  * @version $Id$
+ *
+ * @todo make version of junit and surefire configurable
+ * @todo make report to be produced configurable
  */
 public class SurefirePlugin
 {
-    private String mavenRepoLocal;
-
-    private String basedir;
-
-    private List includes;
-
-    private List excludes;
-
-    private String[] classpathElements;
-
-    public void execute()
+    public void execute( String mavenRepoLocal, String basedir, List includes, List excludes, String[] classpathElements )
         throws Exception
     {
         System.setProperty( "basedir", basedir );
