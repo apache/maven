@@ -50,6 +50,10 @@
             This release includes support for Marmalade, a scripting framework that supports an XML syntax similar to Jelly
             which can be used to integrate Ant tasks and has a Jelly compatibility layer.
           </li>
+          <li>
+            <i>Improved repository layout</i> - Maven 2.0 supports both the existing layout, and an improved repository
+            layout that has deeper, partitioned structure making it easier to browse.
+          </li>
         </ul>
       </answer>
     </faq>
