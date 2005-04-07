@@ -33,7 +33,9 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -51,7 +53,10 @@ import org.codehaus.plexus.util.FileUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -107,7 +112,24 @@ public class MavenCli
         }
         if ( commandLine.hasOption( CLIManager.VERSION ) )
         {
-            System.out.println( "Maven version: " );
+            // TODO: is there a beter way? Maybe read the manifest?
+
+            String version = "unknown";
+
+            for ( Enumeration e = MavenCli.class.getClassLoader().getResources( "/META-INF/maven/pom.xml" );
+                  e.hasMoreElements(); )
+            {
+                URL resource = (URL) e.nextElement();
+                if ( resource.getPath().indexOf( "maven-core" ) >= 0 )
+                {
+                    MavenXpp3Reader reader = new MavenXpp3Reader();
+                    Model model = reader.read( new InputStreamReader( resource.openStream() ) );
+                    version = model.getVersion();
+                    break;
+                }
+            }
+
+            System.out.println( "Maven version: " + version );
             return 0;
         }
 
