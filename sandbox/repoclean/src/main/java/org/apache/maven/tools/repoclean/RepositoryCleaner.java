@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.tools.repoclean.artifact.metadata.ProjectMetadata;
 import org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier;
 import org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer;
+import org.apache.maven.tools.repoclean.index.ArtifactIndexer;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter;
 import org.codehaus.plexus.PlexusConstants;
@@ -61,7 +62,9 @@ public class RepositoryCleaner
     private ArtifactDigestVerifier artifactDigestVerifier;
 
     private MailSender mailSender;
-
+    
+    private ArtifactIndexer artifactIndexer;
+    
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
     private PlexusContainer container;
@@ -145,6 +148,8 @@ public class RepositoryCleaner
                             logger.info( "Rewriting POMs and artifact files." );
                         }
 
+                        artifactIndexer.writeAritfactIndex( artifacts, targetRepositoryBase );
+                        
                         rewriteArtifactsAndPoms( artifacts, sourceRepo, targetRepo, configuration, reportsBase,
                                                  sourceRepositoryBase, targetRepositoryBase, repoReporter );
                     }

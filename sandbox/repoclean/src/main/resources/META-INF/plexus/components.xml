@@ -103,10 +103,22 @@
           <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</role>
         </requirement>
         <requirement>
+          <role>org.apache.maven.tools.repoclean.index.ArtifactIndexer</role>
+        </requirement>
+        <requirement>
           <role>org.codehaus.plexus.mailsender.MailSender</role>
         </requirement>
       </requirements>
     </component>
+    <!--
+     |
+     |
+     |
+     -->
+     <component>
+      <role>org.apache.maven.tools.repoclean.index.ArtifactIndexer</role>
+      <implementation>org.apache.maven.tools.repoclean.index.ArtifactIndexer</implementation>
+     </component>
     <!--
      |
      |
