@@ -1,0 +1,26 @@
+<document>
+  <properties>
+    <title>Download Maven 2.0</title>
+    <author email="brett@apache.org">Brett Porter</author>
+  </properties>
+  <body>
+    <section name="Download Maven 2.0 Technology Preview">
+      <p>
+        ...
+      </p>
+      <a name="requirements"/>
+      <subsection name="System Requirements">
+        <p>
+          ...
+        </p>
+      </subsection>
+      <a name="installation"/>
+      <subsection name="Installation Instructions">
+        <p>
+          ...
+        </p>
+      </subsection>
+    </section>
+  </body>
+</document>
+

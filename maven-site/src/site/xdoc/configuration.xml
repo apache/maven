@@ -1,0 +1,14 @@
+<document>
+  <properties>
+    <title>Configuring Maven</title>
+    <author email="brett@apache.org">Brett Porter</author>
+  </properties>
+  <body>
+    <section name="Configuring Maven">
+      <p>
+        ...
+      </p>
+    </section>
+  </body>
+</document>
+

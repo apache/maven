@@ -1,6 +1,6 @@
 <faqs title="About Maven 2.0">
 
-  <part id="About Maven 2.0">
+  <part id="about">
     <faq id="what-is-maven">
       <question>What is Maven?</question>
       <answer>

@@ -8,7 +8,7 @@
       <div style="float: right; margin: 0 10px 20px 20px; padding: 5px; border: 1px solid #999; background-color: #eee;">
         <h5 style="margin: 0; font-size: smaller; border-bottom: 1px solid #aaaaaa">Get Maven 2.0</h5>
         <p style="font-size: smaller">
-          <a href="http://maven.apache.org/start/download.html">
+          <a href="download.html">
             <img valign="top" src="http://maven.apache.org/images/folder-open.gif" border="0" alt="" title="download"/>
             Download
           </a> Maven 2.0 Build 1
@@ -17,13 +17,13 @@
         </p>
         <ul style="margin-top: 0">
           <li style="font-size: smaller">
-            <a href="#">System Requirements</a>
+            <a href="download.html#requirements">System Requirements</a>
           </li>
           <li style="font-size: smaller">
-            <a href="#">Installation Instructions</a>
+            <a href="download.html#installation">Installation Instructions</a>
           </li>
           <li style="font-size: smaller">
-            <a href="#">Getting Started</a>
+            <a href="getting-started.html">Getting Started</a>
           </li>
         </ul>
       </div>
@@ -85,22 +85,22 @@
       <ul style="list-style-type: square">
         <li>
           <i>
-            <a href="#">What's changed?</a>
+            <a href="maven1.html#">What's changed?</a>
           </i>
         </li>
         <li>
           <i>
-            <a href="#">Should I use Maven 2.0, or Maven 1.0?</a>
+            <a href="maven1.html#m1-or-m2">Should I use Maven 2.0, or Maven 1.0?</a>
           </i>
         </li>
         <li>
           <i>
-            <a href="#">What will happen</a> to Maven 1.0?
+            <a href="maven1.html#">What will happen</a> to Maven 1.0?
           </i>
         </li>
         <li>
           <i>Will my
-            <a href="#">Maven 1.0 plugins</a> be supported?
+            <a href="maven1.html#">Maven 1.0 plugins</a> be supported?
           </i>
         </li>
       </ul>
@@ -113,12 +113,12 @@
       <ul style="list-style-type: square">
         <li>
           <i>
-            <a href="#">Getting Started</a>
+            <a href="getting-started.html">Getting Started</a>
           </i>
         </li>
         <li>
           <i>
-            <a href="#">Configuring Maven</a>
+            <a href="configuration.html">Configuring Maven</a>
           </i>
         </li>
       </ul>
