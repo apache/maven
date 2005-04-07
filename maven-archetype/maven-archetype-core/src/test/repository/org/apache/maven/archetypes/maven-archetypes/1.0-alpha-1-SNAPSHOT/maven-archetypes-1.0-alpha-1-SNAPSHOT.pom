@@ -1,0 +1,17 @@
+<model>
+  <parent>
+    <artifactId>maven-archetype</artifactId>
+    <groupId>org.apache.maven</groupId>
+    <version>1.0-alpha-1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.archetypes</groupId>
+  <artifactId>maven-archetypes</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-alpha-1-SNAPSHOT</version>
+  <modules>
+    <module>maven-archetype-mojo</module>
+    <module>maven-archetype-quickstart</module>
+    <module>maven-archetype-webapp</module>
+  </modules>
+</model>
