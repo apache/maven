@@ -76,4 +76,7 @@
       <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listName=dev@maven.apache.org</archive>
     </mailingList>
   </mailingLists>
+  <reports>
+    <report>maven-faq-plugin</report>
+  </reports>
 </project>

@@ -1,0 +1,11 @@
+<project>
+  <title>Maven 2</title>
+
+  <body>
+    <links>
+      <item name="Maven 1.0" href="http://maven.apache.org/"/>
+      <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
+    </links>
+
+  </body>
+</project>

@@ -1,0 +1,158 @@
+<faqs title="About Maven 2.0">
+
+  <part id="About Maven 2.0">
+    <faq id="what-is-maven">
+      <question>What is Maven?</question>
+      <answer>
+        <p>
+          Maven is a tool that is used to process your project information and sources, not only to build it into
+          binary form but also to generate information to help you get a single view of all aspects of your project,
+          and in some cases related projects.
+        </p>
+        <p>
+          For a full description, see the main
+          <a href="http://maven.apache.org/about/whatismaven.html">What is Maven?</a>
+          document.
+        </p>
+        <p>
+          Maven has also grown into a project that is building other products to help in the software development lifecycle<!--,
+          such as the <a href="http://maven.apache.org/continuum">Continuum</a> continuous integration server -->.
+          <a href="http://maven.apache.org/project/index.html">More information about the Maven Project</a>.
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="features">
+      <question>What are the features of Maven 2.0?</question>
+      <answer>
+        <p>
+          Maven 2.0 has the following major features:
+        </p>
+        <ul>
+          <li>Simple project setup that follows best practices - get a new project or module started in seconds</li>
+          <li>Consistent usage across all projects means no ramp up time for new developers coming onto a project</li>
+          <li>Superior dependency management including automatic updating, dependency closures (also known as transitive dependencies)</li>
+          <li>A large and growing repository of libraries and metadata to use out of the box, and arrangements in place
+          with the largest Open Source projects for real-time availability of their latest releases</li>
+          <li>Extensible, with the ability to easily write plugins in Java or other scripting languages</li>
+          <li>Instant access to new features with little or no extra configuration</li>
+        </ul>
+        <p>
+          The following features are available in Maven 1.0 and will be available and much improved in Maven 2.0 through
+          the coming releases:
+        </p>
+        <ul>
+          <li>Deployment and release management</li>
+          <li>Comprehensive project information and reporting</li>
+          <li>Website and documentation building tools</li>
+        </ul>
+      </answer>
+    </faq>
+
+    <faq id="m2-goals">
+      <question>Tell me about the goals of Maven 2.0</question>
+      <answer>
+        <p>
+          You've seen
+          <a href="#what-is-maven">above</a> the goals that Maven aims to achieve, however there have also
+          been questions about why Maven 2.0 is rewritten from the successful Maven 1.0. In summary, the main goals of
+          the new Maven 2.0 architecture are:
+        </p>
+        <ul>
+          <li>To be simple to use - it should be more obvious and consistent about how things are working</li>
+          <li>Fast - a new architecture and smaller memory footprint make it as fast as possible</li>
+          <li>To be able to implement the features demanded that were not possible under the Maven 1.0 architecture</li>
+        </ul>
+        <p>
+          Unfortunately, to reach these goals - we've had to sacrifice backwards compatibility to do this. Instead of
+          making many small incremental changes that would break compatibility often over time, we decided to build on a
+          new, solid base that can be reliable for the future, and also to maintain the existing Maven 1.x product to
+          ensure that existing users are not left out in the cold.
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="tech-review">
+      <question>What does Technology Preview mean?</question>
+      <answer>
+        <p>
+          While Maven 2.0 is quite useful as is, it does not yet have all of the features of it's predecessor, and has
+          some limitations that may impede it's use on a day-to-day basis in your projects.
+        </p>
+        <p>
+          This release is being made available so that people who are interested in the future of Maven can take a
+          sneak peek, while those interested in becoming early adopters can get involved in the development and
+          direction of the project.
+        </p>
+        <p>
+          For more information on whether this release of Maven 2.0 should be used in your environment, please consult
+          <a href="maven1.html#m1-or-m2">this topic</a>.
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="release-schedule">
+      <question>How often will Maven 2.0 be released?</question>
+      <answer>
+        <p>
+          We are working to a 4-5 week release cycle, meaning that there will be at least one release per month.
+        </p>
+        <p>
+          The first releases such as the technology preview will be designated "alpha" releases, indicating that
+          they are not yet feature complete and there are outstanding bugs. Following that, "beta" releases will be
+          made available where introduction of new features will be restricted and the focus on improving usability and
+          stability. Finally, one or more release candidates will be distributed for testing that are genuinely believed
+          to be final, with the expectation that a final release would be available shortly afterwards.
+        </p>
+        <p>
+          We will continue with the successful technique from Maven 1.0 of making plugins available on a separate
+          release schedule so that new features can be obtained as they are ready and tested.
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="get-involved">
+      <question>Can I get involved?</question>
+      <answer>
+        <p>
+          The Maven project welcomes anyone that wishes to contribute to do so by providing patches to the source code,
+          participating in design discussions, or to help out on the users mailing list by answering questions.
+        </p>
+        <p>
+          Frequent contributors recognised by existing committers to the project may be asked if they would like to
+          join the project.
+        </p>
+        <p>
+          For more information, please see
+          <a href="http://maven.apache.org/contributing/help.html">How to Help</a>.
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="get-help">
+      <question>Where do I get help with Maven 2.0?</question>
+      <answer>
+        <p>
+          Help for both Maven 1.0 and Maven 2.0 can be obtained by subscribing and posting to the
+          <a href="http://maven.apache.org/mail-lists.html">Maven Users List</a>. If you are posting about Maven 2.0,
+          please make that clear in your email.
+        </p>
+        <p>
+          You can also join us on IRC at
+          <code>irc.codehaus.org</code> on
+          <code>#maven2</code>. This is available both
+          over
+          <a href="irc://irc.codehaus.org/#maven2">IRC</a> and
+          <a href="http://irc.codehaus.org/">HTTP</a> for those behind firewalls (enter
+          <code>#maven2</code> in the
+          <i>Channel</i> box).
+        </p>
+        <p>
+          Please remember that is is a preview release, so please be patient with features that are not yet implemented,
+          and be prepared to do some research and to help out yourself wherever possible.
+        </p>
+      </answer>
+    </faq>
+  </part>
+</faqs>
+
