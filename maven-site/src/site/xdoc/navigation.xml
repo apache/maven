@@ -8,6 +8,8 @@
     </links>
 
     <menu name="Maven 2.0">
+      <item name="Introduction" href="index.html"/>
+      <item name="Download" href="download.html"/>
       <item name="General Information" href="about.html"/>
       <item name="For Maven 1.0 Users" href="maven1.html"/>
     </menu>

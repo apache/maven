@@ -76,7 +76,15 @@
       <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listName=dev@maven.apache.org</archive>
     </mailingList>
   </mailingLists>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://cvs.apache.org/viewcvs.cgi/*checkout*/maven/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
   <reports>
     <report>maven-faq-plugin</report>
+    <report>maven-license-plugin</report>
   </reports>
 </project>
