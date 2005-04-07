@@ -241,8 +241,10 @@ public class RepositoryCleaner
 
         try
         {
-            logger.info( "Rewriting " + artifacts.size() + " artifacts (Should be " + ( artifacts.size() * 2 )
+            logger.info( "Rewriting up to " + artifacts.size() + " artifacts (Should be " + ( artifacts.size() * 2 )
                 + " rewrites including POMs)." );
+            
+            int actualRewriteCount = 0;
             for ( Iterator it = artifacts.iterator(); it.hasNext(); )
             {
                 Artifact artifact = (Artifact) it.next();
@@ -266,7 +268,8 @@ public class RepositoryCleaner
 
                     if ( artifactSource.exists() && targetMissingOrOlder )
                     {
-
+                        actualRewriteCount++;
+                        
                         try
                         {
                             if ( !configuration.reportOnly() )
@@ -370,6 +373,8 @@ public class RepositoryCleaner
                     }
                 }
             }
+            
+            logger.info("Actual number of artifacts rewritten: " + actualRewriteCount + " (" + (actualRewriteCount * 2) + " including POMs).");
         }
         finally
         {

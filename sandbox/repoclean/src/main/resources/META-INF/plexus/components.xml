@@ -102,6 +102,9 @@
         <requirement>
           <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</role>
         </requirement>
+        <requirement>
+          <role>org.codehaus.plexus.mailsender.MailSender</role>
+        </requirement>
       </requirements>
     </component>
     <!--
