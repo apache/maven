@@ -6,11 +6,9 @@ import junit.framework.TestSuite;
 
 /**
  * Unit test for simple App.
- *
- * @author <a href="mailto:jason@zenplex.com">Jason van Zyl</a>
  */
 public class AppTest 
-    extends AbstractTestCase
+    extends TestCase
 {
     /**
      * Create the test case
@@ -35,6 +33,6 @@ public class AppTest
      */
     public void testApp()
     {
-        assertEquals( "maven kicks ass", "maven kicks ass" );
+        assertTrue( true );
     }
 }

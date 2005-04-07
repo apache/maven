@@ -8,4 +8,9 @@
   <artifactId>maven-archetype</artifactId>
   <packaging>pom</packaging>
   <version>1.0-alpha-1-SNAPSHOT</version>
+  <modules>
+    <module>maven-archetype-core</module>
+    <module>maven-archetype-plugin</module>
+    <module>maven-archetypes</module>
+  </modules>
 </model>

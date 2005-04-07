@@ -17,15 +17,14 @@ package org.apache.maven.archetype;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -51,27 +50,28 @@ public class ArchetypeTest
 
         parameters.put( "package", "org.apache.maven.quickstart" );
 
-        parameters.put( "outputDirectory",new File( getBasedir(), "target/archetype" ).getPath() );
+        parameters.put( "outputDirectory", new File( getBasedir(), "target/archetype" ).getPath() );
 
         // ----------------------------------------------------------------------
         // This needs to be encapsulated in a maven test case.
         // ----------------------------------------------------------------------
 
-        File mavenPropertiesFile = new File( System.getProperty( "user.home" ), ".m2/maven.properties" );
+        ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                       "default" );
 
-        Properties mavenProperties = new Properties();
-
-        mavenProperties.load( new FileInputStream( mavenPropertiesFile ) );
-
-        ArtifactRepository localRepository = new ArtifactRepository( "local", "file://" + mavenProperties.getProperty( "maven.repo.local" ) );
+        String mavenRepoLocal = getTestFile( "target/local-repository" ).toURL().toString();
+        ArtifactRepository localRepository = new ArtifactRepository( "local", mavenRepoLocal, layout );
 
         List remoteRepositories = new ArrayList();
 
-        ArtifactRepository remoteRepository = new ArtifactRepository( "remote", "http://repo1.maven.org" );
+        String mavenRepoRemote = getTestFile( "src/test/repository" ).toURL().toString();
+        ArtifactRepository remoteRepository = new ArtifactRepository( "remote", mavenRepoRemote, layout );
 
         remoteRepositories.add( remoteRepository );
 
-        archetype.createArchetype( "maven", "maven-archetype-quickstart", "1.0-alpha-1-SNAPSHOT",
-                                   localRepository, remoteRepositories, parameters);
+        archetype.createArchetype( "org.apache.maven.archetypes", "maven-archetype-quickstart", "1.0-alpha-1-SNAPSHOT",
+                                   localRepository, remoteRepositories, parameters );
+
+        // TODO: validate output
     }
 }

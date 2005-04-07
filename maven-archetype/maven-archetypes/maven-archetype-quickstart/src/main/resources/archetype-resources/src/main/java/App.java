@@ -3,8 +3,6 @@ package $package;
 /**
  * Hello world!
  *
- * @author <a href="jason@zenplex.com">Jason van Zyl</a>
- *
  */
 public class App 
 {
