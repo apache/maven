@@ -294,8 +294,6 @@ public class MavenCli
 
     static class CLIManager
     {
-        public static final char NO_BANNER = 'b';
-
         public static final char SET_SYSTEM_PROPERTY = 'D';
 
         public static final char OFFLINE = 'o';
@@ -308,7 +306,7 @@ public class MavenCli
 
         public static final char VERSION = 'v';
 
-        public static final char LIST_GOALS = 'g';
+//        public static final char LIST_GOALS = 'g';
 
         private Options options = null;
 
@@ -319,14 +317,12 @@ public class MavenCli
         public CLIManager()
         {
             options = new Options();
-            options.addOption( OptionBuilder.withLongOpt( "nobanner" ).withDescription( "Suppress logo banner" ).create(
-                NO_BANNER ) );
             options.addOption( OptionBuilder.withLongOpt( "define" ).hasArg().withDescription(
                 "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
             options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create(
                 OFFLINE ) );
-            options.addOption( OptionBuilder.withLongOpt( "mojoDescriptors" ).withDescription(
-                "Display available mojoDescriptors" ).create( LIST_GOALS ) );
+//            options.addOption( OptionBuilder.withLongOpt( "mojoDescriptors" ).withDescription(
+//                "Display available mojoDescriptors" ).create( LIST_GOALS ) );
             options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create(
                 HELP ) );
             options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
