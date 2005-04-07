@@ -233,6 +233,10 @@ public class AssemblyMojo
                 }
                 tarArchiver.setCompression( tarCompressionMethod );
             }
+
+            // TODO: should be able to do this on a file/dir basis
+            tarArchiver.getOptions().setDirMode( "0700" );
+            tarArchiver.getOptions().setMode( "0700" );
         }
         else if ( format.startsWith( "zip" ) )
         {
