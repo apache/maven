@@ -1,0 +1,110 @@
+  ---
+  Maven Repository Synchronization Refactor: Summary of Changes
+  ---
+  John Casey
+  ---
+  2005-April-06
+  ---
+  
+Summary of Changes for the Maven Repository Synchronization Process
+
+*Abstract
+
+  In order to support the impending release of maven2 from a production-ready
+  repository on ibiblio.org, several things had to be changed. Most importantly,
+  we had to somehow find a way to synchronize the maven1 repository and feeds
+  with maven2's repository, and find a way to integrate this conversion process
+  with the synchronization already taking place on beaver.codehaus.org.
+  
+  What follows is a description of the changes I made to the original maven1 
+  synchronization process in order to accommodate maven2's release.
+  
+*Conversion
+
+  First, we needed a reliable tool to convert a maven1 repository into a maven2
+  repository. There are several tasks involved in this process:
+  
+  [[1]] Parsing artifact paths for artifact information.
+  
+  [[2]] Moving artifacts from source repo to target repo, reformatting the
+        relative artifact paths along the way (to conform with the new repo
+        layout for m2).
+  
+  [[3]] Translating m1 POMs into m2 POMs, and creating skeletal POMs where they
+        were missing, using the artifact information parsed in [1] above.
+  
+  [[4]] Repairing and/or moving MD5 checksums for each artifact from source to
+        target repository.
+        
+  [[5]] Preserving a good log of errors encountered during the conversion
+        process, for later auditing.
+        
+  Since I had limited time with which to implement a solution, and didn't have
+  much familiarity with pre-existing repository conversion tools made by Carlos
+  et al. I decided to design my own solution to the problem, and worry about
+  merging with other tools later.
+  
+  The solution I have created is called repoclean, and can be found in
+  <<<maven-components/sandbox/repoclean>>>. It's a plexus application, with some
+  basic bash shell scripts used to install and run the application. The steps
+  enumerated above were implemented as separate components, then stitched 
+  together with a Main class and controller component which serves as the entry
+  point for Main.
+  
+  As a final point, the reporting takes place both at the entire-process level
+  for operations such as artifact discovery, and at the per-artifact level. A
+  report is only written in the event of an error or warning, and per-artifact
+  reports are mentioned in the entire-process report if they contained an error.
+  In the event that an error was detected, the entire-process report should be
+  mailed to the m2-dev list with a subject similar to: <<[REPOCLEAN] Error(s)
+  occurred while converting the repository>>. Other reports can be found in the
+  reports directory of the sync work directory (mentioned below).
+  
+*Synchronization
+
+  Now, the synchronization process as-is was only maintaining a maven1 repository
+  from a set of feeds. In order to refactor this into a maintenance process for
+  both maven1 and maven2 repositories, I had to make a few minor changes.
+  
+  In order to aid in understanding this process, I moved the tools suite into
+  $HOME/repository-tools. I moved the synchronization work directory (the 
+  directory into which all feeds will copy, and which the outbound rsync will
+  use as a source) into $HOME/repository-staging. The tools suite (in
+  $HOME/repository-tools) does NOT contain the only copy of syncopate and the
+  outbound rsync script, only the copies I made and modified for the new
+  synchronization process...this was an insurance policy made to allow rollback.
+  
+  As I said, I made some minor changes to the existing process. These mainly 
+  consisted of reconfiguring syncopate and the outbound rsync script to use the
+  new directory structures, along with adding a control script which would be 
+  called from cron, and which would inject a call to repoclean into the middle
+  of the process. The new controller script was used to consolidate all 
+  synchronization logic into the repository-tools directory, and expose it all
+  equally as scripts to be maintained as a unit. Now, the crontab entry is very
+  simple, only referencing the controller script.
+  
+  The new synchronization process executes the following operations:
+  
+  [[1]] Run syncopate to collect new artifacts from the feeder repositories.
+  
+        <<Syncopate location:>> $HOME/repository-tools/syncopate
+        <<Target repository location:>> $HOME/repository-staging/to-ibiblio/maven
+        
+  [[2]] Run repoclean to convert any new added or updated artifacts to the
+        maven2 repository work directory.
+        
+        <<Repoclean location:>> $HOME/repository-tools/repoclean
+        <<Source repository location:>> $HOME/repository-staging/to-ibiblio/maven
+        <<Target repository location:>> $HOME/repository-staging/to-ibiblio/maven2
+        
+  [[3]] Run the rsync to ibiblio.
+  
+        <<Rsync script location:>> $HOME/repository-tools/ibiblio-sync/synchronize-codehaus-to-ibiblio.sh
+        
+        <<*NOTE:>> This is accomplished as two separate rsync operations, to 
+        avoid unwanted directories being added to the outbound rsync (which 
+        would land in /public/html on ibiblio...a big no-no).
+   
+   All of the old synchronization stuff is still in place, with the exception of
+   the old version of the canonical repositories, which were removed to keep our
+   space usage to a minimum on beaver.codehaus.org.
