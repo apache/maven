@@ -6,11 +6,11 @@ import model.Repository;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Collection;
 
 public class ArtifactDownloader
 {
@@ -31,6 +31,8 @@ public class ArtifactDownloader
     private String proxyPassword;
 
     private Repository localRepository;
+
+    private static final String REPO_URL = "http://repo1.maven.org/maven2";
 
     public ArtifactDownloader( Repository localRepository, List remoteRepositories )
         throws Exception
@@ -117,8 +119,7 @@ public class ArtifactDownloader
         if ( repositories.isEmpty() )
         {
             // TODO: use super POM?
-            Repository repository = new Repository( "http://test.maven.codehaus.org/maven2", Repository.LAYOUT_DEFAULT );
-//            Repository repository = new Repository( "http://repo1.maven.org/maven2", Repository.LAYOUT_LEGACY );
+            Repository repository = new Repository( REPO_URL, Repository.LAYOUT_DEFAULT );
             remoteRepos.add( repository );
         }
     }
