@@ -1,6 +1,140 @@
 <faqs title="Information for Maven 1.0 Users">
 
   <part id="maven1">
+    <faq id="changed">
+      <question>What's Changed?</question>
+      <answer>
+        <p>
+          Maven 2.0 will feel very different to a Maven 1.0 user - and perhaps a little strange. But it is a lot simpler
+          to work with! The key changes from Maven 1.0 are:
+        </p>
+        <ul>
+          <li>
+            <i>Faster and smaller</i> - The Maven core no longer uses Ant, Jelly or Xerces making it much smaller, has
+            fewer dependencies and is perfect for embedding in other tools.
+          </li>
+          <li>
+            <i>Defined build lifecycle</i> - No more
+            <code>prereqs</code>,
+            <code>preGoals</code> and
+            <code>postGoals</code>.
+            The build is a series of well defined phases. This also means that the normal goal names are not used -
+            <code>compile</code>,
+            <code>test</code> and
+            <code>install</code> work for any project type.
+          </li>
+          <li>
+            <i>Built-in multiple project handling</i> - Use the same goals on a set of projects, and aggregate the
+            results.
+          </li>
+          <li>
+            <i>Improved
+              <code>SNAPSHOT</code> handling
+            </i> - Snapshots are now checked for updates only once per day by
+            default - though can be configured to be once per build, on a particular interval, or never. A command line
+            option can force a check - making it more like updating from an SCM.
+          </li>
+          <li>
+            <i>No more properties files</i> - All plugins are now configured from the POM (which is now called
+            <code>pom.xml</code>).
+          </li>
+          <li>
+            <i>No more
+              <code>maven.xml</code>
+            </i> - Plugins are now easier to build and integrate, and are the only way
+            to script your builds. (Note that additions may later be made to the POM to allow simple things that scripting
+            was used for, such as goal aliasing).
+          </li>
+          <li>
+            <i>No more Jelly</i> - Plugins are primarily written in Java, though there are providers for other scripting languages.
+            This release includes support for Marmalade, a scripting framework that supports an XML syntax similar to Jelly
+            which can be used to integrate Ant tasks and has a Jelly compatibility layer.
+          </li>
+        </ul>
+      </answer>
+    </faq>
+    <faq id="m1-or-m2">
+      <question>Should I use Maven 2.0, or Maven 1.0?</question>
+      <answer>
+        <p>
+          The answer depends very much on on your circumstances, and in particular whether you are new to Maven or not.
+        </p>
+        <p>
+          The simple answer is that we hope you'll try Maven 2.0, and use it if it works for you. However, it is a preview
+          release, so you can expect some features to be missing at this point and there may be unexpected bugs.
+          We'd hate for your first experience with Maven 2.0 to be a bad one - so if you are embarking on a big, complicated
+          or mission critical project - we still recommend Maven 1.0.2 as the latest stable release.
+        </p>
+        <p>
+          If you are already using Maven 1.0 - feel free to try out Maven 2.0, but it may be better to remain on an existing
+          version that is working for you until you need the new features and it covers all of your needs.
+        </p>
+        <p>
+          Importantly, a number of features of Maven 1.0 are not yet available in Maven 2.0 - most notably the site
+          generation and reporting. If you need these features, we recommend staying with Maven 1.0 at this point.
+        </p>
+        <p>
+          If you do use Maven 1.0, and would like to upgrade in the future, you should carefully consider following some
+          of the
+          <a href="http://maven.apache.org/using/bestpractices.html">Best Practices</a> listed. These will make
+          your project a lot easier to migrate in the future.
+        </p>
+        <p>
+          The following are the known limitations in the current Maven 2.0 release:
+        </p>
+        <ul>
+          <li>
+            <i>Error handling</i> - there are occasions where Maven 2.0 will drop out with a long stack trace
+            when an error has occurred. If a specific trace is not providing enough information to find out what went
+            wrong, please post the message to JIRA.
+          </li>
+          <li>
+            <i>No site generation</i> - The new site and documentation development tools are much more sophisticated than
+            the Maven 1.0 equivalents, but are not currently complete enough for a release.
+          </li>
+          <li>
+            <i>Ant and scripting support</i> - while this is available, the Ant and scripting support has not undergone
+            rigorous testing at this point.
+          </li>
+          <li>
+            <i>Availability of other plugins</i> - Maven 1.x has a large number of plugins available - however Maven 2.0
+            is not presently capable of executing them.
+          </li>
+          <li>
+            <i>Embedding and Plugin Authoring API</i> - Maven 2.0 is designed to be able to be embedded, and plugins can
+            be written in Java. However, the APIs for these are subject to change so writing code to use them may require
+            some changes in future versions.
+          </li>
+        </ul>
+      </answer>
+    </faq>
+    <faq id="m1-future">
+      <question>What will happen to Maven 1.0?</question>
+      <answer>
+        <p>
+          Maven 1.0.2 continues to work, and a 1.1 release is still under way. While significant new features will not
+          be added to the Maven 1.0 core (such as transitive dependencies), bugfixes and support continue and the
+          repository is still available. Features from Maven 2.0 may be included in Maven 1.1 where possible.
+        </p>
+        <p>
+          An end-of-life for Maven 1.0.2 will be announced when this is decided - but there are currently no plans for
+          this to happen.
+        </p>
+      </answer>
+    </faq>
+    <faq id="m1-plugins">
+      <question>Will my Maven 1.0 plugins be supported?</question>
+      <answer>
+        <p>
+          Not directly. While Marmalade supports a Jelly compatibility layer - the different POM format and goal
+          architecture would prevent most plugins from working.
+        </p>
+        <p>
+          We recommend building your Jelly plugins as thin wrappers around Java beans that do not use Maven 1.0 API's,
+          which will allow easy migration to Maven 2.0.
+        </p>
+      </answer>
+    </faq>
   </part>
 </faqs>
 

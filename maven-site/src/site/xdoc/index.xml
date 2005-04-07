@@ -11,8 +11,8 @@
           <a href="download.html">
             <img valign="top" src="http://maven.apache.org/images/folder-open.gif" border="0" alt="" title="download"/>
             Download
-          </a> Maven 2.0 Build 1
-          <small>(682K)</small>
+          </a> Maven 2.0 Alpha 1
+          <small>(690K)</small>
           <br/>
         </p>
         <ul style="margin-top: 0">
@@ -95,12 +95,12 @@
         </li>
         <li>
           <i>
-            <a href="maven1.html#">What will happen</a> to Maven 1.0?
+            <a href="maven1.html#m1-future">What will happen</a> to Maven 1.0?
           </i>
         </li>
         <li>
           <i>Will my
-            <a href="maven1.html#">Maven 1.0 plugins</a> be supported?
+            <a href="maven1.html#m1-plugins">Maven 1.0 plugins</a> be supported?
           </i>
         </li>
       </ul>
