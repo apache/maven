@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<mojo xmlns="marmalade:mojo">
+  <metadata>
+    <id>myMojo</id>
+    <goal>myMojo</goal>
+    <description>Output a file with specified contents to [outputDirectory]/touch.txt</description>
+    <parameters>
+      <parameter>
+        <name>outputDirectory</name>
+        <expression>#project.build.directory</expression>
+        <description>Output directory for files.</description>
+      </parameter>
+    </parameters>
+  </metadata>
+  <execute>
+    <io:file xmlns:io="marmalade:io" path="${outputDirectory}/touch.txt" mkdirs="true">touch.txt</io:file>
+    <m:copyFile xmlns:m="marmalade:myMojo" source="${outputDirectory}/touch.txt" target="${outputDirectory}/touch2.txt"/>
+  </execute>
+</mojo>
