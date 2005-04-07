@@ -164,11 +164,23 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException, ModelInterpolationException, ArtifactResolutionException
     {
         Model model = project.getModel();
-        String key = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
-        Model cachedModel = (Model) modelCache.get( key );
+        
+        String cacheKey = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
+        
+        // [jc] This needs to be moved below the interpolation and defaults
+        // injection steps, especially since the interpolator returns a different
+        // instance of the Model. HOWEVER, I cannot move this caching step to
+        // the appropriate place, since it results in inconsistent artifact 
+        // naming between the jar:jar and install:install steps for some reason.
+        // 
+        // So, instead I'm commenting out the part of the MavenMetadataSource
+        // that looks up the cached model, and leaving this caching step right
+        // here...at least until I have more time to look at why this cannot be
+        // moved down.
+        Model cachedModel = (Model) modelCache.get( cacheKey );
         if ( cachedModel == null || sourceProject )
         {
-            modelCache.put( key, model );
+            modelCache.put( cacheKey, model );
         }
 
         model = modelInterpolator.interpolate( model );

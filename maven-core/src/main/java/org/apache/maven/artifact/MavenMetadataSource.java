@@ -73,15 +73,29 @@ public class MavenMetadataSource
     {
         List dependencies = null;
 
-        if ( mavenProjectBuilder != null )
-        {
-            Model model = mavenProjectBuilder.getCachedModel( artifact.getGroupId(), artifact.getArtifactId(),
-                                                              artifact.getVersion() );
-            if ( model != null )
-            {
-                dependencies = model.getDependencies();
-            }
-        }
+        // [jc] Commenting this out, because the place where the model is 
+        // cached in the project builder has not accounted for interpolation or
+        // defaults injection. This wouldn't be a problem, except that the 
+        // interpolation step actually returns a different instance of the 
+        // model than was input, thus rendering the old version of the model
+        // stale. To test this, you have to create an artifact whose pom uses
+        // managed dependencies, then depend on that artifact from another
+        // project. The first plugin to refer to this dependency will work fine, 
+        // but subsequent plugins referring to the dep will retrieved a cached
+        // copy of the model that has no versions, etc. defined because that
+        // model instance has not had defaults injected or interpolations 
+        // resolved. See note in DefaultMavenProjectBuilder, line 170 for 
+        // further discussion.
+        
+//        if ( mavenProjectBuilder != null )
+//        {
+//            Model model = mavenProjectBuilder.getCachedModel( artifact.getGroupId(), artifact.getArtifactId(),
+//                                                              artifact.getVersion() );
+//            if ( model != null )
+//            {
+//                dependencies = model.getDependencies();
+//            }
+//        }
 
         if ( dependencies == null )
         {
