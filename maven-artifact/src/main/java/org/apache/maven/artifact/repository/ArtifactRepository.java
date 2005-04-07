@@ -47,13 +47,13 @@ public class ArtifactRepository
 
     public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
     {
-        this( id, url, layout, null );
+        this( id, url, layout, SNAPSHOT_POLICY_NEVER );
     }
 
     public ArtifactRepository( String id, String url, AuthenticationInfo authenticationInfo,
                                ArtifactRepositoryLayout layout )
     {
-        this( id, url, authenticationInfo, layout, null );
+        this( id, url, authenticationInfo, layout, SNAPSHOT_POLICY_NEVER );
     }
 
     public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, String snapshotPolicy )
