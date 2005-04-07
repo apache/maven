@@ -56,7 +56,7 @@ public class SnapshotArtifactMetadata
 
     private long lastModified = 0;
 
-    private static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
+    public static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
     // TODO: very quick and nasty hack to get the same timestamp across a build - not embedder friendly
     private static String sessionTimestamp = null;

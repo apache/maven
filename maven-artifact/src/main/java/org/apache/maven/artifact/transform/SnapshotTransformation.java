@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -53,7 +54,12 @@ public class SnapshotTransformation
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        if ( isSnapshot( artifact ) )
+        Matcher m = SnapshotArtifactMetadata.VERSION_FILE_PATTERN.matcher( artifact.getBaseVersion() );
+        if ( m.matches() )
+        {
+            artifact.setBaseVersion( m.group( 1 ) + "-SNAPSHOT" );
+        }
+        else if ( isSnapshot( artifact ) )
         {
             SnapshotArtifactMetadata localMetadata;
             try
