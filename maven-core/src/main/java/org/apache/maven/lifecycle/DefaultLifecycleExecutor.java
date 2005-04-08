@@ -24,6 +24,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.AbstractPlugin;
@@ -33,14 +35,21 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.DefaultMavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.MavenConstants;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -49,7 +58,7 @@ import java.util.Map;
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
-    implements LifecycleExecutor
+    implements LifecycleExecutor, Initializable
 {
     // ----------------------------------------------------------------------
     // Components
@@ -64,6 +73,9 @@ public class DefaultLifecycleExecutor
     private PluginManager pluginManager;
 
     private List phases;
+
+    // TODO: remove
+    private Model superModel;
 
     // ----------------------------------------------------------------------
     //
@@ -114,14 +126,6 @@ public class DefaultLifecycleExecutor
                         artifactHandler.additionalPlugin() );
 
                     injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
-
-                    Plugin plugin = new Plugin();
-
-                    plugin.setGroupId( additionalPluginGroupId );
-
-                    plugin.setArtifactId( additionalPluginArtifactId );
-
-                    processPluginPhases( plugin, session, phaseMap );
                 }
             }
 
@@ -161,31 +165,71 @@ public class DefaultLifecycleExecutor
 
     private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId )
     {
-        PluginManagement pluginManagement = project.getPluginManagement();
+        // TODO: this is a bit of a hack to get the version from plugin management - please fix
 
-        if ( pluginManagement != null )
+        Plugin plugin = findPlugin( project.getPlugins(), groupId, artifactId );
+
+        if ( plugin == null )
         {
-            List pluginList = pluginManagement.getPlugins();
+            plugin = new Plugin();
+            plugin.setGroupId( groupId );
+            plugin.setArtifactId( artifactId );
+            project.addPlugin( plugin );
+        }
 
-            Plugin handlerPlugin = null;
-
-            for ( Iterator it = pluginList.iterator(); it.hasNext(); )
+        if ( plugin.getVersion() == null )
+        {
+            while ( project != null )
             {
-                Plugin plugin = (Plugin) it.next();
+                PluginManagement pluginManagement = project.getPluginManagement();
 
-                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                if ( pluginManagement != null )
                 {
-                    handlerPlugin = plugin;
+                    Plugin management = findPlugin( pluginManagement.getPlugins(), groupId, artifactId );
+                    if ( management != null && management.getVersion() != null )
+                    {
+                        plugin.setVersion( management.getVersion() );
+                        break;
+                    }
+                }
+                project = project.getParent();
+            }
 
-                    break;
+            if ( plugin.getVersion() == null )
+            {
+                PluginManagement pluginManagement = superModel.getBuild().getPluginManagement();
+
+                if ( pluginManagement != null )
+                {
+                    Plugin management = findPlugin( pluginManagement.getPlugins(), groupId, artifactId );
+                    if ( management != null && management.getVersion() != null )
+                    {
+                        plugin.setVersion( management.getVersion() );
+                    }
                 }
             }
 
-            if ( handlerPlugin != null )
+            if ( plugin.getVersion() == null )
             {
-                project.addPlugin( handlerPlugin );
+                // TODO: this has probably supplanted the default in the plugin manager
+                plugin.setVersion( "1.0-SNAPSHOT" );
             }
         }
+    }
+
+    private static Plugin findPlugin( List plugins, String groupId, String artifactId )
+    {
+        Plugin plugin = null;
+
+        for ( Iterator i = plugins.iterator(); i.hasNext() && plugin == null; )
+        {
+            Plugin p = (Plugin) i.next();
+            if ( groupId.equals( p.getGroupId() ) && artifactId.equals( p.getArtifactId() ) )
+            {
+                plugin = p;
+            }
+        }
+        return plugin;
     }
 
     // TODO: don't throw Exception
@@ -319,6 +363,19 @@ public class DefaultLifecycleExecutor
 
         if ( mojoDescriptor == null )
         {
+            String groupId = AbstractPlugin.getDefaultPluginGroupId();
+
+            String pluginId = task;
+
+            if ( pluginId.indexOf( ":" ) > 0 )
+            {
+                pluginId = pluginId.substring( 0, pluginId.indexOf( ":" ) );
+            }
+
+            String artifactId = AbstractPlugin.getDefaultPluginArtifactId( pluginId );
+
+            injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId );
+
             pluginManager.verifyPluginForGoal( task, session );
 
             mojoDescriptor = pluginManager.getMojoDescriptor( task );
@@ -400,5 +457,13 @@ public class DefaultLifecycleExecutor
     public List getPhases()
     {
         return phases;
+    }
+
+    public void initialize()
+        throws Exception
+    {
+        // TODO: get rid of this and the interface...
+        URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" );
+        superModel = new MavenXpp3Reader().read( new InputStreamReader( url.openStream() ) );
     }
 }
