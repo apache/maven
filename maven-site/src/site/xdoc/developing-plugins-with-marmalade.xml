@@ -27,70 +27,75 @@
   <body>
     <section name="Developing Plugins with Marmalade">
       <p>
-         NOTE: Compare this tutorial to <a href="http://maven.apache.org/using/developing-plugins.html">Developing 
+         NOTE: Compare this tutorial to
+        <a href="http://maven.apache.org/using/developing-plugins.html">Developing
          Plugins</a> from the Maven 1.0 website. Marmalade is meant to be quite similar to Jelly in its 
          syntax, so this process should be very familiar to Maven 1.0 plugin developers.
       </p>
+      <p>
+        If you need some background on how plugins fit into the execution model of Maven 2.0, try reading the
+        <a href="architecture.html">Maven 2.0 Architecture</a>.
+      </p>
 
-      <subsection name="Background">
+      <subsection name="Graduating from Jelly: Plugins in Marmalade">
         <p>
-          Each of the various steps in a given Maven 2.0 build corresponds to one plugin executing.
-          Plugins have access to the common infrastructure of the core API, along with the basic information
-          about the current project being built. Using these facilities, each plugin executes one simple, 
-          repeatable step in the build. It is from these simple building blocks that even the most 
-          complex, powerful build processes are constructed.
-        </p>
-
-        <p>
-          Beginning in Maven 2.0, plugins can be implemented in various languages, ranging from pure Java
-          to Marmalade - a next-generation Jelly-like XML language - and beyond. While our initial
-          technology preview will only offer support for these two languages, we will eventually add
+          Beginning in Maven 2.0, plugins can be implemented in various languages. While our initial
+          technology preview will only offer support for these Marmalade and Java, we will eventually add
           support for additional languages, possibly including Beanshell/Janino, Javascript, and more.
         </p>
 
         <p>
-          For more information on how plugins fit into the execution model of Maven 2.0, try reading
-          <a href="architecture.html">Maven 2.0 Architecture</a>.
+          Marmalade is a next-generation Jelly-like XML language, and was chosen for early inclusion in Maven 2.0 to
+          ease migration from Maven 1.0, and to provide a way to incorporate Ant scripts into a build project.
         </p>
-      </subsection>
 
-      <subsection name="Graduating from Jelly: Plugins in Marmalade">
+        <p>
+          Marmalade currently has basic syntax compatibility with Jelly, and some measure of Jelly taglib
+          compatibility... and this support will continue to improve as Marmalade matures. As such, Marmalade can allow
+          the plugin developer the freedom to concentrate on porting between project models and core facilities, rather
+          than worrying about changing implementation languages.
+        </p>
+
+        <p>
+          Marmalade is still only a fledgling project, and while it's core engine is sophisticated and mature, it's
+          support for Jelly and other taglibs is still growing at a brisk pace. In order to provide as much Jelly
+          functionality out-of-the-box to Maven 2.0 users, Marmalade has an available compatibility layer for Jelly,
+          which will allow the user to embed Jelly within Marmalade for the taglibs that have not yet been ported to
+          native Marmalade.
+        </p>
+
         <p>
           For those Maven 1.x users who have implemented their own plugins using Jelly, Marmalade can be 
-          an extremely powerful language for porting to Maven 2.0. Marmalade currently has basic syntax
-          compatibility with Jelly, and some measure of Jelly taglib compatibility...and this support
-          will continue to improve as Maven 2.0 matures. As such, Marmalade can allow the plugin developer
-          the freedom to concentrate on porting between project models and core facilities, rather than
-          worrying about changing implementation languages.
+          an extremely powerful language for porting to Maven 2.0.
         </p>
 
-        <p>
-          Like Maven 2.0 itself, Marmalade is somewhat of a fledgling project. That is, while it's core
-          engine is fairly sophisticated and mature, it's support for Jelly and other taglibs is still 
-          growing at a brisk pace. In order to provide as much Jelly functionality out-of-the-box to Maven 2.0 
-          users, Marmalade has an available compatibility layer for Jelly, which will allow the user
-          to embed Jelly within Marmalade for the taglibs that have not yet been ported to native Marmalade.
+        <p>For more information on Marmalade, see the
+          <a href="http://marmalade.codehaus.org">Marmalade website.</a>
         </p>
-
-        <p>For more information on Marmalade, see the <a href="http://marmalade.codehaus.org">Marmalade website.</a>
       </subsection>
-      
+
       <subsection name="Marmalade Plugin Basics">
         <p>
           A plugin implemented in Marmalade can contain the following:
           <ul>
-            <li>[Required] One or more Marmalade scripts, each in a file with the extension <code>.mmld</code></li>
+            <li>[Required] One or more Marmalade scripts, each in a file with the extension
+              <code>.mmld</code>
+            </li>
             <li>
               [Optional] One or more Marmalade tag libraries, each consisting of:
               <ul>
-                <li>One or more implementations of MarmaladeTag
-                <li>An implementation of <code>MarmaladeTagLibrary</code>, the constructor of which registers
+                <li>One or more implementations of MarmaladeTag</li>
+                <li>An implementation of
+                  <code>MarmaladeTagLibrary</code>, the constructor of which registers
                     each MarmaladeTag implementation to a tag name (for use in scripts)
+                </li>
               </ul>
             </li>
             <li>
-              [Required] A <code>pom.xml</code> for building the plugin, which contains a script source directory
-              resembling <code><![CDATA[<scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>]]>
+              [Required] A
+              <code>pom.xml</code> for building the plugin, which contains a script source directory
+              resembling
+              <code><![CDATA[<scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>]]></code>
             </li>
             <li>[Optional] Plugin resources to be used from within the plugin's scripts (available on the classpath)</li>
             <li>[Optional] Other Java sources, which can be accessed from the plugin's scripts</li>
@@ -98,7 +103,8 @@
         </p>
 
         <p>
-          Each <code>.mmld</code> script file must provide the same basic structural elements, which define it
+          Each
+          <code>.mmld</code> script file must provide the same basic structural elements, which define it
           as a Maven 2.0 plugin, and provide essential metadata. This metadata is used to:
           <ul>
             <li>Inject project and environmental information into the plugin (parameters)</li>
@@ -148,7 +154,8 @@
           source directory in which to find script sources.
         </p>
         <p>
-          In a new directory, create a <code>pom.xml</code> file like so:
+          In a new directory, create a
+          <code>pom.xml</code> file like so:
         </p>
         <source><![CDATA[<project> 
   <modelVersion>4.0.0</modelVersion>
@@ -195,8 +202,10 @@
           goal within the build system, so you may need several scripts.
         </p>
         <p>
-          Since this is in fact a Hello World plugin, your script will simply output <code>Hello, World</code>
-          to the screen. Create a script in <code>src/main/scripts/hello.mmld</code> with the following contents:
+          Since this is in fact a Hello World plugin, your script will simply output
+          <code>Hello, World</code>
+          to the screen. Create a script in
+          <code>src/main/scripts/hello.mmld</code> with the following contents:
         </p>
         <source><![CDATA[
 <mojo xmlns="marmalade:mojo">
@@ -260,12 +269,15 @@
 </mojo>
         ]]></source>
         <p>
-          Note the additional element in this parameter declaration: <code>default</code> specified a default
+          Note the additional element in this parameter declaration:
+          <code>default</code> specified a default
           salutation in case the user doesn't need or want to customize the plugin.
         </p>
         <p>
-          Now, to make use of the new parameter. Inside the <code><![CDATA[<c:out/>]]></code> action, simply
-          write out the customizable salutation instead of the stock phrase <code>Hello</code>:
+          Now, to make use of the new parameter. Inside the
+          <code><![CDATA[<c:out/>]]></code> action, simply
+          write out the customizable salutation instead of the stock phrase
+          <code>Hello</code>:
         </p>
         <source><![CDATA[
 <c:out xmlns:c="marmalade:core">${salutation}, World.</c:out>
@@ -287,7 +299,8 @@ m2 hello:hello</source>
 
         <p>
           Users of this plugin can also customize the salutation for their project and avoid having to specify it on
-          the command line each time. All they have to do is create a plugin entry in their <code>pom.xml</code>
+          the command line each time. All they have to do is create a plugin entry in their
+          <code>pom.xml</code>
           similar to:
         </p>
         <source><![CDATA[
@@ -314,13 +327,6 @@ m2 hello:hello</source>
         ]]></source>
       </subsection>
     </section>
-
-    <section name="Getting More Information">
-      <p>
-        More information about using Marmalade to write Maven 2.0 plugins will be forthcoming, as we
-        flesh out both Marmalade and the Maven 2.0 platform.
-      </p>
-    </section>
- </body>
+  </body>
 </document>
 
