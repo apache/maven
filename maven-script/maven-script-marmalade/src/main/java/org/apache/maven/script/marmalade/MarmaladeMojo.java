@@ -16,6 +16,7 @@ package org.apache.maven.script.marmalade;
  * limitations under the License.
  */
 
+import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.FailureResponse;
 import org.apache.maven.plugin.PluginExecutionRequest;
@@ -24,6 +25,9 @@ import org.codehaus.marmalade.model.MarmaladeScript;
 import org.codehaus.marmalade.runtime.DefaultContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * @author jdcasey
@@ -47,15 +51,36 @@ public class MarmaladeMojo
 
         context.setVariable( MarmaladeMojoExecutionDirectives.REQUEST_INVAR, request );
         context.setVariable( MarmaladeMojoExecutionDirectives.RESPONSE_INVAR, response );
-
+        
+        StringWriter sOutWriter = new StringWriter();
+        PrintWriter outWriter = new PrintWriter(sOutWriter);
+        
+        context.setOutWriter(outWriter);
+        
+        StringWriter sErrWriter = new StringWriter();
+        PrintWriter errWriter = new PrintWriter(sErrWriter);
+        
+        context.setErrWriter(errWriter);
+        
         try
         {
             script.execute( context );
         }
         catch ( MarmaladeExecutionException e )
         {
-            FailureResponse failure = new MarmaladeMojoFailureResponse( script.getLocation(), e );
-            response.setExecutionFailure( failure );
+            throw e;
+        }
+        
+        StringBuffer output = sOutWriter.getBuffer();
+        if(output.length() > 0)
+        {
+            getLog().info(output);
+        }
+        
+        StringBuffer error = sErrWriter.getBuffer();
+        if(error.length() > 0)
+        {
+            getLog().error(error);
         }
 
         // TODO: need to be able to pass back results
