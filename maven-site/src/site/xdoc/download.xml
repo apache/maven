@@ -10,43 +10,26 @@
       </p>
       <ul>
         <li>
-          <a href="http://people.apache.org/~brett/maven2/maven-2.0-build-2-bin.tar.bz2">
-            <code>.tar.bz2</code> archive (676K)
-          </a>
-        </li>
-        <li>
-          <a href="http://people.apache.org/~brett/maven2/maven-2.0-build-2-bin.tar.gz">
-            <code>.tar.gz</code> archive (682K)
-          </a>
-        </li>
-        <li>
-          <a href="http://people.apache.org/~brett/maven2/maven-2.0-build-2-bin.zip">
-            <code>.zip</code> archive (685K)
-          </a>
-        </li>
-        <!--
-        <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.tar.bz2"><code>.tar.bz2</code> archive</a>
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2"><code>.tar.bz2</code> archive</a>
           <span style="font-size: smaller">
-            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.tar.bz2.md5">checksum</a>)
-            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.tar.bz2.asc">PGP</a>)
+            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2.md5">checksum</a>)
+            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2.asc">PGP</a>)
           </span>
         </li>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.tar.gz"><code>.tar.gz</code> archive</a>
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.gz"><code>.tar.gz</code> archive</a>
           <span style="font-size: smaller">
-            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.tar.gz.md5">checksum</a>)
-            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.tar.gz.asc">PGP</a>)
+            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.gz.md5">checksum</a>)
+            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.gz.asc">PGP</a>)
           </span>
         </li>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.zip"><code>.zip</code> archive</a>
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.zip"><code>.zip</code> archive</a>
           <span style="font-size: smaller">
-            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.zip.md5">checksum</a>)
-            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1.zip.asc">PGP</a>)
+            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.zip.md5">checksum</a>)
+            (<a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.zip.asc">PGP</a>)
           </span>
         </li>
-        -->
       </ul>
       <p>
         Maven 2.0 is distributed under the
@@ -87,7 +70,7 @@
         <ol>
           <li>
             Unzip
-            <code>maven-2.0-alpha-1.zip</code> to the directory you wish to install Maven 2.0. These instructions
+            <code>maven-2.0-alpha-1-bin.zip</code> to the directory you wish to install Maven 2.0. These instructions
             assume you chose
             <code>C:\Program Files\Apache Software Foundation\maven-2.0-alpha-1</code>
           </li>
