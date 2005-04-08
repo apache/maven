@@ -8,26 +8,41 @@
       <p>
         Maven is distributed in several formats for your convenience.
       </p>
+      <p>
+        You will be prompted for a mirror - please be patient, as it may take 24 hours to reach all mirrors.
+      </p>
       <ul>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2"><code>.tar.bz2</code> archive</a>
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2">
+            <code>.tar.bz2</code> archive
+          </a>
           <span style="font-size: smaller">
-            (<a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2.md5">checksum</a>)
-            (<a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2.asc">PGP</a>)
+            (
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2.md5">checksum</a>)
+            (
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.tar.bz2.asc">PGP</a>)
           </span>
         </li>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.gz"><code>.tar.gz</code> archive</a>
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.tar.gz">
+            <code>.tar.gz</code> archive
+          </a>
           <span style="font-size: smaller">
-            (<a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.tar.gz.md5">checksum</a>)
-            (<a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.tar.gz.asc">PGP</a>)
+            (
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.tar.gz.md5">checksum</a>)
+            (
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.tar.gz.asc">PGP</a>)
           </span>
         </li>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.zip"><code>.zip</code> archive</a>
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-1-bin.zip">
+            <code>.zip</code> archive
+          </a>
           <span style="font-size: smaller">
-            (<a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.zip.md5">checksum</a>)
-            (<a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.zip.asc">PGP</a>)
+            (
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.zip.md5">checksum</a>)
+            (
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-1-bin.zip.asc">PGP</a>)
           </span>
         </li>
       </ul>

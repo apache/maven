@@ -116,17 +116,24 @@
             <a href="getting-started.html">Getting Started</a>
           </i>
         </li>
-        <li>
-          <i>
-            <a href="configuration.html">Configuring Maven</a>
-          </i>
-        </li>
+        <!-- TODO
+                <li>
+                  <i>
+                    <a href="configuration.html">Configuring Maven</a>
+                  </i>
+                </li>
+        -->
         <li>
           <i>
             <a href="developing-plugins-with-marmalade.html">Developing Plugins with Marmalade</a>
           </i>
         </li>
       </ul>
+      <p>
+        <b>More coming soon - </b> we will continue to flesh out the documentation in the next week, so stay tuned,
+        and join the
+        <a href="/mail-lists.html">user's mailing list</a> if you have any questions.
+      </p>
     </section>
   </body>
 </document>

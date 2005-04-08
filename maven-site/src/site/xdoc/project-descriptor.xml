@@ -1,0 +1,1149 @@
+<?xml version="1.0"?>
+
+<!-- Generated automatically - do not hand edit.
+  Some changes have been made due to current bugs in modello:xdoc - please take care if regenerating -->
+
+<document>
+  <properties>
+    <author email="dev@maven.apache.org">Maven Development Team</author>
+    <title>Maven Model Documentation</title>
+  </properties>
+  <body>
+    <section name="Descriptor with links">
+      <p>
+        <source>
+          <a href="#Model">&lt;model&gt;</a>
+          <a href="#Model">&lt;extend/&gt;</a>
+          <a href="#Parent">&lt;parent&gt;</a>
+          <a href="#Parent">&lt;artifactId/&gt;</a>
+          <a href="#Parent">&lt;groupId/&gt;</a>
+          <a href="#Parent">&lt;version/&gt;</a>
+          <a href="#Parent">&lt;parent&gt;</a>
+          <a href="#Model">&lt;modelVersion/&gt;</a>
+          <a href="#Model">&lt;groupId/&gt;</a>
+          <a href="#Model">&lt;artifactId/&gt;</a>
+          <a href="#Model">&lt;packaging/&gt;</a>
+          <a href="#Model">&lt;modules/&gt;</a>
+          <a href="#Model">&lt;name/&gt;</a>
+          <a href="#Model">&lt;version/&gt;</a>
+          <a href="#Model">&lt;description/&gt;</a>
+          <a href="#Model">&lt;url/&gt;</a>
+          <a href="#IssueManagement">&lt;issueManagement&gt;</a>
+          <a href="#IssueManagement">&lt;system/&gt;</a>
+          <a href="#IssueManagement">&lt;url/&gt;</a>
+          <a href="#IssueManagement">&lt;issueManagement&gt;</a>
+          <a href="#CiManagement">&lt;ciManagement&gt;</a>
+          <a href="#CiManagement">&lt;system/&gt;</a>
+          <a href="#CiManagement">&lt;url/&gt;</a>
+          <a href="#notifiers">&lt;notifiers&gt;</a>
+          <a href="#Notifier">&lt;notifier&gt;</a>
+          <a href="#Notifier">&lt;type/&gt;</a>
+          <a href="#Notifier">&lt;address/&gt;</a>
+          <a href="#Notifier">&lt;configuration/&gt;</a>
+          <a href="#Notifier">&lt;notifier&gt;</a>
+          <a href="#notifiers">&lt;/notifiers&gt;</a>
+          <a href="#CiManagement">&lt;ciManagement&gt;</a>
+          <a href="#Model">&lt;inceptionYear/&gt;</a>
+          <a href="#repositories">&lt;repositories&gt;</a>
+          <a href="#Repository">&lt;repository&gt;</a>
+          <a href="#Repository">&lt;id/&gt;</a>
+          <a href="#Repository">&lt;name/&gt;</a>
+          <a href="#Repository">&lt;url/&gt;</a>
+          <a href="#Repository">&lt;snapshotPolicy/&gt;</a>
+          <a href="#Repository">&lt;layout/&gt;</a>
+          <a href="#Repository">&lt;repository&gt;</a>
+          <a href="#repositories">&lt;/repositories&gt;</a>
+          <a href="#pluginRepositories">&lt;pluginRepositories&gt;</a>
+          <a href="#Repository">&lt;repository&gt;</a>
+          <a href="#Repository">&lt;id/&gt;</a>
+          <a href="#Repository">&lt;name/&gt;</a>
+          <a href="#Repository">&lt;url/&gt;</a>
+          <a href="#Repository">&lt;snapshotPolicy/&gt;</a>
+          <a href="#Repository">&lt;layout/&gt;</a>
+          <a href="#Repository">&lt;repository&gt;</a>
+          <a href="#pluginRepositories">&lt;/pluginRepositories&gt;</a>
+          <a href="#mailingLists">&lt;mailingLists&gt;</a>
+          <a href="#MailingList">&lt;mailingList&gt;</a>
+          <a href="#MailingList">&lt;name/&gt;</a>
+          <a href="#MailingList">&lt;subscribe/&gt;</a>
+          <a href="#MailingList">&lt;unsubscribe/&gt;</a>
+          <a href="#MailingList">&lt;post/&gt;</a>
+          <a href="#MailingList">&lt;archive/&gt;</a>
+          <a href="#MailingList">&lt;otherArchives/&gt;</a>
+          <a href="#MailingList">&lt;mailingList&gt;</a>
+          <a href="#mailingLists">&lt;/mailingLists&gt;</a>
+          <a href="#developers">&lt;developers&gt;</a>
+          <a href="#Developer">&lt;developer&gt;</a>
+          <a href="#Developer">&lt;id/&gt;</a>
+          <a href="#Developer">&lt;developer&gt;</a>
+          <a href="#developers">&lt;/developers&gt;</a>
+          <a href="#contributors">&lt;contributors&gt;</a>
+          <a href="#Contributor">&lt;contributor&gt;</a>
+          <a href="#Contributor">&lt;name/&gt;</a>
+          <a href="#Contributor">&lt;email/&gt;</a>
+          <a href="#Contributor">&lt;url/&gt;</a>
+          <a href="#Contributor">&lt;organization/&gt;</a>
+          <a href="#Contributor">&lt;roles/&gt;</a>
+          <a href="#Contributor">&lt;timezone/&gt;</a>
+          <a href="#Contributor">&lt;contributor&gt;</a>
+          <a href="#contributors">&lt;/contributors&gt;</a>
+          <a href="#dependencies">&lt;dependencies&gt;</a>
+          <a href="#Dependency">&lt;dependency&gt;</a>
+          <a href="#Dependency">&lt;groupId/&gt;</a>
+          <a href="#Dependency">&lt;artifactId/&gt;</a>
+          <a href="#Dependency">&lt;version/&gt;</a>
+          <a href="#Dependency">&lt;type/&gt;</a>
+          <a href="#Dependency">&lt;scope/&gt;</a>
+          <a href="#Dependency">&lt;dependency&gt;</a>
+          <a href="#dependencies">&lt;/dependencies&gt;</a>
+          <a href="#licenses">&lt;licenses&gt;</a>
+          <a href="#License">&lt;license&gt;</a>
+          <a href="#License">&lt;name/&gt;</a>
+          <a href="#License">&lt;url/&gt;</a>
+          <a href="#License">&lt;comments/&gt;</a>
+          <a href="#License">&lt;license&gt;</a>
+          <a href="#licenses">&lt;/licenses&gt;</a>
+          <a href="#Reports">&lt;reports&gt;</a>
+          <a href="#Reports">&lt;outputDirectory/&gt;</a>
+          <a href="#plugins">&lt;plugins&gt;</a>
+          <a href="#Plugin">&lt;plugin&gt;</a>
+          <a href="#Plugin">&lt;groupId/&gt;</a>
+          <a href="#Plugin">&lt;artifactId/&gt;</a>
+          <a href="#Plugin">&lt;version/&gt;</a>
+          <a href="#Plugin">&lt;configuration/&gt;</a>
+          <a href="#goals">&lt;goals&gt;</a>
+          <a href="#Goal">&lt;goal&gt;</a>
+          <a href="#Goal">&lt;id/&gt;</a>
+          <a href="#Goal">&lt;configuration/&gt;</a>
+          <a href="#Goal">&lt;goal&gt;</a>
+          <a href="#goals">&lt;/goals&gt;</a>
+          <a href="#Plugin">&lt;plugin&gt;</a>
+          <a href="#plugins">&lt;/plugins&gt;</a>
+          <a href="#Reports">&lt;reports&gt;</a>
+          <a href="#Scm">&lt;scm&gt;</a>
+          <a href="#Scm">&lt;connection/&gt;</a>
+          <a href="#Scm">&lt;developerConnection/&gt;</a>
+          <a href="#Scm">&lt;url/&gt;</a>
+          <a href="#Scm">&lt;scm&gt;</a>
+          <a href="#Build">&lt;build&gt;</a>
+          <a href="#Build">&lt;sourceDirectory/&gt;</a>
+          <a href="#Build">&lt;scriptSourceDirectory/&gt;</a>
+          <a href="#Build">&lt;testSourceDirectory/&gt;</a>
+          <a href="#resources">&lt;resources&gt;</a>
+          <a href="#Resource">&lt;resource&gt;</a>
+          <a href="#Resource">&lt;targetPath/&gt;</a>
+          <a href="#Resource">&lt;resource&gt;</a>
+          <a href="#resources">&lt;/resources&gt;</a>
+          <a href="#testResources">&lt;testResources&gt;</a>
+          <a href="#Resource">&lt;resource&gt;</a>
+          <a href="#Resource">&lt;targetPath/&gt;</a>
+          <a href="#Resource">&lt;resource&gt;</a>
+          <a href="#testResources">&lt;/testResources&gt;</a>
+          <a href="#Build">&lt;directory/&gt;</a>
+          <a href="#Build">&lt;outputDirectory/&gt;</a>
+          <a href="#Build">&lt;finalName/&gt;</a>
+          <a href="#Build">&lt;testOutputDirectory/&gt;</a>
+          <a href="#plugins">&lt;plugins&gt;</a>
+          <a href="#Plugin">&lt;plugin&gt;</a>
+          <a href="#Plugin">&lt;groupId/&gt;</a>
+          <a href="#Plugin">&lt;artifactId/&gt;</a>
+          <a href="#Plugin">&lt;version/&gt;</a>
+          <a href="#Plugin">&lt;configuration/&gt;</a>
+          <a href="#goals">&lt;goals&gt;</a>
+          <a href="#Goal">&lt;goal&gt;</a>
+          <a href="#Goal">&lt;id/&gt;</a>
+          <a href="#Goal">&lt;configuration/&gt;</a>
+          <a href="#Goal">&lt;goal&gt;</a>
+          <a href="#goals">&lt;/goals&gt;</a>
+          <a href="#Plugin">&lt;plugin&gt;</a>
+          <a href="#plugins">&lt;/plugins&gt;</a>
+          <a href="#PluginManagement">&lt;pluginManagement&gt;</a>
+          <a href="#plugins">&lt;plugins&gt;</a>
+          <a href="#Plugin">&lt;plugin&gt;</a>
+          <a href="#Plugin">&lt;groupId/&gt;</a>
+          <a href="#Plugin">&lt;artifactId/&gt;</a>
+          <a href="#Plugin">&lt;version/&gt;</a>
+          <a href="#Plugin">&lt;configuration/&gt;</a>
+          <a href="#goals">&lt;goals&gt;</a>
+          <a href="#Goal">&lt;goal&gt;</a>
+          <a href="#Goal">&lt;id/&gt;</a>
+          <a href="#Goal">&lt;configuration/&gt;</a>
+          <a href="#Goal">&lt;goal&gt;</a>
+          <a href="#goals">&lt;/goals&gt;</a>
+          <a href="#Plugin">&lt;plugin&gt;</a>
+          <a href="#plugins">&lt;/plugins&gt;</a>
+          <a href="#PluginManagement">&lt;pluginManagement&gt;</a>
+          <a href="#Build">&lt;build&gt;</a>
+          <a href="#Organization">&lt;organization&gt;</a>
+          <a href="#Organization">&lt;name/&gt;</a>
+          <a href="#Organization">&lt;url/&gt;</a>
+          <a href="#Organization">&lt;organization&gt;</a>
+          <a href="#DistributionManagement">&lt;distributionManagement&gt;</a>
+          <a href="#Repository">&lt;repository&gt;</a>
+          <a href="#Repository">&lt;id/&gt;</a>
+          <a href="#Repository">&lt;name/&gt;</a>
+          <a href="#Repository">&lt;url/&gt;</a>
+          <a href="#Repository">&lt;snapshotPolicy/&gt;</a>
+          <a href="#Repository">&lt;layout/&gt;</a>
+          <a href="#Repository">&lt;repository&gt;</a>
+          <a href="#Site">&lt;site&gt;</a>
+          <a href="#Site">&lt;id/&gt;</a>
+          <a href="#Site">&lt;name/&gt;</a>
+          <a href="#Site">&lt;url/&gt;</a>
+          <a href="#Site">&lt;site&gt;</a>
+          <a href="#DistributionManagement">&lt;distributionManagement&gt;</a>
+          <a href="#DependencyManagement">&lt;dependencyManagement&gt;</a>
+          <a href="#dependencies">&lt;dependencies&gt;</a>
+          <a href="#Dependency">&lt;dependency&gt;</a>
+          <a href="#Dependency">&lt;groupId/&gt;</a>
+          <a href="#Dependency">&lt;artifactId/&gt;</a>
+          <a href="#Dependency">&lt;version/&gt;</a>
+          <a href="#Dependency">&lt;type/&gt;</a>
+          <a href="#Dependency">&lt;scope/&gt;</a>
+          <a href="#Dependency">&lt;dependency&gt;</a>
+          <a href="#dependencies">&lt;/dependencies&gt;</a>
+          <a href="#DependencyManagement">&lt;dependencyManagement&gt;</a>
+          <a href="#Model">&lt;model&gt;</a>
+        </source>
+      </p>
+      <section name="Model">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>extend</td>
+              <td>
+						The location of the parent project, if one exists. Values from the
+            parent project will be the default for this project if they are
+            left unspecified. The path may be absolute, or relative to the
+            current project.xml file.
+
+                <div class="source">
+                  <pre>&lt;extend&gt;${basedir}/../project.xml&lt;/extend&gt;</pre>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>parent</td>
+              <td>Information on which parent POM to extend.</td>
+            </tr>
+            <tr>
+              <td>modelVersion</td>
+              <td>Declares to which version of project descriptor this POM conforms.</td>
+            </tr>
+            <tr>
+              <td>groupId</td>
+              <td>
+          	The short name of the project group. This value is used to group
+            all jars for a project in one directory. For more info look at the
+                <a href="user-guide.html#Naming%20Conventions">user guide</a>.
+              </td>
+            </tr>
+            <tr>
+              <td>artifactId</td>
+              <td>
+          	The short name of the project.  This value is used in conjunction
+            with
+                <code>groupId</code>
+            when naming
+                <a href="plugins/java/index.html">jars</a> and
+                <a href="plugins/dist/index.html">distribution files</a>.
+              </td>
+            </tr>
+            <tr>
+              <td>packaging</td>
+              <td>The type of artifact this project produces.</td>
+            </tr>
+            <tr>
+              <td>modules</td>
+              <td>The modules to build in addition to the current project</td>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>
+          	The full name of the project.  This value is used when
+            generating
+                <a href="plugins/javadoc/index.html">JavaDoc</a>
+            titles.
+              </td>
+            </tr>
+            <tr>
+              <td>version</td>
+              <td>
+          	The current version of the artifact produced by this project.
+              </td>
+            </tr>
+            <tr>
+              <td>description</td>
+              <td>
+          	Optional. A detailed description of the project.
+            This description is used as the default to generate the
+                <a href="plugins/site/index.html">front page</a> of the project's
+            web site, and is shown when
+                <code>maven --usage</code> is called on
+            the project. While this element can be specified as CDATA to enable 
+            the use of HTML tags within the description, you are encouraged to 
+            provide an alternative home page using
+                <code>xdocs/index.xml</code>
+            if this is required.
+              </td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>
+          	 The URL to the project's homepage.
+              </td>
+            </tr>
+            <tr>
+              <td>issueManagement</td>
+              <td>The project's issue management information.</td>
+            </tr>
+            <tr>
+              <td>ciManagement</td>
+              <td>The project's continuous integration management information.</td>
+            </tr>
+            <tr>
+              <td>inceptionYear</td>
+              <td>
+          	The year of the project's inception specified with 4 digits.
+            This value is used when generating
+                <a href="plugins/javadoc/index.html">JavaDoc</a> copyright notices.
+              </td>
+            </tr>
+            <tr>
+              <td>repositories</td>
+              <td>The lists of the remote repositories</td>
+            </tr>
+            <tr>
+              <td>pluginRepositories</td>
+              <td>The lists of the remote repositories for discovering plugins</td>
+            </tr>
+            <tr>
+              <td>mailingLists</td>
+              <td>
+          	Contains information about a project's mailing lists.  This
+            is used to generate the
+                <a href="plugins/site/index.html">front
+            page</a> of the site's web site.
+              </td>
+            </tr>
+            <tr>
+              <td>developers</td>
+              <td>
+          	Describes the committers to a project.  This is used to
+            generate the
+                <a href="plugins/site/index.html">Project Team</a>
+            page of the project's web site.
+              </td>
+            </tr>
+            <tr>
+              <td>contributors</td>
+              <td>
+          	Describes the contributors to a project.  This is used to generate
+            the
+                <a href="plugins/site/index.html">Project Team</a> page of
+            the project's web site.
+              </td>
+            </tr>
+            <tr>
+              <td>dependencies</td>
+              <td>
+                <p>
+            	This element describes all of the dependencies associated with a
+        			project.  Each dependency is described by a
+                  <code>dependency</code> element, which is then described by
+        			additional elements (described below).
+                </p>
+                <p>
+        			These dependencies are used to construct a classpath for your 
+        			project during the build process.
+                </p>
+                <p>
+			        Maven can automatically download these dependencies from a
+                  <a href="user-guide.html#Remote%20Repository%20Layout">remote repository</a>.
+                </p>
+                <p>
+			        The filename that Maven downloads from the repository is
+                  <code>artifactId-version.jar</code> where
+                  <code>artifactId</code>
+              corresponds to the
+                  <code>artifactId</code> element and
+                  <code>version</code> corresponds to the
+                  <code>version</code> element.
+                </p>
+                <p>
+			        When Maven goes looking for a dependency in the remote repository, 
+      			  it uses the dependency element to construct the URL to download 
+			        from. This URL is defined as:
+                </p>
+                <div class="source">
+                  <pre>${repo}/${groupId}/${type}s/${artifactId}-${version}.${type}</pre>
+                </div>
+                <p>
+			        Where
+                </p>
+                <dl>
+                  <dt>repo</dt>
+                  <dd>
+              	is the remote repository URL specified by
+                    <code>${maven.repo.remote}</code>
+                  </dd>
+
+                  <dt>groupId</dt>
+                  <dd>is taken from the dependency element</dd>
+
+                  <dt>type</dt>
+                  <dd>is taken from the dependency element</dd>
+
+                  <dt>artifactId</dt>
+                  <dd>is taken from the dependency element</dd>
+
+                  <dt>version</dt>
+                  <dd>is taken from the dependency element</dd>
+                </dl>
+              </td>
+            </tr>
+            <tr>
+              <td>licenses</td>
+              <td>
+          	This element describes all of the licenses for this project.  
+            Each license is described by a
+                <code>license</code> element, which
+            is then describe by additional elements (described below).  The 
+            auto-generated site documentation references this information.  
+            Projects should only list the license(s) that applies to the project 
+            and not the licenses that apply to dependencies.
+              </td>
+            </tr>
+            <tr>
+              <td>reports</td>
+              <td>
+            This element includes the specification of reports to be
+            included in a Maven-generated site.  These reports will be run
+            when a user executes
+                <code>maven site</code>.  All of the
+            reports will be included in the navigation bar for browsing in
+            the order they are specified.
+              </td>
+            </tr>
+            <tr>
+              <td>scm</td>
+              <td>Specification for the SCM use by the project.</td>
+            </tr>
+            <tr>
+              <td>build</td>
+              <td>Information required to build the project.</td>
+            </tr>
+            <tr>
+              <td>organization</td>
+              <td>
+          	This element describes various attributes of the organziation to
+		        which the project belongs.  These attributes are utilized when
+    		    documentation is created (for copyright notices and links).
+              </td>
+            </tr>
+            <tr>
+              <td>distributionManagement</td>
+              <td>Distribution information for a project.</td>
+            </tr>
+            <tr>
+              <td>dependencyManagement</td>
+              <td>
+          	Default dependency information for grouped projects inheriting from 
+            this one. This dependency information here will not be checked.
+            Instead, when a POM derived from this one declares a dependency 
+            described by a groupId and an artifactId (version not necessary), 
+            the entries in here will supply default values for that dependency.
+            Any locally-supplied information for a particular dependency will
+            overwrite any information specified here for that project.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Build">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>sourceDirectory</td>
+              <td>
+          	This element specifies a directory containing the source
+            of the project. The generated build system will compile
+            the source in this directory when the project is built.
+            The path given is relative to the project descriptor.
+              </td>
+            </tr>
+            <tr>
+              <td>scriptSourceDirectory</td>
+              <td>
+            This element specifies a directory containing the script sources
+            of the project. This directory is meant to be different from the
+            sourceDirectory, in that its contents will be copied to the output
+            directory in most cases (since scripts are interpreted rather than
+            compiled).
+              </td>
+            </tr>
+            <tr>
+              <td>testSourceDirectory</td>
+              <td>
+            This element specifies a directory containing the unit test
+            source of the project. The generated build system will
+            compile these directories when the project is being tested.
+            The unit tests must use the JUnit test framework.
+            The path given is relative to the project descriptor.
+              </td>
+            </tr>
+            <tr>
+              <td>resources</td>
+              <td>
+          	This element describes all of the resources associated with a 
+            project or unit tests. Each resource is described by a resource 
+            element, which is then described by additional elements (described
+                <a href="#resource">below</a>). These resources are used to complete
+            the jar file or to run unit test.
+              </td>
+            </tr>
+            <tr>
+              <td>testResources</td>
+              <td>
+            This element describes all of the resources associated with a 
+            project's unit tests. Each resource is described by a resource 
+            element, which is then described by additional elements (described
+                <a href="#resource">below</a>). These resources are used to complete
+            the jar file or to run unit test.
+              </td>
+            </tr>
+            <tr>
+              <td>directory</td>
+              <td>
+            The directory where all generated by the build is placed.
+              </td>
+            </tr>
+            <tr>
+              <td>outputDirectory</td>
+              <td>
+            The directory where compiled application classes are placed.
+              </td>
+            </tr>
+            <tr>
+              <td>finalName</td>
+              <td>
+            The filename (including an extension, but with no path information) that the produced artifact
+            will be called. The default value is artifactId-version.extension (where extension is derived from
+            type).
+              </td>
+            </tr>
+            <tr>
+              <td>testOutputDirectory</td>
+              <td>
+            The directory where compiled test classes are placed.
+              </td>
+            </tr>
+            <tr>
+              <td>plugins</td>
+              <td>
+          	Configuration for plugins to be used to build this project.
+              </td>
+            </tr>
+            <tr>
+              <td>pluginManagement</td>
+              <td>
+          	Default plugin information to be made available for reference by 
+            projects derived from this one. This plugin configuration will not
+            be validated or bound to the lifecycle unless referenced. Any local
+            configuration for a given plugin will override the plugin's entire
+            definition here.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="CiManagement">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>system</td>
+              <td>The name of the continuous integration system i.e. Bugzilla</td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>Url for the continuous integration system use by the project.</td>
+            </tr>
+            <tr>
+              <td>notifiers</td>
+              <td>
+          	Configuration for notifying developers/users when a build is 
+            unsuccessful, including user information and notification mode.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Notifier">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>type</td>
+              <td>The mechanism used to deliver notifications.</td>
+            </tr>
+            <tr>
+              <td>address</td>
+              <td>
+            Where to send the notification to - eg email address
+              </td>
+            </tr>
+            <tr>
+              <td>configuration</td>
+              <td>Extended configuration specific to this notifier goes here.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Contributor">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>The full name of the contributor.</td>
+            </tr>
+            <tr>
+              <td>email</td>
+              <td>The email address of the contributor.</td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>The URL for the homepage of the contributor.</td>
+            </tr>
+            <tr>
+              <td>organization</td>
+              <td>The organization to which the contributor belongs.</td>
+            </tr>
+            <tr>
+              <td>roles</td>
+              <td>
+            The roles the contributor plays in the project.  Each role is
+            describe by a
+                <code>role</code> element, the body of which is a
+            role name.
+              </td>
+            </tr>
+            <tr>
+              <td>timezone</td>
+              <td>
+            The timezone the contributor is in. This is a number in the range -11 to 12.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Dependency">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>groupId</td>
+              <td>
+            The project group that produced the dependency, e.g.
+                <code>geronimo</code>.
+              </td>
+            </tr>
+            <tr>
+              <td>artifactId</td>
+              <td>
+            The unique id for an artifact produced by the project group, e.g.
+                <code>germonimo-jms</code>
+              </td>
+            </tr>
+            <tr>
+              <td>version</td>
+              <td>
+            The version of the dependency., e.g.
+                <code>3.2.1</code>
+              </td>
+            </tr>
+            <tr>
+              <td>type</td>
+              <td>
+            The type of dependency. This defaults to
+                <code>jar</code>.
+            Known recognised dependency types are:
+                <ul>
+                  <li>
+                    <code>jar</code>
+                  </li>
+                  <li>
+                    <code>ejb</code>
+                  </li>
+                  <li>
+                    <code>plugin</code>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>scope</td>
+              <td>
+            The scope of the dependency - build, compile, test, runtime. Used to
+            calculate the various classpaths used for testing, etc. and for 
+            determining which artifacts to include in a distribution of this
+            project.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Developer">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>The username of the developer.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="IssueManagement">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>system</td>
+              <td>The name of the issue management system i.e. Bugzilla</td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>Url for the issue management system use by the project.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="DistributionManagement">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>repository</td>
+              <td>
+          	Information needed for deploying to remote repository artifacts 
+            generated by the project
+              </td>
+            </tr>
+            <tr>
+              <td>site</td>
+              <td>
+          	Information needed for deploying website files of the project.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="License">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>The full legal name of the license.</td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>The official url for the license text.</td>
+            </tr>
+            <tr>
+              <td>comments</td>
+              <td>
+            Addendum information pertaining to this license.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="MailingList">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>The name of the mailing list.</td>
+            </tr>
+            <tr>
+              <td>subscribe</td>
+              <td>
+            The email address or link that can be used to subscribe to the mailing list.
+            If this is an email address, a
+                <code>mailto:</code> link will automatically be created when
+            the documentation is created.
+              </td>
+            </tr>
+            <tr>
+              <td>unsubscribe</td>
+              <td>
+            The email address or link that can be used to unsubscribe to
+            the mailing list.  If this is an email address, a
+                <code>mailto:</code> link will automatically be created
+            when the documentation is created.
+              </td>
+            </tr>
+            <tr>
+              <td>post</td>
+              <td>
+            The email address or link that can be used to post to
+            the mailing list.  If this is an email address, a
+                <code>mailto:</code> link will automatically be created
+            when the documentation is created.
+              </td>
+            </tr>
+            <tr>
+              <td>archive</td>
+              <td>
+          	The link to a URL where you can browse the mailing list archive.
+              </td>
+            </tr>
+            <tr>
+              <td>otherArchives</td>
+              <td>
+          	The link to other URLs where you can browse the list archive.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Organization">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>The full name of the organization.</td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>The URL to the organization's home page.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="PatternSet">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>includes</td>
+              <td>the description</td>
+            </tr>
+            <tr>
+              <td>excludes</td>
+              <td>the description</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Parent">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>artifactId</td>
+              <td>The artifact id of the project to extend.</td>
+            </tr>
+            <tr>
+              <td>groupId</td>
+              <td>The group id of the project to extend.</td>
+            </tr>
+            <tr>
+              <td>version</td>
+              <td>The versi>on of the project to extend.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Scm">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>connection</td>
+              <td>
+            The source configuration management system URL
+            that describes the repository and how to connect to the
+            repository.  This is used by Maven when
+                <a href="plugins/dist/index.html">building versions</a>
+            from specific ID.
+              </td>
+            </tr>
+            <tr>
+              <td>developerConnection</td>
+              <td>
+            Just like connection, but for developers, i.e. this scm connection
+            will not be read only.
+              </td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>The URL to the project's browsable CVS repository.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="FileSet">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>directory</td>
+              <td>
+            Describe the directory where the resource is stored.
+            The path may be absolute, or relative to the project.xml file.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Resource">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>targetPath</td>
+              <td>
+          	Describe the resource target path. For example, if you want that 
+            resource appear into a specific package 
+            (
+                <code>org.apache.maven.messages</code>), you must specify this
+            element with this value :
+                <code>org/apache/maven/messages</code>
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Repository">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>
+            A unique identifier for a repository.
+              </td>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>
+            Human readable name of the repository
+              </td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>
+             The url of of the repository
+              </td>
+            </tr>
+            <tr>
+              <td>snapshotPolicy</td>
+              <td>
+            The policy for downloading snapshots - can be "always", "daily" (default), "interval:XXX" (in minutes) or
+            "never".
+              </td>
+            </tr>
+            <tr>
+              <td>layout</td>
+              <td>The type of layout this repository uses for locating and storing aritfacts - can be "legacy" or "default".</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Site">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>
+            A unique identifier for a deployment locataion.
+              </td>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>
+            Human readable name of the deployment location
+              </td>
+            </tr>
+            <tr>
+              <td>url</td>
+              <td>
+             The url of of the location where website is deployed
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Plugin">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>groupId</td>
+              <td>No description.</td>
+            </tr>
+            <tr>
+              <td>artifactId</td>
+              <td>No description.</td>
+            </tr>
+            <tr>
+              <td>version</td>
+              <td>The version of the plugin to be used.</td>
+            </tr>
+            <tr>
+              <td>configuration</td>
+              <td>No description.</td>
+            </tr>
+            <tr>
+              <td>goals</td>
+              <td>No description.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Goal">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>No description.</td>
+            </tr>
+            <tr>
+              <td>configuration</td>
+              <td>No description.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="DependencyManagement">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>dependencies</td>
+              <td>
+            The dependencies specified here are not validated until they
+            are referenced in a POM within the group. This allows the
+            specification of a "standard" version for a particular
+            dependency.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="PluginManagement">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>plugins</td>
+              <td>
+            The dependencies specified here are not validated until they
+            are referenced in a POM within the group. This allows the
+            specification of a "standard" version for a particular
+            dependency.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Reports">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>outputDirectory</td>
+              <td>Where to store all of the generated reports</td>
+            </tr>
+            <tr>
+              <td>plugins</td>
+              <td>The reporting plugins to use and their configuration</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+    </section>
+  </body>
+</document>

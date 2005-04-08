@@ -32,10 +32,12 @@
          Plugins</a> from the Maven 1.0 website. Marmalade is meant to be quite similar to Jelly in its 
          syntax, so this process should be very familiar to Maven 1.0 plugin developers.
       </p>
-      <p>
-        If you need some background on how plugins fit into the execution model of Maven 2.0, try reading the
-        <a href="architecture.html">Maven 2.0 Architecture</a>.
-      </p>
+      <!-- TODO
+            <p>
+              If you need some background on how plugins fit into the execution model of Maven 2.0, try reading the
+              <a href="architecture.html">Maven 2.0 Architecture</a>.
+            </p>
+      -->
 
       <subsection name="Graduating from Jelly: Plugins in Marmalade">
         <p>

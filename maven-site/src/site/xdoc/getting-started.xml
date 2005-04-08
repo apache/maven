@@ -6,8 +6,316 @@
   <body>
     <section name="Getting Started">
       <p>
-        ...
+        This section will help you create a trivial project, and build it, and should provide enough information
+        to build any project that requires Maven 2.0. It assumed that you have already
+        <a href="download.html">Downloaded and Installed</a> a Maven 2.0 release.
       </p>
+      <subsection name="Creating a Project Skeleton">
+        <p>
+          The first step is to create a Maven 2.0 project to work on. Run the following command:
+        </p>
+        <source>m2 archetype:create -DgroupId=com.mycompany.app -DartifactId=my-app</source>
+        <p>
+          This command has created a layout according the the conventions laid out
+          <a href="http://maven.apache.org/reference/conventions.html">here</a>.
+        </p>
+        <!-- TODO
+                <p>
+                  If you'd like to know more about archetypes, see the <a href="archetypes.html">Archetypes</a> section.
+                </p>
+        -->
+        <p>
+          The file
+          <code>pom.xml</code> is the Maven 2.0 project descriptor.
+        </p>
+        <source><![CDATA[
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>my-app</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>]]></source>
+        <p>
+          You can get a full reference to the
+          <a href="project-descriptor.html">project descriptor</a> to see what other
+          elements are available.
+        </p>
+        <p>
+          You'll notice there is a
+          <code>src/main/java</code> directory containing a simple source file to compile,
+          and a
+          <code>src/test/java</code> directory containing a trivial unit test.
+        </p>
+        <p>
+          Let's try a few things...
+        </p>
+      </subsection>
+      <subsection name="Building a Project">
+        <p>
+          Maven 2.0's primary build is built around a defined lifecycle. There are many stages, but the most used ones
+          from the command line are:
+        </p>
+        <ul>
+          <li>
+            <code>generate-sources</code> - perform any source generation
+          </li>
+          <li>
+            <code>compile</code> - compile the sources in
+            <code>src/test/java</code> as well as any generated source
+          </li>
+          <li>
+            <code>test</code> - compile and run the unit tests
+          </li>
+          <li>
+            <code>package</code> - package the source code into an archive (primarily a JAR)
+          </li>
+          <li>
+            <code>install</code> - install the package in the local repository for use with other projects
+          </li>
+          <li>
+            <code>deploy</code> - deploy the package to the remote repository
+          </li>
+        </ul>
+        <p>
+          Note that executing any stage in the lifecycle will execute all of the preceding ones, so you need only run:
+        </p>
+        <source>m2 install</source>
+        <p>
+          This will do all of the steps - generating sources, compiling, copying resources, packaging and finally installing.
+        </p>
+        <!-- TODO
+                <p>
+                  For more information on the lifecycle, see the <a href="lifecycle.html">Build Lifecycle</a>.
+                </p>
+        -->
+        <p>
+          You can run other standalone goals as well, for example:
+        </p>
+        <source>m2 clean:clean install</source>
+        <p>
+          Perhaps you'd like to generate an IntelliJ IDEA descriptor for the project?
+        </p>
+        <source>m2 idea:idea</source>
+        <p>
+          This can be run over the top of a previous IDEA project - it will update the settings rather than starting fresh.
+        </p>
+        <p>
+          <b>Note:</b> some familiar goals from Maven 1.0 are still there - such as
+          <code>jar:jar</code>, but they might
+          not behave like you'd expect. Presently,
+          <code>jar:jar</code> will not recompile sources - it will simply just
+          create a JAR from the
+          <code>target/classes</code> directory, under the assumption everything else had already
+          been done.
+        </p>
+      </subsection>
+      <subsection name="Other Project Types">
+        <p>
+          Note that the lifecycle applies to any project type. For example, we can create a simple web application:
+        </p>
+        <source>
+m2 archetype:create
+   -DgroupId=com.mycompany.app -DartifactId=my-webapp
+   -DarchetypeArtifactId=maven-archetype-webapp</source>
+        <p>
+          Note that these must all be on a single line. This will create a directory
+          <code>my-webapp</code> and the following
+          project descriptor:
+        </p>
+        <source><![CDATA[<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>my-webapp</artifactId>
+  <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>1.0-alpha-1</version>
+        <configuration>
+          <warName>my-webapp</warName>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>]]></source>
+        <p>
+          Note the
+          <code>&lt;packaging&gt;</code> element - this tells Maven to build as a WAR. Again, try:
+        </p>
+        <source>m2 clean:clean package</source>
+        <p>
+          You'll see
+          <code>target/my-webapp.war</code> is built, and that all the normal steps were executed.
+        </p>
+        <p>
+          What is the
+          <code>plugins</code> section all about? Well, this is how plugins are configured in Maven 2.0.
+          It is analogours to the
+          <code>project.properties</code> file in Maven 1.0. You may note that it looks more
+          verbose - but you'll see over time that it should be required much less, and is capable of much more powerful
+          configuration than it's Maven 1.0 counterpart. In addition, we hope the burden of editing the POM will be
+          eased by the availability of tools in the near future.
+        </p>
+        <p>
+          Note that this section is not required to build a WAR - if you omit it, the project will still build a WAR,
+          but the default output name of
+          <code>my-webapp-1.0-SNAPSHOT.war</code> will be used instead. In fact... go ahead
+          and try that now!
+        </p>
+      </subsection>
+      <subsection name="Multiple Modules">
+        <p>
+          The concept of dealing with multiple modules is built in to Maven 2.0.
+          In this section, we will show how to build the WAR above, and include the previous JAR as well in one step.
+        </p>
+        <p>
+          Firstly, we need to add a parent
+          <code>pom.xml</code> file in the directory above the other two, so it should look like this:
+        </p>
+        <source>
++- pom.xml
++- my-app
+|  +- pom.xml
++- my-webapp
+|  +- pom.xml
+        </source>
+        <p>
+          The POM file you'll create should contain the following:
+        </p>
+        <source><![CDATA[<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany.app</groupId>
+  <version>1.0-SNAPSHOT</version>
+  <artifactId>app</artifactId>
+  <packaging>pom</packaging>
+  <modules>
+    <module>my-app</module>
+    <module>my-webapp</module>
+  </modules>
+</model>]]></source>
+        <p>
+          We'll need a dependency on the JAR from the webapp, so add this to
+          <code>my-webapp/pom.xml</code>:
+        </p>
+        <source><![CDATA[
+  .
+  .
+  .
+  <dependencies>
+    <dependency>
+      <groupId>com.mycompany.app</groupId>
+      <artifactId>my-app</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    .
+    .
+    .]]></source>
+        <p>
+          Finally, add the following
+          <code>&lt;parent&lt;</code> element to both of the other
+          <code>pom.xml</code> files
+          in the subdirectories:
+        </p>
+        <source><![CDATA[<model>
+  <parent>
+    <groupId>com.mycompany.app</groupId>
+    <artifactId>app</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  .
+  .
+  .]]></source>
+        <p>
+          Now, try it... from the top level directory, run:
+        </p>
+        <source>m2 clean:clean install</source>
+        <p>
+          The WAR has now been created in
+          <code>my-webapp/target/my-webapp-1.0-SNAPSHOT.war</code>, and the JAR is
+          included:
+        </p>
+        <source>$ jar tvf my-webapp/target/my-webapp-1.0-SNAPSHOT.war
+     0 Sat Apr 09 01:45:18 EST 2005 META-INF/
+   222 Sat Apr 09 01:45:16 EST 2005 META-INF/MANIFEST.MF
+     0 Sat Apr 09 01:45:18 EST 2005 META-INF/maven/
+   675 Sat Apr 09 01:42:54 EST 2005 META-INF/maven/pom.xml
+     0 Sat Apr 09 01:45:18 EST 2005 WEB-INF/
+   215 Sat Apr 09 01:45:18 EST 2005 WEB-INF/web.xml
+    52 Sat Apr 09 01:45:18 EST 2005 index.jsp
+     0 Sat Apr 09 01:45:18 EST 2005 WEB-INF/lib/
+  1586 Sat Apr 09 01:45:18 EST 2005 WEB-INF/lib/my-app-1.0-SNAPSHOT.jar</source>
+        <p>
+          How does this work? Firstly, the parent POM created (called
+          <code>app</code>), has a packaging of
+          <code>pom</code>
+          and a list of modules defined. This tells Maven to run all operations over the set of projects instead of
+          just the current one (to override this behaviour, you can use the
+          <code>--non-recursive</code> command line
+          option).
+        </p>
+        <p>
+          Next, we tell the WAR that it requires the
+          <code>my-app</code> JAR. This does a few things: it makes it available
+          on the classpath to any code in the WAR (none in this case), it makes sure the JAR is always built before the
+          WAR, and it indicates to the WAR plugin to include the JAR in it's library directory.
+        </p>
+        <p>
+          You may have noticed that
+          <code>junit-3.8.1.jar</code> was a dependency, but didn't end up in the WAR. The
+          reason for this is the
+          <code>&lt;scope&gt;test&lt;/scope&gt;</code> element - it is only required for testing,
+          and so is not included in the web application as the compile time dependency
+          <code>my-app</code> is.
+        </p>
+        <p>
+          The final step was to include a parent definition. This is different to the
+          <code>extend</code> element you
+          may be familiar with from Maven 1.0: this ensures that the POM can always be located even if the project
+          is distributed separately from its parent by looking it up in the repository.
+        </p>
+        <p>
+          Like Maven 1.0, as of the current Maven release (
+          <code>2.0-alpha-1</code>), it is required that you run
+          <code>install</code> to successfully perform these steps. If you run
+          <code>package</code>, the JAR will not be
+          copied to the local repository and Maven will not be able to find it. This will be improved in future versions.
+        </p>
+      </subsection>
+      <subsection name="Other Topics">
+        <p>
+          That's all there is to this brief tutorial. This is by no means the limits of the capabilities of Maven 2.0,
+          but covers some of the basics and the new features.
+        </p>
+        <p>
+          If you'd like to know more about general Maven concepts, in association with how the current stable release,
+          Maven 1.0, works, see the
+          <a href="http://maven.apache.org">Maven website</a>.
+        </p>
+        <p>
+          For more information on Maven 2.0, you can consult the
+          <a href="plugin-list.html">list of available plugins</a>,
+          or the other documentation on this site.
+        </p>
+      </subsection>
     </section>
   </body>
 </document>
