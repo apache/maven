@@ -2,18 +2,18 @@
   <parent>
     <artifactId>maven-plugin-parent</artifactId>
     <groupId>org.apache.maven.plugins</groupId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0-alpha-1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-war-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven War Plugin</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-alpha-1</version>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-archiver</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>2.0-alpha-1</version>
     </dependency>
   </dependencies>
 </model>
