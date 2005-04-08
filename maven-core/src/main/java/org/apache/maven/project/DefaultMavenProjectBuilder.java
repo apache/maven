@@ -226,7 +226,7 @@ public class DefaultMavenProjectBuilder
         Model cachedModel = (Model) modelCache.get( key );
         if ( cachedModel == null )
         {
-            modelCache.put( cacheKey, model );
+            modelCache.put( key, model );
         }
 
         model = modelInterpolator.interpolate( model );
