@@ -121,6 +121,11 @@
             <a href="configuration.html">Configuring Maven</a>
           </i>
         </li>
+        <li>
+          <i>
+            <a href="developing-plugins-with-marmalade.html">Developing Plugins with Marmalade</a>
+          </i>
+        </li>
       </ul>
     </section>
   </body>

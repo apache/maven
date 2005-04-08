@@ -16,6 +16,7 @@
     <menu name="User's Guide">
       <item name="Getting Started" href="getting-started.html"/>
       <item name="Configuration" href="configuration.html"/>
+      <item name="Developing Plugins with Marmalade" href="developing-plugins-with-marmalade.html"/>
     </menu>
   </body>
 </project>

@@ -61,19 +61,18 @@
           compatibility with Jelly, and some measure of Jelly taglib compatibility...and this support
           will continue to improve as Maven 2.0 matures. As such, Marmalade can allow the plugin developer
           the freedom to concentrate on porting between project models and core facilities, rather than
-          worrying about translating Jelly into Java as well.
+          worrying about changing implementation languages.
         </p>
 
         <p>
           Like Maven 2.0 itself, Marmalade is somewhat of a fledgling project. That is, while it's core
           engine is fairly sophisticated and mature, it's support for Jelly and other taglibs is still 
-          growing at a brisk pace. In order to try to provide as much Jelly functionality to Maven 2.0 
+          growing at a brisk pace. In order to provide as much Jelly functionality out-of-the-box to Maven 2.0 
           users, Marmalade has an available compatibility layer for Jelly, which will allow the user
-          to basically embed Jelly within Marmalade for the taglibs that have not yet been ported to 
-          native Marmalade.
+          to embed Jelly within Marmalade for the taglibs that have not yet been ported to native Marmalade.
         </p>
 
-        <p>For more information on Marmalade, <a href="http://marmalade.codehaus.org">Watch this space.</a>
+        <p>For more information on Marmalade, see the <a href="http://marmalade.codehaus.org">Marmalade website.</a>
       </subsection>
       
       <subsection name="Marmalade Plugin Basics">
@@ -93,8 +92,8 @@
               [Required] A <code>pom.xml</code> for building the plugin, which contains a script source directory
               resembling <code><![CDATA[<scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>]]>
             </li>
-            <li>[Optional] Plugin resources for adding to the classpath when the plugin is run</li>
-            <li>[Optional] Other Java sources, which are accessed from that plugin's scripts</li>
+            <li>[Optional] Plugin resources to be used from within the plugin's scripts (available on the classpath)</li>
+            <li>[Optional] Other Java sources, which can be accessed from the plugin's scripts</li>
           </ul>
         </p>
 
@@ -102,9 +101,9 @@
           Each <code>.mmld</code> script file must provide the same basic structural elements, which define it
           as a Maven 2.0 plugin, and provide essential metadata. This metadata is used to:
           <ul>
-            <li>Inject project and environmental information into the plugin</li>
-            <li>Wire the plugin up to common infrastructural components</li>
-            <li>Bind the plugin to a particular point in the build process lifecycle</li>
+            <li>Inject project and environmental information into the plugin (parameters)</li>
+            <li>Make common infrastructural components available for use in the plugin</li>
+            <li>Bind the plugin to a particular point in the build process lifecycle, if appropriate</li>
             <li>Provide a goal name to reference the plugin from inside the Maven 2.0 system</li>
             <li>Provide descriptive information about what the plugin script does</li>
           </ul>
@@ -114,8 +113,8 @@
           The general structure of a Marmalade plugin script is:
         </p>
         <source><![CDATA[
-<!-- The term mojo is a play on POJO, meant to mean Maven POJO. 
- | Mojos correspond to goals in Maven 2.0. 
+<!-- The term mojo is a play on POJO, meant to mean "Maven POJO". 
+ |   Mojos correspond to goals in Maven 2.0. 
  -->
 <mojo xmlns="marmalade:mojo">
   <metadata>
@@ -152,12 +151,21 @@
           In a new directory, create a <code>pom.xml</code> file like so:
         </p>
         <source><![CDATA[<project> 
-  <modelVersion>4.0.0</modelVersion> 
-  <groupId>org.apache.maven.plugins</groupId> <!-- for now, this is the only groupId acceptable for maven plugins -->
-  <artifactId>maven-hello-plugin</artifactId> 
-  <version>1.0-SNAPSHOT</version> <!-- using this version, we make the plugin fit the anonymous usage requirements. -->
+  <modelVersion>4.0.0</modelVersion>
   
-  <packaging>maven-plugin</packaging> <!-- Designate this project as building a maven plugin -->
+  <!-- for now, this is the only groupId acceptable for maven plugins -->
+  <groupId>org.apache.maven.plugins</groupId>
+  
+  <!-- uses a standard naming convention -->
+  <artifactId>maven-hello-plugin</artifactId> 
+  
+  <!-- uses this version, to make it usable without configuring this plugin from
+   |   the project POM.
+   -->
+  <version>1.0-SNAPSHOT</version>
+  
+  <!-- Designate this project as building a maven plugin -->
+  <packaging>maven-plugin</packaging>
 
   <name>Maven Hello World Plugin</name> 
 
@@ -167,8 +175,18 @@
   -->
  
   <build> 
-    <!-- This is only required if you have Java code -->
     <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory> 
+    
+    <!-- Since the script source directory is only a marker for a resource, you
+     |   still have to declare that directory for resource inclusion when you
+     |   build.
+     -->
+    <resources>
+      <resource>
+        <directory>src/main/scripts</directory>
+        <includes><include>**/*.mmld</include></includes>
+      </resource>
+    </resources>
   </build> 
 </project>]]></source>
 
@@ -177,7 +195,7 @@
           goal within the build system, so you may need several scripts.
         </p>
         <p>
-          Since this is in fact a Hello World plugin, our script will simply output <code>Hello, World</code>
+          Since this is in fact a Hello World plugin, your script will simply output <code>Hello, World</code>
           to the screen. Create a script in <code>src/main/scripts/hello.mmld</code> with the following contents:
         </p>
         <source><![CDATA[
@@ -246,29 +264,29 @@
           salutation in case the user doesn't need or want to customize the plugin.
         </p>
         <p>
-          Now, to make use of the new parameter. Inside the <code><![CDATA[<io:file/>]]></code> tag, we'll
+          Now, to make use of the new parameter. Inside the <code><![CDATA[<c:out/>]]></code> action, simply
           write out the customizable salutation instead of the stock phrase <code>Hello</code>:
         </p>
         <source><![CDATA[
 <c:out xmlns:c="marmalade:core">${salutation}, World.</c:out>
         ]]></source>
         <p>
-          Now, install the new plugin and run it:
+          Install the new plugin and run it, to verify your changes:
         </p>
         <source>m2 install
 m2 hello:hello</source>
         <p>
-          Notice that the file still has the same old salutation (which is the default value of the our parameter). 
+          Notice that the output still has the same old salutation (which is the default value of the parameter). 
           Now, to customize it:
         </p>
         <source>m2 -Dsalutation=Hiya hello:hello</source>
         <p>
-          The contents of <code>hello.txt</code> should now read:
+          The output should now read:
         </p>
         <source>Hiya, World</source>
 
         <p>
-          Now, users of this plugin can customize the salutation for their build without having to specify it on
+          Users of this plugin can also customize the salutation for their project and avoid having to specify it on
           the command line each time. All they have to do is create a plugin entry in their <code>pom.xml</code>
           similar to:
         </p>
