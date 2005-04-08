@@ -1,0 +1,178 @@
+* Assumptions: What is Offline?
+
+  For the purposes of determining the areas sensitive to offline status,
+  it is definitely useful to define what the offline state really means.
+
+  [[1]] This is obvious, but the network/internet is unavailable.
+
+  [[2]] Localhost (127.0.0.1) may also be unavailable if the whole
+        network stack is offline.
+
+  [[3]] "Remote" repositories referenced using the file:// protocol may
+        be available. However, if that file:// url references a
+        file-share, as in the case of an NFS or SMB mount, that will
+        be unavailable.
+
+  So, offline mode has several implications, some of which may not be
+  altogether obvious:
+
+  * Localhost may be unavailable. Therefore, even locally installed
+    server processes which work by conversing over a port may fail.
+
+  * Not all "remote" repositories will fail. Specifically, if the remote
+    repo uses the file:// protocol, and it doesn't refer to a shared
+    filesystem, it will continue to be available.
+
+
+* Implications for Resolution
+
+** Dependency Resolution
+
+  This one is obvious...we only have access to the repositories using
+  the file:// protocol and living on a truly local filesystem when
+  offline.
+
+** Plugin Resolution
+
+  This is similar to dependency resolution. Plugin repositories not
+  using file:// or not residing on a local (not shared) filesystem will
+  be unavailable.
+
+
+* Implications for Mojo Execution
+
+** Deployment mojos
+
+  The concept of deployment is dependent on the availability of a some
+  remote repository. Just as above, if that repository is not using
+  file:// (which is highly likely to be the case), or the repository is
+  not on a local filesystem, deployment will fail when offline.
+
+** Testing mojos
+
+  This can be a problem if the tests are more than simple unit tests;
+  that is, if they require configuration of a server process, and
+  subsequent testing in-container.
+
+** SCM mojos
+
+  See below for discussion on SCM-related operations. Any mojo which
+  carries out some analysis or other interaction with a SCM system
+  will likely be unavailable when in offline mode.
+
+
+* Implications for Subsystems
+
+** Maven-Wagon
+
+  Parts of Wagon will continue to function normally. These include:
+
+  * The file wagon, provided the referenced location is on a local
+    filesystem.
+
+    It is not possible to determine whether a file-based location will
+    be available except on a case-by-case basis (or a root-url by
+    root-url basis).
+
+  * If not otherwise specified, all other wagons are assumed to be
+    remote-only, and are therefore sensitive to offline mode.
+
+** Maven-Artifact
+
+  This is wholly dependent on Maven-Wagon, above.
+
+** Maven-SCM
+
+  In all but trivial examples, SCM operations cannot complete without
+  having access to the versioning server. Therefore, it is assumed that
+  any SCM-related activity will be unavailable when m2 is in offline
+  mode.
+  
+** Maven-Core
+
+  We'll examine the different parts of maven-core on a case-by-case
+  basis, below:
+
+*** DefaultLifecycleExecutor
+
+  When binding goals to the project's configured lifecycle, each mojo
+  descriptor should declare whether it requires online/offline status.
+  This value should be a java.lang.Boolean, so it can implement 3VL
+  (three value logic: yes, no, don't-care). The requiredConnectivity
+  field in the mojo descriptor has the following semantics:
+
+  [Boolean.TRUE] Online status is required for this mojo to function
+                 correctly.
+
+  [Boolean.FALSE] Offline status is required for this mojo to function
+                  correctly.
+
+  [null] Either status is acceptable for the mojo to execute. It doesn't
+         care.
+
+  The majority of mojos will leave the requiredConnectivity == null,
+  since online/offline status will be irrelevant, provided they have
+  access to their required artifacts and other classpath elements.
+
+
+* Implementation Notes
+
+** Accessibility of offline status
+
+  Offline status should be indicated in the MavenSettings instance, since it
+  can conceivably be set from either the settings.xml or the command-line.
+
+  In the event the '-o' switch is the impetus for setting offline mode, this
+  should result in modification of the active profile in the MavenSettings
+  instance, just as definition of the active profile from the command-line
+  should result in similar modification. This object is not meant to be
+  static within the build process, but rather to be setup as an aggregation of
+  all settings-related information passed into the system.
+
+** Control over downloads
+
+  Find the control point for m2 using maven-wagon. At this point, inject
+  a offline status parameter which is used when retrieving the specific Wagon.
+
+  If <<<offline == true>>>:
+  
+  * If the wagon is not bound to "file://", then ignore the request and print
+    a debug message.
+
+  * If the wagon is bound to "file://" then:
+
+    Retrieve the file or base-url file to be "downloaded".
+    
+    * If the file (or more usefully, the base-url file) exists, proceed.
+
+    * If the file (or base-url file) doesn't exist, assume that this location
+      is part of a file-share. Ignore the request and print a debug message 
+      as above.
+
+** Control over mojos in the lifecycle
+
+  When binding a mojo to the project's lifecycle instance, check the mojo 
+  descriptor's requiredConnectivity field.
+
+  * If <<<(offline == true) && (Boolean.TRUE != requiredConnectivity)>>>, bind
+    the mojo to the lifecycle. 
+    
+    In this case, the client is <<offline>>, and the mojo either requires <<offline>>
+    status, or else doesn't care.
+
+  * If <<<(offline == false) && (Boolean.FALSE != requiredConnectivity)>>>, bind
+    the mojo to the lifecycle.
+
+    In this case, the client is <<online>>, and the mojo either requires <<online>>
+    status, or else doesn't care.
+
+  * Otherwise, don't bind the mojo. Log a debug message to indicate that it is
+    sensitive the the online state of the application, and that this state is
+    currently wrong for execution.
+
+  <<NOTE:>> Do we want to fail when we cannot bind a mojo to the lifecycle because
+  of offline/online status? That would probably indicate that the user was trying to
+  do something they cannot succeed at for now...so we probably should throw an
+  exception in this case.
+
+ 
