@@ -51,14 +51,11 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -368,21 +365,6 @@ public class MavenCli
         return mavenUserConfigurationDirectory;
     }
 
-    protected static Properties getMavenProperties( File mavenHomeLocal )
-    {
-        Properties mavenProperties = new Properties();
-        File mavenPropertiesFile = new File( mavenHomeLocal, MavenConstants.MAVEN_PROPERTIES );
-        try
-        {
-            mavenProperties.load( new FileInputStream( mavenPropertiesFile ) );
-        }
-        catch ( IOException e )
-        {
-            // do nothing
-        }
-        return mavenProperties;
-    }
-
     protected static ArtifactRepository getLocalRepository( MavenSettings settings,
                                                             ArtifactRepositoryFactory repoFactory,
                                                             ArtifactRepositoryLayout repositoryLayout )
@@ -398,7 +380,7 @@ public class MavenCli
 
         if ( localRepository == null )
         {
-            String userConfigurationDirectory = System.getProperty( "user.home" ) + "/.m2";
+            File userConfigurationDirectory = getUserConfigurationDirectory();
             localRepository =
                 new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
         }

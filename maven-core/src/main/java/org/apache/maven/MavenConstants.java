@@ -19,8 +19,6 @@ package org.apache.maven;
 
 public class MavenConstants
 {
-    public static final String MAVEN_VERSION = "2.0-alpha-1-SNAPSHOT";
-
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
     // ----------------------------------------------------------------------
@@ -29,13 +27,5 @@ public class MavenConstants
 
     public static final String MAVEN_USER_CONFIGURATION_DIRECTORY = ".m2";
 
-    public static final String MAVEN_PROPERTIES = "maven.properties";
-
     public static final String MAVEN_REPOSITORY = "repository";
-
-    // ----------------------------------------------------------------------
-    // maven.properties
-    // ----------------------------------------------------------------------
-
-    public static final String MAVEN_ONLINE = "maven.online";
 }
