@@ -1,3 +1,13 @@
+  ---
+  Offline Mode Design
+  ---
+  John Casey
+  ---
+  08-April-2005
+  ---
+  
+Offline Mode Design
+
 * Assumptions: What is Offline?
 
   For the purposes of determining the areas sensitive to offline status,
@@ -22,8 +32,44 @@
   * Not all "remote" repositories will fail. Specifically, if the remote
     repo uses the file:// protocol, and it doesn't refer to a shared
     filesystem, it will continue to be available.
+    
+  The question remaining is: Which level of offline mode will we support? It
+  seems reasonable to assume that users will be able to tell when localhost is
+  not active (in most cases, localhost should be available, even if the rest of
+  the network is not). Therefore, let's concentrate on the state where no 
+  network <beyond localhost> exists, and leave the more extreme state to users
+  to diagnose and correct as necessary.
 
+* Why is Offline Mode Important?
 
+  Offline mode is essential for breaking the requirement that m2 operate in a
+  network-connected environment. It means legitimizing a development environment
+  in which there is no network connection, and providing a robust m2 service
+  offering in such circumstances. Introduction of offline mode allows m2 to 
+  anticipate the inevitable network failures that accompany being physically
+  disconnected from the network, and adjust it's behavior accordingly.
+  
+  It is more than simply understanding that m2 cannot go and check for the
+  latest version of some snapshot artifact. If m2 is offline, SCM operations cannot
+  succeed; no artifact downloads can take place, regardless of whether they are
+  snapshot versions; artifact deployment cannot take place; certain types of
+  tests cannot be setup, since the container used to run them cannot be reached
+  or started.
+  
+  All of these operations will produce their own unique errors in the absence of
+  a coordinated offline strategy. In addition, efforts to unite these failing
+  behaviors behind a consistent user interface is much, much more difficult if 
+  the system can't tell whether it has access to the network required by these
+  operations.
+  
+  Offline mode really means anticipating a lack of network connectivity, and as
+  a result turning off certain services provided by m2 and providing a coherent
+  way of predicting and reporting when network-related failures will take place.
+  It means warning users that since the network is missing, certain features and 
+  operations will be unavailable, rather than simply waiting for those operations
+  to fail, then trying to help users decipher the error messages they get as a 
+  result.
+  
 * Implications for Resolution
 
 ** Dependency Resolution
@@ -53,6 +99,11 @@
   This can be a problem if the tests are more than simple unit tests;
   that is, if they require configuration of a server process, and
   subsequent testing in-container.
+  
+  Since we're only going to concern ourselves with states where localhost is
+  still active, we only need to worry about this case when the server container
+  is <<not>> installed on localhost. This allows the popular pattern of starting
+  a server container in-JVM, running tests against it, and shutting it down.
 
 ** SCM mojos
 
