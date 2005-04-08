@@ -6,7 +6,6 @@
     <version>2.0-SNAPSHOT</version>
   </parent>
   <artifactId>maven-archiver</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <name>Maven Archiver</name>
   <dependencies>
     <dependency>

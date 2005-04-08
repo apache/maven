@@ -10,6 +10,7 @@
   <packaging>pom</packaging>
   <version>1.0-alpha-1-SNAPSHOT</version>
   <modules>
+    <module>maven-archetype-marmalade-mojo</module>
     <module>maven-archetype-mojo</module>
     <module>maven-archetype-quickstart</module>
     <module>maven-archetype-webapp</module>

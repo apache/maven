@@ -6,6 +6,5 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-monitor</artifactId>
-  <version>2.0-SNAPSHOT</version>
   <name>Maven Monitor</name>
 </project>

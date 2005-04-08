@@ -6,17 +6,17 @@
   <name>Maven Project</name>
   <version>2.0-SNAPSHOT</version>
   <description>Maven components parent</description>
-  <url>http://maven.apache.org</url>
+  <url>http://maven.apache.org/maven2/</url>
   <issueManagement>
     <system>jira</system>
-    <url>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10500</url>
+    <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
   <ciManagement>
-    <system>m2-dev@maven.apache.org</system>
+    <system>continuum</system>
     <notifiers>
       <notifier>
         <type>mail</type>
-        <address>m2-dev@maven.apache.org</address>
+        <address>dev@maven.apache.org</address>
       </notifier>
     </notifiers>
   </ciManagement>
@@ -79,7 +79,6 @@
     <repository>
       <id>repo1</id>
       <name>Maven Central Repository</name>
-      <!-- url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url -->
       <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
       <layout>default</layout>
     </repository>

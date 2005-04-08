@@ -6,9 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-artifact</artifactId>
-  <name>Maven</name>
-  <version>2.0-SNAPSHOT</version>
-  <inceptionYear>2001</inceptionYear>
+  <name>Maven Artifact</name>
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>

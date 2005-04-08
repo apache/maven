@@ -6,9 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-plugin-tools-marmalade</artifactId>
-  <packaging>jar</packaging>
   <name>Maven Plugin Tools for Marmalade</name>
-  <version>2.0-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>marmalade</groupId>
