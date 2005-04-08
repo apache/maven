@@ -6,8 +6,151 @@
   <body>
     <section name="Available Plugins">
       <p>
-...
+        This page lists some of the available plugins for Maven 2.0. Please bear in mind that this is not a definitive
+        list, and that others can be made available immediately via the Maven repository.
       </p>
+      <p>
+        Full documentation on each of these plugins is still in the works - contributions are welcome!
+      </p>
+      <table>
+        <tr>
+          <th>Plugin</th>
+          <th>Goals</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>
+            assembly
+          </td>
+          <td>
+            assembly:assembly
+          </td>
+          <td>
+            Build an assembly (distribution) of sources and binaries.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            clean
+          </td>
+          <td>
+            clean:clean
+          </td>
+          <td>
+            Clean up after the build.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            compiler
+          </td>
+          <td>
+            compiler:compile, compiler:testCompile
+          </td>
+          <td>
+            Compiles Java sources.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            deploy
+          </td>
+          <td>
+            deploy:deploy
+          </td>
+          <td>
+            Deploy the built artifact to the remote repository.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            ejb
+          </td>
+          <td>
+            ejb:ejb
+          </td>
+          <td>
+            Build an EJB (and optional client) from the current project.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            idea
+          </td>
+          <td>
+            idea:idea
+          </td>
+          <td>
+            Create/update an IDEA workspace for the current project (individual modules are created as IDEA modules)
+          </td>
+        </tr>
+        <tr>
+          <td>
+            install
+          </td>
+          <td>
+            install:install
+          </td>
+          <td>
+            Install the built artifact into the local repository.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            jar
+          </td>
+          <td>
+            jar:jar
+          </td>
+          <td>
+            Build a JAR from the current project.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            plugin
+          </td>
+          <td>
+            plugin:descriptor
+          </td>
+          <td>
+            Create a Maven plugin descriptor for any Mojo's found in the source tree, to include in the JAR.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            resources
+          </td>
+          <td>
+            resources:resources, resources:testResources
+          </td>
+          <td>
+            Copy the resources to the output directory for including in the JAR.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            surefire
+          </td>
+          <td>
+            surefire:test
+          </td>
+          <td>
+            Run the Junit tests in an isolated classloader.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            war
+          </td>
+          <td>
+            war:war
+          </td>
+          <td>
+            Build a WAR from the current project.
+          </td>
+        </tr>
+      </table>
     </section>
   </body>
 </document>

@@ -13,7 +13,6 @@
       <p>
         <source>
           <a href="#Model">&lt;model&gt;</a>
-          <a href="#Model">&lt;extend/&gt;</a>
           <a href="#Parent">&lt;parent&gt;</a>
           <a href="#Parent">&lt;artifactId/&gt;</a>
           <a href="#Parent">&lt;groupId/&gt;</a>
@@ -214,19 +213,6 @@
               <th>Description</th>
             </tr>
             <tr>
-              <td>extend</td>
-              <td>
-						The location of the parent project, if one exists. Values from the
-            parent project will be the default for this project if they are
-            left unspecified. The path may be absolute, or relative to the
-            current project.xml file.
-
-                <div class="source">
-                  <pre>&lt;extend&gt;${basedir}/../project.xml&lt;/extend&gt;</pre>
-                </div>
-              </td>
-            </tr>
-            <tr>
               <td>parent</td>
               <td>Information on which parent POM to extend.</td>
             </tr>
@@ -239,7 +225,7 @@
               <td>
           	The short name of the project group. This value is used to group
             all jars for a project in one directory. For more info look at the
-                <a href="user-guide.html#Naming%20Conventions">user guide</a>.
+                <a href="/user-guide.html#Naming%20Conventions">user guide</a>.
               </td>
             </tr>
             <tr>
@@ -249,8 +235,8 @@
             with
                 <code>groupId</code>
             when naming
-                <a href="plugins/java/index.html">jars</a> and
-                <a href="plugins/dist/index.html">distribution files</a>.
+                <a href="/plugins/java/index.html">jars</a> and
+                <a href="/plugins/dist/index.html">distribution files</a>.
               </td>
             </tr>
             <tr>
@@ -266,7 +252,7 @@
               <td>
           	The full name of the project.  This value is used when
             generating
-                <a href="plugins/javadoc/index.html">JavaDoc</a>
+                <a href="/plugins/javadoc/index.html">JavaDoc</a>
             titles.
               </td>
             </tr>
@@ -281,7 +267,7 @@
               <td>
           	Optional. A detailed description of the project.
             This description is used as the default to generate the
-                <a href="plugins/site/index.html">front page</a> of the project's
+                <a href="/plugins/site/index.html">front page</a> of the project's
             web site, and is shown when
                 <code>maven --usage</code> is called on
             the project. While this element can be specified as CDATA to enable 
@@ -310,7 +296,7 @@
               <td>
           	The year of the project's inception specified with 4 digits.
             This value is used when generating
-                <a href="plugins/javadoc/index.html">JavaDoc</a> copyright notices.
+                <a href="/plugins/javadoc/index.html">JavaDoc</a> copyright notices.
               </td>
             </tr>
             <tr>
@@ -326,7 +312,7 @@
               <td>
           	Contains information about a project's mailing lists.  This
             is used to generate the
-                <a href="plugins/site/index.html">front
+                <a href="/plugins/site/index.html">front
             page</a> of the site's web site.
               </td>
             </tr>
@@ -335,7 +321,7 @@
               <td>
           	Describes the committers to a project.  This is used to
             generate the
-                <a href="plugins/site/index.html">Project Team</a>
+                <a href="/plugins/site/index.html">Project Team</a>
             page of the project's web site.
               </td>
             </tr>
@@ -344,7 +330,7 @@
               <td>
           	Describes the contributors to a project.  This is used to generate
             the
-                <a href="plugins/site/index.html">Project Team</a> page of
+                <a href="/plugins/site/index.html">Project Team</a> page of
             the project's web site.
               </td>
             </tr>
@@ -363,7 +349,7 @@
                 </p>
                 <p>
 			        Maven can automatically download these dependencies from a
-                  <a href="user-guide.html#Remote%20Repository%20Layout">remote repository</a>.
+                  <a href="/user-guide.html#Remote%20Repository%20Layout">remote repository</a>.
                 </p>
                 <p>
 			        The filename that Maven downloads from the repository is
@@ -917,7 +903,7 @@
             The source configuration management system URL
             that describes the repository and how to connect to the
             repository.  This is used by Maven when
-                <a href="plugins/dist/index.html">building versions</a>
+                <a href="/plugins/dist/index.html">building versions</a>
             from specific ID.
               </td>
             </tr>

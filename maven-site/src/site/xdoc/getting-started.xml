@@ -70,7 +70,7 @@
           </li>
           <li>
             <code>compile</code> - compile the sources in
-            <code>src/test/java</code> as well as any generated source
+            <code>src/main/java</code> as well as any generated source
           </li>
           <li>
             <code>test</code> - compile and run the unit tests
@@ -299,6 +299,10 @@ m2 archetype:create
           <code>package</code>, the JAR will not be
           copied to the local repository and Maven will not be able to find it. This will be improved in future versions.
         </p>
+        <p>
+          You might like to generate you IDEA workspace again from the top level directory...
+        </p>
+        <source>m2 idea:idea</source>
       </subsection>
       <subsection name="Other Topics">
         <p>
