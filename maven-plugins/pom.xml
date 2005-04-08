@@ -6,10 +6,10 @@
   <version>2.0-SNAPSHOT</version>
   <name>Maven Plugins</name>
   <description>Maven plugin parent</description>
-  <url>http://maven.apache.org</url>
+  <url>http://maven.apache.org/maven2/</url>
   <issueManagement>
     <system>jira</system>
-    <url>http://jira.codehaus.org/secure/BrowseProject.jspa?id=10500</url>
+    <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
   <developers>
     <developer>
@@ -21,6 +21,17 @@
         <role>Architect</role>
         <role>Release Manager</role>
       </roles>
+    </developer>
+    <developer>
+      <id>brett</id>
+      <name>Brett Porter</name>
+      <email>brett@apache.org</email>
+      <organization>ASF</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>PMC Member</role>
+      </roles>
+      <timezone>+10</timezone>
     </developer>
     <developer>
       <id>evenisse</id>
