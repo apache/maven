@@ -52,6 +52,9 @@ it0015: Test marmalade-driven mojo support. This will compile supporting java
 it0016: Test a WAR generation
 
 it0017: Test an EJB generation
+
+it0018: Ensure that managed dependencies for dependency POMs are calculated
+        correctly when resolved.
 -------------------------------------------------------------------------------
 
 - generated sources

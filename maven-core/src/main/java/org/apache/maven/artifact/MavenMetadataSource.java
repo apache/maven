@@ -87,15 +87,15 @@ public class MavenMetadataSource
         // resolved. See note in DefaultMavenProjectBuilder, line 170 for 
         // further discussion.
         
-//        if ( mavenProjectBuilder != null )
-//        {
-//            Model model = mavenProjectBuilder.getCachedModel( artifact.getGroupId(), artifact.getArtifactId(),
-//                                                              artifact.getVersion() );
-//            if ( model != null )
-//            {
-//                dependencies = model.getDependencies();
-//            }
-//        }
+        if ( mavenProjectBuilder != null )
+        {
+            Model model = mavenProjectBuilder.getCachedModel( artifact.getGroupId(), artifact.getArtifactId(),
+                                                              artifact.getVersion() );
+            if ( model != null )
+            {
+                dependencies = model.getDependencies();
+            }
+        }
 
         if ( dependencies == null )
         {
