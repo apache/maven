@@ -4,6 +4,7 @@
   <artifactId>${artifactId}</artifactId>
   <packaging>jar</packaging>
   <version>${version}</version>
+  <name>Maven Quick Start</name>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
