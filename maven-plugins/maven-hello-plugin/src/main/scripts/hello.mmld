@@ -1,0 +1,21 @@
+<mojo xmlns="marmalade:mojo">
+  <metadata>
+    <id>hello</id>
+    <goal>hello</goal>
+    <description>Say hello to the world.</description>
+    <parameters>
+      <parameter>
+        <name>salutation</name>
+        <expression>#salutation</expression>
+        <default>Hello</default>
+        <description>The salutation to use when saying hello.</description>
+      </parameter>
+    </parameters>
+  </metadata>
+  <execute>
+    <c:out xmlns:c="marmalade:core">
+      
+${salutation}, World.
+</c:out>
+  </execute>
+</mojo>
