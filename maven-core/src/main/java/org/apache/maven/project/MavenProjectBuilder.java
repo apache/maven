@@ -19,18 +19,18 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Model;
 
 import java.io.File;
+import java.util.List;
 
 public interface MavenProjectBuilder
 {
     String ROLE = MavenProjectBuilder.class.getName();
-    
+
     static final String STANDALONE_SUPERPOM_GROUPID = "org.apache.maven";
-    
+
     static final String STANDALONE_SUPERPOM_ARTIFACTID = "super-pom";
-    
+
     static final String STANDALONE_SUPERPOM_VERSION = "2.0";
 
     MavenProject build( File project, ArtifactRepository localRepository )
@@ -39,11 +39,19 @@ public interface MavenProjectBuilder
     MavenProject buildWithDependencies( File project, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject buildFromRepository( Artifact artifact, ArtifactRepository localRepository )
+    /**
+     * Build the artifact from the local repository, resolving it if necessary.
+     *
+     * @param artifact                   the artifact description
+     * @param localRepository            the local repository
+     * @param remoteArtifactRepositories the remote repository list
+     * @return the built project
+     * @throws ProjectBuildingException
+     */
+    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
+                                      ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
-
-    Model getCachedModel( String groupId, String artifactId, String version );
 }

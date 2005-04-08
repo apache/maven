@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Build;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -104,81 +105,126 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public MavenProject buildWithDependencies( File project, ArtifactRepository localRepository )
+    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        return build( project, localRepository, true, true );
+        return buildFromSourceFile( projectDescriptor, localRepository, true );
     }
 
-    public MavenProject build( File project, ArtifactRepository localRepository )
+    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        return build( project, localRepository, false, true );
+        return buildFromSourceFile( projectDescriptor, localRepository, false );
     }
 
-    public MavenProject buildFromRepository( Artifact artifact, ArtifactRepository localRepository )
+    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository,
+                                              boolean resolveDependencies )
         throws ProjectBuildingException
     {
-        return build( artifact.getFile(), localRepository, false, false );
+        Model model = readModel( projectDescriptor );
+
+        // Always cache files in the source tree over those in the repository
+        modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
+
+        MavenProject project = build( model, localRepository, resolveDependencies );
+
+        // Only translate the base directory for files in the source tree
+        pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
+
+        Build build = project.getBuild();
+        project.addCompileSourceRoot( build.getSourceDirectory() );
+        project.addScriptSourceRoot( build.getScriptSourceDirectory() );
+        project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
+
+        // Only track the file of a POM in the source tree
+        project.setFile( projectDescriptor );
+
+        return project;
     }
 
-    private MavenProject build( File projectDescriptor, ArtifactRepository localRepository,
-                                boolean resolveDependencies, boolean sourceProject )
+    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
+                                             ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+        Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
+
+        return build( model, localRepository, false );
+    }
+
+    private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
+                                           ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+        Model model = getCachedModel( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+        if ( model == null )
+        {
+            try
+            {
+                artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new ProjectBuildingException( "Unable to find artifact: " + artifact.toString() );
+            }
+            model = readModel( artifact.getFile() );
+        }
+        return model;
+    }
+
+    private MavenProject build( Model model, ArtifactRepository localRepository, boolean resolveDependencies )
+        throws ProjectBuildingException
+    {
+        Model superModel = getSuperModel();
+
+        LinkedList lineage = new LinkedList();
+
+        List aggregatedRemoteWagonRepositories = buildArtifactRepositories( superModel.getRepositories() );
+
+        MavenProject project = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository );
+
+        Model previous = superModel;
+
+        for ( Iterator i = lineage.iterator(); i.hasNext(); )
+        {
+            Model current = ( (MavenProject) i.next() ).getModel();
+
+            modelInheritanceAssembler.assembleModelInheritance( current, previous );
+
+            previous = current;
+        }
+
         try
         {
-            Model superModel = getSuperModel();
-            
-            LinkedList lineage = new LinkedList();
-
-            List aggregatedRemoteWagonRepositories = buildArtifactRepositories( superModel.getRepositories() );
-            MavenProject project = assembleLineage( projectDescriptor, localRepository, lineage,
-                                                    aggregatedRemoteWagonRepositories );
-
-            Model previous = superModel;
-
-            for ( Iterator i = lineage.iterator(); i.hasNext(); )
-            {
-                Model current = ( (MavenProject) i.next() ).getModel();
-
-                modelInheritanceAssembler.assembleModelInheritance( current, previous );
-
-                previous = current;
-            }
-            
             project = processProjectLogic( project, localRepository, aggregatedRemoteWagonRepositories,
-                                           resolveDependencies, sourceProject );
-
-            return project;
+                                           resolveDependencies );
         }
-        catch ( Exception e )
+        catch ( ModelInterpolationException e )
         {
-            throw new ProjectBuildingException( "Error building project from " + projectDescriptor, e );
+            throw new ProjectBuildingException( "Error building project: " + model.getId(), e );
         }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new ProjectBuildingException( "Error building project: " + model.getId(), e );
+        }
+
+        return project;
     }
 
+    /**
+     * @todo can this take in a model instead of a project and still be successful?
+     * @todo In fact, does project REALLY need a MavenProject as a parent? Couldn't it have just a wrapper around a
+     * model that supported parents which were also the wrapper so that inheritence was assembled. We don't really need
+     * the resolved source roots, etc for the parent - that occurs for the parent when it is constructed independently
+     * and projects are not cached or reused
+     */
     private MavenProject processProjectLogic( MavenProject project, ArtifactRepository localRepository,
-                                              List remoteRepositories, boolean resolveDependencies,
-                                              boolean sourceProject )
+                                              List remoteRepositories, boolean resolveDependencies )
         throws ProjectBuildingException, ModelInterpolationException, ArtifactResolutionException
     {
         Model model = project.getModel();
-        
-        String cacheKey = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
-        
-        // [jc] This needs to be moved below the interpolation and defaults
-        // injection steps, especially since the interpolator returns a different
-        // instance of the Model. HOWEVER, I cannot move this caching step to
-        // the appropriate place, since it results in inconsistent artifact 
-        // naming between the jar:jar and install:install steps for some reason.
-        // 
-        // So, instead I'm commenting out the part of the MavenMetadataSource
-        // that looks up the cached model, and leaving this caching step right
-        // here...at least until I have more time to look at why this cannot be
-        // moved down.
-        Model cachedModel = (Model) modelCache.get( cacheKey );
-        if ( cachedModel == null || sourceProject )
+        String key = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
+        Model cachedModel = (Model) modelCache.get( key );
+        if ( cachedModel == null )
         {
             modelCache.put( cacheKey, model );
         }
@@ -189,12 +235,6 @@ public class DefaultMavenProjectBuilder
         modelDefaultsInjector.injectDefaults( model );
 
         MavenProject parentProject = project.getParent();
-
-        File projectDescriptor = project.getFile();
-        if ( sourceProject )
-        {
-            pathTranslator.alignToBaseDirectory( model, projectDescriptor );
-        }
 
         project = new MavenProject( model );
 
@@ -221,7 +261,6 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        project.setFile( projectDescriptor );
         project.setParent( parentProject );
         project.setRemoteArtifactRepositories( remoteRepositories );
         project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
@@ -256,27 +295,11 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( "Exception while building project: " + validationResult.toString() );
         }
 
-        project.addCompileSourceRoot( project.getBuild().getSourceDirectory() );
-        project.addScriptSourceRoot( project.getBuild().getScriptSourceDirectory() );
-        project.addTestCompileSourceRoot( project.getBuild().getTestSourceDirectory() );
-
         return project;
     }
 
-    private MavenProject assembleLineage( File projectDescriptor, ArtifactRepository localRepository,
-                                          LinkedList lineage, List aggregatedRemoteWagonRepositories )
-        throws ProjectBuildingException
-    {
-        Model model = readModel( projectDescriptor );
-        MavenProject project = assembleLineage( model, localRepository, lineage, aggregatedRemoteWagonRepositories );
-        project.setFile( projectDescriptor );
-
-        return project;
-
-    }
-
-    private MavenProject assembleLineage( Model model, ArtifactRepository localRepository, LinkedList lineage,
-                                          List aggregatedRemoteWagonRepositories )
+    private MavenProject assembleLineage( Model model, LinkedList lineage, List aggregatedRemoteWagonRepositories,
+                                          ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         aggregatedRemoteWagonRepositories.addAll( buildArtifactRepositories( model.getRepositories() ) );
@@ -311,19 +334,13 @@ public class DefaultMavenProjectBuilder
             // as we go in order to do this.
             // ----------------------------------------------------------------------
 
-            MavenProject parent;
-            Model cachedModel = getCachedModel( parentModel.getGroupId(), parentModel.getArtifactId(),
-                                                parentModel.getVersion() );
-            if ( cachedModel == null )
-            {
-                File parentPom = findParentModel( parentModel, aggregatedRemoteWagonRepositories, localRepository );
+            Artifact artifact = artifactFactory.createArtifact( parentModel.getGroupId(), parentModel.getArtifactId(),
+                                                                parentModel.getVersion(), null, "pom", null );
 
-                parent = assembleLineage( parentPom, localRepository, lineage, aggregatedRemoteWagonRepositories );
-            }
-            else
-            {
-                parent = assembleLineage( cachedModel, localRepository, lineage, aggregatedRemoteWagonRepositories );
-            }
+            model = findModelFromRepository( artifact, aggregatedRemoteWagonRepositories, localRepository );
+
+            MavenProject parent = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository );
+
             project.setParent( parent );
         }
 
@@ -355,15 +372,16 @@ public class DefaultMavenProjectBuilder
             ArtifactRepositoryLayout remoteRepoLayout = null;
             try
             {
-                remoteRepoLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                layout );
+                remoteRepoLayout =
+                    (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
             }
             catch ( ComponentLookupException e )
             {
-                throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout + "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.",
+                throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout +
+                                                    "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.",
                                                     e );
             }
-            
+
             ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo, settings,
                                                                                                   remoteRepoLayout );
 
@@ -379,45 +397,47 @@ public class DefaultMavenProjectBuilder
         throws Exception
     {
         List remotePluginRepositories = new ArrayList();
-        
+
         MavenSettings settings = mavenSettingsBuilder.buildSettings();
 
         for ( Iterator it = pluginRepositories.iterator(); it.hasNext(); )
         {
             Repository mavenRepo = (Repository) it.next();
-            
+
             String layout = mavenRepo.getLayout();
 
             ArtifactRepositoryLayout repositoryLayout = null;
             try
             {
-                repositoryLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                layout );
+                repositoryLayout =
+                    (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
             }
             catch ( ComponentLookupException e )
             {
-                throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout + "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.",
+                throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout +
+                                                    "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.",
                                                     e );
             }
-            
-            ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( mavenRepo, settings,
+
+            ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( mavenRepo,
+                                                                                                      settings,
                                                                                                       repositoryLayout );
 
             remotePluginRepositories.add( pluginRepository );
 
         }
-        
+
         return remotePluginRepositories;
     }
 
     private ArtifactRepository buildDistributionManagementRepository( Repository dmRepo )
         throws Exception
     {
-        if(dmRepo == null)
+        if ( dmRepo == null )
         {
             return null;
         }
-        
+
         MavenSettings settings = mavenSettingsBuilder.buildSettings();
 
         String repoLayoutId = dmRepo.getLayout();
@@ -438,7 +458,8 @@ public class DefaultMavenProjectBuilder
         try
         {
             reader = new FileReader( file );
-            return modelReader.read( reader );
+            Model model = modelReader.read( reader );
+            return model;
         }
         catch ( FileNotFoundException e )
         {
@@ -472,27 +493,7 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private File findParentModel( Parent parent, List remoteArtifactRepositories, ArtifactRepository localRepository )
-        throws ProjectBuildingException
-    {
-        Artifact artifact = artifactFactory.createArtifact( parent.getGroupId(), parent.getArtifactId(),
-                                                            parent.getVersion(), null, "pom", null );
-
-        try
-        {
-            artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            // @todo use parent.toString() if modello could generate it, or specify in a code segment
-            throw new ProjectBuildingException( "Missing parent POM: " + parent.getGroupId() + ":" +
-                                                parent.getArtifactId() + "-" + parent.getVersion(), e );
-        }
-
-        return artifact.getFile();
-    }
-
-    public Model getCachedModel( String groupId, String artifactId, String version )
+    private Model getCachedModel( String groupId, String artifactId, String version )
     {
         return (Model) modelCache.get( createCacheKey( groupId, artifactId, version ) );
     }
@@ -521,7 +522,7 @@ public class DefaultMavenProjectBuilder
 
             List remoteRepositories = buildArtifactRepositories( superModel.getRepositories() );
 
-            project = processProjectLogic( project, localRepository, remoteRepositories, false, false );
+            project = processProjectLogic( project, localRepository, remoteRepositories, false );
 
             return project;
         }

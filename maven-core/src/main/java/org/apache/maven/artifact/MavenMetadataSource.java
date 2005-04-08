@@ -55,9 +55,6 @@ public class MavenMetadataSource
 
     public MavenMetadataSource( ArtifactResolver artifactResolver )
     {
-        // there is code in plexus that uses this (though it shouldn't) so we
-        // need to be able to not have a project builder
-        // TODO: remove, then remove those null checks
         this.artifactResolver = artifactResolver;
         this.mavenProjectBuilder = null;
     }
@@ -71,38 +68,32 @@ public class MavenMetadataSource
     public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
+        Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                    artifact.getBaseVersion(), artifact.getScope(),
+                                                                    "pom", null );
+
         List dependencies = null;
 
-        // [jc] Commenting this out, because the place where the model is 
-        // cached in the project builder has not accounted for interpolation or
-        // defaults injection. This wouldn't be a problem, except that the 
-        // interpolation step actually returns a different instance of the 
-        // model than was input, thus rendering the old version of the model
-        // stale. To test this, you have to create an artifact whose pom uses
-        // managed dependencies, then depend on that artifact from another
-        // project. The first plugin to refer to this dependency will work fine, 
-        // but subsequent plugins referring to the dep will retrieved a cached
-        // copy of the model that has no versions, etc. defined because that
-        // model instance has not had defaults injected or interpolations 
-        // resolved. See note in DefaultMavenProjectBuilder, line 170 for 
-        // further discussion.
-        
+        // Use the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
+        // associated artifacts.
         if ( mavenProjectBuilder != null )
         {
-            Model model = mavenProjectBuilder.getCachedModel( artifact.getGroupId(), artifact.getArtifactId(),
-                                                              artifact.getVersion() );
-            if ( model != null )
+            try
             {
-                dependencies = model.getDependencies();
+                MavenProject p = mavenProjectBuilder.buildFromRepository( metadataArtifact, remoteRepositories,
+                                                                          localRepository );
+                dependencies = p.getDependencies();
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
             }
         }
-
-        if ( dependencies == null )
+        else
         {
-            Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(),
-                                                                        artifact.getArtifactId(),
-                                                                        artifact.getBaseVersion(), artifact.getScope(),
-                                                                        "pom", null );
+            // there is code in plexus that uses this (though it shouldn't) so we
+            // need to be able to not have a project builder
+            // TODO: remove - which then makes this a very thin wrapper around a project builder - is it needed?
 
             try
             {
@@ -113,38 +104,20 @@ public class MavenMetadataSource
                 throw new ArtifactMetadataRetrievalException( "Error while resolving metadata artifact", e );
             }
 
-            // [jdcasey/03-Feb-2005]: Replacing with ProjectBuilder, to enable
-            // post-processing and inheritance calculation before retrieving the
-            // associated artifacts. This should improve consistency.
-            if ( mavenProjectBuilder != null )
+            FileReader reader = null;
+            try
             {
-                try
-                {
-                    MavenProject p = mavenProjectBuilder.buildFromRepository( metadataArtifact, localRepository );
-                    dependencies = p.getDependencies();
-                }
-                catch ( ProjectBuildingException e )
-                {
-                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
-                }
+                reader = new FileReader( metadataArtifact.getFile() );
+                Model model = this.reader.read( reader );
+                dependencies = model.getDependencies();
             }
-            else
+            catch ( Exception e )
             {
-                FileReader reader = null;
-                try
-                {
-                    reader = new FileReader( metadataArtifact.getFile() );
-                    Model model = this.reader.read( reader );
-                    dependencies = model.getDependencies();
-                }
-                catch ( Exception e )
-                {
-                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
-                }
-                finally
-                {
-                    IoUtils.close( reader );
-                }
+                throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+            }
+            finally
+            {
+                IoUtils.close( reader );
             }
         }
         return artifactFactory.createArtifacts( dependencies, localRepository, artifact.getScope() );

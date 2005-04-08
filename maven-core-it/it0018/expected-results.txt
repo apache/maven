@@ -1,1 +1,2 @@
-target/classes/org/apache/maven/it0018/Person.class
+# TODO: I would like to build some small core-it artifacts for this purpose instead
+${artifact:commons-logging:commons-logging:1.0.3:jar}

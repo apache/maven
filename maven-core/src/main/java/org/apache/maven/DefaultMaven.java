@@ -83,6 +83,11 @@ public class DefaultMaven
 
     public MavenExecutionResponse execute( MavenExecutionRequest request ) throws ReactorException
     {
+        if ( request.getGoals().isEmpty() )
+        {
+            throw new ReactorException( "You must specify at least one goal. Try 'install'." );
+        }
+
         EventDispatcher dispatcher = request.getEventDispatcher();
         String event = MavenEvents.REACTOR_EXECUTION;
 
