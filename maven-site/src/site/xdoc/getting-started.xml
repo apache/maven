@@ -169,7 +169,7 @@ m2 archetype:create
         <p>
           What is the
           <code>plugins</code> section all about? Well, this is how plugins are configured in Maven 2.0.
-          It is analogours to the
+          It is analogous to the
           <code>project.properties</code> file in Maven 1.0. You may note that it looks more
           verbose - but you'll see over time that it should be required much less, and is capable of much more powerful
           configuration than it's Maven 1.0 counterpart. In addition, we hope the burden of editing the POM will be

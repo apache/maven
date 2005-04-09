@@ -32,7 +32,7 @@
     <class rootElement="true" xml.tagName="project">
       <name>Model</name>
       <description><![CDATA[
-      	 The <code>&lt;project&gt;</code> element specifies various attributes 
+         The <code>&lt;project&gt;</code> element specifies various attributes 
          about a project. This is the root element of the project descriptor. 
          The following table lists all of the possible child elements. Child 
          elements with children are then documented further in subsequent 
@@ -44,13 +44,13 @@
           <name>extend</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-						The location of the parent project, if one exists. Values from the 
+            The location of the parent project, if one exists. Values from the 
             parent project will be the default for this project if they are 
             left unspecified. The path may be absolute, or relative to the 
             current project.xml file.
             
             <div class="source"><pre>&lt;extend&gt;${basedir}/../project.xml&lt;/extend&gt;</pre></div>
-					]]></description>
+          ]]></description>
           <type>String</type>
         </field>
         <field>
@@ -75,7 +75,7 @@
           <required>true</required>
           <type>String</type>
           <description><![CDATA[
-          	The current version of the Maven project descriptor. This version 
+            The current version of the Maven project descriptor. This version 
             number enables Maven to automatically update an out-of-date project 
             descriptor when a new version is available. This version number 
             should not be changed after the descriptor has been created. Maven 
@@ -87,9 +87,9 @@
           <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[
-          	The short name of the project.  This value is used when naming 
-            <a href="plugins/java/index.html">jars</a> and 
-            <a href="plugins/dist/index.html">distribution files</a>.
+            The short name of the project.  This value is used when naming 
+            <a href="/plugins/java/index.html">jars</a> and 
+            <a href="/plugins/dist/index.html">distribution files</a>.
           ]]></description>
           <type>String</type>
         </field>
@@ -98,9 +98,9 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description><![CDATA[
-          	The short name of the project group. This value is used to group
+            The short name of the project group. This value is used to group
             all jars for a project in one directory. For more info look at the
-            <a href="user-guide.html#Naming%20Conventions">user guide</a>.
+            <a href="/user-guide.html#Naming%20Conventions">user guide</a>.
           ]]></description>
           <type>String</type>
         </field>
@@ -109,10 +109,10 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description><![CDATA[
-          	The short name of the project.  This value is used in conjunction
+            The short name of the project.  This value is used in conjunction
             with <code>groupId</code>
-            when naming <a href="plugins/java/index.html">jars</a> and 
-            <a href="plugins/dist/index.html">distribution files</a>.
+            when naming <a href="/plugins/java/index.html">jars</a> and 
+            <a href="/plugins/dist/index.html">distribution files</a>.
           ]]></description>
           <type>String</type>
         </field>
@@ -137,8 +137,8 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description><![CDATA[
-          	The full name of the project.  This value is used when
-            generating <a href="plugins/javadoc/index.html">JavaDoc</a>
+            The full name of the project.  This value is used when
+            generating <a href="/plugins/javadoc/index.html">JavaDoc</a>
             titles.
           ]]></description>
           <type>String</type>
@@ -146,9 +146,9 @@
         <field>
           <name>currentVersion</name>
           <description><![CDATA[
-          	The current version of the project.  This value is used when
-            naming <a href="plugins/java/index.html">jars</a> and 
-            <a href="plugins/dist/index.html">distribution files</a>.
+            The current version of the project.  This value is used when
+            naming <a href="/plugins/java/index.html">jars</a> and 
+            <a href="/plugins/dist/index.html">distribution files</a>.
           ]]></description>
           <version>3.0.0</version>
           <required>true</required>
@@ -159,7 +159,7 @@
           <version>4.0.0</version>
           <required>true</required>
           <description><![CDATA[
-          	The current version of the artifact produced by this project.
+            The current version of the artifact produced by this project.
           ]]></description>
           <type>String</type>
         </field>
@@ -167,7 +167,7 @@
           <name>shortDescription</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	 A short description of the project. The short description should be 
+             A short description of the project. The short description should be 
              limited to a single line.
           ]]></description>
           <type>String</type>
@@ -176,9 +176,9 @@
           <name>description</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	Optional. A detailed description of the project. 
+            Optional. A detailed description of the project. 
             This description is used as the default to generate the
-            <a href="plugins/site/index.html">front page</a> of the project's 
+            <a href="/plugins/site/index.html">Mailing Lists</a> of the project's 
             web site, and is shown when <code>maven --usage</code> is called on 
             the project. While this element can be specified as CDATA to enable 
             the use of HTML tags within the description, you are encouraged to 
@@ -191,15 +191,15 @@
           <name>url</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	 The URL to the project's homepage.
-					]]></description>
+             The URL to the project's homepage.
+          ]]></description>
           <type>String</type>
         </field>
         <field>
           <name>logo</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	The URL to the project's logo image.  This can be an URL relative
+            The URL to the project's logo image.  This can be an URL relative
             to the base directory of the generated web site,
             (e.g., <code>/images/project-logo.png</code>) or an absolute URL
             (e.g., <code>http://my.corp/project-logo.png</code>).  This is used
@@ -211,7 +211,7 @@
           <name>issueTrackingUrl</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	 Optional. The URL to the project's issue tracking system.
+             Optional. The URL to the project's issue tracking system.
           ]]></description>
           <type>String</type>
         </field>
@@ -236,9 +236,9 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description><![CDATA[
-          	The year of the project's inception specified with 4 digits.
+            The year of the project's inception specified with 4 digits.
             This value is used when generating 
-            <a href="plugins/javadoc/index.html">JavaDoc</a> copyright notices.
+            <a href="/plugins/javadoc/index.html">JavaDoc</a> copyright notices.
           ]]></description>
           <type>String</type>
         </field>
@@ -246,7 +246,7 @@
           <name>gumpRepositoryId</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Optional. This is the Id of the Gump repository that this project is
+            Optional. This is the Id of the Gump repository that this project is
             part of (assuming it participates in the Gump integration
             effort).
           ]]></description>
@@ -256,9 +256,9 @@
           <name>siteAddress</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Optional. The hostname of the web server that hosts the project's web
+            Optional. The hostname of the web server that hosts the project's web
             site.  This is used when the web site is 
-            <a href="plugins/site/index.html">deployed</a>.
+            <a href="/plugins/site/index.html">deployed</a>.
           ]]></description>
           <type>String</type>
         </field>
@@ -266,9 +266,9 @@
           <name>siteDirectory</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Optional. The directory on the web server where the public web site
+            Optional. The directory on the web server where the public web site
             for this project resides.  This is used when the web site is 
-            <a href="plugins/site/index.html">deployed</a>.
+            <a href="/plugins/site/index.html">deployed</a>.
           ]]></description>
           <type>String</type>
         </field>
@@ -276,10 +276,10 @@
           <name>distributionSite</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Optional. The server server where the final
+            Optional. The server server where the final
             distributions will be published.  This is used when the
             distributions are
-            <a href="plugins/dist/index.html">deployed</a>.
+            <a href="/plugins/dist/index.html">deployed</a>.
             <p>
               If this isn't defined, the central repository is used instead as
               determined by <code>maven.repo.central</code> and 
@@ -293,10 +293,10 @@
           <name>distributionDirectory</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Optional. The directory on the web server where the final
+            Optional. The directory on the web server where the final
             distributions will be published.  This is used when the
             distributions are
-            <a href="plugins/dist/index.html">deployed</a>.
+            <a href="/plugins/dist/index.html">deployed</a>.
           ]]></description>
           <type>String</type>
           <comment>This naming is inconsistent and distribution should occur from a repository structure.</comment>
@@ -324,8 +324,8 @@
           <name>mailingLists</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	Contains information about a project's mailing lists.  This
-            is used to generate the <a href="plugins/site/index.html">front
+            Contains information about a project's mailing lists.  This
+            is used to generate the <a href="/plugins/site/index.html">front
             page</a> of the site's web site.
           ]]></description>
           <association>
@@ -337,8 +337,8 @@
           <name>developers</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	Describes the committers to a project.  This is used to
-            generate the <a href="plugins/site/index.html">Project Team</a>
+            Describes the committers to a project.  This is used to
+            generate the <a href="/plugins/site/index.html">Project Team</a>
             page of the project's web site.
           ]]></description>
           <association>
@@ -350,8 +350,8 @@
           <name>contributors</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	Describes the contributors to a project.  This is used to generate
-            the <a href="plugins/site/index.html">Project Team</a> page of
+            Describes the contributors to a project.  This is used to generate
+            the <a href="/plugins/site/index.html">Project Team</a> page of
             the project's web site.
           ]]></description>
           <association>
@@ -363,56 +363,56 @@
           <name>dependencies</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-						<p>
-            	This element describes all of the dependencies associated with a
-        			project.  Each dependency is described by a
-        			<code>dependency</code> element, which is then described by
-        			additional elements (described below).
-      			</p>
             <p>
-        			These dependencies are used to construct a classpath for your 
-        			project during the build process.
-      			</p>
+              This element describes all of the dependencies associated with a
+              project.  Each dependency is described by a
+              <code>dependency</code> element, which is then described by
+              additional elements (described below).
+            </p>
             <p>
-			        Maven can automatically download these dependencies from a 
-              <a href="user-guide.html#Remote%20Repository%20Layout">remote repository</a>.
-      			</p>
+              These dependencies are used to construct a classpath for your 
+              project during the build process.
+            </p>
             <p>
-			        The filename that Maven downloads from the repository is 
-      			  <code>artifactId-version.jar</code> where <code>artifactId</code> 
+              Maven can automatically download these dependencies from a 
+              <a href="/user-guide.html#Remote%20Repository%20Layout">remote repository</a>.
+            </p>
+            <p>
+              The filename that Maven downloads from the repository is 
+              <code>artifactId-version.jar</code> where <code>artifactId</code> 
               corresponds to the <code>artifactId</code> element and 
               <code>version</code> corresponds to the <code>version</code> element.
-			      </p>
+            </p>
             <p>
-			        When Maven goes looking for a dependency in the remote repository, 
-      			  it uses the dependency element to construct the URL to download 
-			        from. This URL is defined as:
-      			</p>
-				    <div class="source">
-            	<pre>${repo}/${groupId}/${type}s/${artifactId}-${version}.${type}</pre>
+              When Maven goes looking for a dependency in the remote repository, 
+              it uses the dependency element to construct the URL to download 
+              from. This URL is defined as:
+            </p>
+            <div class="source">
+              <pre>${repo}/${groupId}/${type}s/${artifactId}-${version}.${type}</pre>
             </div>
-					  <p>
-			        Where
-      		  </p>
+            <p>
+              Where
+            </p>
             <dl>
-		          <dt>repo</dt>
-    		      <dd>
-              	is the remote repository URL specified by 
+              <dt>repo</dt>
+              <dd>
+                is the remote repository URL specified by 
                 <code>${maven.repo.remote}</code>
               </dd>
-        		  
+              
               <dt>groupId</dt>
-          		<dd>is taken from the dependency element</dd>
-		          
+              <dd>is taken from the dependency element</dd>
+              
               <dt>type</dt>
-		          <dd>is taken from the dependency element</dd>
-    		      
+              <dd>is taken from the dependency element</dd>
+              
               <dt>artifactId</dt>
-        		  <dd>is taken from the dependency element</dd>
-          		
+              <dd>is taken from the dependency element</dd>
+              
               <dt>version</dt>
-		          <dd>is taken from the dependency element</dd>
-    		    </dl>
+              <dd>is taken from the dependency element</dd>
+            </dl>
           ]]></description>
           <association>
             <type>Dependency</type>
@@ -424,9 +424,9 @@
           <name>licenses</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	This element describes all of the licenses for this project.  
+            This element describes all of the licenses for this project.  
             Each license is described by a <code>license</code> element, which 
-            is then describe by additional elements (described below).  The 
+            is then described by additional elements (described below).  The 
             auto-generated site documentation references this information.  
             Projects should only list the license(s) that applies to the project 
             and not the licenses that apply to dependencies.
@@ -440,9 +440,9 @@
           <name>versions</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Optional. Contains information on previous versions of the
+            Optional. Contains information on previous versions of the
             project. This information is used when invoking the 
-            <a href="plugins/dist/index.html"><code>maven:dist</code></a>
+            <a href="/plugins/dist/index.html"><code>maven:dist</code></a>
             target.
           ]]></description>
           <association>
@@ -454,9 +454,9 @@
           <name>branches</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Optional. Contains information on branches of the
+            Optional. Contains information on branches of the
             project. This information is used when invoking the 
-            <a href="plugins/dist/index.html"><code>maven:dist</code></a>
+            <a href="/plugins/dist/index.html"><code>maven:dist</code></a>
             target.
           ]]></description>
           <association>
@@ -477,7 +477,7 @@
           <name>reports</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	
+            
           ]]></description>
           <association>
             <type>String</type>
@@ -501,7 +501,7 @@
         <field>
           <name>scm</name>
           <version>4.0.0</version>
-          <description><![CDATA[Specification for the SCM use by the project.]]></description>
+          <description><![CDATA[Specification for the SCM used by the project.]]></description>
           <association>
             <type>Scm</type>
           </association>
@@ -509,7 +509,7 @@
         <field>
           <name>repository</name>
           <version>3.0.0</version>
-          <description><![CDATA[Specification for the SCM use by the project.]]></description>
+          <description><![CDATA[Specification for the SCM used by the project.]]></description>
           <association>
             <type>Repository</type>
           </association>
@@ -528,9 +528,9 @@
           <name>organization</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	This element describes various attributes of the organziation to
-		        which the project belongs.  These attributes are utilized when
-    		    documentation is created (for copyright notices and links).
+            This element describes various attributes of the organziation to
+            which the project belongs.  These attributes are utilized when
+            documentation is created (for copyright notices and links).
           ]]></description>
           <association>
             <type>Organization</type>
@@ -551,8 +551,8 @@
           <version>4.0.0</version>
           <required>false</required>
           <description><![CDATA[
-          	Default dependency information for grouped projects inheriting from 
-            this one. This dependency information here will not be checked.
+            Default dependency information for grouped projects inheriting from 
+            this one. The dependency information here will not be checked.
             Instead, when a POM derived from this one declares a dependency 
             described by a groupId and an artifactId (version not necessary), 
             the entries in here will supply default values for that dependency.
@@ -580,8 +580,8 @@
           <version>3.0.0</version>
           <type>String</type>
           <description><![CDATA[
-          	The Java package name of the project.  This value is used
-            when generating <a href="plugins/javadoc/index.html">JavaDoc</a>.
+            The Java package name of the project.  This value is used
+            when generating <a href="/plugins/javadoc/index.html">JavaDoc</a>.
           ]]></description>
         </field>
       </fields>
@@ -640,7 +640,7 @@
       <description><![CDATA[
        Optional. Contains information on branches of the project. This  
        information is used when invoking the 
-       <a href="plugins/dist/index.html"><code>maven:dist</code></a> target.
+       <a href="/plugins/dist/index.html"><code>maven:dist</code></a> target.
       ]]></description>
       <fields>
         <field>
@@ -648,7 +648,7 @@
           <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[
-          	The branch tag in the version control system (e.g. cvs) used by the 
+            The branch tag in the version control system (e.g. cvs) used by the 
             project for the source code associated with this branch of the
             project.
           ]]></description>
@@ -664,11 +664,11 @@
           <name>nagEmailAddress</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	An address to which notifications regarding the status of builds
+            An address to which notifications regarding the status of builds
             for this project can be sent. This is intended for use by tools
             which do unattended builds, for example those providing for
             continuous integration. Currently this is used by the
-            <a href="plugins/gump/">gump plugin</a>
+            <a href="/plugins/gump/">gump plugin</a>
             target.
           ]]></description>
           <type>String</type>
@@ -679,7 +679,7 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description><![CDATA[
-          	This element specifies a directory containing the source
+            This element specifies a directory containing the source
             of the project. The generated build system will compile
             the source in this directory when the project is built.
             The path given is relative to the project descriptor.
@@ -704,7 +704,7 @@
           <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[
-          	This element specifies a directory containing the unit test
+            This element specifies a directory containing the unit test
             source of the project. The generated build system will
             compile these directories when the project is being tested.
             The unit tests must use the JUnit test framework.
@@ -728,23 +728,23 @@
         <field>
           <name>aspectSourceDirectory</name>
           <version>3.0.0</version>
-          <description><![CDATA[ 	 
-             This element specifies a directory containing Aspect 	 
-             sources of the project.  The generated build system will 	 
-             compile the Aspects in this directory when the project is 	 
-             built if Aspects have been enabled (see the 	 
-             <a 	 
-               href="plugins/aspectj/goals.html">Aspectj goals</a> document). 	 
-             The path given is relative to the project descriptor. 	 
+          <description><![CDATA[    
+             This element specifies a directory containing Aspect    
+             sources of the project.  The generated build system will    
+             compile the Aspects in this directory when the project is    
+             built if Aspects have been enabled (see the    
+             <a    
+               href="/plugins/aspectj/goals.html">Aspectj goals</a> document).    
+             The path given is relative to the project descriptor.    
            ]]></description>
           <type>String</type>
         </field>
         <field>
           <name>integrationUnitTestSourceDirectory</name>
           <version>3.0.0</version>
-          <description><![CDATA[ 	 
-             This element specifies a directory containing integration test 	 
-             sources of the project. 	 
+          <description><![CDATA[    
+             This element specifies a directory containing integration test    
+             sources of the project.    
            ]]></description>
           <type>String</type>
         </field>
@@ -753,12 +753,12 @@
           <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[
-          	This element describes all of the sourceModifications associated 
-	          with a project.  Each source modification is described by a
-  	        <code>sourceModification</code> element, which is then described by
-     		    additional elements (described below).  These modifications are used 
-        		to exclude or include various source depending on the environment
-         		the build is running in.
+            This element describes all of the sourceModifications associated 
+            with a project.  Each source modification is described by a
+            <code>sourceModification</code> element, which is then described by
+             additional elements (described below).  These modifications are used 
+            to exclude or include various source depending on the environment
+             the build is running in.
           ]]></description>
           <association>
             <type>SourceModification</type>
@@ -770,7 +770,7 @@
           <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[
-          	This element specifies unit tests associated with the project.
+            This element specifies unit tests associated with the project.
           ]]></description>
           <defaultValue>new UnitTest()</defaultValue>
           <association>
@@ -781,7 +781,7 @@
           <name>resources</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	This element describes all of the resources associated with a 
+            This element describes all of the resources associated with a 
             project or unit tests. Each resource is described by a resource 
             element, which is then described by additional elements (described 
             <a href="#resource">below</a>). These resources are used to complete 
@@ -811,7 +811,7 @@
           <name>directory</name>
           <version>4.0.0</version>
           <description><![CDATA[
-            The directory where all generated by the build is placed.
+            The directory where all files generated by the build is placed.
           ]]></description>
           <type>String</type>
         </field>
@@ -845,7 +845,7 @@
           <name>plugins</name>
           <version>4.0.0</version>
           <description><![CDATA[
-          	Configuration for plugins to be used to build this project.
+            Configuration for plugins to be used to build this project.
           ]]></description>
           <association>
             <type>Plugin</type>
@@ -859,7 +859,7 @@
           <version>4.0.0</version>
           <required>false</required>
           <description><![CDATA[
-          	Default plugin information to be made available for reference by 
+            Default plugin information to be made available for reference by 
             projects derived from this one. This plugin configuration will not
             be validated or bound to the lifecycle unless referenced. Any local
             configuration for a given plugin will override the plugin's entire
@@ -884,14 +884,14 @@
         <field>
           <name>url</name>
           <version>4.0.0</version>
-          <description><![CDATA[Url for the continuous integration system use by the project.]]></description>
+          <description><![CDATA[Url for the continuous integration system used by the project.]]></description>
           <type>String</type>
         </field>
         <field>
           <name>notifiers</name>
           <version>4.0.0</version>
           <description><![CDATA[
-          	Configuration for notifying developers/users when a build is 
+            Configuration for notifying developers/users when a build is 
             unsuccessful, including user information and notification mode.
           ]]></description>
           <association>
@@ -904,7 +904,7 @@
     <class>
       <name>Notifier</name>
       <description>
-      	Configures one method for notifying users/developers when a build breaks.
+        Configures one method for notifying users/developers when a build breaks.
       </description>
       <version>4.0.0</version>
       <fields>
@@ -972,7 +972,7 @@
           <version>3.0.0+</version>
           <description><![CDATA[
             The roles the contributor plays in the project.  Each role is
-            describe by a <code>role</code> element, the body of which is a
+            described by a <code>role</code> element, the body of which is a
             role name.
           ]]></description>
           <association>
@@ -999,7 +999,7 @@
           <version>3.0.0</version>
           <required>true</required>
           <description><![CDATA[
-          	<p>The name of the dependency.</p>
+            <p>The name of the dependency.</p>
             <p>
               <strong>Note:</strong> The use of the id element for
               a dependency is deprecated. Please use <code>groupId</code> and
@@ -1034,7 +1034,7 @@
           <!-- [ jdcasey:01-Feb-2005 ] No longer required. We'll validate after injecting defaults. -->
           <!-- required>true</required -->
           <description><![CDATA[
-            The version of the dependency., e.g. <code>3.2.1</code>
+            The version of the dependency, e.g. <code>3.2.1</code>
           ]]></description>
           <type>String</type>
         </field>
@@ -1052,7 +1052,7 @@
           <name>jar</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Literal name of the artifact. Used to override the calculated artifact name.
+            Literal name of the artifact. Used to override the calculated artifact name.
           ]]></description>
           <type>String</type>
         </field>
@@ -1075,9 +1075,9 @@
           <name>properties</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	Properties about the dependency. Various plugins allow you to 
+            Properties about the dependency. Various plugins allow you to 
             <code>mark</code> dependencies with properties. For example the 
-            <a href="plugins/war/index.html">war</a> plugin looks for a 
+            <a href="/plugins/war/index.html">war</a> plugin looks for a 
             <code>war.bundle</code> property, and if found will include the 
             dependency in <code>WEB-INF/lib</code>. For example syntax, check 
             the war plugin docs.
@@ -1228,7 +1228,7 @@
         <field>
           <name>url</name>
           <version>4.0.0</version>
-          <description><![CDATA[Url for the issue management system use by the project.]]></description>
+          <description><![CDATA[Url for the issue management system used by the project.]]></description>
           <type>String</type>
         </field>
       </fields>
@@ -1246,7 +1246,7 @@
           <name>repository</name>
           <version>4.0.0</version>
           <description><![CDATA[
-          	Information needed for deploying to remote repository artifacts 
+            Information needed for deploying to remote repository artifacts 
             generated by the project
           ]]></description>
           <association>
@@ -1256,7 +1256,7 @@
         <field>
           <name>site</name>
           <description><![CDATA[
-          	Information needed for deploying website files of the project.
+            Information needed for deploying website files of the project.
           ]]></description>
           <version>4.0.0</version>
           <association>
@@ -1268,8 +1268,8 @@
     <class>
       <name>License</name>
       <description><![CDATA[
-				Describes the licenses for this project.  This is used to generate
-        the <a href="plugins/site/index.html">License</a> page of
+        Describes the licenses for this project.  This is used to generate
+        the <a href="/plugins/site/index.html">License</a> page of
         the project's web site. Typically the licenses listed for the project
         are that of the project itself, and not of dependencies.
       ]]></description>
@@ -1365,7 +1365,7 @@
           <name>archive</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	The link to a URL where you can browse the mailing list archive.
+            The link to a URL where you can browse the mailing list archive.
           ]]></description>
           <type>String</type>
         </field>
@@ -1373,7 +1373,7 @@
           <name>otherArchives</name>
           <version>3.1.0+</version>
           <description><![CDATA[
-          	The link to other URLs where you can browse the list archive.
+            The link to other URLs where you can browse the list archive.
           ]]></description>
           <association>
             <type>String</type>
@@ -1409,7 +1409,7 @@
           <name>logo</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	The URL to the organization's logo image.  This can be an URL relative
+            The URL to the organization's logo image.  This can be an URL relative
             to the base directory of the generated web site,
             (e.g., <code>/images/org-logo.png</code>) or an absolute URL
             (e.g., <code>http://my.corp/logo.png</code>).  This value is used
@@ -1468,20 +1468,20 @@
               public List getDefaultExcludes() 
               {
                   List defaultExcludes = new ArrayList(); 
-			            defaultExcludes.add( "**/*~" ); 
+                  defaultExcludes.add( "**/*~" ); 
                   defaultExcludes.add( "**/#*#" ); 
                   defaultExcludes.add( "**/.#*" ); 
                   defaultExcludes.add( "**/%*%" ); 
                   defaultExcludes.add( "**/._*" ); 
                   
                   // CVS 
-			            defaultExcludes.add( "**/CVS" ); 
+                  defaultExcludes.add( "**/CVS" ); 
                   defaultExcludes.add( "**/CVS/**" ); 
-      			      defaultExcludes.add( "**/.cvsignore" ); 
+                  defaultExcludes.add( "**/.cvsignore" ); 
                   
                   // SCCS 
                   defaultExcludes.add( "**/SCCS" ); 
-            			defaultExcludes.add( "**/SCCS/**" ); 
+                  defaultExcludes.add( "**/SCCS/**" ); 
                   
                   // Visual SourceSafe 
                   defaultExcludes.add( "**/vssver.scc" ); 
@@ -1518,7 +1518,7 @@
         <field>
           <name>version</name>
           <version>4.0.0</version>
-          <description><![CDATA[The versi>on of the project to extend.]]></description>
+          <description><![CDATA[The version of the project to extend.]]></description>
           <type>String</type>
         </field>
       </fields>
@@ -1531,31 +1531,31 @@
           <name>connection</name>
           <version>3.0.0</version>
           <description><![CDATA[
-          	<p>
-            	Optional.  The source configuration management system URL
-	            that describes the repository and how to connect to the
-  	          repository.  This is used by Maven when <a href="plugins/dist/index.html">building versions</a>
-    	        from specific ID.
+            <p>
+              Optional.  The source configuration management system URL
+              that describes the repository and how to connect to the
+              repository.  This is used by Maven when <a href="/plugins/dist/index.html">building versions</a>
+              from specific ID.
             </p>
             <p>
-            	The format of this element is as follows:
+              The format of this element is as follows:
             </p>
             <pre>scm:&lt;provider&gt;:&lt;provider-parameters&gt;</pre>
             <p>For cvs, the format for pserver repositories should be:</p>
             <div class="source">
-            	<pre>scm:cvs:pserver:user@host:/cvs/root:module-name</pre>
+              <pre>scm:cvs:pserver:user@host:/cvs/root:module-name</pre>
             </div>
             <p>
               For local networked repositories (eg. pserver to local machine)
-				    </p>
+            </p>
             <div class="source">
-            	<pre>scm:cvs:lserver:user@host:/cvs/root:module-name</pre>
+              <pre>scm:cvs:lserver:user@host:/cvs/root:module-name</pre>
             </div>
             <p>
               For ssh access:
-    				</p>
+            </p>
             <div class="source">
-            	<pre>scm:cvs:ext:user@host:/cvs/root:module-name</pre>
+              <pre>scm:cvs:ext:user@host:/cvs/root:module-name</pre>
             </div>
 
             Remember that CVS will expect an environment variable called
@@ -1565,9 +1565,9 @@
             <p>
               Some cvs clients support other protocols, such as ntserver and extssh.
               Here's an example using CVS NT and ntserver:
-				    </p>
+            </p>
             <div class="source">
-            	<pre>scm|cvs|ntserver|user@server|e:\cvs|Deployment</pre>
+              <pre>scm|cvs|ntserver|user@server|e:\cvs|Deployment</pre>
             </div>
   
             Note the use of the vertical bar as delimiter as the repository has a 
@@ -1575,16 +1575,16 @@
             
             <p>
               For local file system repositories
-				    </p>
+            </p>
             <div class="source">
-            	<pre>scm:cvs:local:ignored:/cvs/root:module-name</pre>
+              <pre>scm:cvs:local:ignored:/cvs/root:module-name</pre>
             </div>
   
             <p>
               For StarTeam access: 
-				    </p>
+            </p>
             <div class="source">
-            	<pre>scm:starteam:username:password@host:port/project/view/folder</pre>
+              <pre>scm:starteam:username:password@host:port/project/view/folder</pre>
             </div>
 
             All of this information can be had from either the StarTeam Universal 
@@ -1644,7 +1644,7 @@
             that describes the repository and how to connect to the
             repository.  This is used by Maven when
             <a
-              href="plugins/dist/index.html">building versions</a>
+              href="/plugins/dist/index.html">building versions</a>
             from specific ID.
           ]]></description>
           <type>String</type>
@@ -1685,7 +1685,7 @@
     <class>
       <name>Resource</name>
       <description><![CDATA[
-      	This element describes all of the resources associated with a project or 
+        This element describes all of the resources associated with a project or 
         unit tests. Each resource is described by a resource element, which is 
         then described by additional elements (described 
         <a href="#resource">below</a>). These resources are used to complete the 
@@ -1698,7 +1698,7 @@
           <name>targetPath</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-          	Describe the resource target path. For example, if you want that 
+            Describe the resource target path. For example, if you want that 
             resource appear into a specific package 
             (<code>org.apache.maven.messages</code>), you must specify this 
             element with this value : <code>org/apache/maven/messages</code>
@@ -1717,7 +1717,7 @@
     <class>
       <name>SourceModification</name>
       <description><![CDATA[
-      	This element describes all of the sourceModifications associated with a
+        This element describes all of the sourceModifications associated with a
         project.  Each source modification is described by a
         <code>sourceModification</code> element, which is then described by
         additional elements (described below).  These modifications are used 
@@ -1731,7 +1731,7 @@
           <name>className</name>
           <version>3.0.0</version>
           <description><![CDATA[
-						If the class with this name can <strong>not</strong> be
+            If the class with this name can <strong>not</strong> be
             loaded, then the includes and excludes specified below 
             will be applied to the contents of the 
             <a href="#sourceDirectory">sourceDirectory</a>
@@ -1766,7 +1766,7 @@
       <name>Version</name>
       <version>3.0.0</version>
       <description><![CDATA[
-      	This element describes each of the previous versions of the
+        This element describes each of the previous versions of the
         project. Each version is described by a <code>version</code>
         element
       ]]></description>
@@ -1798,7 +1798,7 @@
           <description><![CDATA[
             A unique identifier for a version.  This ID is
             used to specify the version that
-            <a href="plugins/dist/index.html">
+            <a href="/plugins/dist/index.html">
               <code>maven:dist</code>
             </a> builds.
           ]]></description>
@@ -1846,7 +1846,7 @@
           <name>url</name>
           <version>4.0.0</version>
           <description><![CDATA[
-             The url of of the repository
+             The url of the repository
           ]]></description>
           <type>String</type>
         </field>
@@ -1863,7 +1863,7 @@
         <field>
           <name>layout</name>
           <version>4.0.0</version>
-          <description>The type of layout this repository uses for locating and storing aritfacts - can be "legacy" or "default".</description>
+          <description>The type of layout this repository uses for locating and storing artifacts - can be "legacy" or "default".</description>
           <type>String</type>
           <defaultValue>default</defaultValue>
         </field>
@@ -1918,7 +1918,7 @@
           <name>url</name>
           <version>4.0.0</version>
           <description><![CDATA[
-             The url of of the location where website is deployed
+             The url of the location where website is deployed
           ]]></description>
           <type>String</type>
         </field>
