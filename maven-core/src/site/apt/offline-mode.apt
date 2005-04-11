@@ -50,11 +50,11 @@ Offline Mode Design
   disconnected from the network, and adjust it's behavior accordingly.
   
   It is more than simply understanding that m2 cannot go and check for the
-  latest version of some snapshot artifact. If m2 is offline, SCM operations cannot
-  succeed; no artifact downloads can take place, regardless of whether they are
-  snapshot versions; artifact deployment cannot take place; certain types of
-  tests cannot be setup, since the container used to run them cannot be reached
-  or started.
+  latest version of some snapshot artifact. If m2 is offline, SCM operations 
+  cannot succeed; no artifact downloads can take place, regardless of whether 
+  they are snapshot versions; artifact deployment cannot take place; certain 
+  types of tests cannot be setup, since the container used to run them cannot be 
+  reached or started.
   
   All of these operations will produce their own unique errors in the absence of
   a coordinated offline strategy. In addition, efforts to unite these failing
@@ -66,9 +66,9 @@ Offline Mode Design
   a result turning off certain services provided by m2 and providing a coherent
   way of predicting and reporting when network-related failures will take place.
   It means warning users that since the network is missing, certain features and 
-  operations will be unavailable, rather than simply waiting for those operations
-  to fail, then trying to help users decipher the error messages they get as a 
-  result.
+  operations will be unavailable, rather than simply waiting for those 
+  operations to fail, then trying to help users decipher the error messages they 
+  get as a result.
   
 * Implications for Resolution
 
@@ -149,21 +149,21 @@ Offline Mode Design
   When binding goals to the project's configured lifecycle, each mojo
   descriptor should declare whether it requires online/offline status.
   This value should be a java.lang.Boolean, so it can implement 3VL
-  (three value logic: yes, no, don't-care). The requiredConnectivity
+  (three value logic: yes, no, don't-care). The requiresOnline
   field in the mojo descriptor has the following semantics:
 
-  [Boolean.TRUE] Online status is required for this mojo to function
-                 correctly.
+  [true] Online status is required for this mojo to function
+         correctly.
 
-  [Boolean.FALSE] Offline status is required for this mojo to function
-                  correctly.
+  [false] <<(Default)>> Either status is acceptable for the mojo to 
+  				execute. It doesn't care.
 
-  [null] Either status is acceptable for the mojo to execute. It doesn't
-         care.
-
-  The majority of mojos will leave the requiredConnectivity == null,
+  The majority of mojos will leave the requiresOnline == false,
   since online/offline status will be irrelevant, provided they have
-  access to their required artifacts and other classpath elements.
+  access to their required artifacts and other classpath elements. In the case
+  of required artifacts and other classpath elemtents, this is assumed by the 
+  mojo API to be in a correct state, and will be handled by the Wagon 
+  modifications.
 
 
 * Implementation Notes
@@ -205,25 +205,25 @@ Offline Mode Design
   When binding a mojo to the project's lifecycle instance, check the mojo 
   descriptor's requiredConnectivity field.
 
-  * If <<<(offline == true) && (Boolean.TRUE != requiredConnectivity)>>>, bind
+  * If <<<(offline == true) && (requiresOnline != true)>>>, bind
     the mojo to the lifecycle. 
     
-    In this case, the client is <<offline>>, and the mojo either requires <<offline>>
-    status, or else doesn't care.
+    In this case, the client is <<offline>>, and the mojo does not require
+    online status.
 
-  * If <<<(offline == false) && (Boolean.FALSE != requiredConnectivity)>>>, bind
+  * If <<<(offline == false) && (requiresOnline == true)>>>, bind
     the mojo to the lifecycle.
 
-    In this case, the client is <<online>>, and the mojo either requires <<online>>
-    status, or else doesn't care.
+    In this case, the client is <<online>>, and the mojo either requires 
+    <<online>> status, or else doesn't care.
 
   * Otherwise, don't bind the mojo. Log a debug message to indicate that it is
     sensitive the the online state of the application, and that this state is
     currently wrong for execution.
 
-  <<NOTE:>> Do we want to fail when we cannot bind a mojo to the lifecycle because
-  of offline/online status? That would probably indicate that the user was trying to
-  do something they cannot succeed at for now...so we probably should throw an
-  exception in this case.
+    <<NOTE:>> Do we want to fail when we cannot bind a mojo to the lifecycle 
+    because of offline/online status? That would probably indicate that the user 
+    was trying to do something they cannot succeed at for now...so we probably 
+    should throw an exception in this case.
 
  
