@@ -21,7 +21,6 @@
   </pluginRepositories>
 
   <build>
-    <!-- This all may just fold into plugin parameters -->
     <directory>target</directory>
     <outputDirectory>target/classes</outputDirectory>
     <finalName>${artifactId}-${version}</finalName>
@@ -45,7 +44,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
