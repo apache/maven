@@ -1,11 +1,5 @@
 package org.apache.maven.artifact.repository.layout;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -21,6 +15,12 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 
 /**
  * @author jdcasey
