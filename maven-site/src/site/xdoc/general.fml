@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<faqs id="General FAQ">
+  <part id="General">
+    <faq id="scripting-languages">
+      <question>What plugin languages will Maven 2.0 support? What about [insert language here]?</question>
+      <answer>
+        <p>
+          As of the Technology Preview, Maven supports pure Java and Marmalade. Java is the preferred language
+          for it's familiarity and speed, while Marmalade is preferred for porting Maven 1.x plugins, and writing
+          plugins based on Ant tasks.
+        </p>
+        <p>
+          In alpha-2, Beanshell support is planned. We currently view this as the best candidate to be the primary
+          plugin scripting language in Maven 2.0.
+        </p>
+        <p>
+          We get asked a lot whether Maven 2.0 will support other languages, in particular Groovy.
+          We will allow the use of Groovy - and virtually any other scripting
+          language if there is demand, or someone can commit a small amount of time to implementing a
+          factory for it.
+        </p>
+        <p>
+          We would recommend waiting for Groovy to have a 1.0 release so the API
+          (and language!) is stable. What we will not be doing is actively
+          supporting it (in terms of answering questions about how to use it)
+          like we currently do for Jelly in Maven 1.x.
+        </p>
+        <p>
+          Beanshell is more mature, and we want a language that users will find
+          answers for when they look, and that when they find bugs, it is
+          clearly defined where they actually are.
+        </p>
+        <p>
+          We may consider emphasising a different language if there are compelling technical reasons
+          for doing so - if you have a suggestion, feel free to contact the development list.
+        </p>
+      </answer>
+    </faq>
+  </part>
+</faqs>
