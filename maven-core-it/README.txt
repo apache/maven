@@ -56,6 +56,8 @@ it0017: Test an EJB generation
 it0018: Ensure that managed dependencies for dependency POMs are calculated
         correctly when resolved. Removes commons-logging-1.0.3 and checks it is
         redownloaded.
+
+it0019: Test that a version is managed by pluginManagement in the super POM
 -------------------------------------------------------------------------------
 
 - generated sources
