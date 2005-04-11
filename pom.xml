@@ -86,6 +86,7 @@
   <modules>
     <module>maven-archiver</module>
     <module>maven-artifact</module>
+    <module>maven-artifact-test</module>
     <module>maven-model</module>
     <module>maven-monitor</module>
     <module>maven-plugin</module>
