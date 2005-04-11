@@ -42,8 +42,8 @@ public class DefaultRepositoryLayout
         }
         catch ( ArtifactHandlerNotFoundException e )
         {
-            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId()
-                + "\'.", e );
+            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId() +
+                                                   "\'.", e );
         }
 
         StringBuffer path = new StringBuffer();
@@ -58,7 +58,10 @@ public class DefaultRepositoryLayout
             path.append( '-' ).append( artifact.getClassifier() );
         }
 
-        path.append( '.' ).append( artifactHandler.extension() );
+        if ( artifactHandler.extension() != null && artifactHandler.extension().length() > 0 )
+        {
+            path.append( '.' ).append( artifactHandler.extension() );
+        }
 
         return path.toString();
     }

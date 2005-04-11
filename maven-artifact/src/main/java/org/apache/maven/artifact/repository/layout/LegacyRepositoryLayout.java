@@ -42,22 +42,25 @@ public class LegacyRepositoryLayout
         }
         catch ( ArtifactHandlerNotFoundException e )
         {
-            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId()
-                + "\'.", e );
+            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId() +
+                                                   "\'.", e );
         }
-        
+
         StringBuffer path = new StringBuffer();
-        
-        path.append(artifact.getGroupId()).append('/');
-        path.append(artifactHandler.directory()).append('/');
-        path.append(artifact.getArtifactId()).append('-').append(artifact.getVersion());
-        
+
+        path.append( artifact.getGroupId() ).append( '/' );
+        path.append( artifactHandler.directory() ).append( '/' );
+        path.append( artifact.getArtifactId() ).append( '-' ).append( artifact.getVersion() );
+
         if ( artifact.hasClassifier() )
         {
-            path.append('-').append(artifact.getClassifier());
+            path.append( '-' ).append( artifact.getClassifier() );
         }
-        
-        path.append('.').append(artifactHandler.extension());
+
+        if ( artifactHandler.extension() != null && artifactHandler.extension().length() > 0 )
+        {
+            path.append( '.' ).append( artifactHandler.extension() );
+        }
 
         return path.toString();
     }
@@ -66,12 +69,12 @@ public class LegacyRepositoryLayout
         throws ArtifactPathFormatException
     {
         Artifact artifact = metadata.getArtifact();
-        
+
         StringBuffer path = new StringBuffer();
-        
-        path.append(artifact.getGroupId()).append("/poms/");
-        path.append(metadata.getFilename());
-        
+
+        path.append( artifact.getGroupId() ).append( "/poms/" );
+        path.append( metadata.getFilename() );
+
         return path.toString();
     }
 
