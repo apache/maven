@@ -116,14 +116,23 @@ public class IdeaMojo
             Xpp3Dom component = findComponent( module, "ProjectModuleManager" );
             Xpp3Dom modules = findElement( component, "modules" );
 
-            removeOldElements( modules, "module" );
-
-            for ( Iterator i = project.getCollectedProjects().iterator(); i.hasNext(); )
+            if ( project.getCollectedProjects().size() > 0 )
             {
-                MavenProject p = (MavenProject) i.next();
+                removeOldElements( modules, "module" );
 
+                for ( Iterator i = project.getCollectedProjects().iterator(); i.hasNext(); )
+                {
+                    MavenProject p = (MavenProject) i.next();
+
+                    Xpp3Dom m = createElement( modules, "module" );
+                    String modulePath = new File( p.getBasedir(), p.getArtifactId() + ".iml" ).getAbsolutePath();
+                    m.setAttribute( "filepath", "$PROJECT_DIR$/" + toRelative( project.getBasedir(), modulePath ) );
+                }
+            }
+            else
+            {
                 Xpp3Dom m = createElement( modules, "module" );
-                String modulePath = new File( p.getBasedir(), p.getArtifactId() + ".iml" ).getAbsolutePath();
+                String modulePath = new File( project.getBasedir(), project.getArtifactId() + ".iml" ).getAbsolutePath();
                 m.setAttribute( "filepath", "$PROJECT_DIR$/" + toRelative( project.getBasedir(), modulePath ) );
             }
 
