@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <document>
   <properties>
     <title>Welcome</title>
@@ -116,10 +117,20 @@
             <a href="getting-started.html">Getting Started</a>
           </i>
         </li>
+        <li>
+          <i>
+            <a href="general.html">General FAQ</a>
+          </i>
+        </li>
         <!-- TODO
                 <li>
                   <i>
                     <a href="configuration.html">Configuring Maven</a>
+                  </i>
+                </li>
+                <li>
+                  <i>
+                    <a href="archetypes.html">Generating a Template Project: Archetypes</a>
                   </i>
                 </li>
         -->

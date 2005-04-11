@@ -249,6 +249,10 @@ m2 archetype:create
         </p>
         <source>m2 clean:clean install</source>
         <p>
+          <b>Note: </b> If you didn't remove the <code>warName</code> plugin configuration, this will have
+          failed due to a bug. Please remove that section, and try again.
+        </p>
+        <p>
           The WAR has now been created in
           <code>my-webapp/target/my-webapp-1.0-SNAPSHOT.war</code>, and the JAR is
           included:
