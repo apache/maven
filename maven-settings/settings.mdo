@@ -126,6 +126,7 @@
           <version>1.0.0</version>
           <description><![CDATA[The proxy protocol.]]></description>
           <type>String</type>
+          <defaultValue>http</defaultValue>
         </field>
         <field>
           <name>username</name>
