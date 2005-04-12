@@ -57,6 +57,7 @@ public class SnapshotTransformation
         Matcher m = SnapshotArtifactMetadata.VERSION_FILE_PATTERN.matcher( artifact.getBaseVersion() );
         if ( m.matches() )
         {
+            // This corrects the base version, but ensure it is not resolved again
             artifact.setBaseVersion( m.group( 1 ) + "-SNAPSHOT" );
         }
         else if ( isSnapshot( artifact ) )
@@ -205,6 +206,11 @@ public class SnapshotTransformation
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
+        Matcher m = SnapshotArtifactMetadata.VERSION_FILE_PATTERN.matcher( artifact.getBaseVersion() );
+        if ( m.matches() )
+        {
+            artifact.setBaseVersion( m.group( 1 ) + "-SNAPSHOT" );
+        }
         try
         {
             SnapshotArtifactMetadata metadata = SnapshotArtifactMetadata.readFromLocalRepository( artifact,
@@ -228,7 +234,13 @@ public class SnapshotTransformation
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
-        if ( isSnapshot( artifact ) )
+        Matcher m = SnapshotArtifactMetadata.VERSION_FILE_PATTERN.matcher( artifact.getBaseVersion() );
+        if ( m.matches() )
+        {
+            // This corrects the base version, but ensure it is not updated again
+            artifact.setBaseVersion( m.group( 1 ) + "-SNAPSHOT" );
+        }
+        else if ( isSnapshot( artifact ) )
         {
             SnapshotArtifactMetadata metadata = SnapshotArtifactMetadata.retrieveFromRemoteRepository( artifact,
                                                                                                        remoteRepository,

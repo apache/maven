@@ -31,8 +31,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +58,9 @@ public class DefaultModelInheritanceAssembler
         // currentVersion
         if ( child.getVersion() == null )
         {
-            child.setVersion( parent.getVersion() );
+            // The parent version may have resolved to something different, so we take what we asked for...
+            // instead of - child.setVersion( parent.getVersion() );
+            child.setVersion( child.getParent().getVersion() );
         }
 
         // inceptionYear
@@ -158,7 +158,7 @@ public class DefaultModelInheritanceAssembler
         // Plugin Repositories :: aggregate
         List parentPluginRepositories = parent.getPluginRepositories();
         List childPluginRepositories = child.getPluginRepositories();
-        
+
         for ( Iterator iterator = parentPluginRepositories.iterator(); iterator.hasNext(); )
         {
             Repository repository = (Repository) iterator.next();

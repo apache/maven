@@ -19,6 +19,7 @@ package org.apache.maven.project.inheritance;
 import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 
@@ -60,6 +61,12 @@ public class DefaultModelInheritanceAssemblerTest
         parent.setBuild( parentBuild );
 
         Model child = new Model();
+
+        Parent parentElement = new Parent();
+        parentElement.setArtifactId( parent.getArtifactId() );
+        parentElement.setGroupId( parent.getGroupId() );
+        parentElement.setVersion( parent.getVersion() );
+        child.setParent( parentElement );
 
         child.setPackaging( "plugin" );
 
@@ -256,6 +263,8 @@ public class DefaultModelInheritanceAssemblerTest
         model.setGroupId( "maven" );
 
         model.setArtifactId( artifactId );
+
+        model.setVersion( "1.0" );
 
         if ( connection != null || developerConnection != null || url != null )
         {
