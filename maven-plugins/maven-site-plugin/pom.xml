@@ -1,0 +1,41 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>maven-plugin-parent</artifactId>
+    <groupId>org.apache.maven.plugins</groupId>
+    <version>2.0-alpha-1</version>
+  </parent>
+  <artifactId>maven-site-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+  <name>Maven Site plugin</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>doxia</groupId>
+      <artifactId>doxia-core</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-provider-api</artifactId>
+      <version>1.0-alpha-2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-ssh</artifactId>
+      <version>1.0-alpha-2</version>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-reporting-api</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    -->
+  </dependencies>
+</project>
