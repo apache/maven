@@ -22,6 +22,7 @@
     </menu>
     <menu name="Reference">
       <item name="Project Descriptor" href="project-descriptor.html"/>
+      <item name="Settings Descriptor" href="settings-descriptor.html"/>
       <item name="Available Plugins" href="plugin-list.html"/>
     </menu>
   </body>

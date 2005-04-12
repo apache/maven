@@ -6,8 +6,123 @@
   <body>
     <section name="Configuring Maven">
       <p>
-        ...
+        Maven configuration occurs at 3 levels:
       </p>
+      <ul>
+        <li>
+          <i>Project</i> - most static configuration occurs in
+          <code>pom.xml</code>
+        </li>
+        <li>
+          <i>Installation</i> - this is configuration added once for a Maven installation (not supported in the initial Technology Preview)
+        </li>
+        <li>
+          <i>User</i> - this is configuration specific to a particular user
+        </li>
+      </ul>
+      <p>
+        The separation is quite clear - the project defines information that applies to the project, no matter who is
+        building it, while the others both define settings for the current environment.
+      </p>
+      <p>
+        <b>Note: </b> the installation and user configuration can not be used to add shared project information -
+        for example setting
+        <code>&lt;organization&gt;</code> or
+        <code>&lt;distributionManagement&gt;</code> company-wide.
+        For this, you should have your projects inherit from a company-wide parent
+        <code>pom.xml</code>.
+        <!-- TODO: versioning doc that discusses this -->
+      </p>
+      <p>
+        User configuration is specified in
+        <code>${user.home}/.m2/settings.xml</code>. A
+        <a href="settings-descriptor.html">full reference</a> to the
+        configuration file is available. This section will show how to make some common configurations.
+      </p>
+      <p style="font-weight: bold; font-size: larger">
+        Configuring your Local Repository
+      </p>
+      <p>
+        The local repository is part of a profile in your user configuration. You can have multiple profiles, with one
+        set to active so that you can switch environments.
+      </p>
+      <source><![CDATA[
+<settings>
+  .
+  .
+  <profiles>
+    <profile>
+      <active>true</active>
+      <localRepository>/path/to/local/repo</localRepository>
+    </profile>
+  </profiles>
+  .
+  .]]></source>
+      <p>
+        The local repository must be an absolute path.
+      </p>
+      <p style="font-weight: bold; font-size: larger">
+        Configuring a Proxy
+      </p>
+      <p>
+        You can configure a proxy to use for some or all of your HTTP requests in Maven 2.0. The username and
+        password are only required if your proxy requires basic authentication (note that later alphas will support
+        storing your passwords in a secured keystore - in the mean time, please ensure your <code>settings.xml</code>
+        file is secured with permissions appropriate for your operating system).
+      </p>
+      <p>
+        The <code>nonProxyHosts</code> setting accepts wild cards, and each host not to proxy is separated by the
+        <code>|</code> character. This matches the
+        <a href="http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html">JDK configuration</a> equivalent.
+      </p>
+      <source><![CDATA[
+<settings>
+  .
+  .
+  <proxies>
+   <proxy>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>http://proxy.somewhere.com</host>
+      <port>8080</port>
+      <username>proxyuser</username>
+      <password>somepassword</password>
+      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+    </proxy>
+  </proxies>
+  .
+  .]]></source>
+      <p style="font-weight: bold; font-size: larger">
+        Deployment Settings
+      </p>
+      <p>
+        Repositories to deploy to are defined in a project in the <code>&lt;distributionManagement&gt;</code> section.
+        However, you cannot put your username, password, or other security settings in that project. For that reason,
+        you should add a server definition to your own settings with an <code>id</code> that matches that of the
+        deployment repository in the project.
+      </p>
+      <p>
+        Which settings are required will depend on the type of repository you are deploying to. As of the first release,
+        only SCP deployments and file deployments are supported by default, so only the following SCP configuration
+        is needed:
+      </p>
+      <source><![CDATA[
+<settings>
+  .
+  .
+  <servers>
+    <server>
+      <id>repo1</id>
+      <username>repouser</username>
+      <!-- other optional elements:
+        <password>my_login_password</password>
+        <privateKey>/path/to/identity</privateKey> (default is ~/.ssh/id_dsa)
+        <passphrase>my_key_passphrase</passphrase>
+      -->
+    </server>
+  </servers>
+  .
+  .]]></source>
     </section>
   </body>
 </document>

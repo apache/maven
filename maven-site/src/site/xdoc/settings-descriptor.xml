@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<document>
+  <properties>
+    <author email="dev@modello.codehaus.org">Maven Development Team</author>
+    <title>Maven Model Documentation</title>
+  </properties>
+  <body>
+    <section name="Descriptor with links">
+      <p>
+        <source>
+<a href="#Settings">&lt;settings&gt;</a>
+<a href="#jdks">&lt;jdks&gt;</a>
+<a href="#Jdk">&lt;jdk&gt;</a>
+<a href="#Jdk">&lt;active/&gt;</a>
+<a href="#Jdk">&lt;version/&gt;</a>
+<a href="#Jdk">&lt;javaHome/&gt;</a>
+<a href="#Jdk">&lt;jdk&gt;</a>
+<a href="#jdks">&lt;/jdks&gt;</a>
+<a href="#proxies">&lt;proxies&gt;</a>
+<a href="#Proxy">&lt;proxy&gt;</a>
+<a href="#Proxy">&lt;active/&gt;</a>
+<a href="#Proxy">&lt;protocol/&gt;</a>
+<a href="#Proxy">&lt;username/&gt;</a>
+<a href="#Proxy">&lt;password/&gt;</a>
+<a href="#Proxy">&lt;port/&gt;</a>
+<a href="#Proxy">&lt;host/&gt;</a>
+<a href="#Proxy">&lt;nonProxyHosts/&gt;</a>
+<a href="#Proxy">&lt;proxy&gt;</a>
+<a href="#proxies">&lt;/proxies&gt;</a>
+<a href="#servers">&lt;servers&gt;</a>
+<a href="#Server">&lt;server&gt;</a>
+<a href="#Server">&lt;id/&gt;</a>
+<a href="#Server">&lt;username/&gt;</a>
+<a href="#Server">&lt;password/&gt;</a>
+<a href="#Server">&lt;privateKey/&gt;</a>
+<a href="#Server">&lt;passphrase/&gt;</a>
+<a href="#Server">&lt;server&gt;</a>
+<a href="#servers">&lt;/servers&gt;</a>
+<a href="#profiles">&lt;profiles&gt;</a>
+<a href="#Profile">&lt;profile&gt;</a>
+<a href="#Profile">&lt;active/&gt;</a>
+<a href="#Profile">&lt;localRepository/&gt;</a>
+<a href="#Profile">&lt;passwordStore/&gt;</a>
+<a href="#Profile">&lt;profile&gt;</a>
+<a href="#profiles">&lt;/profiles&gt;</a>
+<a href="#Settings">&lt;settings&gt;</a></source>
+      </p>
+      <section name="Settings">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>jdks</td>
+              <td>
+          	Configuration for different java environment profiles. One good use
+            for this might be to configure both JDK 1.4 and JDK 1.5 to work with
+            maven. Profiles will allow switching of entire java environments
+            based on the profile id, either in the defaults section below, or on
+            the command line.
+              </td>
+            </tr>
+            <tr>
+              <td>proxies</td>
+              <td>
+          	Configuration for different proxy profiles. Multiple proxy profiles
+            might come in handy for anyone working from a notebook or other 
+            mobile platform, to enable easy switching of entire proxy 
+            configurations by simply specifying the profile id, again either from
+            the command line or from the defaults section below.
+              </td>
+            </tr>
+            <tr>
+              <td>servers</td>
+              <td>
+          	Configuration of server-specific settings, mainly authentication
+            method. This allows configuration of authentication on a per-server
+            basis.
+              </td>
+            </tr>
+            <tr>
+              <td>profiles</td>
+              <td>
+          	Configuration for different runtime profiles for maven itself. For
+            example, this will allow plugin developers to switch from a "work"
+            local repository to a "testing" local repository. It may also allow
+            configuration of such things as password keystore, etc. Once again, 
+            the active profile will be switchable via either the defaults section
+            or the command line (read: system properties).
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Jdk">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>active</td>
+              <td>Whether this JDK is the active one.</td>
+            </tr>
+            <tr>
+              <td>version</td>
+              <td>The JDK major version (eg. '1.4').</td>
+            </tr>
+            <tr>
+              <td>javaHome</td>
+              <td>The JDK home.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Proxy">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>active</td>
+              <td>Whether this proxy configuration is the active one.</td>
+            </tr>
+            <tr>
+              <td>protocol</td>
+              <td>The proxy protocol.</td>
+            </tr>
+            <tr>
+              <td>username</td>
+              <td>The proxy user.</td>
+            </tr>
+            <tr>
+              <td>password</td>
+              <td>The proxy password.</td>
+            </tr>
+            <tr>
+              <td>port</td>
+              <td>The proxy port.</td>
+            </tr>
+            <tr>
+              <td>host</td>
+              <td>The proxy host.</td>
+            </tr>
+            <tr>
+              <td>nonProxyHosts</td>
+              <td>
+          	The list of non-proxied hosts (usually 
+          	comma-delimited).
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Server">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>
+          	The ID of this configuration for indicating the default or "active" 
+            profile.
+              </td>
+            </tr>
+            <tr>
+              <td>username</td>
+              <td>The username used to authenticate.</td>
+            </tr>
+            <tr>
+              <td>password</td>
+              <td>
+          	The password used in conjunction with the username to authenticate.
+              </td>
+            </tr>
+            <tr>
+              <td>privateKey</td>
+              <td>The private key location used to authenticate.</td>
+            </tr>
+            <tr>
+              <td>passphrase</td>
+              <td>
+          	The passphrase used in conjunction with the privateKey to authenticate.
+              </td>
+            </tr>
+          </table>
+        </p>
+      </section>
+      <section name="Profile">
+        <p>
+          <table>
+            <tr>
+              <th>Element</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>active</td>
+              <td>Whether this is the active maven profile.</td>
+            </tr>
+            <tr>
+              <td>localRepository</td>
+              <td>The local repository.</td>
+            </tr>
+            <tr>
+              <td>passwordStore</td>
+              <td>The keystore used to store passwords.</td>
+            </tr>
+          </table>
+        </p>
+      </section>
+    </section>
+  </body>
+</document>

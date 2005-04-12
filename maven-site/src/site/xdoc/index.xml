@@ -16,7 +16,7 @@
           <small>(685K)</small>
           <br/>
         </p>
-        <ul style="margin-top: 0">
+        <ul style="margin-top: 0; list-style-type: disc">
           <li style="font-size: smaller">
             <a href="download.html#requirements">System Requirements</a>
           </li>
@@ -39,7 +39,7 @@
         Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
         basis to take it into the future. It is currently available as a Technology Preview.
       </p>
-      <ul style="list-style-type: square">
+      <ul>
         <li>
           <i>
             <a href="about.html#what-is-maven">What is Maven?</a>
@@ -83,7 +83,7 @@
         Maven 1.0 users will likely have a lot of questions about Maven 2.0 and how it will impact the future of Maven
         1.0.
       </p>
-      <ul style="list-style-type: square">
+      <ul>
         <li>
           <i>
             <a href="maven1.html#">What's changed?</a>
@@ -111,7 +111,7 @@
       <p>
         Maven is now simpler than ever to use!
       </p>
-      <ul style="list-style-type: square">
+      <ul>
         <li>
           <i>
             <a href="getting-started.html">Getting Started</a>
@@ -122,12 +122,12 @@
             <a href="general.html">General FAQ</a>
           </i>
         </li>
+        <li>
+          <i>
+            <a href="configuration.html">Configuring Maven</a>
+          </i>
+        </li>
         <!-- TODO
-                <li>
-                  <i>
-                    <a href="configuration.html">Configuring Maven</a>
-                  </i>
-                </li>
                 <li>
                   <i>
                     <a href="archetypes.html">Generating a Template Project: Archetypes</a>

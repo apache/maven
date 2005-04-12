@@ -3,3 +3,6 @@ a.externalLink, a.externalLink:link, a.externalLink:visited, a.externalLink:acti
   padding-right: 0;
 }
 
+body ul {
+  list-style-type: square;
+}
