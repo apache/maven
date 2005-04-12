@@ -26,8 +26,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.apache.maven.wagon.TransferFailedException;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -71,6 +73,13 @@ public class DefaultArtifactDeployer
                 transform.transformForDeployment( artifact, deploymentRepository );
             }
 
+            // Copy the original file to the new one if it was transformed
+            File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+            if ( !artifactFile.equals( source ) )
+            {
+                FileUtils.copyFile( source, artifactFile );
+            }
+
             wagonManager.putArtifact( source, artifact, deploymentRepository );
 
             // must be after the artifact is installed
@@ -92,6 +101,10 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
         }
         catch ( ArtifactPathFormatException e )
+        {
+            throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
+        }
+        catch ( IOException e )
         {
             throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
         }
