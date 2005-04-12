@@ -17,13 +17,32 @@ public class CompilerConfiguration
 {
 
     private String outputLocation;
+
     private List classpathEntries = new LinkedList();
+
     private List sourceLocations = new LinkedList();
+
     private Set includes = new HashSet();
     private Set excludes = new HashSet();
+
     private Map compilerOptions = new TreeMap();
+
     private boolean debug = false;
 
+    private Set sourceFiles = new HashSet();
+
+    private boolean noWarn;
+
+    public void setSourceFiles(Set sourceFiles)
+    {
+        this.sourceFiles = sourceFiles;
+    }
+    
+    public Set getSourceFiles()
+    {
+        return sourceFiles;
+    }
+    
     public void setOutputLocation(String outputLocation)
     {
         this.outputLocation = outputLocation;
@@ -111,6 +130,16 @@ public class CompilerConfiguration
     public boolean isDebug()
     {
         return debug;
+    }
+
+    public void setNoWarn( boolean noWarn )
+    {
+        this.noWarn = noWarn;
+    }
+
+    public boolean isNoWarn()
+    {
+        return noWarn;
     }
     
 }

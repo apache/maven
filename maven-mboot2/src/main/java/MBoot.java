@@ -885,6 +885,7 @@ public class MBoot
             CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
             compilerConfiguration.setOutputLocation( outputDirectory );
             List classpathEntries = classpath( dependencies, extraClasspath, scope, localRepository );
+            compilerConfiguration.setNoWarn( true );
             compilerConfiguration.setClasspathEntries( classpathEntries );
             compilerConfiguration.setSourceLocations( Arrays.asList( sourceDirectories ) );
 

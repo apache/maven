@@ -25,8 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +43,8 @@ public class JavacCompiler
     {
     }
 
-    public List compile( CompilerConfiguration config ) throws Exception
+    public List compile( CompilerConfiguration config )
+        throws Exception
     {
         File destinationDir = new File( config.getOutputLocation() );
 
@@ -61,8 +60,9 @@ public class JavacCompiler
             return Collections.EMPTY_LIST;
         }
 
-        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" )
-            + " to " + destinationDir.getAbsolutePath() );
+        // TODO: use getLogger() - but for some reason it is null when this is used
+        System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" ) +
+                            " to " + destinationDir.getAbsolutePath() );
 
         Map compilerOptions = config.getCompilerOptions();
 
@@ -72,15 +72,45 @@ public class JavacCompiler
 
         args.add( destinationDir.getAbsolutePath() );
 
-        args.add( "-nowarn" );
+        if ( config.isNoWarn() )
+        {
+            args.add( "-nowarn" );
+        }
 
-        args.add( "-classpath" );
+        List classpathEntries = config.getClasspathEntries();
+        if ( classpathEntries != null && !classpathEntries.isEmpty() )
+        {
+            args.add( "-classpath" );
 
-        args.add( getClasspathString( config.getClasspathEntries() ) );
+            args.add( getPathString( classpathEntries ) );
+        }
 
         if ( config.isDebug() )
         {
             args.add( "-g" );
+        }
+
+        List sourceLocations = config.getSourceLocations();
+        if ( sourceLocations != null && !sourceLocations.isEmpty() )
+        {
+            args.add( "-sourcepath" );
+
+            args.add( getPathString( sourceLocations ) );
+        }
+
+        // TODO: this could be much improved
+        if ( !compilerOptions.containsKey( "-target" ) )
+        {
+            if ( !compilerOptions.containsKey( "-source" ) )
+            {
+                // If omitted, later JDKs complain about a 1.1 target
+                args.add( "-source" );
+                args.add( "1.3" );
+            }
+
+            // Required, or it defaults to the target of your JDK (eg 1.5)
+            args.add( "-target" );
+            args.add( "1.1" );
         }
 
         Iterator it = compilerOptions.entrySet().iterator();
@@ -89,8 +119,10 @@ public class JavacCompiler
         {
             Map.Entry entry = (Map.Entry) it.next();
             args.add( entry.getKey() );
-            if ( (entry.getValue() != null) )
+            if ( ( entry.getValue() != null ) )
+            {
                 args.add( entry.getValue() );
+            }
         }
 
         for ( int i = 0; i < sources.length; i++ )
@@ -102,32 +134,34 @@ public class JavacCompiler
 
         File toolsJar = new File( System.getProperty( "java.home" ), "../lib/tools.jar" );
 
-        cl.addURL( toolsJar.toURL() );
+        if ( toolsJar.exists() )
+        {
+            cl.addURL( toolsJar.toURL() );
+        }
 
-        Class c = cl.loadClass( "sun.tools.javac.Main" );
-
-        Constructor cons = c.getConstructor( new Class[] { OutputStream.class, String.class } );
+        Class c = cl.loadClass( "com.sun.tools.javac.Main" );
 
         ByteArrayOutputStream err = new ByteArrayOutputStream();
 
-        Object compiler = cons.newInstance( new Object[] { err, "javac" } );
+        Method compile = c.getMethod( "compile", new Class[]{String[].class} );
 
-        Method compile = c.getMethod( "compile", new Class[] { String[].class } );
+        Integer ok = (Integer) compile.invoke( null, new Object[]{args.toArray( new String[0] )} );
 
-        Boolean ok = (Boolean) compile.invoke( compiler, new Object[] { args.toArray( new String[0] ) } );
+        List messages = parseModernStream(
+            new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
 
-        List messages = parseModernStream( new BufferedReader( new InputStreamReader( new ByteArrayInputStream( err.toByteArray() ) ) ) );
-
-        if ( !ok.booleanValue() && messages.isEmpty() )
+        if ( ok.intValue() != 0 && messages.isEmpty() )
         {
-            // TODO: don't throw exception
-            throw new Exception( "Failure executing javac, but could not parse the error:\n\n" + err.toString() );
+            // TODO: exception?
+            messages.add( new CompilerError(
+                "Failure executing javac, but could not parse the error:\n\n" + err.toString(), true ) );
         }
 
         return messages;
     }
 
-    protected List parseModernStream( BufferedReader input ) throws IOException
+    protected List parseModernStream( BufferedReader input )
+        throws IOException
     {
         List errors = new ArrayList();
 
@@ -143,14 +177,19 @@ public class JavacCompiler
             // most errors terminate with the '^' char
             do
             {
-                if ( (line = input.readLine()) == null )
+                if ( ( line = input.readLine() ) == null )
                 {
                     return errors;
                 }
 
+                // TODO: there should be a better way to parse these
                 if ( buffer.length() == 0 && line.startsWith( "error: " ) )
                 {
-                    errors.add( new CompilerError( line ) );
+                    errors.add( new CompilerError( line, true ) );
+                }
+                else if ( buffer.length() == 0 && line.startsWith( "Note: " ) )
+                {
+                    // skip this one - it is JDK 1.5 telling us that the interface is deprecated.
                 }
                 else
                 {
@@ -200,11 +239,13 @@ public class JavacCompiler
         }
         catch ( NoSuchElementException nse )
         {
-            return new CompilerError( "no more tokens - could not parse error message: " + error );
+            // TODO: exception?
+            return new CompilerError( "no more tokens - could not parse error message: " + error, true );
         }
         catch ( Exception nse )
         {
-            return new CompilerError( "could not parse error message: " + error );
+            // TODO: exception?
+            return new CompilerError( "could not parse error message: " + error, true );
         }
     }
 
