@@ -52,9 +52,7 @@ public class HttpUtils
      * @throws SecurityException if an operation is not authorized by the
      *                           SecurityManager
      */
-    public static void useProxyUser( final String proxyHost,
-                                     final String proxyPort,
-                                     final String proxyUserName,
+    public static void useProxyUser( final String proxyHost, final String proxyPort, final String proxyUserName,
                                      final String proxyPassword )
     {
         if ( proxyHost != null && proxyPort != null )
@@ -70,7 +68,8 @@ public class HttpUtils
                     protected PasswordAuthentication getPasswordAuthentication()
                     {
                         return new PasswordAuthentication( proxyUserName,
-                                                           proxyPassword == null ? new char[0] : proxyPassword.toCharArray() );
+                                                           proxyPassword == null
+                                                           ? new char[0] : proxyPassword.toCharArray() );
                     }
                 } );
             }
@@ -97,26 +96,13 @@ public class HttpUtils
      *                        artifact if it is available.
      * @throws IOException If an I/O exception occurs.
      */
-    public static void getFile( String url,
-                                File destinationFile,
-                                boolean ignoreErrors,
-                                boolean useTimestamp,
-                                String proxyHost,
-                                String proxyPort,
-                                String proxyUserName,
-                                String proxyPassword,
+    public static void getFile( String url, File destinationFile, boolean ignoreErrors, boolean useTimestamp,
+                                String proxyHost, String proxyPort, String proxyUserName, String proxyPassword,
                                 boolean useChecksum )
         throws IOException
     {
         // Get the requested file.
-        getFile( url,
-                 destinationFile,
-                 ignoreErrors,
-                 useTimestamp,
-                 proxyHost,
-                 proxyPort,
-                 proxyUserName,
-                 proxyPassword );
+        getFile( url, destinationFile, ignoreErrors, useTimestamp, proxyHost, proxyPort, proxyUserName, proxyPassword );
 
         // Get the checksum if requested.
         if ( useChecksum )
@@ -125,13 +111,7 @@ public class HttpUtils
 
             try
             {
-                getFile( url + ".md5",
-                         checksumFile,
-                         ignoreErrors,
-                         useTimestamp,
-                         proxyHost,
-                         proxyPort,
-                         proxyUserName,
+                getFile( url + ".md5", checksumFile, ignoreErrors, useTimestamp, proxyHost, proxyPort, proxyUserName,
                          proxyPassword );
             }
             catch ( Exception e )
@@ -160,14 +140,8 @@ public class HttpUtils
      *                        or null
      * @throws IOException If an I/O exception occurs.
      */
-    public static void getFile( String url,
-                                File destinationFile,
-                                boolean ignoreErrors,
-                                boolean useTimestamp,
-                                String proxyHost,
-                                String proxyPort,
-                                String proxyUserName,
-                                String proxyPassword )
+    public static void getFile( String url, File destinationFile, boolean ignoreErrors, boolean useTimestamp,
+                                String proxyHost, String proxyPort, String proxyUserName, String proxyPassword )
         throws IOException
     {
         //set the timestamp to the file date.
@@ -179,13 +153,7 @@ public class HttpUtils
 
         try
         {
-            getFile( url,
-                     destinationFile,
-                     timestamp,
-                     proxyHost,
-                     proxyPort,
-                     proxyUserName,
-                     proxyPassword );
+            getFile( url, destinationFile, timestamp, proxyHost, proxyPort, proxyUserName, proxyPassword );
         }
         catch ( IOException ex )
         {
@@ -212,13 +180,8 @@ public class HttpUtils
      *                        or null
      * @throws IOException If an I/O exception occurs.
      */
-    public static void getFile( String url,
-                                File destinationFile,
-                                long timestamp,
-                                String proxyHost,
-                                String proxyPort,
-                                String proxyUserName,
-                                String proxyPassword )
+    public static void getFile( String url, File destinationFile, long timestamp, String proxyHost, String proxyPort,
+                                String proxyUserName, String proxyPassword )
         throws IOException
     {
         String[] s = parseUrl( url );
@@ -247,6 +210,8 @@ public class HttpUtils
             connection.setRequestProperty( "Authorization", "Basic " + encoding );
         }
 
+        connection.setUseCaches( timestamp >= 0 );
+
         //connect to the remote site (may take some time)
         connection.connect();
         //next test for a 304 result (HTTP only)
@@ -258,8 +223,10 @@ public class HttpUtils
             // test for 404 ourselves, and throw FileNotFoundException as needed
             if ( httpConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND )
             {
-                throw new FileNotFoundException( url.toString() + " (HTTP Error: "
-                                                 + httpConnection.getResponseCode() + " " + httpConnection.getResponseMessage() + ")" );
+                throw new FileNotFoundException(
+                    url.toString() + " (HTTP Error: " + httpConnection.getResponseCode() + " " +
+                    httpConnection.getResponseMessage() +
+                    ")" );
             }
             if ( httpConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED )
             {
@@ -301,8 +268,7 @@ public class HttpUtils
             throw isException;
         }
 
-        if ( connection.getLastModified() <= timestamp &&
-            connection.getLastModified() != 0 )
+        if ( connection.getLastModified() <= timestamp && connection.getLastModified() != 0 )
         {
             return;
         }
