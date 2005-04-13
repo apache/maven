@@ -149,8 +149,6 @@ public class Verifier
                 }
 
                 lines.addAll( replaceArtifacts( line ) );
-
-                lines.add( line );
             }
 
             reader.close();
@@ -179,7 +177,7 @@ public class Verifier
             newLine += convertArtifact( artifact );
             newLine += line.substring( index + 1 );
 
-            index = newLine.indexOf( "SNAPSHOT" );
+            index = newLine.lastIndexOf( "SNAPSHOT" );
             if ( index >= 0 )
             {
                 List l = new ArrayList();
@@ -189,7 +187,7 @@ public class Verifier
             }
             else
             {
-                return Collections.singletonList( line );
+                return Collections.singletonList( newLine );
             }
         }
         else
