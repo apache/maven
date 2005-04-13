@@ -9,7 +9,6 @@
   <packaging>maven-plugin</packaging>
   <name>Maven Hello World Plugin</name>
   <version>1.0-SNAPSHOT</version>
-  
   <build>
     <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
     <resources>

@@ -16,6 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -701,9 +702,10 @@ public class DefaultPluginManager
     {
         // TODO: configure this from bootstrap or scan lib
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
-                                                              "maven-settings", "maven-monitor", "maven-plugin",
-                                                              "plexus-container-default", "plexus-artifact-container",
-                                                              "wagon-provider-api", "classworlds"} );
+                                                              "maven-settings", "maven-monitor", "maven-plugin-api",
+                                                              "maven-plugin-descriptor", "plexus-container-default",
+                                                              "plexus-artifact-container", "wagon-provider-api",
+                                                              "classworlds"} );
     }
 
     // ----------------------------------------------------------------------

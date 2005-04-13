@@ -49,17 +49,17 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
           <configuration>
             <includes>
               <include implementation="java.lang.String">**/*Test.java</include>
@@ -72,27 +72,27 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pom-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
-          <version>1.0-alpha-1</version>
+          <version>1.0-alpha-2-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>

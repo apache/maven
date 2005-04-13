@@ -14,10 +14,10 @@ package org.apache.maven.plugin;
  * the License.
  */
 
-import org.apache.maven.plugin.util.scan.InclusionScanException;
-import org.apache.maven.plugin.util.scan.SourceInclusionScanner;
-import org.apache.maven.plugin.util.scan.StaleSourceScanner;
-import org.apache.maven.plugin.util.scan.mapping.SuffixMapping;
+import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
+import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
+import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
+import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;

@@ -66,8 +66,8 @@ public class MavenPluginDiscoverer
         }
 
         // ----------------------------------------------------------------------
-        // We take the plugin descriptor as it has been built by the maven-plugin
-        // code. This descriptor is specific to maven-plugin and we are now
+        // We take the plugin descriptor as it has been built by the maven-plugin-descriptor
+        // code. This descriptor is specific to maven-plugin-descriptor and we are now
         // going to adapt it into a ComponentSetDescriptor that can be
         // utlized by Plexus.
         // ----------------------------------------------------------------------

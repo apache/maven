@@ -83,7 +83,7 @@
    <proxy>
       <active>true</active>
       <protocol>http</protocol>
-      <host>http://proxy.somewhere.com</host>
+      <host>proxy.somewhere.com</host>
       <port>8080</port>
       <username>proxyuser</username>
       <password>somepassword</password>

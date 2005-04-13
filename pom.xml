@@ -89,7 +89,8 @@
     <module>maven-artifact-test</module>
     <module>maven-model</module>
     <module>maven-monitor</module>
-    <module>maven-plugin</module>
+    <module>maven-plugin-api</module>
+    <module>maven-plugin-descriptor</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-script</module>
