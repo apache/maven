@@ -2,9 +2,11 @@ package download;
 
 import model.Dependency;
 import model.Repository;
+import util.FileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -82,7 +84,7 @@ public class ArtifactDownloader
                     directory.mkdirs();
                 }
 
-                boolean snapshot = dep.getVersion().indexOf( SNAPSHOT_SIGNATURE ) >= 0;
+                boolean snapshot = isSnapshot( dep );
 
                 if ( dep.getGroupId().equals( "org.apache.maven" ) && snapshot )
                 {
@@ -105,6 +107,11 @@ public class ArtifactDownloader
                 downloadedArtifacts.add( dep );
             }
         }
+    }
+
+    private static boolean isSnapshot( Dependency dep )
+    {
+        return dep.getVersion().indexOf( SNAPSHOT_SIGNATURE ) >= 0;
     }
 
     private void setRemoteRepos( List repositories )
@@ -158,6 +165,27 @@ public class ArtifactDownloader
             // of the checksum file was successful.
             try
             {
+                if ( isSnapshot( dep ) )
+                {
+                    String filename = getSnapshotMetadataFile( destinationFile.getPath(), "SNAPSHOT.version.txt" );
+                    String metaUrl = getSnapshotMetadataFile( url, "SNAPSHOT.version.txt" );
+                    log( "Downloading " + metaUrl );
+                    try
+                    {
+                        HttpUtils.getFile( metaUrl, new File( filename ), ignoreErrors, useTimestamp, proxyHost,
+                                           proxyPort, proxyUserName, proxyPassword, true );
+                        String version = FileUtils.fileRead( filename );
+                        log( "Resolved version: " + version );
+                        version = version.substring( version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
+                        String extension = url.substring( url.length() - 4 );
+                        url = getSnapshotMetadataFile( url, version + extension );
+                    }
+                    catch ( IOException e )
+                    {
+                        log( "WARNING: SNAPSHOT version not found, using default" );
+                    }
+                }
+
                 log( "Downloading " + url );
                 HttpUtils.getFile( url, destinationFile, ignoreErrors, useTimestamp, proxyHost, proxyPort,
                                    proxyUserName, proxyPassword, true );
@@ -195,6 +223,12 @@ public class ArtifactDownloader
         }
 
         return fileFound;
+    }
+
+    private static String getSnapshotMetadataFile( String filename, String s )
+    {
+        int index = filename.lastIndexOf( "SNAPSHOT" );
+        return filename.substring( 0, index ) + s;
     }
 
     private String replace( String text, String repl, String with )
