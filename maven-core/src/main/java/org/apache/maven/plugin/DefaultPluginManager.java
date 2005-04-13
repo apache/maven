@@ -688,7 +688,8 @@ public class DefaultPluginManager
                                                               "maven-settings", "maven-monitor", "maven-plugin-api",
                                                               "maven-plugin-descriptor", "plexus-container-default",
                                                               "plexus-artifact-container", "wagon-provider-api",
-                                                              "classworlds"} );
+                                                              "classworlds",
+                                                              "maven-plugin" /* Just re-added until all plugins are switched over...*/} );
     }
 
     // ----------------------------------------------------------------------
