@@ -36,6 +36,11 @@ export MESSAGE=${MESSAGE_DIR}/${MESSAGE_NAME}
 
 # ----------------------------------------------------------------------------------
 
+BUILD_REQUIRED=false
+if [ -f $HOME_DIR/build_required ]; then
+  BUILD_REQUIRED=`cat $HOME_DIR/build_required`
+fi
+
 export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
 
 (
@@ -78,7 +83,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
       if [ "$?" = "1" ]
       then
         
-	echo "false" > $HOME_DIR/build_required
+	echo $BUILD_REQUIRED > $HOME_DIR/build_required
       
         else
 	
@@ -145,6 +150,7 @@ then
     echo "" >> log
     echo "Distribution:" >> log
     echo "${DEPLOY_SITE}/${DIST}" >>log
+    rm $HOME_DIR/build_required
   fi
   echo "" >> log
   echo "Log:" >> log
