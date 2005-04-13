@@ -17,7 +17,9 @@ package org.apache.maven.plugin.assembly;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.IncludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
@@ -326,70 +328,4 @@ public class AssemblyMojo
         return defaultExcludes;
     }
 
-    // TODO: move to maven-artifact - generally useful
-    private static class AndArtifactFilter
-        implements ArtifactFilter
-    {
-        private final List filters = new ArrayList();
-
-        public boolean include( Artifact artifact )
-        {
-            boolean include = true;
-            for ( Iterator i = filters.iterator(); i.hasNext() && include; )
-            {
-                ArtifactFilter filter = (ArtifactFilter) i.next();
-                if ( !filter.include( artifact ) )
-                {
-                    include = false;
-                }
-            }
-            return include;
-        }
-
-        public void add( ArtifactFilter artifactFilter )
-        {
-            filters.add( artifactFilter );
-        }
-    }
-
-    private static class IncludesArtifactFilter
-        implements ArtifactFilter
-    {
-        private final List patterns;
-
-        public IncludesArtifactFilter( List patterns )
-        {
-            this.patterns = patterns;
-        }
-
-        public boolean include( Artifact artifact )
-        {
-            String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
-
-            boolean matched = false;
-            for ( Iterator i = patterns.iterator(); i.hasNext() & !matched; )
-            {
-                // TODO: what about wildcards? Just specifying groups? versions?
-                if ( id.equals( i.next() ) )
-                {
-                    matched = true;
-                }
-            }
-            return matched;
-        }
-    }
-
-    private static class ExcludesArtifactFilter
-        extends IncludesArtifactFilter
-    {
-        public ExcludesArtifactFilter( List patterns )
-        {
-            super( patterns );
-        }
-
-        public boolean include( Artifact artifact )
-        {
-            return !super.include( artifact );
-        }
-    }
 }
