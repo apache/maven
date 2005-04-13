@@ -87,4 +87,59 @@ public class PluginDescriptor
     {
         return isolatedRealm;
     }
+
+    public static String constructPluginKey( String groupId, String artifactId )
+    {
+        return groupId + ":" + artifactId;
+    }
+
+    public String getId()
+    {
+        return constructPluginKey( groupId, artifactId );
+    }
+
+    /**
+     * @todo remove - harcoding.
+     */
+    public static String getPluginIdFromGoal( String goalName )
+    {
+        String pluginId = goalName;
+
+        if ( pluginId.indexOf( ":" ) > 0 )
+        {
+            pluginId = pluginId.substring( 0, pluginId.indexOf( ":" ) );
+        }
+
+        return getDefaultPluginArtifactId( pluginId );
+    }
+
+    /**
+     * @todo remove - harcoding.
+     */
+    public static String getDefaultPluginArtifactId( String id )
+    {
+        return "maven-" + id + "-plugin";
+    }
+
+    /**
+     * @todo remove - harcoding.
+     */
+    public static String getDefaultPluginGroupId()
+    {
+        return "org.apache.maven.plugins";
+    }
+
+    /**
+     * Parse maven-...-plugin.
+     *
+     * @todo remove - harcoding. What about clashes?
+     */
+    public static String getPluginIdFromArtifactId( String artifactId )
+    {
+        int firstHyphen = artifactId.indexOf( "-" );
+
+        int lastHyphen = artifactId.lastIndexOf( "-" );
+
+        return artifactId.substring( firstHyphen + 1, lastHyphen );
+    }
 }

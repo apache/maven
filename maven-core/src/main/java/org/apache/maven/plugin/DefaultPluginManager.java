@@ -16,7 +16,6 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -126,12 +125,7 @@ public class DefaultPluginManager
 
     public PluginDescriptor getPluginDescriptor( String groupId, String artifactId )
     {
-        return (PluginDescriptor) pluginDescriptors.get( constructPluginKey( groupId, artifactId ) );
-    }
-
-    private static String constructPluginKey( String groupId, String artifactId )
-    {
-        return groupId + ":" + artifactId;
+        return (PluginDescriptor) pluginDescriptors.get( PluginDescriptor.constructPluginKey( groupId, artifactId ) );
     }
 
     // ----------------------------------------------------------------------
@@ -143,14 +137,15 @@ public class DefaultPluginManager
     public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor )
         throws CycleDetectedException
     {
-        if ( pluginsInProcess.contains( mavenPluginDescriptor.getPluginId() ) )
+        PluginDescriptor pluginDescriptor = mavenPluginDescriptor.getPluginDescriptor();
+        String key = pluginDescriptor.getId();
+
+        if ( pluginsInProcess.contains( key ) )
         {
             return;
         }
 
-        pluginsInProcess.add( mavenPluginDescriptor.getPluginId() );
-
-        PluginDescriptor pluginDescriptor = mavenPluginDescriptor.getPluginDescriptor();
+        pluginsInProcess.add( key );
 
         for ( Iterator it = mavenPluginDescriptor.getMavenMojoDescriptors().iterator(); it.hasNext(); )
         {
@@ -161,7 +156,6 @@ public class DefaultPluginManager
             mojoDescriptors.put( mojoDescriptor.getId(), mojoDescriptor );
         }
 
-        String key = constructPluginKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
         pluginDescriptors.put( key, pluginDescriptor );
     }
 
@@ -196,28 +190,16 @@ public class DefaultPluginManager
 
     public boolean isPluginInstalled( String groupId, String artifactId )
     {
-        return pluginDescriptors.containsKey( constructPluginKey( groupId, artifactId ) );
-    }
-
-    private static String getPluginId( String goalName )
-    {
-        String pluginId = goalName;
-
-        if ( pluginId.indexOf( ":" ) > 0 )
-        {
-            pluginId = pluginId.substring( 0, pluginId.indexOf( ":" ) );
-        }
-
-        return AbstractPlugin.getDefaultPluginArtifactId( pluginId );
+        return pluginDescriptors.containsKey( PluginDescriptor.constructPluginKey( groupId, artifactId ) );
     }
 
     // TODO: don't throw Exception
     public void verifyPluginForGoal( String goalName, MavenSession session )
         throws Exception
     {
-        String pluginId = getPluginId( goalName );
+        String pluginId = PluginDescriptor.getPluginIdFromGoal( goalName );
 
-        verifyPlugin( AbstractPlugin.getDefaultPluginGroupId(), pluginId, session );
+        verifyPlugin( PluginDescriptor.getDefaultPluginGroupId(), pluginId, session );
     }
 
     // TODO: don't throw Exception
@@ -397,7 +379,8 @@ public class DefaultPluginManager
             }
 
             // TODO: can probable refactor these a little when only the new plugin technique is in place
-            Xpp3Dom dom = session.getProject().getGoalConfiguration( getPluginId( goalName ), goalId );
+            Xpp3Dom dom = session.getProject().getGoalConfiguration( PluginDescriptor.getPluginIdFromGoal( goalName ),
+                                                                     goalId );
 
             PlexusConfiguration configuration;
             if ( dom == null )

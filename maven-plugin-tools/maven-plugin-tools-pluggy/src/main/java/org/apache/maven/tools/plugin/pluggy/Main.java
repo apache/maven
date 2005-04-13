@@ -71,6 +71,16 @@ public class Main
 
         Model model = modelReader.read( reader );
 
+        // Not doing inheritence, except for groupId and version
+        if ( model.getGroupId() == null )
+        {
+            model.setGroupId( model.getParent().getGroupId() );
+        }
+        if ( model.getVersion() == null )
+        {
+            model.setVersion( model.getParent().getVersion() );
+        }
+
         MavenProject project = new MavenProject( model );
         project.setFile( new File( pom ) );
         project.addCompileSourceRoot( sourceDirectory );

@@ -53,7 +53,9 @@ public class PluginDescriptorGenerator
 
         w.startElement( "plugin" );
 
-        element( w, "id", PluginUtils.pluginId( project ) );
+        element( w, "groupId", project.getGroupId() );
+
+        element( w, "artifactId", project.getArtifactId() );
 
         element( w, "isolatedRealm", "true" );
 

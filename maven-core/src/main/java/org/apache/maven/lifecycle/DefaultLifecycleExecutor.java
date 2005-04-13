@@ -16,40 +16,37 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
+import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Goal;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.DefaultMavenProjectBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.DefaultMavenProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.MavenConstants;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -120,9 +117,9 @@ public class DefaultLifecycleExecutor
 
                 if ( artifactHandler.additionalPlugin() != null )
                 {
-                    String additionalPluginGroupId = AbstractPlugin.getDefaultPluginGroupId();
+                    String additionalPluginGroupId = PluginDescriptor.getDefaultPluginGroupId();
 
-                    String additionalPluginArtifactId = AbstractPlugin.getDefaultPluginArtifactId(
+                    String additionalPluginArtifactId = PluginDescriptor.getDefaultPluginArtifactId(
                         artifactHandler.additionalPlugin() );
 
                     injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
@@ -275,9 +272,7 @@ public class DefaultLifecycleExecutor
 
             // TODO: Right now this maven-foo-plugin so this is a hack right now.
 
-            pluginId = pluginId.substring( 6 );
-
-            pluginId = pluginId.substring( 0, pluginId.lastIndexOf( "-" ) );
+            pluginId = PluginDescriptor.getPluginIdFromArtifactId( pluginId );
 
             for ( Iterator i = plugin.getGoals().iterator(); i.hasNext(); )
             {
@@ -363,7 +358,7 @@ public class DefaultLifecycleExecutor
 
         if ( mojoDescriptor == null )
         {
-            String groupId = AbstractPlugin.getDefaultPluginGroupId();
+            String groupId = PluginDescriptor.getDefaultPluginGroupId();
 
             String pluginId = task;
 
@@ -372,7 +367,7 @@ public class DefaultLifecycleExecutor
                 pluginId = pluginId.substring( 0, pluginId.indexOf( ":" ) );
             }
 
-            String artifactId = AbstractPlugin.getDefaultPluginArtifactId( pluginId );
+            String artifactId = PluginDescriptor.getDefaultPluginArtifactId( pluginId );
 
             injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId );
 

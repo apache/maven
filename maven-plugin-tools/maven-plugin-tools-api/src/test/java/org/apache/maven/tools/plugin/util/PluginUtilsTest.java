@@ -1,14 +1,14 @@
 package org.apache.maven.tools.plugin.util;
 
+import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.CompactXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.StringWriter;
-
-import junit.framework.TestCase;
 
 /**
  * @author jdcasey
@@ -24,12 +24,13 @@ public class PluginUtilsTest
 
         MavenProject project = new MavenProject( model );
 
-        String pluginId = PluginUtils.pluginId( project );
+        String pluginId = PluginDescriptor.getPluginIdFromArtifactId( project.getArtifactId() );
 
         System.out.println( pluginId );
     }
 
-    public void testShouldWriteDependencies() throws Exception
+    public void testShouldWriteDependencies()
+        throws Exception
     {
         Dependency dependency = new Dependency();
         dependency.setArtifactId( "testArtifactId" );
@@ -49,9 +50,9 @@ public class PluginUtilsTest
 
         String output = sWriter.toString();
 
-        String pattern = "<dependencies>" + "<dependency>" + "<groupId>testGroupId</groupId>"
-            + "<artifactId>testArtifactId</artifactId>" + "<type>pom</type>" + "<version>0.0.0</version>"
-            + "</dependency>" + "</dependencies>";
+        String pattern = "<dependencies>" + "<dependency>" + "<groupId>testGroupId</groupId>" +
+            "<artifactId>testArtifactId</artifactId>" + "<type>pom</type>" + "<version>0.0.0</version>" +
+            "</dependency>" + "</dependencies>";
 
         assertEquals( pattern, output );
     }

@@ -38,12 +38,6 @@ public class MavenPluginDescriptor
         this.pluginDescriptor = pluginDescriptor;
     }
 
-    public String getPluginId()
-    {
-        // TODO: groupID
-        return pluginDescriptor.getArtifactId();
-    }
-
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------
@@ -62,4 +56,5 @@ public class MavenPluginDescriptor
     {
         return pluginDescriptor.isIsolatedRealm();
     }
+
 }

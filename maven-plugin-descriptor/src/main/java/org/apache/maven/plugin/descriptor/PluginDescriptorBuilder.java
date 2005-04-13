@@ -1,6 +1,5 @@
 package org.apache.maven.plugin.descriptor;
 
-import org.apache.maven.plugin.AbstractPlugin;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -24,8 +23,18 @@ public class PluginDescriptorBuilder
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
 
-        pluginDescriptor.setGroupId( AbstractPlugin.getDefaultPluginGroupId() );
-        pluginDescriptor.setArtifactId( AbstractPlugin.getDefaultPluginArtifactId( c.getChild( "id" ).getValue() ) );
+        String id = c.getChild( "id" ).getValue();
+        if ( id != null )
+        {
+            // TODO: remove. This is old style mojos (alpha-1)
+            pluginDescriptor.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
+            pluginDescriptor.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( id ) );
+        }
+        else
+        {
+            pluginDescriptor.setGroupId( c.getChild( "groupId" ).getValue() );
+            pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
+        }
 
         // ----------------------------------------------------------------------
         // Components

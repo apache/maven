@@ -27,7 +27,6 @@ import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 import org.apache.maven.util.Xpp3DomUtils;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -44,7 +43,6 @@ import java.util.TreeMap;
  * model.
  */
 public class DefaultModelInheritanceAssembler
-    extends AbstractLogEnabled
     implements ModelInheritanceAssembler
 {
     public void assembleModelInheritance( Model child, Model parent )

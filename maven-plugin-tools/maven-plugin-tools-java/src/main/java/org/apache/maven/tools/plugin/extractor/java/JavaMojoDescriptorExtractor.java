@@ -22,10 +22,10 @@ import com.thoughtworks.qdox.model.JavaClass;
 import com.thoughtworks.qdox.model.JavaSource;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.InvalidParameterException;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
-import org.apache.maven.tools.plugin.util.PluginUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -121,7 +121,7 @@ public class JavaMojoDescriptorExtractor
 
         DocletTag tag;
 
-        String pluginId = PluginUtils.pluginId( project );
+        String pluginId = PluginDescriptor.getPluginIdFromArtifactId( project.getArtifactId() );
 
         mojoDescriptor.setId( pluginId );
 

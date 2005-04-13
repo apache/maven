@@ -18,6 +18,7 @@ package org.apache.maven.tools.plugin.generator.jelly;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.util.PluginUtils;
@@ -32,11 +33,11 @@ import java.util.Set;
 
 /**
  * @todo use the descriptions in the descriptor for the javadoc pushed into the
- *       source code.
+ * source code.
  * @todo write plugin.properties (as a place holder, we don't technially need
- *       it)
+ * it)
  * @todo convert POM or just strip out the dependencies to create a project.xml
- *       that will serve as the trigger to download dependencies.
+ * that will serve as the trigger to download dependencies.
  */
 public class JellyHarnessGenerator
     implements Generator
@@ -46,13 +47,14 @@ public class JellyHarnessGenerator
         return pluginDescriptor.getImplementation() + "Bean";
     }
 
-    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project ) throws Exception
+    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project )
+        throws Exception
     {
         FileWriter writer = new FileWriter( new File( destinationDirectory, "plugin.jelly" ) );
 
         PrettyPrintXMLWriter w = new PrettyPrintXMLWriter( writer );
 
-        String pluginId = PluginUtils.pluginId( project );
+        String pluginId = PluginDescriptor.getPluginIdFromArtifactId( project.getArtifactId() );
 
         // ----------------------------------------------------------------------
         //
@@ -133,7 +135,7 @@ public class JellyHarnessGenerator
     protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w, MavenProject project )
         throws Exception
     {
-        String pluginId = PluginUtils.pluginId( project );
+        String pluginId = PluginDescriptor.getPluginIdFromArtifactId( project.getArtifactId() );
 
         String goalName = mojoDescriptor.getGoal();
 
@@ -252,7 +254,8 @@ public class JellyHarnessGenerator
 
             if ( projectIndex > 0 )
             {
-                expression = expression.substring( 0, projectIndex ) + "pom" + expression.substring( projectIndex + 7 );
+                expression = expression.substring( 0, projectIndex ) + "pom" +
+                    expression.substring( projectIndex + 7 );
             }
 
             if ( expression.startsWith( "#" ) )
@@ -275,8 +278,7 @@ public class JellyHarnessGenerator
             return str;
         }
 
-        return new StringBuffer( str.length() ).append( Character.toTitleCase( str.charAt( 0 ) ) )
-                                               .append( str.substring( 1 ) )
-                                               .toString();
+        return new StringBuffer( str.length() ).append( Character.toTitleCase( str.charAt( 0 ) ) ).append(
+            str.substring( 1 ) ).toString();
     }
 }
