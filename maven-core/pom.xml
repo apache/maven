@@ -8,6 +8,14 @@
   <artifactId>maven-core</artifactId>
   <name>Maven</name>
   <dependencies>
+    <!-- TODO: shouldn't be required, but is for correct version to appear in distribution - need dependency mediation -->
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-provider-api</artifactId>
+      <version>1.0-alpha-3-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-artifact</artifactId>
