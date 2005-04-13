@@ -29,6 +29,7 @@ import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.wagon.observers.ChecksumObserver;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -128,6 +129,10 @@ public class DefaultWagonManager
 //        {
 //            wagon.addTransferListener( downloadMonitor );
 //        }
+
+        // TODO: configure these
+        wagon.addTransferListener( new ChecksumObserver( "MD5" ) );
+        wagon.addTransferListener( new ChecksumObserver( "SHA-1" ) );
 
         try
         {

@@ -9,6 +9,14 @@
   <name>Maven MBoot</name>
   <description>Tool used to bootstrap m2.</description>
   <dependencies>
+    <!-- TODO: shouldn't be required - need latest version dependency resolution -->
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-provider-api</artifactId>
+      <version>1.0-alpha-3-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.codehaus.modello</groupId>
       <artifactId>modello-plugin-xpp3</artifactId>
