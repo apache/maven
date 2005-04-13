@@ -147,7 +147,7 @@ public class Verifier
                     continue;
                 }
 
-                line = replaceArtifacts( line );
+                lines.addAll( replaceArtifacts( line ) );
 
                 lines.add( line );
             }
@@ -161,7 +161,7 @@ public class Verifier
         return lines;
     }
 
-    private static String replaceArtifacts( String line )
+    private static List replaceArtifacts( String line )
     {
         String MARKER = "${artifact:";
         int index = line.indexOf( MARKER );
@@ -178,9 +178,23 @@ public class Verifier
             newLine += convertArtifact( artifact );
             newLine += line.substring( index + 1 );
 
-            line = replaceArtifacts( newLine );
+            index = newLine.indexOf( "SNAPSHOT" );
+            if ( index >= 0 )
+            {
+                List l = new ArrayList();
+                l.add( newLine );
+                l.add( newLine.substring( 0, index ) + "SNAPSHOT.version.txt" );
+                return l;
+            }
+            else
+            {
+                return Collections.singletonList( line );
+            }
         }
-        return line;
+        else
+        {
+            return Collections.singletonList( line );
+        }
     }
 
     private static String convertArtifact( String artifact )
