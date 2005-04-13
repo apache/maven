@@ -78,7 +78,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
       
       cvs update -dP > $HOME_DIR/$SCM_LOG 2>&1
       
-      grep ^P $HOME_DIR/$SCM_LOG > /dev/null 2>&1
+      grep ^[PU] $HOME_DIR/$SCM_LOG > /dev/null 2>&1
 
       if [ "$?" = "1" ]
       then
@@ -102,7 +102,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
       
     echo "Updates occured, build required ..."
     echo
-    grep ^P $HOME_DIR/$SCM_LOG
+    grep ^[PU] $HOME_DIR/$SCM_LOG
     echo
 
     (
