@@ -18,6 +18,7 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
@@ -228,6 +229,7 @@ public class MavenProject
     }
 
     public List getCompileClasspathElements()
+        throws DependencyResolutionRequiredException
     {
         List list = new ArrayList( getArtifacts().size() );
 
@@ -238,14 +240,19 @@ public class MavenProject
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) )
             {
-                // TODO: this assumes resolution, which may not have been the case - improve error reporting in that instance
-                list.add( a.getFile().getPath() );
+                File file = a.getFile();
+                if ( file == null )
+                {
+                    throw new DependencyResolutionRequiredException( a );
+                }
+                list.add( file.getPath() );
             }
         }
         return list;
     }
 
     public List getTestClasspathElements()
+        throws DependencyResolutionRequiredException
     {
         List list = new ArrayList( getArtifacts().size() + 1 );
 
@@ -261,8 +268,12 @@ public class MavenProject
                 if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
                     Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
-                    // TODO: this assumes resolution, which may not have been the case - improve error reporting in that instance
-                    list.add( a.getFile().getPath() );
+                    File file = a.getFile();
+                    if ( file == null )
+                    {
+                        throw new DependencyResolutionRequiredException( a );
+                    }
+                    list.add( file.getPath() );
                 }
             }
         }
@@ -270,6 +281,7 @@ public class MavenProject
     }
 
     public List getRuntimeClasspathElements()
+        throws DependencyResolutionRequiredException
     {
         List list = new ArrayList( getArtifacts().size() + 1 );
 
@@ -284,8 +296,12 @@ public class MavenProject
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
-                    // TODO: this assumes resolution, which may not have been the case - improve error reporting in that instance
-                    list.add( a.getFile().getPath() );
+                    File file = a.getFile();
+                    if ( file == null )
+                    {
+                        throw new DependencyResolutionRequiredException( a );
+                    }
+                    list.add( file.getPath() );
                 }
             }
         }
