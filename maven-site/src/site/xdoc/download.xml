@@ -96,7 +96,7 @@
             <code>PATH</code>
             variable in the user variables.
             eg.
-            <code>"C:\Program Files\Apache Software Foundation\maven-2.0-alpha-1";%PATH%</code>
+            <code>"C:\Program Files\Apache Software Foundation\maven-2.0-alpha-1\bin";%PATH%</code>
           </li>
           <li>
             In the same dialog, make sure that
@@ -122,7 +122,7 @@
           <li>
             Add the
             <code>bin</code> directory to your path, eg.
-            <code>export PATH=/usr/local/maven-2.0-alpha-1:$PATH</code>
+            <code>export PATH=/usr/local/maven-2.0-alpha-1/bin:$PATH</code>
           </li>
           <li>
             Make sure that
