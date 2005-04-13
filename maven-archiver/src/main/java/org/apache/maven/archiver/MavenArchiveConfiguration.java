@@ -35,6 +35,9 @@ public class MavenArchiveConfiguration
      */
     private String index;
 
+    /**
+     * @todo File instead
+     */
     private String manifestFile;
 
     private ManifestConfiguration manifest;
