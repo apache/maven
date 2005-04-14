@@ -392,14 +392,18 @@ public class DefaultPluginManager
                 configuration = new XmlPlexusConfiguration( dom );
             }
 
-            Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session );
-
             if ( newMojoTechnique )
             {
+                Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session );
+
                 populatePluginFields( plugin, configuration, map );
             }
             else
             {
+                getLogger().warn( "WARNING: The mojo " + mojoDescriptor.getId() + " is using the OLD API" );
+
+                Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session );
+
                 request = createPluginRequest( configuration, map );
             }
 
@@ -684,12 +688,11 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
-                                                              "maven-settings", "maven-monitor", "maven-plugin-api",
-                                                              "maven-plugin-descriptor", "plexus-container-default",
-                                                              "plexus-artifact-container", "wagon-provider-api",
-                                                              "classworlds",
-                                                              "maven-plugin" /* Just re-added until all plugins are switched over...*/} );
+        artifactFilter =
+            new ExclusionSetFilter(
+                new String[]{"maven-core", "maven-artifact", "maven-model", "maven-settings", "maven-monitor",
+                             "maven-plugin-api", "maven-plugin-descriptor", "plexus-container-default",
+                             "plexus-artifact-container", "wagon-provider-api", "classworlds", "maven-plugin" /* Just re-added until all plugins are switched over...*/} );
     }
 
     // ----------------------------------------------------------------------

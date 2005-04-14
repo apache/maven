@@ -214,27 +214,6 @@ public class JellyHarnessGenerator
 
         w.addAttribute( "name", id + ":" + mojoDescriptor.getGoal() );
 
-        List goalPrereqs = mojoDescriptor.getPrereqs();
-
-        if ( goalPrereqs.size() > 0 )
-        {
-            StringBuffer prereqs = new StringBuffer();
-
-            for ( int j = 0; j < goalPrereqs.size(); j++ )
-            {
-                String prereq = (String) goalPrereqs.get( j );
-
-                prereqs.append( prereq );
-
-                if ( j < goalPrereqs.size() - 1 )
-                {
-                    prereqs.append( "," );
-                }
-            }
-
-            w.addAttribute( "prereqs", prereqs.toString() );
-        }
-
         if ( mojoDescriptor.getDescription() != null )
         {
             w.addAttribute( "description", mojoDescriptor.getDescription() );

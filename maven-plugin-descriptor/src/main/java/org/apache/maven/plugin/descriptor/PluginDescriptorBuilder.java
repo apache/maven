@@ -1,5 +1,6 @@
 package org.apache.maven.plugin.descriptor;
 
+import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -155,22 +156,28 @@ public class PluginDescriptorBuilder
 
         mojo.setParameters( parameters );
 
+        // TODO: this should not need to be handed off...
+
         // ----------------------------------------------------------------------
-        // Prereqs
+        // Requirements
         // ----------------------------------------------------------------------
 
-        PlexusConfiguration[] prereqConfigurations = c.getChild( "prereqs" ).getChildren( "prereq" );
+        PlexusConfiguration[] requirements = c.getChild( "requirements" ).getChildren( "requirement" );
 
-        List prereqs = new ArrayList();
-
-        for ( int i = 0; i < prereqConfigurations.length; i++ )
+        for ( int i = 0; i < requirements.length; i++ )
         {
-            PlexusConfiguration d = prereqConfigurations[i];
+            PlexusConfiguration requirement = requirements[i];
 
-            prereqs.add( d.getValue() );
+            ComponentRequirement cr = new ComponentRequirement();
+
+            cr.setRole( requirement.getChild( "role" ).getValue() );
+
+            cr.setRoleHint( requirement.getChild( "role-hint" ).getValue() );
+
+            cr.setFieldName( requirement.getChild( "field-name" ).getValue() );
+
+            mojo.addRequirement( cr );
         }
-
-        mojo.setPrereqs( prereqs );
 
         return mojo;
     }

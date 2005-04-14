@@ -51,11 +51,6 @@ public class MavenMojoDescriptor
         return mojoDescriptor.getImplementation();
     }
 
-    public List getPrereqs()
-    {
-        return mojoDescriptor.getPrereqs();
-    }
-    
     public String getComponentFactory()
     {
         return mojoDescriptor.getLanguage();
@@ -74,5 +69,10 @@ public class MavenMojoDescriptor
     public String getComponentType()
     {
         return DefaultPluginManager.MAVEN_PLUGIN;
+    }
+
+    public List getRequirements()
+    {
+        return mojoDescriptor.getRequirements();
     }
 }

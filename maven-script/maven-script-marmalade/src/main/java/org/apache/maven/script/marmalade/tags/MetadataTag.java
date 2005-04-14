@@ -103,6 +103,8 @@ public class MetadataTag
         descriptor.setRequiresDependencyResolution( requiresDependencyResolution );
         descriptor.setRequiresProject( requiresProject );
 
+        // TODO: component requirements
+
         String basePath = (String) context.getVariable( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR,
                                                         getExpressionEvaluator() );
 

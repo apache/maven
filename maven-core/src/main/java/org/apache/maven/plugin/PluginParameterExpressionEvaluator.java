@@ -40,6 +40,9 @@ public class PluginParameterExpressionEvaluator
         }
         if ( expression.startsWith( "#component" ) )
         {
+            context.getLog().warn( "WARNING: plugin is using deprecated expression " + expression );
+
+            // TODO: deprecated... and can remove the lookup method in context afterwards
             String role = expression.substring( 11 );
 
             try

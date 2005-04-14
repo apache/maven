@@ -25,6 +25,8 @@ import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -159,6 +161,7 @@ public class PluginDescriptorGenerator
 
         w.startElement( "parameters" );
 
+        Collection requirements = new ArrayList();
         for ( int j = 0; j < parameters.size(); j++ )
         {
             Parameter parameter = (Parameter) parameters.get( j );
@@ -169,11 +172,18 @@ public class PluginDescriptorGenerator
 
             element( w, "type", parameter.getType() );
 
-            element( w, "required", Boolean.toString( parameter.isRequired() ) );
-
             element( w, "validator", parameter.getValidator() );
 
-            element( w, "expression", parameter.getExpression() );
+            if ( parameter.getExpression().startsWith( "#component" ) )
+            {
+                requirements.add( parameter );
+            }
+            else
+            {
+                element( w, "required", Boolean.toString( parameter.isRequired() ) );
+
+                element( w, "expression", parameter.getExpression() );
+            }
 
             element( w, "description", parameter.getDescription() );
 
@@ -185,20 +195,24 @@ public class PluginDescriptorGenerator
         w.endElement();
 
         // ----------------------------------------------------------------------
-        // Prereqs
+        // Requirements
         // ----------------------------------------------------------------------
 
-        // TODO: remove
-
-        List prereqs = mojoDescriptor.getPrereqs();
-
-        if ( prereqs != null && prereqs.size() > 0 )
+        if ( !requirements.isEmpty() )
         {
-            w.startElement( "prereqs" );
+            w.startElement( "requirements" );
 
-            for ( int j = 0; j < prereqs.size(); j++ )
+            for ( Iterator i = requirements.iterator(); i.hasNext(); )
             {
-                element( w, "prereq", (String) prereqs.get( j ) );
+                Parameter requirement = (Parameter) i.next();
+
+                w.startElement( "requirement" );
+
+                element( w, "role", requirement.getExpression().substring( 11 ) );
+
+                element( w, "field-name", requirement.getName() );
+
+                w.endElement();
             }
 
             w.endElement();

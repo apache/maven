@@ -16,11 +16,19 @@ package org.apache.maven.plugin.descriptor;
  * limitations under the License.
  */
 
+import org.codehaus.plexus.component.repository.ComponentRequirement;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The bean containing the mojo descriptor.
+ *
+ * @todo is there a need for the delegation of MavenMojoDescriptor to this? Why not just extend ComponentDescriptor here?
+ */
 public class MojoDescriptor
     implements Cloneable
 {
@@ -48,11 +56,11 @@ public class MojoDescriptor
 
     private String phase;
 
+    private List requirements;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
-
-    private List prereqs;
 
     private String requiresDependencyResolution = null;
 
@@ -63,11 +71,6 @@ public class MojoDescriptor
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
-
-    public String getRole()
-    {
-        return "org.apache.maven.plugin.Plugin";
-    }
 
     public String getImplementation()
     {
@@ -169,28 +172,24 @@ public class MojoDescriptor
         this.requiresProject = requiresProject;
     }
 
-    public boolean requiresProject()
+    public boolean isRequiresProject()
     {
         return requiresProject;
     }
 
-    // ----------------------------------------------------------------------
-    // Prereqs
-    // ----------------------------------------------------------------------
-
-    public List getPrereqs()
+    public void setRequirements( List requirements )
     {
-        return prereqs;
+        this.requirements = requirements;
     }
 
-    public void setPrereqs( List prereqs )
+    public List getRequirements()
     {
-        this.prereqs = prereqs;
+        if ( requirements == null )
+        {
+            requirements = new ArrayList();
+        }
+        return requirements;
     }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
 
     public String getPhase()
     {
@@ -225,5 +224,10 @@ public class MojoDescriptor
     public void setExecutionStrategy( String executionStrategy )
     {
         this.executionStrategy = executionStrategy;
+    }
+
+    public void addRequirement( ComponentRequirement cr )
+    {
+        getRequirements().add( cr );
     }
 }
