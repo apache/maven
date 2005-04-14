@@ -25,5 +25,8 @@
       <item name="Settings Descriptor" href="settings-descriptor.html"/>
       <item name="Available Plugins" href="plugin-list.html"/>
     </menu>
+    <menu name="Developers">
+      <item name="Documentation Needed" href="docs-required.html"/>
+    </menu>
   </body>
 </project>

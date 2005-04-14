@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<document>
+  <properties>
+    <title>Documentation Required</title>
+    <author email="brett@apache.org">Brett Porter</author>
+  </properties>
+  <body>
+    <section name="Documentation Required">
+      <p>
+        This page lists some of the most pressing documentation needs. If you feel something is missing, please be sure
+        to let us know at the
+        <a href="/mail-lists.html">Maven Users Mailing List</a>.
+      </p>
+      <p style="font-size: larger; font-weight: bold">Documentation for users</p>
+      <ul>
+        <li>transitive dependencies</li>
+        <li>dependency scope</li>
+        <li>new SNAPSHOT handling -
+          <i>partially done on Brett's blog</i>
+        </li>
+        <li>deployment mechanism</li>
+        <li>build lifecycle documentation</li>
+      </ul>
+      <p style="font-size: larger; font-weight: bold">Documentation for plugin authors</p>
+      <ul>
+        <li>plugin architecture</li>
+      </ul>
+      <p style="font-size: larger; font-weight: bold">Documentation for Maven developers</p>
+      <ul>
+        <li>Lifecycle architecture</li>
+      </ul>
+    </section>
+  </body>
+</document>
+

@@ -141,10 +141,29 @@
         </li>
       </ul>
       <p>
-        <b>More coming soon - </b> we will continue to flesh out the documentation in the next week, so stay tuned,
-        and join the
+        <b>More coming soon - </b> we will continue to flesh out the documentation, so stay tuned, and join the
         <a href="/mail-lists.html">user's mailing list</a> if you have any questions.
       </p>
+      <subsection name="Developing Maven 2">
+        <p>
+          <b style="font-size: larger">Developers and Prospective Contributors</b>
+        </p>
+        <p>
+          There is plenty of work to be done. If you are interested in getting involved, the following may help:
+        </p>
+        <ul>
+          <li>
+            <i>How can I
+              <a href="about.html#get-involved">get involved</a>?
+            </i>
+          </li>
+          <li>
+            <i>What
+              <a href="docs-required.html">documentation is needed</a>?
+            </i>
+          </li>
+        </ul>
+      </subsection>
     </section>
   </body>
 </document>
