@@ -16,32 +16,25 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Goal;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.DefaultMavenProjectBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,7 +48,7 @@ import java.util.Map;
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
-    implements LifecycleExecutor, Initializable
+    implements LifecycleExecutor
 {
     // ----------------------------------------------------------------------
     // Components
@@ -70,9 +63,6 @@ public class DefaultLifecycleExecutor
     private PluginManager pluginManager;
 
     private List phases;
-
-    // TODO: remove
-    private Model superModel;
 
     // ----------------------------------------------------------------------
     //
@@ -190,20 +180,6 @@ public class DefaultLifecycleExecutor
                     }
                 }
                 project = project.getParent();
-            }
-
-            if ( plugin.getVersion() == null )
-            {
-                PluginManagement pluginManagement = superModel.getBuild().getPluginManagement();
-
-                if ( pluginManagement != null )
-                {
-                    Plugin management = findPlugin( pluginManagement.getPlugins(), groupId, artifactId );
-                    if ( management != null && management.getVersion() != null )
-                    {
-                        plugin.setVersion( management.getVersion() );
-                    }
-                }
             }
 
             if ( plugin.getVersion() == null )
@@ -454,11 +430,4 @@ public class DefaultLifecycleExecutor
         return phases;
     }
 
-    public void initialize()
-        throws Exception
-    {
-        // TODO: get rid of this and the interface...
-        URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" );
-        superModel = new MavenXpp3Reader().read( new InputStreamReader( url.openStream() ) );
-    }
 }

@@ -201,7 +201,7 @@ public class DefaultModelInheritanceAssembler
     private void assemblePluginManagementInheritance( Model child, Model parent )
     {
         Build parentBuild = parent.getBuild();
-        Build childBuild = parent.getBuild();
+        Build childBuild = child.getBuild();
 
         if ( childBuild == null )
         {
@@ -247,6 +247,11 @@ public class DefaultModelInheritanceAssembler
                         else
                         {
                             Plugin childPlugin = (Plugin) mappedChildPlugins.get( constructPluginKey( plugin ) );
+
+                            if ( childPlugin.getVersion() == null )
+                            {
+                                childPlugin.setVersion( childPlugin.getVersion() );
+                            }
 
                             Map mappedChildGoals = new TreeMap();
                             for ( Iterator itGoals = childPlugin.getGoals().iterator(); itGoals.hasNext(); )
