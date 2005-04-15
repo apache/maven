@@ -147,8 +147,10 @@ public class PluginDescriptorBuilder
 
             parameter.setDescription( d.getChild( "description" ).getValue() );
 
+            // TODO: remove
             parameter.setExpression( d.getChild( "expression" ).getValue() );
 
+            // TODO: remove
             parameter.setDefaultValue( d.getChild( "default" ).getValue() );
 
             parameters.add( parameter );
@@ -157,6 +159,12 @@ public class PluginDescriptorBuilder
         mojo.setParameters( parameters );
 
         // TODO: this should not need to be handed off...
+
+        // ----------------------------------------------------------------------
+        // Configuration
+        // ----------------------------------------------------------------------
+
+        mojo.setConfiguration( c.getChild( "configuration" ) );
 
         // ----------------------------------------------------------------------
         // Requirements

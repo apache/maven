@@ -106,8 +106,6 @@ public class PluginDescriptorGeneratorTest
 
     private void checkParameter( Parameter parameter )
     {
-        assertEquals( "value", parameter.getDefaultValue() );
-        assertEquals( "#project.build.directory", parameter.getExpression() );
         assertEquals( "dir", parameter.getName() );
         assertEquals( "String", parameter.getType() );
         assertTrue( parameter.isRequired() );

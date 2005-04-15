@@ -46,7 +46,7 @@ import java.io.File;
  * type="String"
  * required="false"
  * validator=""
- * expression="#maven.ejb.generateclient"
+ * expression=""
  * default="false"
  * description=""
  * @parameter name="outputDirectory"

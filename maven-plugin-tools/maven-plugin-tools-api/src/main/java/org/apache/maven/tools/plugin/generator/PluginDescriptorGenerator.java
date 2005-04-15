@@ -27,8 +27,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -162,6 +164,7 @@ public class PluginDescriptorGenerator
         w.startElement( "parameters" );
 
         Collection requirements = new ArrayList();
+        Map configuration = new HashMap( parameters.size() );
         for ( int j = 0; j < parameters.size(); j++ )
         {
             Parameter parameter = (Parameter) parameters.get( j );
@@ -174,6 +177,7 @@ public class PluginDescriptorGenerator
 
             element( w, "validator", parameter.getValidator() );
 
+            String value = null;
             if ( parameter.getExpression().startsWith( "#component" ) )
             {
                 requirements.add( parameter );
@@ -182,17 +186,53 @@ public class PluginDescriptorGenerator
             {
                 element( w, "required", Boolean.toString( parameter.isRequired() ) );
 
-                element( w, "expression", parameter.getExpression() );
+                value = parameter.getExpression();
             }
 
             element( w, "description", parameter.getDescription() );
 
-            element( w, "default", parameter.getDefaultValue() );
+            if ( value == null || value.length() == 0 )
+            {
+                value = parameter.getDefaultValue();
+            }
+
+            if ( value != null && value.length() > 0 )
+            {
+                configuration.put( parameter, value );
+            }
 
             w.endElement();
         }
 
         w.endElement();
+
+        // ----------------------------------------------------------------------
+        // Coinfiguration
+        // ----------------------------------------------------------------------
+
+        if ( !configuration.isEmpty() )
+        {
+            w.startElement( "configuration" );
+
+            for ( Iterator i = configuration.keySet().iterator(); i.hasNext(); )
+            {
+                Parameter parameter = (Parameter) i.next();
+
+                w.startElement( parameter.getName() );
+
+                String type = convertType( parameter.getType() );
+                if ( type != null )
+                {
+                    w.addAttribute( "implementation", type );
+                }
+
+                w.writeText( (String) configuration.get( parameter ) );
+
+                w.endElement();
+            }
+
+            w.endElement();
+        }
 
         // ----------------------------------------------------------------------
         // Requirements
@@ -223,6 +263,35 @@ public class PluginDescriptorGenerator
         // ----------------------------------------------------------------------
 
         w.endElement();
+    }
+
+    /**
+     * @param type
+     * @return
+     * @deprecated - should force proper class specification
+     */
+    private static String convertType( String type )
+    {
+        if ( "String".equals( type ) )
+        {
+            return "java.lang.String";
+        }
+        else if ( "File".equals( type ) )
+        {
+            return "java.io.File";
+        }
+        else if ( "List".equals( type ) )
+        {
+            return "java.util.List";
+        }
+        else if ( "".equals( type ) )
+        {
+            return null;
+        }
+        else
+        {
+            return type;
+        }
     }
 
     public void element( XMLWriter w, String name, String value )

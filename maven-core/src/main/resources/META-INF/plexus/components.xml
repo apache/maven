@@ -232,6 +232,12 @@
         <!-- END SNIPPET: lifecycle -->
       </configuration>
     </component>
+
+    <component>
+      <role>org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator</role>
+      <implementation>org.apache.maven.</implementation>
+    </component>
+
     <!-- ********************* FIXME *******************************************
      | I realize this is duplicated but allows the project builder to work by itself
      -->

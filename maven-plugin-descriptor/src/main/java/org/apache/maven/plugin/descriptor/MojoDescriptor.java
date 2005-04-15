@@ -17,6 +17,7 @@ package org.apache.maven.plugin.descriptor;
  */
 
 import org.codehaus.plexus.component.repository.ComponentRequirement;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,6 +68,8 @@ public class MojoDescriptor
     private boolean requiresProject = true;
 
     private String language = DEFAULT_LANGUAGE;
+
+    private PlexusConfiguration configuration;
 
     // ----------------------------------------------------------------------
     //
@@ -229,5 +232,15 @@ public class MojoDescriptor
     public void addRequirement( ComponentRequirement cr )
     {
         getRequirements().add( cr );
+    }
+
+    public void setConfiguration( PlexusConfiguration configuration )
+    {
+        this.configuration = configuration;
+    }
+
+    public PlexusConfiguration getConfiguration()
+    {
+        return configuration;
     }
 }

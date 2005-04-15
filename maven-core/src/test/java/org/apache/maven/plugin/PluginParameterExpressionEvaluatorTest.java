@@ -11,6 +11,7 @@ import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.MavenSettings;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 
 import java.io.File;
 import java.util.Collections;
@@ -25,7 +26,8 @@ public class PluginParameterExpressionEvaluatorTest
 {
     private MavenProject project;
 
-    protected void setUp() throws Exception
+    protected void setUp()
+        throws Exception
     {
         super.setUp();
 
@@ -34,7 +36,8 @@ public class PluginParameterExpressionEvaluatorTest
         project = getProject( f );
     }
 
-    public void testValueExtractionWithAPomValueContainingAPath() throws Exception
+    public void testValueExtractionWithAPomValueContainingAPath()
+        throws Exception
     {
         String expected = getTestFile( "target/test-classes/target/classes" ).getCanonicalPath();
 
@@ -59,7 +62,8 @@ public class PluginParameterExpressionEvaluatorTest
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
-        Object value = PluginParameterExpressionEvaluator.evaluate( "#project.build.directory/classes", session );
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+        Object value = expressionEvaluator.evaluate( "#project.build.directory/classes" );
 
         String actual = new File( value.toString() ).getCanonicalPath();
 
@@ -69,7 +73,8 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( expected, actual );
     }
 
-    public void testParameterThatIsAComponent() throws Exception
+    public void testParameterThatIsAComponent()
+        throws Exception
     {
         String role = "#component.org.apache.maven.project.MavenProjectBuilder";
 
@@ -85,12 +90,14 @@ public class PluginParameterExpressionEvaluatorTest
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
-        Object value = PluginParameterExpressionEvaluator.evaluate( role, session );
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+        Object value = expressionEvaluator.evaluate( role );
 
         assertNotNull( value );
     }
 
-    public void testLocalRepositoryExtraction() throws Exception
+    public void testLocalRepositoryExtraction()
+        throws Exception
     {
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
@@ -104,7 +111,8 @@ public class PluginParameterExpressionEvaluatorTest
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
-        Object value = PluginParameterExpressionEvaluator.evaluate( "#localRepository", session );
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+        Object value = expressionEvaluator.evaluate( "#localRepository" );
 
         assertEquals( "local", ( (ArtifactRepository) value ).getId() );
     }

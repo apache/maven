@@ -42,12 +42,13 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -392,19 +393,31 @@ public class DefaultPluginManager
                 configuration = new XmlPlexusConfiguration( dom );
             }
 
-            if ( newMojoTechnique )
-            {
-                Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session );
+            configuration = mergeConfiguration( configuration, mojoDescriptor.getConfiguration() );
 
-                populatePluginFields( plugin, configuration, map );
+            PluginParameterExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+            try
+            {
+                if ( newMojoTechnique )
+                {
+                    Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session,
+                                                                     expressionEvaluator );
+
+                    populatePluginFields( plugin, configuration, map, expressionEvaluator );
+                }
+                else
+                {
+                    getLogger().warn( "WARNING: The mojo " + mojoDescriptor.getId() + " is using the OLD API" );
+
+                    Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session,
+                                                                     expressionEvaluator );
+
+                    request = createPluginRequest( configuration, map );
+                }
             }
-            else
+            catch ( ExpressionEvaluationException e )
             {
-                getLogger().warn( "WARNING: The mojo " + mojoDescriptor.getId() + " is using the OLD API" );
-
-                Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session );
-
-                request = createPluginRequest( configuration, map );
+                throw new PluginExecutionException( "Unable to configure plugin", e );
             }
 
             // !! This is ripe for refactoring to an aspect.
@@ -436,7 +449,8 @@ public class DefaultPluginManager
         }
         catch ( PluginConfigurationException e )
         {
-            throw new PluginExecutionException( "Error configuring plugin for execution.", e );
+            String msg = "Error configuring plugin for execution of .";
+            throw new PluginExecutionException( msg, e );
         }
         catch ( ComponentLookupException e )
         {
@@ -446,8 +460,6 @@ public class DefaultPluginManager
         {
             try
             {
-                releaseComponents( mojoDescriptor, request );
-
                 container.release( plugin );
             }
             catch ( Exception e )
@@ -456,6 +468,48 @@ public class DefaultPluginManager
                 e.printStackTrace();
             }
         }
+    }
+
+    private PlexusConfiguration mergeConfiguration( PlexusConfiguration dominant, PlexusConfiguration configuration )
+    {
+        // TODO: share with mergeXpp3Dom
+        PlexusConfiguration[] children = configuration.getChildren();
+        for ( int i = 0; i < children.length; i++ )
+        {
+            PlexusConfiguration child = children[i];
+            PlexusConfiguration childDom = (XmlPlexusConfiguration) dominant.getChild( child.getName(), false );
+            if ( childDom != null )
+            {
+                mergeConfiguration( childDom, child );
+            }
+            else
+            {
+                dominant.addChild( copyConfiguration( child ) );
+            }
+        }
+        return dominant;
+    }
+
+    public static PlexusConfiguration copyConfiguration( PlexusConfiguration src )
+    {
+        // TODO: shouldn't be necessary
+        XmlPlexusConfiguration dom = new XmlPlexusConfiguration( src.getName() );
+        dom.setValue( src.getValue( null ) );
+
+        String[] attributeNames = src.getAttributeNames();
+        for ( int i = 0; i < attributeNames.length; i++ )
+        {
+            String attributeName = attributeNames[i];
+            dom.setAttribute( attributeName, src.getAttribute( attributeName, null ) );
+        }
+
+        PlexusConfiguration[] children = src.getChildren();
+        for ( int i = 0; i < children.length; i++ )
+        {
+            dom.addChild( copyConfiguration( children[i] ) );
+        }
+
+        return dom;
     }
 
     /**
@@ -482,61 +536,36 @@ public class DefaultPluginManager
         return newMojoTechnique;
     }
 
-    // TODO: don't throw Exception
-    private void releaseComponents( MojoDescriptor goal, PluginExecutionRequest request )
-        throws Exception
-    {
-        if ( request != null && request.getParameters() != null )
-        {
-            for ( Iterator iterator = goal.getParameters().iterator(); iterator.hasNext(); )
-            {
-                Parameter parameter = (Parameter) iterator.next();
-
-                String key = parameter.getName();
-
-                String expression = parameter.getExpression();
-
-                if ( expression != null && expression.startsWith( "#component" ) )
-                {
-                    Object component = request.getParameter( key );
-
-                    container.release( component );
-                }
-            }
-        }
-    }
-
     // ----------------------------------------------------------------------
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
 
+    /**
+     * @param configuration
+     * @param map
+     * @return
+     * @deprecated
+     */
     private static PluginExecutionRequest createPluginRequest( PlexusConfiguration configuration, Map map )
-        throws PluginConfigurationException
     {
-        try
+        Map parameters = new HashMap();
+        PlexusConfiguration[] children = configuration.getChildren();
+        for ( int i = 0; i < children.length; i++ )
         {
-            Map parameters = new HashMap();
-            PlexusConfiguration[] children = configuration.getChildren();
-            for ( int i = 0; i < children.length; i++ )
-            {
-                PlexusConfiguration child = children[i];
-                parameters.put( child.getName(), child.getValue() );
-            }
-            map = CollectionUtils.mergeMaps( map, parameters );
+            PlexusConfiguration child = children[i];
+            parameters.put( child.getName(), child.getValue( null ) );
         }
-        catch ( PlexusConfigurationException e )
-        {
-            throw new PluginConfigurationException( "Unable to construct map from plugin configuration", e );
-        }
+        map = CollectionUtils.mergeMaps( map, parameters );
         return new PluginExecutionRequest( map );
     }
 
-    private void populatePluginFields( Plugin plugin, PlexusConfiguration configuration, Map map )
+    private void populatePluginFields( Plugin plugin, PlexusConfiguration configuration, Map map,
+                                       ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
         try
         {
-            configurator.configureComponent( plugin, configuration );
+            configurator.configureComponent( plugin, configuration, expressionEvaluator );
         }
         catch ( ComponentConfigurationException e )
         {
@@ -544,7 +573,7 @@ public class DefaultPluginManager
         }
 
         // Configuration does not store objects, so the non-String fields are configured here
-        // TODO: we don't have converters, so "primitives" that -are- strings are not configured properly (eg String -> File from an expression)
+        // TODO: remove - this is for plugins built with alpha-1
         for ( Iterator i = map.keySet().iterator(); i.hasNext(); )
         {
             String key = (String) i.next();
@@ -602,9 +631,12 @@ public class DefaultPluginManager
         }
     }
 
+    /**
+     * @deprecated
+     */
     private Map getPluginConfigurationFromExpressions( MojoDescriptor goal, PlexusConfiguration configuration,
-                                                       MavenSession session )
-        throws PluginConfigurationException
+                                                       MavenSession session, ExpressionEvaluator expressionEvaluator )
+        throws ExpressionEvaluationException, PluginConfigurationException
     {
         List parameters = goal.getParameters();
 
@@ -616,49 +648,52 @@ public class DefaultPluginManager
 
             String key = parameter.getName();
 
+            String expression;
             if ( configuration.getChild( key, false ) == null )
             {
-                String expression = parameter.getExpression();
-
-                Object value = PluginParameterExpressionEvaluator.evaluate( expression, session );
-
-                getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
-
-                if ( value == null )
-                {
-                    if ( parameter.getDefaultValue() != null )
-                    {
-                        value = PluginParameterExpressionEvaluator.evaluate( parameter.getDefaultValue(), session );
-                    }
-                }
-
-                // ----------------------------------------------------------------------
-                // We will perform a basic check here for parameters values that are
-                // required. Required parameters can't be null so we throw an
-                // Exception in the case where they are. We probably want some
-                // pluggable
-                // mechanism here but this will catch the most obvious of
-                // misconfigurations.
-                // ----------------------------------------------------------------------
-
-                if ( value == null && parameter.isRequired() )
-                {
-                    throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
-                }
-
-                String type = parameter.getType();
-
-                // TODO: Not sure how we might find files that are nested in other objects... perhaps
-                //  we add a "needs translation" to the mojo so such types can be translated (implementing some interface) and
-                //  address their own file objects
-                if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
-                {
-                    value = pathTranslator.alignToBaseDirectory( (String) value,
-                                                                 session.getProject().getFile().getParentFile() );
-                }
-
-                map.put( key, value );
+                expression = parameter.getExpression();
             }
+            else
+            {
+                expression = configuration.getChild( key, false ).getValue( null );
+            }
+
+            Object value = expressionEvaluator.evaluate( expression );
+
+            getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
+
+            if ( value == null )
+            {
+                if ( parameter.getDefaultValue() != null )
+                {
+                    value = expressionEvaluator.evaluate( parameter.getDefaultValue() );
+                }
+            }
+
+            // ----------------------------------------------------------------------
+            // We will perform a basic check here for parameters values that are
+            // required. Required parameters can't be null so we throw an
+            // Exception in the case where they are. We probably want some
+            // pluggable
+            // mechanism here but this will catch the most obvious of
+            // misconfigurations.
+            // ----------------------------------------------------------------------
+
+            if ( value == null && parameter.isRequired() )
+            {
+                throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
+            }
+
+            String type = parameter.getType();
+
+            // TODO: remove - done via plexus configuration, but need to inject the base directory into it
+            if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
+            {
+                value = pathTranslator.alignToBaseDirectory( (String) value,
+                                                             session.getProject().getFile().getParentFile() );
+            }
+
+            map.put( key, value );
         }
         return map;
     }

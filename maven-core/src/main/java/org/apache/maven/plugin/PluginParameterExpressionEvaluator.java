@@ -1,35 +1,44 @@
 package org.apache.maven.plugin;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.util.introspection.ReflectionValueExtractor;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ * @todo belong in MavenSession, so it only gets created once?
  */
 public class PluginParameterExpressionEvaluator
+    implements ExpressionEvaluator
 {
-    public static Object evaluate( String expression, MavenSession context )
-        throws PluginConfigurationException
+    private final MavenSession context;
+
+    public PluginParameterExpressionEvaluator( MavenSession context )
+    {
+        this.context = context;
+    }
+
+    public Object evaluate( String expression )
+        throws ExpressionEvaluationException
     {
         Object value = null;
 
@@ -51,7 +60,7 @@ public class PluginParameterExpressionEvaluator
             }
             catch ( ComponentLookupException e )
             {
-                throw new PluginConfigurationException( "Cannot lookup component: " + role + ".", e );
+                throw new ExpressionEvaluationException( "Cannot lookup component: " + role + ".", e );
             }
         }
         else if ( expression.equals( "#localRepository" ) )
@@ -61,7 +70,7 @@ public class PluginParameterExpressionEvaluator
         else if ( expression.equals( "#maven.final.name" ) )
         {
             // TODO: remove this alias
-            value = context.getProject().getModel().getBuild().getFinalName();
+            value = context.getProject().getBuild().getFinalName();
         }
         else if ( expression.equals( "#project" ) )
         {
@@ -75,18 +84,20 @@ public class PluginParameterExpressionEvaluator
 
                 if ( pathSeparator > 0 )
                 {
-                    value = getValue( expression.substring( 1, pathSeparator ), context.getProject() ) +
-                        expression.substring( pathSeparator );
+                    String pathExpression = expression.substring( 1, pathSeparator );
+                    value = ReflectionValueExtractor.evaluate( pathExpression, context.getProject() );
+                    value = value + expression.substring( pathSeparator );
                 }
                 else
                 {
-                    value = getValue( expression.substring( 1 ), context.getProject() );
+                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), context.getProject() );
                 }
             }
             catch ( Exception e )
             {
-                throw new PluginConfigurationException( "Error evaluating plugin parameter expression: " + expression,
-                                                        e );
+                // TODO: don't catch exception
+                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
+                                                         e );
             }
         }
         else if ( "#settings".equals( expression ) )
@@ -128,12 +139,12 @@ public class PluginParameterExpressionEvaluator
 
             if ( sharpSeparator > 0 )
             {
-                val = val.substring( 0, sharpSeparator ) + evaluate( val.substring( sharpSeparator ), context );
+                val = val.substring( 0, sharpSeparator ) + evaluate( val.substring( sharpSeparator ) );
                 value = val;
             }
             else if ( sharpSeparator > 0 )
             {
-                value = evaluate( val.substring( sharpSeparator ), context );
+                value = evaluate( val.substring( sharpSeparator ) );
             }
         }
 
@@ -154,10 +165,5 @@ public class PluginParameterExpressionEvaluator
         return value;
     }
 
-    private static Object getValue( String expression, MavenProject project )
-        throws Exception
-    {
-        return ReflectionValueExtractor.evaluate( expression, project );
-    }
 }
 
