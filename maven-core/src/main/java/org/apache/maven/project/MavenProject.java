@@ -367,7 +367,15 @@ public class MavenProject
 
     public String getName()
     {
-        return model.getName();
+        // TODO: this should not be allowed to be null.
+        if ( model.getName() != null )
+        {
+            return model.getName();
+        }
+        else
+        {
+            return getId();
+        }
     }
 
     public void setVersion( String version )
