@@ -83,13 +83,13 @@
           </tr>
           <tr>
             <th>compile</th>
-            <td>compile</td>
+            <td>compile (*)</td>
             <td>runtime</td>
             <td>-</td>
           </tr>
           <tr>
             <th>runtime</th>
-            <td>compile (*)</td>
+            <td>runtime</td>
             <td>runtime</td>
             <td>-</td>
           </tr>
