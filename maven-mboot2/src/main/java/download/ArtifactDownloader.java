@@ -172,8 +172,8 @@ public class ArtifactDownloader
                     log( "Downloading " + metaUrl );
                     try
                     {
-                        HttpUtils.getFile( metaUrl, new File( filename ), ignoreErrors, useTimestamp, proxyHost,
-                                           proxyPort, proxyUserName, proxyPassword, false );
+                        HttpUtils.getFile( metaUrl, new File( filename ), ignoreErrors, false, proxyHost, proxyPort,
+                                           proxyUserName, proxyPassword, false );
                         String version = FileUtils.fileRead( filename );
                         log( "Resolved version: " + version );
                         version = version.substring( version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
