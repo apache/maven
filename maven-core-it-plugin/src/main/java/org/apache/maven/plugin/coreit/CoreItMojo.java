@@ -54,8 +54,7 @@ public class CoreItMojo
 {
     private String outputDirectory;
 
-    // TODO: should be a File, but plugin manager can't convert that from an expression yet
-    private String basedirAlignmentDirectory;
+    private File basedirAlignmentDirectory;
 
     private String pluginItem;
 
@@ -68,8 +67,13 @@ public class CoreItMojo
 
         // This parameter should be aligned to the basedir as the parameter type is specified
         // as java.io.File
+
+        if ( basedirAlignmentDirectory.getPath().equals( "target/test-basedir-alignment" ) )
+        {
+            throw new PluginExecutionException( "basedirAlignmentDirectory not aligned" );
+        }
         
-        touch( new File( basedirAlignmentDirectory ), "touch.txt" );
+        touch( basedirAlignmentDirectory, "touch.txt" );
 
         // Test parameter setting
         if ( pluginItem != null )
