@@ -67,9 +67,8 @@ public class HttpUtils
                 {
                     protected PasswordAuthentication getPasswordAuthentication()
                     {
-                        return new PasswordAuthentication( proxyUserName,
-                                                           proxyPassword == null
-                                                           ? new char[0] : proxyPassword.toCharArray() );
+                        return new PasswordAuthentication( proxyUserName, proxyPassword == null
+                                                                          ? new char[0] : proxyPassword.toCharArray() );
                     }
                 } );
             }
@@ -210,7 +209,7 @@ public class HttpUtils
             connection.setRequestProperty( "Authorization", "Basic " + encoding );
         }
 
-        connection.setUseCaches( false );
+        connection.setRequestProperty( "Pragma", "no-cache" );
 
         //connect to the remote site (may take some time)
         connection.connect();
@@ -223,10 +222,9 @@ public class HttpUtils
             // test for 404 ourselves, and throw FileNotFoundException as needed
             if ( httpConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND )
             {
-                throw new FileNotFoundException(
-                    url.toString() + " (HTTP Error: " + httpConnection.getResponseCode() + " " +
-                    httpConnection.getResponseMessage() +
-                    ")" );
+                throw new FileNotFoundException( url.toString() + " (HTTP Error: " + httpConnection.getResponseCode() +
+                                                 " " +
+                                                 httpConnection.getResponseMessage() + ")" );
             }
             if ( httpConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED )
             {
