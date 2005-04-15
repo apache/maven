@@ -46,6 +46,13 @@ public class CoreIt0013Mojo
     {
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
 
+        if ( outputDirectory == null || outputDirectory.length() == 0 )
+        {
+            throw new Exception( "outputDirectory must be specified" );
+        }
+
+        getLog().info( "outputDirectory = " + outputDirectory );
+
         File f = new File( outputDirectory );
         
         if ( !f.exists() )
