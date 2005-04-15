@@ -1092,7 +1092,7 @@
           <name>scope</name>
           <version>4.0.0</version>
           <description>
-            The scope of the dependency - build, compile, test, runtime. Used to
+            The scope of the dependency - compile, runtime, test. Used to
             calculate the various classpaths used for testing, etc. and for 
             determining which artifacts to include in a distribution of this
             project.

@@ -10,6 +10,11 @@
         to build any project that requires Maven 2.0. It assumed that you have already
         <a href="download.html">Downloaded and Installed</a> a Maven 2.0 release.
       </p>
+      <p>
+        If you are behind a proxy, make sure that you've read
+        <a href="configuration.html">Configuring Maven</a> first
+        for instructions on how to configure your proxy.
+      </p>
       <subsection name="Creating a Project Skeleton">
         <p>
           The first step is to create a Maven 2.0 project to work on. Run the following command:
@@ -249,7 +254,8 @@ m2 archetype:create
         </p>
         <source>m2 clean:clean install</source>
         <p>
-          <b>Note: </b> If you didn't remove the <code>warName</code> plugin configuration, this will have
+          <b>Note: </b> If you didn't remove the
+          <code>warName</code> plugin configuration, this will have
           failed due to a bug. Please remove that section, and try again.
         </p>
         <p>

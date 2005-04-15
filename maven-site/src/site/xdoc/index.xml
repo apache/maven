@@ -127,6 +127,11 @@
             <a href="configuration.html">Configuring Maven</a>
           </i>
         </li>
+        <li>
+          <i>
+            <a href="dependencies.html">Dependency Mechanism</a>
+          </i>
+        </li>
         <!-- TODO
                 <li>
                   <i>

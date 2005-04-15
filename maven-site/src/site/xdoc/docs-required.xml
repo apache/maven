@@ -13,13 +13,14 @@
       </p>
       <p style="font-size: larger; font-weight: bold">Documentation for users</p>
       <ul>
-        <li>transitive dependencies</li>
-        <li>dependency scope</li>
         <li>new SNAPSHOT handling -
           <i>partially done on Brett's blog</i>
         </li>
         <li>deployment mechanism</li>
         <li>build lifecycle documentation</li>
+        <li>dependency management</li>
+        <li>plugin management</li>
+        <li>plugin configuration</li>
       </ul>
       <p style="font-size: larger; font-weight: bold">Documentation for plugin authors</p>
       <ul>
