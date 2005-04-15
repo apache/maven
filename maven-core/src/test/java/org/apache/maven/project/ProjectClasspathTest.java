@@ -66,14 +66,11 @@ public class ProjectClasspathTest
         artifact = getArtifact( project, "maven-test-test", "scope-test" );
         assertNull( "Check no test dependencies are transitive", artifact );
         artifact = getArtifact( project, "maven-test-test", "scope-compile" );
-//        assertEquals( "Check scope", "test", artifact.getScope() );
-        assertNull( "Check no test dependencies are transitive", artifact );
+        assertEquals( "Check scope", "test", artifact.getScope() );
         artifact = getArtifact( project, "maven-test-test", "scope-default" );
-//        assertEquals( "Check scope", "test", artifact.getScope() );
-        assertNull( "Check no test dependencies are transitive", artifact );
+        assertEquals( "Check scope", "test", artifact.getScope() );
         artifact = getArtifact( project, "maven-test-test", "scope-runtime" );
-//        assertEquals( "Check scope", "test", artifact.getScope() );
-        assertNull( "Check no test dependencies are transitive", artifact );
+        assertEquals( "Check scope", "test", artifact.getScope() );
 
         // check all transitive deps of a runtime dependency are runtime scope, except for test
         checkGroupIdScope( project, "runtime", "runtime" );
@@ -92,7 +89,7 @@ public class ProjectClasspathTest
         artifact = getArtifact( project, groupId, "scope-compile" );
         assertEquals( "Check scope", scopeValue, artifact.getScope() );
         artifact = getArtifact( project, groupId, "scope-test" );
-        assertEquals( "Check scope", "test", artifact.getScope() );
+        assertNull( "Check test dependency is not transitive", artifact );
         artifact = getArtifact( project, groupId, "scope-default" );
         assertEquals( "Check scope", scopeValue, artifact.getScope() );
         artifact = getArtifact( project, groupId, "scope-runtime" );

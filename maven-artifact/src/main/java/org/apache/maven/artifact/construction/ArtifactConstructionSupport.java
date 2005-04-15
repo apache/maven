@@ -47,17 +47,14 @@ public class ArtifactConstructionSupport
     {
         // TODO: can refactor, use scope handler
 
-        // re-instate this if test deps are propogated
-//        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) && Artifact.SCOPE_TEST.equals( scope ) )
-        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
+        String desiredScope = Artifact.SCOPE_RUNTIME;
+        if ( inheritedScope == null )
+        {
+            desiredScope = scope;
+        }
+        else if ( Artifact.SCOPE_TEST.equals( scope ) )
         {
             return null;
-        }
-
-        String desiredScope = Artifact.SCOPE_RUNTIME;
-        if ( Artifact.SCOPE_COMPILE.equals( scope ) && inheritedScope == null )
-        {
-            desiredScope = Artifact.SCOPE_COMPILE;
         }
 
         // vvv added to retain compile scope. Remove if you want compile inherited as runtime
@@ -67,9 +64,7 @@ public class ArtifactConstructionSupport
         }
         // ^^^ added to retain compile scope. Remove if you want compile inherited as runtime
 
-        // re-instate this if test deps are propogated
-//        if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_TEST.equals( inheritedScope ) )
-        if ( Artifact.SCOPE_TEST.equals( scope ) )
+        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
         {
             desiredScope = Artifact.SCOPE_TEST;
         }
