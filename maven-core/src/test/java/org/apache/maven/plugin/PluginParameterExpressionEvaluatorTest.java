@@ -62,7 +62,7 @@ public class PluginParameterExpressionEvaluatorTest
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
         Object value = expressionEvaluator.evaluate( "#project.build.directory/classes" );
 
         String actual = new File( value.toString() ).getCanonicalPath();
@@ -90,7 +90,7 @@ public class PluginParameterExpressionEvaluatorTest
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
         Object value = expressionEvaluator.evaluate( role );
 
         assertNotNull( value );
@@ -111,7 +111,7 @@ public class PluginParameterExpressionEvaluatorTest
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
         Object value = expressionEvaluator.evaluate( "#localRepository" );
 
         assertEquals( "local", ( (ArtifactRepository) value ).getId() );

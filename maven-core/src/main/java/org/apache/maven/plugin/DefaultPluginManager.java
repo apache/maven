@@ -395,7 +395,7 @@ public class DefaultPluginManager
 
             configuration = mergeConfiguration( configuration, mojoDescriptor.getConfiguration() );
 
-            PluginParameterExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator );
             try
             {
                 if ( newMojoTechnique )
@@ -577,6 +577,12 @@ public class DefaultPluginManager
         for ( Iterator i = map.keySet().iterator(); i.hasNext(); )
         {
             String key = (String) i.next();
+
+            if ( configuration.getChild( key ) != null )
+            {
+                continue;
+            }
+
             Object value = map.get( key );
 
             if ( value != null )
@@ -682,15 +688,6 @@ public class DefaultPluginManager
             if ( value == null && parameter.isRequired() )
             {
                 throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter ) );
-            }
-
-            String type = parameter.getType();
-
-            // TODO: remove - done via plexus configuration, but need to inject the base directory into it
-            if ( type != null && ( type.equals( "File" ) || type.equals( "java.io.File" ) ) )
-            {
-                value = pathTranslator.alignToBaseDirectory( (String) value,
-                                                             session.getProject().getFile().getParentFile() );
             }
 
             map.put( key, value );

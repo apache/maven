@@ -17,10 +17,13 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -30,11 +33,14 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public class PluginParameterExpressionEvaluator
     implements ExpressionEvaluator
 {
+    private final PathTranslator pathTranslator;
+
     private final MavenSession context;
 
-    public PluginParameterExpressionEvaluator( MavenSession context )
+    public PluginParameterExpressionEvaluator( MavenSession context, PathTranslator pathTranslator )
     {
         this.context = context;
+        this.pathTranslator = pathTranslator;
     }
 
     public Object evaluate( String expression )
@@ -163,6 +169,12 @@ public class PluginParameterExpressionEvaluator
         }
 
         return value;
+    }
+
+    public File alignToBaseDirectory( File file )
+    {
+        File basedir = context.getProject().getFile().getParentFile();
+        return new File( pathTranslator.alignToBaseDirectory( file.getPath(), basedir ) );
     }
 
 }
