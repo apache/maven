@@ -210,7 +210,7 @@ public class HttpUtils
             connection.setRequestProperty( "Authorization", "Basic " + encoding );
         }
 
-        connection.setUseCaches( timestamp >= 0 );
+        connection.setUseCaches( false );
 
         //connect to the remote site (may take some time)
         connection.connect();
