@@ -56,6 +56,17 @@
       </roles>
       <timezone>+10</timezone>
     </developer>
+    <developer>
+      <id>evenisse</id>
+      <name>Emmanuel Venisse</name>
+      <email>evenisse@apache.org</email>
+      <organization>ASF</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>PMC Member</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
   <dependencies>
     <dependency>
