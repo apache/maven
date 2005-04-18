@@ -1,0 +1,34 @@
+<assembly>
+  <!-- TODO: a jarjar format would be better -->
+  <id>dep</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <!-- TODO: use expressions instead: ${project.build.directory}, ${project.build.finalName}, or have a <build /> tag to include the built artifact -->
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <scope>runtime</scope>
+      <excludes>
+        <exclude>junit:junit</exclude>
+        <exclude>ant:ant</exclude>
+        <exclude>marmalade:marmalade-core</exclude>
+        <exclude>plexus:plexus-marmalade-factory</exclude>
+        <exclude>commons-cli:commons-cli</exclude>
+        <exclude>plexus:plexus-container-artifact</exclude>
+        <exclude>plexus:plexus-i18n</exclude>
+        <exclude>org.apache.maven:maven-script-marmalade</exclude>
+        <exclude>org.apache.maven:maven-plugin</exclude>
+        <exclude>org.apache.maven:maven-monitor</exclude>
+      </excludes>
+    </dependencySet>
+  </dependencySets>
+</assembly>

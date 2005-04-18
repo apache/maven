@@ -1,5 +1,7 @@
 package org.apache.maven.artifact.ant;
 
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -17,35 +19,12 @@ package org.apache.maven.artifact.ant;
  */
 
 /**
- * Remote repository type.
+ * Ant Wrapper for wagon authentication.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class RemoteRepository
-    extends Repository
+public class Authentication
+    extends AuthenticationInfo
 {
-    private String url;
-
-    private Authentication authentication;
-
-    public String getUrl()
-    {
-        return ( (RemoteRepository) getInstance() ).url;
-    }
-
-    public void setUrl( String url )
-    {
-        this.url = url;
-    }
-
-    public Authentication getAuthentication()
-    {
-        return authentication;
-    }
-
-    public void addAuthentication( Authentication authentication )
-    {
-        this.authentication = authentication;
-    }
 }

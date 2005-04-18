@@ -36,19 +36,16 @@ public abstract class AbstractArtifactTask
 
     protected ArtifactRepository createArtifactRepository( LocalRepository repository )
     {
-        return createArtifactRepository( "local", "file://" + repository.getLocation(), repository.getLayout() );
+        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                       repository.getLayout() );
+        return new ArtifactRepository( "local", "file://" + repository.getLocation(), repositoryLayout );
     }
 
     protected ArtifactRepository createArtifactRepository( RemoteRepository repository )
     {
-        return createArtifactRepository( "remote", repository.getUrl(), repository.getLayout() );
-    }
-
-    private ArtifactRepository createArtifactRepository( String id, String url, String layout )
-    {
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                       layout );
-        return new ArtifactRepository( id, url, repositoryLayout );
+                                                                                       repository.getLayout() );
+        return new ArtifactRepository( "remote", repository.getUrl(), repository.getAuthentication(), repositoryLayout );
     }
 
     protected Object lookup( String role )

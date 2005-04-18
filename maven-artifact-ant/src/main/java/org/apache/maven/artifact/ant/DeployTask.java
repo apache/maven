@@ -18,12 +18,11 @@ package org.apache.maven.artifact.ant;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
+import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.MavenMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.tools.ant.BuildException;
 
@@ -63,6 +62,7 @@ public class DeployTask
             artifact.addMetadata( metadata );
         }
 
+        log( "Deploying to " + remoteRepository.getUrl() );
         ArtifactDeployer deployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
         try
         {
