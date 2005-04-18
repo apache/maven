@@ -22,7 +22,7 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -59,10 +59,10 @@ public class MavenSession
 
     private Log log;
 
-    private final MavenSettings settings;
+    private final Settings settings;
 
     public MavenSession( MavenProject project, PlexusContainer container, PluginManager pluginManager,
-                        MavenSettings settings, ArtifactRepository localRepository, EventDispatcher eventDispatcher,
+                        Settings settings, ArtifactRepository localRepository, EventDispatcher eventDispatcher,
                         Log log, List goals )
     {
         this.project = project;
@@ -138,7 +138,7 @@ public class MavenSession
         return log;
     }
 
-    public MavenSettings getSettings()
+    public Settings getSettings()
     {
         return settings;
     }

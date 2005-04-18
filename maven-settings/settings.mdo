@@ -17,7 +17,8 @@
       <version>1.0.0</version>
       <description>Root element of the user configuration file.</description>
       <fields>
-        <field>
+        <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
+        <!-- field>
           <name>jdks</name>
           <version>1.0.0</version>
           <description><![CDATA[
@@ -31,7 +32,7 @@
             <type>Jdk</type>
             <multiplicity>*</multiplicity>
           </association>
-        </field>
+        </field -->
         <field>
           <name>proxies</name>
           <version>1.0.0</version>
@@ -77,10 +78,113 @@
           </association>
         </field>
       </fields>
-      <codeSegments/>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    private Profile activeProfile;
+    private Proxy activeProxy;
+    
+    public synchronized void initializeActiveProfile(String localRepository)
+    {
+        if(getActiveProfile() == null)
+        {
+          Profile profile = new Profile();
+          profile.setLocalRepository(localRepository);
+          profile.setActive(true);
+          
+          addProfile(profile);
+          activeProfile = profile;
+        }
+    }
+    
+    public synchronized Profile getActiveProfile()
+    {
+        if(activeProfile == null)
+        {
+            List profiles = getProfiles();
+            if ( profiles != null && !profiles.isEmpty() )
+            {
+                if ( profiles.size() > 1 )
+                {
+                    for ( Iterator it = profiles.iterator(); it.hasNext(); )
+                    {
+                        Profile profile = (Profile) it.next();
+                        if ( profile.isActive() )
+                        {
+                            activeProfile = profile;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // If we only have one profile, use it as the active one.
+                    activeProfile = (Profile) profiles.get( 0 );
+                }
+            }
+        }
+        
+        return activeProfile;
+    }
+
+    public synchronized Proxy getActiveProxy()
+    {
+        if(activeProxy == null)
+        {
+            List proxies = getProxies();
+            if ( proxies != null && !proxies.isEmpty() )
+            {
+                if ( proxies.size() > 1 )
+                {
+                    for ( Iterator it = proxies.iterator(); it.hasNext(); )
+                    {
+                        Proxy proxy = (Proxy) it.next();
+                        if ( proxy.isActive() )
+                        {
+                            activeProxy = proxy;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // If we only have one proxy, use it as the active one.
+                    activeProxy = (Proxy) proxies.get( 0 );
+                }
+            }
+        }
+
+        return activeProxy;
+    }
+    
+    public Server getServer( String serverId )
+    {
+        Server match = null;
+
+        List servers = getServers();
+        if ( servers != null && serverId != null )
+        {
+            for ( Iterator it = servers.iterator(); it.hasNext(); )
+            {
+                Server server = (Server) it.next();
+                if ( serverId.equals( server.getId() ) )
+                {
+                    match = server;
+                    break;
+                }
+            }
+        }
+
+        return match;
+    }
+        ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
-    <class>
+    <!-- [JC] Commenting out until we're ready to use it... -->
+    <!-- class>
       <name>Jdk</name>
       <version>1.0.0</version>
       <description><![CDATA[Describes one Java environment]]></description>
@@ -108,7 +212,7 @@
           <type>String</type>
         </field>
       </fields>
-    </class>
+    </class -->
     <class>
       <name>Proxy</name>
       <version>1.0.0</version>
@@ -226,12 +330,21 @@
           <description><![CDATA[The local repository.]]></description>
           <type>String</type>
         </field>
-        <field>
+        <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
+        <!-- field>
           <name>passwordStore</name>
           <version>1.0.0</version>
-          <required>true</required>
+          <required>false</required>
           <description><![CDATA[The keystore used to store passwords.]]></description>
           <type>String</type>
+        </field -->
+        <field>
+          <name>offline</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <description><![CDATA[Indicate whether maven should operate in offline mode full-time.]]></description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
         </field>
       </fields>
     </class>

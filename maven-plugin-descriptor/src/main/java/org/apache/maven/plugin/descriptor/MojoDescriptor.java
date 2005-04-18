@@ -66,6 +66,8 @@ public class MojoDescriptor
     private String requiresDependencyResolution = null;
 
     private boolean requiresProject = true;
+    
+    private boolean requiresOnline = false;
 
     private String language = DEFAULT_LANGUAGE;
 
@@ -178,6 +180,28 @@ public class MojoDescriptor
     public boolean isRequiresProject()
     {
         return requiresProject;
+    }
+
+    // ----------------------------------------------------------------------
+    // Online vs. Offline requirement
+    // ----------------------------------------------------------------------
+
+    public void setRequiresOnline( boolean requiresOnline )
+    {
+        this.requiresOnline = requiresOnline;
+    }
+
+    // blech! this isn't even intelligible as a method name. provided for 
+    // consistency...
+    public boolean isRequiresOnline()
+    {
+        return requiresOnline;
+    }
+
+    // more english-friendly method...keep the code clean! :)
+    public boolean requiresOnline()
+    {
+        return requiresOnline;
     }
 
     public void setRequirements( List requirements )

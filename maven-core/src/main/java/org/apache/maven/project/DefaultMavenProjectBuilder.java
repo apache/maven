@@ -39,8 +39,8 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.apache.maven.settings.MavenSettings;
 import org.apache.maven.settings.MavenSettingsBuilder;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -125,6 +125,19 @@ public class DefaultMavenProjectBuilder
 
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
+        
+        Settings settings = null;
+        
+        try
+        {
+            settings = mavenSettingsBuilder.buildSettings();
+        }
+        catch ( Exception e )
+        {
+            throw new ProjectBuildingException( "Cannot read settings.", e );
+        }
+        
+        boolean systemOnline = !settings.getActiveProfile().isOffline();
 
         MavenProject project = build( model, localRepository, resolveDependencies );
 
@@ -146,6 +159,17 @@ public class DefaultMavenProjectBuilder
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+        Settings settings = null;
+        
+        try
+        {
+            settings = mavenSettingsBuilder.buildSettings();
+        }
+        catch ( Exception e )
+        {
+            throw new ProjectBuildingException( "Cannot read settings.", e );
+        }
+        
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         return build( model, localRepository, false );
@@ -279,6 +303,16 @@ public class DefaultMavenProjectBuilder
 
         if ( resolveDependencies )
         {
+            Settings settings;
+            try
+            {
+                settings = mavenSettingsBuilder.buildSettings();
+            }
+            catch ( Exception e )
+            {
+                throw new ProjectBuildingException( "Cannot read settings.", e );
+            }
+            
             MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
@@ -350,7 +384,7 @@ public class DefaultMavenProjectBuilder
     private List buildArtifactRepositories( List repositories )
         throws ProjectBuildingException
     {
-        MavenSettings settings = null;
+        Settings settings = null;
 
         try
         {
@@ -398,7 +432,7 @@ public class DefaultMavenProjectBuilder
     {
         List remotePluginRepositories = new ArrayList();
 
-        MavenSettings settings = mavenSettingsBuilder.buildSettings();
+        Settings settings = mavenSettingsBuilder.buildSettings();
 
         for ( Iterator it = pluginRepositories.iterator(); it.hasNext(); )
         {
@@ -438,7 +472,7 @@ public class DefaultMavenProjectBuilder
             return null;
         }
 
-        MavenSettings settings = mavenSettingsBuilder.buildSettings();
+        Settings settings = mavenSettingsBuilder.buildSettings();
 
         String repoLayoutId = dmRepo.getLayout();
 

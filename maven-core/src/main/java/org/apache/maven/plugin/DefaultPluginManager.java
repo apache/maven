@@ -741,6 +741,8 @@ public class DefaultPluginManager
 
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
+        boolean systemOnline = !context.getSettings().getActiveProfile().isOffline();
+        
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
                                                                                 context.getRemoteRepositories(),
                                                                                 context.getLocalRepository(),

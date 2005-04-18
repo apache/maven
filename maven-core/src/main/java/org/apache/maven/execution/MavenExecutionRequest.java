@@ -21,7 +21,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.monitor.logging.Log;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Settings;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public interface MavenExecutionRequest
 
     EventDispatcher getEventDispatcher();
 
-    MavenSettings getSettings();
+    Settings getSettings();
 
     String getBaseDirectory();
 

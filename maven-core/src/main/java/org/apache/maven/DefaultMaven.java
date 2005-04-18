@@ -32,7 +32,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.ReactorException;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -76,6 +76,8 @@ public class DefaultMaven
     protected PlexusContainer container;
 
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
+    
+    protected WagonManager wagonManager;
 
     // ----------------------------------------------------------------------
     // Project execution
@@ -87,12 +89,18 @@ public class DefaultMaven
         {
             throw new ReactorException( "You must specify at least one goal. Try 'install'." );
         }
+        
+        if( request.getSettings().getActiveProfile().isOffline() )
+        {
+            getLogger().info( "Maven is running in offline mode." );
+        }
 
         EventDispatcher dispatcher = request.getEventDispatcher();
         String event = MavenEvents.REACTOR_EXECUTION;
 
         // TODO: goals are outer loop
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
+        
         try
         {
             List projects;
@@ -285,12 +293,15 @@ public class DefaultMaven
     /**
      * @todo [BP] this might not be required if there is a better way to pass
      * them in. It doesn't feel quite right.
+     * 
+     * @todo [JC] we should at least provide a mapping of protocol-to-proxy for
+     * the wagons, shouldn't we?
      */
     private void resolveParameters( MavenExecutionRequest request ) throws ComponentLookupException
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
-        MavenSettings settings = request.getSettings();
+        Settings settings = request.getSettings();
 
         Proxy proxy = settings.getActiveProxy();
 

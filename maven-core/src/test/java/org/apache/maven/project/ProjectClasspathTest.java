@@ -30,12 +30,12 @@ public class ProjectClasspathTest
     extends MavenTestCase
 {
 
-    private String dir = "src/test/resources/projects/scope/";
+    private String dir = "projects/scope/";
 
     public void testProjectClasspath()
         throws Exception
     {
-        File f = getTestFile( dir + "project-with-scoped-dependencies.xml" );
+        File f = getFileForClasspathResource( dir + "project-with-scoped-dependencies.xml" );
 
         // XXX: Because this test fails, we resort to crude reflection hacks, see PLX-108 for the solution
 //        assertEquals( ProjectClasspathArtifactResolver.class, getContainer().lookup( ArtifactResolver.ROLE ).getClass() );

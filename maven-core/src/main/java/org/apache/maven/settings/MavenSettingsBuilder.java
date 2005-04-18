@@ -25,6 +25,6 @@ public interface MavenSettingsBuilder
     String ROLE = MavenSettingsBuilder.class.getName();
 
     // TODO: Don't throw Exception.
-    MavenSettings buildSettings()
+    Settings buildSettings()
         throws Exception;
 }

@@ -123,7 +123,9 @@ Offline Mode Design
 
     It is not possible to determine whether a file-based location will
     be available except on a case-by-case basis (or a root-url by
-    root-url basis).
+    root-url basis). We may want to move the offline sensitivity entirely to
+    Maven-Artifact, below, so we can be smarter about testing filesystem-based
+    repositories, etc.
 
   * If not otherwise specified, all other wagons are assumed to be
     remote-only, and are therefore sensitive to offline mode.
@@ -131,6 +133,12 @@ Offline Mode Design
 ** Maven-Artifact
 
   This is wholly dependent on Maven-Wagon, above.
+  
+  We could possibly use a flag on a particular Wagon to see whether it supports
+  offline mode, and then test to see if the file-based basedir for an aritfact
+  repository works...if it doesn't work, we can mark that repository offline...
+  
+  OTOH, all offline-mode checks can probably be run from Wagon-based APIs.
 
 ** Maven-SCM
 

@@ -21,7 +21,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.monitor.logging.Log;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Settings;
 
 import java.util.List;
 
@@ -47,13 +47,13 @@ public class DefaultMavenExecutionRequest
 
     private final EventDispatcher eventDispatcher;
 
-    private final MavenSettings settings;
+    private final Settings settings;
 
     private final String baseDirectory;
 
     private boolean recursive = true;
 
-    public DefaultMavenExecutionRequest( ArtifactRepository localRepository, MavenSettings settings,
+    public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
                                          EventDispatcher eventDispatcher, List goals, List files, String baseDirectory )
     {
         this.localRepository = localRepository;
@@ -69,7 +69,7 @@ public class DefaultMavenExecutionRequest
         this.baseDirectory = baseDirectory;
     }
 
-    public MavenSettings getSettings()
+    public Settings getSettings()
     {
         return settings;
     }

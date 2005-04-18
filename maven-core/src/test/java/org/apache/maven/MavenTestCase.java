@@ -53,7 +53,9 @@ public abstract class MavenTestCase
 
     protected File getLocalRepositoryPath()
     {
-        return getTestFile( "src/test/resources/local-repo" );
+        File markerFile =  getFileForClasspathResource( "local-repo/marker.txt" );
+        
+        return markerFile.getAbsoluteFile().getParentFile();
     }
 
     protected File getFileForClasspathResource( String resource )

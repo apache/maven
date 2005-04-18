@@ -25,7 +25,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.maven.Maven;
-import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -41,7 +40,7 @@ import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Plugin;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Profile;
 import org.codehaus.classworlds.ClassWorld;
@@ -64,8 +63,6 @@ import java.util.List;
 public class MavenCli
 {
     public static final String POMv4 = "pom.xml";
-
-    public static final String userHome = System.getProperty( "user.home" );
 
     public static File userDir = new File( System.getProperty( "user.dir" ) );
 
@@ -153,17 +150,23 @@ public class MavenCli
 
         MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
 
-        MavenSettings settings = settingsBuilder.buildSettings();
+        Settings settings = settingsBuilder.buildSettings();
 
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
             ArtifactRepositoryFactory.ROLE );
 
+        
+        boolean snapshotPolicySet = false;
         if ( commandLine.hasOption( CLIManager.OFFLINE ) )
         {
+            settings.getActiveProfile().setOffline(true);
+            
             // TODO: this will still check to download if the artifact does not exist locally, instead of failing as it should in offline mode
             artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_NEVER );
+            snapshotPolicySet = true;
         }
-        else if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
+        
+        if ( !snapshotPolicySet && commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
         {
             artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS );
         }
@@ -352,44 +355,18 @@ public class MavenCli
     //
     // ----------------------------------------------------------------------
 
-    protected static File getUserConfigurationDirectory()
-    {
-        File mavenUserConfigurationDirectory = new File( userHome, MavenConstants.MAVEN_USER_CONFIGURATION_DIRECTORY );
-        if ( !mavenUserConfigurationDirectory.exists() )
-        {
-            if ( !mavenUserConfigurationDirectory.mkdirs() )
-            {
-                //throw a configuration exception
-            }
-        }
-        return mavenUserConfigurationDirectory;
-    }
-
-    protected static ArtifactRepository getLocalRepository( MavenSettings settings,
+    protected static ArtifactRepository getLocalRepository( Settings settings,
                                                             ArtifactRepositoryFactory repoFactory,
                                                             ArtifactRepositoryLayout repositoryLayout )
         throws Exception
     {
         Profile profile = settings.getActiveProfile();
 
-        String localRepository = null;
-        if ( profile != null )
-        {
-            localRepository = profile.getLocalRepository();
-        }
-
-        if ( localRepository == null )
-        {
-            File userConfigurationDirectory = getUserConfigurationDirectory();
-            localRepository =
-                new File( userConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
-        }
-
         Repository repo = new Repository();
 
         repo.setId( "local" );
 
-        repo.setUrl( "file://" + localRepository );
+        repo.setUrl( "file://" + profile.getLocalRepository() );
 
         return repoFactory.createArtifactRepository( repo, settings, repositoryLayout );
     }

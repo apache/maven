@@ -32,6 +32,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -222,17 +223,17 @@ public class DefaultLifecycleExecutor
      * phase in the lifecycle and if it does place it at the end of the list of goals
      * to execute for that given phase.
      *
-     * @param mavenSession
+     * @param session
      * @throws Exception
      */
-    private void processPluginPhases( Plugin plugin, MavenSession mavenSession, Map phaseMap )
+    private void processPluginPhases( Plugin plugin, MavenSession session, Map phaseMap )
         throws Exception
     {
         String groupId = plugin.getGroupId();
 
         String artifactId = plugin.getArtifactId();
 
-        pluginManager.verifyPlugin( groupId, artifactId, mavenSession );
+        pluginManager.verifyPlugin( groupId, artifactId, session );
 
         PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( groupId, artifactId );
 
@@ -264,7 +265,7 @@ public class DefaultLifecycleExecutor
                                                            "' was declared in pom.xml, but does not exist" );
                 }
 
-                configureMojo( mojoDescriptor, phaseMap );
+                configureMojo( mojoDescriptor, phaseMap, session.getSettings() );
             }
         }
         else
@@ -273,7 +274,7 @@ public class DefaultLifecycleExecutor
             {
                 MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
 
-                configureMojo( mojoDescriptor, phaseMap );
+                configureMojo( mojoDescriptor, phaseMap, session.getSettings() );
             }
         }
     }
@@ -285,13 +286,21 @@ public class DefaultLifecycleExecutor
      *
      * @param mojoDescriptor
      */
-    private void configureMojo( MojoDescriptor mojoDescriptor, Map phaseMap )
+    private void configureMojo( MojoDescriptor mojoDescriptor, Map phaseMap, Settings settings )
     {
-        if ( mojoDescriptor.getPhase() != null )
+        if( settings.getActiveProfile().isOffline() && mojoDescriptor.requiresOnline() )
         {
-            Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
+            String goal = mojoDescriptor.getGoal();
+            getLogger().warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );
+        }
+        else
+        {
+            if ( mojoDescriptor.getPhase() != null )
+            {
+                Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
 
-            phase.getGoals().add( mojoDescriptor.getId() );
+                phase.getGoals().add( mojoDescriptor.getId() );
+            }
         }
     }
 
@@ -357,7 +366,7 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        configureMojo( mojoDescriptor, phaseMap );
+        configureMojo( mojoDescriptor, phaseMap, session.getSettings() );
     }
 
     private void executePhase( String phase, MavenSession session, Map phaseMap )

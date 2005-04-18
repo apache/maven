@@ -18,7 +18,7 @@ package org.apache.maven.artifact.repository;
 
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Repository;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.Server;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -33,7 +33,7 @@ public class DefaultArtifactRepositoryFactory
 {
     private String globalSnapshotPolicy = null;
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings,
+    public ArtifactRepository createArtifactRepository( Repository modelRepository, Settings settings,
                                                         ArtifactRepositoryLayout repositoryLayout )
     {
         Server repoProfile = null;

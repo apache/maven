@@ -9,7 +9,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 
@@ -58,7 +58,7 @@ public class PluginParameterExpressionEvaluatorTest
         MavenProject project = new MavenProject( model );
         project.setFile( new File( "pom.xml" ).getCanonicalFile() );
 
-        MavenSession session = new MavenSession( project, container, mgr, new MavenSettings(), repo,
+        MavenSession session = new MavenSession( project, container, mgr, new Settings(), repo,
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
@@ -86,7 +86,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         PlexusContainer container = getContainer();
         MavenSession session = new MavenSession( null, // don't need a project for this test.
-                                                 container, mgr, new MavenSettings(), repo,
+                                                 container, mgr, new Settings(), repo,
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
@@ -107,7 +107,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         PlexusContainer container = getContainer();
         MavenSession session = new MavenSession( null, // don't need a project for this test.
-                                                 container, mgr, new MavenSettings(), repo,
+                                                 container, mgr, new Settings(), repo,
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 

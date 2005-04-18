@@ -18,7 +18,7 @@ package org.apache.maven.artifact.repository;
 
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Repository;
-import org.apache.maven.settings.MavenSettings;
+import org.apache.maven.settings.Settings;
 
 /**
  * @author jdcasey
@@ -28,7 +28,7 @@ public interface ArtifactRepositoryFactory
 
     public static final String ROLE = ArtifactRepositoryFactory.class.getName();
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository, MavenSettings settings,
+    public ArtifactRepository createArtifactRepository( Repository modelRepository, Settings settings,
                                                         ArtifactRepositoryLayout repositoryLayout );
 
     void setGlobalSnapshotPolicy( String snapshotPolicy );
