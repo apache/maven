@@ -8,6 +8,21 @@
   
 Offline Mode Design
 
+* UPDATE: 18-April-2005
+
+  We cannot take the approach outlined below of detecting which remote 
+  repositories are "really" offline, since offline mode is more of a behavior, 
+  and this will lead to counter-intuitive results. A different feature may exist
+  unimplemented, which is to detect when the network is down and provide better
+  feedback for that case. However, when offline mode is declared, nothing 
+  earmarked as remote should be accessed, regardless of whether it is actually
+  a physically local resource.
+  
+  NOTE: One side-effect of this design change is that all offline-mode code can
+  be isolated to maven-core, maven-plugin-descriptor, and [possibly] 
+  maven-artifact. Usage of maven-wagon will be determined by an offline-aware
+  manager.
+
 * Assumptions: What is Offline?
 
   For the purposes of determining the areas sensitive to offline status,
