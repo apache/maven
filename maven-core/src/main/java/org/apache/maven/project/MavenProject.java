@@ -815,5 +815,10 @@ public class MavenProject
         }
         return dom;
     }
+
+    public List getPluginRepositories()
+    {
+        return model.getPluginRepositories();
+    }
 }
 
