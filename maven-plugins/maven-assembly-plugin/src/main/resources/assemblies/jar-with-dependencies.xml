@@ -1,0 +1,22 @@
+<assembly>
+  <!-- TODO: a jarjar format would be better -->
+  <id>jar-with-dependencies</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <!-- TODO: use expressions instead: ${project.build.directory}, ${project.build.finalName}, or have a <build /> tag to include the built artifact -->
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets>
+</assembly>

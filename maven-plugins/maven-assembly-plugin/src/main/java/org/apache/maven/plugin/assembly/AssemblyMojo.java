@@ -35,14 +35,19 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -52,6 +57,7 @@ import java.util.Set;
  * @description assemble an application bundle or distribution
  * @parameter name="basedir" type="String" required="true" validator="" expression="#basedir" description=""
  * @parameter name="outputDirectory" type="java.io.File" required="true" validator="" expression="#project.build.directory" description=""
+ * @parameter name="workDirectory" type="java.io.File" required="true" validator="" expression="#project.build.directory/assembly/work" description="Directory to unpack JARs into if needed"
  * @parameter name="descriptor" type="java.io.File" required="false" validator="" expression="#maven.assembly.descriptor" description=""
  * @parameter name="finalName" type="String" required="true" validator="" expression="#project.build.finalName" description=""
  * @parameter name="descriptorId" type="String" required="false" validator="" expression="#maven.assembly.descriptorId" description=""
@@ -64,10 +70,7 @@ public class AssemblyMojo
 
     private String basedir;
 
-    /**
-     * @todo use java.io.File
-     */
-    private String outputDirectory;
+    private File outputDirectory;
 
     private File descriptor;
 
@@ -76,6 +79,8 @@ public class AssemblyMojo
     private String finalName;
 
     private Set dependencies;
+
+    private File workDirectory;
 
     public void execute()
         throws PluginExecutionException
@@ -136,8 +141,8 @@ public class AssemblyMojo
                 // TODO: use component roles? Can we do that in a mojo?
                 Archiver archiver = createArchiver( format );
 
-                processFileSets( archiver, assembly.getFileSets() );
-                processDependencySets( archiver, assembly.getDependencySets() );
+                processFileSets( archiver, assembly.getFileSets(), assembly.isIncludeBaseDirectory() );
+                processDependencySets( archiver, assembly.getDependencySets(), assembly.isIncludeBaseDirectory() );
 
                 archiver.setDestFile( new File( outputDirectory, filename ) );
                 archiver.createArchive();
@@ -149,14 +154,14 @@ public class AssemblyMojo
         }
     }
 
-    private void processDependencySets( Archiver archiver, List dependencySets )
-        throws ArchiverException
+    private void processDependencySets( Archiver archiver, List dependencySets, boolean includeBaseDirectory )
+        throws ArchiverException, IOException
     {
         for ( Iterator i = dependencySets.iterator(); i.hasNext(); )
         {
             DependencySet depedencySet = (DependencySet) i.next();
             String output = depedencySet.getOutputDirectory();
-            output = getOutputDirectory( output );
+            output = getOutputDirectory( output, includeBaseDirectory );
 
             AndArtifactFilter filter = new AndArtifactFilter();
             filter.add( new ScopeArtifactFilter( depedencySet.getScope() ) );
@@ -176,13 +181,68 @@ public class AssemblyMojo
 
                 if ( filter.include( artifact ) )
                 {
-                    archiver.addFile( artifact.getFile(), output + artifact.getFile().getName() );
+                    String name = artifact.getFile().getName();
+                    if ( depedencySet.isUnpack() )
+                    {
+                        // TODO: something like zipfileset in plexus-archiver
+//                        archiver.addJar(  )
+
+                        File tempLocation = new File( workDirectory, name.substring( 0, name.length() - 4 ) );
+                        boolean process = false;
+                        if ( !tempLocation.exists() )
+                        {
+                            tempLocation.mkdirs();
+                            process = true;
+                        }
+                        else if ( artifact.getFile().lastModified() > tempLocation.lastModified() )
+                        {
+                            process = true;
+                        }
+
+                        if ( process )
+                        {
+                            unpackJar( artifact.getFile(), tempLocation );
+                        }
+                        archiver.addDirectory( tempLocation, null,
+                                               (String[]) getJarExcludes().toArray( EMPTY_STRING_ARRAY ) );
+                    }
+                    else
+                    {
+                        archiver.addFile( artifact.getFile(), output + name );
+                    }
                 }
             }
         }
     }
 
-    private String getOutputDirectory( String output )
+    private void unpackJar( File file, File tempLocation )
+        throws IOException
+    {
+        JarFile jar = new JarFile( file );
+        for ( Enumeration e = jar.entries(); e.hasMoreElements(); )
+        {
+            JarEntry entry = (JarEntry) e.nextElement();
+
+            if ( entry.isDirectory() )
+            {
+                new File( tempLocation, entry.getName() ).mkdir();
+            }
+            else
+            {
+                IOUtil.copy( jar.getInputStream( entry ),
+                             new FileOutputStream( new File( tempLocation, entry.getName() ) ) );
+            }
+        }
+    }
+
+    private List getJarExcludes()
+    {
+        List l = new ArrayList( getDefaultExcludes() );
+        l.add( "META-INF/**" );
+        return l;
+    }
+
+    private String getOutputDirectory( String output, boolean includeBaseDirectory )
     {
         if ( output == null )
         {
@@ -194,13 +254,23 @@ public class AssemblyMojo
             output += '/';
         }
 
-        if ( output.startsWith( "/" ) )
+        if ( includeBaseDirectory )
         {
-            output = finalName + output;
+            if ( output.startsWith( "/" ) )
+            {
+                output = finalName + output;
+            }
+            else
+            {
+                output = finalName + "/" + output;
+            }
         }
         else
         {
-            output = finalName + "/" + output;
+            if ( output.startsWith( "/" ) )
+            {
+                output = output.substring( 1 );
+            }
         }
         return output;
     }
@@ -247,7 +317,10 @@ public class AssemblyMojo
         else if ( format.startsWith( "jar" ) )
         {
             // TODO: use MavenArchiver for manifest?
-            archiver = new JarArchiver();
+            JarArchiver jarArchiver = new JarArchiver();
+            jarArchiver.setCompress( true );
+            archiver = jarArchiver;
+
         }
         else
         {
@@ -257,7 +330,7 @@ public class AssemblyMojo
         return archiver;
     }
 
-    private void processFileSets( Archiver archiver, java.util.List fileSets )
+    private void processFileSets( Archiver archiver, List fileSets, boolean includeBaseDirecetory )
         throws ArchiverException
     {
         for ( Iterator i = fileSets.iterator(); i.hasNext(); )
@@ -280,7 +353,7 @@ public class AssemblyMojo
                     output = directory;
                 }
             }
-            output = getOutputDirectory( output );
+            output = getOutputDirectory( output, includeBaseDirecetory );
 
             String[] includes = (String[]) fileSet.getIncludes().toArray( EMPTY_STRING_ARRAY );
             if ( includes.length == 0 )
