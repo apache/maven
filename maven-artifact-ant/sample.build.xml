@@ -1,0 +1,45 @@
+<project name="foo" xmlns:artifact="antlib:org.apache.maven.artifact.ant" default="foo">
+  <target name="foo">
+<!--
+TODO...
+Implementation:
+- don't require everything in $ANT_HOME/lib (give example using typedef) - currently all of M2_HOME/lib needs to be in ANT_HOME/lib (ie maven-core's dependencies)
+- need to decouple maven-artifact from plexus, or create an ant logger for plexus, then embed it in here
+- need to decouple project loading from maven-core. Loading the model was not enough (no inheritence or super model)
+Features:
+- read .m2/settings.xml
+- get dependencies from POM
+-->
+
+    <artifact:localRepository id="local.repository" location="${basedir}/target/local-repo" layout="default" />
+
+    <artifact:remoteRepository id="deploy.repository" url="file://${basedir}/target/deployment-repo" layout="legacy" />
+
+    <artifact:pom file="pom.xml" id="maven.project" />
+
+    <!--
+- TODO: would be nice to declare the POM inline, but I'd need to proxy all of the model objects
+<artifact:pom id="maven.project">
+  <artifactId>...</artifactId>
+</artifact:pom>
+-->
+
+    <artifact:dependencies pathId="dependency.classpath">
+      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2" />
+      <dependency groupId="plexus" artifactId="plexus-container-default" version="1.0-alpha-2" />
+      <localRepository refid="local.repository" />
+    </artifact:dependencies>
+
+    <artifact:install file="target/maven-artifact-ant-1.0-alpha-2-SNAPSHOT.jar">
+      <localRepository refid="local.repository" />
+      <pom refid="maven.project" />
+    </artifact:install>
+
+    <artifact:deploy file="target/maven-artifact-ant-1.0-alpha-2-SNAPSHOT.jar">
+      <localRepository refid="local.repository" />
+      <remoteRepository refid="deploy.repository" />
+      <pom refid="maven.project" />
+    </artifact:deploy>
+  </target>
+</project>
+
