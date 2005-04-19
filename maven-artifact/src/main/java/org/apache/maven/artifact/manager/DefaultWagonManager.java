@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.security.NoSuchAlgorithmException;
 
 public class DefaultWagonManager
     extends AbstractLogEnabled
@@ -132,15 +131,16 @@ public class DefaultWagonManager
 //        }
 
         // TODO: configure these
-        try
-        {
+        // TODO: Clean up this try/catch if it truly isn't needed.
+//        try
+//        {
             wagon.addTransferListener( new ChecksumObserver( "MD5" ) );
             wagon.addTransferListener( new ChecksumObserver( "SHA-1" ) );
-        }
-        catch ( NoSuchAlgorithmException e )
-        {
-            throw new TransferFailedException( "Unable to add checksum methods", e );
-        }
+//        }
+//        catch ( NoSuchAlgorithmException e )
+//        {
+//            throw new TransferFailedException( "Unable to add checksum methods", e );
+//        }
 
         try
         {
