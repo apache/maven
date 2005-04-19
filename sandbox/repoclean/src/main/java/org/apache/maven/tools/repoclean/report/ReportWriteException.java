@@ -16,22 +16,23 @@ package org.apache.maven.tools.repoclean.report;
  * limitations under the License.
  */
 
-public interface Reporter
+public class ReportWriteException
+    extends Exception
 {
 
-    public void close();
+    public ReportWriteException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 
-    public boolean hasWarning();
+    public ReportWriteException( String message )
+    {
+        super( message );
+    }
 
-    public boolean hasError();
-
-    public void warn( String message )
-        throws ReportWriteException;
-
-    public void error( String message, Throwable error )
-        throws ReportWriteException;
-
-    public void error( String message )
-        throws ReportWriteException;
+    public ReportWriteException( Throwable cause )
+    {
+        super( cause );
+    }
 
 }

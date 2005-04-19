@@ -18,7 +18,7 @@ package org.apache.maven.tools.repoclean.digest;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.report.FileReporter;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class ArtifactDigestVerifier
 
     private ArtifactDigestor artifactDigestor;
 
-    public void verifyDigest( Artifact artifact, File artifactTarget, Reporter reporter, boolean reportOnly ) throws Exception
+    public void verifyDigest( Artifact artifact, File artifactTarget, FileReporter reporter, boolean reportOnly ) throws Exception
     {
         // create the digest source file from which to copy/verify.
         File digestSourceFile = new File( artifact.getFile() + ".md5" );

@@ -4,7 +4,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.report.FileReporter;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
 
@@ -36,7 +36,7 @@ public class DefaultArtifactDiscoverer
 
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
-    public List discoverArtifacts( File repositoryBase, Reporter reporter )
+    public List discoverArtifacts( File repositoryBase, FileReporter reporter )
         throws Exception
     {
         List artifacts = new ArrayList();
@@ -64,7 +64,7 @@ public class DefaultArtifactDiscoverer
         return artifacts;
     }
 
-    private Artifact buildArtifact( File repositoryBase, String path, Reporter reporter )
+    private Artifact buildArtifact( File repositoryBase, String path, FileReporter reporter )
         throws Exception
     {
         Artifact result = null;

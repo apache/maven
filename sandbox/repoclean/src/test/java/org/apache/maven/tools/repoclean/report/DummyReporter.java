@@ -16,22 +16,50 @@ package org.apache.maven.tools.repoclean.report;
  * limitations under the License.
  */
 
-public interface Reporter
+public class DummyReporter
+    implements Reporter
 {
 
-    public void close();
+    public void close()
+    {
+    }
 
-    public boolean hasWarning();
+    public boolean hasWarning()
+    {
+        return false;
+    }
 
-    public boolean hasError();
+    public boolean hasError()
+    {
+        return false;
+    }
 
     public void warn( String message )
-        throws ReportWriteException;
+        throws ReportWriteException
+    {
+        log( "[WARNING]", message, null );
+    }
 
     public void error( String message, Throwable error )
-        throws ReportWriteException;
+        throws ReportWriteException
+    {
+        log( "[ERROR]", message, error );
+    }
 
     public void error( String message )
-        throws ReportWriteException;
+        throws ReportWriteException
+    {
+        log( "[ERROR]", message, null );
+    }
+
+    private void log( String classifier, String message, Throwable error )
+    {
+        System.out.println( classifier + " " + message );
+
+        if ( error != null )
+        {
+            error.printStackTrace();
+        }
+    }
 
 }

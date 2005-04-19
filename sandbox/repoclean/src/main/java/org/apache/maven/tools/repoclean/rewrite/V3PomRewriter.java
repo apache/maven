@@ -4,7 +4,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.v3_0_0.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.report.FileReporter;
 import org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -38,7 +38,7 @@ public class V3PomRewriter
 {
     private PomV3ToV4Translator translator;
 
-    public void rewrite( Artifact artifact, File from, File to, Reporter reporter, boolean reportOnly )
+    public void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly )
         throws Exception
     {
         Model v4Model = null;
@@ -107,7 +107,7 @@ public class V3PomRewriter
         }
     }
 
-    private void validateV4Basics( Model model, Artifact artifact, Reporter reporter )
+    private void validateV4Basics( Model model, Artifact artifact, FileReporter reporter )
         throws Exception
     {
         if ( StringUtils.isEmpty( model.getModelVersion() ) )

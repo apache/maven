@@ -24,7 +24,7 @@ import org.apache.maven.tools.repoclean.artifact.metadata.ProjectMetadata;
 import org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier;
 import org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer;
 import org.apache.maven.tools.repoclean.index.ArtifactIndexer;
-import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.report.FileReporter;
 import org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -86,10 +86,10 @@ public class RepositoryCleaner
         {
             Logger logger = getLogger();
 
-            Reporter repoReporter = null;
+            FileReporter repoReporter = null;
             try
             {
-                repoReporter = new Reporter( reportsBase, "repository.report.txt" );
+                repoReporter = new FileReporter( reportsBase, "repository.report.txt" );
 
                 ArtifactDiscoverer artifactDiscoverer = null;
 
@@ -197,12 +197,9 @@ public class RepositoryCleaner
                 MailMessage message = new MailMessage();
                 message.setContent( reportContents );
                 message.setSubject( configuration.getErrorReportSubject() );
-                message.setFromName( configuration.getErrorReportFromName() );
-                message.setFromAddress( configuration.getErrorReportFromAddress() );
+                message.setFrom( configuration.getErrorReportFromName(), configuration.getErrorReportFromAddress() );
                 message.setSendDate( new Date() );
                 message.addTo( configuration.getErrorReportToName(), configuration.getErrorReportToAddress() );
-
-                mailSender.setSmtpHost( configuration.getErrorReportSmtpHost() );
 
                 mailSender.send( message );
             }
@@ -237,7 +234,7 @@ public class RepositoryCleaner
 
     private void rewriteArtifactsAndPoms( List artifacts, ArtifactRepository sourceRepo, ArtifactRepository targetRepo,
                                          RepositoryCleanerConfiguration configuration, File reportsBase,
-                                         File sourceRepositoryBase, File targetRepositoryBase, Reporter repoReporter )
+                                         File sourceRepositoryBase, File targetRepositoryBase, FileReporter repoReporter )
         throws Exception
     {
         Logger logger = getLogger();
@@ -256,10 +253,10 @@ public class RepositoryCleaner
 
                 String artifactReportPath = buildArtifactReportPath( artifact );
 
-                Reporter artifactReporter = null;
+                FileReporter artifactReporter = null;
                 try
                 {
-                    artifactReporter = new Reporter( reportsBase, artifactReportPath );
+                    artifactReporter = new FileReporter( reportsBase, artifactReportPath );
 
                     boolean errorOccurred = false;
 
@@ -398,7 +395,7 @@ public class RepositoryCleaner
             + "/" + ( ( classifier != null ) ? ( classifier + "-" ) : ( "" ) ) + artifact.getVersion() + ".report.txt";
     }
 
-    private void copyArtifact( Artifact artifact, File artifactTarget, Reporter reporter )
+    private void copyArtifact( Artifact artifact, File artifactTarget, FileReporter reporter )
         throws IOException
     {
         File artifactSource = artifact.getFile();

@@ -16,7 +16,7 @@ package org.apache.maven.tools.repoclean.discover;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
-import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.report.FileReporter;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.DirectoryScanner;
 
@@ -38,7 +38,7 @@ public class LegacyArtifactDiscoverer
 
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
-    public List discoverArtifacts( File repositoryBase, Reporter reporter )
+    public List discoverArtifacts( File repositoryBase, FileReporter reporter )
         throws Exception
     {
         List artifacts = new ArrayList();
@@ -65,7 +65,7 @@ public class LegacyArtifactDiscoverer
         return artifacts;
     }
 
-    private Artifact buildArtifact( String path, Reporter reporter )
+    private Artifact buildArtifact( String path, FileReporter reporter )
         throws Exception
     {
         StringTokenizer tokens = new StringTokenizer( path, "/\\" );

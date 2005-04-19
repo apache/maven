@@ -1,0 +1,61 @@
+  ---
+  Transitioning from Repository Conversion to Repository Management
+  ---
+  John Casey
+  ---
+  19-Apr-2005
+  ---
+  
+Notes on Transitioning Repoclean from a Conversion Tool to a Management Tool
+
+* Abstract
+
+  Repoclean was born a conversion tool, with the primary purpose of performing
+  the initial conversion between maven1 and maven2 repository formats. As such,
+  it has facilities for translating POMs, restructuring artifact directories, 
+  repairing checksums, and more.
+  
+  However, it has become exceedingly clear with the first alpha release of
+  maven2 that we need a tool to perform smart mirroring of artifacts and 
+  metadata between m1 and m2 repositories. To that end, we must redesign and
+  refactor repoclean (the closest thing to a solution we currently have), and
+  transform it from a one-off project to an active part of the maven toolset.
+  
+* Execution Modes
+
+  While these execution modes are in various states of development, we need to
+  formalize these options in the configuration and repair any gaps in the 
+  implementation.
+
+** Support for m1-to-m1 synchronization
+
+  We need to support blacklisting and other features relevant to m1 repositories
+  in this feature. In the feature list below, I'll note which ones are 
+  applicable to m1.
+  
+** Support for m2-to-m2 synchronization
+
+  We'll need to support normalization and blacklisting for synchronization of
+  a feeder m2 repository to our canonical m2 repository.
+  
+** Support for m2-to-m1 synchronization
+
+  We have to be able to do bidirectional synchronization, for the case where one
+  or more of our feeder repositories transitions to maven2 while we're still
+  supporting maven1 users. This really should only involve any normalization
+  that we'd normally do in a m2-to-m2 sync process, plus forced usage of the 
+  legacy repository layout and translation of POMs.
+  
+** Support for m1-to-m2 synchronization
+
+  This one should be mostly complete, with only new features still needing
+  implementation.
+  
+* Features
+
+* Required Modifications
+
+** Add CLI for parsing command-line modifications to config files, and for
+   "--force".
+   
+** Add SHA-1 checksum file support.

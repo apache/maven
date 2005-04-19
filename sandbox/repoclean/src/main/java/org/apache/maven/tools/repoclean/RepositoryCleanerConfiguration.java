@@ -47,9 +47,9 @@ public class RepositoryCleanerConfiguration
 
     private String errorReportToAddress;
 
-    private String errorReportSmtpHost;
-
     private boolean mailErrorReport;
+    
+    private boolean force;
 
     public void setSourceRepositoryPath( String sourceRepositoryPath )
     {
@@ -151,16 +151,6 @@ public class RepositoryCleanerConfiguration
         this.errorReportFromName = errorReportFromName;
     }
 
-    public String getErrorReportSmtpHost()
-    {
-        return errorReportSmtpHost;
-    }
-
-    public void setErrorReportSmtpHost( String errorReportSmtpHost )
-    {
-        this.errorReportSmtpHost = errorReportSmtpHost;
-    }
-
     public String getErrorReportToAddress()
     {
         return errorReportToAddress;
@@ -189,5 +179,15 @@ public class RepositoryCleanerConfiguration
     public boolean mailErrorReport()
     {
         return mailErrorReport;
+    }
+
+    public boolean force()
+    {
+        return force;
+    }
+
+    public void setForce( boolean force )
+    {
+        this.force = force;
     }
 }

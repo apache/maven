@@ -21,7 +21,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.report.FileReporter;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -35,7 +35,7 @@ import java.io.FileWriter;
 public class V4PomRewriter
     implements ArtifactPomRewriter
 {
-    public void rewrite( Artifact artifact, File from, File to, Reporter reporter, boolean reportOnly )
+    public void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly )
         throws Exception
     {
         Model model = null;
@@ -95,7 +95,7 @@ public class V4PomRewriter
         }
     }
 
-    private void validateBasics( Model model, Artifact artifact, Reporter reporter )
+    private void validateBasics( Model model, Artifact artifact, FileReporter reporter )
         throws Exception
     {
         if ( StringUtils.isEmpty( model.getModelVersion() ) )

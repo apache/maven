@@ -49,31 +49,40 @@ public class Main
             System.exit( 0 );
         }
 
-        Embedder embedder = new Embedder();
         try
         {
-            embedder.start( new ClassWorld() );
-
             RepositoryCleanerConfiguration config = buildConfig( args[0] );
 
-            RepositoryCleaner cleaner = null;
-            try
-            {
-                cleaner = (RepositoryCleaner) embedder.lookup( RepositoryCleaner.ROLE );
-
-                cleaner.cleanRepository( config );
-            }
-            finally
-            {
-                if ( cleaner != null )
-                {
-                    embedder.release( cleaner );
-                }
-            }
+            launch( config );
+            
+            System.exit( 0 );
         }
-        catch ( Throwable e )
+        catch ( Exception e )
         {
             e.printStackTrace();
+            
+            System.exit( 1 );
+        }
+    }
+
+    public static void launch( RepositoryCleanerConfiguration config ) throws Exception
+    {
+        Embedder embedder = new Embedder();
+        embedder.start( new ClassWorld() );
+
+        RepositoryCleaner cleaner = null;
+        try
+        {
+            cleaner = (RepositoryCleaner) embedder.lookup( RepositoryCleaner.ROLE );
+
+            cleaner.cleanRepository( config );
+        }
+        finally
+        {
+            if ( cleaner != null )
+            {
+                embedder.release( cleaner );
+            }
         }
     }
 
@@ -104,7 +113,6 @@ public class Main
         config.setMailErrorReport( Boolean.valueOf( props.getProperty( "errorReport.mailOnError", "false") ).booleanValue() );
         config.setErrorReportFromAddress( props.getProperty( "errorReport.fromAddress" ) );
         config.setErrorReportFromName( props.getProperty( "errorReport.fromName" ) );
-        config.setErrorReportSmtpHost( props.getProperty( "errorReport.smtpHost", "localhost" ) );
         config.setErrorReportSubject( props.getProperty( "errorReport.subject" ) );
         config.setErrorReportToAddress( props.getProperty( "errorReport.toAddress" ) );
         config.setErrorReportToName( props.getProperty( "errorReport.toName" ) );

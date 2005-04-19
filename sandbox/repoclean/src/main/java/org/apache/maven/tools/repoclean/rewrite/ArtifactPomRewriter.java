@@ -1,7 +1,7 @@
 package org.apache.maven.tools.repoclean.rewrite;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.report.FileReporter;
 
 import java.io.File;
 
@@ -30,6 +30,6 @@ public interface ArtifactPomRewriter
     
     public static final String ROLE = ArtifactPomRewriter.class.getName();
     
-    void rewrite( Artifact artifact, File from, File to, Reporter reporter, boolean reportOnly ) throws Exception;
+    void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly ) throws Exception;
 
 }

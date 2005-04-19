@@ -1,6 +1,6 @@
 package org.apache.maven.tools.repoclean.discover;
 
-import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.report.FileReporter;
 
 import java.io.File;
 import java.util.List;
@@ -43,6 +43,6 @@ public interface ArtifactDiscoverer
         "**/REPOSITORY-V*.txt"
     };
 
-    List discoverArtifacts( File repositoryBase, Reporter reporter ) throws Exception;
+    List discoverArtifacts( File repositoryBase, FileReporter reporter ) throws Exception;
     
 }

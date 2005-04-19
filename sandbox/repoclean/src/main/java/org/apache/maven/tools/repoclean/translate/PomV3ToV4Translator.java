@@ -19,6 +19,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
+import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
@@ -54,74 +55,88 @@ public class PomV3ToV4Translator
 {
 
     public static final String ROLE = PomV3ToV4Translator.class.getName();
+    
+    private transient List discoveredPlugins = new ArrayList();
 
     public Model translate( org.apache.maven.model.v3_0_0.Model v3Model, Reporter reporter )
-        throws Exception
+        throws ReportWriteException
     {
-        String groupId = v3Model.getGroupId();
-        String artifactId = v3Model.getArtifactId();
-
-        String id = v3Model.getId();
-        if ( StringUtils.isNotEmpty( id ) )
-        {
-            if ( StringUtils.isEmpty( groupId ) )
-            {
-                groupId = id;
-            }
-
-            if ( StringUtils.isEmpty( artifactId ) )
-            {
-                artifactId = id;
-            }
-        }
-
-        String version = v3Model.getCurrentVersion();
-        if ( version == null )
-        {
-            version = v3Model.getVersion();
-        }
-
-        PomKey pomKey = new PomKey( groupId, artifactId, version );
-
-        warnOfUnsupportedMainModelElements( v3Model, reporter );
-
-        Model model = null;
         try
         {
-            model = new Model();
-            model.setArtifactId( v3Model.getArtifactId() );
-            model.setBuild( translateBuild( v3Model.getBuild(), reporter ) );
-            model.setCiManagement( translateCiManagementInfo( v3Model.getBuild() ) );
-            model.setContributors( translateContributors( v3Model.getContributors() ) );
+            String groupId = v3Model.getGroupId();
+            String artifactId = v3Model.getArtifactId();
 
-            model.setDependencies( translateDependencies( v3Model.getDependencies() ) );
-            model.setDescription( v3Model.getDescription() );
-            model.setDevelopers( translateDevelopers( v3Model.getDevelopers() ) );
+            String id = v3Model.getId();
+            if ( StringUtils.isNotEmpty( id ) )
+            {
+                if ( StringUtils.isEmpty( groupId ) )
+                {
+                    groupId = id;
+                }
 
-            model.setDistributionManagement( translateDistributionManagement( pomKey, v3Model ) );
+                if ( StringUtils.isEmpty( artifactId ) )
+                {
+                    artifactId = id;
+                }
+            }
 
-            model.setGroupId( v3Model.getGroupId() );
-            model.setInceptionYear( v3Model.getInceptionYear() );
-            model.setIssueManagement( translateIssueManagement( v3Model ) );
+            String version = v3Model.getCurrentVersion();
+            if ( version == null )
+            {
+                version = v3Model.getVersion();
+            }
 
-            model.setLicenses( translateLicenses( v3Model.getLicenses() ) );
-            model.setMailingLists( translateMailingLists( v3Model.getMailingLists() ) );
-            model.setModelVersion( "4.0.0" );
-            model.setName( v3Model.getName() );
-            model.setOrganization( translateOrganization( v3Model.getOrganization(), reporter ) );
-            model.setPackaging( "jar" );
-            model.setReports( translateReports( v3Model.getReports(), reporter ) );
-            model.setScm( translateScm( v3Model ) );
-            model.setUrl( v3Model.getUrl() );
+            PomKey pomKey = new PomKey( groupId, artifactId, version );
 
-            model.setVersion( version );
+            warnOfUnsupportedMainModelElements( v3Model, reporter );
+
+            Model model = null;
+            try
+            {
+                model = new Model();
+                model.setArtifactId( v3Model.getArtifactId() );
+
+                // moved this above the translation of the build, to allow
+                // additional plugins to be defined in v3 poms via 
+                // <dependency><type>plugin</type></dependency>
+                model.setDependencies( translateDependencies( v3Model.getDependencies() ) );
+
+                model.setBuild( translateBuild( v3Model.getBuild(), reporter ) );
+                model.setCiManagement( translateCiManagementInfo( v3Model.getBuild() ) );
+                model.setContributors( translateContributors( v3Model.getContributors() ) );
+
+                model.setDescription( v3Model.getDescription() );
+                model.setDevelopers( translateDevelopers( v3Model.getDevelopers() ) );
+
+                model.setDistributionManagement( translateDistributionManagement( pomKey, v3Model ) );
+
+                model.setGroupId( v3Model.getGroupId() );
+                model.setInceptionYear( v3Model.getInceptionYear() );
+                model.setIssueManagement( translateIssueManagement( v3Model ) );
+
+                model.setLicenses( translateLicenses( v3Model.getLicenses() ) );
+                model.setMailingLists( translateMailingLists( v3Model.getMailingLists() ) );
+                model.setModelVersion( "4.0.0" );
+                model.setName( v3Model.getName() );
+                model.setOrganization( translateOrganization( v3Model.getOrganization(), reporter ) );
+                model.setPackaging( "jar" );
+                model.setReports( translateReports( v3Model.getReports(), reporter ) );
+                model.setScm( translateScm( v3Model ) );
+                model.setUrl( v3Model.getUrl() );
+
+                model.setVersion( version );
+            }
+            catch ( PomTranslationException e )
+            {
+                reporter.error( "Invalid POM detected. Cannot translate.", e );
+            }
+
+            return model;
         }
-        catch ( PomTranslationException e )
+        finally
         {
-            reporter.error( "Invalid POM detected. Cannot translate.", e );
+            this.discoveredPlugins.clear();
         }
-
-        return model;
     }
 
     private CiManagement translateCiManagementInfo( org.apache.maven.model.v3_0_0.Build v3Build )
@@ -148,7 +163,7 @@ public class PomV3ToV4Translator
     }
 
     private void warnOfUnsupportedMainModelElements( org.apache.maven.model.v3_0_0.Model v3Model, Reporter reporter )
-        throws Exception
+        throws ReportWriteException
     {
         if ( StringUtils.isNotEmpty( v3Model.getExtend() ) )
         {
@@ -216,7 +231,7 @@ public class PomV3ToV4Translator
     }
 
     private Reports translateReports( List v3Reports, Reporter reporter )
-        throws Exception
+        throws ReportWriteException
     {
         Reports reports = null;
         if ( v3Reports != null && !v3Reports.isEmpty() )
@@ -280,7 +295,7 @@ public class PomV3ToV4Translator
     private org.apache.maven.model.Organization translateOrganization(
                                                                       org.apache.maven.model.v3_0_0.Organization v3Organization,
                                                                       Reporter reporter )
-        throws Exception
+        throws ReportWriteException
     {
         Organization organization = null;
 
@@ -486,26 +501,72 @@ public class PomV3ToV4Translator
             {
                 org.apache.maven.model.v3_0_0.Dependency v3Dep = (org.apache.maven.model.v3_0_0.Dependency) it.next();
 
-                Dependency dep = new Dependency();
-
-                String artifactId = v3Dep.getArtifactId();
-                String groupId = v3Dep.getGroupId();
-                
-                if(StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId))
+                String type = v3Dep.getType();
+                if( "plugin".equals( type ) )
                 {
-                    dep.setGroupId(groupId);
-                    dep.setArtifactId(artifactId);
+                    String groupId = v3Dep.getGroupId();
+
+                    if( "maven".equals( groupId ) )
+                    {
+                        groupId = "org.apache.maven.plugins";
+                    }
+                    
+                    Plugin plugin = new Plugin();
+                    plugin.setGroupId( groupId );
+                    plugin.setArtifactId( v3Dep.getArtifactId() );
+                    plugin.setVersion( v3Dep.getVersion() );
+
+                    Xpp3Dom config = new Xpp3Dom( "configuration" );
+
+                    Properties props = v3Dep.getProperties();
+                    
+                    if ( !props.isEmpty() )
+                    {
+                        for ( Iterator propertyIterator = props.keySet().iterator(); it.hasNext(); )
+                        {
+                            String key = (String) propertyIterator.next();
+                            String value = props.getProperty( key );
+                            
+                            Xpp3Dom child = new Xpp3Dom( key );
+                            child.setValue( value );
+                            
+                            config.addChild( child );
+                        }
+                    }
+                    
+                    plugin.setConfiguration( config );
+                    
+                    this.discoveredPlugins.add( plugin );
                 }
                 else
                 {
-                    dep.setGroupId(v3Dep.getId());
-                    dep.setArtifactId(v3Dep.getId());
+                    Dependency dep = new Dependency();
+
+                    String artifactId = v3Dep.getArtifactId();
+                    String groupId = v3Dep.getGroupId();
+                    
+                    if(StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId))
+                    {
+                        dep.setGroupId(groupId);
+                        dep.setArtifactId(artifactId);
+                    }
+                    else
+                    {
+                        dep.setGroupId(v3Dep.getId());
+                        dep.setArtifactId(v3Dep.getId());
+                    }
+
+                    dep.setVersion( v3Dep.getVersion() );
+                    dep.setType( v3Dep.getType() );
+                    
+                    String scope = v3Dep.getProperty( "scope" );
+                    if( scope != null && scope.trim().length() > 0 )
+                    {
+                        dep.setScope( scope );
+                    }
+
+                    deps.add( dep );
                 }
-
-                dep.setVersion( v3Dep.getVersion() );
-                dep.setType( v3Dep.getType() );
-
-                deps.add( dep );
             }
         }
 
@@ -539,7 +600,7 @@ public class PomV3ToV4Translator
     }
 
     private Build translateBuild( org.apache.maven.model.v3_0_0.Build v3Build, Reporter reporter )
-        throws Exception
+        throws ReportWriteException
     {
         Build build = null;
         if ( v3Build != null )
@@ -566,7 +627,7 @@ public class PomV3ToV4Translator
                 if ( notEmpty( testIncludes ) || notEmpty( testExcludes ) )
                 {
                     Plugin plugin = new Plugin();
-                    plugin.setGroupId( "maven" );
+                    plugin.setGroupId( "org.apache.maven.plugins" );
                     plugin.setArtifactId( "surefire" );
                     plugin.setVersion( "1.0-SNAPSHOT" );
 
@@ -611,12 +672,27 @@ public class PomV3ToV4Translator
                 }
             }
         }
+        
+        if(!this.discoveredPlugins.isEmpty())
+        {
+            if(build == null)
+            {
+                build = new Build();
+            }
+            
+            for ( Iterator it = this.discoveredPlugins.iterator(); it.hasNext(); )
+            {
+                Plugin plugin = (Plugin) it.next();
+                
+                build.addPlugin( plugin );
+            }
+        }
 
         return build;
     }
 
     private void warnOfUnsupportedBuildElements( org.apache.maven.model.v3_0_0.Build v3Build, Reporter reporter )
-        throws Exception
+        throws ReportWriteException
     {
         if ( notEmpty( v3Build.getSourceModifications() ) )
         {
