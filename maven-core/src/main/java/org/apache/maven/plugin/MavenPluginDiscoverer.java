@@ -24,6 +24,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.codehaus.plexus.component.discovery.AbstractComponentDiscoverer;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class MavenPluginDiscoverer
     }
 
     public ComponentSetDescriptor createComponentDescriptors( Reader componentDescriptorConfiguration, String source )
-        throws Exception
+        throws PlexusConfigurationException
     {
         PluginDescriptor pluginDescriptor;
 
@@ -59,10 +60,10 @@ public class MavenPluginDiscoverer
         {
             pluginDescriptor = builder.build( componentDescriptorConfiguration );
         }
-        catch ( Exception e )
+        catch ( PlexusConfigurationException e )
         {
-            // If the plugin is not valid, we cannot continue as it may make the lifecycle ebhave differently than expected 
-            throw new Exception( "Cannot process plugin descriptor: " + source, e );
+            // If the plugin is not valid, we cannot continue as it may make the lifecycle ebhave differently than expected
+            throw new PlexusConfigurationException( "Cannot process plugin descriptor: " + source, e );
         }
 
         // ----------------------------------------------------------------------

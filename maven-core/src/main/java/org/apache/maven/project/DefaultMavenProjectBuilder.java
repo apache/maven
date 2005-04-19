@@ -45,6 +45,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -125,9 +126,9 @@ public class DefaultMavenProjectBuilder
 
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
-        
+
         Settings settings = null;
-        
+
         try
         {
             settings = mavenSettingsBuilder.buildSettings();
@@ -136,7 +137,7 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( "Cannot read settings.", e );
         }
-        
+
         boolean systemOnline = !settings.getActiveProfile().isOffline();
 
         MavenProject project = build( model, localRepository, resolveDependencies );
@@ -160,7 +161,7 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         Settings settings = null;
-        
+
         try
         {
             settings = mavenSettingsBuilder.buildSettings();
@@ -169,7 +170,7 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( "Cannot read settings.", e );
         }
-        
+
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         return build( model, localRepository, false );
@@ -312,7 +313,7 @@ public class DefaultMavenProjectBuilder
             {
                 throw new ProjectBuildingException( "Cannot read settings.", e );
             }
-            
+
             MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
@@ -583,7 +584,7 @@ public class DefaultMavenProjectBuilder
     }
 
     public void contextualize( Context context )
-        throws Exception
+        throws ContextException
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }

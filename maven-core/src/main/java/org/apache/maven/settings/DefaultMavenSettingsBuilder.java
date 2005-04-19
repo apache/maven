@@ -16,15 +16,14 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileReader;
-
 import org.apache.maven.MavenConstants;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
+
+import java.io.File;
+import java.io.FileReader;
 
 /**
  * @author jdcasey
@@ -36,7 +35,9 @@ public class DefaultMavenSettingsBuilder
 {
     public static final String userHome = System.getProperty( "user.home" );
 
-    /** @configuration */
+    /**
+     * @configuration
+     */
     private String settingsPath;
 
     private File settingsFile;
@@ -46,7 +47,6 @@ public class DefaultMavenSettingsBuilder
     // ----------------------------------------------------------------------
 
     public void initialize()
-        throws Exception
     {
         settingsFile = getSettingsFile();
 
@@ -62,7 +62,7 @@ public class DefaultMavenSettingsBuilder
         throws Exception
     {
         Settings settings = null;
-        
+
         if ( settingsFile.exists() && settingsFile.isFile() )
         {
             FileReader reader = null;
@@ -79,17 +79,18 @@ public class DefaultMavenSettingsBuilder
                 IOUtil.close( reader );
             }
         }
-        
-        if(settings == null)
+
+        if ( settings == null )
         {
             getLogger().debug( "Settings model not found. Creating empty instance of MavenSettings." );
 
             settings = new Settings();
         }
-        
-        if(settings.getActiveProfile() == null)
+
+        if ( settings.getActiveProfile() == null )
         {
-            File mavenUserConfigurationDirectory = new File( userHome, MavenConstants.MAVEN_USER_CONFIGURATION_DIRECTORY );
+            File mavenUserConfigurationDirectory = new File( userHome,
+                                                             MavenConstants.MAVEN_USER_CONFIGURATION_DIRECTORY );
             if ( !mavenUserConfigurationDirectory.exists() )
             {
                 if ( !mavenUserConfigurationDirectory.mkdirs() )
@@ -98,12 +99,11 @@ public class DefaultMavenSettingsBuilder
                 }
             }
 
-            String localRepository =
-                new File( mavenUserConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
-            
+            String localRepository = new File( mavenUserConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
+
             settings.initializeActiveProfile( localRepository );
         }
-        
+
         return settings;
     }
 
