@@ -16,10 +16,6 @@ package org.apache.maven.artifact.handler;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
-import java.io.File;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -27,8 +23,6 @@ import java.io.File;
 public interface ArtifactHandler
 {
     static String ROLE = ArtifactHandler.class.getName();
-
-    File source( String basedir, Artifact artifact );
 
     String extension();
 

@@ -68,7 +68,7 @@ public class DeployTask
         {
             if ( !isPomArtifact )
             {
-                deployer.deploy( pom.getBuild().getDirectory(), artifact, deploymentRepository, localRepo );
+                deployer.deploy( file, artifact, deploymentRepository, localRepo );
             }
             else
             {

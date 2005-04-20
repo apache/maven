@@ -34,11 +34,12 @@ public interface ArtifactInstaller
      * of the source file.
      *
      * @param basedir         the directory where the artifact is stored
+     * @param finalName       the name of the artifact sans extension
      * @param artifact        the artifact definition
      * @param localRepository the local repository to install into
      * @throws ArtifactInstallationException if an error occurred installing the artifact
      */
-    void install( String basedir, Artifact artifact, ArtifactRepository localRepository )
+    void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException;
 
 

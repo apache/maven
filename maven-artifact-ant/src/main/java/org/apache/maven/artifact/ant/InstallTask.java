@@ -64,7 +64,7 @@ public class InstallTask
         {
             if ( !isPomArtifact )
             {
-                installer.install( pom.getBuild().getDirectory(), artifact, localRepo );
+                installer.install( file, artifact, localRepo );
             }
             else
             {

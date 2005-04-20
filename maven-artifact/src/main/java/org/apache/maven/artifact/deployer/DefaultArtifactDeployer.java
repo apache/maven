@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.apache.maven.wagon.TransferFailedException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -34,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class DefaultArtifactDeployer
+    extends AbstractLogEnabled
     implements ArtifactDeployer
 {
     private WagonManager wagonManager;
@@ -42,7 +44,7 @@ public class DefaultArtifactDeployer
 
     private List artifactTransformations;
 
-    public void deploy( String basedir, Artifact artifact, ArtifactRepository deploymentRepository,
+    public void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
@@ -50,7 +52,8 @@ public class DefaultArtifactDeployer
 
         try
         {
-            source = artifactHandlerManager.getArtifactHandler( artifact.getType() ).source( basedir, artifact );
+            String extension = artifactHandlerManager.getArtifactHandler( artifact.getType() ).extension();
+            source = new File( basedir, finalName + "." + extension );
         }
         catch ( ArtifactHandlerNotFoundException e )
         {
@@ -64,6 +67,12 @@ public class DefaultArtifactDeployer
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
+        if ( deploymentRepository.getAuthenticationInfo() == null )
+        {
+            getLogger().warn( "Deployment repository {id: \'" + deploymentRepository.getId() +
+                           "\'} has no associated authentication info!" );
+        }
+
         try
         {
             // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?

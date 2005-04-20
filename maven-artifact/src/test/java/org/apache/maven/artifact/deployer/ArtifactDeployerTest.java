@@ -50,7 +50,7 @@ public class ArtifactDeployerTest
 
         Artifact artifact = createArtifact( "artifact", "1.0" );
 
-        artifactDeployer.deploy( artifactBasedir, artifact, remoteRepository(), localRepository() );
+        artifactDeployer.deploy( artifactBasedir, "artifact-1.0", artifact, remoteRepository(), localRepository() );
 
         assertRemoteArtifactPresent( artifact );
     }

@@ -80,13 +80,6 @@ public class DeployMojo
             throw new PluginExecutionException( msg );
         }
 
-        // TODO: put into the deployer
-        if ( deploymentRepository.getAuthenticationInfo() == null )
-        {
-            getLog().warn( "Deployment repository {id: \'" + deploymentRepository.getId() +
-                           "\'} has no associated authentication info!" );
-        }
-
         // Deploy the POM
         Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
                                                  project.getPackaging() );
@@ -102,7 +95,8 @@ public class DeployMojo
         {
             if ( !isPomArtifact )
             {
-                deployer.deploy( project.getBuild().getDirectory(), artifact, deploymentRepository, localRepository );
+                deployer.deploy( project.getBuild().getDirectory(), project.getBuild().getFinalName(), artifact,
+                                 deploymentRepository, localRepository );
             }
             else
             {

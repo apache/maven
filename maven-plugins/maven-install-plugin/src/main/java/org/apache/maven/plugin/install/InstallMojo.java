@@ -80,7 +80,9 @@ public class InstallMojo
         {
             if ( !isPomArtifact )
             {
-                installer.install( project.getBuild().getDirectory(), artifact, localRepository );
+                // TODO: would be something nice to get back from the project to get the full filename (the OGNL feedback thing)
+                installer.install( project.getBuild().getDirectory(), project.getBuild().getFinalName(), artifact,
+                                   localRepository );
             }
             else
             {

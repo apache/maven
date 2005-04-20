@@ -16,10 +16,6 @@ package org.apache.maven.artifact.handler;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
-import java.io.File;
-
 /**
  * @todo these should be configurable
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -31,11 +27,6 @@ public abstract class AbstractArtifactHandler
     public String additionalPlugin()
     {
         return null;
-    }
-
-    public File source( String basedir, Artifact artifact )
-    {
-        return new File( basedir, artifact.getArtifactId() + "-" + artifact.getVersion() + "." + extension() );
     }
 
     public String extension()

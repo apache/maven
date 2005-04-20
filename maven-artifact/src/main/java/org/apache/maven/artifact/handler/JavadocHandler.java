@@ -16,10 +16,6 @@ package org.apache.maven.artifact.handler;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
-import java.io.File;
-
 /**
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez </a>
  * @version $Id$
@@ -27,10 +23,6 @@ import java.io.File;
 public class JavadocHandler
     extends AbstractArtifactHandler
 {
-    public File source( String basedir, Artifact artifact )
-    {
-        return new File( basedir, artifact.getArtifactId() + "-" + artifact.getVersion() + "-javadocs." + extension() );
-    }
 
     public String extension()
     {

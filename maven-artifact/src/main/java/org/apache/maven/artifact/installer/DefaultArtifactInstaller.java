@@ -40,14 +40,15 @@ public class DefaultArtifactInstaller
 
     private List artifactTransformations;
 
-    public void install( String basedir, Artifact artifact, ArtifactRepository localRepository )
+    public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
         File source = null;
 
         try
         {
-            source = artifactHandlerManager.getArtifactHandler( artifact.getType() ).source( basedir, artifact );
+            String extension = artifactHandlerManager.getArtifactHandler( artifact.getType() ).extension();
+            source = new File( basedir, finalName + "." + extension );
         }
         catch ( ArtifactHandlerNotFoundException e )
         {

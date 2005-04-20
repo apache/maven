@@ -50,7 +50,7 @@ public class ArtifactInstallerTest
 
         Artifact artifact = createArtifact( "artifact", "1.0" );
 
-        artifactInstaller.install( artifactBasedir, artifact, localRepository() );
+        artifactInstaller.install( artifactBasedir, "artifact-1.0", artifact, localRepository() );
 
         assertLocalArtifactPresent( artifact );
     }

@@ -25,7 +25,7 @@ public interface ArtifactDeployer
 {
     String ROLE = ArtifactDeployer.class.getName();
 
-    void deploy( String basedir, Artifact artifact, ArtifactRepository deploymentRepository,
+    void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
                  ArtifactRepository localRepository )
         throws ArtifactDeploymentException;
 
