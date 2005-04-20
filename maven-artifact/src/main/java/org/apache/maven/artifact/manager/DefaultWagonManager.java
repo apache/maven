@@ -33,6 +33,7 @@ import org.apache.maven.wagon.observers.ChecksumObserver;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -42,6 +43,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -77,9 +79,8 @@ public class DefaultWagonManager
         return wagon;
     }
 
-    // TODO: don't throw exception
     private void releaseWagon( Wagon wagon )
-        throws Exception
+        throws ComponentLifecycleException
     {
         container.release( wagon );
     }
@@ -131,16 +132,15 @@ public class DefaultWagonManager
 //        }
 
         // TODO: configure these
-        // TODO: Clean up this try/catch if it truly isn't needed.
-//        try
-//        {
+        try
+        {
             wagon.addTransferListener( new ChecksumObserver( "MD5" ) );
             wagon.addTransferListener( new ChecksumObserver( "SHA-1" ) );
-//        }
-//        catch ( NoSuchAlgorithmException e )
-//        {
-//            throw new TransferFailedException( "Unable to add checksum methods", e );
-//        }
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new TransferFailedException( "Unable to add checksum methods", e );
+        }
 
         try
         {
