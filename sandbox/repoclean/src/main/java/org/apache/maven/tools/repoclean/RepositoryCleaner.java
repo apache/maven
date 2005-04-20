@@ -25,6 +25,8 @@ import org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier;
 import org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer;
 import org.apache.maven.tools.repoclean.index.ArtifactIndexer;
 import org.apache.maven.tools.repoclean.report.FileReporter;
+import org.apache.maven.tools.repoclean.report.ReportWriteException;
+import org.apache.maven.tools.repoclean.report.Reporter;
 import org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -61,6 +63,8 @@ public class RepositoryCleaner
     public static final String ROLE = RepositoryCleaner.class.getName();
 
     private ArtifactDigestVerifier artifactDigestVerifier;
+
+    private ArtifactRepositoryLayout bridgingLayout;
 
     private MailSender mailSender;
     
@@ -241,7 +245,7 @@ public class RepositoryCleaner
         Logger logger = getLogger();
 
         ArtifactPomRewriter artifactPomRewriter = null;
-
+        
         try
         {
             logger.info( "Rewriting up to " + artifacts.size() + " artifacts (Should be " + ( artifacts.size() * 2 )
@@ -337,11 +341,15 @@ public class RepositoryCleaner
                             File sourcePom = new File( sourceRepositoryBase, sourceRepo.pathOfMetadata( pom ) );
 
                             File targetPom = new File( targetRepositoryBase, targetRepo.pathOfMetadata( pom ) );
+                            
+                            File bridgedTargetPom = new File( targetRepositoryBase, bridgingLayout.pathOfMetadata( pom ) );
 
                             try
                             {
                                 artifactPomRewriter.rewrite( artifact, sourcePom, targetPom, artifactReporter,
                                                              configuration.reportOnly() );
+                                
+                                bridgePomLocations( targetPom, bridgedTargetPom, artifactReporter );
                             }
                             catch ( Exception e )
                             {
@@ -390,6 +398,30 @@ public class RepositoryCleaner
             {
                 container.release( artifactPomRewriter );
             }
+        }
+    }
+
+    private void bridgePomLocations( File targetPom, File bridgedTargetPom, Reporter reporter ) throws IOException, ReportWriteException
+    {
+        if(targetPom.equals(bridgedTargetPom))
+        {
+            reporter.warn("Cannot create legacy-compatible copy of POM at: " + targetPom + "; legacy-compatible path is the same as the converted POM itself."); 
+        }
+        
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        
+        try
+        {
+            in = new FileInputStream(targetPom);
+            out = new FileOutputStream(bridgedTargetPom);
+            
+            IOUtil.copy(in, out);
+        }
+        finally
+        {
+            IOUtil.close(in);
+            IOUtil.close(out);
         }
     }
 

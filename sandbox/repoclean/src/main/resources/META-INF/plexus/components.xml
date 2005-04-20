@@ -1,5 +1,15 @@
 <component-set>
   <components>
+    <component>
+      <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
+      <role-hint>alpha-bridging</role-hint>
+      <implementation>org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
+      </requirements>
+    </component>
     <!--
      |
      |
@@ -99,6 +109,11 @@
       <role>org.apache.maven.tools.repoclean.RepositoryCleaner</role>
       <implementation>org.apache.maven.tools.repoclean.RepositoryCleaner</implementation>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
+          <role-hint>alpha-bridging</role-hint>
+          <field-name>bridgingLayout</field-name>
+        </requirement>
         <requirement>
           <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</role>
         </requirement>
