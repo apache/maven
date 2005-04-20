@@ -21,39 +21,63 @@ import java.net.URL;
 
 public final class TestSupport
 {
-    
+
+    private static final String REPO_SUBDIR = "repo/";
+
     private static final String REPO_MARKER = "repo-marker.txt";
-    private static final int MY_PACKAGE_TRIM = TestSupport.class.getPackage().getName().length() + 1;
-    
+
+    private static final int PACKAGE_TRIM = TestSupport.class.getPackage().getName().length() + 1;
+
     private TestSupport()
     {
     }
-    
-    public static String getMyRepositoryPath(Object testInstance)
+
+    public static String getMyRepositoryPath( Object testInstance )
     {
         Class testClass = testInstance.getClass();
-        
-        String myRepo = testClass.getName().substring(MY_PACKAGE_TRIM);
-        
-        return getRepositoryPath(myRepo);
+
+        String myRepo = testClass.getName().substring( PACKAGE_TRIM );
+
+        return getRepositoryPath( myRepo );
+    }
+
+    public static File getMyResource( Object testInstance, String relativePath )
+    {
+        Class testClass = testInstance.getClass();
+
+        String myPath = testClass.getName().substring( PACKAGE_TRIM );
+
+        String resource = myPath.replace( '.', '/' );
+
+        if ( !relativePath.startsWith( "/" ) )
+        {
+            resource += "/";
+        }
+
+        resource += relativePath;
+
+        return getResource( resource );
     }
 
     public static String getRepositoryPath( String relativePath )
     {
-        String base = relativePath.replace('.', '/');
-        
-        if(!base.endsWith("/"))
+        String base = relativePath.replace( '.', '/' );
+
+        if ( !base.endsWith( "/" ) )
         {
             base += "/";
         }
-        
+
+        return getResource( base + REPO_SUBDIR + REPO_MARKER ).getParentFile().getAbsolutePath();
+    }
+
+    public static File getResource( String relativePath )
+    {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         
-        URL repoMarkerResource = cloader.getResource(base + REPO_MARKER);
-        
-        File repoMarker = new File(repoMarkerResource.getPath()).getAbsoluteFile();
-        
-        return repoMarker.getParentFile().getPath();
+        URL resource = cloader.getResource( relativePath );
+
+        return new File( resource.getPath() ).getAbsoluteFile();
     }
 
 }

@@ -6,10 +6,10 @@ import org.codehaus.plexus.util.IOUtil;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -43,24 +43,24 @@ public class ArtifactDigestor
     public boolean verifyArtifactDigest( File artifactFile, File digestFile, String algorithm )
         throws ArtifactDigestException
     {
-        if(artifactFile.exists() && digestFile.exists())
+        if ( artifactFile.exists() && digestFile.exists() )
         {
             byte[] generatedDigest = generateArtifactDigest( artifactFile, algorithm );
-            
+
             InputStream in = null;
             try
             {
                 in = new FileInputStream( artifactFile );
-                
+
                 int digestLen = generatedDigest.length;
                 int currentIdx = 0;
-                
+
                 boolean matched = true;
-                
+
                 int read = -1;
                 while ( ( read = in.read() ) > -1 )
                 {
-                    if(currentIdx >= digestLen || read != generatedDigest[currentIdx])
+                    if ( currentIdx >= digestLen || read != generatedDigest[currentIdx] )
                     {
                         return false;
                     }
@@ -68,23 +68,25 @@ public class ArtifactDigestor
             }
             catch ( IOException e )
             {
-                throw new ArtifactDigestException("Cannot verify digest for artifact file: \'" + artifactFile + "\' against digest file: \'" + digestFile + "\' using algorithm: \'" + algorithm + "\'", e);
+                throw new ArtifactDigestException( "Cannot verify digest for artifact file: \'" + artifactFile
+                    + "\' against digest file: \'" + digestFile + "\' using algorithm: \'" + algorithm + "\'", e );
             }
             finally
             {
                 IOUtil.close( in );
             }
-            
+
         }
         else
         {
             return false;
         }
-        
+
         return true;
     }
-    
-    private byte[] generateArtifactDigest( File artifactFile, String algorithm ) throws ArtifactDigestException
+
+    public byte[] generateArtifactDigest( File artifactFile, String algorithm )
+        throws ArtifactDigestException
     {
         MessageDigest digest = null;
         try
@@ -105,7 +107,7 @@ public class ArtifactDigestor
             int read = -1;
             while ( ( read = in.read( buffer ) ) > -1 )
             {
-                digest.update(buffer, 0, read);
+                digest.update( buffer, 0, read );
             }
         }
         catch ( IOException e )
@@ -120,14 +122,17 @@ public class ArtifactDigestor
         return digest.digest();
     }
 
-    private void writeDigestFile( File digestFile, byte[] digestData ) throws IOException
+    private void writeDigestFile( File digestFile, byte[] digestData )
+        throws IOException
     {
-        OutputStream out = null;
+        Writer out = null;
         try
         {
-            out = new FileOutputStream( digestFile );
-            out.write( digestData );
-            out.flush();
+            out = new FileWriter( digestFile );
+            for ( int i = 0; i < digestData.length; i++ )
+            {
+                out.write( Integer.toHexString( digestData[i] ) );
+            }
         }
         finally
         {
