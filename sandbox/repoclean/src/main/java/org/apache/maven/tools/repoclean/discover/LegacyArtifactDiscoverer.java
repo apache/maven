@@ -124,18 +124,32 @@ public class LegacyArtifactDiscoverer
 
             if ( extPos > 0 )
             {
-                lastAvceToken = lastAvceToken.substring( 0, extPos );
-            }
+                String ext = lastAvceToken.substring( extPos + 1 );
+                if ( type.equals( ext ) )
+                {
+                    lastAvceToken = lastAvceToken.substring( 0, extPos );
 
-            avceTokenList.addLast( lastAvceToken );
+                    avceTokenList.addLast( lastAvceToken );
+                }
+                else
+                {
+                    reporter
+                        .warn( "Artifact path: \'"
+                            + path
+                            + "\' does not match naming convention. Cannot reliably extract artifact information from path." );
+
+                    return null;
+                }
+            }
         }
 
-        String validVersionParts = "([Dd][Ee][Vv][_.0-9]*)|" + "([Ss][Nn][Aa][Pp][Ss][Hh][Oo][Tt])|" + "([0-9][_.0-9a-zA-Z]*)|"
-            + "([Gg]?[_.0-9ab]*([Pp][Rr][Ee]|[Rr][Cc]|[Gg]|[Mm])[_.0-9]*)|" + "([Aa][Ll][Pp][Hh][Aa][_.0-9]*)|"
-            + "([Bb][Ee][Tt][Aa][_.0-9]*)|" + "([Rr][Cc][_.0-9]*)|" + "([Tt][Ee][Ss][Tt][_.0-9]*)|"
-            + "([Dd][Ee][Bb][Uu][Gg][_.0-9]*)|" + "([Uu][Nn][Oo][Ff][Ff][Ii][Cc][Ii][Aa][Ll][_.0-9]*)|"
-            + "([Cc][Uu][Rr][Rr][Ee][Nn][Tt])|" + "([Ll][Aa][Tt][Ee][Ss][Tt])|" + "([Ff][Cc][Ss])|"
-            + "([Rr][Ee][Ll][Ee][Aa][Ss][Ee][_.0-9]*)|" + "([Nn][Ii][Gg][Hh][Tt][Ll][Yy])";
+        String validVersionParts = "([Dd][Ee][Vv][_.0-9]*)|" + "([Ss][Nn][Aa][Pp][Ss][Hh][Oo][Tt])|"
+            + "([0-9][_.0-9a-zA-Z]*)|" + "([Gg]?[_.0-9ab]*([Pp][Rr][Ee]|[Rr][Cc]|[Gg]|[Mm])[_.0-9]*)|"
+            + "([Aa][Ll][Pp][Hh][Aa][_.0-9]*)|" + "([Bb][Ee][Tt][Aa][_.0-9]*)|" + "([Rr][Cc][_.0-9]*)|"
+            + "([Tt][Ee][Ss][Tt][_.0-9]*)|" + "([Dd][Ee][Bb][Uu][Gg][_.0-9]*)|"
+            + "([Uu][Nn][Oo][Ff][Ff][Ii][Cc][Ii][Aa][Ll][_.0-9]*)|" + "([Cc][Uu][Rr][Rr][Ee][Nn][Tt])|"
+            + "([Ll][Aa][Tt][Ee][Ss][Tt])|" + "([Ff][Cc][Ss])|" + "([Rr][Ee][Ll][Ee][Aa][Ss][Ee][_.0-9]*)|"
+            + "([Nn][Ii][Gg][Hh][Tt][Ll][Yy])";
 
         // let's discover the version, and whatever's leftover will be either
         // a classifier, or part of the artifactId, depending on position.
@@ -211,16 +225,16 @@ public class LegacyArtifactDiscoverer
         }
 
         String artifactId = artifactIdBuffer.toString();
-        
-        int lastVersionCharIdx = versionBuffer.length() -1;
-        if(lastVersionCharIdx > -1 && versionBuffer.charAt(lastVersionCharIdx) == '-')
+
+        int lastVersionCharIdx = versionBuffer.length() - 1;
+        if ( lastVersionCharIdx > -1 && versionBuffer.charAt( lastVersionCharIdx ) == '-' )
         {
-            versionBuffer.setLength(lastVersionCharIdx);
+            versionBuffer.setLength( lastVersionCharIdx );
         }
-        
+
         String version = versionBuffer.toString();
-        
-        if(version.length() < 1)
+
+        if ( version.length() < 1 )
         {
             version = null;
         }

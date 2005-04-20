@@ -39,8 +39,7 @@ public interface ArtifactDiscoverer
         "**/.htaccess",
         "**/*.html",
         "**/*.asc",
-        "**/*.txt",
-        "**/REPOSITORY-V*.txt"
+        "**/*.txt"
     };
 
     List discoverArtifacts( File repositoryBase, FileReporter reporter ) throws Exception;
