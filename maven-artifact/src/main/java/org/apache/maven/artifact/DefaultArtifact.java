@@ -249,4 +249,44 @@ public class DefaultArtifact
         this.baseVersion = baseVersion;
     }
 
+    public int compareTo( Object o )
+    {
+        Artifact a = (Artifact) o;
+
+        int result = groupId.compareTo( a.getGroupId() );
+        if ( result == 0 )
+        {
+            result = artifactId.compareTo( a.getArtifactId() );
+            if ( result == 0 )
+            {
+                result = type.compareTo( a.getType() );
+                if ( result == 0 )
+                {
+                    if ( classifier == null )
+                    {
+                        if ( a.getClassifier() != null )
+                        {
+                            result = 1;
+                        }
+                    }
+                    else
+                    {
+                        if ( a.getClassifier() != null )
+                        {
+                            result = classifier.compareTo( a.getClassifier() );
+                        }
+                        else
+                        {
+                            result = -1;
+                        }
+                    }
+                    if ( result == 0 )
+                    {
+                        result = version.compareTo( a.getVersion() );
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

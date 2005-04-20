@@ -28,6 +28,7 @@ import java.util.List;
  * @todo do we really need an interface here?
  */
 public interface Artifact
+    extends Comparable
 {
     // TODO: into scope handler
     String SCOPE_COMPILE = "compile";
