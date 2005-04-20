@@ -33,6 +33,9 @@
         <requirement>
           <role>org.codehaus.plexus.component.configurator.ComponentConfigurator</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
       </requirements>
     </component>
     <component>
@@ -49,6 +52,10 @@
       <configuration>
         <settingsPath>${user.home}/.m2/settings.xml</settingsPath>
       </configuration>
+    </component>
+    <component>
+      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+      <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
     </component>
   </components>
 </plexus>

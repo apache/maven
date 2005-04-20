@@ -117,10 +117,6 @@
      |
      |
      -->
-    <component>
-      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-      <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
-    </component>
 
     <!--
      |
@@ -233,6 +229,13 @@
       </configuration>
     </component>
 
+    <!-- ********************* FIXME *******************************************
+     | I realize this is duplicated but allows the project builder to work by itself
+     -->
+    <component>
+      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+      <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
+    </component>
     <!-- ********************* FIXME *******************************************
      | I realize this is duplicated but allows the project builder to work by itself
      -->

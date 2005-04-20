@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -32,8 +33,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.ReactorException;
-import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -76,21 +77,22 @@ public class DefaultMaven
     protected PlexusContainer container;
 
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
-    
+
     protected WagonManager wagonManager;
 
     // ----------------------------------------------------------------------
     // Project execution
     // ----------------------------------------------------------------------
 
-    public MavenExecutionResponse execute( MavenExecutionRequest request ) throws ReactorException
+    public MavenExecutionResponse execute( MavenExecutionRequest request )
+        throws ReactorException
     {
         if ( request.getGoals().isEmpty() )
         {
             throw new ReactorException( "You must specify at least one goal. Try 'install'." );
         }
-        
-        if( request.getSettings().getActiveProfile().isOffline() )
+
+        if ( request.getSettings().getActiveProfile().isOffline() )
         {
             getLogger().info( "Maven is running in offline mode." );
         }
@@ -100,7 +102,7 @@ public class DefaultMaven
 
         // TODO: goals are outer loop
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
-        
+
         try
         {
             List projects;
@@ -201,11 +203,19 @@ public class DefaultMaven
     }
 
     private MavenExecutionResponse processProject( MavenExecutionRequest request, MavenProject project,
-                                                  EventDispatcher dispatcher, List goals ) throws Exception
+                                                   EventDispatcher dispatcher, List goals )
+        throws LifecycleExecutionException
     {
         MavenSession session = createSession( request, project );
 
-        resolveParameters( request );
+        try
+        {
+            resolveParameters( request );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new LifecycleExecutionException( "Unable to configure Maven for execution", e );
+        }
 
         // !! This is ripe for refactoring to an aspect.
         // Event monitoring.
@@ -221,7 +231,7 @@ public class DefaultMaven
 
             dispatcher.dispatchEnd( event, project.getId() );
         }
-        catch ( Exception e )
+        catch ( LifecycleExecutionException e )
         {
             dispatcher.dispatchError( event, project.getId(), e );
             throw e;
@@ -261,7 +271,8 @@ public class DefaultMaven
         return response;
     }
 
-    public MavenProject getProject( File pom, ArtifactRepository localRepository ) throws ProjectBuildingException
+    public MavenProject getProject( File pom, ArtifactRepository localRepository )
+        throws ProjectBuildingException
     {
         if ( pom.exists() )
         {
@@ -293,11 +304,11 @@ public class DefaultMaven
     /**
      * @todo [BP] this might not be required if there is a better way to pass
      * them in. It doesn't feel quite right.
-     * 
      * @todo [JC] we should at least provide a mapping of protocol-to-proxy for
      * the wagons, shouldn't we?
      */
-    private void resolveParameters( MavenExecutionRequest request ) throws ComponentLookupException
+    private void resolveParameters( MavenExecutionRequest request )
+        throws ComponentLookupException
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
@@ -317,7 +328,8 @@ public class DefaultMaven
     // Lifecylce Management
     // ----------------------------------------------------------------------
 
-    public void contextualize( Context context ) throws ContextException
+    public void contextualize( Context context )
+        throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
@@ -394,9 +406,8 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info(
-                          "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/"
-                              + ( r.totalMemory() / mb ) + "M" );
+        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" +
+                          ( r.totalMemory() / mb ) + "M" );
     }
 
     protected void line()

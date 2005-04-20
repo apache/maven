@@ -40,16 +40,21 @@ import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Plugin;
-import org.apache.maven.settings.Settings;
+import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Settings;
 import org.codehaus.classworlds.ClassWorld;
+import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collections;
@@ -67,7 +72,6 @@ public class MavenCli
     public static File userDir = new File( System.getProperty( "user.dir" ) );
 
     public static int main( String[] args, ClassWorld classWorld )
-        throws Exception
     {
         // ----------------------------------------------------------------------
         // Setup the command line parser
@@ -75,7 +79,17 @@ public class MavenCli
 
         CLIManager cliManager = new CLIManager();
 
-        CommandLine commandLine = cliManager.parse( args );
+        CommandLine commandLine;
+        try
+        {
+            commandLine = cliManager.parse( args );
+        }
+        catch ( ParseException e )
+        {
+            System.err.println( "Unable to parse command line options: " + e.getMessage() );
+            cliManager.displayHelp();
+            return 1;
+        }
 
         // ----------------------------------------------------------------------
         //
@@ -95,6 +109,8 @@ public class MavenCli
 
         initializeSystemProperties( commandLine );
 
+        boolean debug = commandLine.hasOption( CLIManager.DEBUG );
+
         // ----------------------------------------------------------------------
         // Process particular command line options
         // ----------------------------------------------------------------------
@@ -106,10 +122,218 @@ public class MavenCli
         }
         if ( commandLine.hasOption( CLIManager.VERSION ) )
         {
-            // TODO: is there a beter way? Maybe read the manifest?
+            showVersion();
 
-            String version = "unknown";
+            return 0;
+        }
 
+        EventDispatcher eventDispatcher = new DefaultEventDispatcher();
+
+        // ----------------------------------------------------------------------
+        // Now that we have everything that we need we will fire up plexus and
+        // bring the maven component to life for use.
+        // ----------------------------------------------------------------------
+
+        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
+
+        try
+        {
+            embedder.start( classWorld );
+        }
+        catch ( PlexusContainerException e )
+        {
+            showFatalError( "Unable to start the embedded plexus container", e, debug );
+            return 1;
+        }
+
+        Settings settings;
+        try
+        {
+            MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
+
+            settings = settingsBuilder.buildSettings();
+        }
+        catch ( IOException e )
+        {
+            showFatalError( "Unable to read settings.xml", e, debug );
+            return 1;
+        }
+        catch ( XmlPullParserException e )
+        {
+            showFatalError( "Unable to read settings.xml", e, debug );
+            return 1;
+        }
+        catch ( ComponentLookupException e )
+        {
+            showFatalError( "Unable to read settings.xml", e, debug );
+            return 1;
+        }
+
+        List projectFiles = null;
+        try
+        {
+            projectFiles = getProjectFiles( commandLine );
+        }
+        catch ( IOException e )
+        {
+            showFatalError( "Error locating project files for reactor execution", e, debug );
+            return 1;
+        }
+
+        Maven maven = null;
+        MavenExecutionRequest request = null;
+        try
+        {
+            maven = createMavenInstance( embedder );
+
+            request = createRequest( projectFiles, embedder, commandLine, settings, eventDispatcher, debug );
+        }
+        catch ( ComponentLookupException e )
+        {
+            showFatalError( "Unable to configure the Maven application", e, debug );
+            return 1;
+        }
+
+        MavenExecutionResponse response = null;
+        try
+        {
+            response = maven.execute( request );
+        }
+        catch ( ReactorException e )
+        {
+            showFatalError( "Error executing Maven for a project", e, debug );
+            return 1;
+        }
+
+        if ( response != null && response.isExecutionFailure() )
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    private static void showFatalError( String message, Exception e, boolean debug )
+    {
+        System.err.println( "FATAL ERROR: " + message );
+        if ( debug )
+        {
+            e.printStackTrace();
+        }
+        else
+        {
+            System.err.println( "For more information, run with the -X flag" );
+        }
+    }
+
+    private static MavenExecutionRequest createRequest( List files, ArtifactEnabledEmbedder embedder,
+                                                        CommandLine commandLine, Settings settings,
+                                                        EventDispatcher eventDispatcher, boolean debug )
+        throws ComponentLookupException
+    {
+        MavenExecutionRequest request = null;
+
+        ArtifactRepository localRepository = createLocalRepository( embedder, settings, commandLine );
+
+        request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
+                                                    commandLine.getArgList(), files, userDir.getPath() );
+
+        LoggerManager manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
+        if ( debug )
+        {
+            manager.setThreshold( Logger.LEVEL_DEBUG );
+        }
+
+        // TODO [BP]: do we set one per mojo? where to do it?
+        Logger logger = manager.getLoggerForComponent( Plugin.ROLE );
+        if ( logger != null )
+        {
+            request.setLog( new DefaultLog( logger ) );
+
+            request.addEventMonitor( new DefaultEventMonitor( logger ) );
+        }
+
+        if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
+        {
+            request.setRecursive( false );
+        }
+        return request;
+    }
+
+    private static List getProjectFiles( CommandLine commandLine )
+        throws IOException
+    {
+        List files = Collections.EMPTY_LIST;
+        if ( commandLine.hasOption( CLIManager.REACTOR ) )
+        {
+            // TODO: should we now include the pom.xml in the current directory?
+            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
+
+            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
+
+            files = FileUtils.getFiles( userDir, includes, excludes );
+        }
+        else
+        {
+            File projectFile = new File( userDir, POMv4 );
+
+            if ( projectFile.exists() )
+            {
+                files = Collections.singletonList( projectFile );
+            }
+        }
+        return files;
+    }
+
+    private static Maven createMavenInstance( ArtifactEnabledEmbedder embedder )
+        throws ComponentLookupException
+    {
+        // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place (likewise logger).
+        WagonManager wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
+        wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
+
+        return (Maven) embedder.lookup( Maven.ROLE );
+    }
+
+    private static ArtifactRepository createLocalRepository( ArtifactEnabledEmbedder embedder, Settings settings,
+                                                             CommandLine commandLine )
+        throws ComponentLookupException
+    {
+        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) embedder.lookup(
+            ArtifactRepositoryLayout.ROLE, "default" );
+
+        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
+            ArtifactRepositoryFactory.ROLE );
+
+        ArtifactRepository localRepository = getLocalRepository( settings, artifactRepositoryFactory, repositoryLayout );
+
+        boolean snapshotPolicySet = false;
+        if ( commandLine.hasOption( CLIManager.OFFLINE ) )
+        {
+            settings.getActiveProfile().setOffline( true );
+
+            // TODO: this will still check to download if the artifact does not exist locally, instead of failing as it should in offline mode
+            artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_NEVER );
+            snapshotPolicySet = true;
+        }
+
+        if ( !snapshotPolicySet && commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
+        {
+            artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS );
+        }
+        return localRepository;
+    }
+
+    private static void showVersion()
+    {
+        // TODO: is there a beter way? Maybe read the manifest?
+
+        String version = "unknown";
+
+        try
+        {
             for ( Enumeration e = MavenCli.class.getClassLoader().getResources( "/META-INF/maven/pom.xml" );
                   e.hasMoreElements(); )
             {
@@ -124,121 +348,14 @@ public class MavenCli
             }
 
             System.out.println( "Maven version: " + version );
-            return 0;
         }
-
-        // ----------------------------------------------------------------------
-        // We will ultimately not require a flag to indicate the reactor as
-        // we should take this from the execution context i.e. what the type
-        // is stated as in the POM.
-        // ----------------------------------------------------------------------
-
-        MavenExecutionRequest request = null;
-
-        File projectFile = new File( userDir, POMv4 );
-
-        EventDispatcher eventDispatcher = new DefaultEventDispatcher();
-
-        // ----------------------------------------------------------------------
-        // Now that we have everything that we need we will fire up plexus and
-        // bring the maven component to life for use.
-        // ----------------------------------------------------------------------
-
-        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
-
-        embedder.start( classWorld );
-
-        MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
-
-        Settings settings = settingsBuilder.buildSettings();
-
-        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
-            ArtifactRepositoryFactory.ROLE );
-
-        
-        boolean snapshotPolicySet = false;
-        if ( commandLine.hasOption( CLIManager.OFFLINE ) )
+        catch ( IOException e )
         {
-            settings.getActiveProfile().setOffline(true);
-            
-            // TODO: this will still check to download if the artifact does not exist locally, instead of failing as it should in offline mode
-            artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_NEVER );
-            snapshotPolicySet = true;
+            System.err.println( "Unable determine version from JAR file: " + e.getMessage() );
         }
-        
-        if ( !snapshotPolicySet && commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
+        catch ( XmlPullParserException e )
         {
-            artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS );
-        }
-
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) embedder.lookup(
-            ArtifactRepositoryLayout.ROLE, "default" );
-
-        ArtifactRepository localRepository = getLocalRepository( settings, artifactRepositoryFactory, repositoryLayout );
-
-        if ( commandLine.hasOption( CLIManager.REACTOR ) )
-        {
-            // TODO: should we now include the pom.xml in the current directory?
-            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
-
-            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
-
-            request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
-                                                        commandLine.getArgList(), FileUtils.getFiles( userDir,
-                                                                                                      includes,
-                                                                                                      excludes ),
-                                                        userDir.getPath() );
-        }
-        else
-        {
-            List files = Collections.EMPTY_LIST;
-            if ( projectFile.exists() )
-            {
-                files = Collections.singletonList( projectFile );
-            }
-            request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
-                                                        commandLine.getArgList(), files, userDir.getPath() );
-
-            if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
-            {
-                request.setRecursive( false );
-            }
-        }
-
-        LoggerManager manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
-        if ( commandLine.hasOption( CLIManager.DEBUG ) )
-        {
-            manager.setThreshold( Logger.LEVEL_DEBUG );
-        }
-
-        // TODO [BP]: do we set one per mojo? where to do it?
-        Logger logger = manager.getLoggerForComponent( Plugin.ROLE );
-        if ( logger != null )
-        {
-            request.setLog( new DefaultLog( logger ) );
-
-            request.addEventMonitor( new DefaultEventMonitor( logger ) );
-        }
-
-        // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place (likewise logger).
-        WagonManager wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
-        wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
-
-        Maven maven = (Maven) embedder.lookup( Maven.ROLE );
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        MavenExecutionResponse response = maven.execute( request );
-
-        if ( response != null && response.isExecutionFailure() )
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
+            System.err.println( "Unable to parse POM in JAR file: " + e.getMessage() );
         }
     }
 
@@ -355,10 +472,8 @@ public class MavenCli
     //
     // ----------------------------------------------------------------------
 
-    protected static ArtifactRepository getLocalRepository( Settings settings,
-                                                            ArtifactRepositoryFactory repoFactory,
+    protected static ArtifactRepository getLocalRepository( Settings settings, ArtifactRepositoryFactory repoFactory,
                                                             ArtifactRepositoryLayout repositoryLayout )
-        throws Exception
     {
         Profile profile = settings.getActiveProfile();
 

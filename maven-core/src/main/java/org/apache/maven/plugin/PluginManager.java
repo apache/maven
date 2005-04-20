@@ -30,17 +30,15 @@ public interface PluginManager
     String ROLE = PluginManager.class.getName();
 
     void executeMojo( MavenSession session, String goalName )
-        throws PluginExecutionException;
+        throws PluginExecutionException, PluginNotFoundException;
 
     MojoDescriptor getMojoDescriptor( String goalId );
 
-    // TODO: don't throw Exception
     void verifyPluginForGoal( String goalName, MavenSession session )
-        throws Exception;
+        throws PluginNotFoundException, PluginManagerException;
 
-    // TODO: don't throw Exception
     void verifyPlugin( String groupId, String artifactId, MavenSession session )
-        throws Exception;
+        throws PluginNotFoundException, PluginManagerException;
 
     PluginDescriptor getPluginDescriptor( String groupId, String artifactId );
 }

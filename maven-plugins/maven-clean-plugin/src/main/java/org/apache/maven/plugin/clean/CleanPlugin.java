@@ -97,7 +97,6 @@ public class CleanPlugin
      * @param d the directory to delete
      */
     protected void removeDir( File d )
-        throws Exception
     {
         String[] list = d.list();
         if ( list == null )
@@ -124,7 +123,7 @@ public class CleanPlugin
 //                    }
 //                    else
 //                    {
-                        getLog().info( message );
+                    getLog().info( message );
 //                    }
                 }
             }
@@ -140,7 +139,7 @@ public class CleanPlugin
 //            }
 //            else
 //            {
-                getLog().info( message );
+            getLog().info( message );
 //            }
         }
     }

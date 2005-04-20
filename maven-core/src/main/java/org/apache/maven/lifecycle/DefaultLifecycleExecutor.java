@@ -18,6 +18,7 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
@@ -28,6 +29,8 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -139,9 +142,13 @@ public class DefaultLifecycleExecutor
         {
             response.setException( e );
         }
-        catch ( Exception e )
+        catch ( PluginNotFoundException e )
         {
-            throw new LifecycleExecutionException( "Error during lifecycle execution", e );
+            response.setException( e );
+        }
+        catch ( ArtifactHandlerNotFoundException e )
+        {
+            response.setException( e );
         }
         finally
         {
@@ -206,9 +213,8 @@ public class DefaultLifecycleExecutor
         return plugin;
     }
 
-    // TODO: don't throw Exception
     private void processPluginConfiguration( MavenProject project, MavenSession mavenSession, Map phaseMap )
-        throws Exception
+        throws LifecycleExecutionException, PluginNotFoundException
     {
         for ( Iterator i = project.getPlugins().iterator(); i.hasNext(); )
         {
@@ -224,16 +230,22 @@ public class DefaultLifecycleExecutor
      * to execute for that given phase.
      *
      * @param session
-     * @throws Exception
      */
     private void processPluginPhases( Plugin plugin, MavenSession session, Map phaseMap )
-        throws Exception
+        throws LifecycleExecutionException, PluginNotFoundException
     {
         String groupId = plugin.getGroupId();
 
         String artifactId = plugin.getArtifactId();
 
-        pluginManager.verifyPlugin( groupId, artifactId, session );
+        try
+        {
+            pluginManager.verifyPlugin( groupId, artifactId, session );
+        }
+        catch ( PluginManagerException e )
+        {
+            throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+        }
 
         PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( groupId, artifactId );
 
@@ -288,7 +300,7 @@ public class DefaultLifecycleExecutor
      */
     private void configureMojo( MojoDescriptor mojoDescriptor, Map phaseMap, Settings settings )
     {
-        if( settings.getActiveProfile().isOffline() && mojoDescriptor.requiresOnline() )
+        if ( settings.getActiveProfile().isOffline() && mojoDescriptor.requiresOnline() )
         {
             String goal = mojoDescriptor.getGoal();
             getLogger().warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );
@@ -305,7 +317,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void processGoalChain( String task, MavenSession session, Map phaseMap )
-        throws Exception
+        throws LifecycleExecutionException, PluginNotFoundException
     {
         if ( phaseMap.containsKey( task ) )
         {
@@ -337,7 +349,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void verifyMojoPhase( String task, MavenSession session, Map phaseMap )
-        throws Exception
+        throws LifecycleExecutionException, PluginNotFoundException
     {
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
 
@@ -356,7 +368,14 @@ public class DefaultLifecycleExecutor
 
             injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId );
 
-            pluginManager.verifyPluginForGoal( task, session );
+            try
+            {
+                pluginManager.verifyPluginForGoal( task, session );
+            }
+            catch ( PluginManagerException e )
+            {
+                throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+            }
 
             mojoDescriptor = pluginManager.getMojoDescriptor( task );
 
@@ -370,7 +389,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void executePhase( String phase, MavenSession session, Map phaseMap )
-        throws PluginExecutionException
+        throws PluginExecutionException, PluginNotFoundException
     {
         // only execute up to the given phase
         int index = phases.indexOf( phaseMap.get( phase ) );
@@ -411,7 +430,7 @@ public class DefaultLifecycleExecutor
     }
 
     protected void executeMojo( String id, MavenSession session )
-        throws PluginExecutionException
+        throws PluginExecutionException, PluginNotFoundException
     {
         // ----------------------------------------------------------------------
         // We have something of the form <pluginId>:<mojoId>, so this might be

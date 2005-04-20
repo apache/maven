@@ -127,16 +127,7 @@ public class DefaultMavenProjectBuilder
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
-        Settings settings = null;
-
-        try
-        {
-            settings = mavenSettingsBuilder.buildSettings();
-        }
-        catch ( Exception e )
-        {
-            throw new ProjectBuildingException( "Cannot read settings.", e );
-        }
+        Settings settings = readSettings();
 
         boolean systemOnline = !settings.getActiveProfile().isOffline();
 
@@ -156,8 +147,13 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
-                                             ArtifactRepository localRepository )
+    /**
+     * @return
+     * @throws ProjectBuildingException
+     * @todo shouldn't be re-reading all the time - perhaps cache, but check a timestamp so you can detect and reload on
+     * changes in a long running process
+     */
+    private Settings readSettings()
         throws ProjectBuildingException
     {
         Settings settings = null;
@@ -170,6 +166,14 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( "Cannot read settings.", e );
         }
+        return settings;
+    }
+
+    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
+                                             ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+        Settings settings = readSettings();
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
@@ -304,16 +308,6 @@ public class DefaultMavenProjectBuilder
 
         if ( resolveDependencies )
         {
-            Settings settings;
-            try
-            {
-                settings = mavenSettingsBuilder.buildSettings();
-            }
-            catch ( Exception e )
-            {
-                throw new ProjectBuildingException( "Cannot read settings.", e );
-            }
-
             MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
@@ -385,16 +379,7 @@ public class DefaultMavenProjectBuilder
     private List buildArtifactRepositories( List repositories )
         throws ProjectBuildingException
     {
-        Settings settings = null;
-
-        try
-        {
-            settings = mavenSettingsBuilder.buildSettings();
-        }
-        catch ( Exception e )
-        {
-            throw new ProjectBuildingException( "Cannot read settings.", e );
-        }
+        Settings settings = readSettings();
 
         List repos = new ArrayList();
 
@@ -402,20 +387,7 @@ public class DefaultMavenProjectBuilder
         {
             Repository mavenRepo = (Repository) i.next();
 
-            String layout = mavenRepo.getLayout();
-
-            ArtifactRepositoryLayout remoteRepoLayout = null;
-            try
-            {
-                remoteRepoLayout =
-                    (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout +
-                                                    "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.",
-                                                    e );
-            }
+            ArtifactRepositoryLayout remoteRepoLayout = getRepositoryLayout( mavenRepo );
 
             ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo, settings,
                                                                                                   remoteRepoLayout );
@@ -429,30 +401,17 @@ public class DefaultMavenProjectBuilder
     }
 
     private List buildPluginRepositories( List pluginRepositories )
-        throws Exception
+        throws ProjectBuildingException
     {
         List remotePluginRepositories = new ArrayList();
 
-        Settings settings = mavenSettingsBuilder.buildSettings();
+        Settings settings = readSettings();
 
         for ( Iterator it = pluginRepositories.iterator(); it.hasNext(); )
         {
             Repository mavenRepo = (Repository) it.next();
 
-            String layout = mavenRepo.getLayout();
-
-            ArtifactRepositoryLayout repositoryLayout = null;
-            try
-            {
-                repositoryLayout =
-                    (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout +
-                                                    "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.",
-                                                    e );
-            }
+            ArtifactRepositoryLayout repositoryLayout = getRepositoryLayout( mavenRepo );
 
             ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( mavenRepo,
                                                                                                       settings,
@@ -465,20 +424,35 @@ public class DefaultMavenProjectBuilder
         return remotePluginRepositories;
     }
 
+    private ArtifactRepositoryLayout getRepositoryLayout( Repository mavenRepo )
+        throws ProjectBuildingException
+    {
+        String layout = mavenRepo.getLayout();
+
+        ArtifactRepositoryLayout repositoryLayout = null;
+        try
+        {
+            repositoryLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout +
+                                                "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
+        }
+        return repositoryLayout;
+    }
+
     private ArtifactRepository buildDistributionManagementRepository( Repository dmRepo )
-        throws Exception
+        throws ProjectBuildingException
     {
         if ( dmRepo == null )
         {
             return null;
         }
 
-        Settings settings = mavenSettingsBuilder.buildSettings();
+        Settings settings = readSettings();
 
-        String repoLayoutId = dmRepo.getLayout();
-
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container.lookup(
-            ArtifactRepositoryLayout.ROLE, repoLayoutId );
+        ArtifactRepositoryLayout repositoryLayout = getRepositoryLayout( dmRepo );
 
         ArtifactRepository dmArtifactRepository = artifactRepositoryFactory.createArtifactRepository( dmRepo, settings,
                                                                                                       repositoryLayout );

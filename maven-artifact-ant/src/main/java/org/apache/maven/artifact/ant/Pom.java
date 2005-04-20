@@ -74,7 +74,6 @@ public class Pom
     }
 
     public void setFile( File file )
-        throws Exception
     {
         this.file = file;
     }

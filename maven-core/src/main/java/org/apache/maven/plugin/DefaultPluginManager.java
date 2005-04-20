@@ -38,6 +38,7 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.ArtifactEnabledContainer;
+import org.codehaus.plexus.ArtifactEnabledContainerException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
@@ -47,6 +48,7 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -92,6 +94,8 @@ public class DefaultPluginManager
     protected MavenSettingsBuilder mavenSettingsBuilder;
 
     protected ComponentConfigurator configurator;
+
+    private ArtifactFactory artifactFactory;
 
     public DefaultPluginManager()
     {
@@ -194,80 +198,91 @@ public class DefaultPluginManager
         return pluginDescriptors.containsKey( PluginDescriptor.constructPluginKey( groupId, artifactId ) );
     }
 
-    // TODO: don't throw Exception
     public void verifyPluginForGoal( String goalName, MavenSession session )
-        throws Exception
+        throws PluginNotFoundException, PluginManagerException
     {
         String pluginId = PluginDescriptor.getPluginIdFromGoal( goalName );
 
         verifyPlugin( PluginDescriptor.getDefaultPluginGroupId(), pluginId, session );
     }
 
-    // TODO: don't throw Exception
     public void verifyPlugin( String groupId, String artifactId, MavenSession session )
-        throws Exception
+        throws PluginNotFoundException, PluginManagerException
     {
         if ( !isPluginInstalled( groupId, artifactId ) )
         {
-            ArtifactFactory artifactFactory = null;
+            MavenProject project = session.getProject();
+
+            org.apache.maven.model.Plugin pluginConfig = null;
+
+            for ( Iterator it = project.getPlugins().iterator(); it.hasNext(); )
+            {
+                org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
+
+                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                {
+                    pluginConfig = plugin;
+
+                    break;
+                }
+            }
+
+            String version = null;
+
+            if ( pluginConfig != null )
+            {
+                if ( StringUtils.isEmpty( pluginConfig.getVersion() ) )
+                {
+                    // The model/project builder should have validated this already
+                    String message = "The maven plugin with groupId: '" + groupId + "' and artifactId: '" + artifactId +
+                        "' which was configured for use in this project does not have a version associated with it.";
+                    throw new IllegalStateException( message );
+                }
+                else
+                {
+                    version = pluginConfig.getVersion();
+                }
+            }
+
             try
             {
-                MavenProject project = session.getProject();
-
-                org.apache.maven.model.Plugin pluginConfig = null;
-
-                for ( Iterator it = project.getPlugins().iterator(); it.hasNext(); )
-                {
-                    org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
-
-                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-                    {
-                        pluginConfig = plugin;
-
-                        break;
-                    }
-                }
-
-                String version = null;
-
-                if ( pluginConfig != null )
-                {
-                    if ( StringUtils.isEmpty( pluginConfig.getVersion() ) )
-                    {
-                        throw new PluginVersionNotConfiguredException( groupId, artifactId );
-                    }
-                    else
-                    {
-                        version = pluginConfig.getVersion();
-                    }
-                }
-
-                // TODO: Default over to a sensible value (is 1.0-SNAPSHOT right?) Hardcoging of group ID also
-                if ( StringUtils.isEmpty( version ) )
-                {
-                    version = "1.0-SNAPSHOT";
-                }
-
-                artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
-
                 Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version, null,
                                                                           MAVEN_PLUGIN, null );
 
                 addPlugin( pluginArtifact, session );
             }
+            catch ( ArtifactEnabledContainerException e )
+            {
+                throw new PluginManagerException( "Error occurred in the artifact container attempting to download plugin " +
+                                                  groupId + ":" + artifactId, e );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new PluginNotFoundException( groupId, artifactId, version, e );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new PluginManagerException( "Internal configuration error while retrieving " + groupId + ":" + artifactId, e );
+            }
             finally
             {
                 if ( artifactFactory != null )
                 {
-                    container.release( artifactFactory );
+                    try
+                    {
+                        container.release( artifactFactory );
+                    }
+                    catch ( ComponentLifecycleException e )
+                    {
+                        getLogger().error( "Error releasing component - ignoring", e );
+                    }
                 }
             }
         }
     }
 
-    // TODO: don't throw Exception
     protected void addPlugin( Artifact pluginArtifact, MavenSession session )
-        throws Exception
+        throws ArtifactEnabledContainerException, ArtifactResolutionException, ComponentLookupException
     {
         ArtifactResolver artifactResolver = null;
         MavenProjectBuilder mavenProjectBuilder = null;
@@ -287,14 +302,27 @@ public class DefaultPluginManager
         }
         finally
         {
-            // TODO: watch out for the exceptions being thrown
             if ( artifactResolver != null )
             {
-                container.release( artifactResolver );
+                try
+                {
+                    container.release( artifactResolver );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    getLogger().error( "Error releasing component - ignoring", e );
+                }
             }
             if ( mavenProjectBuilder != null )
             {
-                container.release( mavenProjectBuilder );
+                try
+                {
+                    container.release( mavenProjectBuilder );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    getLogger().error( "Error releasing component - ignoring", e );
+                }
             }
         }
     }
@@ -304,7 +332,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public void executeMojo( MavenSession session, String goalName )
-        throws PluginExecutionException
+        throws PluginExecutionException, PluginNotFoundException
     {
         try
         {
@@ -400,7 +428,7 @@ public class DefaultPluginManager
             {
                 if ( newMojoTechnique )
                 {
-                    Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session,
+                    Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration,
                                                                      expressionEvaluator );
 
                     populatePluginFields( plugin, configuration, map, expressionEvaluator );
@@ -409,7 +437,7 @@ public class DefaultPluginManager
                 {
                     getLogger().warn( "WARNING: The mojo " + mojoDescriptor.getId() + " is using the OLD API" );
 
-                    Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration, session,
+                    Map map = getPluginConfigurationFromExpressions( mojoDescriptor, configuration,
                                                                      expressionEvaluator );
 
                     request = createPluginRequest( configuration, map );
@@ -641,7 +669,7 @@ public class DefaultPluginManager
      * @deprecated
      */
     private Map getPluginConfigurationFromExpressions( MojoDescriptor goal, PlexusConfiguration configuration,
-                                                       MavenSession session, ExpressionEvaluator expressionEvaluator )
+                                                       ExpressionEvaluator expressionEvaluator )
         throws ExpressionEvaluationException, PluginConfigurationException
     {
         List parameters = goal.getParameters();
@@ -742,7 +770,7 @@ public class DefaultPluginManager
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         boolean systemOnline = !context.getSettings().getActiveProfile().isOffline();
-        
+
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
                                                                                 context.getRemoteRepositories(),
                                                                                 context.getLocalRepository(),

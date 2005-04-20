@@ -1,8 +1,4 @@
-package org.apache.maven.settings;
-
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.IOException;
+package org.apache.maven.plugin;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -20,14 +16,21 @@ import java.io.IOException;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+
 /**
- * @author jdcasey
+ * Exception occurring trying to resolve a plugin.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public interface MavenSettingsBuilder
+public class PluginNotFoundException
+    extends Throwable
 {
-    String ROLE = MavenSettingsBuilder.class.getName();
-
-    Settings buildSettings()
-        throws IOException, XmlPullParserException;
+    public PluginNotFoundException( String groupId, String artifactId, String version, ArtifactResolutionException e )
+    {
+        super(
+            "Plugin could not found in any remote repositories: [" + groupId + ":" + artifactId + ":" + version + "]",
+            e );
+    }
 }

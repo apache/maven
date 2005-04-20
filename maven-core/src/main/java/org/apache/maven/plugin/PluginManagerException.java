@@ -1,8 +1,4 @@
-package org.apache.maven.settings;
-
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.IOException;
+package org.apache.maven.plugin;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -21,13 +17,15 @@ import java.io.IOException;
  */
 
 /**
- * @author jdcasey
+ * Exception in the plugin manager.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public interface MavenSettingsBuilder
+public class PluginManagerException
+    extends Exception
 {
-    String ROLE = MavenSettingsBuilder.class.getName();
-
-    Settings buildSettings()
-        throws IOException, XmlPullParserException;
+    public PluginManagerException( String message, Exception e )
+    {
+    }
 }

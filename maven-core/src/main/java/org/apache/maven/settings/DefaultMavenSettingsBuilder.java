@@ -21,9 +21,12 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * @author jdcasey
@@ -57,9 +60,8 @@ public class DefaultMavenSettingsBuilder
     // MavenSettingsBuilder Implementation
     // ----------------------------------------------------------------------
 
-    // TODO: don't throw Exception.
     public Settings buildSettings()
-        throws Exception
+        throws IOException, XmlPullParserException
     {
         Settings settings = null;
 
@@ -73,6 +75,11 @@ public class DefaultMavenSettingsBuilder
                 SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
                 settings = modelReader.read( reader );
+            }
+            catch ( FileNotFoundException e )
+            {
+                // Not possible - just ignore
+                getLogger().warn( "Settings file disappeared - ignoring", e );
             }
             finally
             {
