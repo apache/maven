@@ -29,6 +29,7 @@ import org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.mailsender.MailMessage;
@@ -350,6 +351,11 @@ public class RepositoryCleaner
                         }
 
                     }
+                    else if( !targetMissingOrOlder )
+                    {
+                        artifactReporter.warn( "Target file for artifact is present and not stale. (Artifact: \'" + artifact.getId()
+                                                + "\' in path: \'" + artifactSource + "\' with target path: " + artifactTarget + ")." );
+                    }
                     else
                     {
                         artifactReporter.error( "Cannot find source file for artifact: \'" + artifact.getId()
@@ -500,8 +506,7 @@ public class RepositoryCleaner
         return reportsBase;
     }
 
-    public void contextualize( Context context )
-        throws Exception
+    public void contextualize( Context context ) throws ContextException
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
