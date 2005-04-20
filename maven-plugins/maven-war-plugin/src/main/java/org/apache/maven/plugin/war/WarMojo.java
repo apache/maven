@@ -29,7 +29,9 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -44,6 +46,7 @@ import java.util.Set;
  * validator=""
  * expression="#project.build.finalName"
  * description=""
+ * deprecated="Please use the finalName element of build instead"
  * @parameter name="archive"
  * type=""
  * required="false"
@@ -110,10 +113,6 @@ import java.util.Set;
 public class WarMojo
     extends AbstractPlugin
 {
-    private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
-
-    private static final String[] DEFAULT_EXCLUDES = new String[]{"**/WEB-INF/web.xml"};
-
     public static final String WEB_INF = "WEB-INF";
 
     private String mode;
@@ -146,6 +145,8 @@ public class WarMojo
     private String warName;
 
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
+
+    private static final String[] EMPTY_STRING_ARRAY = {};
 
     public void copyResources( File sourceDirectory, File webappDirectory, String includes, String excludes,
                                String webXml )
@@ -270,7 +271,8 @@ public class WarMojo
 
                 archiver.setOutputFile( warFile );
 
-                warArchiver.addDirectory( new File( webappDirectory ), DEFAULT_INCLUDES, DEFAULT_EXCLUDES );
+                String[] excludes = (String[]) getDefaultExcludes().toArray( EMPTY_STRING_ARRAY );
+                warArchiver.addDirectory( new File( webappDirectory ), null, excludes );
 
                 warArchiver.setWebxml( new File( webappDirectory, "WEB-INF/web.xml" ) );
 
@@ -280,4 +282,40 @@ public class WarMojo
         }
     }
 
+    /**
+     * @todo copied again. Next person to touch it puts it in the right place! :)
+     */
+    public List getDefaultExcludes()
+    {
+        List defaultExcludes = new ArrayList();
+        defaultExcludes.add( "**/*~" );
+        defaultExcludes.add( "**/#*#" );
+        defaultExcludes.add( "**/.#*" );
+        defaultExcludes.add( "**/%*%" );
+        defaultExcludes.add( "**/._*" );
+
+        // CVS
+        defaultExcludes.add( "**/CVS" );
+        defaultExcludes.add( "**/CVS/**" );
+        defaultExcludes.add( "**/.cvsignore" );
+
+        // SCCS
+        defaultExcludes.add( "**/SCCS" );
+        defaultExcludes.add( "**/SCCS/**" );
+
+        // Visual SourceSafe
+        defaultExcludes.add( "**/vssver.scc" );
+
+        // Subversion
+        defaultExcludes.add( "**/.svn" );
+        defaultExcludes.add( "**/.svn/**" );
+
+        // Mac
+        defaultExcludes.add( "**/.DS_Store" );
+
+        // Special one for WARs
+        defaultExcludes.add( "**/" + WEB_INF + "/web.xml" );
+
+        return defaultExcludes;
+    }
 }
