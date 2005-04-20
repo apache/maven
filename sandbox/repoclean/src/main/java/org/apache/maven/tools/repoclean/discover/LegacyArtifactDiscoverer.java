@@ -156,65 +156,95 @@ public class LegacyArtifactDiscoverer
         // Since version is at the end, we have to move in from the back.
         Collections.reverse( avceTokenList );
 
-        String classifier = null;
+        StringBuffer classifierBuffer = new StringBuffer();
         StringBuffer versionBuffer = new StringBuffer();
 
-        boolean inFirstToken = true;
+        boolean firstVersionTokenEncountered = false;
+        boolean firstToken = true;
+
+        int tokensIterated = 0;
         for ( Iterator it = avceTokenList.iterator(); it.hasNext(); )
         {
             String token = (String) it.next();
 
             boolean tokenIsVersionPart = token.matches( validVersionParts );
-            if ( inFirstToken && !tokenIsVersionPart )
-            {
-                classifier = token;
-            }
-            else if ( tokenIsVersionPart )
-            {
-                if ( !inFirstToken )
-                {
-                    versionBuffer.insert( 0, '-' );
-                }
 
-                versionBuffer.insert( 0, token );
+            StringBuffer bufferToUpdate = null;
+
+            // NOTE: logic in code is reversed, since we're peeling off the back
+            // Any token after the last versionPart will be in the classifier.
+            // Any token UP TO first non-versionPart is part of the version.
+            if ( !tokenIsVersionPart )
+            {
+                if ( firstVersionTokenEncountered )
+                {
+                    break;
+                }
+                else
+                {
+                    bufferToUpdate = classifierBuffer;
+                }
             }
             else
             {
-                // if we didn't find a version, but we did find a 'classifier', 
-                // then push that classifier back onto the list...chances are, 
-                // it doesn't have a version or a classifier if this is the case.
-                if ( versionBuffer.length() < 1 && classifier != null )
-                {
-                    avceTokenList.addFirst( classifier );
-                }
+                firstVersionTokenEncountered = true;
 
-                // we've discovered all the version parts. break the loop.
-                break;
+                bufferToUpdate = versionBuffer;
             }
 
-            if ( inFirstToken )
+            if ( firstToken )
             {
-                inFirstToken = false;
+                firstToken = false;
+            }
+            else
+            {
+                bufferToUpdate.insert( 0, '-' );
             }
 
-            // pop the token off the list so it doesn't appear in the
-            // artifactId.
-            it.remove();
+            bufferToUpdate.insert( 0, token );
+
+            tokensIterated++;
         }
+        
+        getLogger().debug("After parsing loop, state of buffers:\no  Version Buffer: \'" + versionBuffer + "\'\no  Classifier Buffer: \'" + classifierBuffer + "\'\no Number of Tokens Iterated: " + tokensIterated);
 
         // Now, restore the proper ordering so we can build the artifactId.
         Collections.reverse( avceTokenList );
+        
+        getLogger().debug("Before repairing bad version and/or cleaning up used tokens, avce token list is:\n" + avceTokenList);
+        
+        // if we didn't find a version, then punt. Use the last token
+        // as the version, and set the classifier empty.
+        if ( versionBuffer.length() < 1 )
+        {
+            int lastIdx = avceTokenList.size() - 1;
+            
+            versionBuffer.append( avceTokenList.get( lastIdx ) );
+            avceTokenList.remove( lastIdx );
+
+            classifierBuffer.setLength( 0 );
+        }
+        else
+        {
+            getLogger().debug("Removing " + tokensIterated + " tokens from avce token list.");
+            
+            // if everything is kosher, then pop off all the classifier and
+            // version tokens, leaving the naked artifact id in the list.
+            avceTokenList = new LinkedList( avceTokenList.subList( 0, avceTokenList.size() - ( tokensIterated ) ) );
+        }
+        
+        getLogger().debug("Now, remainder of avce token list is:\n" + avceTokenList);
 
         StringBuffer artifactIdBuffer = new StringBuffer();
 
-        inFirstToken = true;
+        firstToken = true;
         for ( Iterator it = avceTokenList.iterator(); it.hasNext(); )
         {
             String token = (String) it.next();
 
-            if ( inFirstToken )
+            if ( firstToken )
             {
-                inFirstToken = false;
+                firstToken = false;
             }
             else
             {
@@ -240,20 +270,29 @@ public class LegacyArtifactDiscoverer
         }
 
         getLogger().debug(
-                           "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
-                               + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n" + "version: \'"
-                               + version + "\'\n" + "classifier: \'" + classifier + "\'" );
+                          "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
+                              + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n" + "version: \'"
+                              + version + "\'\n" + "classifier: \'" + classifierBuffer.toString() + "\'" );
 
-        if ( classifier != null )
+        Artifact result = null;
+
+        if ( classifierBuffer.length() > 0 )
         {
-            return artifactConstructionSupport.createArtifactWithClassifier( groupId, artifactId, version,
-                                                                             Artifact.SCOPE_RUNTIME, type, classifier );
+            getLogger().debug("Creating artifact with classifier.");
+            
+            result = artifactConstructionSupport.createArtifactWithClassifier( groupId, artifactId, version,
+                                                                               Artifact.SCOPE_RUNTIME, type,
+                                                                               classifierBuffer.toString() );
         }
         else
         {
-            return artifactConstructionSupport.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME,
-                                                               type );
+            result = artifactConstructionSupport.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME,
+                                                                 type );
         }
+
+        getLogger().debug( "Resulting artifact is: " + result.getId() + " and has classifier of: " + result.getClassifier() + "\n\n" );
+
+        return result;
     }
 
 }

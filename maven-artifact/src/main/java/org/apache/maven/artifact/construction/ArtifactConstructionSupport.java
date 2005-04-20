@@ -69,6 +69,8 @@ public class ArtifactConstructionSupport
             desiredScope = Artifact.SCOPE_TEST;
         }
 
-        return new DefaultArtifact( groupId, artifactId, version, desiredScope, type );
+        DefaultArtifact artifact = new DefaultArtifact( groupId, artifactId, version, desiredScope, type, classifier );
+        
+        return artifact;
     }
 }
