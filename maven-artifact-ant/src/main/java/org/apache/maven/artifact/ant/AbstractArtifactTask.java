@@ -20,6 +20,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
 
@@ -85,7 +86,7 @@ public abstract class AbstractArtifactTask
                 {
                     embedder.start();
                 }
-                catch ( Exception e )
+                catch ( PlexusContainerException e )
                 {
                     throw new BuildException( "Unable to start embedder", e );
                 }

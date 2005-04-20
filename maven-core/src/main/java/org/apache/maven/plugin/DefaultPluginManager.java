@@ -262,21 +262,8 @@ public class DefaultPluginManager
             }
             catch ( ComponentLookupException e )
             {
-                throw new PluginManagerException( "Internal configuration error while retrieving " + groupId + ":" + artifactId, e );
-            }
-            finally
-            {
-                if ( artifactFactory != null )
-                {
-                    try
-                    {
-                        container.release( artifactFactory );
-                    }
-                    catch ( ComponentLifecycleException e )
-                    {
-                        getLogger().error( "Error releasing component - ignoring", e );
-                    }
-                }
+                throw new PluginManagerException(
+                    "Internal configuration error while retrieving " + groupId + ":" + artifactId, e );
             }
         }
     }
@@ -304,26 +291,24 @@ public class DefaultPluginManager
         {
             if ( artifactResolver != null )
             {
-                try
-                {
-                    container.release( artifactResolver );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    getLogger().error( "Error releasing component - ignoring", e );
-                }
+                releaseComponent( artifactResolver );
             }
             if ( mavenProjectBuilder != null )
             {
-                try
-                {
-                    container.release( mavenProjectBuilder );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    getLogger().error( "Error releasing component - ignoring", e );
-                }
+                releaseComponent( mavenProjectBuilder );
             }
+        }
+    }
+
+    private void releaseComponent( Object component )
+    {
+        try
+        {
+            container.release( component );
+        }
+        catch ( ComponentLifecycleException e )
+        {
+            getLogger().error( "Error releasing component - ignoring", e );
         }
     }
 
@@ -332,16 +317,9 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public void executeMojo( MavenSession session, String goalName )
-        throws PluginExecutionException, PluginNotFoundException
+        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException
     {
-        try
-        {
-            verifyPluginForGoal( goalName, session );
-        }
-        catch ( Exception e )
-        {
-            throw new PluginExecutionException( "Unable to execute goal: " + goalName, e );
-        }
+        verifyPluginForGoal( goalName, session );
 
         PluginExecutionRequest request = null;
 
@@ -351,40 +329,36 @@ public class DefaultPluginManager
             throw new PluginExecutionException( "Unable to find goal: " + goalName );
         }
 
-        try
+        if ( mojoDescriptor.getRequiresDependencyResolution() != null )
         {
-            if ( mojoDescriptor.getRequiresDependencyResolution() != null )
+
+            ArtifactResolver artifactResolver = null;
+            MavenProjectBuilder mavenProjectBuilder = null;
+
+            try
             {
+                artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
+                mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
-                ArtifactResolver artifactResolver = null;
-                MavenProjectBuilder mavenProjectBuilder = null;
-
-                try
+                resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder,
+                                               mojoDescriptor.getRequiresDependencyResolution() );
+                downloadDependencies( session, artifactResolver );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new PluginManagerException( "Internal configuration error in plugin manager", e );
+            }
+            finally
+            {
+                if ( artifactResolver != null )
                 {
-                    artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
-                    mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
-
-                    resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder,
-                                                   mojoDescriptor.getRequiresDependencyResolution() );
-                    downloadDependencies( session, artifactResolver );
+                    releaseComponent( artifactResolver );
                 }
-                finally
+                if ( mavenProjectBuilder != null )
                 {
-                    // TODO: watch out for the exceptions being thrown
-                    if ( artifactResolver != null )
-                    {
-                        container.release( artifactResolver );
-                    }
-                    if ( mavenProjectBuilder != null )
-                    {
-                        container.release( mavenProjectBuilder );
-                    }
+                    releaseComponent( mavenProjectBuilder );
                 }
             }
-        }
-        catch ( Exception e )
-        {
-            throw new PluginExecutionException( "Unable to resolve required dependencies for goal", e );
         }
 
         Plugin plugin = null;
@@ -421,9 +395,10 @@ public class DefaultPluginManager
                 configuration = new XmlPlexusConfiguration( dom );
             }
 
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator );
+
             configuration = mergeConfiguration( configuration, mojoDescriptor.getConfiguration() );
 
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator );
             try
             {
                 if ( newMojoTechnique )
@@ -486,15 +461,7 @@ public class DefaultPluginManager
         }
         finally
         {
-            try
-            {
-                container.release( plugin );
-            }
-            catch ( Exception e )
-            {
-                // TODO: better error handling, needed!
-                e.printStackTrace();
-            }
+            releaseComponent( plugin );
         }
     }
 
@@ -634,11 +601,11 @@ public class DefaultPluginManager
                 }
                 catch ( NoSuchFieldException e )
                 {
-                    throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
+                    throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'", e );
                 }
                 catch ( IllegalAccessException e )
                 {
-                    throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'" );
+                    throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'", e );
                 }
             }
         }

@@ -67,9 +67,6 @@ public class PluginParameterExpressionEvaluatorTest
 
         String actual = new File( value.toString() ).getCanonicalPath();
 
-        System.out.println( "Expected value: " + expected );
-        System.out.println( "Resolved value: " + actual );
-
         assertEquals( expected, actual );
     }
 

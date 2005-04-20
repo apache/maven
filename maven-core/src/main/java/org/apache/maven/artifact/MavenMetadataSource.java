@@ -29,8 +29,11 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.wagon.util.IoUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -111,9 +114,17 @@ public class MavenMetadataSource
                 Model model = this.reader.read( reader );
                 dependencies = model.getDependencies();
             }
-            catch ( Exception e )
+            catch ( FileNotFoundException e )
+            {
+                throw new ArtifactMetadataRetrievalException( "Unable to find the metadata file", e );
+            }
+            catch ( IOException e )
             {
                 throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new ArtifactMetadataRetrievalException( "Unable to parse the metadata file", e );
             }
             finally
             {

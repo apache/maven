@@ -79,12 +79,6 @@ public class DefaultWagonManager
         return wagon;
     }
 
-    private void releaseWagon( Wagon wagon )
-        throws ComponentLifecycleException
-    {
-        container.release( wagon );
-    }
-
     public void putArtifact( File source, Artifact artifact, ArtifactRepository repository )
         throws TransferFailedException
     {
@@ -147,9 +141,6 @@ public class DefaultWagonManager
             wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
             wagon.put( source, remotePath );
-
-            // TODO [BP]: put all disconnects in finally
-            wagon.disconnect();
         }
         catch ( ConnectionException e )
         {
@@ -169,14 +160,9 @@ public class DefaultWagonManager
         }
         finally
         {
-            try
-            {
-                releaseWagon( wagon );
-            }
-            catch ( Exception e )
-            {
-                throw new TransferFailedException( "Unable to release wagon", e );
-            }
+            disconnectWagon( wagon );
+
+            releaseWagon( wagon );
         }
     }
 
@@ -289,9 +275,6 @@ public class DefaultWagonManager
             wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
             wagon.get( remotePath, temp );
-
-            // TODO [BP]: put all disconnects in finally
-            wagon.disconnect();
         }
         catch ( ConnectionException e )
         {
@@ -307,19 +290,14 @@ public class DefaultWagonManager
         }
         finally
         {
-            try
-            {
-                releaseWagon( wagon );
-            }
-            catch ( Exception e )
-            {
-                throw new TransferFailedException( "Release of wagon failed: ", e );
-            }
+            disconnectWagon( wagon );
+
+            releaseWagon( wagon );
         }
 
         if ( !temp.exists() )
         {
-            throw new TransferFailedException( "Downloaded file does not exist: " + temp );
+            throw new ResourceDoesNotExistException( "Downloaded file does not exist: " + temp );
         }
 
         // The temporary file is named destination + ".tmp" and is done this
@@ -344,6 +322,30 @@ public class DefaultWagonManager
             {
                 throw new TransferFailedException( "Error copying temporary file to the final destination: ", e );
             }
+        }
+    }
+
+    private void disconnectWagon( Wagon wagon )
+    {
+        try
+        {
+            wagon.disconnect();
+        }
+        catch ( ConnectionException e )
+        {
+            getLogger().error( "Problem disconnecting from wagon - ignoring: " + e.getMessage() );
+        }
+    }
+
+    private void releaseWagon( Wagon wagon )
+    {
+        try
+        {
+            container.release( wagon );
+        }
+        catch ( ComponentLifecycleException e )
+        {
+            getLogger().error( "Problem releasing wagon - ignoring: " + e.getMessage() );
         }
     }
 

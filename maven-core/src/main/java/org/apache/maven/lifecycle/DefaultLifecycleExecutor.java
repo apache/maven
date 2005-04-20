@@ -19,6 +19,7 @@ package org.apache.maven.lifecycle;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
@@ -86,57 +87,9 @@ public class DefaultLifecycleExecutor
 
         response.setStart( new Date() );
 
-        Map phaseMap = new HashMap();
-
-        for ( Iterator i = phases.iterator(); i.hasNext(); )
-        {
-            Phase p = (Phase) i.next();
-
-            // Make a copy of the phase as we will modify it
-            phaseMap.put( p.getId(), new Phase( p ) );
-        }
-
         try
         {
-            MavenProject project = session.getProject();
-
-            ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
-
-            if ( artifactHandler != null )
-            {
-                if ( artifactHandler.packageGoal() != null )
-                {
-                    verifyMojoPhase( artifactHandler.packageGoal(), session, phaseMap );
-                }
-
-                if ( artifactHandler.additionalPlugin() != null )
-                {
-                    String additionalPluginGroupId = PluginDescriptor.getDefaultPluginGroupId();
-
-                    String additionalPluginArtifactId = PluginDescriptor.getDefaultPluginArtifactId(
-                        artifactHandler.additionalPlugin() );
-
-                    injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
-                }
-            }
-
-            processPluginConfiguration( session.getProject(), session, phaseMap );
-
-            for ( Iterator i = tasks.iterator(); i.hasNext(); )
-            {
-                String task = (String) i.next();
-
-                processGoalChain( task, session, phaseMap );
-
-                if ( phaseMap.containsKey( task ) )
-                {
-                    executePhase( task, session, phaseMap );
-                }
-                else
-                {
-                    executeMojo( task, session );
-                }
-            }
+            processGoals( session, tasks );
         }
         catch ( PluginExecutionException e )
         {
@@ -150,12 +103,78 @@ public class DefaultLifecycleExecutor
         {
             response.setException( e );
         }
+        catch ( ArtifactResolutionException e )
+        {
+            response.setException( e );
+        }
         finally
         {
             response.setFinish( new Date() );
         }
 
         return response;
+    }
+
+    private void processGoals( MavenSession session, List tasks )
+        throws ArtifactHandlerNotFoundException, LifecycleExecutionException, PluginNotFoundException,
+        PluginExecutionException, ArtifactResolutionException
+    {
+        Map phaseMap = new HashMap();
+
+        for ( Iterator i = phases.iterator(); i.hasNext(); )
+        {
+            Phase p = (Phase) i.next();
+
+            // Make a copy of the phase as we will modify it
+            phaseMap.put( p.getId(), new Phase( p ) );
+        }
+
+        MavenProject project = session.getProject();
+
+        ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
+
+        if ( artifactHandler != null )
+        {
+            if ( artifactHandler.packageGoal() != null )
+            {
+                verifyMojoPhase( artifactHandler.packageGoal(), session, phaseMap );
+            }
+
+            if ( artifactHandler.additionalPlugin() != null )
+            {
+                String additionalPluginGroupId = PluginDescriptor.getDefaultPluginGroupId();
+
+                String additionalPluginArtifactId = PluginDescriptor.getDefaultPluginArtifactId(
+                    artifactHandler.additionalPlugin() );
+
+                injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
+            }
+        }
+
+        processPluginConfiguration( session.getProject(), session, phaseMap );
+
+        for ( Iterator i = tasks.iterator(); i.hasNext(); )
+        {
+            String task = (String) i.next();
+
+            processGoalChain( task, session, phaseMap );
+
+            try
+            {
+                if ( phaseMap.containsKey( task ) )
+                {
+                    executePhase( task, session, phaseMap );
+                }
+                else
+                {
+                    executeMojo( task, session );
+                }
+            }
+            catch ( PluginManagerException e )
+            {
+                throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+            }
+        }
     }
 
     private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId )
@@ -389,7 +408,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void executePhase( String phase, MavenSession session, Map phaseMap )
-        throws PluginExecutionException, PluginNotFoundException
+        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException
     {
         // only execute up to the given phase
         int index = phases.indexOf( phaseMap.get( phase ) );
@@ -424,13 +443,23 @@ public class DefaultLifecycleExecutor
                 dispatcher.dispatchError( event, p.getId(), e );
                 throw e;
             }
+            catch ( PluginManagerException e )
+            {
+                dispatcher.dispatchError( event, p.getId(), e );
+                throw e;
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                dispatcher.dispatchError( event, p.getId(), e );
+                throw e;
+            }
 
             dispatcher.dispatchEnd( event, p.getId() );
         }
     }
 
     protected void executeMojo( String id, MavenSession session )
-        throws PluginExecutionException, PluginNotFoundException
+        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException
     {
         // ----------------------------------------------------------------------
         // We have something of the form <pluginId>:<mojoId>, so this might be

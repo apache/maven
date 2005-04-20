@@ -23,7 +23,9 @@ import org.apache.maven.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.regex.Matcher;
@@ -52,7 +54,7 @@ public class RegexBasedModelInterpolator
         {
             writer.write( sWriter, model );
         }
-        catch ( Exception e )
+        catch ( IOException e )
         {
             throw new ModelInterpolationException( "Cannot serialize project model for interpolation.", e );
         }
@@ -67,7 +69,12 @@ public class RegexBasedModelInterpolator
         {
             model = modelReader.read( sReader );
         }
-        catch ( Exception e )
+        catch ( IOException e )
+        {
+            throw new ModelInterpolationException(
+                "Cannot read project model from interpolating filter of serialized version.", e );
+        }
+        catch ( XmlPullParserException e )
         {
             throw new ModelInterpolationException(
                 "Cannot read project model from interpolating filter of serialized version.", e );

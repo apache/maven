@@ -16,10 +16,9 @@ package org.apache.maven.project.inheritance;
  * limitations under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.MavenTestCase;
-import org.apache.maven.project.MavenProjectBuilder;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

@@ -30,8 +30,11 @@ import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Set;
@@ -52,17 +55,27 @@ public class ProjectClasspathArtifactResolver
         public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
-            MavenXpp3Reader reader = new MavenXpp3Reader();
             Model model = null;
+            InputStreamReader r = null;
             try
             {
                 String scope = artifact.getArtifactId().substring( "scope-".length() );
                 String name = "/projects/scope/transitive-" + scope + "-dep.xml";
-                model = reader.read( new InputStreamReader( getClass().getResourceAsStream( name ) ) );
+                r = new InputStreamReader( getClass().getResourceAsStream( name ) );
+                MavenXpp3Reader reader = new MavenXpp3Reader();
+                model = reader.read( r );
             }
-            catch ( Exception e )
+            catch ( IOException e )
             {
                 throw new ArtifactMetadataRetrievalException( e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new ArtifactMetadataRetrievalException( e );
+            }
+            finally
+            {
+                IOUtil.close( r );
             }
             return artifactFactory.createArtifacts( model.getDependencies(), localRepository, artifact.getScope() );
         }

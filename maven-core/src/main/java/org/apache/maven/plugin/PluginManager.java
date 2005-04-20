@@ -17,6 +17,7 @@ package org.apache.maven.plugin;
  * ====================================================================
  */
 
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -30,7 +31,7 @@ public interface PluginManager
     String ROLE = PluginManager.class.getName();
 
     void executeMojo( MavenSession session, String goalName )
-        throws PluginExecutionException, PluginNotFoundException;
+        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException;
 
     MojoDescriptor getMojoDescriptor( String goalId );
 

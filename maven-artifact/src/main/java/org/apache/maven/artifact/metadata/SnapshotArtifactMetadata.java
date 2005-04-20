@@ -147,16 +147,14 @@ public class SnapshotArtifactMetadata
             File destination = File.createTempFile( "maven-artifact", null );
             destination.deleteOnExit();
 
-            try
-            {
-                wagonManager.getArtifactMetadata( snapshotMetadata, remoteRepository, destination );
+            wagonManager.getArtifactMetadata( snapshotMetadata, remoteRepository, destination );
 
-                snapshotMetadata.readFromFile( destination );
-            }
-            catch ( ResourceDoesNotExistException e )
-            {
-                // this just means that there is no snapshot version file, so we keep timestamp = null, build = 0
-            }
+            snapshotMetadata.readFromFile( destination );
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            // No problem...
+            // this just means that there is no snapshot version file, so we keep timestamp = null, build = 0
         }
         catch ( TransferFailedException e )
         {

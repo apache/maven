@@ -19,7 +19,6 @@ package org.apache.maven.util.introspection;
 import org.apache.maven.MavenTestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 
 import java.io.File;
 import java.util.List;

@@ -1,20 +1,19 @@
 package org.apache.maven.cli;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import org.apache.commons.cli.CommandLine;
@@ -88,6 +87,16 @@ public class MavenCli
         {
             System.err.println( "Unable to parse command line options: " + e.getMessage() );
             cliManager.displayHelp();
+            return 1;
+        }
+
+        // TODO: maybe classworlds could handle this requirement...
+        if ( System.getProperty( "java.class.version", "44.0" ).compareTo( "48.0" ) < 0 )
+        {
+            System.err.println( "Sorry, but JDK 1.4 or above is required to execute Maven" );
+            System.err.println(
+                "You appear to be using Java version: " + System.getProperty( "java.version", "<unknown>" ) );
+
             return 1;
         }
 
@@ -191,6 +200,15 @@ public class MavenCli
         catch ( ComponentLookupException e )
         {
             showFatalError( "Unable to configure the Maven application", e, debug );
+            return 1;
+        }
+
+        // TODO: this should be in default maven, and should accommodate default goals
+        if ( request.getGoals().isEmpty() )
+        {
+            System.err.println( "You must specify at least one goal. Try 'install'" );
+
+            cliManager.displayHelp();
             return 1;
         }
 
@@ -463,6 +481,8 @@ public class MavenCli
 
         public void displayHelp()
         {
+            System.out.println();
+
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "maven [options] [goal [goal2 [goal3] ...]]", "\nOptions:", options, "\n" );
         }

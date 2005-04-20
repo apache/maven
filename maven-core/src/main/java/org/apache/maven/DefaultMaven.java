@@ -87,11 +87,6 @@ public class DefaultMaven
     public MavenExecutionResponse execute( MavenExecutionRequest request )
         throws ReactorException
     {
-        if ( request.getGoals().isEmpty() )
-        {
-            throw new ReactorException( "You must specify at least one goal. Try 'install'." );
-        }
-
         if ( request.getSettings().getActiveProfile().isOffline() )
         {
             getLogger().info( "Maven is running in offline mode." );
@@ -103,34 +98,34 @@ public class DefaultMaven
         // TODO: goals are outer loop
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
+        List projects;
+
         try
         {
-            List projects;
+            projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive() );
 
-            try
-            {
-                projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive() );
+            projects = MavenProject.getSortedProjects( projects );
 
-                projects = MavenProject.getSortedProjects( projects );
+            if ( projects.isEmpty() )
+            {
+                projects.add( projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() ) );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new ReactorException( "Error processing projects for the reactor: ", e );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            throw new ReactorException( "Error processing projects for the reactor: ", e );
+        }
+        catch ( CycleDetectedException e )
+        {
+            throw new ReactorException( "Error processing projects for the reactor: ", e );
+        }
 
-                if ( projects.isEmpty() )
-                {
-                    projects.add( projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() ) );
-                }
-            }
-            catch ( IOException e )
-            {
-                throw new ReactorException( "Error processing projects for the reactor: ", e );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new ReactorException( "Error processing projects for the reactor: ", e );
-            }
-            catch ( CycleDetectedException e )
-            {
-                throw new ReactorException( "Error processing projects for the reactor: ", e );
-            }
-
+        try
+        {
             for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
             {
                 MavenProject project = (MavenProject) iterator.next();
@@ -143,13 +138,13 @@ public class DefaultMaven
 
                 try
                 {
-                    MavenExecutionResponse response = processProject( request, project, dispatcher, request.getGoals() );
+                    MavenExecutionResponse response = processProject( request, project, dispatcher );
                     if ( response.isExecutionFailure() )
                     {
                         return response;
                     }
                 }
-                catch ( Exception e )
+                catch ( LifecycleExecutionException e )
                 {
                     throw new ReactorException( "Error executing project within the reactor", e );
                 }
@@ -188,7 +183,7 @@ public class DefaultMaven
 
                 if ( includes.indexOf( ".." ) >= 0 )
                 {
-                    throw new ReactorException( "Modules may not include '..'" );
+                    throw new ProjectBuildingException( "Modules may not include '..'" );
                 }
 
                 List moduleFiles = FileUtils.getFiles( project.getFile().getParentFile(), includes, null );
@@ -203,9 +198,11 @@ public class DefaultMaven
     }
 
     private MavenExecutionResponse processProject( MavenExecutionRequest request, MavenProject project,
-                                                   EventDispatcher dispatcher, List goals )
+                                                   EventDispatcher dispatcher )
         throws LifecycleExecutionException
     {
+        List goals = request.getGoals();
+
         MavenSession session = createSession( request, project );
 
         try
@@ -252,6 +249,7 @@ public class DefaultMaven
                 }
                 else
                 {
+                    // TODO: throw exceptions like this, so "failures" are just that
                     logError( response );
                 }
             }
@@ -423,13 +421,29 @@ public class DefaultMaven
 
         secs = secs % 60;
 
-        if ( min > 0 )
+        String msg = "";
+
+        if ( min > 1 )
         {
-            return min + " minutes " + secs + " seconds";
+            msg = min + " minutes ";
+        }
+        else if ( min == 1 )
+        {
+            msg = "1 minute ";
+        }
+
+        if ( secs > 1 )
+        {
+            msg += secs + " seconds";
+        }
+        else if ( secs == 1 )
+        {
+            msg += "1 second";
         }
         else
         {
-            return secs + " seconds";
+            msg += "< 1 second";
         }
+        return msg;
     }
 }

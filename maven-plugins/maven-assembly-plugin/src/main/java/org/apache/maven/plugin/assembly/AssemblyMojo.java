@@ -110,15 +110,14 @@ public class AssemblyMojo
             InputStream resourceAsStream = getClass().getResourceAsStream( "/assemblies/" + descriptorId + ".xml" );
             if ( resourceAsStream == null )
             {
-                // TODO: better exception
-                throw new Exception( "Descriptor with ID '" + descriptorId + "' not found" );
+                throw new PluginExecutionException( "Descriptor with ID '" + descriptorId + "' not found" );
             }
             r = new InputStreamReader( resourceAsStream );
         }
         else
         {
             // TODO: better exception
-            throw new Exception( "You must specify descriptor or descriptorId" );
+            throw new PluginExecutionException( "You must specify descriptor or descriptorId" );
         }
 
         try

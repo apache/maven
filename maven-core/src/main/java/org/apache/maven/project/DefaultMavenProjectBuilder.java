@@ -51,6 +51,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -162,7 +163,11 @@ public class DefaultMavenProjectBuilder
         {
             settings = mavenSettingsBuilder.buildSettings();
         }
-        catch ( Exception e )
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( "Cannot read settings.", e );
+        }
+        catch ( XmlPullParserException e )
         {
             throw new ProjectBuildingException( "Cannot read settings.", e );
         }
@@ -193,7 +198,7 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ArtifactResolutionException e )
             {
-                throw new ProjectBuildingException( "Unable to find artifact: " + artifact.toString() );
+                throw new ProjectBuildingException( "Unable to find artifact: " + artifact.toString(), e );
             }
             model = readModel( artifact.getFile() );
         }
@@ -267,27 +272,13 @@ public class DefaultMavenProjectBuilder
 
         project = new MavenProject( model );
 
-        try
-        {
-            project.setPluginArtifactRepositories( buildPluginRepositories( model.getPluginRepositories() ) );
-        }
-        catch ( Exception e )
-        {
-            throw new ProjectBuildingException( "Error building plugin repository list.", e );
-        }
+        project.setPluginArtifactRepositories( buildPluginRepositories( model.getPluginRepositories() ) );
 
         DistributionManagement dm = model.getDistributionManagement();
         if ( dm != null )
         {
-            try
-            {
-                project.setDistributionManagementArtifactRepository( buildDistributionManagementRepository(
-                    dm.getRepository() ) );
-            }
-            catch ( Exception e )
-            {
-                throw new ProjectBuildingException( "Error building distribution management repository.", e );
-            }
+            project.setDistributionManagementArtifactRepository( buildDistributionManagementRepository(
+                dm.getRepository() ) );
         }
 
         project.setParent( parentProject );
@@ -472,12 +463,17 @@ public class DefaultMavenProjectBuilder
         }
         catch ( FileNotFoundException e )
         {
-            throw new ProjectBuildingException( "Could not find the model file '" + file.getAbsolutePath() + "'." );
+            throw new ProjectBuildingException( "Could not find the model file '" + file.getAbsolutePath() + "'.", e );
         }
-        catch ( Exception e )
+        catch ( IOException e )
         {
             throw new ProjectBuildingException(
                 "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new ProjectBuildingException(
+                "Error while parsing model from file '" + file.getAbsolutePath() + "'.", e );
         }
         finally
         {
@@ -488,17 +484,23 @@ public class DefaultMavenProjectBuilder
     private Model readModel( URL url )
         throws ProjectBuildingException
     {
+        InputStreamReader reader = null;
         try
         {
-            return modelReader.read( new InputStreamReader( url.openStream() ) );
+            reader = new InputStreamReader( url.openStream() );
+            return modelReader.read( reader );
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "Error while reading model.", e );
+            throw new ProjectBuildingException( "Error while building model from " + url.toExternalForm(), e );
         }
-        catch ( Exception ex )
+        catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException( "Error while building model from " + url.toExternalForm(), ex );
+            throw new ProjectBuildingException( "Error while building model from " + url.toExternalForm(), e );
+        }
+        finally
+        {
+            IOUtil.close( reader );
         }
     }
 

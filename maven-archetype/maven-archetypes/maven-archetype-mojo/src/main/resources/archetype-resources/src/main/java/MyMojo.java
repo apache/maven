@@ -64,7 +64,7 @@ public class MyMojo
         }
         catch ( IOException e )
         {
-            throw new PluginExecutionException( "Error creating file " + touch );
+            throw new PluginExecutionException( "Error creating file " + touch, e );
         }
         finally
         {

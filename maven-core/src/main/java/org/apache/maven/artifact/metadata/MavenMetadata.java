@@ -24,10 +24,13 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Attach a POM to an artifact.
@@ -80,7 +83,15 @@ public class MavenMetadata
             MavenXpp3Writer modelWriter = new MavenXpp3Writer();
             modelWriter.write( writer, model );
         }
-        catch ( Exception e )
+        catch ( FileNotFoundException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Error rewriting POM", e );
+        }
+        catch ( IOException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Error rewriting POM", e );
+        }
+        catch ( XmlPullParserException e )
         {
             throw new ArtifactMetadataRetrievalException( "Error rewriting POM", e );
         }

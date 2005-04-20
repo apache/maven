@@ -107,7 +107,7 @@ public class DependenciesTask
             }
             catch ( ArtifactPathFormatException e )
             {
-                throw new BuildException( "Unable to determine path to artifact: " + artifact );
+                throw new BuildException( "Unable to determine path to artifact: " + artifact, e );
             }
 
             FileList.FileName file = new FileList.FileName();

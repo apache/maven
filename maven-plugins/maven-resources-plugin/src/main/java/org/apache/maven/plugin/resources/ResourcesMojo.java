@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
@@ -67,7 +66,7 @@ public class ResourcesMojo
         {
             for ( Iterator i = getJarResources( resources ).entrySet().iterator(); i.hasNext(); )
             {
-                Map.Entry entry = (Entry) i.next();
+                Map.Entry entry = (Map.Entry) i.next();
                 String source = (String) entry.getKey();
                 String destination = (String) entry.getValue();
                 

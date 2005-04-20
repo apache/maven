@@ -53,14 +53,7 @@ public class CleanPlugin
             if ( dir.exists() && dir.isDirectory() )
             {
                 getLog().info( "Deleting directory " + dir.getAbsolutePath() );
-                try
-                {
-                    removeDir( dir );
-                }
-                catch ( Exception e )
-                {
-                    throw new PluginExecutionException( "Unable to delete directory", e );
-                }
+                removeDir( dir );
             }
         }
     }

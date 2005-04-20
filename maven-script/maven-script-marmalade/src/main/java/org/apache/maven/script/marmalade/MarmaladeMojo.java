@@ -16,9 +16,7 @@ package org.apache.maven.script.marmalade;
  * limitations under the License.
  */
 
-import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.FailureResponse;
 import org.apache.maven.plugin.PluginExecutionRequest;
 import org.apache.maven.plugin.PluginExecutionResponse;
 import org.codehaus.marmalade.model.MarmaladeScript;
