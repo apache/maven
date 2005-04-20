@@ -139,36 +139,33 @@ public class SnapshotTransformation
                 resolvedArtifactCache.add( getCacheKey( artifact ) );
             }
 
-            // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
-            if ( artifact.getFile().exists() && !localMetadata.newerThanFile( artifact.getFile() ) )
+            String version = localMetadata.constructVersion();
+
+            if ( getLogger().isInfoEnabled() && !alreadyResolved )
             {
-                if ( !alreadyResolved )
+                if ( !version.equals( artifact.getBaseVersion() ) )
+                {
+                    String message = artifact.getArtifactId() + ": resolved to version " + version;
+                    if ( artifact.getRepository() != null )
+                    {
+                        message += " from repository " + artifact.getRepository().getId();
+                    }
+                    else
+                    {
+                        message += " from local repository";
+                    }
+                    getLogger().info( message );
+                }
+                else
                 {
                     // Locally installed file is newer, don't use the resolved version
                     getLogger().info( artifact.getArtifactId() + ": using locally installed snapshot" );
                 }
             }
-            else
+
+            // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
+            if ( !artifact.getFile().exists() || localMetadata.newerThanFile( artifact.getFile() ) )
             {
-                String version = localMetadata.constructVersion();
-
-                if ( getLogger().isInfoEnabled() )
-                {
-                    if ( !version.equals( artifact.getBaseVersion() ) && !alreadyResolved )
-                    {
-                        String message = artifact.getArtifactId() + ": resolved to version " + version;
-                        if ( artifact.getRepository() != null )
-                        {
-                            message += " from repository " + artifact.getRepository().getId();
-                        }
-                        else
-                        {
-                            message += " from local repository";
-                        }
-                        getLogger().info( message );
-                    }
-                }
-
                 artifact.setVersion( version );
                 try
                 {
