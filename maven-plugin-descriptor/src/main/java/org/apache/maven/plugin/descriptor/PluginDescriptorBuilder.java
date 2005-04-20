@@ -5,7 +5,9 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -153,6 +155,8 @@ public class PluginDescriptorBuilder
             // TODO: remove
             parameter.setDefaultValue( d.getChild( "default" ).getValue() );
 
+            parameter.setDeprecated( d.getChild( "deprecated" ).getValue() );
+
             parameters.add( parameter );
         }
 
@@ -194,7 +198,6 @@ public class PluginDescriptorBuilder
     //
     // ----------------------------------------------------------------------
 
-    // TODO: catches Exception
     public PlexusConfiguration buildConfiguration( Reader configuration )
         throws PlexusConfigurationException
     {
@@ -202,7 +205,11 @@ public class PluginDescriptorBuilder
         {
             return new XmlPlexusConfiguration( Xpp3DomBuilder.build( configuration ) );
         }
-        catch ( Exception e )
+        catch ( IOException e )
+        {
+            throw new PlexusConfigurationException( "Error creating configuration", e );
+        }
+        catch ( XmlPullParserException e )
         {
             throw new PlexusConfigurationException( "Error creating configuration", e );
         }

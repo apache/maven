@@ -59,6 +59,8 @@ public class MojoDescriptor
 
     private List requirements;
 
+    private String deprecated;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -66,7 +68,7 @@ public class MojoDescriptor
     private String requiresDependencyResolution = null;
 
     private boolean requiresProject = true;
-    
+
     private boolean requiresOnline = false;
 
     private String language = DEFAULT_LANGUAGE;
@@ -125,6 +127,16 @@ public class MojoDescriptor
     public void setId( String id )
     {
         this.id = id;
+    }
+
+    public String getDeprecated()
+    {
+        return deprecated;
+    }
+
+    public void setDeprecated( String deprecated )
+    {
+        this.deprecated = deprecated;
     }
 
     public List getParameters()

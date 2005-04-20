@@ -28,6 +28,7 @@ import org.codehaus.marmalade.parsing.MarmaladeParsingContext;
 import org.codehaus.marmalade.parsing.ScriptParser;
 import org.codehaus.marmalade.runtime.DefaultContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,7 +51,8 @@ public class MarmaladeMojoDescriptorExtractor
         return ".mmld";
     }
 
-    protected Set extractMojoDescriptors( Map sourceFilesKeyedByBasedir ) throws Exception
+    protected Set extractMojoDescriptors( Map sourceFilesKeyedByBasedir )
+        throws Exception
     {
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try
@@ -84,14 +86,15 @@ public class MarmaladeMojoDescriptorExtractor
 
                         contextMap = context.getExternalizedVariables();
 
-                        MojoDescriptor descriptor = (MojoDescriptor) contextMap.get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
+                        MojoDescriptor descriptor = (MojoDescriptor) contextMap.get(
+                            MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
 
                         descriptors.add( descriptor );
                     }
                     else
                     {
-                        System.out.println( "This script is not a mojo. Its root tag is {element: "
-                            + rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}" );
+                        System.out.println( "This script is not a mojo. Its root tag is {element: " +
+                                            rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}" );
                     }
                 }
             }
@@ -104,7 +107,8 @@ public class MarmaladeMojoDescriptorExtractor
         }
     }
 
-    private MarmaladeScript parse( File scriptFile ) throws Exception
+    private MarmaladeScript parse( File scriptFile )
+        throws Exception
     {
         BufferedReader reader = null;
 
@@ -127,16 +131,7 @@ public class MarmaladeMojoDescriptorExtractor
         }
         finally
         {
-            if ( reader != null )
-            {
-                try
-                {
-                    reader.close();
-                }
-                catch ( Exception e )
-                {
-                }
-            }
+            IOUtil.close( reader );
         }
     }
 

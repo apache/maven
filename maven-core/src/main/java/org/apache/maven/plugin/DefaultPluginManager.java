@@ -657,6 +657,15 @@ public class DefaultPluginManager
             else
             {
                 expression = configuration.getChild( key, false ).getValue( null );
+
+                if ( expression != null && parameter.getDeprecated() != null )
+                {
+                    if ( !expression.equals( goal.getConfiguration().getChild( key, false ).getValue( null ) ) )
+                    {
+                        getLogger().warn(
+                            "DEPRECATED: " + parameter.getName() + " is deprecated.\n\t" + parameter.getDeprecated() );
+                    }
+                }
             }
 
             Object value = expressionEvaluator.evaluate( expression );

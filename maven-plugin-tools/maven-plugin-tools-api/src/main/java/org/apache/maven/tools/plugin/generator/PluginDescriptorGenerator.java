@@ -175,6 +175,11 @@ public class PluginDescriptorGenerator
 
             element( w, "type", parameter.getType() );
 
+            if ( parameter.getDeprecated() != null )
+            {
+                element( w, "deprecated", parameter.getDeprecated() );
+            }
+
             element( w, "validator", parameter.getValidator() );
 
             String value = null;

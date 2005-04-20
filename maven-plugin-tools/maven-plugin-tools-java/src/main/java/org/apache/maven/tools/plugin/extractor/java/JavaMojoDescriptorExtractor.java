@@ -216,6 +216,8 @@ public class JavaMojoDescriptorExtractor
 
             pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
 
+            pd.setDeprecated( parameter.getNamedParameter( "deprecated" ) );
+
             parameters.add( pd );
         }
 

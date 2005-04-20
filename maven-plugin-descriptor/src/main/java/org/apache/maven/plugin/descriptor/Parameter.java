@@ -36,6 +36,8 @@ public class Parameter
 
     private String defaultValue;
 
+    private String deprecated;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -108,5 +110,15 @@ public class Parameter
     public void setDefaultValue( String defaultValue )
     {
         this.defaultValue = defaultValue;
+    }
+
+    public String getDeprecated()
+    {
+        return deprecated;
+    }
+
+    public void setDeprecated( String deprecated )
+    {
+        this.deprecated = deprecated;
     }
 }

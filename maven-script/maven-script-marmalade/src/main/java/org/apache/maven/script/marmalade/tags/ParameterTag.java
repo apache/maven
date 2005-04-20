@@ -41,9 +41,12 @@ public class ParameterTag
 
     private String defaultVal;
 
+    private String deprecated;
+
     private boolean required = true;
 
-    protected void doExecute( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
+    protected void doExecute( MarmaladeExecutionContext context )
+        throws MarmaladeExecutionException
     {
         processChildren( context );
 
@@ -64,6 +67,7 @@ public class ParameterTag
         param.setRequired( required );
         param.setType( type );
         param.setValidator( validator );
+        param.setDeprecated( deprecated );
 
         return param;
     }
@@ -103,4 +107,13 @@ public class ParameterTag
         this.required = required;
     }
 
+    public String getDeprecated()
+    {
+        return deprecated;
+    }
+
+    public void setDeprecated( String deprecated )
+    {
+        this.deprecated = deprecated;
+    }
 }
