@@ -30,6 +30,11 @@ public class Xpp3DomUtils
     {
         // TODO: how to mergeXpp3Dom lists rather than override?
         // TODO: share this as some sort of assembler, implement a walk interface?
+        if ( recessive == null )
+        {
+            return;
+        }
+
         Xpp3Dom[] children = recessive.getChildren();
         for ( int i = 0; i < children.length; i++ )
         {
