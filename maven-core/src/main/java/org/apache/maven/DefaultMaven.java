@@ -32,6 +32,7 @@ import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
@@ -104,7 +105,7 @@ public class DefaultMaven
         {
             projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive() );
 
-            projects = MavenProject.getSortedProjects( projects );
+            projects = ProjectSorter.getSortedProjects( projects );
 
             if ( projects.isEmpty() )
             {
