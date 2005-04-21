@@ -27,4 +27,7 @@ if [ "$1" == "profile" ]; then
   shift
 fi
 
-nice -n 19 java -Xmx128M -Xms64M -Xincgc $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $* | tee repoclean-log.txt
+if [ -z "$JAVA_HOME" ]; then
+  JAVA_HOME=/usr/local/java
+
+nice -n 19 $JAVA_HOME/bin/java -Xmx128M -Xms64M -Xincgc $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $* | tee repoclean-log.txt
