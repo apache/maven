@@ -132,7 +132,14 @@ public class MavenProject
 
     public File getBasedir()
     {
-        return getFile().getParentFile();
+        if ( getFile() != null )
+        {
+            return getFile().getParentFile();
+        }
+        else
+        {
+            return new File( System.getProperty( "user.dir" ) );
+        }
     }
 
     public void setDependencies( List denpendencies )

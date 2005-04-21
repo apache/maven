@@ -112,7 +112,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( expression.equals( "#basedir" ) )
         {
-            value = context.getProject().getFile().getParentFile().getAbsolutePath();
+            value = context.getProject().getBasedir().getAbsolutePath();
         }
         else if ( expression.startsWith( "#basedir" ) )
         {
