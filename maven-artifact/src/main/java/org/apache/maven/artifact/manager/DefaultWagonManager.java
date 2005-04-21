@@ -318,10 +318,13 @@ public class DefaultWagonManager
                 String expectedChecksum = FileUtils.fileRead( checksumFile );
                 if ( !expectedChecksum.equals( actualChecksum ) )
                 {
+                    getLogger().warn(
+                        "*** CHECKSUM MISMATCH - currently disabled fail due to bad repository checksums ***" );
+
                     // TODO: optionally retry?
-                    throw new ChecksumFailedException(
-                        "Checksum failed on download: local = " + actualChecksum + "; remote = " +
-                        expectedChecksum );
+                    /*                   throw new ChecksumFailedException( "Checksum failed on download: local = '" + actualChecksum +
+                                                                          "'; remote = '" + expectedChecksum + "'" );
+                    */
                 }
             }
             catch ( ResourceDoesNotExistException e )
@@ -446,5 +449,4 @@ public class DefaultWagonManager
     {
         this.downloadMonitor = downloadMonitor;
     }
-
 }
