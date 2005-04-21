@@ -46,7 +46,12 @@ public final class PluginUtils
         scanner.setIncludes( new String[]{include} );
         if ( !StringUtils.isEmpty( exclude ) )
         {
-            scanner.setExcludes( new String[]{exclude} );
+            // TODO: need default excludes in scanner
+            scanner.setExcludes( new String[]{exclude, "**/.svn/**"} );
+        }
+        else
+        {
+            scanner.setExcludes( new String[]{"**/.svn/**"} );
         }
 
         scanner.scan();
