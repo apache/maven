@@ -262,6 +262,8 @@ public class DefaultWagonManager
                                 TransferListener downloadMonitor )
         throws TransferFailedException, ResourceDoesNotExistException, ChecksumFailedException
     {
+        // TODO: better excetpions - transfer failed is not enough?
+
         Wagon wagon;
 
         try
