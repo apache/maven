@@ -17,6 +17,7 @@ package org.apache.maven.cli;
  * ====================================================================
  */
 
+import org.apache.maven.wagon.WagonConstants;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -37,8 +38,10 @@ public class ConsoleDownloadMonitor
     {
         String message = transferEvent.getRequestType() == TransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
 
+        String url = transferEvent.getWagon().getRepository().getUrl();
+
         // TODO: can't use getLogger() because this isn't currently instantiated as a component
-        System.out.println( message + ": " + transferEvent.getResource().getName() );
+        System.out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
 
         complete = 0;
     }
@@ -53,13 +56,15 @@ public class ConsoleDownloadMonitor
         long total = transferEvent.getResource().getContentLength();
         complete += length;
         // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
-        System.out.print( ( complete / 1024 ) + "/" + ( total == 0 ? "?" : ( total / 1024 ) + "K" ) + "\r" );
+        System.out.print(
+            ( complete / 1024 ) + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K" ) +
+            "\r" );
     }
 
     public void transferCompleted( TransferEvent transferEvent )
     {
-        long total = transferEvent.getResource().getContentLength();
-        System.out.println( ( total / 1024 ) + "K downloaded" );
+        System.out.println( ( complete / 1024 ) + "K " +
+                            ( transferEvent.getRequestType() == TransferEvent.REQUEST_PUT ? "uploaded" : "downloaded" ) );
     }
 
     public void transferError( TransferEvent transferEvent )

@@ -257,4 +257,9 @@ public class SnapshotArtifactMetadata
         }
         return false;
     }
+
+    public String toString()
+    {
+        return "snapshot information for " + artifact.getArtifactId() + " " + artifact.getBaseVersion();
+    }
 }

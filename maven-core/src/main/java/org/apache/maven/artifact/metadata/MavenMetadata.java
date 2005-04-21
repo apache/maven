@@ -106,4 +106,9 @@ public class MavenMetadata
     {
         // not used - TODO: again indicates bad design?
     }
+
+    public String toString()
+    {
+        return "project information for " + artifact.getArtifactId() + " " + artifact.getVersion();
+    }
 }

@@ -84,7 +84,7 @@ public class DefaultWagonManager
     {
         try
         {
-            putRemoteFile( repository, source, repository.pathOf( artifact ) );
+            putRemoteFile( repository, source, repository.pathOf( artifact ), downloadMonitor );
         }
         catch ( ArtifactPathFormatException e )
         {
@@ -97,7 +97,8 @@ public class DefaultWagonManager
     {
         try
         {
-            putRemoteFile( repository, source, repository.pathOfMetadata( artifactMetadata ) );
+            getLogger().info( "Uploading " + artifactMetadata );
+            putRemoteFile( repository, source, repository.pathOfMetadata( artifactMetadata ), null );
         }
         catch ( ArtifactPathFormatException e )
         {
@@ -105,7 +106,8 @@ public class DefaultWagonManager
         }
     }
 
-    private void putRemoteFile( ArtifactRepository repository, File source, String remotePath )
+    private void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
+                                TransferListener downloadMonitor )
         throws TransferFailedException
     {
         Wagon wagon = null;
@@ -118,12 +120,10 @@ public class DefaultWagonManager
             throw new TransferFailedException( "Unsupported Protocol: ", e );
         }
 
-        // TODO: probably don't want this on metadata...
-        // TODO: not working well on upload, commented out for now
-//        if ( downloadMonitor != null )
-//        {
-//            wagon.addTransferListener( downloadMonitor );
-//        }
+        if ( downloadMonitor != null )
+        {
+            wagon.addTransferListener( downloadMonitor );
+        }
 
         // TODO: configure these
         try
@@ -227,7 +227,7 @@ public class DefaultWagonManager
             throw new TransferFailedException( "Failed to determine path for artifact", e );
         }
 
-        // TODO: maybe some other listener that still notifies when metadata is being retrieved?
+        getLogger().info( "Retrieving " + metadata );
         getRemoteFile( remoteRepository, destination, remotePath, null );
     }
 
