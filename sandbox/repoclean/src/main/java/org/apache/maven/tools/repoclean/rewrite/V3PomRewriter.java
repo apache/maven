@@ -41,13 +41,6 @@ public class V3PomRewriter
     public void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly )
         throws Exception
     {
-        // should only have to handle this here...v4 repos shouldn't have this
-        // problem...
-        String toPath = to.getPath();
-        toPath = toPath.replace( '+', '-' );
-        
-        File target = new File( toPath );
-        
         Model v4Model = null;
 
         if ( from.exists() )
@@ -104,7 +97,7 @@ public class V3PomRewriter
                 FileWriter toWriter = null;
                 try
                 {
-                    toWriter = new FileWriter( target );
+                    toWriter = new FileWriter( to );
                     MavenXpp3Writer v4Writer = new MavenXpp3Writer();
                     v4Writer.write( toWriter, v4Model );
                 }

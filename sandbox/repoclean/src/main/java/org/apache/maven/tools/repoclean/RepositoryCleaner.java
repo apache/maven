@@ -288,7 +288,7 @@ public class RepositoryCleaner
                     boolean errorOccurred = false;
 
                     File artifactSource = new File( sourceRepo.getBasedir(), sourceRepo.pathOf( artifact ) );
-                    File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
+                    File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ).replace('+', '-') );
 
                     transaction.addFile( artifactTarget );
 
@@ -364,7 +364,7 @@ public class RepositoryCleaner
 
                         File sourcePom = new File( sourceRepositoryBase, sourceRepo.pathOfMetadata( pom ) );
 
-                        File targetPom = new File( targetRepositoryBase, targetRepo.pathOfMetadata( pom ) );
+                        File targetPom = new File( targetRepositoryBase, targetRepo.pathOfMetadata( pom ).replace('+', '-') );
 
                         transaction.addFile( targetPom );
 
