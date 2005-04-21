@@ -199,7 +199,7 @@ public class DefaultPluginManager
     }
 
     public void verifyPluginForGoal( String goalName, MavenSession session )
-        throws PluginNotFoundException, PluginManagerException
+        throws ArtifactResolutionException, PluginManagerException
     {
         String pluginId = PluginDescriptor.getPluginIdFromGoal( goalName );
 
@@ -207,7 +207,7 @@ public class DefaultPluginManager
     }
 
     public void verifyPlugin( String groupId, String artifactId, MavenSession session )
-        throws PluginNotFoundException, PluginManagerException
+        throws ArtifactResolutionException, PluginManagerException
     {
         if ( !isPluginInstalled( groupId, artifactId ) )
         {
@@ -258,7 +258,15 @@ public class DefaultPluginManager
             }
             catch ( ArtifactResolutionException e )
             {
-                throw new PluginNotFoundException( groupId, artifactId, version, e );
+                if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
+                    version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
+                {
+                    throw new PluginNotFoundException( groupId, artifactId, version, e );
+                }
+                else
+                {
+                    throw e;
+                }
             }
             catch ( ComponentLookupException e )
             {

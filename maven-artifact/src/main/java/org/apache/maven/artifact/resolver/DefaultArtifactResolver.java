@@ -128,11 +128,11 @@ public class DefaultArtifactResolver
             }
             catch ( ResourceDoesNotExistException e )
             {
-                throw new ArtifactResolutionException( artifactNotFound( localPath, remoteRepositories ), e );
+                throw new ArtifactResolutionException( artifactNotFound( localPath, remoteRepositories ), artifact, e );
             }
             catch ( TransferFailedException e )
             {
-                throw new ArtifactResolutionException( "Error downloading artifact " + artifact, e );
+                throw new ArtifactResolutionException( e.getMessage(), artifact, e );
             }
             catch ( ArtifactMetadataRetrievalException e )
             {

@@ -95,10 +95,6 @@ public class DefaultLifecycleExecutor
         {
             response.setException( e );
         }
-        catch ( PluginNotFoundException e )
-        {
-            response.setException( e );
-        }
         catch ( ArtifactHandlerNotFoundException e )
         {
             response.setException( e );
@@ -233,7 +229,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void processPluginConfiguration( MavenProject project, MavenSession mavenSession, Map phaseMap )
-        throws LifecycleExecutionException, PluginNotFoundException
+        throws LifecycleExecutionException, ArtifactResolutionException
     {
         for ( Iterator i = project.getPlugins().iterator(); i.hasNext(); )
         {
@@ -251,7 +247,7 @@ public class DefaultLifecycleExecutor
      * @param session
      */
     private void processPluginPhases( Plugin plugin, MavenSession session, Map phaseMap )
-        throws LifecycleExecutionException, PluginNotFoundException
+        throws LifecycleExecutionException, ArtifactResolutionException
     {
         String groupId = plugin.getGroupId();
 
@@ -336,7 +332,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void processGoalChain( String task, MavenSession session, Map phaseMap )
-        throws LifecycleExecutionException, PluginNotFoundException
+        throws LifecycleExecutionException, ArtifactResolutionException
     {
         if ( phaseMap.containsKey( task ) )
         {
@@ -368,7 +364,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void verifyMojoPhase( String task, MavenSession session, Map phaseMap )
-        throws LifecycleExecutionException, PluginNotFoundException
+        throws LifecycleExecutionException, ArtifactResolutionException
     {
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
 

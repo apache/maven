@@ -1,5 +1,7 @@
 package org.apache.maven.artifact.resolver;
 
+import org.apache.maven.artifact.Artifact;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -23,20 +25,51 @@ package org.apache.maven.artifact.resolver;
 public class ArtifactResolutionException
     extends Exception
 {
+    private String groupId;
 
+    private String artifactId;
 
-    public ArtifactResolutionException( String message )
+    private String version;
+
+    private String type;
+
+    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type, Throwable t )
     {
-        super( message );
+        super( "Unable to resolve artifact " + groupId + ":" + artifactId + ":" + version + ":" + type + "\n" + message, t );
+
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.type = type;
+        this.version = version;
     }
 
-    public ArtifactResolutionException( Throwable cause )
+    public ArtifactResolutionException( String message, Artifact artifact, Throwable t )
     {
-        super( cause );
+        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), t );
     }
 
     public ArtifactResolutionException( String message, Throwable cause )
     {
         super( message, cause );
+    }
+
+    public String getGroupId()
+    {
+        return groupId;
+    }
+
+    public String getArtifactId()
+    {
+        return artifactId;
+    }
+
+    public String getVersion()
+    {
+        return version;
+    }
+
+    public String getType()
+    {
+        return type;
     }
 }

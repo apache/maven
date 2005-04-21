@@ -36,10 +36,10 @@ public interface PluginManager
     MojoDescriptor getMojoDescriptor( String goalId );
 
     void verifyPluginForGoal( String goalName, MavenSession session )
-        throws PluginNotFoundException, PluginManagerException;
+        throws ArtifactResolutionException, PluginManagerException;
 
     void verifyPlugin( String groupId, String artifactId, MavenSession session )
-        throws PluginNotFoundException, PluginManagerException;
+        throws ArtifactResolutionException, PluginManagerException;
 
     PluginDescriptor getPluginDescriptor( String groupId, String artifactId );
 }

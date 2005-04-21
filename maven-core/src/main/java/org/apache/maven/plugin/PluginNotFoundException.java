@@ -25,12 +25,11 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
  * @version $Id$
  */
 public class PluginNotFoundException
-    extends Throwable
+    extends ArtifactResolutionException
 {
     public PluginNotFoundException( String groupId, String artifactId, String version, ArtifactResolutionException e )
     {
-        super(
-            "Plugin could not found in any remote repositories: [" + groupId + ":" + artifactId + ":" + version + "]",
-            e );
+        super( "Plugin could not be found - check that the goal name is correct", groupId, artifactId, version,
+               "maven-plugin", e );
     }
 }
