@@ -20,6 +20,7 @@ package org.apache.maven;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
@@ -246,13 +247,18 @@ public class DefaultMaven
             {
                 if ( exception.getCause() == null )
                 {
-                    logFailure( response, (PluginExecutionException) exception );
+                    PluginExecutionException e = (PluginExecutionException) exception;
+                    logFailure( response, e, e.getLongMessage() );
                 }
                 else
                 {
                     // TODO: throw exceptions like this, so "failures" are just that
                     logError( response );
                 }
+            }
+            else if ( exception instanceof ArtifactResolutionException )
+            {
+                logFailure( response, exception, null );
             }
             else
             {
@@ -354,7 +360,7 @@ public class DefaultMaven
         line();
     }
 
-    protected void logFailure( MavenExecutionResponse r, PluginExecutionException e )
+    protected void logFailure( MavenExecutionResponse r, Throwable e, String longMessage )
     {
         line();
 
@@ -366,9 +372,9 @@ public class DefaultMaven
 
         line();
 
-        if ( e.getLongMessage() != null )
+        if ( longMessage != null )
         {
-            getLogger().info( e.getLongMessage() );
+            getLogger().info( longMessage );
 
             line();
         }

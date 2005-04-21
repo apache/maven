@@ -19,6 +19,7 @@ package org.apache.maven.project;
 import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -178,7 +179,6 @@ public class DefaultMavenProjectBuilder
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        Settings settings = readSettings();
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
