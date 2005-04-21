@@ -57,7 +57,7 @@ public class ArchetypeTest
         // ----------------------------------------------------------------------
 
         ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                       "default" );
+                                                                                       "legacy" );
 
         String mavenRepoLocal = getTestFile( "target/local-repository" ).toURL().toString();
         ArtifactRepository localRepository = new ArtifactRepository( "local", mavenRepoLocal, layout );
