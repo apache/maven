@@ -20,25 +20,25 @@ package org.apache.maven.tools.repoclean.digest;
 /**
  * @author jdcasey
  */
-public class ArtifactDigestVerificationException
+public class DigestVerificationException
     extends Exception
 {
 
-    public ArtifactDigestVerificationException()
+    public DigestVerificationException()
     {
     }
 
-    public ArtifactDigestVerificationException( String message )
+    public DigestVerificationException( String message )
     {
         super( message );
     }
 
-    public ArtifactDigestVerificationException( String message, Throwable cause )
+    public DigestVerificationException( String message, Throwable cause )
     {
         super( message, cause );
     }
 
-    public ArtifactDigestVerificationException( Throwable cause )
+    public DigestVerificationException( Throwable cause )
     {
         super( cause );
     }

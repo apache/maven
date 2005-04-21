@@ -32,11 +32,11 @@ public class ArtifactDigestorTest
     
     public void testShouldWriteDigestFileInHexNotBinary() throws Exception
     {
-        ArtifactDigestor digestor = new ArtifactDigestor();
+        Digestor digestor = new Digestor();
         
         File artifact = TestSupport.getMyResource(this, DIGEST_FORMAT_VERIFY_ARTIFACT);
         
-        byte[] rawDigest = digestor.generateArtifactDigest( artifact, ArtifactDigestor.MD5 );
+        byte[] rawDigest = digestor.generateArtifactDigest( artifact, Digestor.MD5 );
         
         StringBuffer rawConverted = new StringBuffer(rawDigest.length * 2);
         for ( int i = 0; i < rawDigest.length; i++ )
@@ -46,7 +46,7 @@ public class ArtifactDigestorTest
         
         File digestFile = File.createTempFile("repoclean-artifactDigest-formatTest", ".md5");
         
-        digestor.createArtifactDigest( artifact, digestFile, ArtifactDigestor.MD5 );
+        digestor.createArtifactDigest( artifact, digestFile, Digestor.MD5 );
         
         FileReader reader = new FileReader(digestFile);
         StringBuffer written = new StringBuffer(rawDigest.length * 2);

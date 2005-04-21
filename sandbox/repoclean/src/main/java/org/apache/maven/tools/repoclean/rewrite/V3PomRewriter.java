@@ -41,6 +41,13 @@ public class V3PomRewriter
     public void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly )
         throws Exception
     {
+        // should only have to handle this here...v4 repos shouldn't have this
+        // problem...
+        String toPath = to.getPath();
+        toPath = toPath.replace( '+', '-' );
+        
+        File target = new File( toPath );
+        
         Model v4Model = null;
 
         if ( from.exists() )
@@ -60,6 +67,8 @@ public class V3PomRewriter
                 catch ( Exception e )
                 {
                     reporter.error( "Invalid v3 POM at: \'" + from + "\'. Cannot read.", e );
+                    
+                    throw e;
                 }
 
                 if(v3Model != null)
@@ -95,7 +104,7 @@ public class V3PomRewriter
                 FileWriter toWriter = null;
                 try
                 {
-                    toWriter = new FileWriter( to );
+                    toWriter = new FileWriter( target );
                     MavenXpp3Writer v4Writer = new MavenXpp3Writer();
                     v4Writer.write( toWriter, v4Model );
                 }

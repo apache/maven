@@ -4,6 +4,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.tools.repoclean.TestSupport;
 import org.apache.maven.tools.repoclean.report.DummyReporter;
+import org.apache.maven.tools.repoclean.transaction.RewriteTransaction;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
@@ -27,28 +28,29 @@ import java.io.File;
 public class ArtifactDigestVerifierTest
     extends PlexusTestCase
 {
-    
-    public void testShouldWriteBothMD5AndSHA1DigestFiles() throws Exception
+
+    public void testShouldWriteBothMD5AndSHA1DigestFiles()
+        throws Exception
     {
-        ArtifactDigestVerifier verifier = (ArtifactDigestVerifier) lookup( ArtifactDigestVerifier.ROLE );
-        
-        Artifact artifact = new DefaultArtifact("testGroup", "testArtifact", "1.0", "jar");
-        
-        File artifactFile = TestSupport.getResource("digest/ArtifactDigestorTest/digestFormatVerifyArtifact.jar");
-        
-        artifact.setFile(artifactFile);
-        
-        File tempFile = File.createTempFile("artifactDigestFileVerifyBase", "jar");
-        
-        File md5 = new File(tempFile + ".md5");
-        File sha1 = new File(tempFile + ".sha1");
-        
-        System.out.println("[INFO] We expect warnings for missing source digest files here:");
-        verifier.verifyDigest(artifact, tempFile, new DummyReporter(), false);
-        System.out.println("[INFO] Target digest files should have been created.");
-        
-        assertTrue(md5.exists());
-        assertTrue(sha1.exists());
+        DigestVerifier verifier = (DigestVerifier) lookup( DigestVerifier.ROLE );
+
+        Artifact artifact = new DefaultArtifact( "testGroup", "testArtifact", "1.0", "jar" );
+
+        File artifactFile = TestSupport.getResource( "digest/ArtifactDigestorTest/digestFormatVerifyArtifact.jar" );
+
+        artifact.setFile( artifactFile );
+
+        File tempFile = File.createTempFile( "artifactDigestFileVerifyBase", "jar" );
+
+        File md5 = new File( tempFile + ".md5" );
+        File sha1 = new File( tempFile + ".sha1" );
+
+        System.out.println( "[INFO] We expect warnings for missing source digest files here:" );
+        verifier.verifyDigest( artifactFile, tempFile, new RewriteTransaction( artifact ), new DummyReporter(), false );
+        System.out.println( "[INFO] Target digest files should have been created." );
+
+        assertTrue( md5.exists() );
+        assertTrue( sha1.exists() );
     }
 
 }

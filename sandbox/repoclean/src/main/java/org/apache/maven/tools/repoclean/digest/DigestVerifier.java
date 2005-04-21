@@ -17,9 +17,9 @@ package org.apache.maven.tools.repoclean.digest;
  * ====================================================================
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
+import org.apache.maven.tools.repoclean.transaction.RewriteTransaction;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -28,35 +28,37 @@ import java.io.IOException;
 /**
  * @author jdcasey
  */
-public class ArtifactDigestVerifier
+public class DigestVerifier
 {
 
-    public static final String ROLE = ArtifactDigestVerifier.class.getName();
+    public static final String ROLE = DigestVerifier.class.getName();
 
-    private ArtifactDigestor artifactDigestor;
+    private Digestor artifactDigestor;
     
-    public void setArtifactDigestor(ArtifactDigestor artifactDigestor)
+    public void setArtifactDigestor(Digestor artifactDigestor)
     {
         this.artifactDigestor = artifactDigestor;
     }
 
-    public void verifyDigest( Artifact artifact, File artifactTarget, Reporter reporter, boolean reportOnly )
-        throws ArtifactDigestException, ReportWriteException, IOException
+    public void verifyDigest( File source, File target, RewriteTransaction transaction, Reporter reporter, boolean reportOnly )
+        throws DigestException, ReportWriteException, IOException
     {
-        verifyDigestFile( artifact, artifactTarget, reporter, reportOnly, ".md5", ArtifactDigestor.MD5 );
+        verifyDigestFile( source, target, transaction, reporter, reportOnly, ".md5", Digestor.MD5 );
         
-        verifyDigestFile( artifact, artifactTarget, reporter, reportOnly, ".sha1", ArtifactDigestor.SHA );
+        verifyDigestFile( source, target, transaction, reporter, reportOnly, ".sha1", Digestor.SHA );
     }
 
-    private void verifyDigestFile( Artifact artifact, File artifactTarget, Reporter reporter, boolean reportOnly,
+    private void verifyDigestFile( File artifactSource, File artifactTarget, RewriteTransaction transaction, Reporter reporter, boolean reportOnly,
                                   String digestExt, String digestAlgorithm )
-        throws ArtifactDigestException, ReportWriteException, IOException
+        throws DigestException, ReportWriteException, IOException
     {
         // create the digest source file from which to copy/verify.
-        File digestSourceFile = new File( artifact.getFile() + digestExt );
+        File digestSourceFile = new File( artifactSource + digestExt );
 
         // create the digest target file from which to copy/create.
         File digestTargetFile = new File( artifactTarget + digestExt );
+        
+        transaction.addFile( digestTargetFile );
 
         boolean verified = false;
 
@@ -75,7 +77,7 @@ public class ArtifactDigestVerifier
                     }
                     catch ( IOException e )
                     {
-                        reporter.error( "Cannot copy digest file for artifact[" + artifact.getId()
+                        reporter.error( "Cannot copy digest file for path [" + artifactSource
                             + "] from source to target for digest algorithm: \'" + digestAlgorithm + "\'.", e );
 
                         throw e;
@@ -84,12 +86,12 @@ public class ArtifactDigestVerifier
             }
             else
             {
-                reporter.warn( digestExt + " for artifact[" + artifact.getId() + "] in target repository is wrong." );
+                reporter.warn( digestExt + " for path [" + artifactSource + "] in target repository is wrong." );
             }
         }
         else
         {
-            reporter.warn( digestExt + " for artifact[" + artifact.getId() + "] is missing in source repository." );
+            reporter.warn( digestExt + " for path [" + artifactSource + "] is missing in source repository." );
         }
 
         // if the .md5 was missing or did not verify correctly, create a new one

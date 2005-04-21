@@ -16,17 +16,17 @@ import java.security.NoSuchAlgorithmException;
 /**
  * @author jdcasey
  */
-public class ArtifactDigestor
+public class Digestor
 {
 
-    public static final String ROLE = ArtifactDigestor.class.getName();
+    public static final String ROLE = Digestor.class.getName();
 
     public static final String MD5 = "MD5";
 
     public static final String SHA = "SHA";
 
     public void createArtifactDigest( File artifactFile, File digestFile, String algorithm )
-        throws ArtifactDigestException
+        throws DigestException
     {
         byte[] digestData = generateArtifactDigest( artifactFile, algorithm );
 
@@ -36,12 +36,12 @@ public class ArtifactDigestor
         }
         catch ( IOException e )
         {
-            throw new ArtifactDigestException( "Cannot write digest to file: \'" + digestFile + "\'", e );
+            throw new DigestException( "Cannot write digest to file: \'" + digestFile + "\'", e );
         }
     }
 
     public boolean verifyArtifactDigest( File artifactFile, File digestFile, String algorithm )
-        throws ArtifactDigestException
+        throws DigestException
     {
         if ( artifactFile.exists() && digestFile.exists() )
         {
@@ -68,7 +68,7 @@ public class ArtifactDigestor
             }
             catch ( IOException e )
             {
-                throw new ArtifactDigestException( "Cannot verify digest for artifact file: \'" + artifactFile
+                throw new DigestException( "Cannot verify digest for artifact file: \'" + artifactFile
                     + "\' against digest file: \'" + digestFile + "\' using algorithm: \'" + algorithm + "\'", e );
             }
             finally
@@ -86,7 +86,7 @@ public class ArtifactDigestor
     }
 
     public byte[] generateArtifactDigest( File artifactFile, String algorithm )
-        throws ArtifactDigestException
+        throws DigestException
     {
         MessageDigest digest = null;
         try
@@ -95,7 +95,7 @@ public class ArtifactDigestor
         }
         catch ( NoSuchAlgorithmException e )
         {
-            throw new ArtifactDigestException( "Cannot load digest algoritm provider.", e );
+            throw new DigestException( "Cannot load digest algoritm provider.", e );
         }
 
         InputStream in = null;
@@ -112,7 +112,7 @@ public class ArtifactDigestor
         }
         catch ( IOException e )
         {
-            throw new ArtifactDigestException( "Error reading artifact data from: \'" + artifactFile + "\'", e );
+            throw new DigestException( "Error reading artifact data from: \'" + artifactFile + "\'", e );
         }
         finally
         {

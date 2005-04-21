@@ -1,6 +1,7 @@
 package org.apache.maven.tools.repoclean.discover;
 
-import org.apache.maven.tools.repoclean.report.FileReporter;
+import org.apache.maven.tools.repoclean.report.PathLister;
+import org.apache.maven.tools.repoclean.report.Reporter;
 
 import java.io.File;
 import java.util.List;
@@ -32,6 +33,9 @@ public interface ArtifactDiscoverer
         ".maven/**",
         "**/poms/*.pom",
         "**/*.md5",
+        "**/*.MD5",
+        "**/*.sha1",
+        "**/*.SHA1",
         "**/*snapshot-version",
         "*/website/**",
         "*/licenses/**",
@@ -39,9 +43,14 @@ public interface ArtifactDiscoverer
         "**/.htaccess",
         "**/*.html",
         "**/*.asc",
-        "**/*.txt" };
+        "**/*.txt",
+        "**/*.xml",
+        "**/README*",
+        "**/CHANGELOG*",
+        "**/KEYS*" };
 
-    List discoverArtifacts( File repositoryBase, FileReporter reporter, String blacklistedPatterns )
+    List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns,
+                           PathLister excludeLister, PathLister kickoutLister )
         throws Exception;
 
 }

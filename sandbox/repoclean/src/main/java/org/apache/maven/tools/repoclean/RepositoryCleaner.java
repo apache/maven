@@ -1,8 +1,8 @@
 package org.apache.maven.tools.repoclean;
 
 /*
- * ==================================================================== Copyright 2001-2004 The
- * Apache Software Foundation.
+ * ==================================================================== 
+ * Copyright 2001-2004 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -21,13 +21,16 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.tools.repoclean.artifact.metadata.ProjectMetadata;
-import org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier;
+import org.apache.maven.tools.repoclean.digest.DigestVerifier;
 import org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer;
 import org.apache.maven.tools.repoclean.index.ArtifactIndexer;
 import org.apache.maven.tools.repoclean.report.FileReporter;
+import org.apache.maven.tools.repoclean.report.PathLister;
 import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter;
+import org.apache.maven.tools.repoclean.transaction.RewriteTransaction;
+import org.apache.maven.tools.repoclean.transaction.RollbackException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
@@ -48,6 +51,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -62,7 +66,9 @@ public class RepositoryCleaner
 
     public static final String ROLE = RepositoryCleaner.class.getName();
 
-    private ArtifactDigestVerifier artifactDigestVerifier;
+    private static final String REPORTS_DIR_DATE_FORMAT = "dd-MMM-yyyy_hh.mm.ss";
+
+    private DigestVerifier digestVerifier;
 
     private ArtifactRepositoryLayout bridgingLayout;
 
@@ -77,7 +83,7 @@ public class RepositoryCleaner
     public void cleanRepository( RepositoryCleanerConfiguration configuration )
         throws Exception
     {
-        File reportsBase = normalizeReportsBase( configuration.getReportsPath() );
+        File reportsBase = formatReportsBase( configuration.getReportsPath() );
 
         File sourceRepositoryBase = normalizeSourceRepositoryBase( configuration.getSourceRepositoryPath() );
 
@@ -99,6 +105,10 @@ public class RepositoryCleaner
                 ArtifactDiscoverer artifactDiscoverer = null;
 
                 List artifacts = null;
+                
+                PathLister kickoutLister = null;
+                PathLister excludeLister = null;
+                
                 try
                 {
                     artifactDiscoverer = (ArtifactDiscoverer) container.lookup( ArtifactDiscoverer.ROLE, configuration
@@ -111,8 +121,14 @@ public class RepositoryCleaner
 
                     try
                     {
+                        File kickoutsList = new File(reportsBase, "kickouts.txt");
+                        File excludesList = new File(reportsBase, "excludes.txt");
+                        
+                        kickoutLister = new PathLister(kickoutsList);
+                        excludeLister = new PathLister(excludesList);
+
                         artifacts = artifactDiscoverer.discoverArtifacts( sourceRepositoryBase, repoReporter,
-                                                                          configuration.getBlacklistedPatterns() );
+                                                                          configuration.getBlacklistedPatterns(), excludeLister, kickoutLister );
                     }
                     catch ( Exception e )
                     {
@@ -126,6 +142,9 @@ public class RepositoryCleaner
                     {
                         container.release( artifactDiscoverer );
                     }
+                    
+                    excludeLister.close();
+                    kickoutLister.close();
                 }
 
                 if ( artifacts != null )
@@ -257,6 +276,8 @@ public class RepositoryCleaner
             {
                 Artifact artifact = (Artifact) it.next();
 
+                RewriteTransaction transaction = new RewriteTransaction( artifact );
+
                 String artifactReportPath = buildArtifactReportPath( artifact );
 
                 FileReporter artifactReporter = null;
@@ -269,6 +290,8 @@ public class RepositoryCleaner
                     File artifactSource = new File( sourceRepo.getBasedir(), sourceRepo.pathOf( artifact ) );
                     File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ) );
 
+                    transaction.addFile( artifactTarget );
+
                     artifact.setFile( artifactSource );
 
                     boolean targetMissingOrOlder = !artifactTarget.exists()
@@ -277,6 +300,8 @@ public class RepositoryCleaner
                     if ( artifactSource.exists() && ( configuration.force() || targetMissingOrOlder ) )
                     {
                         actualRewriteCount++;
+
+                        transaction.addFile( artifactTarget );
 
                         try
                         {
@@ -291,6 +316,8 @@ public class RepositoryCleaner
                                 File targetParent = artifactTarget.getParentFile();
                                 if ( !targetParent.exists() )
                                 {
+                                    transaction.addFile( targetParent );
+
                                     targetParent.mkdirs();
                                 }
 
@@ -308,55 +335,64 @@ public class RepositoryCleaner
                             repoReporter.error( "Error transferring artifact[" + artifact.getId()
                                 + "] to the target repository.", e );
 
-                            // if we can't copy the jar over, then skip the rest.
-                            errorOccurred = true;
+                            throw e;
                         }
 
-                        if ( !errorOccurred )
+                        if ( logger.isDebugEnabled() )
                         {
-                            if ( logger.isDebugEnabled() )
-                            {
-                                logger.debug( "working on digest for artifact[" + artifact.getId()
-                                    + "] with groupId: \'" + artifact.getGroupId() + "\'" );
-                            }
-
-                            try
-                            {
-                                artifactDigestVerifier.verifyDigest( artifact, artifactTarget, artifactReporter,
-                                                                     configuration.reportOnly() );
-                            }
-                            catch ( Exception e )
-                            {
-                                repoReporter.error( "Error verifying digest for artifact[" + artifact.getId() + "]", e );
-                            }
+                            logger.debug( "working on digest for artifact[" + artifact.getId() + "] with groupId: \'"
+                                + artifact.getGroupId() + "\'" );
                         }
 
-                        if ( !errorOccurred )
+                        try
                         {
-                            ArtifactMetadata pom = new ProjectMetadata( artifact );
+                            digestVerifier.verifyDigest( artifactSource, artifactTarget, transaction,
+                                                                 artifactReporter, configuration.reportOnly() );
+                        }
+                        catch ( Exception e )
+                        {
+                            repoReporter.error( "Error verifying digest for artifact[" + artifact.getId() + "]", e );
 
-                            artifactPomRewriter = (ArtifactPomRewriter) container.lookup( ArtifactPomRewriter.ROLE,
-                                                                                          configuration
-                                                                                              .getSourcePomVersion() );
+                            throw e;
+                        }
 
-                            File sourcePom = new File( sourceRepositoryBase, sourceRepo.pathOfMetadata( pom ) );
+                        ArtifactMetadata pom = new ProjectMetadata( artifact );
 
-                            File targetPom = new File( targetRepositoryBase, targetRepo.pathOfMetadata( pom ) );
+                        artifactPomRewriter = (ArtifactPomRewriter) container.lookup( ArtifactPomRewriter.ROLE,
+                                                                                      configuration
+                                                                                          .getSourcePomVersion() );
 
-                            File bridgedTargetPom = new File( targetRepositoryBase, bridgingLayout.pathOfMetadata( pom ) );
+                        File sourcePom = new File( sourceRepositoryBase, sourceRepo.pathOfMetadata( pom ) );
 
-                            try
+                        File targetPom = new File( targetRepositoryBase, targetRepo.pathOfMetadata( pom ) );
+
+                        transaction.addFile( targetPom );
+
+                        File bridgedTargetPom = new File( targetRepositoryBase, bridgingLayout.pathOfMetadata( pom ) );
+
+                        transaction.addFile( bridgedTargetPom );
+
+                        try
+                        {
+                            artifactPomRewriter.rewrite( artifact, sourcePom, targetPom, artifactReporter,
+                                                         configuration.reportOnly() );
+
+                            boolean wroteBridge = bridgePomLocations( targetPom, bridgedTargetPom, artifactReporter );
+                            
+                            digestVerifier.verifyDigest( sourcePom, targetPom, transaction,
+                                                                 artifactReporter, configuration.reportOnly() );
+                            
+                            if(wroteBridge)
                             {
-                                artifactPomRewriter.rewrite( artifact, sourcePom, targetPom, artifactReporter,
-                                                             configuration.reportOnly() );
-
-                                bridgePomLocations( targetPom, bridgedTargetPom, artifactReporter );
+                                digestVerifier.verifyDigest( sourcePom, bridgedTargetPom, transaction,
+                                                                     artifactReporter, configuration.reportOnly() );
                             }
-                            catch ( Exception e )
-                            {
-                                repoReporter.error( "Error rewriting POM for artifact[" + artifact.getId()
-                                    + "] into the target repository.", e );
-                            }
+                            
+                        }
+                        catch ( Exception e )
+                        {
+                            repoReporter.error( "Error rewriting POM for artifact[" + artifact.getId()
+                                + "] into the target repository.\n Error message: " + e.getMessage() );
                         }
 
                     }
@@ -380,6 +416,18 @@ public class RepositoryCleaner
                 }
                 catch ( Exception e )
                 {
+                    if ( !configuration.force() )
+                    {
+                        try
+                        {
+                            transaction.rollback();
+                        }
+                        catch ( RollbackException re )
+                        {
+                            repoReporter.error( "Error rolling back conversion transaction.", re );
+                        }
+                    }
+
                     artifactReporter.error( "Error while rewriting file or POM for artifact: \'" + artifact.getId()
                         + "\'. See report at: \'" + artifactReportPath + "\'.", e );
                 }
@@ -404,13 +452,15 @@ public class RepositoryCleaner
         }
     }
 
-    private void bridgePomLocations( File targetPom, File bridgedTargetPom, Reporter reporter )
+    private boolean bridgePomLocations( File targetPom, File bridgedTargetPom, Reporter reporter )
         throws IOException, ReportWriteException
     {
         if ( targetPom.equals( bridgedTargetPom ) )
         {
             reporter.warn( "Cannot create legacy-compatible copy of POM at: " + targetPom
                 + "; legacy-compatible path is the same as the converted POM itself." );
+            
+            return false;
         }
 
         FileInputStream in = null;
@@ -428,6 +478,8 @@ public class RepositoryCleaner
             IOUtil.close( in );
             IOUtil.close( out );
         }
+        
+        return true;
     }
 
     private String buildArtifactReportPath( Artifact artifact )
@@ -522,22 +574,29 @@ public class RepositoryCleaner
         return sourceRepositoryBase;
     }
 
-    private File normalizeReportsBase( String reportsPath )
+    private File formatReportsBase( String reportsPath )
     {
         Logger logger = getLogger();
 
-        File reportsBase = new File( reportsPath );
-        if ( !reportsBase.exists() )
-        {
-            logger.info( "Creating reports directory: \'" + reportsBase + "\'" );
+        SimpleDateFormat dateFormat = new SimpleDateFormat( REPORTS_DIR_DATE_FORMAT );
 
-            reportsBase.mkdirs();
-        }
-        else if ( !reportsBase.isDirectory() )
+        String subdir = dateFormat.format( new Date() );
+
+        File allReportsBase = new File( reportsPath );
+
+        File reportsBase = new File( allReportsBase, subdir );
+
+        if ( reportsBase.exists() && !reportsBase.isDirectory() )
         {
             logger.error( "Cannot write reports to \'" + reportsBase + "\' because it is not a directory." );
 
             reportsBase = null;
+        }
+        else
+        {
+            logger.info( "Creating reports directory: \'" + reportsBase + "\'" );
+
+            reportsBase.mkdirs();
         }
 
         return reportsBase;

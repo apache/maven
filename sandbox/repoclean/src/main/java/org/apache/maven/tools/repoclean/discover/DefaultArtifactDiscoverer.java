@@ -4,8 +4,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.tools.repoclean.report.FileReporter;
-import org.codehaus.plexus.util.DirectoryScanner;
+import org.apache.maven.tools.repoclean.report.PathLister;
+import org.apache.maven.tools.repoclean.report.Reporter;
 import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
@@ -31,44 +31,23 @@ import java.util.List;
  * @author jdcasey
  */
 public class DefaultArtifactDiscoverer
-    implements ArtifactDiscoverer
+    extends AbstractArtifactDiscoverer
 {
 
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
-    public List discoverArtifacts( File repositoryBase, FileReporter reporter, String blacklistedPatterns )
+    public List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns, PathLister excludeLister, PathLister kickoutLister )
         throws Exception
     {
         List artifacts = new ArrayList();
 
-        String[] blacklisted = null;
-        if ( blacklistedPatterns != null && blacklistedPatterns.length() > 0 )
-        {
-            blacklisted = blacklistedPatterns.split( "," );
-        }
-        else
-        {
-            blacklisted = new String[0];
-        }
-
-        String[] allExcludes = new String[STANDARD_DISCOVERY_EXCLUDES.length + blacklisted.length];
-
-        System.arraycopy( STANDARD_DISCOVERY_EXCLUDES, 0, allExcludes, 0, STANDARD_DISCOVERY_EXCLUDES.length );
-        System.arraycopy( blacklisted, 0, allExcludes, 0, blacklisted.length );
-
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir( repositoryBase );
-        scanner.setExcludes( allExcludes );
-
-        scanner.scan();
-
-        String[] artifactPaths = scanner.getIncludedFiles();
-
+        String[] artifactPaths = scanForArtifactPaths( repositoryBase, blacklistedPatterns, excludeLister );
+        
         for ( int i = 0; i < artifactPaths.length; i++ )
         {
             String path = artifactPaths[i];
 
-            Artifact artifact = buildArtifact( repositoryBase, path, reporter );
+            Artifact artifact = buildArtifact( repositoryBase, path, kickoutLister );
 
             if ( artifact != null )
             {
@@ -79,7 +58,7 @@ public class DefaultArtifactDiscoverer
         return artifacts;
     }
 
-    private Artifact buildArtifact( File repositoryBase, String path, FileReporter reporter )
+    private Artifact buildArtifact( File repositoryBase, String path, PathLister kickoutLister )
         throws Exception
     {
         Artifact result = null;
@@ -88,8 +67,7 @@ public class DefaultArtifactDiscoverer
 
         if ( lastDot < 0 )
         {
-            reporter.error( "Found potential artifact file with invalid name. Path: \'" + path
-                + "\' doesn't seem to contain a file extension." );
+            kickoutLister.addPath(path);
         }
         else
         {
@@ -117,8 +95,7 @@ public class DefaultArtifactDiscoverer
             }
             else
             {
-                reporter.error( "POM not found for potential artifact at \'" + path
-                    + "\'. Cannot create Artifact instance." );
+                kickoutLister.addPath(path);
             }
         }
 

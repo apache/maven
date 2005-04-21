@@ -1,6 +1,31 @@
 <component-set>
   <components>
     <component>
+      <role>org.apache.maven.tools.repoclean.RepositoryCleaner</role>
+      <implementation>org.apache.maven.tools.repoclean.RepositoryCleaner</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
+          <role-hint>alpha-bridging</role-hint>
+          <field-name>bridgingLayout</field-name>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.tools.repoclean.digest.DigestVerifier</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.tools.repoclean.index.ArtifactIndexer</role>
+        </requirement>
+        <requirement>
+          <role>org.codehaus.plexus.mailsender.MailSender</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
       <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
       <role-hint>alpha-bridging</role-hint>
       <implementation>org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout</implementation>
@@ -105,31 +130,6 @@
      |
      |
      -->
-    <component>
-      <role>org.apache.maven.tools.repoclean.RepositoryCleaner</role>
-      <implementation>org.apache.maven.tools.repoclean.RepositoryCleaner</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
-          <role-hint>alpha-bridging</role-hint>
-          <field-name>bridgingLayout</field-name>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.tools.repoclean.index.ArtifactIndexer</role>
-        </requirement>
-        <requirement>
-          <role>org.codehaus.plexus.mailsender.MailSender</role>
-        </requirement>
-      </requirements>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
      <component>
       <role>org.apache.maven.tools.repoclean.index.ArtifactIndexer</role>
       <implementation>org.apache.maven.tools.repoclean.index.ArtifactIndexer</implementation>
@@ -160,11 +160,11 @@
      |
      -->
     <component>
-      <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</role>
-      <implementation>org.apache.maven.tools.repoclean.digest.ArtifactDigestVerifier</implementation>
+      <role>org.apache.maven.tools.repoclean.digest.DigestVerifier</role>
+      <implementation>org.apache.maven.tools.repoclean.digest.DigestVerifier</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestor</role>
+          <role>org.apache.maven.tools.repoclean.digest.Digestor</role>
         </requirement>
       </requirements>
     </component>
@@ -174,8 +174,8 @@
      |
      -->
     <component>
-      <role>org.apache.maven.tools.repoclean.digest.ArtifactDigestor</role>
-      <implementation>org.apache.maven.tools.repoclean.digest.ArtifactDigestor</implementation>
+      <role>org.apache.maven.tools.repoclean.digest.Digestor</role>
+      <implementation>org.apache.maven.tools.repoclean.digest.Digestor</implementation>
     </component>
     <!--
      |
