@@ -41,8 +41,6 @@ if [ -f $HOME_DIR/build_required ]; then
   BUILD_REQUIRED=`cat $HOME_DIR/build_required`
 fi
 
-export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
-
 (
   if [ "$CMD" = "checkout" ]
   then
@@ -62,7 +60,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
     (
       cd $DIR
         
-      cvs co maven-components > $HOME_DIR/$SCM_LOG 2>&1
+      svn co http://svn.apache.org/repos/asf/maven/components/trunk maven-components > $HOME_DIR/$SCM_LOG 2>&1
     
       echo "true" > $HOME_DIR/build_required     
     )
@@ -76,9 +74,9 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
     (
       cd $DIR/maven-components
       
-      cvs update -dP > $HOME_DIR/$SCM_LOG 2>&1
+      svn update > $HOME_DIR/$SCM_LOG 2>&1
       
-      grep ^[PU] $HOME_DIR/$SCM_LOG > /dev/null 2>&1
+      grep "^[PUAD] " $HOME_DIR/$SCM_LOG > /dev/null 2>&1
 
       if [ "$?" = "1" ]
       then
@@ -102,7 +100,7 @@ export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
       
     echo "Updates occured, build required ..."
     echo
-    grep ^[PU] $HOME_DIR/$SCM_LOG
+    grep "^[PUAD] " $HOME_DIR/$SCM_LOG
     echo
 
     (
