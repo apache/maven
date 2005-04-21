@@ -144,6 +144,7 @@ public class SnapshotArtifactMetadata
 
         try
         {
+            // TODO: shouldn't need a file intermediatary - improve wagon to take a stream
             File destination = File.createTempFile( "maven-artifact", null );
             destination.deleteOnExit();
 

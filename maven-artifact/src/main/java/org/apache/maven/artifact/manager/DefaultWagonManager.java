@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 public class DefaultWagonManager
     extends AbstractLogEnabled
@@ -125,11 +126,17 @@ public class DefaultWagonManager
             wagon.addTransferListener( downloadMonitor );
         }
 
-        // TODO: configure these
+        Map checksums = new HashMap();
+
+        // TODO: configure these on the repository
         try
         {
-            wagon.addTransferListener( new ChecksumObserver( "MD5" ) );
-            wagon.addTransferListener( new ChecksumObserver( "SHA-1" ) );
+            ChecksumObserver checksumObserver = new ChecksumObserver( "MD5" );
+            wagon.addTransferListener( checksumObserver );
+            checksums.put( "md5", checksumObserver );
+            checksumObserver = new ChecksumObserver( "SHA-1" );
+            wagon.addTransferListener( checksumObserver );
+            checksums.put( "sha1", checksumObserver );
         }
         catch ( NoSuchAlgorithmException e )
         {
@@ -141,6 +148,22 @@ public class DefaultWagonManager
             wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
             wagon.put( source, remotePath );
+
+            wagon.removeTransferListener( downloadMonitor );
+
+            // We do this in here so we can checksum the artifact metadata too, otherwise it could be metadata itself
+            for ( Iterator i = checksums.keySet().iterator(); i.hasNext(); )
+            {
+                String extension = (String) i.next();
+                ChecksumObserver observer = (ChecksumObserver) checksums.get( extension );
+
+                // TODO: shouldn't need a file intermediatary - improve wagon to take a stream
+                File temp = File.createTempFile( "maven-artifact", null );
+                temp.deleteOnExit();
+                FileUtils.fileWrite( temp.getAbsolutePath(), observer.getActualChecksum() );
+
+                wagon.put( temp, remotePath + "." + extension );
+            }
         }
         catch ( ConnectionException e )
         {
@@ -157,6 +180,10 @@ public class DefaultWagonManager
         catch ( ResourceDoesNotExistException e )
         {
             throw new TransferFailedException( "Resource to deploy not found: ", e );
+        }
+        catch ( IOException e )
+        {
+            throw new TransferFailedException( "Error creating temporary file for deployment: ", e );
         }
         finally
         {
