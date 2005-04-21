@@ -16,10 +16,8 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenConstants;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -98,6 +96,8 @@ public class DefaultMavenProjectBuilder
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private final Map modelCache = new HashMap();
+
+    public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
     public void initialize()
     {
@@ -554,7 +554,7 @@ public class DefaultMavenProjectBuilder
     private Model getSuperModel()
         throws ProjectBuildingException
     {
-        URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MavenConstants.MAVEN_MODEL_VERSION + ".xml" );
+        URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
 
         return readModel( url );
     }

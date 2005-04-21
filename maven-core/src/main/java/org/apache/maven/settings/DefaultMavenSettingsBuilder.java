@@ -16,7 +16,6 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenConstants;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -96,8 +95,7 @@ public class DefaultMavenSettingsBuilder
 
         if ( settings.getActiveProfile() == null )
         {
-            File mavenUserConfigurationDirectory = new File( userHome,
-                                                             MavenConstants.MAVEN_USER_CONFIGURATION_DIRECTORY );
+            File mavenUserConfigurationDirectory = new File( userHome, ".m2" );
             if ( !mavenUserConfigurationDirectory.exists() )
             {
                 if ( !mavenUserConfigurationDirectory.mkdirs() )
@@ -106,7 +104,7 @@ public class DefaultMavenSettingsBuilder
                 }
             }
 
-            String localRepository = new File( mavenUserConfigurationDirectory, MavenConstants.MAVEN_REPOSITORY ).getAbsolutePath();
+            String localRepository = new File( mavenUserConfigurationDirectory, "repository" ).getAbsolutePath();
 
             settings.initializeActiveProfile( localRepository );
         }
