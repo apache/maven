@@ -17,6 +17,7 @@ package org.apache.maven.artifact.manager;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ChecksumFailedException;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -48,7 +49,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 public class DefaultWagonManager
     extends AbstractLogEnabled
@@ -260,7 +260,7 @@ public class DefaultWagonManager
 
     private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
                                 TransferListener downloadMonitor )
-        throws TransferFailedException, ResourceDoesNotExistException
+        throws TransferFailedException, ResourceDoesNotExistException, ChecksumFailedException
     {
         Wagon wagon;
 
@@ -273,16 +273,6 @@ public class DefaultWagonManager
             throw new TransferFailedException( "Unsupported Protocol: ", e );
         }
 
-        // ----------------------------------------------------------------------
-        // These can certainly be configurable ... registering listeners
-        // ...
-
-        //ChecksumObserver md5SumObserver = new ChecksumObserver();
-
-        // ----------------------------------------------------------------------
-
-        //wagon.addTransferListener( md5SumObserver );
-
         if ( downloadMonitor != null )
         {
             wagon.addTransferListener( downloadMonitor );
@@ -294,6 +284,18 @@ public class DefaultWagonManager
             destination.getParentFile().mkdirs();
         }
 
+        // TODO: configure on repository
+        ChecksumObserver checksumObserver;
+        try
+        {
+            checksumObserver = new ChecksumObserver( "MD5" );
+            wagon.addTransferListener( checksumObserver );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new TransferFailedException( "Unable to add checksum methods", e );
+        }
+
         File temp = new File( destination + ".tmp" );
         temp.deleteOnExit();
 
@@ -302,6 +304,32 @@ public class DefaultWagonManager
             wagon.connect( repository, getProxy( repository.getProtocol() ) );
 
             wagon.get( remotePath, temp );
+
+            try
+            {
+                // grab it first, because it's about to change...
+                String actualChecksum = checksumObserver.getActualChecksum();
+
+                File checksumFile = new File( destination + ".md5" );
+                wagon.get( remotePath + ".md5", checksumFile );
+
+                String expectedChecksum = FileUtils.fileRead( checksumFile );
+                if ( !expectedChecksum.equals( actualChecksum ) )
+                {
+                    // TODO: optionally retry?
+                    throw new ChecksumFailedException(
+                        "Checksum failed on download: local = " + actualChecksum + "; remote = " +
+                        expectedChecksum );
+                }
+            }
+            catch ( ResourceDoesNotExistException e )
+            {
+                getLogger().warn( "No checksum exists - assuming a valid download" );
+            }
+            catch ( IOException e )
+            {
+                getLogger().error( "Unable to read checksum - assuming a valid download", e );
+            }
         }
         catch ( ConnectionException e )
         {
@@ -327,15 +355,11 @@ public class DefaultWagonManager
             throw new ResourceDoesNotExistException( "Downloaded file does not exist: " + temp );
         }
 
-        // The temporary file is named destination + ".tmp" and is done this
-        // way to ensure
-        // that the temporary file is in the same file system as the
-        // destination because the
+        // The temporary file is named destination + ".tmp" and is done this way to ensure
+        // that the temporary file is in the same file system as the destination because the
         // File.renameTo operation doesn't really work across file systems.
-        // So we will attempt
-        // to do a File.renameTo for efficiency and atomicity, if this fails
-        // then we will use
-        // a brute force copy and delete the temporary file.
+        // So we will attempt to do a File.renameTo for efficiency and atomicity, if this fails
+        // then we will use a brute force copy and delete the temporary file.
 
         if ( !temp.renameTo( destination ) )
         {
