@@ -19,6 +19,7 @@ TIMESTAMP=`date +%Y%m%d.%H%M%S`
 DEPLOY_DIR=$HOME_DIR/public_html/m2
 DEPLOY_SITE=http://www.codehaus.org/~maven/m2
 DIST=m2-${TIMESTAMP}.tar.gz
+SVN=/usr/local/subversion/bin/svn
 
 export JAVA_HOME=/usr/local/java
 # Required until classworlds.conf is updated
@@ -60,7 +61,7 @@ fi
     (
       cd $DIR
         
-      svn co http://svn.apache.org/repos/asf/maven/components/trunk maven-components > $HOME_DIR/$SCM_LOG 2>&1
+      $SVN co http://svn.apache.org/repos/asf/maven/components/trunk maven-components > $HOME_DIR/$SCM_LOG 2>&1
     
       echo "true" > $HOME_DIR/build_required     
     )
@@ -74,7 +75,7 @@ fi
     (
       cd $DIR/maven-components
       
-      svn update > $HOME_DIR/$SCM_LOG 2>&1
+      $SVN update > $HOME_DIR/$SCM_LOG 2>&1
       
       grep "^[PUAD] " $HOME_DIR/$SCM_LOG > /dev/null 2>&1
 
