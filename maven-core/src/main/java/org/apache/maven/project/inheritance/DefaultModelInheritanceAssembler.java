@@ -26,7 +26,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
-import org.apache.maven.util.Xpp3DomUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -273,7 +272,7 @@ public class DefaultModelInheritanceAssembler
                                 {
                                     Xpp3Dom childDom = (Xpp3Dom) childGoal.getConfiguration();
                                     Xpp3Dom parentDom = (Xpp3Dom) parentGoal.getConfiguration();
-                                    childGoal.setConfiguration( Xpp3DomUtils.mergeXpp3Dom( childDom, parentDom ) );
+                                    childGoal.setConfiguration( Xpp3Dom.mergeXpp3Dom( childDom, parentDom ) );
                                 }
                             }
                         }

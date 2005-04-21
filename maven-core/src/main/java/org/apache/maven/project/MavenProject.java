@@ -37,7 +37,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reports;
 import org.apache.maven.model.Scm;
-import org.apache.maven.util.Xpp3DomUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -739,8 +738,8 @@ public class MavenProject
                                 Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
                                 if ( goalConfiguration != null )
                                 {
-                                    Xpp3Dom newDom = Xpp3DomUtils.copyXpp3Dom( goalConfiguration );
-                                    dom = Xpp3DomUtils.mergeXpp3Dom( newDom, dom );
+                                    Xpp3Dom newDom = new Xpp3Dom( goalConfiguration );
+                                    dom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
                                 }
                                 break;
                             }

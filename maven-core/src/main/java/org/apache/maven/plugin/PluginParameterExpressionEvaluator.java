@@ -18,10 +18,10 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
 
