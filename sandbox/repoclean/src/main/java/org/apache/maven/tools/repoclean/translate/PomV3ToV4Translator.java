@@ -63,10 +63,10 @@ public class PomV3ToV4Translator
     {
         try
         {
-            String groupId = v3Model.getGroupId();
-            String artifactId = v3Model.getArtifactId();
+            String groupId = format( v3Model.getGroupId() );
+            String artifactId = format( v3Model.getArtifactId() );
 
-            String id = v3Model.getId();
+            String id = format( v3Model.getId() );
             if ( StringUtils.isNotEmpty( id ) )
             {
                 if ( StringUtils.isEmpty( groupId ) )
@@ -80,10 +80,10 @@ public class PomV3ToV4Translator
                 }
             }
 
-            String version = v3Model.getCurrentVersion();
+            String version = format( v3Model.getCurrentVersion() );
             if ( version == null )
             {
-                version = v3Model.getVersion();
+                version = format( v3Model.getVersion() );
             }
 
             PomKey pomKey = new PomKey( groupId, artifactId, version );
@@ -94,7 +94,7 @@ public class PomV3ToV4Translator
             try
             {
                 model = new Model();
-                model.setArtifactId( v3Model.getArtifactId() );
+                model.setArtifactId( artifactId );
 
                 // moved this above the translation of the build, to allow
                 // additional plugins to be defined in v3 poms via 
@@ -110,7 +110,7 @@ public class PomV3ToV4Translator
 
                 model.setDistributionManagement( translateDistributionManagement( pomKey, v3Model ) );
 
-                model.setGroupId( v3Model.getGroupId() );
+                model.setGroupId( groupId );
                 model.setInceptionYear( v3Model.getInceptionYear() );
                 model.setIssueManagement( translateIssueManagement( v3Model ) );
 
@@ -137,6 +137,11 @@ public class PomV3ToV4Translator
         {
             this.discoveredPlugins.clear();
         }
+    }
+
+    private String format( String source )
+    {
+        return (source == null)?(null):(source.replace('+', '-'));
     }
 
     private CiManagement translateCiManagementInfo( org.apache.maven.model.v3_0_0.Build v3Build )
@@ -501,11 +506,27 @@ public class PomV3ToV4Translator
             {
                 org.apache.maven.model.v3_0_0.Dependency v3Dep = (org.apache.maven.model.v3_0_0.Dependency) it.next();
 
+                String groupId = format( v3Dep.getGroupId() );
+                String artifactId = format( v3Dep.getArtifactId() );
+                
+                String id = format( v3Dep.getId() );
+                
+                if( StringUtils.isNotEmpty( id ) )
+                {
+                    if( StringUtils.isEmpty( groupId ) )
+                    {
+                        groupId = id;
+                    }
+                    
+                    if( StringUtils.isEmpty( artifactId ) )
+                    {
+                        artifactId = id;
+                    }
+                }
+
                 String type = v3Dep.getType();
                 if( "plugin".equals( type ) )
                 {
-                    String groupId = v3Dep.getGroupId();
-
                     if( "maven".equals( groupId ) )
                     {
                         groupId = "org.apache.maven.plugins";
@@ -513,8 +534,8 @@ public class PomV3ToV4Translator
                     
                     Plugin plugin = new Plugin();
                     plugin.setGroupId( groupId );
-                    plugin.setArtifactId( v3Dep.getArtifactId() );
-                    plugin.setVersion( v3Dep.getVersion() );
+                    plugin.setArtifactId( artifactId );
+                    plugin.setVersion( format( v3Dep.getVersion() ) );
 
                     Xpp3Dom config = new Xpp3Dom( "configuration" );
 
@@ -542,25 +563,13 @@ public class PomV3ToV4Translator
                 {
                     Dependency dep = new Dependency();
 
-                    String artifactId = v3Dep.getArtifactId();
-                    String groupId = v3Dep.getGroupId();
-                    
-                    if(StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId))
-                    {
-                        dep.setGroupId(groupId);
-                        dep.setArtifactId(artifactId);
-                    }
-                    else
-                    {
-                        dep.setGroupId(v3Dep.getId());
-                        dep.setArtifactId(v3Dep.getId());
-                    }
-
+                    dep.setGroupId(groupId);
+                    dep.setArtifactId(artifactId);
                     dep.setVersion( v3Dep.getVersion() );
                     dep.setType( v3Dep.getType() );
                     
                     String scope = v3Dep.getProperty( "scope" );
-                    if( scope != null && scope.trim().length() > 0 )
+                    if( StringUtils.isNotEmpty( scope ) )
                     {
                         dep.setScope( scope );
                     }

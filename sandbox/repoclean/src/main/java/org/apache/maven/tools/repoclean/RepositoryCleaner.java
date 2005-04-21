@@ -368,7 +368,7 @@ public class RepositoryCleaner
 
                         transaction.addFile( targetPom );
 
-                        File bridgedTargetPom = new File( targetRepositoryBase, bridgingLayout.pathOfMetadata( pom ) );
+                        File bridgedTargetPom = new File( targetRepositoryBase, bridgingLayout.pathOfMetadata( pom ).replace('+', '-') );
 
                         transaction.addFile( bridgedTargetPom );
 
