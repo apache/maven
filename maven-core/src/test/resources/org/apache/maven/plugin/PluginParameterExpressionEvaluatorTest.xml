@@ -28,9 +28,6 @@
         <requirement>
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
-        </requirement>
       </requirements>
     </component>
 	</components>

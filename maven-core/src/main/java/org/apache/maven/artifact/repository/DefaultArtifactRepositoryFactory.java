@@ -20,9 +20,13 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Repository;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.Server;
+import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.IOException;
 
 /**
  * @author jdcasey
@@ -31,17 +35,36 @@ public class DefaultArtifactRepositoryFactory
     extends AbstractLogEnabled
     implements ArtifactRepositoryFactory
 {
+    // TODO: use settings?
     private String globalSnapshotPolicy = null;
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository, Settings settings,
+    // TODO: make this a store once object?
+    private MavenSettingsBuilder settingsBuilder;
+
+    public ArtifactRepository createArtifactRepository( Repository modelRepository,
                                                         ArtifactRepositoryLayout repositoryLayout )
     {
+
         Server repoProfile = null;
 
         String repoId = modelRepository.getId();
 
         if ( repoId != null && repoId.length() > 0 )
         {
+            Settings settings = null;
+            try
+            {
+                settings = settingsBuilder.buildSettings();
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Error reading settings", e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                getLogger().warn( "Error reading settings", e );
+            }
+
             repoProfile = settings.getServer( modelRepository.getId() );
         }
         else

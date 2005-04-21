@@ -21,6 +21,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.ArtifactEnabledPlexusTestCase;
 
 import java.io.File;

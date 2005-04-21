@@ -89,9 +89,6 @@
         <requirement>
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
-        </requirement>
       </requirements>
     </component>
     <!--
@@ -251,6 +248,11 @@
     <component>
       <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
       <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
+        </requirement>
+      </requirements>
     </component>
     <!-- ********************* FIXME *******************************************
      | NOTE: This is also declared in plexus.xml for maven. We currently need it

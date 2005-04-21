@@ -38,8 +38,6 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -91,8 +89,6 @@ public class DefaultMavenProjectBuilder
 
     private ModelInterpolator modelInterpolator;
 
-    private MavenSettingsBuilder mavenSettingsBuilder;
-
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private final Map modelCache = new HashMap();
@@ -129,10 +125,6 @@ public class DefaultMavenProjectBuilder
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
-        Settings settings = readSettings();
-
-        boolean systemOnline = !settings.getActiveProfile().isOffline();
-
         MavenProject project = build( model, localRepository, resolveDependencies );
 
         // Only translate the base directory for files in the source tree
@@ -147,32 +139,6 @@ public class DefaultMavenProjectBuilder
         project.setFile( projectDescriptor );
 
         return project;
-    }
-
-    /**
-     * @return
-     * @throws ProjectBuildingException
-     * @todo shouldn't be re-reading all the time - perhaps cache, but check a timestamp so you can detect and reload on
-     * changes in a long running process
-     */
-    private Settings readSettings()
-        throws ProjectBuildingException
-    {
-        Settings settings = null;
-
-        try
-        {
-            settings = mavenSettingsBuilder.buildSettings();
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( "Cannot read settings.", e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ProjectBuildingException( "Cannot read settings.", e );
-        }
-        return settings;
     }
 
     public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -370,7 +336,6 @@ public class DefaultMavenProjectBuilder
     private List buildArtifactRepositories( List repositories )
         throws ProjectBuildingException
     {
-        Settings settings = readSettings();
 
         List repos = new ArrayList();
 
@@ -380,7 +345,7 @@ public class DefaultMavenProjectBuilder
 
             ArtifactRepositoryLayout remoteRepoLayout = getRepositoryLayout( mavenRepo );
 
-            ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo, settings,
+            ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo,
                                                                                                   remoteRepoLayout );
 
             if ( !repos.contains( artifactRepo ) )
@@ -396,8 +361,6 @@ public class DefaultMavenProjectBuilder
     {
         List remotePluginRepositories = new ArrayList();
 
-        Settings settings = readSettings();
-
         for ( Iterator it = pluginRepositories.iterator(); it.hasNext(); )
         {
             Repository mavenRepo = (Repository) it.next();
@@ -405,7 +368,6 @@ public class DefaultMavenProjectBuilder
             ArtifactRepositoryLayout repositoryLayout = getRepositoryLayout( mavenRepo );
 
             ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( mavenRepo,
-                                                                                                      settings,
                                                                                                       repositoryLayout );
 
             remotePluginRepositories.add( pluginRepository );
@@ -441,11 +403,9 @@ public class DefaultMavenProjectBuilder
             return null;
         }
 
-        Settings settings = readSettings();
-
         ArtifactRepositoryLayout repositoryLayout = getRepositoryLayout( dmRepo );
 
-        ArtifactRepository dmArtifactRepository = artifactRepositoryFactory.createArtifactRepository( dmRepo, settings,
+        ArtifactRepository dmArtifactRepository = artifactRepositoryFactory.createArtifactRepository( dmRepo,
                                                                                                       repositoryLayout );
 
         return dmArtifactRepository;

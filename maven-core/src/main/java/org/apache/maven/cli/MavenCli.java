@@ -503,6 +503,6 @@ public class MavenCli
 
         repo.setUrl( "file://" + profile.getLocalRepository() );
 
-        return repoFactory.createArtifactRepository( repo, settings, repositoryLayout );
+        return repoFactory.createArtifactRepository( repo, repositoryLayout );
     }
 }
