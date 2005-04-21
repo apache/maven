@@ -30,9 +30,14 @@ import java.util.Properties;
  */
 public class Main
 {
+    
+    public static final String FORCE_ARG = "--force";
 
     public static void main( String[] args )
     {
+        boolean force = false;
+        String configFile = null;
+        
         if ( args.length < 1 )
         {
             printUsage();
@@ -48,10 +53,36 @@ public class Main
             printTemplate();
             System.exit( 0 );
         }
+        // up the ante, and let's try to see if there's a --force option.
+        else if ( args.length == 2 )
+        {
+            if(FORCE_ARG.equals(args[0]))
+            {
+                force = true;
+                configFile = args[1];
+            }
+            else if(FORCE_ARG.equals(args[1]))
+            {
+                force = true;
+                configFile = args[0];
+            }
+            else
+            {
+                System.out.println("Invalid argument list: \'" + args[0] + " " + args[1]);
+                printUsage();
+                System.exit(1);
+            }
+        }
+        else
+        {
+            configFile = args[0];
+        }
 
         try
         {
-            RepositoryCleanerConfiguration config = buildConfig( args[0] );
+            RepositoryCleanerConfiguration config = buildConfig( configFile );
+            
+            config.setForce(force);
 
             launch( config );
             
@@ -108,6 +139,7 @@ public class Main
         config.setTargetRepositoryPath( props.getProperty( "targetRepositoryPath" ) );
         config.setTargetRepositoryLayout( props.getProperty( "targetRepositoryLayout", "default" ) );
         config.setReportsPath( props.getProperty( "reportsPath" ) );
+        config.setBlacklistedPatterns( props.getProperty( "blacklistedPatterns" ) );
         config.setReportOnly( Boolean.valueOf( props.getProperty( "reportOnly" ) ).booleanValue() );
 
         config.setMailErrorReport( Boolean.valueOf( props.getProperty( "errorReport.mailOnError", "false") ).booleanValue() );

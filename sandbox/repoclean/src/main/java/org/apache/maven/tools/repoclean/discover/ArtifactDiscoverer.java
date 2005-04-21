@@ -25,7 +25,7 @@ import java.util.List;
 public interface ArtifactDiscoverer
 {
     public static final String ROLE = ArtifactDiscoverer.class.getName();
-    
+
     public static final String[] STANDARD_DISCOVERY_EXCLUDES = {
         "bin/**",
         "reports/**",
@@ -39,9 +39,9 @@ public interface ArtifactDiscoverer
         "**/.htaccess",
         "**/*.html",
         "**/*.asc",
-        "**/*.txt"
-    };
+        "**/*.txt" };
 
-    List discoverArtifacts( File repositoryBase, FileReporter reporter ) throws Exception;
-    
+    List discoverArtifacts( File repositoryBase, FileReporter reporter, String blacklistedPatterns )
+        throws Exception;
+
 }

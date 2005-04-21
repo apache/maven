@@ -38,14 +38,38 @@ public class LegacyArtifactDiscoverer
 
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
-    public List discoverArtifacts( File repositoryBase, FileReporter reporter )
+    public List discoverArtifacts( File repositoryBase, FileReporter reporter, String blacklistedPatterns )
         throws Exception
     {
         List artifacts = new ArrayList();
 
+        String[] blacklisted = null;
+        if ( blacklistedPatterns != null && blacklistedPatterns.length() > 0 )
+        {
+            blacklisted = blacklistedPatterns.split( "," );
+        }
+        else
+        {
+            blacklisted = new String[0];
+        }
+        
+        String[] allExcludes = null;
+
+        if ( blacklisted != null && blacklisted.length > 0 )
+        {
+            allExcludes = new String[STANDARD_DISCOVERY_EXCLUDES.length + blacklisted.length ];
+
+            System.arraycopy( STANDARD_DISCOVERY_EXCLUDES, 0, allExcludes, 0, STANDARD_DISCOVERY_EXCLUDES.length );
+            System.arraycopy( blacklisted, 0, allExcludes, STANDARD_DISCOVERY_EXCLUDES.length, blacklisted.length );
+        }
+        else
+        {
+            allExcludes = STANDARD_DISCOVERY_EXCLUDES;
+        }
+        
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( repositoryBase );
-        scanner.setExcludes( STANDARD_DISCOVERY_EXCLUDES );
+        scanner.setExcludes( allExcludes );
 
         scanner.scan();
 
@@ -205,20 +229,25 @@ public class LegacyArtifactDiscoverer
 
             tokensIterated++;
         }
-        
-        getLogger().debug("After parsing loop, state of buffers:\no  Version Buffer: \'" + versionBuffer + "\'\no  Classifier Buffer: \'" + classifierBuffer + "\'\no Number of Tokens Iterated: " + tokensIterated);
+
+        getLogger().debug(
+                           "After parsing loop, state of buffers:\no  Version Buffer: \'" + versionBuffer
+                               + "\'\no  Classifier Buffer: \'" + classifierBuffer
+                               + "\'\no Number of Tokens Iterated: " + tokensIterated );
 
         // Now, restore the proper ordering so we can build the artifactId.
         Collections.reverse( avceTokenList );
-        
-        getLogger().debug("Before repairing bad version and/or cleaning up used tokens, avce token list is:\n" + avceTokenList);
-        
+
+        getLogger().debug(
+                           "Before repairing bad version and/or cleaning up used tokens, avce token list is:\n"
+                               + avceTokenList );
+
         // if we didn't find a version, then punt. Use the last token
         // as the version, and set the classifier empty.
         if ( versionBuffer.length() < 1 )
         {
             int lastIdx = avceTokenList.size() - 1;
-            
+
             versionBuffer.append( avceTokenList.get( lastIdx ) );
             avceTokenList.remove( lastIdx );
 
@@ -226,14 +255,14 @@ public class LegacyArtifactDiscoverer
         }
         else
         {
-            getLogger().debug("Removing " + tokensIterated + " tokens from avce token list.");
-            
+            getLogger().debug( "Removing " + tokensIterated + " tokens from avce token list." );
+
             // if everything is kosher, then pop off all the classifier and
             // version tokens, leaving the naked artifact id in the list.
             avceTokenList = new LinkedList( avceTokenList.subList( 0, avceTokenList.size() - ( tokensIterated ) ) );
         }
-        
-        getLogger().debug("Now, remainder of avce token list is:\n" + avceTokenList);
+
+        getLogger().debug( "Now, remainder of avce token list is:\n" + avceTokenList );
 
         StringBuffer artifactIdBuffer = new StringBuffer();
 
@@ -270,16 +299,16 @@ public class LegacyArtifactDiscoverer
         }
 
         getLogger().debug(
-                          "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
-                              + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n" + "version: \'"
-                              + version + "\'\n" + "classifier: \'" + classifierBuffer.toString() + "\'" );
+                           "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
+                               + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n" + "version: \'"
+                               + version + "\'\n" + "classifier: \'" + classifierBuffer.toString() + "\'" );
 
         Artifact result = null;
 
         if ( classifierBuffer.length() > 0 )
         {
-            getLogger().debug("Creating artifact with classifier.");
-            
+            getLogger().debug( "Creating artifact with classifier." );
+
             result = artifactConstructionSupport.createArtifactWithClassifier( groupId, artifactId, version,
                                                                                Artifact.SCOPE_RUNTIME, type,
                                                                                classifierBuffer.toString() );
@@ -290,7 +319,9 @@ public class LegacyArtifactDiscoverer
                                                                  type );
         }
 
-        getLogger().debug( "Resulting artifact is: " + result.getId() + " and has classifier of: " + result.getClassifier() + "\n\n" );
+        getLogger().debug(
+                           "Resulting artifact is: " + result.getId() + " and has classifier of: "
+                               + result.getClassifier() + "\n\n" );
 
         return result;
     }

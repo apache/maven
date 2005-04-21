@@ -51,6 +51,8 @@ public class RepositoryCleanerConfiguration
     
     private boolean force;
 
+    private String blacklistedPatterns;
+
     public void setSourceRepositoryPath( String sourceRepositoryPath )
     {
         this.sourceRepositoryPath = sourceRepositoryPath;
@@ -189,5 +191,15 @@ public class RepositoryCleanerConfiguration
     public void setForce( boolean force )
     {
         this.force = force;
+    }
+
+    public void setBlacklistedPatterns( String blacklistedPatterns )
+    {
+        this.blacklistedPatterns = blacklistedPatterns;
+    }
+    
+    public String getBlacklistedPatterns()
+    {
+        return blacklistedPatterns;
     }
 }

@@ -67,9 +67,9 @@ public class RepositoryCleaner
     private ArtifactRepositoryLayout bridgingLayout;
 
     private MailSender mailSender;
-    
+
     private ArtifactIndexer artifactIndexer;
-    
+
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
     private PlexusContainer container;
@@ -101,9 +101,8 @@ public class RepositoryCleaner
                 List artifacts = null;
                 try
                 {
-                    artifactDiscoverer = (ArtifactDiscoverer) container.lookup(
-                                                                                ArtifactDiscoverer.ROLE,
-                                                                                configuration.getSourceRepositoryLayout() );
+                    artifactDiscoverer = (ArtifactDiscoverer) container.lookup( ArtifactDiscoverer.ROLE, configuration
+                        .getSourceRepositoryLayout() );
 
                     if ( logger.isInfoEnabled() )
                     {
@@ -112,7 +111,8 @@ public class RepositoryCleaner
 
                     try
                     {
-                        artifacts = artifactDiscoverer.discoverArtifacts( sourceRepositoryBase, repoReporter );
+                        artifacts = artifactDiscoverer.discoverArtifacts( sourceRepositoryBase, repoReporter,
+                                                                          configuration.getBlacklistedPatterns() );
                     }
                     catch ( Exception e )
                     {
@@ -134,16 +134,16 @@ public class RepositoryCleaner
                     ArtifactRepositoryLayout targetLayout = null;
                     try
                     {
-                        sourceLayout = (ArtifactRepositoryLayout) container.lookup(
-                                                                                    ArtifactRepositoryLayout.ROLE,
-                                                                                    configuration.getSourceRepositoryLayout() );
+                        sourceLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                    configuration
+                                                                                        .getSourceRepositoryLayout() );
 
                         ArtifactRepository sourceRepo = new ArtifactRepository( "source", "file://"
                             + sourceRepositoryBase.getAbsolutePath(), sourceLayout );
 
-                        targetLayout = (ArtifactRepositoryLayout) container.lookup(
-                                                                                    ArtifactRepositoryLayout.ROLE,
-                                                                                    configuration.getTargetRepositoryLayout() );
+                        targetLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
+                                                                                    configuration
+                                                                                        .getTargetRepositoryLayout() );
 
                         ArtifactRepository targetRepo = new ArtifactRepository( "target", "file://"
                             + targetRepositoryBase.getAbsolutePath(), targetLayout );
@@ -154,7 +154,7 @@ public class RepositoryCleaner
                         }
 
                         artifactIndexer.writeAritfactIndex( artifacts, targetRepositoryBase );
-                        
+
                         rewriteArtifactsAndPoms( artifacts, sourceRepo, targetRepo, configuration, reportsBase,
                                                  sourceRepositoryBase, targetRepositoryBase, repoReporter );
                     }
@@ -179,7 +179,8 @@ public class RepositoryCleaner
 
                 if ( repoReporter.hasWarning() && logger.isWarnEnabled() )
                 {
-                    logger.warn( "Warning encountered while rewriting one or more artifacts from source repository to target repository." );
+                    logger
+                        .warn( "Warning encountered while rewriting one or more artifacts from source repository to target repository." );
                 }
 
                 if ( repoReporter.hasError() )
@@ -245,12 +246,12 @@ public class RepositoryCleaner
         Logger logger = getLogger();
 
         ArtifactPomRewriter artifactPomRewriter = null;
-        
+
         try
         {
             logger.info( "Rewriting up to " + artifacts.size() + " artifacts (Should be " + ( artifacts.size() * 2 )
                 + " rewrites including POMs)." );
-            
+
             int actualRewriteCount = 0;
             for ( Iterator it = artifacts.iterator(); it.hasNext(); )
             {
@@ -273,10 +274,10 @@ public class RepositoryCleaner
                     boolean targetMissingOrOlder = !artifactTarget.exists()
                         || artifactTarget.lastModified() < artifactSource.lastModified();
 
-                    if ( artifactSource.exists() && targetMissingOrOlder )
+                    if ( artifactSource.exists() && ( configuration.force() || targetMissingOrOlder ) )
                     {
                         actualRewriteCount++;
-                        
+
                         try
                         {
                             if ( !configuration.reportOnly() )
@@ -334,21 +335,21 @@ public class RepositoryCleaner
                         {
                             ArtifactMetadata pom = new ProjectMetadata( artifact );
 
-                            artifactPomRewriter = (ArtifactPomRewriter) container.lookup(
-                                                                                          ArtifactPomRewriter.ROLE,
-                                                                                          configuration.getSourcePomVersion() );
+                            artifactPomRewriter = (ArtifactPomRewriter) container.lookup( ArtifactPomRewriter.ROLE,
+                                                                                          configuration
+                                                                                              .getSourcePomVersion() );
 
                             File sourcePom = new File( sourceRepositoryBase, sourceRepo.pathOfMetadata( pom ) );
 
                             File targetPom = new File( targetRepositoryBase, targetRepo.pathOfMetadata( pom ) );
-                            
+
                             File bridgedTargetPom = new File( targetRepositoryBase, bridgingLayout.pathOfMetadata( pom ) );
 
                             try
                             {
                                 artifactPomRewriter.rewrite( artifact, sourcePom, targetPom, artifactReporter,
                                                              configuration.reportOnly() );
-                                
+
                                 bridgePomLocations( targetPom, bridgedTargetPom, artifactReporter );
                             }
                             catch ( Exception e )
@@ -359,10 +360,11 @@ public class RepositoryCleaner
                         }
 
                     }
-                    else if( !targetMissingOrOlder )
+                    else if ( !targetMissingOrOlder )
                     {
-                        artifactReporter.warn( "Target file for artifact is present and not stale. (Artifact: \'" + artifact.getId()
-                                                + "\' in path: \'" + artifactSource + "\' with target path: " + artifactTarget + ")." );
+                        artifactReporter.warn( "Target file for artifact is present and not stale. (Artifact: \'"
+                            + artifact.getId() + "\' in path: \'" + artifactSource + "\' with target path: "
+                            + artifactTarget + ")." );
                     }
                     else
                     {
@@ -389,8 +391,9 @@ public class RepositoryCleaner
                     }
                 }
             }
-            
-            logger.info("Actual number of artifacts rewritten: " + actualRewriteCount + " (" + (actualRewriteCount * 2) + " including POMs).");
+
+            logger.info( "Actual number of artifacts rewritten: " + actualRewriteCount + " ("
+                + ( actualRewriteCount * 2 ) + " including POMs)." );
         }
         finally
         {
@@ -401,27 +404,29 @@ public class RepositoryCleaner
         }
     }
 
-    private void bridgePomLocations( File targetPom, File bridgedTargetPom, Reporter reporter ) throws IOException, ReportWriteException
+    private void bridgePomLocations( File targetPom, File bridgedTargetPom, Reporter reporter )
+        throws IOException, ReportWriteException
     {
-        if(targetPom.equals(bridgedTargetPom))
+        if ( targetPom.equals( bridgedTargetPom ) )
         {
-            reporter.warn("Cannot create legacy-compatible copy of POM at: " + targetPom + "; legacy-compatible path is the same as the converted POM itself."); 
+            reporter.warn( "Cannot create legacy-compatible copy of POM at: " + targetPom
+                + "; legacy-compatible path is the same as the converted POM itself." );
         }
-        
+
         FileInputStream in = null;
         FileOutputStream out = null;
-        
+
         try
         {
-            in = new FileInputStream(targetPom);
-            out = new FileOutputStream(bridgedTargetPom);
-            
-            IOUtil.copy(in, out);
+            in = new FileInputStream( targetPom );
+            out = new FileOutputStream( bridgedTargetPom );
+
+            IOUtil.copy( in, out );
         }
         finally
         {
-            IOUtil.close(in);
-            IOUtil.close(out);
+            IOUtil.close( in );
+            IOUtil.close( out );
         }
     }
 
@@ -538,7 +543,8 @@ public class RepositoryCleaner
         return reportsBase;
     }
 
-    public void contextualize( Context context ) throws ContextException
+    public void contextualize( Context context )
+        throws ContextException
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }

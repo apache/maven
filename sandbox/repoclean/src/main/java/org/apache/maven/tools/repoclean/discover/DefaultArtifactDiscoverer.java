@@ -36,14 +36,29 @@ public class DefaultArtifactDiscoverer
 
     private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
-    public List discoverArtifacts( File repositoryBase, FileReporter reporter )
+    public List discoverArtifacts( File repositoryBase, FileReporter reporter, String blacklistedPatterns )
         throws Exception
     {
         List artifacts = new ArrayList();
 
+        String[] blacklisted = null;
+        if ( blacklistedPatterns != null && blacklistedPatterns.length() > 0 )
+        {
+            blacklisted = blacklistedPatterns.split( "," );
+        }
+        else
+        {
+            blacklisted = new String[0];
+        }
+
+        String[] allExcludes = new String[STANDARD_DISCOVERY_EXCLUDES.length + blacklisted.length];
+
+        System.arraycopy( STANDARD_DISCOVERY_EXCLUDES, 0, allExcludes, 0, STANDARD_DISCOVERY_EXCLUDES.length );
+        System.arraycopy( blacklisted, 0, allExcludes, 0, blacklisted.length );
+
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( repositoryBase );
-        scanner.setExcludes( STANDARD_DISCOVERY_EXCLUDES );
+        scanner.setExcludes( allExcludes );
 
         scanner.scan();
 
