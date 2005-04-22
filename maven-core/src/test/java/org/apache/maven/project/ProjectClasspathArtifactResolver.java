@@ -77,7 +77,7 @@ public class ProjectClasspathArtifactResolver
             {
                 IOUtil.close( r );
             }
-            return artifactFactory.createArtifacts( model.getDependencies(), localRepository, artifact.getScope() );
+            return artifactFactory.createArtifacts( model.getDependencies(), artifact.getScope() );
         }
     }
 

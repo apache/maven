@@ -97,6 +97,11 @@
         <p>
           This will do all of the steps - generating sources, compiling, copying resources, packaging and finally installing.
         </p>
+        <p>
+          If you try that, you'll see that the file is copied to a directory under <code>~/.m2/repository</code>.
+          This is also where all those downloaded files go - it is called your <i>local repository</i>.
+          The location is configurable - see <a href="configuration.html">Configuration</a> for more information.
+        </p>
         <!-- TODO
                 <p>
                   For more information on the lifecycle, see the <a href="lifecycle.html">Build Lifecycle</a>.
@@ -106,6 +111,10 @@
           You can run other standalone goals as well, for example:
         </p>
         <source>m2 clean:clean install</source>
+        <p>
+          This will remove the <code>target</code> directory with all the build data before starting so that it is
+          fresh.
+        </p>
         <p>
           Perhaps you'd like to generate an IntelliJ IDEA descriptor for the project?
         </p>

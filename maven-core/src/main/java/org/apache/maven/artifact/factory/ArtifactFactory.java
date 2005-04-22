@@ -27,9 +27,7 @@ public interface ArtifactFactory
 {
     static String ROLE = ArtifactFactory.class.getName();
 
-    Set createArtifacts( List dependencies, ArtifactRepository localRepository, String inheritedScope );
-
-    Artifact createArtifact( Dependency dependency, ArtifactRepository localRepository, String inheritedScope );
+    Set createArtifacts( List dependencies, String inheritedScope );
 
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                              String inheritedScope );

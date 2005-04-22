@@ -251,7 +251,7 @@ public class DefaultMavenProjectBuilder
 
         project.setParent( parentProject );
         project.setRemoteArtifactRepositories( remoteRepositories );
-        project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), localRepository, null ) );
+        project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), null ) );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper

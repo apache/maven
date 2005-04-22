@@ -131,6 +131,6 @@ public class MavenMetadataSource
                 IoUtils.close( reader );
             }
         }
-        return artifactFactory.createArtifacts( dependencies, localRepository, artifact.getScope() );
+        return artifactFactory.createArtifacts( dependencies, artifact.getScope() );
     }
 }

@@ -34,10 +34,10 @@
         <!-- TODO: versioning doc that discusses this -->
       </p>
       <p>
-        User configuration is specified in
-        <code>${user.home}/.m2/settings.xml</code>. A
+        You can specify your user configuration in <code>${user.home}/.m2/settings.xml</code>. A
         <a href="settings-descriptor.html">full reference</a> to the
         configuration file is available. This section will show how to make some common configurations.
+        Note that the file is not required - defaults will be used if it is not found.
       </p>
       <p style="font-weight: bold; font-size: larger">
         Configuring your Local Repository

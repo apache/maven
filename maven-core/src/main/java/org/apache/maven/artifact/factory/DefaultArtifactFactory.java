@@ -30,7 +30,7 @@ public class DefaultArtifactFactory
     extends ArtifactConstructionSupport
     implements ArtifactFactory
 {
-    public Set createArtifacts( List dependencies, ArtifactRepository localRepository, String inheritedScope )
+    public Set createArtifacts( List dependencies, String inheritedScope )
     {
         Set projectArtifacts = new HashSet();
 
@@ -38,7 +38,7 @@ public class DefaultArtifactFactory
         {
             Dependency d = (Dependency) i.next();
 
-            Artifact artifact = createArtifact( d, localRepository, inheritedScope );
+            Artifact artifact = createArtifact( d, inheritedScope );
             if ( artifact != null )
             {
                 projectArtifacts.add( artifact );
@@ -48,7 +48,7 @@ public class DefaultArtifactFactory
         return projectArtifacts;
     }
 
-    public Artifact createArtifact( Dependency dependency, ArtifactRepository localRepository, String inheritedScope )
+    private Artifact createArtifact( Dependency dependency, String inheritedScope )
     {
         return createArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
                                dependency.getScope(), dependency.getType(), inheritedScope );
