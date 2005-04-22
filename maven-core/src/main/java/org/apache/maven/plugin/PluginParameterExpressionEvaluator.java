@@ -57,6 +57,19 @@ public class PluginParameterExpressionEvaluator
         String expression = stripTokens( expr );
         if ( expression.equals( expr ) )
         {
+            int index = expr.indexOf( "${" );
+            if ( index >= 0 )
+            {
+                int lastIndex = expr.indexOf( "}", index );
+                if ( lastIndex >= 0 )
+                {
+                    String retVal = expr.substring( 0, index );
+                    retVal += evaluate( expr.substring( index, lastIndex + 1 ) );
+                    retVal += evaluate( expr.substring( lastIndex + 1 ) );
+                    return retVal;
+                }
+            }
+
             // Was not an expression
             return expression;
         }
@@ -148,7 +161,8 @@ public class PluginParameterExpressionEvaluator
 
         if ( value instanceof String )
         {
-            // Note that we only half support nesting of expressions due to endsWith above
+            // TODO: without #, this could just be an evaluate call...
+
             String val = (String) value;
             int sharpSeparator = val.indexOf( "#" );
             if ( sharpSeparator < 0 )

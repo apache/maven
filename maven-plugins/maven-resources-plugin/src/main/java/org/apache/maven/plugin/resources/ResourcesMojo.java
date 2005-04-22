@@ -43,13 +43,13 @@ import java.util.TreeMap;
  * type="String"
  * required="true"
  * validator=""
- * expression="#project.build.outputDirectory"
+ * expression="${project.build.outputDirectory}"
  * description=""
  * @parameter name="resources"
  * type="List"
  * required="true"
  * validator=""
- * expression="#project.build.resources"
+ * expression="${project.build.resources}"
  * description=""
  */
 public class ResourcesMojo

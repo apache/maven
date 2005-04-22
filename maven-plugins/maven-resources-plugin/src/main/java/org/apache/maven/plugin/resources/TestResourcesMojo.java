@@ -26,13 +26,13 @@ package org.apache.maven.plugin.resources;
  * type="String"
  * required="true"
  * validator=""
- * expression="#project.build.testOutputDirectory"
+ * expression="${project.build.testOutputDirectory}"
  * description=""
  * @parameter name="resources"
  * type="List"
  * required="true"
  * validator=""
- * expression="#project.build.testResources"
+ * expression="${project.build.testResources}"
  * description=""
  */
 public class TestResourcesMojo

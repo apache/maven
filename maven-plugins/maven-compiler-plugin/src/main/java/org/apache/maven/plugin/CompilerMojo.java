@@ -37,20 +37,20 @@ import java.util.Set;
  * @requiresDependencyResolution compile
  * @description Compiles application sources
  * @parameter name="compileSourceRoots" type="java.util.List" required="true" validator=""
- * expression="#project.compileSourceRoots" description=""
+ * expression="${project.compileSourceRoots}" description=""
  * @parameter name="outputDirectory" type="String" required="true" validator=""
- * expression="#project.build.outputDirectory" description=""
+ * expression="${project.build.outputDirectory}" description=""
  * @parameter name="classpathElements" type="List" required="true" validator=""
- * expression="#project.compileClasspathElements" description=""
+ * expression="${project.compileClasspathElements}" description=""
  * @parameter name="debug" type="boolean" required="false" validator=""
- * expression="#maven.compiler.debug" description="Whether to include debugging
+ * expression="${maven.compiler.debug}" description="Whether to include debugging
  * information in the compiled class files; the default value is false"
  * @todo change debug parameter type to Boolean
- * @parameter name="source" type="String" required="false" expression="#source" validator=""
+ * @parameter name="source" type="String" required="false" expression="${source}" validator=""
  * description="The -source argument for the Java compiler"
- * @parameter name="target" type="String" required="false" expression="#target" validator=""
+ * @parameter name="target" type="String" required="false" expression="${target}" validator=""
  * description="The -target argument for the Java compiler"
- * @parameter name="staleMillis" type="long" required="false" expression="#lastModGranularityMs"
+ * @parameter name="staleMillis" type="long" required="false" expression="${lastModGranularityMs}"
  * validator="" description="The granularity in milliseconds of the last modification
  * date for testing whether a source needs recompilation"
  * @todo change staleMillis parameter type to Long
