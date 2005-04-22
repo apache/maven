@@ -78,9 +78,9 @@
     </dependency>
   </dependencies>
   <scm>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components</connection>
-    <developerConnection>scm:cvs:ext:${maven.username}@cvs.apache.org:/home/cvs:maven-components</developerConnection>
-    <url>http://cvs.apache.org/viewcvs.cgi/maven-components/</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/</url>
   </scm>
   <organization>
     <name>Apache Software Foundation</name>
