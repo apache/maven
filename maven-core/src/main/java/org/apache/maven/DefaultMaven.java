@@ -19,7 +19,6 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
@@ -29,13 +28,13 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginExecutionException;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -295,9 +294,8 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request, MavenProject project )
     {
-        return new MavenSession( project, container, request.getSettings(),
-                                 request.getLocalRepository(), request.getEventDispatcher(), request.getLog(),
-                                 request.getGoals() );
+        return new MavenSession( project, container, request.getSettings(), request.getLocalRepository(),
+                                 request.getEventDispatcher(), request.getLog(), request.getGoals() );
     }
 
     /**
@@ -317,10 +315,17 @@ public class DefaultMaven
 
         if ( proxy != null )
         {
-            wagonManager.setProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+            wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
                                    proxy.getPassword(), proxy.getNonProxyHosts() );
         }
 
+        for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+        {
+            Server server = (Server) i.next();
+
+            wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
+                                                server.getPrivateKey(), server.getPassphrase() );
+        }
     }
 
     // ----------------------------------------------------------------------

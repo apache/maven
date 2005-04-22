@@ -54,7 +54,10 @@ public interface WagonManager
     public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void setProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
+    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
+
+    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
+                                String passphrase );
 
     void setDownloadMonitor( TransferListener downloadMonitor );
 }

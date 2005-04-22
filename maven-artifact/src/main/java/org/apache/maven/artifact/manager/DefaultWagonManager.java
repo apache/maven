@@ -28,6 +28,7 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.ChecksumObserver;
@@ -56,7 +57,10 @@ public class DefaultWagonManager
 {
     private PlexusContainer container;
 
+    // TODO: proxies and authentication are via settings, and should come in via an alternate method - perhaps attached to ArtifactRepository before the method is called (so AR would be composed of WR, not inherit it)
     private Map proxies = new HashMap();
+
+    private Map authenticationInfoMap = new HashMap();
 
     private TransferListener downloadMonitor;
 
@@ -145,7 +149,8 @@ public class DefaultWagonManager
 
         try
         {
-            wagon.connect( repository, getProxy( repository.getProtocol() ) );
+            wagon.connect( repository, getAuthenticationInfo( repository.getId() ),
+                           getProxy( repository.getProtocol() ) );
 
             wagon.put( source, remotePath );
 
@@ -303,7 +308,8 @@ public class DefaultWagonManager
 
         try
         {
-            wagon.connect( repository, getProxy( repository.getProtocol() ) );
+            wagon.connect( repository, getAuthenticationInfo( repository.getId() ),
+                           getProxy( repository.getProtocol() ) );
 
             wagon.get( remotePath, temp );
 
@@ -410,6 +416,11 @@ public class DefaultWagonManager
         return (ProxyInfo) proxies.get( protocol );
     }
 
+    private AuthenticationInfo getAuthenticationInfo( String id )
+    {
+        return (AuthenticationInfo) authenticationInfoMap.get( id );
+    }
+
     /**
      * Set the proxy used for a particular protocol.
      *
@@ -422,7 +433,7 @@ public class DefaultWagonManager
      *                      property format: <code>*.foo.com|localhost</code>.
      * @todo [BP] would be nice to configure this via plexus in some way
      */
-    public void setProxy( String protocol, String host, int port, String username, String password,
+    public void addProxy( String protocol, String host, int port, String username, String password,
                           String nonProxyHosts )
     {
         ProxyInfo proxyInfo = new ProxyInfo();
@@ -448,5 +459,21 @@ public class DefaultWagonManager
     public void setDownloadMonitor( TransferListener downloadMonitor )
     {
         this.downloadMonitor = downloadMonitor;
+    }
+
+    public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
+                                       String passphrase )
+    {
+        AuthenticationInfo authInfo = new AuthenticationInfo();
+
+        authInfo.setUserName( username );
+
+        authInfo.setPassword( password );
+
+        authInfo.setPrivateKey( privateKey );
+
+        authInfo.setPassphrase( passphrase );
+
+        authenticationInfoMap.put( repositoryId, authInfo );
     }
 }

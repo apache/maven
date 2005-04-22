@@ -31,7 +31,6 @@ import java.util.Set;
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Revision$ $Date$
- * @todo improve the use of this now that plugin fields are used instead of a request object - add an <archive> element to configuration?
  */
 public class MavenArchiver
 {

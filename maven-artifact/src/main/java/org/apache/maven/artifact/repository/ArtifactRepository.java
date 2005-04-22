@@ -50,25 +50,9 @@ public class ArtifactRepository
         this( id, url, layout, SNAPSHOT_POLICY_NEVER );
     }
 
-    public ArtifactRepository( String id, String url, AuthenticationInfo authenticationInfo,
-                               ArtifactRepositoryLayout layout )
-    {
-        this( id, url, authenticationInfo, layout, SNAPSHOT_POLICY_NEVER );
-    }
-
     public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, String snapshotPolicy )
     {
         super( id, url );
-
-        this.layout = layout;
-
-        this.snapshotPolicy = snapshotPolicy;
-    }
-
-    public ArtifactRepository( String id, String url, AuthenticationInfo authInfo, ArtifactRepositoryLayout layout,
-                               String snapshotPolicy )
-    {
-        super( id, url, authInfo );
 
         this.layout = layout;
 

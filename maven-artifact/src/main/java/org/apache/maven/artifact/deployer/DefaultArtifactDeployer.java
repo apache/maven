@@ -67,12 +67,6 @@ public class DefaultArtifactDeployer
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        if ( deploymentRepository.getAuthenticationInfo() == null )
-        {
-            getLogger().warn( "Deployment repository {id: \'" + deploymentRepository.getId() +
-                           "\'} has no associated authentication info!" );
-        }
-
         try
         {
             // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?

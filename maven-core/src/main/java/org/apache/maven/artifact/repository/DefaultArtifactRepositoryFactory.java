@@ -18,14 +18,7 @@ package org.apache.maven.artifact.repository;
 
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.IOException;
 
 /**
  * @author jdcasey
@@ -44,50 +37,6 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryLayout repositoryLayout,
                                                         String snapshotPolicy )
     {
-        AuthenticationInfo authInfo = null;
-
-        if ( id != null && id.length() > 0 )
-        {
-            Settings settings = null;
-            try
-            {
-                settings = settingsBuilder.buildSettings();
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn( "Error reading settings", e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                getLogger().warn( "Error reading settings", e );
-            }
-
-            Server repoProfile = settings.getServer( id );
-
-            if ( repoProfile != null )
-            {
-                authInfo = new AuthenticationInfo();
-
-                authInfo.setUserName( repoProfile.getUsername() );
-
-                authInfo.setPassword( repoProfile.getPassword() );
-
-                authInfo.setPrivateKey( repoProfile.getPrivateKey() );
-
-                authInfo.setPassphrase( repoProfile.getPassphrase() );
-            }
-
-        }
-        else
-        {
-            Logger logger = getLogger();
-            if ( logger != null )
-            {
-                logger.warn( "Cannot associate authentication to repository with null id. The offending repository's URL is: " +
-                             url );
-            }
-        }
-
         ArtifactRepository repo = null;
 
         if ( globalSnapshotPolicy != null )
@@ -95,14 +44,7 @@ public class DefaultArtifactRepositoryFactory
             snapshotPolicy = globalSnapshotPolicy;
         }
 
-        if ( authInfo != null )
-        {
-            repo = new ArtifactRepository( id, url, authInfo, repositoryLayout, snapshotPolicy );
-        }
-        else
-        {
-            repo = new ArtifactRepository( id, url, repositoryLayout, snapshotPolicy );
-        }
+        repo = new ArtifactRepository( id, url, repositoryLayout, snapshotPolicy );
 
         return repo;
     }
