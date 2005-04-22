@@ -17,6 +17,7 @@ package org.apache.maven.archiver;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.List;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
@@ -44,7 +46,7 @@ public class MavenArchiver
      * @todo Add user attributes list and user groups list
      */
     public Manifest getManifest( MavenProject project, ManifestConfiguration config )
-        throws ManifestException
+        throws ManifestException, DependencyResolutionRequiredException
     {
         // Added basic entries
         Manifest m = new Manifest();
@@ -65,20 +67,18 @@ public class MavenArchiver
         if ( config.isAddClasspath() )
         {
             StringBuffer classpath = new StringBuffer();
-            Set artifacts = project.getArtifacts();
+            List artifacts = project.getRuntimeClasspathElements();
 
             for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
             {
-                Artifact artifact = (Artifact) iter.next();
-                if ( "jar".equals( artifact.getType() ) && Artifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
-                {
-                    if ( classpath.length() > 0 )
-                    {
-                        classpath.append( " " );
-                    }
+                File f = (File) iter.next();
 
-                    classpath.append( artifact.getArtifactId() + "-" + artifact.getVersion() + ".jar" );
+                if ( classpath.length() > 0 )
+                {
+                    classpath.append( " " );
                 }
+
+                classpath.append( f.getName() );
             }
 
             if ( classpath.length() > 0 )
@@ -193,7 +193,7 @@ public class MavenArchiver
     }
 
     public void createArchive( MavenProject project, MavenArchiveConfiguration archiveConfiguration )
-        throws ArchiverException, ManifestException, IOException
+        throws ArchiverException, ManifestException, IOException, DependencyResolutionRequiredException
     {
         // ----------------------------------------------------------------------
         //
