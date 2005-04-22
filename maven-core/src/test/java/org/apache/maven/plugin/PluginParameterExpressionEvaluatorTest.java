@@ -74,7 +74,7 @@ public class PluginParameterExpressionEvaluatorTest
         MavenProject project = new MavenProject( model );
         project.setFile( new File( "pom.xml" ).getCanonicalFile() );
 
-        MavenSession session = new MavenSession( project, container, mgr, new Settings(), repo,
+        MavenSession session = new MavenSession( project, container, new Settings(), repo,
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
@@ -99,7 +99,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         PlexusContainer container = getContainer();
         MavenSession session = new MavenSession( null, // don't need a project for this test.
-                                                 container, mgr, new Settings(), repo,
+                                                 container, new Settings(), repo,
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 
@@ -120,7 +120,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         PlexusContainer container = getContainer();
         MavenSession session = new MavenSession( null, // don't need a project for this test.
-                                                 container, mgr, new Settings(), repo,
+                                                 container, new Settings(), repo,
                                                  new DefaultEventDispatcher(), new DefaultLog( container.getLogger() ),
                                                  Collections.EMPTY_LIST );
 

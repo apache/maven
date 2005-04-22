@@ -26,11 +26,11 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
@@ -59,12 +59,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * @version $Id: DefaultMavenProjectBuilder.java,v 1.37 2005/03/08 01:55:22
@@ -84,6 +84,7 @@ public class DefaultMavenProjectBuilder
 
     private ModelValidator validator;
 
+    // TODO: make it a component
     private MavenXpp3Reader modelReader;
 
     private PathTranslator pathTranslator;
@@ -92,7 +93,6 @@ public class DefaultMavenProjectBuilder
 
     private ModelInterpolator modelInterpolator;
 
-    // TODO: comes from Maven CORE
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private final Map modelCache = new HashMap();
@@ -242,13 +242,12 @@ public class DefaultMavenProjectBuilder
 
         project = new MavenProject( model );
 
-        project.setPluginArtifactRepositories( buildPluginRepositories( model.getPluginRepositories() ) );
+        project.setPluginArtifactRepositories( buildArtifactRepositories( model.getPluginRepositories() ) );
 
         DistributionManagement dm = model.getDistributionManagement();
         if ( dm != null )
         {
-            project.setDistributionManagementArtifactRepository( buildDistributionManagementRepository(
-                dm.getRepository() ) );
+            project.setDistributionManagementArtifactRepository( buildArtifactRepository( dm.getRepository() ) );
         }
 
         project.setParent( parentProject );
@@ -348,10 +347,7 @@ public class DefaultMavenProjectBuilder
         {
             Repository mavenRepo = (Repository) i.next();
 
-            ArtifactRepositoryLayout remoteRepoLayout = getRepositoryLayout( mavenRepo );
-
-            ArtifactRepository artifactRepo = artifactRepositoryFactory.createArtifactRepository( mavenRepo,
-                                                                                                  remoteRepoLayout );
+            ArtifactRepository artifactRepo = buildArtifactRepository( mavenRepo );
 
             if ( !repos.contains( artifactRepo ) )
             {
@@ -359,27 +355,6 @@ public class DefaultMavenProjectBuilder
             }
         }
         return repos;
-    }
-
-    private List buildPluginRepositories( List pluginRepositories )
-        throws ProjectBuildingException
-    {
-        List remotePluginRepositories = new ArrayList();
-
-        for ( Iterator it = pluginRepositories.iterator(); it.hasNext(); )
-        {
-            Repository mavenRepo = (Repository) it.next();
-
-            ArtifactRepositoryLayout repositoryLayout = getRepositoryLayout( mavenRepo );
-
-            ArtifactRepository pluginRepository = artifactRepositoryFactory.createArtifactRepository( mavenRepo,
-                                                                                                      repositoryLayout );
-
-            remotePluginRepositories.add( pluginRepository );
-
-        }
-
-        return remotePluginRepositories;
     }
 
     private ArtifactRepositoryLayout getRepositoryLayout( Repository mavenRepo )
@@ -400,20 +375,21 @@ public class DefaultMavenProjectBuilder
         return repositoryLayout;
     }
 
-    private ArtifactRepository buildDistributionManagementRepository( Repository dmRepo )
+    private ArtifactRepository buildArtifactRepository( Repository repo )
         throws ProjectBuildingException
     {
-        if ( dmRepo == null )
+        if ( repo != null )
+        {
+            String id = repo.getId();
+            String url = repo.getUrl();
+            ArtifactRepositoryLayout layout = getRepositoryLayout( repo );
+            String snapshotPolicy = repo.getSnapshotPolicy();
+            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshotPolicy );
+        }
+        else
         {
             return null;
         }
-
-        ArtifactRepositoryLayout repositoryLayout = getRepositoryLayout( dmRepo );
-
-        ArtifactRepository dmArtifactRepository = artifactRepositoryFactory.createArtifactRepository( dmRepo,
-                                                                                                      repositoryLayout );
-
-        return dmArtifactRepository;
     }
 
     private Model readModel( File file )

@@ -32,7 +32,6 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
@@ -319,13 +318,16 @@ public class MavenCli
                                                              CommandLine commandLine )
         throws ComponentLookupException
     {
+        // TODO: release
+        // TODO: something in plexus to show all active hooks?
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) embedder.lookup(
             ArtifactRepositoryLayout.ROLE, "default" );
 
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
             ArtifactRepositoryFactory.ROLE );
 
-        ArtifactRepository localRepository = getLocalRepository( settings, artifactRepositoryFactory, repositoryLayout );
+        String url = "file://" + settings.getActiveProfile().getLocalRepository();
+        ArtifactRepository localRepository = new ArtifactRepository( "local", url, repositoryLayout );
 
         boolean snapshotPolicySet = false;
         if ( commandLine.hasOption( CLIManager.OFFLINE ) )
@@ -486,23 +488,5 @@ public class MavenCli
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "maven [options] [goal [goal2 [goal3] ...]]", "\nOptions:", options, "\n" );
         }
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    protected static ArtifactRepository getLocalRepository( Settings settings, ArtifactRepositoryFactory repoFactory,
-                                                            ArtifactRepositoryLayout repositoryLayout )
-    {
-        Profile profile = settings.getActiveProfile();
-
-        Repository repo = new Repository();
-
-        repo.setId( "local" );
-
-        repo.setUrl( "file://" + profile.getLocalRepository() );
-
-        return repoFactory.createArtifactRepository( repo, repositoryLayout );
     }
 }

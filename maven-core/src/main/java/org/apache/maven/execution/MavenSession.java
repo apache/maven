@@ -25,13 +25,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
-import org.codehaus.plexus.util.dag.TopologicalSorter;
-import org.codehaus.plexus.util.dag.Vertex;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -45,31 +41,21 @@ public class MavenSession
 
     private ArtifactRepository localRepository;
 
-    private PluginManager pluginManager;
-
-    private DAG dag;
-
     private List goals;
-
-    private Map preGoalMappings;
-
-    private Map postGoalMappings;
 
     private EventDispatcher eventDispatcher;
 
     private Log log;
 
+    // TODO: make this the central one, get rid of build settings...
     private final Settings settings;
 
-    public MavenSession( MavenProject project, PlexusContainer container, PluginManager pluginManager,
-                        Settings settings, ArtifactRepository localRepository, EventDispatcher eventDispatcher,
-                        Log log, List goals )
+    public MavenSession( MavenProject project, PlexusContainer container, Settings settings,
+                         ArtifactRepository localRepository, EventDispatcher eventDispatcher, Log log, List goals )
     {
         this.project = project;
 
         this.container = container;
-
-        this.pluginManager = pluginManager;
 
         this.settings = settings;
 
@@ -79,19 +65,12 @@ public class MavenSession
 
         this.log = log;
 
-        this.dag = new DAG();
-
         this.goals = goals;
     }
 
     public PlexusContainer getContainer()
     {
         return container;
-    }
-
-    public PluginManager getPluginManager()
-    {
-        return pluginManager;
     }
 
     public MavenProject getProject()
@@ -118,12 +97,14 @@ public class MavenSession
     //
     // ----------------------------------------------------------------------
 
-    public Object lookup( String role ) throws ComponentLookupException
+    public Object lookup( String role )
+        throws ComponentLookupException
     {
         return container.lookup( role );
     }
 
-    public Object lookup( String role, String roleHint ) throws ComponentLookupException
+    public Object lookup( String role, String roleHint )
+        throws ComponentLookupException
     {
         return container.lookup( role, roleHint );
     }
@@ -141,29 +122,6 @@ public class MavenSession
     public Settings getSettings()
     {
         return settings;
-    }
-
-    public void addImpliedExecution( String goal, String implied ) throws CycleDetectedException
-    {
-        dag.addEdge( goal, implied );
-    }
-
-    public void addSingleExecution( String goal )
-    {
-        dag.addVertex( goal );
-    }
-
-    public List getExecutionChain( String goal )
-    {
-        Vertex vertex = dag.getVertex( goal );
-
-        List sorted = TopologicalSorter.sort( vertex );
-
-        int goalIndex = sorted.indexOf( goal );
-
-        List chainToHere = sorted.subList( 0, goalIndex + 1 );
-
-        return chainToHere;
     }
 
     public List getPluginRepositories()

@@ -13,16 +13,10 @@
           <role>org.codehaus.plexus.i18n.I18N</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.plugin.PluginManager</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.project.MavenProjectBuilder</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
       </requirements>
     </component>
@@ -232,20 +226,6 @@
     <component>
       <role>org.apache.maven.project.path.PathTranslator</role>
       <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
-    </component>
-    <!-- ********************* FIXME *******************************************
-     | NOTE: This is also declared in plexus.xml for maven. We currently need it
-     | in both places, for systems that don't use maven's plexus.xml. This will
-     | become unnecessary when multiple plexus.xml files are allowed in plexus.
-     -->
-    <component>
-      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
-        </requirement>
-      </requirements>
     </component>
     <!-- ********************* FIXME *******************************************
      | NOTE: This is also declared in plexus.xml for maven. We currently need it

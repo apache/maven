@@ -56,9 +56,8 @@ public class ConsoleDownloadMonitor
         long total = transferEvent.getResource().getContentLength();
         complete += length;
         // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
-        System.out.print(
-            ( complete / 1024 ) + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K" ) +
-            "\r" );
+        System.out.print( ( complete / 1024 ) + "/" +
+                          ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K" ) + "\r" );
     }
 
     public void transferCompleted( TransferEvent transferEvent )

@@ -72,15 +72,9 @@ public class DefaultMaven
 
     protected MavenProjectBuilder projectBuilder;
 
-    protected PluginManager pluginManager;
-
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
-
-    protected ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    protected WagonManager wagonManager;
 
     // ----------------------------------------------------------------------
     // Project execution
@@ -301,7 +295,7 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request, MavenProject project )
     {
-        return new MavenSession( project, container, pluginManager, request.getSettings(),
+        return new MavenSession( project, container, request.getSettings(),
                                  request.getLocalRepository(), request.getEventDispatcher(), request.getLog(),
                                  request.getGoals() );
     }

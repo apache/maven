@@ -17,10 +17,9 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.model.Repository;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.Server;
 import org.apache.maven.settings.MavenSettingsBuilder;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -41,15 +40,13 @@ public class DefaultArtifactRepositoryFactory
     // TODO: make this a store once object?
     private MavenSettingsBuilder settingsBuilder;
 
-    public ArtifactRepository createArtifactRepository( Repository modelRepository,
-                                                        ArtifactRepositoryLayout repositoryLayout )
+    public ArtifactRepository createArtifactRepository( String id, String url,
+                                                        ArtifactRepositoryLayout repositoryLayout,
+                                                        String snapshotPolicy )
     {
+        AuthenticationInfo authInfo = null;
 
-        Server repoProfile = null;
-
-        String repoId = modelRepository.getId();
-
-        if ( repoId != null && repoId.length() > 0 )
+        if ( id != null && id.length() > 0 )
         {
             Settings settings = null;
             try
@@ -65,7 +62,21 @@ public class DefaultArtifactRepositoryFactory
                 getLogger().warn( "Error reading settings", e );
             }
 
-            repoProfile = settings.getServer( modelRepository.getId() );
+            Server repoProfile = settings.getServer( id );
+
+            if ( repoProfile != null )
+            {
+                authInfo = new AuthenticationInfo();
+
+                authInfo.setUserName( repoProfile.getUsername() );
+
+                authInfo.setPassword( repoProfile.getPassword() );
+
+                authInfo.setPrivateKey( repoProfile.getPrivateKey() );
+
+                authInfo.setPassphrase( repoProfile.getPassphrase() );
+            }
+
         }
         else
         {
@@ -73,37 +84,24 @@ public class DefaultArtifactRepositoryFactory
             if ( logger != null )
             {
                 logger.warn( "Cannot associate authentication to repository with null id. The offending repository's URL is: " +
-                             modelRepository.getUrl() );
+                             url );
             }
         }
 
         ArtifactRepository repo = null;
 
-        String snapshotPolicy = globalSnapshotPolicy;
-        if ( snapshotPolicy == null )
+        if ( globalSnapshotPolicy != null )
         {
-            snapshotPolicy = modelRepository.getSnapshotPolicy();
+            snapshotPolicy = globalSnapshotPolicy;
         }
 
-        if ( repoProfile != null )
+        if ( authInfo != null )
         {
-            AuthenticationInfo authInfo = new AuthenticationInfo();
-
-            authInfo.setUserName( repoProfile.getUsername() );
-
-            authInfo.setPassword( repoProfile.getPassword() );
-
-            authInfo.setPrivateKey( repoProfile.getPrivateKey() );
-
-            authInfo.setPassphrase( repoProfile.getPassphrase() );
-
-            repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl(), authInfo,
-                                           repositoryLayout, snapshotPolicy );
+            repo = new ArtifactRepository( id, url, authInfo, repositoryLayout, snapshotPolicy );
         }
         else
         {
-            repo = new ArtifactRepository( modelRepository.getId(), modelRepository.getUrl(), repositoryLayout,
-                                           snapshotPolicy );
+            repo = new ArtifactRepository( id, url, repositoryLayout, snapshotPolicy );
         }
 
         return repo;
@@ -113,5 +111,4 @@ public class DefaultArtifactRepositoryFactory
     {
         this.globalSnapshotPolicy = snapshotPolicy;
     }
-
 }
