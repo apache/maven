@@ -17,7 +17,6 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
@@ -29,9 +28,6 @@ public class DefaultArtifactRepositoryFactory
 {
     // TODO: use settings?
     private String globalSnapshotPolicy = null;
-
-    // TODO: make this a store once object?
-    private MavenSettingsBuilder settingsBuilder;
 
     public ArtifactRepository createArtifactRepository( String id, String url,
                                                         ArtifactRepositoryLayout repositoryLayout,

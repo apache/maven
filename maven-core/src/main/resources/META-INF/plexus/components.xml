@@ -227,11 +227,7 @@
       <role>org.apache.maven.project.path.PathTranslator</role>
       <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
     </component>
-    <!-- ********************* FIXME *******************************************
-     | NOTE: This is also declared in plexus.xml for maven. We currently need it
-     | in both places, for systems that don't use maven's plexus.xml. This will
-     | become unnecessary when multiple plexus.xml files are allowed in plexus.
-     -->
+    
     <component>
       <role>org.apache.maven.settings.MavenSettingsBuilder</role>
       <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>

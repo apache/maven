@@ -25,12 +25,6 @@
           <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
-        </requirement>
-        <requirement>
           <role>org.codehaus.plexus.component.configurator.ComponentConfigurator</role>
         </requirement>
         <requirement>
@@ -38,25 +32,11 @@
         </requirement>
       </requirements>
     </component>
+
+    <!-- Duplicated from Maven core as it is used in the plugin manager -->
     <component>
       <role>org.apache.maven.project.path.PathTranslator</role>
       <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
-    </component>
-    <component>
-      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
-        </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>org.apache.maven.settings.MavenSettingsBuilder</role>
-      <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
-      <configuration>
-        <settingsPath>${user.home}/.m2/settings.xml</settingsPath>
-      </configuration>
     </component>
 
     <!-- Duplicated from Maven artifact as it is used in the plugin manager -->

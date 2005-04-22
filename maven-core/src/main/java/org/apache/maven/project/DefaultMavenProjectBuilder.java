@@ -74,6 +74,7 @@ public class DefaultMavenProjectBuilder
     extends AbstractLogEnabled
     implements MavenProjectBuilder, Initializable, Contextualizable
 {
+    // TODO: remove
     private PlexusContainer container;
 
     private ArtifactResolver artifactResolver;
@@ -382,8 +383,9 @@ public class DefaultMavenProjectBuilder
         {
             String id = repo.getId();
             String url = repo.getUrl();
-            ArtifactRepositoryLayout layout = getRepositoryLayout( repo );
             String snapshotPolicy = repo.getSnapshotPolicy();
+            // TODO: make this a map inside the factory instead, so no lookup needed
+            ArtifactRepositoryLayout layout = getRepositoryLayout( repo );
             return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshotPolicy );
         }
         else

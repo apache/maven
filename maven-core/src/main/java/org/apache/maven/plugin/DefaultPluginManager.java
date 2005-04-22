@@ -89,10 +89,6 @@ public class DefaultPluginManager
 
     protected PathTranslator pathTranslator;
 
-    protected ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    protected MavenSettingsBuilder mavenSettingsBuilder;
-
     protected ComponentConfigurator configurator;
 
     private ArtifactFactory artifactFactory;

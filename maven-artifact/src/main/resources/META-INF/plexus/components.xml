@@ -180,5 +180,10 @@
       <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
       <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
     </component>
+    
+    <component>
+      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+    </component>
   </components>
 </component-set>
