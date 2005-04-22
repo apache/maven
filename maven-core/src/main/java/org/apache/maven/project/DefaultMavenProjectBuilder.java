@@ -17,8 +17,8 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -109,20 +109,40 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository )
-        throws ProjectBuildingException
+    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
+                                               ArtifactMetadataSource artifactMetadataSource )
+        throws ProjectBuildingException, ArtifactResolutionException
     {
-        return buildFromSourceFile( projectDescriptor, localRepository, true );
+        MavenProject project = buildFromSourceFile( projectDescriptor, localRepository );
+
+        // ----------------------------------------------------------------------
+        // Typically when the project builder is being used from maven proper
+        // the transitive dependencies will not be resolved here because this
+        // requires a lot of work when we may only be interested in running
+        // something simple like 'm2 clean'. So the artifact collector is used
+        // in the dependency resolution phase if it is required by any of the
+        // goals being executed. But when used as a component in another piece
+        // of code people may just want to build maven projects and have the
+        // dependencies resolved for whatever reason: this is why we keep
+        // this snippet of code here.
+        // ----------------------------------------------------------------------
+
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
+                                                                                project.getRemoteArtifactRepositories(),
+                                                                                localRepository,
+                                                                                artifactMetadataSource );
+
+        project.addArtifacts( result.getArtifacts().values(), artifactFactory );
+        return project;
     }
 
     public MavenProject build( File projectDescriptor, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        return buildFromSourceFile( projectDescriptor, localRepository, false );
+        return buildFromSourceFile( projectDescriptor, localRepository );
     }
 
-    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository,
-                                              boolean resolveDependencies )
+    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
@@ -130,7 +150,7 @@ public class DefaultMavenProjectBuilder
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
-        MavenProject project = build( model, localRepository, resolveDependencies );
+        MavenProject project = build( model, localRepository );
 
         // Only translate the base directory for files in the source tree
         pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
@@ -153,7 +173,7 @@ public class DefaultMavenProjectBuilder
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-        return build( model, localRepository, false );
+        return build( model, localRepository );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -176,7 +196,7 @@ public class DefaultMavenProjectBuilder
         return model;
     }
 
-    private MavenProject build( Model model, ArtifactRepository localRepository, boolean resolveDependencies )
+    private MavenProject build( Model model, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -200,18 +220,12 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( project, localRepository, aggregatedRemoteWagonRepositories,
-                                           resolveDependencies );
+            project = processProjectLogic( project, aggregatedRemoteWagonRepositories );
         }
         catch ( ModelInterpolationException e )
         {
             throw new ProjectBuildingException( "Error building project: " + model.getId(), e );
         }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new ProjectBuildingException( "Error building project: " + model.getId(), e );
-        }
-
         return project;
     }
 
@@ -222,9 +236,8 @@ public class DefaultMavenProjectBuilder
      * the resolved source roots, etc for the parent - that occurs for the parent when it is constructed independently
      * and projects are not cached or reused
      */
-    private MavenProject processProjectLogic( MavenProject project, ArtifactRepository localRepository,
-                                              List remoteRepositories, boolean resolveDependencies )
-        throws ProjectBuildingException, ModelInterpolationException, ArtifactResolutionException
+    private MavenProject processProjectLogic( MavenProject project, List remoteRepositories )
+        throws ProjectBuildingException, ModelInterpolationException
     {
         Model model = project.getModel();
         String key = createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() );
@@ -254,30 +267,6 @@ public class DefaultMavenProjectBuilder
         project.setParent( parentProject );
         project.setRemoteArtifactRepositories( remoteRepositories );
         project.setArtifacts( createArtifacts( project.getDependencies() ) );
-
-        // ----------------------------------------------------------------------
-        // Typically when the project builder is being used from maven proper
-        // the transitive dependencies will not be resolved here because this
-        // requires a lot of work when we may only be interested in running
-        // something simple like 'm2 clean'. So the artifact collector is used
-        // in the dependency resolution phase if it is required by any of the
-        // goals being executed. But when used as a component in another piece
-        // of code people may just want to build maven projects and have the
-        // dependencies resolved for whatever reason: this is why we keep
-        // this snippet of code here.
-        // ----------------------------------------------------------------------
-
-        if ( resolveDependencies )
-        {
-            // TODO: comes from Maven CORE
-            MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
-
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
-                                                                                    remoteRepositories,
-                                                                                    localRepository, sourceReader );
-
-            project.addArtifacts( result.getArtifacts().values(), artifactFactory );
-        }
 
         ModelValidationResult validationResult = validator.validate( model );
 
@@ -495,7 +484,7 @@ public class DefaultMavenProjectBuilder
 
             List remoteRepositories = buildArtifactRepositories( superModel.getRepositories() );
 
-            project = processProjectLogic( project, localRepository, remoteRepositories, false );
+            project = processProjectLogic( project, remoteRepositories );
 
             return project;
         }
@@ -503,10 +492,15 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( "Error building super-project", e );
         }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new ProjectBuildingException( "Error building super-project", e );
-        }
+    }
+
+    /**
+     * @return
+     * @todo remove
+     */
+    public ArtifactResolver getArtifactResolver()
+    {
+        return artifactResolver;
     }
 
     // ----------------------------------------------------------------------

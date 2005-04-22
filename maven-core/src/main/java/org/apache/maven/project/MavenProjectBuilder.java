@@ -18,6 +18,10 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.MavenMetadataSource;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Settings;
 
@@ -37,8 +41,9 @@ public interface MavenProjectBuilder
     MavenProject build( File project, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository )
-        throws ProjectBuildingException;
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+                                        ArtifactMetadataSource artifactMetadataSource )
+        throws ProjectBuildingException, ArtifactResolutionException;
 
     /**
      * Build the artifact from the local repository, resolving it if necessary.
@@ -55,4 +60,6 @@ public interface MavenProjectBuilder
 
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
+
+    ArtifactResolver getArtifactResolver();
 }

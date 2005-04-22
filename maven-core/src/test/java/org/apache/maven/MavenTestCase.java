@@ -16,12 +16,12 @@ package org.apache.maven;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.ArtifactEnabledPlexusTestCase;
 
 import java.io.File;
@@ -54,8 +54,8 @@ public abstract class MavenTestCase
 
     protected File getLocalRepositoryPath()
     {
-        File markerFile =  getFileForClasspathResource( "local-repo/marker.txt" );
-        
+        File markerFile = getFileForClasspathResource( "local-repo/marker.txt" );
+
         return markerFile.getAbsoluteFile().getParentFile();
     }
 
@@ -93,7 +93,9 @@ public abstract class MavenTestCase
     protected MavenProject getProjectWithDependencies( File pom )
         throws Exception
     {
-        return projectBuilder.buildWithDependencies( pom, getLocalRepository() );
+        return projectBuilder.buildWithDependencies( pom, getLocalRepository(),
+                                                     new MavenMetadataSource( projectBuilder.getArtifactResolver(),
+                                                                              projectBuilder ) );
     }
 
     protected MavenProject getProject( File pom )
