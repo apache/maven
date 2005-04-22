@@ -17,9 +17,7 @@ or
 
 4) Make sure JAVA_HOME is set to the location of your JDK
 
-5) Run "m2" to verify that it is correctly installed. It should output a short build message, and download some
-   additional dependencies. 
-
+5) Run "m2 --version" to verify that it is correctly installed.
 
 For more information, please see http://maven.apache.org/maven2/
 
