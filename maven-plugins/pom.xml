@@ -67,9 +67,7 @@
     </repository>
   </distributionManagement>
   <modules>
-<!--
     <module>maven-assembly-plugin</module>
--->
     <module>maven-clean-plugin</module>
     <module>maven-compiler-plugin</module>
     <module>maven-deploy-plugin</module>

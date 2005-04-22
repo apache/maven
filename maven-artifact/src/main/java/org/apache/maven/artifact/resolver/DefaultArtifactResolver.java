@@ -17,7 +17,7 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -48,8 +48,6 @@ public class DefaultArtifactResolver
     extends AbstractLogEnabled
     implements ArtifactResolver
 {
-    private final ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
-
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
@@ -59,6 +57,8 @@ public class DefaultArtifactResolver
     private ArtifactHandlerManager artifactHandlerManager;
 
     private List artifactTransformations;
+
+    private ArtifactFactory artifactFactory;
 
     // ----------------------------------------------------------------------
     // Implementation
@@ -275,11 +275,10 @@ public class DefaultArtifactResolver
                         // TODO: Artifact factory?
                         // TODO: [jc] Is this a better way to centralize artifact construction here?
 
-                        Artifact artifact = artifactConstructionSupport.createArtifact( knownArtifact.getGroupId(),
-                                                                                        knownArtifact.getArtifactId(),
-                                                                                        knownVersion,
-                                                                                        newArtifact.getScope(),
-                                                                                        knownArtifact.getType() );
+                        Artifact artifact = artifactFactory.createArtifact( knownArtifact.getGroupId(),
+                                                                            knownArtifact.getArtifactId(),
+                                                                            knownVersion, newArtifact.getScope(),
+                                                                            knownArtifact.getType() );
                         resolvedArtifacts.put( artifact.getConflictId(), artifact );
                     }
                 }

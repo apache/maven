@@ -49,6 +49,9 @@
           <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
           <field-name>artifactTransformations</field-name>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
       </requirements>
     </component>
 
@@ -173,5 +176,9 @@
       <implementation>org.apache.maven.artifact.handler.WarHandler</implementation>
     </component>
 
+    <component>
+      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+      <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
+    </component>
   </components>
 </component-set>

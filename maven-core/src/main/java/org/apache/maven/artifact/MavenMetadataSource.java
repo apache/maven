@@ -23,6 +23,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
@@ -34,6 +35,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -131,6 +134,25 @@ public class MavenMetadataSource
                 IoUtils.close( reader );
             }
         }
-        return artifactFactory.createArtifacts( dependencies, artifact.getScope() );
+        return createArtifacts( dependencies, artifact.getScope() );
+    }
+
+    protected Set createArtifacts( List dependencies, String inheritedScope )
+    {
+        Set projectArtifacts = new HashSet();
+
+        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+        {
+            Dependency d = (Dependency) i.next();
+
+            Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
+                                                                d.getScope(), d.getType(), inheritedScope );
+            if ( artifact != null )
+            {
+                projectArtifacts.add( artifact );
+            }
+        }
+
+        return projectArtifacts;
     }
 }

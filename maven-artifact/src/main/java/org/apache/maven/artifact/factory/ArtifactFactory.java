@@ -17,18 +17,13 @@ package org.apache.maven.artifact.factory;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Dependency;
-
-import java.util.List;
-import java.util.Set;
 
 public interface ArtifactFactory
 {
     static String ROLE = ArtifactFactory.class.getName();
 
-    Set createArtifacts( List dependencies, String inheritedScope );
-
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                              String inheritedScope );
+
+    Artifact createArtifact( String groupId, String artifactId, String knownVersion, String scope, String type );
 }

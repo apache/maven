@@ -30,6 +30,7 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
@@ -62,6 +63,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * @version $Id: DefaultMavenProjectBuilder.java,v 1.37 2005/03/08 01:55:22
@@ -75,7 +78,6 @@ public class DefaultMavenProjectBuilder
 
     private ArtifactResolver artifactResolver;
 
-    // TODO: comes from Maven CORE
     private ArtifactFactory artifactFactory;
 
     private ModelInheritanceAssembler modelInheritanceAssembler;
@@ -251,7 +253,7 @@ public class DefaultMavenProjectBuilder
 
         project.setParent( parentProject );
         project.setRemoteArtifactRepositories( remoteRepositories );
-        project.setArtifacts( artifactFactory.createArtifacts( project.getDependencies(), null ) );
+        project.setArtifacts( createArtifacts( project.getDependencies() ) );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -274,7 +276,7 @@ public class DefaultMavenProjectBuilder
                                                                                     remoteRepositories,
                                                                                     localRepository, sourceReader );
 
-            project.addArtifacts( result.getArtifacts().values() );
+            project.addArtifacts( result.getArtifacts().values(), artifactFactory );
         }
 
         ModelValidationResult validationResult = validator.validate( model );
@@ -475,6 +477,25 @@ public class DefaultMavenProjectBuilder
     private static String createCacheKey( String groupId, String artifactId, String version )
     {
         return groupId + ":" + artifactId + ":" + version;
+    }
+
+    protected Set createArtifacts( List dependencies )
+    {
+        Set projectArtifacts = new HashSet();
+
+        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+        {
+            Dependency d = (Dependency) i.next();
+
+            Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
+                                                                d.getScope(), d.getType(), null );
+            if ( artifact != null )
+            {
+                projectArtifacts.add( artifact );
+            }
+        }
+
+        return projectArtifacts;
     }
 
     public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )

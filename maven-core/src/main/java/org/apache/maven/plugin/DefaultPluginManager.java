@@ -760,7 +760,7 @@ public class DefaultPluginManager
                                                                                 context.getLocalRepository(),
                                                                                 sourceReader, filter );
 
-        project.addArtifacts( result.getArtifacts().values() );
+        project.addArtifacts( result.getArtifacts().values(), artifactFactory );
     }
 
     // ----------------------------------------------------------------------

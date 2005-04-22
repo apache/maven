@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.construction;
+package org.apache.maven.artifact.factory;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -19,12 +19,9 @@ package org.apache.maven.artifact.construction;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 
-/**
- * @author jdcasey
- */
-public class ArtifactConstructionSupport
+public class DefaultArtifactFactory
+    implements ArtifactFactory
 {
-
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return createArtifact( groupId, artifactId, version, scope, type, null, null );
@@ -70,7 +67,7 @@ public class ArtifactConstructionSupport
         }
 
         DefaultArtifact artifact = new DefaultArtifact( groupId, artifactId, version, desiredScope, type, classifier );
-        
+
         return artifact;
     }
 }

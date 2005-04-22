@@ -19,7 +19,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
@@ -76,8 +76,6 @@ public class MavenProject
     private List remoteArtifactRepositories;
 
     private List collectedProjects = Collections.EMPTY_LIST;
-
-    private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
 
     public MavenProject( Model model )
     {
@@ -633,7 +631,7 @@ public class MavenProject
         this.collectedProjects = collectedProjects;
     }
 
-    public void addArtifacts( Collection newArtifacts )
+    public void addArtifacts( Collection newArtifacts, ArtifactFactory artifactFactory )
     {
         //        project.getArtifacts().addAll( result.getArtifacts().values() );
         // We need to override the scope if one declared it higher
@@ -668,10 +666,10 @@ public class MavenProject
                 {
                     // TODO: Artifact factory?
                     // TODO: [jc] Is this a better way to centralize artifact construction here?
-                    Artifact artifact = artifactConstructionSupport.createArtifact( existing.getGroupId(),
-                                                                                    existing.getArtifactId(),
-                                                                                    existing.getVersion(),
-                                                                                    a.getScope(), existing.getType() );
+                    Artifact artifact = artifactFactory.createArtifact( existing.getGroupId(),
+                                                                        existing.getArtifactId(),
+                                                                        existing.getVersion(), a.getScope(),
+                                                                        existing.getType() );
 
                     artifact.setFile( existing.getFile() );
                     artifact.setBaseVersion( existing.getBaseVersion() );
