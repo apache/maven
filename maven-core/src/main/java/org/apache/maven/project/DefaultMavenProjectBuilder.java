@@ -75,6 +75,7 @@ public class DefaultMavenProjectBuilder
 
     private ArtifactResolver artifactResolver;
 
+    // TODO: comes from Maven CORE
     private ArtifactFactory artifactFactory;
 
     private ModelInheritanceAssembler modelInheritanceAssembler;
@@ -89,6 +90,7 @@ public class DefaultMavenProjectBuilder
 
     private ModelInterpolator modelInterpolator;
 
+    // TODO: comes from Maven CORE
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     private final Map modelCache = new HashMap();
@@ -265,6 +267,7 @@ public class DefaultMavenProjectBuilder
 
         if ( resolveDependencies )
         {
+            // TODO: comes from Maven CORE
             MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, this );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),

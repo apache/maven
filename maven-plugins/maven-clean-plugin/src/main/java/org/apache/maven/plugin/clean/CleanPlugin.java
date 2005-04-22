@@ -30,7 +30,7 @@ import java.io.File;
  * type="String"
  * required="true"
  * validator=""
- * expression="#project.build.directory"
+ * expression="${project.build.directory}"
  * description=""
  */
 public class CleanPlugin

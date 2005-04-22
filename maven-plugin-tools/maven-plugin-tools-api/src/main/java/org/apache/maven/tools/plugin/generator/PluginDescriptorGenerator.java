@@ -183,7 +183,8 @@ public class PluginDescriptorGenerator
             element( w, "validator", parameter.getValidator() );
 
             String value = null;
-            if ( parameter.getExpression().startsWith( "#component" ) )
+            if ( parameter.getExpression().startsWith( "#component." ) ||
+                parameter.getExpression().startsWith( "${component." ) )
             {
                 requirements.add( parameter );
             }
@@ -253,7 +254,18 @@ public class PluginDescriptorGenerator
 
                 w.startElement( "requirement" );
 
-                element( w, "role", requirement.getExpression().substring( 11 ) );
+                String role;
+                // remove "component." plus expression delimiters
+                String expression = requirement.getExpression();
+                if ( expression.startsWith( "${" ) )
+                {
+                    role = expression.substring( "${component.".length(), expression.length() - 1 );
+                }
+                else
+                {
+                    role = expression.substring( "#component.".length() );
+                }
+                element( w, "role", role );
 
                 element( w, "field-name", requirement.getName() );
 

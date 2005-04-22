@@ -43,22 +43,30 @@ public class PluginParameterExpressionEvaluator
         this.pathTranslator = pathTranslator;
     }
 
-    public Object evaluate( String expression )
+    public Object evaluate( String expr )
         throws ExpressionEvaluationException
     {
         Object value = null;
 
-        if ( expression == null )
+        if ( expr == null )
         {
-            // todo : verify if it's fixed with trygvis modification in Plexus
+            // TODO: this should not have happened - previously there was a note about a fix to plexus Trygve was going to make - investigate
             return null;
         }
-        if ( expression.startsWith( "#component" ) )
+
+        String expression = stripTokens( expr );
+        if ( expression.equals( expr ) )
+        {
+            // Was not an expression
+            return expression;
+        }
+
+        if ( expression.startsWith( "component" ) )
         {
             context.getLog().warn( "WARNING: plugin is using deprecated expression " + expression );
 
             // TODO: deprecated... and can remove the lookup method in context afterwards
-            String role = expression.substring( 11 );
+            String role = expression.substring( 10 );
 
             try
             {
@@ -69,20 +77,20 @@ public class PluginParameterExpressionEvaluator
                 throw new ExpressionEvaluationException( "Cannot lookup component: " + role + ".", e );
             }
         }
-        else if ( expression.equals( "#localRepository" ) )
+        else if ( expression.equals( "localRepository" ) )
         {
             value = context.getLocalRepository();
         }
-        else if ( expression.equals( "#maven.final.name" ) )
+        else if ( expression.equals( "maven.final.name" ) )
         {
             // TODO: remove this alias
             value = context.getProject().getBuild().getFinalName();
         }
-        else if ( expression.equals( "#project" ) )
+        else if ( expression.equals( "project" ) )
         {
             value = context.getProject();
         }
-        else if ( expression.startsWith( "#project" ) )
+        else if ( expression.startsWith( "project" ) )
         {
             try
             {
@@ -106,15 +114,15 @@ public class PluginParameterExpressionEvaluator
                                                          e );
             }
         }
-        else if ( "#settings".equals( expression ) )
+        else if ( "settings".equals( expression ) )
         {
             value = context.getSettings();
         }
-        else if ( expression.equals( "#basedir" ) )
+        else if ( expression.equals( "basedir" ) )
         {
             value = context.getProject().getBasedir().getAbsolutePath();
         }
-        else if ( expression.startsWith( "#basedir" ) )
+        else if ( expression.startsWith( "basedir" ) )
         {
             int pathSeparator = expression.indexOf( "/" );
 
@@ -125,50 +133,57 @@ public class PluginParameterExpressionEvaluator
             }
             else
             {
-                new Exception( "Got expression '" + expression + "' that was not recognised" ).printStackTrace();
+                context.getLog().error( "Got expression '" + expression + "' that was not recognised" );
             }
         }
-        else if ( expression.startsWith( "#" ) )
+        else
         {
             // We will attempt to get nab a system property as a way to specify a
             // parameter to a plugins. My particular case here is allowing the surefire
             // plugin to run a single test so I want to specify that class on the cli
             // as a parameter.
 
-            value = System.getProperty( expression.substring( 1 ) );
+            value = System.getProperty( expression );
         }
 
         if ( value instanceof String )
         {
+            // Note that we only half support nesting of expressions due to endsWith above
             String val = (String) value;
             int sharpSeparator = val.indexOf( "#" );
-
-            if ( sharpSeparator > 0 )
+            if ( sharpSeparator < 0 )
             {
-                val = val.substring( 0, sharpSeparator ) + evaluate( val.substring( sharpSeparator ) );
-                value = val;
+                sharpSeparator = val.indexOf( "${" );
             }
-            else if ( sharpSeparator > 0 )
+
+            if ( sharpSeparator >= 0 )
             {
-                value = evaluate( val.substring( sharpSeparator ) );
+                if ( sharpSeparator > 0 )
+                {
+                    value = val.substring( 0, sharpSeparator ) + evaluate( val.substring( sharpSeparator ) );
+                }
+                else
+                {
+                    value = evaluate( val.substring( sharpSeparator ) );
+                }
             }
-        }
-
-        // ----------------------------------------------------------------------
-        // If we strike and we are not dealing with an expression then we will
-        // will let the value pass through unaltered so that users can hardcode
-        // literal values. Expressions that evaluate to null will be passed
-        // through as null so that the validator can see the null value and
-        // act in accordance with the requirements laid out in the
-        // mojo descriptor.
-        // ----------------------------------------------------------------------
-
-        if ( value == null && expression.length() > 0 && !expression.startsWith( "#" ) )
-        {
-            value = expression;
         }
 
         return value;
+    }
+
+    private String stripTokens( String expr )
+    {
+        if ( expr.startsWith( "#" ) )
+        {
+            context.getLog().warn( "DEPRECATED: use ${} to delimit expressions instead of # for '" + expr + "'" );
+            expr = expr.substring( 1 );
+        }
+        else if ( expr.startsWith( "${" ) && expr.endsWith( "}" ) )
+        {
+            expr = expr.substring( 2, expr.length() - 1 );
+        }
+        return expr;
     }
 
     public File alignToBaseDirectory( File file )
