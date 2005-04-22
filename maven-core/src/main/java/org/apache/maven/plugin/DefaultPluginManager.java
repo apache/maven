@@ -19,7 +19,6 @@ package org.apache.maven.plugin;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -36,7 +35,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.settings.MavenSettingsBuilder;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.ArtifactEnabledContainerException;
 import org.codehaus.plexus.PlexusConstants;
@@ -456,7 +454,7 @@ public class DefaultPluginManager
         }
         catch ( PluginConfigurationException e )
         {
-            String msg = "Error configuring plugin for execution of .";
+            String msg = "Error configuring plugin for execution of '" + goalName + "'.";
             throw new PluginExecutionException( msg, e );
         }
         catch ( ComponentLookupException e )
