@@ -16,10 +16,10 @@ package org.apache.maven.project.canonical;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenTestCase;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectTestCase;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.List;
  * @version $Id$
  */
 public class CanonicalProjectBuilderTest
-    extends MavenTestCase
+    extends MavenProjectTestCase
 {
     public void testProjectBuilder()
         throws Exception

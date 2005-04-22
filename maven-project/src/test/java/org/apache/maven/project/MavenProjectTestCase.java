@@ -1,7 +1,7 @@
-package org.apache.maven;
+package org.apache.maven.project;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,27 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.codehaus.plexus.ArtifactEnabledPlexusTestCase;
+import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
-public abstract class MavenTestCase
-    extends ArtifactEnabledPlexusTestCase
+public abstract class MavenProjectTestCase
+    extends PlexusTestCase
 {
-    protected PluginManager pluginManager;
-
     protected MavenProjectBuilder projectBuilder;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
-
-        pluginManager = (PluginManager) lookup( PluginManager.ROLE );
 
         projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
     }
@@ -53,6 +46,7 @@ public abstract class MavenTestCase
     // ----------------------------------------------------------------------
 
     protected File getLocalRepositoryPath()
+        throws FileNotFoundException
     {
         File markerFile = getFileForClasspathResource( "local-repo/marker.txt" );
 
@@ -60,6 +54,7 @@ public abstract class MavenTestCase
     }
 
     protected File getFileForClasspathResource( String resource )
+        throws FileNotFoundException
     {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
@@ -69,6 +64,10 @@ public abstract class MavenTestCase
         if ( resourceUrl != null )
         {
             resourceFile = new File( resourceUrl.getPath() );
+        }
+        else
+        {
+            throw new FileNotFoundException( "Unable to find: " + resource );
         }
 
         return resourceFile;
@@ -94,8 +93,7 @@ public abstract class MavenTestCase
         throws Exception
     {
         return projectBuilder.buildWithDependencies( pom, getLocalRepository(),
-                                                     new MavenMetadataSource( projectBuilder.getArtifactResolver(),
-                                                                              projectBuilder ) );
+                                                     new ProjectClasspathArtifactResolver.Source() );
     }
 
     protected MavenProject getProject( File pom )

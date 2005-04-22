@@ -16,7 +16,6 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
@@ -27,6 +26,7 @@ import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 
 import java.io.File;
@@ -38,20 +38,8 @@ import java.util.Collections;
  *          06:06:21 jdcasey Exp $
  */
 public class PluginParameterExpressionEvaluatorTest
-    extends MavenTestCase
+    extends PlexusTestCase
 {
-    private MavenProject project;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        File f = getFileForClasspathResource( "pom.xml" );
-
-        project = getProject( f );
-    }
-
     public void testValueExtractionWithAPomValueContainingAPath()
         throws Exception
     {

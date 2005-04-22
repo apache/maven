@@ -1,13 +1,12 @@
 package org.apache.maven.project;
 
-import org.apache.maven.MavenTestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Resource;
 
 import java.io.File;
 
 public class ProjectBaseDirectoryAlignmentTest
-    extends MavenTestCase
+    extends MavenProjectTestCase
 {
 
     private String dir = "src/test/resources/projects/base-directory-alignment/";

@@ -16,7 +16,6 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenTestCase;
 import org.apache.maven.artifact.Artifact;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import java.util.Iterator;
  * @todo relocate to maven-artifact in entirety
  */
 public class ProjectClasspathTest
-    extends MavenTestCase
+    extends MavenProjectTestCase
 {
 
     private String dir = "projects/scope/";

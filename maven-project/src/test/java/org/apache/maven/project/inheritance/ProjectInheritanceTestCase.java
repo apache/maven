@@ -16,7 +16,7 @@ package org.apache.maven.project.inheritance;
  * limitations under the License.
  */
 
-import org.apache.maven.MavenTestCase;
+import org.apache.maven.project.MavenProjectTestCase;
 
 import java.io.File;
 
@@ -25,7 +25,7 @@ import java.io.File;
  * @version $Id$
  */
 public abstract class ProjectInheritanceTestCase
-    extends MavenTestCase
+    extends MavenProjectTestCase
 {
     protected String getTestSeries()
     {
