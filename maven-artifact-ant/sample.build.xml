@@ -26,7 +26,7 @@
 
     <artifact:dependencies pathId="dependency.classpath">
       <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
-      <dependency groupId="plexus" artifactId="plexus-container-default" version="1.0-alpha-2"/>
+      <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
       <localRepository refid="local.repository"/>
     </artifact:dependencies>
 
