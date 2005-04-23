@@ -26,7 +26,7 @@ public class JarMojo
 
         Map includes = new LinkedHashMap();
 
-        addDirectory( includes, "**/**", "**/package.html", "", basedir );
+        addDirectory( includes, "**/**", "**/package.html,**/.svn/**", "", basedir );
 
         createJar( jarFile, includes );
     }
