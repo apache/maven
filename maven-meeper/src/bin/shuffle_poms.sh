@@ -20,7 +20,6 @@ copyFile()
 
 processPom()
 {
-  echo processing POM: $1
   contents=`cat $1 | tr '\n' ' ' | sed 's#<parent>.*</parent>##m' | sed 's#<dependencies>.*</dependencies>##m'`
   groupId=`echo $contents | grep '<groupId>' | sed 's#^.*<groupId>##' | sed 's#</groupId>.*$##'`
   artifactId=`echo $contents | grep '<artifactId>' | sed 's#^.*<artifactId>##' | sed 's#</artifactId>.*$##'`
@@ -54,8 +53,6 @@ processPom()
     exit 1
   fi
 
-  echo $groupId : $artifactId : $version
-
   slashedGroupId=`echo $groupId | sed 's#\.#/#g'`
   tsVersion=`echo $1 | sed "s#^.*/$artifactId-##" | sed 's#.pom$##'`
 
@@ -64,27 +61,35 @@ processPom()
   oldTxtVersion=$slashedGroupId/$artifactId/$version/$artifactId-$version.version.txt
   newTxtVersion=$slashedGroupId/$artifactId-$version.version.txt
 
+  banner=0
+
   if [ ! -f $oldPath ]; then
     copyFile $1 $oldPath
+    banner=1
   fi
 
   if [ ! -f $newPath ]; then
     copyFile $1 $newPath
+    banner=1
   fi
 
   if [ -f $newTxtVersion ]; then
     if [ ! -f $oldTxtVersion ]; then
       copyFile $newTxtVersion $oldTxtVersion
+      banner=1
     fi
   fi
 
   if [ -f $oldTxtVersion ]; then
     if [ ! -f $newTxtVersion ]; then
       copyFile $oldTxtVersion $newTxtVersion
+      banner=1
     fi
   fi
 
-  echo ==================================================
+  if [ $banner -eq 1 ]; then
+    echo ==================================================
+  fi
 }
 
 find . -mtime -1 -name '*.pom' | xargs grep -l '<packaging>pom</packaging>' | while read pom
