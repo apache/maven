@@ -16,6 +16,7 @@ package org.apache.maven.artifact.ant;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.tools.ant.BuildException;
@@ -46,6 +47,15 @@ public abstract class AbstractArtifactTask
     {
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                        repository.getLayout() );
+
+        Authentication authentication = repository.getAuthentication();
+        if ( authentication != null )
+        {
+            WagonManager manager = (WagonManager) lookup( WagonManager.ROLE );
+            manager.addAuthenticationInfo( "remote", authentication.getUserName(), authentication.getPassword(),
+                                           authentication.getPrivateKey(), authentication.getPassphrase() );
+        }
+
         return new ArtifactRepository( "remote", repository.getUrl(), repositoryLayout );
     }
 
