@@ -71,14 +71,16 @@ public class MavenArchiver
 
             for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
             {
-                File f = (File) iter.next();
-
-                if ( classpath.length() > 0 )
+                File f = new File( (String) iter.next() );
+                if ( f.isFile() )
                 {
-                    classpath.append( " " );
-                }
+                    if ( classpath.length() > 0 )
+                    {
+                        classpath.append( " " );
+                    }
 
-                classpath.append( f.getName() );
+                    classpath.append( f.getName() );
+                }
             }
 
             if ( classpath.length() > 0 )
