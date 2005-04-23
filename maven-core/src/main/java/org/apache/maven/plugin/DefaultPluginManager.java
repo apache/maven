@@ -726,11 +726,12 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter =
-            new ExclusionSetFilter(
-                new String[]{"maven-core", "maven-artifact", "maven-model", "maven-settings", "maven-monitor",
-                             "maven-plugin-api", "maven-plugin-descriptor", "plexus-container-default",
-                             "plexus-artifact-container", "wagon-provider-api", "classworlds", "maven-plugin" /* Just re-added until all plugins are switched over...*/} );
+        // TODO: Note: maven-plugin just re-added until all plugins are switched over...
+        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
+                                                              "maven-settings", "maven-monitor", "maven-plugin-api",
+                                                              "maven-plugin-descriptor", "plexus-container-default",
+                                                              "maven-project", "plexus-artifact-container",
+                                                              "wagon-provider-api", "classworlds", "maven-plugin"} );
     }
 
     // ----------------------------------------------------------------------
