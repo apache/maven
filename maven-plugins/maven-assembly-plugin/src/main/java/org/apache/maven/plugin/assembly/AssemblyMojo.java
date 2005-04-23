@@ -222,14 +222,11 @@ public class AssemblyMojo
         {
             JarEntry entry = (JarEntry) e.nextElement();
 
-            if ( entry.isDirectory() )
+            if ( !entry.isDirectory() )
             {
-                new File( tempLocation, entry.getName() ).mkdir();
-            }
-            else
-            {
-                IOUtil.copy( jar.getInputStream( entry ),
-                             new FileOutputStream( new File( tempLocation, entry.getName() ) ) );
+                File outFile = new File( tempLocation, entry.getName() );
+                outFile.getParentFile().mkdirs();
+                IOUtil.copy( jar.getInputStream( entry ), new FileOutputStream( outFile ) );
             }
         }
     }
