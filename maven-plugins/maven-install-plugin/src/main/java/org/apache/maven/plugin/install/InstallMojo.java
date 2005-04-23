@@ -21,7 +21,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.MavenMetadata;
+import org.apache.maven.artifact.metadata.ProjectArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
@@ -72,7 +72,7 @@ public class InstallMojo
         File pom = new File( project.getFile().getParentFile(), "pom.xml" );
         if ( !isPomArtifact )
         {
-            ArtifactMetadata metadata = new MavenMetadata( artifact, pom );
+            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom );
             artifact.addMetadata( metadata );
         }
 

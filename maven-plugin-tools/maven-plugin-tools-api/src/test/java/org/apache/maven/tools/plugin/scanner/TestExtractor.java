@@ -1,6 +1,5 @@
 package org.apache.maven.tools.plugin.scanner;
 
-import org.apache.maven.plugin.MavenMojoDescriptor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
@@ -22,9 +21,7 @@ public class TestExtractor
         desc.setId( "testPluginId" );
         desc.setGoal( "testGoal" );
 
-        MavenMojoDescriptor mmDesc = new MavenMojoDescriptor( desc );
-
-        return Collections.singleton( mmDesc );
+        return Collections.singleton( desc );
     }
 
 }

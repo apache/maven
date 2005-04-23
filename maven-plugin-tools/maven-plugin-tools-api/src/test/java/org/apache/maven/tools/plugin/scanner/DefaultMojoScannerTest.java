@@ -1,16 +1,15 @@
 package org.apache.maven.tools.plugin.scanner;
 
+import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.plugin.MavenMojoDescriptor;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
-import junit.framework.TestCase;
 
 /**
  * @author jdcasey
@@ -38,9 +37,9 @@ public class DefaultMojoScannerTest
 
         assertEquals( 1, descriptors.size() );
 
-        MavenMojoDescriptor mmDesc = (MavenMojoDescriptor) descriptors.iterator().next();
-        assertEquals( "testPluginId", mmDesc.getMojoDescriptor().getId() );
-        assertEquals( "testGoal", mmDesc.getMojoDescriptor().getGoal() );
+        MojoDescriptor desc = (MojoDescriptor) descriptors.iterator().next();
+        assertEquals( "testPluginId", desc.getId() );
+        assertEquals( "testGoal", desc.getGoal() );
     }
 
 }

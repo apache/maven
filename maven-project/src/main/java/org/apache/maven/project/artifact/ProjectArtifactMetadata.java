@@ -38,12 +38,12 @@ import java.io.IOException;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class MavenMetadata
+public class ProjectArtifactMetadata
     extends AbstractArtifactMetadata
 {
     private final File file;
 
-    public MavenMetadata( Artifact artifact, File file )
+    public ProjectArtifactMetadata( Artifact artifact, File file )
     {
         super( artifact, null );
         this.file = file;
