@@ -378,6 +378,13 @@ public class DefaultMaven
             line();
         }
 
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Trace", e );
+
+            line();
+        }
+
         stats( r.getStart(), r.getFinish() );
 
         line();

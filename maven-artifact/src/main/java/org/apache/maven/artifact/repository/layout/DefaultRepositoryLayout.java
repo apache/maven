@@ -49,8 +49,11 @@ public class DefaultRepositoryLayout
         StringBuffer path = new StringBuffer();
 
         path.append( artifact.getGroupId().replace( '.', '/' ) ).append( '/' );
+//        if ( !artifact.getType().equals( "pom" ) )
+//        {
         path.append( artifact.getArtifactId() ).append( '/' );
         path.append( artifact.getBaseVersion() ).append( '/' );
+//        }
         path.append( artifact.getArtifactId() ).append( '-' ).append( artifact.getVersion() );
 
         if ( artifact.hasClassifier() )
@@ -74,8 +77,12 @@ public class DefaultRepositoryLayout
         StringBuffer path = new StringBuffer();
 
         path.append( artifact.getGroupId().replace( '.', '/' ) ).append( '/' );
+//        if ( !artifact.getType().equals( "pom" ) )
+//        {
         path.append( artifact.getArtifactId() ).append( '/' );
         path.append( artifact.getBaseVersion() ).append( '/' );
+//        }
+
         path.append( metadata.getFilename() );
 
         return path.toString();

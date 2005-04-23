@@ -202,7 +202,7 @@ public class ModelReader
             }
 
             // actually, these should be transtive (see MNG-77) - but some projects have circular deps that way (marmalade, and currently m2)
-            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, false );
+            ModelReader p = retrievePom( parentGroupId, parentArtifactId, parentVersion, "pom", false );
 
             addDependencies( p.getDependencies(), parentDependencies, null );
 
@@ -219,7 +219,8 @@ public class ModelReader
                 if ( resolveTransitiveDependencies )
                 {
                     ModelReader p = retrievePom( currentDependency.getGroupId(), currentDependency.getArtifactId(),
-                                                 currentDependency.getVersion(), resolveTransitiveDependencies );
+                                                 currentDependency.getVersion(), currentDependency.getType(),
+                                                 resolveTransitiveDependencies );
 
                     addDependencies( p.getDependencies(), transitiveDependencies, currentDependency.getScope() );
                 }
@@ -383,7 +384,7 @@ public class ModelReader
         return false;
     }
 
-    private ModelReader retrievePom( String groupId, String artifactId, String version,
+    private ModelReader retrievePom( String groupId, String artifactId, String version, String type,
                                      boolean resolveTransitiveDependencies )
         throws SAXException
     {
@@ -400,11 +401,13 @@ public class ModelReader
 
         try
         {
-            Dependency pom = new Dependency( groupId, artifactId, version, "pom" );
+            Dependency pom = new Dependency( groupId, artifactId, version, type );
             downloader.downloadDependencies( Collections.singletonList( pom ) );
 
             Repository localRepository = downloader.getLocalRepository();
-            p.parse( localRepository.getArtifactFile( pom ) );
+            p.parse(
+                localRepository.getMetadataFile( groupId, artifactId, version, type,
+                                                 artifactId + "-" + version + ".pom" ) );
         }
         catch ( IOException e )
         {

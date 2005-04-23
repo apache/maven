@@ -58,7 +58,15 @@ public abstract class AbstractReader
 
         InputSource is = new InputSource( new StringReader( out ) );
 
-        parser.parse( is, this );
+        try
+        {
+            parser.parse( is, this );
+        }
+        catch ( SAXException e )
+        {
+            System.err.println( "Error reading POM: " + file );
+            throw e;
+        }
     }
 
     public void warning( SAXParseException spe )

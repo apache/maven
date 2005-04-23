@@ -69,8 +69,11 @@ public class Repository
         }
         else if ( LAYOUT_DEFAULT.equals( layout ) )
         {
-            String pathGroup = dependency.getGroupId().replace( '.', '/' );
-            repositoryPath = pathGroup + "/" + dependency.getArtifactId() + "/" + dependency.getVersion();
+            repositoryPath = dependency.getGroupId().replace( '.', '/' );
+//            if ( !dependency.getType().equals( "pom" ) )
+//            {
+            repositoryPath = repositoryPath + "/" + dependency.getArtifactId() + "/" + dependency.getVersion();
+//            }
             repositoryPath = repositoryPath + "/" + dependency.getArtifact();
         }
         else
@@ -82,6 +85,13 @@ public class Repository
 
     public File getMetadataFile( String groupId, String artifactId, String version, String type, String filename )
     {
+        String repositoryPath = getMetadataPath( groupId, artifactId, version, type, filename );
+
+        return new File( basedir, repositoryPath );
+    }
+
+    public String getMetadataPath( String groupId, String artifactId, String version, String type, String filename )
+    {
         Dependency dependency = new Dependency( groupId, artifactId, version, type );
 
         String repositoryPath;
@@ -91,16 +101,18 @@ public class Repository
         }
         else if ( LAYOUT_DEFAULT.equals( layout ) )
         {
-            String pathGroup = dependency.getGroupId().replace( '.', '/' );
-            repositoryPath = pathGroup + "/" + dependency.getArtifactId() + "/" + dependency.getVersion();
+            repositoryPath = dependency.getGroupId().replace( '.', '/' );
+//            if ( !dependency.getType().equals( "pom" ) )
+//            {
+            repositoryPath = repositoryPath + "/" + dependency.getArtifactId() + "/" + dependency.getVersion();
+//            }
             repositoryPath = repositoryPath + "/" + filename;
         }
         else
         {
             throw new IllegalStateException( "Unknown layout: " + layout );
         }
-
-        return new File( basedir, repositoryPath );
+        return repositoryPath;
     }
 
     public String toString()

@@ -92,11 +92,6 @@ public class ArtifactDownloader
                     continue;
                 }
 
-                if ( destinationFile.exists() && !snapshot )
-                {
-                    continue;
-                }
-
                 getRemoteArtifact( dep, destinationFile );
 
                 if ( !destinationFile.exists() )
@@ -139,56 +134,72 @@ public class ArtifactDownloader
         {
             Repository remoteRepo = (Repository) i.next();
 
-            // The username and password parameters are not being
-            // used here. Those are the "" parameters you see below.
+            // The username and password parameters are not being used here.
             String url = remoteRepo.getBasedir() + "/" + remoteRepo.getArtifactPath( dep );
-
-            if ( !url.startsWith( "file" ) )
-            {
-                url = replace( url, "//", "/" );
-                if ( url.startsWith( "https" ) )
-                {
-                    url = replace( url, "https:/", "https://" );
-                }
-                else
-                {
-                    url = replace( url, "http:/", "http://" );
-                }
-            }
-            else
-            {
-                // THe JDK URL for file: should have one or no / instead of // for some reason
-                url = replace( url, "file://", "file:" );
-            }
 
             // Attempt to retrieve the artifact and set the checksum if retrieval
             // of the checksum file was successful.
             try
             {
+                String version = dep.getVersion();
                 if ( isSnapshot( dep ) )
                 {
-                    String filename = getSnapshotMetadataFile( destinationFile.getPath(), "SNAPSHOT.version.txt" );
-                    String metaUrl = getSnapshotMetadataFile( url, "SNAPSHOT.version.txt" );
+                    String filename = getSnapshotMetadataFile( destinationFile.getName(), "SNAPSHOT.version.txt" );
+                    File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
+                                                                 dep.getVersion(), dep.getType(), filename );
+                    String metadataPath = remoteRepo.getMetadataPath( dep.getGroupId(), dep.getArtifactId(),
+                                                                      dep.getVersion(), dep.getType(), filename );
+                    String metaUrl = remoteRepo.getBasedir() + "/" + metadataPath;
                     log( "Downloading " + metaUrl );
                     try
                     {
-                        HttpUtils.getFile( metaUrl, new File( filename ), ignoreErrors, false, proxyHost, proxyPort,
-                                           proxyUserName, proxyPassword, false );
-                        String version = FileUtils.fileRead( filename );
+                        HttpUtils.getFile( metaUrl, file, ignoreErrors, false, proxyHost, proxyPort, proxyUserName,
+                                           proxyPassword, false );
+                        version = FileUtils.fileRead( file );
                         log( "Resolved version: " + version );
-                        version = version.substring( version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
+                        String ver = version.substring( version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
                         String extension = url.substring( url.length() - 4 );
-                        url = getSnapshotMetadataFile( url, version + extension );
+                        url = getSnapshotMetadataFile( url, ver + extension );
                     }
                     catch ( IOException e )
                     {
-                        log( "WARNING: SNAPSHOT version not found, using default" );
+                        log( "WARNING: SNAPSHOT version not found, using default: " + e.getMessage() );
+                    }
+                }
+                if ( !dep.getType().equals( "pom" ) )
+                {
+                    File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
+                                                                 dep.getVersion(), dep.getType(),
+                                                                 dep.getArtifactId() + "-" + dep.getVersion() + ".pom" );
+
+                    file.getParentFile().mkdirs();
+
+                    if ( !file.exists() || version.indexOf( "SNAPSHOT" ) >= 0 )
+                    {
+                        String filename = dep.getArtifactId() + "-" + version + ".pom";
+                        String metadataPath = remoteRepo.getMetadataPath( dep.getGroupId(), dep.getArtifactId(),
+                                                                          dep.getVersion(), dep.getType(), filename );
+                        String metaUrl = remoteRepo.getBasedir() + "/" + metadataPath;
+                        log( "Downloading " + metaUrl );
+
+                        try
+                        {
+                            HttpUtils.getFile( metaUrl, file, ignoreErrors, false, proxyHost, proxyPort, proxyUserName,
+                                               proxyPassword, false );
+                        }
+                        catch ( IOException e )
+                        {
+                            log( "Couldn't find POM - ignoring: " + e.getMessage() );
+                        }
                     }
                 }
 
-                log( "Downloading " + url );
-                HttpUtils.getFile( url, destinationFile, ignoreErrors, useTimestamp, proxyHost, proxyPort,
-                                   proxyUserName, proxyPassword, true );
+                if ( !destinationFile.exists() || version.indexOf( "SNAPSHOT" ) >= 0 )
+                {
+                    log( "Downloading " + url );
+                    HttpUtils.getFile( url, destinationFile, ignoreErrors, useTimestamp, proxyHost, proxyPort,
+                                       proxyUserName, proxyPassword, true );
+                }
 
                 // Artifact was found, continue checking additional remote repos (if any)
                 // in case there is a newer version (i.e. snapshots) in another repo

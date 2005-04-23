@@ -223,8 +223,11 @@ public class Verifier
         }
         else if ( "default".equals( localRepoLayout ) )
         {
-            String pathGroup = a[0].replace( '.', '/' );
-            repositoryPath = pathGroup + "/" + a[1] + "/" + a[2];
+            repositoryPath = a[0].replace( '.', '/' );
+//            if ( !a[3].equals( "pom" ) )
+//            {
+            repositoryPath = repositoryPath + "/" + a[1] + "/" + a[2];
+//            }
             repositoryPath = repositoryPath + "/" + a[1] + "-" + a[2] + "." + ext;
         }
         else

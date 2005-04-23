@@ -21,6 +21,7 @@ import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
@@ -32,6 +33,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.wagon.util.IoUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -74,9 +76,9 @@ public class MavenMetadataSource
     public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        Artifact metadataArtifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                                    artifact.getBaseVersion(), artifact.getScope(),
-                                                                    "pom", null );
+        // TODO: only metadata is really needed - resolve as metadata
+        artifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                   artifact.getVersion(), artifact.getScope(), "pom" );
 
         List dependencies = null;
 
@@ -86,7 +88,7 @@ public class MavenMetadataSource
         {
             try
             {
-                MavenProject p = mavenProjectBuilder.buildFromRepository( metadataArtifact, remoteRepositories,
+                MavenProject p = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
                                                                           localRepository );
                 dependencies = p.getDependencies();
             }
@@ -103,7 +105,7 @@ public class MavenMetadataSource
 
             try
             {
-                artifactResolver.resolve( metadataArtifact, remoteRepositories, localRepository );
+                artifactResolver.resolve( artifact, remoteRepositories, localRepository );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -113,7 +115,10 @@ public class MavenMetadataSource
             FileReader reader = null;
             try
             {
-                reader = new FileReader( metadataArtifact.getFile() );
+//                String path = localRepository.pathOfMetadata( new ProjectArtifactMetadata( artifact, null ) );
+//                File file = new File( localRepository.getBasedir(), path );
+                File file = artifact.getFile();
+                reader = new FileReader( file );
                 Model model = this.reader.read( reader );
                 dependencies = model.getDependencies();
             }

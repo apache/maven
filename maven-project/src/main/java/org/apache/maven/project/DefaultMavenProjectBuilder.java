@@ -185,13 +185,18 @@ public class DefaultMavenProjectBuilder
         {
             try
             {
+                // TODO: can't assume artifact is a POM
                 artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
             }
             catch ( ArtifactResolutionException e )
             {
                 throw new ProjectBuildingException( "Unable to find artifact: " + artifact.toString(), e );
             }
-            model = readModel( artifact.getFile() );
+
+//                String path = localRepository.pathOfMetadata( new ProjectArtifactMetadata( artifact, null ) );
+//                File file = new File( localRepository.getBasedir(), path );
+            File file = artifact.getFile();
+            model = readModel( file );
         }
         return model;
     }
