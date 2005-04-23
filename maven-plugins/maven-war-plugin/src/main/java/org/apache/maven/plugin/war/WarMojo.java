@@ -19,6 +19,7 @@ package org.apache.maven.plugin.war;
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -248,7 +249,7 @@ public class WarMojo
     }
 
     private void performPackaging( File warFile )
-        throws IOException, ArchiverException, ManifestException
+        throws IOException, ArchiverException, ManifestException, DependencyResolutionRequiredException
     {
         if ( "inplace".equals( mode ) )
         {
