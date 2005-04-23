@@ -17,7 +17,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.MavenMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -34,6 +33,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.ArtifactEnabledContainerException;

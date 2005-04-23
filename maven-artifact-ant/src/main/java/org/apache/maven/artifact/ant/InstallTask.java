@@ -21,7 +21,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.MavenMetadata;
+import org.apache.maven.artifact.metadata.ProjectArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.tools.ant.BuildException;
@@ -55,7 +55,7 @@ public class InstallTask
         boolean isPomArtifact = "pom".equals( pom.getPackaging() );
         if ( !isPomArtifact )
         {
-            ArtifactMetadata metadata = new MavenMetadata( artifact, pom.getFile() );
+            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom.getFile() );
             artifact.addMetadata( metadata );
         }
 

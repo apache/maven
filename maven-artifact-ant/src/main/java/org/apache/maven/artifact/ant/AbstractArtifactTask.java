@@ -46,7 +46,7 @@ public abstract class AbstractArtifactTask
     {
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                        repository.getLayout() );
-        return new ArtifactRepository( "remote", repository.getUrl(), repository.getAuthentication(), repositoryLayout );
+        return new ArtifactRepository( "remote", repository.getUrl(), repositoryLayout );
     }
 
     protected Object lookup( String role )
