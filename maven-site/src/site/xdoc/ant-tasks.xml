@@ -7,7 +7,7 @@
     <section name="Ant Tasks for Maven 2.0">
       <p>
         Maven 2.0 now comes with a set of Ant tasks that can be used to utilise Maven's artifact handling features
-        from within Ant 1.6+ or Maven 1.0+. This includes:
+        from within Ant. This includes:
       </p>
       <ul>
         <li>
@@ -42,6 +42,10 @@
           directory, add the following namespace to your <code>build.xml</code> file:
         </p>
         <source><![CDATA[<project ... xmlns:artifact="antlib:org.apache.maven.artifact.ant">]]></source>
+        <p>
+          Note, if you are using Ant 1.5 or below, the tasks should still continue to work by declaring
+          them as <code>taskdef</code> elements - however this is unsupported.
+        </p>
       </subsection>
       <subsection name="Declaring Dependencies">
         <p>
@@ -104,7 +108,12 @@
           them to an remote location you have set up to serve as a repository in your organisation.
         </p>
         <p>
-          Please refer to the sample script for usage.
+          Note that the installation and deployment require that you have a Maven 2.0 POM file to deploy along with it.
+          These are required for the transitive dependency mechanism to work effectively, and can be quite simple to
+          create.
+        </p>
+        <p>
+          Please refer to the sample script below for usage of the deployment tasks.
         </p>
       </subsection>
       <subsection name="Sample Ant Script">
@@ -116,6 +125,12 @@
       <subsection name="Getting Help">
         <p>
           If you have any questions specific to the Ant tasks, please contact the <a href="mail-lists.html">Maven Users Mailing List</a>.
+        </p>
+      </subsection>
+      <subsection name="Why Won't it Work in Maven 1.0?">
+        <p>
+          This has not been completely tested and Maven 1.0 is based on Ant 1.5. In addition, it will not operate on
+          Maven 1.0 project files, which may result in some confusion. It may be possible, but is not yet supported.
         </p>
       </subsection>
     </section>
