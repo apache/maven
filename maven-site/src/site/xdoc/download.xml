@@ -48,7 +48,7 @@
       </ul>
       <a name="ant"></a>
       <p>
-        Also available is a distribution suitable for use with Ant and Maven 1.x to use Maven 2.0's dependency
+        Also available is a distribution suitable for use with Ant to use Maven 2.0's dependency
         management (including transitive dependencies), repository and artifact deployment support.
         See <a href="ant-tasks.html">Ant Tasks</a> for more information and installation instructions.
       </p>
