@@ -38,6 +38,7 @@
           with the largest Open Source projects for real-time availability of their latest releases</li>
           <li>Extensible, with the ability to easily write plugins in Java or other scripting languages</li>
           <li>Instant access to new features with little or no extra configuration</li>
+          <li><a href="ant-tasks.html">Ant tasks</a> for dependency management and deployment outside of Maven</li>
         </ul>
         <p>
           The following features are available in Maven 1.0 and will be available and much improved in Maven 2.0 through

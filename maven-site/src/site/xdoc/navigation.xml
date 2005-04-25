@@ -23,6 +23,7 @@
       <item name="Project Descriptor" href="project-descriptor.html"/>
       <item name="Settings Descriptor" href="settings-descriptor.html"/>
       <item name="Available Plugins" href="plugin-list.html"/>
+      <item name="Ant Tasks" href="ant-tasks.html"/>
     </menu>
     <menu name="Developers">
       <item name="Documentation Needed" href="docs-required.html"/>
