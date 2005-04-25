@@ -25,6 +25,8 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
 
+import java.io.File;
+
 /**
  * Base class for artifact tasks.
  *
@@ -104,5 +106,12 @@ public abstract class AbstractArtifactTask
             }
         }
         return embedder;
+    }
+
+    protected LocalRepository getDefaultLocalRepository()
+    {
+        LocalRepository localRepository = new LocalRepository();
+        localRepository.setLocation( new File( System.getProperty( "user.home" ), ".m2/repository" ) );
+        return localRepository;
     }
 }

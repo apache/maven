@@ -55,6 +55,11 @@ public class DependenciesTask
 
     public void execute()
     {
+        if ( localRepository == null )
+        {
+            localRepository = getDefaultLocalRepository();
+        }
+
         ArtifactRepository localRepo = createArtifactRepository( localRepository );
 
         ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );

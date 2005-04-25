@@ -46,6 +46,11 @@ public class InstallTask
 
     public void execute()
     {
+        if ( localRepository == null )
+        {
+            localRepository = getDefaultLocalRepository();
+        }
+
         ArtifactRepository localRepo = createArtifactRepository( localRepository );
         pom.initialise( (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE ), localRepo );
 
