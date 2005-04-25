@@ -35,8 +35,9 @@
   <siteAddress>minotaur.apache.org</siteAddress>
   <siteDirectory>/www/maven.apache.org/maven2/</siteDirectory>
   <repository>
-    <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:maven-components</connection>
-    <url>http://cvs.apache.org/viewcvs/maven-components/</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/</url>
   </repository>
   <!-- copied from ../pom.xml -->
   <developers>
