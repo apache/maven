@@ -54,7 +54,7 @@
       </p>
       <ul>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-alpha-1.jar">
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-alpha-1-dep.jar">
             <code>.jar</code> archive
           </a>
         </li>

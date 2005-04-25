@@ -81,7 +81,7 @@
         </p>
         <source><![CDATA[<artifact:remoteRepository id="remote.repository" url="http://repo1.maven.org/maven2" />]]></source>
         <p>
-          If not remote repositories are specified, the default
+          If no remote repositories are specified, the default
           <a href="http://repo1.maven.org/maven2">http://repo1.maven.org/maven2/</a>
           is used. This is a complete copy of Ibiblio.
         </p>
