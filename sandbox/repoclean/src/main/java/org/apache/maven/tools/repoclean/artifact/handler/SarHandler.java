@@ -22,14 +22,13 @@ import org.apache.maven.artifact.handler.JarHandler;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class SarHandler
-    extends JarHandler
+public class SarHandler extends JarHandler
 {
     public String directory()
     {
         return "sars";
     }
-    
+
     public String extension()
     {
         return "sar";

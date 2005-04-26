@@ -16,8 +16,7 @@ package org.apache.maven.tools.repoclean.report;
  * limitations under the License.
  */
 
-public class ReportWriteException
-    extends Exception
+public class ReportWriteException extends Exception
 {
 
     public ReportWriteException( String message, Throwable cause )

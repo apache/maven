@@ -17,7 +17,7 @@ echo "mydir: $mydir"
 
 CP=$mydir/lib/repoclean-1.0-SNAPSHOT.jar
 
-for lib in `ls -1 ./lib | grep -v 'repoclean'`
+for lib in `ls -1 $mydir/lib | grep -v 'repoclean'`
 do
 
   CP=$CP:$mydir/lib/$lib

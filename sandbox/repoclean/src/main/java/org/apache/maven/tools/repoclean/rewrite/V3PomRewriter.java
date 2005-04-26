@@ -33,8 +33,7 @@ import java.io.FileWriter;
 /**
  * @author jdcasey
  */
-public class V3PomRewriter
-    implements ArtifactPomRewriter
+public class V3PomRewriter implements ArtifactPomRewriter
 {
     private PomV3ToV4Translator translator;
 
@@ -60,11 +59,11 @@ public class V3PomRewriter
                 catch ( Exception e )
                 {
                     reporter.error( "Invalid v3 POM at: \'" + from + "\'. Cannot read.", e );
-                    
+
                     throw e;
                 }
 
-                if(v3Model != null)
+                if ( v3Model != null )
                 {
                     v4Model = translator.translate( v3Model, reporter );
                 }
@@ -76,13 +75,13 @@ public class V3PomRewriter
         }
         else
         {
-            reporter.warn( "POM for artifact[" + artifact.getId()
-                + "] does not exist in source repository. We will create a skeletal one here." );
-            
+            reporter.warn( "POM for artifact[" + artifact.getId() +
+                           "] does not exist in source repository. We will create a skeletal one here." );
+
             v4Model = new Model();
         }
 
-        if(v4Model != null)
+        if ( v4Model != null )
         {
             validateV4Basics( v4Model, artifact, reporter );
 

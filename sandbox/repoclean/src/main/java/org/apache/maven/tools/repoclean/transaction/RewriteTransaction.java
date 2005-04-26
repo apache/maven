@@ -48,8 +48,8 @@ public class RewriteTransaction
             File file = (File) it.next();
             if ( file.exists() && !file.delete() )
             {
-                throw new RollbackException( "[rollback] Cannot delete file: " + file
-                    + "\nPart of transaction for artifact: {" + artifact.getId() + "}." );
+                throw new RollbackException( "[rollback] Cannot delete file: " + file +
+                                             "\nPart of transaction for artifact: {" + artifact.getId() + "}." );
             }
         }
     }

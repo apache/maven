@@ -32,8 +32,7 @@ import java.util.List;
 /**
  * @author jdcasey
  */
-public class ArtifactIndexer
-    extends AbstractLogEnabled
+public class ArtifactIndexer extends AbstractLogEnabled
 {
 
     public static final String ROLE = ArtifactIndexer.class.getName();
@@ -65,8 +64,7 @@ public class ArtifactIndexer
         }
     }
 
-    private static final class ArtifactIdComparator
-        implements Comparator
+    private static final class ArtifactIdComparator implements Comparator
     {
 
         public int compare( Object first, Object second )

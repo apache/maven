@@ -20,8 +20,7 @@ package org.apache.maven.tools.repoclean.translate;
 /**
  * @author jdcasey
  */
-public class PomTranslationException
-    extends Exception
+public class PomTranslationException extends Exception
 {
 
     private final String groupId;

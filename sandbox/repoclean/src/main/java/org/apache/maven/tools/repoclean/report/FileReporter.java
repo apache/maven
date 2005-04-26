@@ -48,7 +48,7 @@ public class FileReporter implements Reporter
     private boolean hasWarning = false;
 
     private Writer writer;
-    
+
     public FileReporter( File reportsBase, String reportPath )
     {
         this.reportsFile = new File( reportsBase, reportPath );
@@ -61,12 +61,12 @@ public class FileReporter implements Reporter
 
         if ( !parentDir.isDirectory() )
         {
-            throw new IllegalArgumentException( "path: \'" + parentDir.getAbsolutePath()
-                + "\' refers to a file, not a directory.\n" + "Cannot write report file: \'"
-                + reportsFile.getAbsolutePath() + "\'." );
+            throw new IllegalArgumentException( "path: \'" + parentDir.getAbsolutePath() +
+                                                "\' refers to a file, not a directory.\n" + "Cannot write report file: \'" +
+                                                reportsFile.getAbsolutePath() + "\'." );
         }
     }
-    
+
     public File getReportFile()
     {
         return reportsFile;
@@ -122,19 +122,22 @@ public class FileReporter implements Reporter
         return hasError;
     }
 
-    public void warn( String message ) throws ReportWriteException
+    public void warn( String message )
+        throws ReportWriteException
     {
         hasWarning = true;
         write( new AppendingList( 2 ).append( WARN_LEVEL ).append( message ) );
     }
 
-    public void error( String message, Throwable error ) throws ReportWriteException
+    public void error( String message, Throwable error )
+        throws ReportWriteException
     {
         hasError = true;
         write( new AppendingList( 3 ).append( ERROR_LEVEL ).append( message ).append( error ) );
     }
 
-    public void error( String message ) throws ReportWriteException
+    public void error( String message )
+        throws ReportWriteException
     {
         hasError = true;
         write( new AppendingList( 2 ).append( ERROR_LEVEL ).append( message ) );
@@ -167,8 +170,7 @@ public class FileReporter implements Reporter
         return sWriter.toString();
     }
 
-    private static class AppendingList
-        extends ArrayList
+    private static class AppendingList extends ArrayList
     {
         public AppendingList()
         {

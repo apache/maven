@@ -35,12 +35,12 @@ import java.util.regex.Pattern;
 /*
  * ==================================================================== Copyright 2001-2004 The
  * Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -50,12 +50,11 @@ import java.util.regex.Pattern;
 /**
  * @author jdcasey
  */
-public class PomV3ToV4Translator
-    extends AbstractLogEnabled
+public class PomV3ToV4Translator extends AbstractLogEnabled
 {
 
     public static final String ROLE = PomV3ToV4Translator.class.getName();
-    
+
     private transient List discoveredPlugins = new ArrayList();
 
     public Model translate( org.apache.maven.model.v3_0_0.Model v3Model, Reporter reporter )
@@ -97,7 +96,7 @@ public class PomV3ToV4Translator
                 model.setArtifactId( artifactId );
 
                 // moved this above the translation of the build, to allow
-                // additional plugins to be defined in v3 poms via 
+                // additional plugins to be defined in v3 poms via
                 // <dependency><type>plugin</type></dependency>
                 model.setDependencies( translateDependencies( v3Model.getDependencies() ) );
 
@@ -141,7 +140,7 @@ public class PomV3ToV4Translator
 
     private String format( String source )
     {
-        return (source == null)?(null):(source.replace('+', '-'));
+        return ( source == null ) ? ( null ) : ( source.replace( '+', '-' ) );
     }
 
     private CiManagement translateCiManagementInfo( org.apache.maven.model.v3_0_0.Build v3Build )
@@ -177,8 +176,8 @@ public class PomV3ToV4Translator
 
         if ( StringUtils.isNotEmpty( v3Model.getGumpRepositoryId() ) )
         {
-            reporter.warn( "Ignoring gump repository id: \'" + v3Model.getGumpRepositoryId()
-                + "\'. This is not supported in v4 POMs." );
+            reporter.warn( "Ignoring gump repository id: \'" + v3Model.getGumpRepositoryId() +
+                           "\'. This is not supported in v4 POMs." );
         }
 
         if ( notEmpty( v3Model.getVersions() ) )
@@ -252,8 +251,8 @@ public class PomV3ToV4Translator
                 String reportPluginName = null;
                 if ( !matcher.matches() )
                 {
-                    reporter.warn( "Non-standard report name: \'" + reportName
-                        + "\'. Using entire name for plugin artifactId." );
+                    reporter.warn( "Non-standard report name: \'" + reportName +
+                                   "\'. Using entire name for plugin artifactId." );
 
                     reportPluginName = reportName;
                 }
@@ -273,14 +272,10 @@ public class PomV3ToV4Translator
                 StringBuffer info = new StringBuffer();
 
                 info.append( "Using some contrived information for report: \'" ).append( reportName ).append( "\'.\n" ).append(
-                                                                                                                                "\to groupId: \'maven\'\n" ).append(
-                                                                                                                                                                     "\to artifactId: \'" ).append(
-                                                                                                                                                                                                    reportPluginName ).append(
-                                                                                                                                                                                                                               "\'\n" ).append(
-                                                                                                                                                                                                                                                "\to version: \'1.0-SNAPSHOT\'\n" ).append(
-                                                                                                                                                                                                                                                                                            "\to goal: \'report\'\n" ).append(
-                                                                                                                                                                                                                                                                                                                               "\n" ).append(
-                                                                                                                                                                                                                                                                                                                                              "These values were extracted using the v3 report naming convention, but may be wrong." );
+                    "\to groupId: \'maven\'\n" ).append( "\to artifactId: \'" ).append( reportPluginName ).append(
+                        "\'\n" ).append( "\to version: \'1.0-SNAPSHOT\'\n" ).append( "\to goal: \'report\'\n" ).append(
+                            "\n" ).append(
+                                "These values were extracted using the v3 report naming convention, but may be wrong." );
 
                 reporter.warn( info.toString() );
 
@@ -298,8 +293,7 @@ public class PomV3ToV4Translator
     }
 
     private org.apache.maven.model.Organization translateOrganization(
-                                                                      org.apache.maven.model.v3_0_0.Organization v3Organization,
-                                                                      Reporter reporter )
+        org.apache.maven.model.v3_0_0.Organization v3Organization, Reporter reporter )
         throws ReportWriteException
     {
         Organization organization = null;
@@ -378,7 +372,7 @@ public class PomV3ToV4Translator
     }
 
     private DistributionManagement translateDistributionManagement( PomKey pomKey,
-                                                                   org.apache.maven.model.v3_0_0.Model v3Model )
+                                                                    org.apache.maven.model.v3_0_0.Model v3Model )
         throws PomTranslationException
     {
         DistributionManagement distributionManagement = new DistributionManagement();
@@ -508,30 +502,30 @@ public class PomV3ToV4Translator
 
                 String groupId = format( v3Dep.getGroupId() );
                 String artifactId = format( v3Dep.getArtifactId() );
-                
+
                 String id = format( v3Dep.getId() );
-                
-                if( StringUtils.isNotEmpty( id ) )
+
+                if ( StringUtils.isNotEmpty( id ) )
                 {
-                    if( StringUtils.isEmpty( groupId ) )
+                    if ( StringUtils.isEmpty( groupId ) )
                     {
                         groupId = id;
                     }
-                    
-                    if( StringUtils.isEmpty( artifactId ) )
+
+                    if ( StringUtils.isEmpty( artifactId ) )
                     {
                         artifactId = id;
                     }
                 }
 
                 String type = v3Dep.getType();
-                if( "plugin".equals( type ) )
+                if ( "plugin".equals( type ) )
                 {
-                    if( "maven".equals( groupId ) )
+                    if ( "maven".equals( groupId ) )
                     {
                         groupId = "org.apache.maven.plugins";
                     }
-                    
+
                     Plugin plugin = new Plugin();
                     plugin.setGroupId( groupId );
                     plugin.setArtifactId( artifactId );
@@ -540,36 +534,36 @@ public class PomV3ToV4Translator
                     Xpp3Dom config = new Xpp3Dom( "configuration" );
 
                     Properties props = v3Dep.getProperties();
-                    
+
                     if ( !props.isEmpty() )
                     {
                         for ( Iterator propertyIterator = props.keySet().iterator(); it.hasNext(); )
                         {
                             String key = (String) propertyIterator.next();
                             String value = props.getProperty( key );
-                            
+
                             Xpp3Dom child = new Xpp3Dom( key );
                             child.setValue( value );
-                            
+
                             config.addChild( child );
                         }
                     }
-                    
+
                     plugin.setConfiguration( config );
-                    
+
                     this.discoveredPlugins.add( plugin );
                 }
                 else
                 {
                     Dependency dep = new Dependency();
 
-                    dep.setGroupId(groupId);
-                    dep.setArtifactId(artifactId);
+                    dep.setGroupId( groupId );
+                    dep.setArtifactId( artifactId );
                     dep.setVersion( v3Dep.getVersion() );
                     dep.setType( v3Dep.getType() );
-                    
+
                     String scope = v3Dep.getProperty( "scope" );
-                    if( StringUtils.isNotEmpty( scope ) )
+                    if ( StringUtils.isNotEmpty( scope ) )
                     {
                         dep.setScope( scope );
                     }
@@ -681,18 +675,18 @@ public class PomV3ToV4Translator
                 }
             }
         }
-        
-        if(!this.discoveredPlugins.isEmpty())
+
+        if ( !this.discoveredPlugins.isEmpty() )
         {
-            if(build == null)
+            if ( build == null )
             {
                 build = new Build();
             }
-            
+
             for ( Iterator it = this.discoveredPlugins.iterator(); it.hasNext(); )
             {
                 Plugin plugin = (Plugin) it.next();
-                
+
                 build.addPlugin( plugin );
             }
         }
@@ -731,12 +725,12 @@ public class PomV3ToV4Translator
                 Resource resource = new Resource();
 
                 resource.setDirectory( v3Resource.getDirectory() );
-                
-                List excludes = new ArrayList(v3Resource.getExcludes());
-                excludes.removeAll(v3Resource.getDefaultExcludes());
-                
+
+                List excludes = new ArrayList( v3Resource.getExcludes() );
+                excludes.removeAll( v3Resource.getDefaultExcludes() );
+
                 resource.setExcludes( excludes );
-                
+
                 resource.setIncludes( v3Resource.getIncludes() );
                 resource.setTargetPath( v3Resource.getTargetPath() );
 

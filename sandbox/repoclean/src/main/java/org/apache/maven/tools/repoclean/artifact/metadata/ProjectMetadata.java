@@ -28,21 +28,20 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class ProjectMetadata
-    implements ArtifactMetadata
+public class ProjectMetadata implements ArtifactMetadata
 {
     private final Artifact artifact;
 
-    public ProjectMetadata( Artifact artifact)
+    public ProjectMetadata( Artifact artifact )
     {
         this.artifact = artifact;
     }
-    
+
     public Artifact getArtifact()
     {
         return artifact;
     }
-    
+
     public String getFilename()
     {
         return getArtifact().getArtifactId() + "-" + getArtifact().getVersion() + ".pom";

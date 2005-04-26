@@ -27,9 +27,10 @@ import java.io.File;
  */
 public interface ArtifactPomRewriter
 {
-    
+
     public static final String ROLE = ArtifactPomRewriter.class.getName();
-    
-    void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly ) throws Exception;
+
+    void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly )
+        throws Exception;
 
 }

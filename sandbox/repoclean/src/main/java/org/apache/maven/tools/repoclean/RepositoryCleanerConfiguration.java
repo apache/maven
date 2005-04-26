@@ -47,8 +47,10 @@ public class RepositoryCleanerConfiguration
 
     private String errorReportToAddress;
 
+    private String errorReportLink;
+
     private boolean mailErrorReport;
-    
+
     private boolean force;
 
     private String blacklistedPatterns;
@@ -197,9 +199,20 @@ public class RepositoryCleanerConfiguration
     {
         this.blacklistedPatterns = blacklistedPatterns;
     }
-    
+
     public String getBlacklistedPatterns()
     {
         return blacklistedPatterns;
     }
+
+    public String getErrorReportLink()
+    {
+        return errorReportLink;
+    }
+
+    public void setErrorReportLink( String errorReportLink )
+    {
+        this.errorReportLink = errorReportLink;
+    }
+
 }

@@ -19,8 +19,8 @@ package org.apache.maven.tools.repoclean.rewrite;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.tools.repoclean.report.FileReporter;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -32,8 +32,7 @@ import java.io.FileWriter;
 /**
  * @author jdcasey
  */
-public class V4PomRewriter
-    implements ArtifactPomRewriter
+public class V4PomRewriter implements ArtifactPomRewriter
 {
     public void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly )
         throws Exception

@@ -20,8 +20,7 @@ package org.apache.maven.tools.repoclean.digest;
 /**
  * @author jdcasey
  */
-public class DigestVerificationException
-    extends Exception
+public class DigestVerificationException extends Exception
 {
 
     public DigestVerificationException()
@@ -42,5 +41,5 @@ public class DigestVerificationException
     {
         super( cause );
     }
-    
+
 }

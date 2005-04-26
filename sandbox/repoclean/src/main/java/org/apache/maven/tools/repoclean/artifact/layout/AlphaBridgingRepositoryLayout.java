@@ -21,8 +21,7 @@ import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
  * limitations under the License.
  */
 
-public class AlphaBridgingRepositoryLayout
-    extends DefaultRepositoryLayout
+public class AlphaBridgingRepositoryLayout extends DefaultRepositoryLayout
 {
 
     public String pathOfMetadata( ArtifactMetadata metadata )

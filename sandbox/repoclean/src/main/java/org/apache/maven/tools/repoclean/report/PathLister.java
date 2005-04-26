@@ -25,23 +25,24 @@ import java.io.Writer;
 
 public class PathLister
 {
-    
+
     private final File listFile;
-    
+
     private Writer writer;
 
     public PathLister( File listFile )
     {
         this.listFile = listFile;
     }
-    
-    private synchronized void checkOpen() throws ReportWriteException
+
+    private synchronized void checkOpen()
+        throws ReportWriteException
     {
-        if(writer == null)
+        if ( writer == null )
         {
             try
             {
-                writer = new FileWriter(listFile);
+                writer = new FileWriter( listFile );
             }
             catch ( IOException e )
             {
@@ -49,16 +50,17 @@ public class PathLister
             }
         }
     }
-    
+
     public void close()
     {
         IOUtil.close( writer );
     }
-    
-    public void addPath( String path ) throws ReportWriteException
+
+    public void addPath( String path )
+        throws ReportWriteException
     {
         checkOpen();
-        
+
         try
         {
             writer.write( path + "\n" );
@@ -69,10 +71,11 @@ public class PathLister
         }
     }
 
-    public void addPath( File path ) throws ReportWriteException
+    public void addPath( File path )
+        throws ReportWriteException
     {
         checkOpen();
-        
+
         try
         {
             writer.write( path + "\n" );

@@ -22,8 +22,7 @@ import org.apache.maven.artifact.handler.JarHandler;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class RarHandler
-    extends JarHandler
+public class RarHandler extends JarHandler
 {
     public String directory()
     {

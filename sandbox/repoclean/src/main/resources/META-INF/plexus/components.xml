@@ -26,6 +26,19 @@
      |
      -->
     <component>
+      <role>org.codehaus.plexus.mailsender.MailSender</role>
+      <implementation>org.codehaus.plexus.mailsender.simple.SimpleMailSender</implementation>
+      <configuration>
+        <smtp-host>localhost</smtp-host>
+        <smtp-port>25</smtp-port>
+      </configuration>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
       <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
       <role-hint>alpha-bridging</role-hint>
       <implementation>org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout</implementation>
@@ -143,6 +156,11 @@
       <role>org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer</role>
       <role-hint>legacy</role-hint>
       <implementation>org.apache.maven.tools.repoclean.discover.LegacyArtifactDiscoverer</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <!--
      |
@@ -153,6 +171,26 @@
       <role>org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.tools.repoclean.discover.DefaultArtifactDiscoverer</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.repoclean.discover.ArtifactDiscoverer</role>
+      <role-hint>alpha-bridging</role-hint>
+      <implementation>org.apache.maven.tools.repoclean.discover.DefaultArtifactDiscoverer</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <!--
      |

@@ -34,22 +34,23 @@ public class DigestVerifier
     public static final String ROLE = DigestVerifier.class.getName();
 
     private Digestor artifactDigestor;
-    
-    public void setArtifactDigestor(Digestor artifactDigestor)
+
+    public void setArtifactDigestor( Digestor artifactDigestor )
     {
         this.artifactDigestor = artifactDigestor;
     }
 
-    public void verifyDigest( File source, File target, RewriteTransaction transaction, Reporter reporter, boolean reportOnly )
+    public void verifyDigest( File source, File target, RewriteTransaction transaction, Reporter reporter,
+                              boolean reportOnly )
         throws DigestException, ReportWriteException, IOException
     {
         verifyDigestFile( source, target, transaction, reporter, reportOnly, ".md5", Digestor.MD5 );
-        
+
         verifyDigestFile( source, target, transaction, reporter, reportOnly, ".sha1", Digestor.SHA );
     }
 
-    private void verifyDigestFile( File artifactSource, File artifactTarget, RewriteTransaction transaction, Reporter reporter, boolean reportOnly,
-                                  String digestExt, String digestAlgorithm )
+    private void verifyDigestFile( File artifactSource, File artifactTarget, RewriteTransaction transaction,
+                                   Reporter reporter, boolean reportOnly, String digestExt, String digestAlgorithm )
         throws DigestException, ReportWriteException, IOException
     {
         // create the digest source file from which to copy/verify.
@@ -57,7 +58,7 @@ public class DigestVerifier
 
         // create the digest target file from which to copy/create.
         File digestTargetFile = new File( artifactTarget + digestExt );
-        
+
         transaction.addFile( digestTargetFile );
 
         boolean verified = false;
@@ -77,8 +78,8 @@ public class DigestVerifier
                     }
                     catch ( IOException e )
                     {
-                        reporter.error( "Cannot copy digest file for path [" + artifactSource
-                            + "] from source to target for digest algorithm: \'" + digestAlgorithm + "\'.", e );
+                        reporter.error( "Cannot copy digest file for path [" + artifactSource +
+                                        "] from source to target for digest algorithm: \'" + digestAlgorithm + "\'.", e );
 
                         throw e;
                     }
