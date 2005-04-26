@@ -106,7 +106,8 @@ public class RegexBasedModelInterpolator
                 Logger logger = getLogger();
                 if ( logger != null )
                 {
-                    logger.debug( "POM interpolation cannot proceed with expression: " + wholeExpr + ". Skipping...", e );
+                    logger.debug( "POM interpolation cannot proceed with expression: " + wholeExpr + ". Skipping...",
+                                  e );
                 }
             }
 

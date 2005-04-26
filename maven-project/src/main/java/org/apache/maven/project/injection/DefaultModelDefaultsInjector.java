@@ -121,8 +121,7 @@ public class DefaultModelDefaultsInjector
                 {
                     Xpp3Dom goalConfiguration = (Xpp3Dom) localGoal.getConfiguration();
                     Xpp3Dom defaultGoalConfiguration = (Xpp3Dom) defaultGoal.getConfiguration();
-                    localGoal.setConfiguration(
-                        Xpp3Dom.mergeXpp3Dom( goalConfiguration, defaultGoalConfiguration ) );
+                    localGoal.setConfiguration( Xpp3Dom.mergeXpp3Dom( goalConfiguration, defaultGoalConfiguration ) );
                 }
             }
         }

@@ -16,10 +16,9 @@ package org.apache.maven.project.interpolation;
  * limitations under the License.
  */
 
+import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-
-import junit.framework.TestCase;
 
 /**
  * @author jdcasey

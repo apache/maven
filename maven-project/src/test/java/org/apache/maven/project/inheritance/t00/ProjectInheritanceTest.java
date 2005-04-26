@@ -1,7 +1,7 @@
 package org.apache.maven.project.inheritance.t00;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public class ProjectInheritanceTest
         // Value taken from p2
         // ----------------------------------------------------------------------
 
-        assertEquals( "mailing-list", ((MailingList)p4.getMailingLists().get(0)).getName() );
+        assertEquals( "mailing-list", ( (MailingList) p4.getMailingLists().get( 0 ) ).getName() );
 
         // ----------------------------------------------------------------------
         // Value taken from p1
@@ -85,7 +85,6 @@ public class ProjectInheritanceTest
         // ----------------------------------------------------------------------
 
         assertEquals( "4.0.0", p4.getModelVersion() );
-
 
         assertEquals( "4.0.0", p4.getModelVersion() );
     }

@@ -1,20 +1,19 @@
 package org.apache.maven.project.validation;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import java.util.ArrayList;
@@ -55,18 +54,24 @@ public class ModelValidationResult
     public String toString()
     {
         if ( messages.size() == 0 )
+        {
             return "There was no validation errors.";
+        }
 
         StringBuffer message = new StringBuffer();
 
         if ( messages.size() == 1 )
+        {
             message.append( "There was 1 validation error: " );
+        }
         else
-            message.append( "There was " + messages.size() + " validation errors: " + NEWLINE);
+        {
+            message.append( "There was " + messages.size() + " validation errors: " + NEWLINE );
+        }
 
         for ( int i = 0; i < messages.size(); i++ )
         {
-            message.append( "#" + (i + 1) + ": " + messages.get( i ).toString() + NEWLINE );
+            message.append( "#" + ( i + 1 ) + ": " + messages.get( i ).toString() + NEWLINE );
         }
 
         return message.toString();
