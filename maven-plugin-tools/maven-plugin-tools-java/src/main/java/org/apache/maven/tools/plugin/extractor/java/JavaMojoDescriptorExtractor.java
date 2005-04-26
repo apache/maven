@@ -16,16 +16,21 @@ package org.apache.maven.tools.plugin.extractor.java;
  * limitations under the License.
  */
 
-import com.thoughtworks.qdox.JavaDocBuilder;
-import com.thoughtworks.qdox.model.DocletTag;
-import com.thoughtworks.qdox.model.JavaClass;
-import com.thoughtworks.qdox.model.JavaSource;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.InvalidParameterException;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
+import org.codehaus.modello.StringUtils;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
+
+import com.thoughtworks.qdox.JavaDocBuilder;
+import com.thoughtworks.qdox.model.DocletTag;
+import com.thoughtworks.qdox.model.JavaClass;
+import com.thoughtworks.qdox.model.JavaField;
+import com.thoughtworks.qdox.model.JavaSource;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,6 +45,7 @@ import java.util.Set;
  * get validation directives to help users in IDEs.
  */
 public class JavaMojoDescriptorExtractor
+    extends AbstractLogEnabled
     implements MojoDescriptorExtractor
 {
     public static final String MAVEN_PLUGIN_ID = "maven.plugin.id";
@@ -81,15 +87,6 @@ public class JavaMojoDescriptorExtractor
             throw new InvalidParameterException( "type", i );
         }
 
-        boolean required = parameter.isRequired();
-
-        String validator = parameter.getValidator();
-
-        if ( validator == null )
-        {
-            throw new InvalidParameterException( "validator", i );
-        }
-
         String expression = parameter.getExpression();
 
         if ( expression == null )
@@ -125,21 +122,21 @@ public class JavaMojoDescriptorExtractor
 
         mojoDescriptor.setId( pluginId );
 
-        tag = javaClass.getTagByName( MAVEN_PLUGIN_DESCRIPTION );
+        tag = findInClassHierarchy( javaClass, MAVEN_PLUGIN_DESCRIPTION );
 
         if ( tag != null )
         {
             mojoDescriptor.setDescription( tag.getValue() );
         }
 
-        tag = javaClass.getTagByName( MAVEN_PLUGIN_INSTANTIATION );
+        tag = findInClassHierarchy( javaClass, MAVEN_PLUGIN_INSTANTIATION );
 
         if ( tag != null )
         {
             mojoDescriptor.setInstantiationStrategy( tag.getValue() );
         }
 
-        tag = javaClass.getTagByName( GOAL_MULTI_EXECUTION_STRATEGY );
+        tag = findInClassHierarchy( javaClass, GOAL_MULTI_EXECUTION_STRATEGY );
 
         if ( tag != null )
         {
@@ -154,7 +151,7 @@ public class JavaMojoDescriptorExtractor
         // Goal name
         // ----------------------------------------------------------------------
 
-        DocletTag goal = javaClass.getTagByName( GOAL );
+        DocletTag goal = findInClassHierarchy( javaClass, GOAL );
 
         if ( goal != null )
         {
@@ -165,7 +162,7 @@ public class JavaMojoDescriptorExtractor
         // Phase name
         // ----------------------------------------------------------------------
 
-        DocletTag phase = javaClass.getTagByName( PHASE );
+        DocletTag phase = findInClassHierarchy( javaClass, PHASE );
 
         if ( phase != null )
         {
@@ -176,7 +173,7 @@ public class JavaMojoDescriptorExtractor
         // Dependency resolution flag
         // ----------------------------------------------------------------------
 
-        DocletTag requiresDependencyResolution = javaClass.getTagByName( GOAL_REQUIRES_DEPENDENCY_RESOLUTION );
+        DocletTag requiresDependencyResolution = findInClassHierarchy( javaClass, GOAL_REQUIRES_DEPENDENCY_RESOLUTION );
 
         if ( requiresDependencyResolution != null )
         {
@@ -188,42 +185,159 @@ public class JavaMojoDescriptorExtractor
             mojoDescriptor.setRequiresDependencyResolution( value );
         }
 
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
+        extractParameters( mojoDescriptor, javaClass );
 
-        DocletTag[] parameterTags = javaClass.getTagsByName( PARAMETER );
+        return mojoDescriptor;
+    }
 
-        List parameters = new ArrayList();
+    private DocletTag findInClassHierarchy( JavaClass javaClass, String tagName )
+    {
+        DocletTag tag = javaClass.getTagByName( tagName );
 
-        for ( int j = 0; j < parameterTags.length; j++ )
+        if ( tag == null )
         {
-            DocletTag parameter = parameterTags[j];
+            JavaClass superClass = javaClass.getSuperJavaClass();
+
+            if ( superClass != null )
+            {
+                tag = findInClassHierarchy( superClass, tagName );
+            }
+        }
+
+        return tag;
+    }
+
+    private void extractParameters( MojoDescriptor mojoDescriptor, JavaClass javaClass )
+    {
+        // ---------------------------------------------------------------------------------
+        // We're resolving class-level, ancestor-class-field, local-class-field order here.
+        // ---------------------------------------------------------------------------------
+
+        List rawParams = new ArrayList();
+
+        // for backward compat, we'll toss on the params declared at the class level.
+        DocletTag[] classLevelParams = javaClass.getTagsByName( PARAMETER );
+        if ( classLevelParams != null )
+        {
+            for ( int i = 0; i < classLevelParams.length; i++ )
+            {
+                DocletTag tag = classLevelParams[i];
+
+                String message = "DEPRECATED: Use field-level annotations "
+                    + "for parameters instead of class-level annotations. (parameter \'"
+                    + tag.getNamedParameter( "name" ) + "\'; class \'" + javaClass.getFullyQualifiedName() + ")";
+
+                Logger logger = getLogger();
+                if ( logger != null )
+                {
+                    logger.warn( message );
+                }
+                else
+                {
+                    // we're being used from pluggy, so this is okay...
+                    System.err.println( message );
+                }
+
+                rawParams.add( tag );
+            }
+        }
+
+        extractFieldParameterTags( javaClass, rawParams );
+
+        Set parameters = new HashSet();
+
+        for ( Iterator it = rawParams.iterator(); it.hasNext(); )
+        {
+            Object parameterInfo = it.next();
+
+            JavaField field = null;
+            DocletTag parameter = null;
+
+            // FIXME: ICK! This is only here for backward compatibility to the class-level annotations of params.
+            if ( parameterInfo instanceof JavaField )
+            {
+                field = (JavaField) parameterInfo;
+
+                parameter = field.getTagByName( PARAMETER );
+            }
+            else
+            {
+                parameter = (DocletTag) parameterInfo;
+            }
 
             Parameter pd = new Parameter();
 
-            pd.setName( parameter.getNamedParameter( "name" ) );
+            // if the field is null, then we're using a deprecated annotation pattern...
+            // TODO: Remove this check once we're clear of the annotation-compat issues.
+            if ( field == null )
+            {
+                pd.setName( parameter.getNamedParameter( "name" ) );
 
-            pd.setType( parameter.getNamedParameter( "type" ) );
+                pd.setType( parameter.getNamedParameter( "type" ) );
+
+                pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
+            }
+            else
+            {
+                pd.setName( field.getName() );
+
+                pd.setType( field.getType().getValue() );
+            }
+
+            String alias = parameter.getNamedParameter( "alias" );
+
+            if ( StringUtils.isEmpty( alias ) )
+            {
+                pd.setAlias( alias );
+            }
 
             pd.setRequired( parameter.getNamedParameter( "required" ).equals( "true" ) ? true : false );
-
-            pd.setValidator( parameter.getNamedParameter( "validator" ) );
 
             pd.setExpression( parameter.getNamedParameter( "expression" ) );
 
             pd.setDescription( parameter.getNamedParameter( "description" ) );
-
-            pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
 
             pd.setDeprecated( parameter.getNamedParameter( "deprecated" ) );
 
             parameters.add( pd );
         }
 
-        mojoDescriptor.setParameters( parameters );
+        if ( !parameters.isEmpty() )
+        {
+            List paramList = new ArrayList( parameters );
 
-        return mojoDescriptor;
+            mojoDescriptor.setParameters( paramList );
+        }
+    }
+
+    private void extractFieldParameterTags( JavaClass javaClass, List rawParams )
+    {
+        // we have to add the parent fields first, so that they will be overwritten by the local fields if
+        // that actually happens...
+        JavaClass superClass = javaClass.getSuperJavaClass();
+
+        if ( superClass != null )
+        {
+            extractFieldParameterTags( superClass, rawParams );
+        }
+
+        JavaField[] classFields = javaClass.getFields();
+
+        if ( classFields != null )
+        {
+            for ( int i = 0; i < classFields.length; i++ )
+            {
+                JavaField field = classFields[i];
+
+                DocletTag paramTag = field.getTagByName( PARAMETER );
+
+                if ( paramTag != null )
+                {
+                    rawParams.add( field );
+                }
+            }
+        }
+
     }
 
     private JavaClass getJavaClass( JavaSource javaSource )
@@ -278,19 +392,19 @@ public class JavaMojoDescriptorExtractor
                 //                method: execute signature:
                 // (Ljava/lang/String;Lorg/apache/maven/project/MavenProject;)Ljava/util/Set;)
                 //                Incompatible object argument for function call
-                //                
+                //
                 //                Refactored to allow MavenMojoDescriptor.getComponentFactory()
                 //                return MavenMojoDescriptor.getMojoDescriptor().getLanguage(),
                 //                and removed all usage of MavenMojoDescriptor from extractors.
-                //                
-                //                
+                //
+                //
                 //                MavenMojoDescriptor mmDescriptor = new
                 // MavenMojoDescriptor(mojoDescriptor);
-                //                
+                //
                 //                JavaClass javaClass = getJavaClass(javaSources[i]);
-                //                
+                //
                 //                mmDescriptor.setImplementation(javaClass.getFullyQualifiedName());
-                //                
+                //
                 //                descriptors.add( mmDescriptor );
 
                 descriptors.add( mojoDescriptor );

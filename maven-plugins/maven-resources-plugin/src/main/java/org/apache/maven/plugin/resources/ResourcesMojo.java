@@ -39,27 +39,37 @@ import java.util.TreeMap;
  * @version $Id$
  * @goal resources
  * @description copy application resources
- * @parameter name="outputDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="${project.build.outputDirectory}"
- * description=""
- * @parameter name="resources"
- * type="List"
- * required="true"
- * validator=""
- * expression="${project.build.resources}"
- * description=""
  */
 public class ResourcesMojo
     extends AbstractPlugin
 {
+    /**
+     * @parameter name="outputDirectory"
+     * type="String"
+     * required="true"
+     * validator=""
+     * expression="${project.build.outputDirectory}"
+     * description=""
+     */
     private String outputDirectory;
 
+    /**
+     * @parameter name="resources"
+     * type="List"
+     * required="true"
+     * validator=""
+     * expression="${project.build.resources}"
+     * description=""
+     */
     private List resources;
 
     public void execute()
+        throws PluginExecutionException
+    {
+        copyResources( resources, outputDirectory );
+    }
+
+    protected void copyResources( List resources, String outputDirectory )
         throws PluginExecutionException
     {
         try
@@ -69,7 +79,7 @@ public class ResourcesMojo
                 Map.Entry entry = (Map.Entry) i.next();
                 String source = (String) entry.getKey();
                 String destination = (String) entry.getValue();
-                
+
                 File destinationFile = new File( outputDirectory, destination );
 
                 if ( !destinationFile.getParentFile().exists() )
@@ -160,7 +170,7 @@ public class ResourcesMojo
 
         int count;
         byte[] b = new byte[512];
-        while ( ( count = in.read( b ) ) > 0 )  // blocking read
+        while ( ( count = in.read( b ) ) > 0 ) // blocking read
         {
             buffer.write( b, 0, count );
         }

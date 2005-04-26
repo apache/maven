@@ -22,6 +22,8 @@ package org.apache.maven.plugin.descriptor;
  */
 public class Parameter
 {
+    private String alias;
+    
     private String name;
 
     private String type;
@@ -120,5 +122,25 @@ public class Parameter
     public void setDeprecated( String deprecated )
     {
         this.deprecated = deprecated;
+    }
+
+    public int hashCode()
+    {
+        return name.hashCode();
+    }
+
+    public boolean equals(Object other)
+    {
+        return (other instanceof Parameter) && getName().equals(((Parameter)other).getName());
+    }
+
+    public String getAlias()
+    {
+        return alias;
+    }
+
+    public void setAlias( String alias )
+    {
+        this.alias = alias;
     }
 }

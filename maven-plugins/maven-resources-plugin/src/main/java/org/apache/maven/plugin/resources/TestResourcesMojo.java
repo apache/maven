@@ -1,5 +1,9 @@
 package org.apache.maven.plugin.resources;
 
+import org.apache.maven.plugin.PluginExecutionException;
+
+import java.util.List;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -22,20 +26,34 @@ package org.apache.maven.plugin.resources;
  * @version $Id$
  * @goal testResources
  * @description copy test resources
- * @parameter name="outputDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="${project.build.testOutputDirectory}"
- * description=""
- * @parameter name="resources"
- * type="List"
- * required="true"
- * validator=""
- * expression="${project.build.testResources}"
- * description=""
  */
 public class TestResourcesMojo
     extends ResourcesMojo
 {
+    /**
+     * @parameter name="outputDirectory"
+     * type="String"
+     * required="true"
+     * validator=""
+     * expression="${project.build.testOutputDirectory}"
+     * description=""
+     */
+    private String outputDirectory;
+
+    /**
+     * @parameter name="resources"
+     * type="List"
+     * required="true"
+     * validator=""
+     * expression="${project.build.testResources}"
+     * description=""
+     */
+    private List resources;
+
+    public void execute()
+        throws PluginExecutionException
+    {
+        copyResources( resources, outputDirectory );
+    }
+
 }

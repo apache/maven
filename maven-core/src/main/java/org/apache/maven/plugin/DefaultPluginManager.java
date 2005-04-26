@@ -18,6 +18,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.MavenMetadataSource;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -33,7 +34,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.ArtifactEnabledContainer;
 import org.codehaus.plexus.ArtifactEnabledContainerException;
@@ -635,7 +635,7 @@ public class DefaultPluginManager
     }
 
     /**
-     * @deprecated
+     * @deprecated [JC] in favor of what?
      */
     private Map getPluginConfigurationFromExpressions( MojoDescriptor goal, PlexusConfiguration configuration,
                                                        ExpressionEvaluator expressionEvaluator )
@@ -649,20 +649,29 @@ public class DefaultPluginManager
         {
             Parameter parameter = (Parameter) parameters.get( i );
 
+            // the key for the configuration map we're building.
             String key = parameter.getName();
+            
+            // the key used to lookup the parameter in the config from the POM, etc.
+            String lookupKey = parameter.getAlias();
+            
+            if ( StringUtils.isEmpty( lookupKey ) )
+            {
+                lookupKey = key;
+            }
 
             String expression;
-            if ( configuration.getChild( key, false ) == null )
+            if ( configuration.getChild( lookupKey, false ) == null )
             {
                 expression = parameter.getExpression();
             }
             else
             {
-                expression = configuration.getChild( key, false ).getValue( null );
+                expression = configuration.getChild( lookupKey, false ).getValue( null );
 
                 if ( expression != null && parameter.getDeprecated() != null )
                 {
-                    if ( !expression.equals( goal.getConfiguration().getChild( key, false ).getValue( null ) ) )
+                    if ( !expression.equals( goal.getConfiguration().getChild( lookupKey, false ).getValue( null ) ) )
                     {
                         getLogger().warn(
                             "DEPRECATED: " + parameter.getName() + " is deprecated.\n\t" + parameter.getDeprecated() );

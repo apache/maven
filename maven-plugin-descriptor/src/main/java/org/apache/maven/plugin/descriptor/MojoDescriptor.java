@@ -203,7 +203,7 @@ public class MojoDescriptor
         this.requiresOnline = requiresOnline;
     }
 
-    // blech! this isn't even intelligible as a method name. provided for 
+    // blech! this isn't even intelligible as a method name. provided for
     // consistency...
     public boolean isRequiresOnline()
     {
