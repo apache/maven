@@ -887,14 +887,15 @@ public class MBoot
             compilerConfiguration.setSourceLocations( Arrays.asList( sourceDirectories ) );
 
             /* Compile with debugging info */
-            String debugAsString = System.getProperty( "maven.compiler.debug" );
+            String debugAsString = System.getProperty( "maven.compiler.debug", "true" );
 
-            if ( debugAsString != null )
+            if ( !Boolean.valueOf( debugAsString ).booleanValue() )
             {
-                if ( Boolean.valueOf( debugAsString ).booleanValue() )
-                {
-                    compilerConfiguration.setDebug( true );
-                }
+                compilerConfiguration.setDebug( false );
+            }
+            else
+            {
+                compilerConfiguration.setDebug( true );
             }
 
             List messages = compiler.compile( compilerConfiguration );
@@ -925,7 +926,7 @@ public class MBoot
             return;
         }
 
-        List files = FileUtils.getFiles( sd, "**/**", "**/CVS/**", false );
+        List files = FileUtils.getFiles( sd, "**/**", "**/CVS/**,**/.svn/**", false );
 
         for ( Iterator i = files.iterator(); i.hasNext(); )
         {

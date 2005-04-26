@@ -62,7 +62,7 @@ public class CompilerMojo
     private Compiler compiler = new JavacCompiler();
 
     // TODO: use boolean when supported
-    private String debug = Boolean.FALSE.toString();
+    private String debug = Boolean.TRUE.toString();
 
     private List compileSourceRoots;
 
