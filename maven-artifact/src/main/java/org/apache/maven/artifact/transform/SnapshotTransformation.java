@@ -141,31 +141,26 @@ public class SnapshotTransformation
 
             String version = localMetadata.constructVersion();
 
-            if ( getLogger().isInfoEnabled() && !alreadyResolved )
-            {
-                if ( !version.equals( artifact.getBaseVersion() ) )
-                {
-                    String message = artifact.getArtifactId() + ": resolved to version " + version;
-                    if ( artifact.getRepository() != null )
-                    {
-                        message += " from repository " + artifact.getRepository().getId();
-                    }
-                    else
-                    {
-                        message += " from local repository";
-                    }
-                    getLogger().info( message );
-                }
-                else
-                {
-                    // Locally installed file is newer, don't use the resolved version
-                    getLogger().info( artifact.getArtifactId() + ": using locally installed snapshot" );
-                }
-            }
-
             // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
             if ( !artifact.getFile().exists() || localMetadata.newerThanFile( artifact.getFile() ) )
             {
+                if ( getLogger().isInfoEnabled() && !alreadyResolved )
+                {
+                    if ( !version.equals( artifact.getBaseVersion() ) )
+                    {
+                        String message = artifact.getArtifactId() + ": resolved to version " + version;
+                        if ( artifact.getRepository() != null )
+                        {
+                            message += " from repository " + artifact.getRepository().getId();
+                        }
+                        else
+                        {
+                            message += " from local repository";
+                        }
+                        getLogger().info( message );
+                    }
+                }
+
                 artifact.setVersion( version );
                 try
                 {
@@ -174,6 +169,14 @@ public class SnapshotTransformation
                 catch ( ArtifactPathFormatException e )
                 {
                     throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
+                }
+            }
+            else
+            {
+                if ( getLogger().isInfoEnabled() && !alreadyResolved )
+                {
+                    // Locally installed file is newer, don't use the resolved version
+                    getLogger().info( artifact.getArtifactId() + ": using locally installed snapshot" );
                 }
             }
         }
