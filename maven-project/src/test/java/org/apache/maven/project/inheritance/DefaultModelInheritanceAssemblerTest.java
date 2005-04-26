@@ -20,9 +20,13 @@ import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -219,6 +223,50 @@ public class DefaultModelInheritanceAssemblerTest
         assertScm( null, null, "http://bar/foo", child.getScm() );
     }
 
+    public void testRepositoryInheritenceWhereParentHasRepositoryAndTheChildDoesnt()
+    {
+        Model parent = makeRepositoryModel( "parent", "central", "http://repo1.maven.org/maven" );
+
+        List repos = new ArrayList( parent.getRepositories() );
+
+        Model child = makeBaseModel( "child" );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        // TODO: a lot easier if modello generated equals() :)
+        assertRepositories( repos, child.getRepositories() );
+    }
+
+    public void testRepositoryInheritenceWhereParentHasRepositoryAndTheChildHasDifferent()
+    {
+        Model parent = makeRepositoryModel( "parent", "central", "http://repo1.maven.org/maven" );
+
+        List repos = new ArrayList( parent.getRepositories() );
+
+        Model child = makeRepositoryModel( "child", "workplace", "http://repository.mycompany.com/maven" );
+
+        repos.addAll( child.getRepositories() );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        // TODO: a lot easier if modello generated equals() :)
+        assertRepositories( repos, child.getRepositories() );
+    }
+
+    public void testRepositoryInheritenceWhereParentHasRepositoryAndTheChildHasSameId()
+    {
+        Model parent = makeRepositoryModel( "parent", "central", "http://repo1.maven.org/maven" );
+
+        Model child = makeRepositoryModel( "child", "central", "http://repo2.maven.org/maven" );
+
+        List repos = new ArrayList( child.getRepositories() );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        // TODO: a lot easier if modello generated equals() :)
+        assertRepositories( repos, child.getRepositories() );
+    }
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -249,22 +297,14 @@ public class DefaultModelInheritanceAssemblerTest
         assertEquals( url, scm.getUrl() );
     }
 
-    private Model makeScmModel( String artifactId )
+    private static Model makeScmModel( String artifactId )
     {
         return makeScmModel( artifactId, null, null, null );
     }
 
-    private Model makeScmModel( String artifactId, String connection, String developerConnection, String url )
+    private static Model makeScmModel( String artifactId, String connection, String developerConnection, String url )
     {
-        Model model = new Model();
-
-        model.setModelVersion( "4.0.0" );
-
-        model.setGroupId( "maven" );
-
-        model.setArtifactId( artifactId );
-
-        model.setVersion( "1.0" );
+        Model model = makeBaseModel( artifactId );
 
         if ( connection != null || developerConnection != null || url != null )
         {
@@ -281,4 +321,54 @@ public class DefaultModelInheritanceAssemblerTest
 
         return model;
     }
+
+    private static Model makeBaseModel( String artifactId )
+    {
+        Model model = new Model();
+
+        model.setModelVersion( "4.0.0" );
+
+        model.setGroupId( "maven" );
+
+        model.setArtifactId( artifactId );
+
+        model.setVersion( "1.0" );
+        return model;
+    }
+
+    private static Model makeRepositoryModel( String artifactId, String id, String url )
+    {
+        Model model = makeBaseModel( artifactId );
+
+        Repository repository = new Repository();
+        repository.setId( id );
+        repository.setUrl( url );
+
+        model.setRepositories( new ArrayList( Collections.singletonList( repository ) ) );
+
+        return model;
+    }
+
+    private void assertRepositories( List expected, List actual )
+    {
+        assertEquals( "Repository list sizes don't match", expected.size(), actual.size() );
+
+        for ( Iterator i = expected.iterator(); i.hasNext(); )
+        {
+            Repository expectedRepository = (Repository) i.next();
+            boolean found = false;
+            for ( Iterator j = actual.iterator(); j.hasNext() && !found; )
+            {
+                Repository actualRepository = (Repository) j.next();
+
+                if ( actualRepository.getId().equals( expectedRepository.getId() ) )
+                {
+                    assertEquals( "Repository URLs don't match", expectedRepository.getUrl(), actualRepository.getUrl() );
+                    found = true;
+                }
+            }
+            assertTrue( "Repository with ID " + expectedRepository.getId() + " not found", found );
+        }
+    }
+
 }
