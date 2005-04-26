@@ -73,6 +73,7 @@ public class JavaMojoDescriptorExtractor
     protected void validateParameter( Parameter parameter, int i )
         throws InvalidParameterException
     {
+        // TODO: remove when backward compatibility is no longer an issue.
         String name = parameter.getName();
 
         if ( name == null )
@@ -80,6 +81,7 @@ public class JavaMojoDescriptorExtractor
             throw new InvalidParameterException( "name", i );
         }
 
+        // TODO: remove when backward compatibility is no longer an issue.
         String type = parameter.getType();
 
         if ( type == null )
@@ -94,6 +96,7 @@ public class JavaMojoDescriptorExtractor
             throw new InvalidParameterException( "expression", i );
         }
 
+        // TODO: remove when backward compatibility is no longer an issue.
         String description = parameter.getDescription();
 
         if ( description == null )
@@ -268,7 +271,7 @@ public class JavaMojoDescriptorExtractor
             Parameter pd = new Parameter();
 
             // if the field is null, then we're using a deprecated annotation pattern...
-            // TODO: Remove this check once we're clear of the annotation-compat issues.
+            // TODO: remove when backward compatibility is no longer an issue.
             if ( field == null )
             {
                 pd.setName( parameter.getNamedParameter( "name" ) );
@@ -276,12 +279,16 @@ public class JavaMojoDescriptorExtractor
                 pd.setType( parameter.getNamedParameter( "type" ) );
 
                 pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
+                
+                pd.setDescription( parameter.getNamedParameter( "description" ) );
             }
             else
             {
                 pd.setName( field.getName() );
 
                 pd.setType( field.getType().getValue() );
+                
+                pd.setDescription( field.getComment() );
             }
 
             String alias = parameter.getNamedParameter( "alias" );
@@ -294,8 +301,6 @@ public class JavaMojoDescriptorExtractor
             pd.setRequired( parameter.getNamedParameter( "required" ).equals( "true" ) ? true : false );
 
             pd.setExpression( parameter.getNamedParameter( "expression" ) );
-
-            pd.setDescription( parameter.getNamedParameter( "description" ) );
 
             pd.setDeprecated( parameter.getNamedParameter( "deprecated" ) );
 
