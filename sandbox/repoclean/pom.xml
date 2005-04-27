@@ -9,7 +9,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-2</version>
+      <version>1.0-alpha-3-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -24,12 +24,12 @@
       <version>1.0-alpha-1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
+    <!-- dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>1.0-alpha-2</version>
       <scope>compile</scope>
-    </dependency>
+    </dependency -->
     <dependency>
       <groupId>classworlds</groupId>
       <artifactId>classworlds</artifactId>

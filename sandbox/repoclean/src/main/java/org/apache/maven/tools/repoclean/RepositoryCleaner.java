@@ -229,9 +229,9 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
 
                 message.setContent( contentBuffer.toString() );
                 message.setSubject( configuration.getErrorReportSubject() );
-                message.setFrom( configuration.getErrorReportFromName(), configuration.getErrorReportFromAddress() );
+                message.setFrom( configuration.getErrorReportFromAddress(), configuration.getErrorReportFromName() );
                 message.setSendDate( new Date() );
-                message.addTo( configuration.getErrorReportToName(), configuration.getErrorReportToAddress() );
+                message.addTo( configuration.getErrorReportToAddress(), configuration.getErrorReportToName() );
 
                 try
                 {

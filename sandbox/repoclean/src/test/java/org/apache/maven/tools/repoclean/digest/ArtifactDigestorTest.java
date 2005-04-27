@@ -41,7 +41,13 @@ public class ArtifactDigestorTest
         StringBuffer rawConverted = new StringBuffer(rawDigest.length * 2);
         for ( int i = 0; i < rawDigest.length; i++ )
         {
-            rawConverted.append(Integer.toHexString(rawDigest[i]));
+            String encoded = Integer.toHexString(rawDigest[i] & 0xff);
+            if(encoded.length() < 2)
+            {
+                encoded = "0" + encoded;
+            }
+            
+            rawConverted.append(encoded);
         }
         
         File digestFile = File.createTempFile("repoclean-artifactDigest-formatTest", ".md5");

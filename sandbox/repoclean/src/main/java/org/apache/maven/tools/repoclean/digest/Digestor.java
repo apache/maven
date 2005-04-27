@@ -131,7 +131,14 @@ public class Digestor
             out = new FileWriter( digestFile );
             for ( int i = 0; i < digestData.length; i++ )
             {
-                out.write( Integer.toHexString( digestData[i] ) );
+                String t = Integer.toHexString( digestData[i] & 0xff );
+
+                if ( t.length() == 1 )
+                {
+                    t = "0" + t;
+                }
+                
+                out.write( t );
             }
         }
         finally

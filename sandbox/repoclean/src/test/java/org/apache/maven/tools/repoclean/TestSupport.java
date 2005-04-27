@@ -73,10 +73,10 @@ public final class TestSupport
 
     public static File getResource( String relativePath )
     {
-        ClassLoader cloader = Thread.currentThread().getContextClassLoader();
+        ClassLoader cloader = TestSupport.class.getClassLoader();
         
         URL resource = cloader.getResource( relativePath );
-
+        
         return new File( resource.getPath() ).getAbsoluteFile();
     }
 
