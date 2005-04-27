@@ -318,18 +318,10 @@ public class DefaultPluginManager
     // Plugin execution
     // ----------------------------------------------------------------------
 
-    public void executeMojo( MavenSession session, String goalName )
-        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException
+    public void executeMojo( MavenSession session, MojoDescriptor mojoDescriptor )
+        throws ArtifactResolutionException, PluginManagerException, PluginExecutionException
     {
-        verifyPluginForGoal( goalName, session );
-
         PluginExecutionRequest request = null;
-
-        MojoDescriptor mojoDescriptor = getMojoDescriptor( goalName );
-        if ( mojoDescriptor == null )
-        {
-            throw new PluginExecutionException( "Unable to find goal: " + goalName );
-        }
 
         if ( mojoDescriptor.getRequiresDependencyResolution() != null )
         {
@@ -364,6 +356,8 @@ public class DefaultPluginManager
         }
 
         Plugin plugin = null;
+
+        String goalName = mojoDescriptor.getId();
 
         try
         {

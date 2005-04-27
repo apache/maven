@@ -109,6 +109,13 @@ public class PluginDescriptorBuilder
             mojo.setPhase( phase );
         }
 
+        String executePhase = c.getChild( "executePhase" ).getValue();
+
+        if ( executePhase != null )
+        {
+            mojo.setExecutePhase( executePhase );
+        }
+
         mojo.setInstantiationStrategy( c.getChild( "instantiationStrategy" ).getValue() );
 
         mojo.setDescription( c.getChild( "description" ).getValue() );

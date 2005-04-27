@@ -57,6 +57,8 @@ public class MojoDescriptor
 
     private String phase;
 
+    private String executePhase;
+
     private List requirements;
 
     private String deprecated;
@@ -248,6 +250,16 @@ public class MojoDescriptor
     public void setGoal( String goal )
     {
         this.goal = goal;
+    }
+
+    public String getExecutePhase()
+    {
+        return executePhase;
+    }
+
+    public void setExecutePhase( String executePhase )
+    {
+        this.executePhase = executePhase;
     }
 
     public boolean alwaysExecute()

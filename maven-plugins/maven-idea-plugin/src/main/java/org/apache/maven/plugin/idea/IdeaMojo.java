@@ -38,6 +38,7 @@ import java.util.Iterator;
 
 /**
  * @goal idea
+ * @executePhase generate-sources
  * @requiresDependencyResolution test
  * @description Goal for generating IDEA files from a POM
  * @parameter name="project"

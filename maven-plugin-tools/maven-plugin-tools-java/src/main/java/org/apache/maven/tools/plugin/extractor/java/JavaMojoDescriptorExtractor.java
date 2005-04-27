@@ -62,7 +62,7 @@ public class JavaMojoDescriptorExtractor
 
     public static final String PHASE = "phase";
 
-    public static final String DISPATCH = "dispatch";
+    public static final String EXECUTE_PHASE = "executePhase";
 
     public static final String GOAL_DESCRIPTION = "description";
 
@@ -170,6 +170,17 @@ public class JavaMojoDescriptorExtractor
         if ( phase != null )
         {
             mojoDescriptor.setPhase( phase.getValue() );
+        }
+
+        // ----------------------------------------------------------------------
+        // Additional phase to execute first
+        // ----------------------------------------------------------------------
+
+        DocletTag executePhase = findInClassHierarchy( javaClass, EXECUTE_PHASE );
+
+        if ( executePhase != null )
+        {
+            mojoDescriptor.setExecutePhase( executePhase.getValue() );
         }
 
         // ----------------------------------------------------------------------

@@ -30,8 +30,8 @@ public interface PluginManager
 {
     String ROLE = PluginManager.class.getName();
 
-    void executeMojo( MavenSession session, String goalName )
-        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException;
+    void executeMojo( MavenSession session, MojoDescriptor mojoDescriptor )
+        throws PluginExecutionException, PluginManagerException, ArtifactResolutionException;
 
     MojoDescriptor getMojoDescriptor( String goalId );
 

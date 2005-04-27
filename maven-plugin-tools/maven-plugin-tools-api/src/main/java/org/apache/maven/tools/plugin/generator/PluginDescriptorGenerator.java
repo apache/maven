@@ -119,6 +119,15 @@ public class PluginDescriptorGenerator
         //
         // ----------------------------------------------------------------------
 
+        if ( mojoDescriptor.getExecutePhase() != null )
+        {
+            element( w, "executePhase", mojoDescriptor.getExecutePhase() );
+        }
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
         w.startElement( "implementation" );
 
         w.writeText( mojoDescriptor.getImplementation() );

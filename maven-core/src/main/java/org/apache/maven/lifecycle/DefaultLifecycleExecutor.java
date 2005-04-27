@@ -45,8 +45,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /**
+ * @todo there is some duplication between this and the plugin manager
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id: DefaultLifecycleExecutor.java,v 1.16 2005/03/04 09:04:25
  *          jdcasey Exp $
@@ -404,7 +406,8 @@ public class DefaultLifecycleExecutor
     }
 
     private void executePhase( String phase, MavenSession session, Map phaseMap )
-        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException
+        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
+        LifecycleExecutionException
     {
         // only execute up to the given phase
         int index = phases.indexOf( phaseMap.get( phase ) );
@@ -455,7 +458,8 @@ public class DefaultLifecycleExecutor
     }
 
     protected void executeMojo( String id, MavenSession session )
-        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException
+        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
+        LifecycleExecutionException
     {
         // ----------------------------------------------------------------------
         // We have something of the form <pluginId>:<mojoId>, so this might be
@@ -471,7 +475,22 @@ public class DefaultLifecycleExecutor
         logger.debug( "\t{localRepository: " + session.getLocalRepository() + "}" );
         logger.debug( "\t{remoteRepositories: " + session.getRemoteRepositories() + "}" );
 
-        pluginManager.executeMojo( session, id );
+        pluginManager.verifyPluginForGoal( id, session );
+
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( id );
+
+        if ( mojoDescriptor == null )
+        {
+            throw new PluginExecutionException( "Unable to find goal: " + id );
+        }
+
+        if ( mojoDescriptor.getExecutePhase() != null )
+        {
+            // TODO: is this too broad to execute?
+            execute( Collections.singletonList( mojoDescriptor.getExecutePhase() ), session );
+        }
+
+        pluginManager.executeMojo( session, mojoDescriptor );
     }
 
     // ----------------------------------------------------------------------
