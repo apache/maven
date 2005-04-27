@@ -44,22 +44,20 @@ public class ResourcesMojo
     extends AbstractPlugin
 {
     /**
+     * The output directory into which to copy the resources.
+     * 
      * @parameter name="outputDirectory"
-     * type="String"
      * required="true"
-     * validator=""
      * expression="${project.build.outputDirectory}"
-     * description=""
      */
     private String outputDirectory;
 
     /**
+     * The list of resources we want to transfer.
+     * 
      * @parameter name="resources"
-     * type="List"
      * required="true"
-     * validator=""
      * expression="${project.build.resources}"
-     * description=""
      */
     private List resources;
 
