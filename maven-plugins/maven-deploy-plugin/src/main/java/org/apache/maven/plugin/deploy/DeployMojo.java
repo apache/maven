@@ -21,11 +21,11 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ProjectArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
 import java.io.File;
 
