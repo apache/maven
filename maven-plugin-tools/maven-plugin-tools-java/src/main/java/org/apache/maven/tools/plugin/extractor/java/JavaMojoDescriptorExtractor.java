@@ -37,7 +37,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -227,7 +230,7 @@ public class JavaMojoDescriptorExtractor
         // We're resolving class-level, ancestor-class-field, local-class-field order here.
         // ---------------------------------------------------------------------------------
 
-        List rawParams = new ArrayList();
+        Map rawParams = new TreeMap();
 
         // for backward compat, we'll toss on the params declared at the class level.
         DocletTag[] classLevelParams = javaClass.getTagsByName( PARAMETER );
@@ -252,31 +255,34 @@ public class JavaMojoDescriptorExtractor
                     System.err.println( message );
                 }
 
-                rawParams.add( tag );
+                rawParams.put( tag.getNamedParameter("name"), tag );
             }
         }
-
+        
         extractFieldParameterTags( javaClass, rawParams );
 
         Set parameters = new HashSet();
 
-        for ( Iterator it = rawParams.iterator(); it.hasNext(); )
+        for ( Iterator it = rawParams.entrySet().iterator(); it.hasNext(); )
         {
-            Object parameterInfo = it.next();
-
+            Map.Entry entry = (Entry) it.next();
+            String paramName = (String) entry.getKey();
+            
+            Object val = entry.getValue();
+            
             JavaField field = null;
             DocletTag parameter = null;
 
             // FIXME: ICK! This is only here for backward compatibility to the class-level annotations of params.
-            if ( parameterInfo instanceof JavaField )
+            if ( val instanceof JavaField )
             {
-                field = (JavaField) parameterInfo;
+                field = (JavaField) val;
 
                 parameter = field.getTagByName( PARAMETER );
             }
             else
             {
-                parameter = (DocletTag) parameterInfo;
+                parameter = (DocletTag) val;
             }
 
             Parameter pd = new Parameter();
@@ -285,7 +291,7 @@ public class JavaMojoDescriptorExtractor
             // TODO: remove when backward compatibility is no longer an issue.
             if ( field == null )
             {
-                pd.setName( parameter.getNamedParameter( "name" ) );
+                pd.setName( paramName );
 
                 pd.setType( parameter.getNamedParameter( "type" ) );
 
@@ -295,7 +301,7 @@ public class JavaMojoDescriptorExtractor
             }
             else
             {
-                pd.setName( field.getName() );
+                pd.setName( paramName );
 
                 pd.setType( field.getType().getValue() );
                 
@@ -326,7 +332,7 @@ public class JavaMojoDescriptorExtractor
         }
     }
 
-    private void extractFieldParameterTags( JavaClass javaClass, List rawParams )
+    private void extractFieldParameterTags( JavaClass javaClass, Map rawParams )
     {
         // we have to add the parent fields first, so that they will be overwritten by the local fields if
         // that actually happens...
@@ -349,7 +355,7 @@ public class JavaMojoDescriptorExtractor
 
                 if ( paramTag != null )
                 {
-                    rawParams.add( field );
+                    rawParams.put( field.getName(), field );
                 }
             }
         }
