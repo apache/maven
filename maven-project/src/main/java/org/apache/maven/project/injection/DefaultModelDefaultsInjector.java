@@ -91,46 +91,18 @@ public class DefaultModelDefaultsInjector
         {
             plugin.setVersion( def.getVersion() );
         }
-
-        Map goalMap = new TreeMap();
-
+        
         List pluginGoals = plugin.getGoals();
-        if ( pluginGoals != null )
+        if( pluginGoals == null || pluginGoals.isEmpty() )
         {
-            for ( Iterator it = pluginGoals.iterator(); it.hasNext(); )
-            {
-                Goal goal = (Goal) it.next();
-
-                goalMap.put( goal.getId(), goal );
-            }
+            plugin.setGoals( def.getGoals() );
         }
-
-        List defGoals = def.getGoals();
-        if ( defGoals != null )
-        {
-            for ( Iterator it = defGoals.iterator(); it.hasNext(); )
-            {
-                Goal defaultGoal = (Goal) it.next();
-
-                Goal localGoal = (Goal) goalMap.get( defaultGoal.getId() );
-                if ( localGoal == null )
-                {
-                    goalMap.put( defaultGoal.getId(), defaultGoal );
-                }
-                else
-                {
-                    Xpp3Dom goalConfiguration = (Xpp3Dom) localGoal.getConfiguration();
-                    Xpp3Dom defaultGoalConfiguration = (Xpp3Dom) defaultGoal.getConfiguration();
-                    localGoal.setConfiguration( Xpp3Dom.mergeXpp3Dom( goalConfiguration, defaultGoalConfiguration ) );
-                }
-            }
-        }
-
-        plugin.setGoals( new ArrayList( goalMap.values() ) );
-
+        
         Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
-        Xpp3Dom defaultPluginConfiguration = (Xpp3Dom) def.getConfiguration();
-        plugin.setConfiguration( Xpp3Dom.mergeXpp3Dom( pluginConfiguration, defaultPluginConfiguration ) );
+        if( pluginConfiguration == null )
+        {
+            plugin.setConfiguration( def.getConfiguration() );
+        }
     }
 
     private void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )

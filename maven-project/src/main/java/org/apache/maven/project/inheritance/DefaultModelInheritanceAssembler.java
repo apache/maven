@@ -239,13 +239,16 @@ public class DefaultModelInheritanceAssembler
                     for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
                     {
                         Plugin plugin = (Plugin) it.next();
-                        if ( !mappedChildPlugins.containsKey( constructPluginKey( plugin ) ) )
+                        
+                        String pluginKey = constructPluginKey( plugin );
+                        
+                        if ( !mappedChildPlugins.containsKey( pluginKey ) )
                         {
                             childPluginMgmt.addPlugin( plugin );
                         }
                         else
                         {
-                            Plugin childPlugin = (Plugin) mappedChildPlugins.get( constructPluginKey( plugin ) );
+                            Plugin childPlugin = (Plugin) mappedChildPlugins.get( pluginKey );
 
                             if ( childPlugin.getVersion() == null )
                             {
@@ -275,6 +278,10 @@ public class DefaultModelInheritanceAssembler
                                     childGoal.setConfiguration( Xpp3Dom.mergeXpp3Dom( childDom, parentDom ) );
                                 }
                             }
+                            
+                            Xpp3Dom childConfig = (Xpp3Dom) childPlugin.getConfiguration();
+                            Xpp3Dom parentConfig = (Xpp3Dom) plugin.getConfiguration();
+                            childPlugin.setConfiguration( Xpp3Dom.mergeXpp3Dom( childConfig, parentConfig ) );
                         }
                     }
                 }
