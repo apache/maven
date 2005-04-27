@@ -181,6 +181,11 @@ public class PluginDescriptorGenerator
             w.startElement( "parameter" );
 
             element( w, "name", parameter.getName() );
+            
+            if( parameter.getAlias() != null )
+            {
+                element( w, "alias", parameter.getAlias() );
+            }
 
             element( w, "type", parameter.getType() );
 

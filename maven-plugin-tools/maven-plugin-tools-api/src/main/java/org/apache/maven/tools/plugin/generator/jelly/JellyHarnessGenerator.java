@@ -22,6 +22,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.util.PluginUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
@@ -194,7 +195,14 @@ public class JellyHarnessGenerator
         {
             Parameter parameter = (Parameter) parameters.get( i );
 
-            w.addAttribute( parameter.getName(), "${" + parameter.getName() + "}" );
+            String paramName = parameter.getAlias();
+            
+            if( StringUtils.isEmpty( paramName ) )
+            {
+                paramName = parameter.getName();
+            }
+            
+            w.addAttribute( paramName, "${" + paramName + "}" );
         }
 
         w.endElement();

@@ -60,6 +60,12 @@ public class JavaMojoDescriptorExtractor
     public static final String MAVEN_PLUGIN_MODE = "maven.plugin.mode";
 
     public static final String PARAMETER = "parameter";
+    
+    public static final String PARAMETER_EXPRESSION = "expression";
+    
+    public static final String REQUIRED = "required";
+
+    public static final String DEPRECATED = "deprecated";
 
     public static final String GOAL = "goal";
 
@@ -298,6 +304,10 @@ public class JavaMojoDescriptorExtractor
                 pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
                 
                 pd.setDescription( parameter.getNamedParameter( "description" ) );
+                
+                pd.setRequired( parameter.getNamedParameter( "required" ).equals( "true" ) ? true : false );
+                
+                pd.setDeprecated( parameter.getNamedParameter( "deprecated" ) );
             }
             else
             {
@@ -306,6 +316,14 @@ public class JavaMojoDescriptorExtractor
                 pd.setType( field.getType().getValue() );
                 
                 pd.setDescription( field.getComment() );
+                
+                pd.setRequired( field.getTagByName(REQUIRED) != null );
+                
+                DocletTag deprecationTag = field.getTagByName( DEPRECATED );
+                if( deprecationTag != null)
+                {
+                    pd.setDeprecated( deprecationTag.getValue() );
+                }
             }
 
             String alias = parameter.getNamedParameter( "alias" );
@@ -315,11 +333,7 @@ public class JavaMojoDescriptorExtractor
                 pd.setAlias( alias );
             }
 
-            pd.setRequired( parameter.getNamedParameter( "required" ).equals( "true" ) ? true : false );
-
-            pd.setExpression( parameter.getNamedParameter( "expression" ) );
-
-            pd.setDeprecated( parameter.getNamedParameter( "deprecated" ) );
+            pd.setExpression( parameter.getNamedParameter( PARAMETER_EXPRESSION ) );
 
             parameters.add( pd );
         }

@@ -19,6 +19,7 @@ package org.apache.maven.tools.plugin.generator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
@@ -37,7 +38,8 @@ import java.util.Set;
 public class PluginXdocGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project ) throws Exception
+    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project )
+        throws Exception
     {
         for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
         {
@@ -137,7 +139,8 @@ public class PluginXdocGenerator
         writer.close();
     }
 
-    private void writeGoalParameterTable( MojoDescriptor mojoDescriptor, XMLWriter w ) throws Exception
+    private void writeGoalParameterTable( MojoDescriptor mojoDescriptor, XMLWriter w )
+        throws Exception
     {
         w.startElement( "p" );
 
@@ -153,6 +156,12 @@ public class PluginXdocGenerator
 
         w.startElement( "th" );
 
+        w.writeText( "Type" );
+
+        w.endElement();
+
+        w.startElement( "th" );
+
         w.writeText( "Expression" );
 
         w.endElement();
@@ -160,6 +169,18 @@ public class PluginXdocGenerator
         w.startElement( "th" );
 
         w.writeText( "Description" );
+
+        w.endElement();
+
+        w.startElement( "th" );
+
+        w.writeText( "Required?" );
+
+        w.endElement();
+
+        w.startElement( "th" );
+
+        w.writeText( "Deprecated?" );
 
         w.endElement();
 
@@ -181,7 +202,24 @@ public class PluginXdocGenerator
 
             w.startElement( "td" );
 
-            w.writeText( parameter.getName() );
+            String paramName = parameter.getAlias();
+
+            if ( StringUtils.isEmpty( paramName ) )
+            {
+                paramName = parameter.getName();
+            }
+
+            w.writeText( paramName );
+
+            w.endElement();
+
+            // ----------------------------------------------------------------------
+            //
+            // ----------------------------------------------------------------------
+
+            w.startElement( "td" );
+
+            w.writeText( parameter.getType() );
 
             w.endElement();
 
@@ -201,11 +239,33 @@ public class PluginXdocGenerator
 
             w.startElement( "td" );
 
-            Parameter p = (Parameter) parameterMap.get( parameter.getName() );
-
-            w.writeText( p.getDescription() );
+            w.writeText( parameter.getDescription() );
 
             w.endElement();
+
+            // ----------------------------------------------------------------------
+            //
+            // ----------------------------------------------------------------------
+
+            w.startElement( "td" );
+
+            w.writeText( Boolean.toString( parameter.isRequired() ) );
+
+            w.endElement();
+
+            // ----------------------------------------------------------------------
+            //
+            // ----------------------------------------------------------------------
+
+            String deprecationWarning = parameter.getDeprecated();
+            if ( StringUtils.isNotEmpty( deprecationWarning ) )
+            {
+                w.startElement( "td" );
+
+                w.writeText( deprecationWarning );
+
+                w.endElement();
+            }
 
             w.endElement();
         }

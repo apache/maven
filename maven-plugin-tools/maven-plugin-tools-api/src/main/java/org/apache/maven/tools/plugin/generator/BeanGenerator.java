@@ -33,6 +33,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * [JC] Is this class defunct now? I can't find o.a.m.plugin.BeanPluginAdapter in the codebase...
+ * I'm not going to edit this class to account for aliases, deprecation, etc. until I know.
+ * 
  * @todo use the descriptions in the descriptor for the javadoc pushed into the
  *       source code.
  */

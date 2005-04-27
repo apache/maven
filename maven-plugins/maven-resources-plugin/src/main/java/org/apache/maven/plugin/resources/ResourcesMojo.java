@@ -46,18 +46,16 @@ public class ResourcesMojo
     /**
      * The output directory into which to copy the resources.
      * 
-     * @parameter name="outputDirectory"
-     * required="true"
-     * expression="${project.build.outputDirectory}"
+     * @parameter expression="${project.build.outputDirectory}"
+     * @required
      */
     private String outputDirectory;
 
     /**
      * The list of resources we want to transfer.
      * 
-     * @parameter name="resources"
-     * required="true"
-     * expression="${project.build.resources}"
+     * @parameter expression="${project.build.resources}"
+     * @required
      */
     private List resources;
 
