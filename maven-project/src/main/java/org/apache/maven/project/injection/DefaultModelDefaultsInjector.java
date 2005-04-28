@@ -18,6 +18,7 @@ package org.apache.maven.project.injection;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
@@ -89,18 +90,49 @@ public class DefaultModelDefaultsInjector
         {
             plugin.setVersion( def.getVersion() );
         }
-        
+
+        Map defaultGoals = new TreeMap();
+
+        List defGoalList = def.getGoals();
+
+        if ( defGoalList != null )
+        {
+            for ( Iterator it = defGoalList.iterator(); it.hasNext(); )
+            {
+                Goal defaultGoal = (Goal) it.next();
+
+                defaultGoals.put( defaultGoal.getId(), defaultGoal );
+            }
+        }
+
         List pluginGoals = plugin.getGoals();
-        if( pluginGoals == null || pluginGoals.isEmpty() )
+
+        if ( pluginGoals != null )
         {
-            plugin.setGoals( def.getGoals() );
+            for ( Iterator it = pluginGoals.iterator(); it.hasNext(); )
+            {
+                Goal pluginGoal = (Goal) it.next();
+
+                Goal defaultGoal = (Goal) defaultGoals.get( pluginGoal.getId() );
+
+                if ( defaultGoal != null )
+                {
+                    Xpp3Dom pluginGoalConfig = (Xpp3Dom) pluginGoal.getConfiguration();
+                    Xpp3Dom defaultGoalConfig = (Xpp3Dom) defaultGoal.getConfiguration();
+
+                    pluginGoalConfig = Xpp3Dom.mergeXpp3Dom( pluginGoalConfig, defaultGoalConfig );
+
+                    pluginGoal.setConfiguration( pluginGoalConfig );
+                }
+            }
         }
-        
+
         Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
-        if( pluginConfiguration == null )
-        {
-            plugin.setConfiguration( def.getConfiguration() );
-        }
+        Xpp3Dom defaultConfiguration = (Xpp3Dom) def.getConfiguration();
+
+        pluginConfiguration = Xpp3Dom.mergeXpp3Dom( pluginConfiguration, defaultConfiguration );
+
+        plugin.setConfiguration( pluginConfiguration );
     }
 
     private void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )
