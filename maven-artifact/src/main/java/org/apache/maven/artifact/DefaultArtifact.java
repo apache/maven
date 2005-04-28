@@ -240,6 +240,11 @@ public class DefaultArtifact
         if ( baseVersion == null )
         {
             baseVersion = version;
+
+            if ( version == null )
+            {
+                throw new NullPointerException( "version was null for " + groupId + ":" + artifactId );
+            }
         }
         return baseVersion;
     }
