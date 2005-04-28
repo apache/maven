@@ -1,0 +1,31 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <!-- parent>
+    <artifactId>mojo</artifactId>
+    <groupId>org.apache.maven.plugins</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent -->
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-project-info-reports-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+  <name>Maven Project Info Reports Plugin</name>
+  <inceptionYear>2005</inceptionYear>
+  <dependencies>
+    <dependency>
+      <groupId>doxia</groupId>
+      <artifactId>doxia-core</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.reporting</groupId>
+      <artifactId>maven-reporting-api</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>
