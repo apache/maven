@@ -312,64 +312,68 @@ public class DefaultModelInheritanceAssembler
         Build childBuild = child.getBuild();
         Build parentBuild = parent.getBuild();
 
-        if ( childBuild == null )
+        if ( parentBuild != null )
         {
-            child.setBuild( new Build() );
+            if ( childBuild == null )
+            {
+                childBuild = new Build();
+                child.setBuild( childBuild );
+            }
+            // The build has been set but we want to step in here and fill in
+            // values
+            // that have not been set by the child.
+
+            if ( childBuild.getDirectory() == null )
+            {
+                childBuild.setDirectory( parentBuild.getDirectory() );
+            }
+
+            if ( childBuild.getSourceDirectory() == null )
+            {
+                childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
+            }
+
+            if ( childBuild.getScriptSourceDirectory() == null )
+            {
+                childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
+            }
+
+            if ( childBuild.getTestSourceDirectory() == null )
+            {
+                childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
+            }
+
+            if ( childBuild.getOutputDirectory() == null )
+            {
+                childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
+            }
+
+            if ( childBuild.getTestOutputDirectory() == null )
+            {
+                childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
+            }
+
+            if ( childBuild.getFinalName() == null )
+            {
+                childBuild.setFinalName( parentBuild.getFinalName() );
+            }
+
+            List resources = childBuild.getResources();
+            if ( resources == null || resources.isEmpty() )
+            {
+                childBuild.setResources( parentBuild.getResources() );
+            }
+
+            resources = childBuild.getTestResources();
+            if ( resources == null || resources.isEmpty() )
+            {
+                childBuild.setTestResources( parentBuild.getTestResources() );
+            }
+
+            // Plugins are not aggregated, but management is
+
+            assemblePluginManagementInheritance( childBuild, parentBuild );
         }
-        // The build has been set but we want to step in here and fill in
-        // values
-        // that have not been set by the child.
-
-        if ( childBuild.getDirectory() == null )
-        {
-            childBuild.setDirectory( parentBuild.getDirectory() );
-        }
-
-        if ( childBuild.getSourceDirectory() == null )
-        {
-            childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
-        }
-
-        if ( childBuild.getScriptSourceDirectory() == null )
-        {
-            childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
-        }
-
-        if ( childBuild.getTestSourceDirectory() == null )
-        {
-            childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
-        }
-
-        if ( childBuild.getOutputDirectory() == null )
-        {
-            childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
-        }
-
-        if ( childBuild.getTestOutputDirectory() == null )
-        {
-            childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
-        }
-
-        if ( childBuild.getFinalName() == null )
-        {
-            childBuild.setFinalName( parentBuild.getFinalName() );
-        }
-
-        List resources = childBuild.getResources();
-        if ( resources == null || resources.isEmpty() )
-        {
-            childBuild.setResources( parentBuild.getResources() );
-        }
-
-        resources = childBuild.getTestResources();
-        if ( resources == null || resources.isEmpty() )
-        {
-            childBuild.setTestResources( parentBuild.getTestResources() );
-        }
-
-        // Plugins are not aggregated, but management is
-
-        assemblePluginManagementInheritance( childBuild, parentBuild );
     }
 
     private void assembleScmInheritance( Model child, Model parent )
