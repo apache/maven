@@ -1,0 +1,14 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>maven</artifactId>
+    <groupId>org.apache.maven</groupId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+  <groupId>org.apache.maven.reporting</groupId>
+  <artifactId>maven-reporting</artifactId>
+  <packaging>pom</packaging>
+  <name>Maven Reporting</name>
+  <version>2.0-SNAPSHOT</version>
+  <inceptionYear>2005</inceptionYear>
+</project>

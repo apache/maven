@@ -79,7 +79,9 @@
     <module>maven-jar-plugin</module>
     <module>maven-plugin-plugin</module>
     <module>maven-resources-plugin</module>
+<!--
     <module>maven-site-plugin</module>
+-->
     <module>maven-surefire-plugin</module>
     <module>maven-war-plugin</module>
   </modules>
