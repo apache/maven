@@ -74,6 +74,11 @@ public class DefaultMavenReportManager
 
             String version = pluginReport.getVersion();
 
+            if ( version == null )
+            {
+                throw new ReportManagerException( "The version of " + groupId + ":" + artifactId + " can not be empty" );
+            }
+
             try
             {
                 Artifact pluginArtifact = artifactFactory.createArtifact( pluginReport.getGroupId(),

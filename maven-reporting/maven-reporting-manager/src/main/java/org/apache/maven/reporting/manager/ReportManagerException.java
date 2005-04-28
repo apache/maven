@@ -19,6 +19,11 @@ package org.apache.maven.reporting.manager;
 public class ReportManagerException
     extends Exception
 {
+    public ReportManagerException( String message )
+    {
+        super( message );
+    }
+
     public ReportManagerException( String message, Exception e )
     {
         super( message, e );
