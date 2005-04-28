@@ -25,6 +25,7 @@ import org.codehaus.doxia.sink.Sink;
  * @todo Later it may be appropriate to create something like a VelocityMavenReportRenderer that could take a velocity template and pipe that through Doxia rather than coding them up like this.
  */
 public abstract class AbstractMavenReportRenderer
+    implements MavenReportRenderer
 {
     protected Sink sink;
 
@@ -180,7 +181,7 @@ public abstract class AbstractMavenReportRenderer
         sink.tableRow_();
     }
 
-    protected abstract String getTitle();
+    public abstract String getTitle();
 
     protected abstract void renderBody();
 

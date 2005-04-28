@@ -22,6 +22,7 @@ import org.apache.maven.reporting.MavenReportConfiguration;
 import org.apache.maven.reporting.MavenReportException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manage the set of available reports.
@@ -34,9 +35,11 @@ public interface MavenReportManager
 {
     String ROLE = MavenReportManager.class.getName();
 
+    Map getReports();
+
     void addReports( Reports reports, ArtifactRepository localRepository, List remoteRepositories )
         throws ReportManagerException, ReportNotFoundException;
 
-    void executeReport( String name, MavenReportConfiguration config, String outputDirectory )
+    void executeReport( String name, MavenReportConfiguration config )
         throws MavenReportException;
 }

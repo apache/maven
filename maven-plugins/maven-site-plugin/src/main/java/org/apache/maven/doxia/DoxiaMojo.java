@@ -85,15 +85,17 @@ public class DoxiaMojo
 
             config.setModel( project.getModel() );
 
+            config.setOutputDirectory( new File( generatedSiteDirectory ) );
+
             if ( project.getReports() != null )
             {
                 reportManager.addReports( project.getReports(), localRepository, remoteRepositories );
 
-                for ( Iterator i = project.getReports().getPlugins().iterator(); i.hasNext(); )
+                for ( Iterator i = reportManager.getReports().keySet().iterator(); i.hasNext(); )
                 {
-                    org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) i.next();
+                    String reportName = (String) i.next();
 
-                    reportManager.executeReport( plugin.getArtifactId(), config, outputDirectory );
+                    reportManager.executeReport( reportName, config );
                 }
             }
 

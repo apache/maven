@@ -39,6 +39,7 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -74,16 +75,19 @@ public class DefaultMavenReportManager
 
             String version = pluginReport.getVersion();
 
-            if ( version == null )
-            {
-                throw new ReportManagerException( "The version of " + groupId + ":" + artifactId + " can not be empty" );
+            if ( pluginReport != null && StringUtils.isEmpty( version ) )
+                {
+                    // The model/project builder should have validated this already
+                    String message = "The maven plugin with groupId: '" + groupId + "' and artifactId: '" + artifactId +
+                        "' which was configured for use in this project does not have a version associated with it.";
+                    throw new IllegalStateException( message );
             }
 
             try
             {
                 Artifact pluginArtifact = artifactFactory.createArtifact( pluginReport.getGroupId(),
                                                                           pluginReport.getArtifactId(),
-                                                                          pluginReport.getVersion(),
+                                                                          version,
                                                                           null, "maven-plugin", null );
 
                 addPlugin( pluginArtifact, localRepository, remoteRepositories );
@@ -159,17 +163,33 @@ public class DefaultMavenReportManager
         }
     }
 
+    public Map getReports()
+    {
+        try
+        {
+            mavenReports = container.lookupMap( MavenReport.ROLE );
+        }
+        catch(ComponentLookupException e)
+        {
+            e.printStackTrace();
+        }
+System.out.println("nb reports=" + mavenReports.keySet().size() );
+        return mavenReports;
+    }
+
     /**
      * @todo we need some type of response
      */
-    public void executeReport( String name, MavenReportConfiguration config, String outputDirectory )
+    public void executeReport( String name, MavenReportConfiguration config )
         throws MavenReportException
     {
         MavenReport report = (MavenReport) mavenReports.get( name );
 
         if ( report != null )
         {
-            report.execute( config );
+            report.setConfiguration( config );
+
+            report.generate();
         }
         else
         {

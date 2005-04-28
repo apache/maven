@@ -26,16 +26,42 @@ import java.io.IOException;
 public abstract class AbstractMavenReport
     implements MavenReport
 {
-    public Sink getSink( File outputDirectory )
-        throws IOException
+    private MavenReportConfiguration config;
+
+    public MavenReportConfiguration getConfiguration()
     {
-        return getSink( outputDirectory, getOutputName() );
+        return config;
     }
 
-    public Sink getSink( File outputDirectory, String outputName )
+    public void setConfiguration( MavenReportConfiguration config )
+    {
+        this.config = config;
+    }
+
+    public void generate()
+        throws MavenReportException
+    {
+        if ( config == null )
+        {
+            throw new MavenReportException( "You must specify a report configuration." );
+        }
+
+        execute();
+    }
+
+    protected abstract void execute()
+        throws MavenReportException;
+
+    public Sink getSink()
         throws IOException
     {
-        FileWriter writer = new FileWriter( new File( outputDirectory, "xdoc/" + outputName + ".xml" ) );
+        return getSink( getOutputName() );
+    }
+
+    public Sink getSink( String outputName )
+        throws IOException
+    {
+        FileWriter writer = new FileWriter( new File( config.getOutputDirectory(), "xdoc/" + outputName + ".xml" ) );
 
         return new XdocSink( writer );
     }

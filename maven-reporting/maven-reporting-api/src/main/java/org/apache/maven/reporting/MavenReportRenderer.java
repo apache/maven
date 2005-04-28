@@ -1,7 +1,7 @@
 package org.apache.maven.reporting;
 
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2004-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,32 +18,15 @@ package org.apache.maven.reporting;
 
 import org.codehaus.doxia.sink.Sink;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
- * The basis for a Maven report.
- *
- * @author Brett Porter
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: MavenReport.java 163376 2005-02-23 00:06:06Z brett $
+ * @version $Id: AbstractMavenReportRenderer.java 163373 2005-02-22 03:37:00Z brett $
+ * @todo Later it may be appropriate to create something like a VelocityMavenReportRenderer that could take a velocity template and pipe that through Doxia rather than coding them up like this.
  */
-public interface MavenReport
+public interface MavenReportRenderer
 {
-    String ROLE = MavenReport.class.getName();
+    String getTitle();
 
-    MavenReportConfiguration getConfiguration();
-
-    void setConfiguration( MavenReportConfiguration config );
-
-    void generate()
-        throws MavenReportException;
-
-    String getOutputName();
-
-    Sink getSink()
-        throws IOException;
-
-    Sink getSink( String outputName )
-        throws IOException;
+    void render();
 }

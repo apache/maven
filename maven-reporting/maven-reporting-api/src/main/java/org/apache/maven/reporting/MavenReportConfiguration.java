@@ -19,6 +19,7 @@ package org.apache.maven.reporting;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Scm;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -28,6 +29,18 @@ import java.util.List;
 public class MavenReportConfiguration
 {
     private Model model;
+
+    private File outputDirectory;
+
+    public File getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    public void setOutputDirectory( File outputDirectory )
+    {
+        this.outputDirectory = outputDirectory;
+    }
 
     public Model getModel()
     {
