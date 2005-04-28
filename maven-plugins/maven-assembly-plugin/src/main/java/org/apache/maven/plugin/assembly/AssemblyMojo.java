@@ -64,6 +64,7 @@ public class AssemblyMojo
     /**
     * @parameter expression="${basedir}"
     * @required
+    * @readonly
     */
     private String basedir;
 
@@ -86,11 +87,13 @@ public class AssemblyMojo
     /**
      * @parameter expression="${project.build.finalName}"
      * @required
+     * @readonly
      */
     private String finalName;
 
     /**
      * @parameter expression="${project.artifacts}"
+     * @readonly
      */
     private Set dependencies;
 
