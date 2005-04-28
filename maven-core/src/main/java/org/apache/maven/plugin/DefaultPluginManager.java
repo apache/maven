@@ -569,7 +569,7 @@ public class DefaultPluginManager
         {
             String key = (String) i.next();
 
-            if ( configuration.getChild( key ) != null )
+            if ( configuration.getChild( key, false ) != null )
             {
                 continue;
             }
