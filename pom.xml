@@ -106,5 +106,6 @@
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-script</module>
+    <module>maven-reporting</module>
   </modules>
 </project>

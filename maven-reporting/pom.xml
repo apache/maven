@@ -11,4 +11,8 @@
   <name>Maven Reporting</name>
   <version>2.0-SNAPSHOT</version>
   <inceptionYear>2005</inceptionYear>
+  <modules>
+    <module>maven-reporting-api</module>
+    <module>maven-reporting-manager</module>
+  </modules>
 </project>
