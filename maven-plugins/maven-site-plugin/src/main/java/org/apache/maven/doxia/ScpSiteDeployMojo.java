@@ -129,9 +129,7 @@ public class ScpSiteDeployMojo
             Repository repository = new Repository( id, url );
 
             //@todo dirty hack to make artifact uploading work
-            repository.setAuthenticationInfo( WagonUtils.getAuthInfo() );
-
-            commandExecutor.connect( repository );
+            commandExecutor.connect( repository, WagonUtils.getAuthInfo() );
 
             String basedir = repository.getBasedir();
 
