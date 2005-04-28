@@ -38,8 +38,7 @@ import java.util.TreeMap;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id: DefaultModelInheritanceAssembler.java,v 1.4 2004/08/23 20:24:54
  *          jdcasey Exp $
- * @todo generate this with modello to keep it in sync with changes in the
- * model.
+ * @todo generate this with modello to keep it in sync with changes in the model.
  */
 public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
@@ -166,8 +165,6 @@ public class DefaultModelInheritanceAssembler
             }
         }
         
-        // Plugins are not aggregated
-
         // Reports :: aggregate
         if ( child.getReports() != null && parent.getReports() != null )
         {
@@ -193,96 +190,77 @@ public class DefaultModelInheritanceAssembler
 
         assembleDependencyManagementInheritance( child, parent );
 
-        assemblePluginManagementInheritance( child, parent );
-
     }
 
-    private void assemblePluginManagementInheritance( Model child, Model parent )
+    private void assemblePluginManagementInheritance( Build childBuild, Build parentBuild )
     {
-        Build parentBuild = parent.getBuild();
-        Build childBuild = child.getBuild();
+        PluginManagement parentPluginMgmt = parentBuild.getPluginManagement();
 
-        if ( childBuild == null )
+        PluginManagement childPluginMgmt = childBuild.getPluginManagement();
+
+        if ( parentPluginMgmt != null )
         {
-            if ( parentBuild != null )
+            if ( childPluginMgmt == null )
             {
-                child.setBuild( parentBuild );
+                childBuild.setPluginManagement( parentPluginMgmt );
             }
             else
             {
-                childBuild = new Build();
-            }
-        }
-        else
-        {
-            PluginManagement parentPluginMgmt = parentBuild.getPluginManagement();
+                List childPlugins = childPluginMgmt.getPlugins();
 
-            PluginManagement childPluginMgmt = childBuild.getPluginManagement();
-
-            if ( parentPluginMgmt != null )
-            {
-                if ( childPluginMgmt == null )
+                Map mappedChildPlugins = new TreeMap();
+                for ( Iterator it = childPlugins.iterator(); it.hasNext(); )
                 {
-                    childBuild.setPluginManagement( parentPluginMgmt );
+                    Plugin plugin = (Plugin) it.next();
+                    mappedChildPlugins.put( constructPluginKey( plugin ), plugin );
                 }
-                else
+
+                for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
                 {
-                    List childPlugins = childPluginMgmt.getPlugins();
+                    Plugin plugin = (Plugin) it.next();
 
-                    Map mappedChildPlugins = new TreeMap();
-                    for ( Iterator it = childPlugins.iterator(); it.hasNext(); )
+                    String pluginKey = constructPluginKey( plugin );
+
+                    if ( !mappedChildPlugins.containsKey( pluginKey ) )
                     {
-                        Plugin plugin = (Plugin) it.next();
-                        mappedChildPlugins.put( constructPluginKey( plugin ), plugin );
+                        childPluginMgmt.addPlugin( plugin );
                     }
-
-                    for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
+                    else
                     {
-                        Plugin plugin = (Plugin) it.next();
-                        
-                        String pluginKey = constructPluginKey( plugin );
-                        
-                        if ( !mappedChildPlugins.containsKey( pluginKey ) )
+                        Plugin childPlugin = (Plugin) mappedChildPlugins.get( pluginKey );
+
+                        if ( childPlugin.getVersion() == null )
                         {
-                            childPluginMgmt.addPlugin( plugin );
+                            childPlugin.setVersion( childPlugin.getVersion() );
                         }
-                        else
+
+                        Map mappedChildGoals = new TreeMap();
+                        for ( Iterator itGoals = childPlugin.getGoals().iterator(); itGoals.hasNext(); )
                         {
-                            Plugin childPlugin = (Plugin) mappedChildPlugins.get( pluginKey );
-
-                            if ( childPlugin.getVersion() == null )
-                            {
-                                childPlugin.setVersion( childPlugin.getVersion() );
-                            }
-
-                            Map mappedChildGoals = new TreeMap();
-                            for ( Iterator itGoals = childPlugin.getGoals().iterator(); itGoals.hasNext(); )
-                            {
-                                Goal goal = (Goal) itGoals.next();
-                                mappedChildGoals.put( goal.getId(), goal );
-                            }
-
-                            for ( Iterator itGoals = plugin.getGoals().iterator(); itGoals.hasNext(); )
-                            {
-                                Goal parentGoal = (Goal) itGoals.next();
-                                Goal childGoal = (Goal) mappedChildGoals.get( parentGoal.getId() );
-
-                                if ( childGoal == null )
-                                {
-                                    childPlugin.addGoal( parentGoal );
-                                }
-                                else
-                                {
-                                    Xpp3Dom childDom = (Xpp3Dom) childGoal.getConfiguration();
-                                    Xpp3Dom parentDom = (Xpp3Dom) parentGoal.getConfiguration();
-                                    childGoal.setConfiguration( Xpp3Dom.mergeXpp3Dom( childDom, parentDom ) );
-                                }
-                            }
-                            
-                            Xpp3Dom childConfig = (Xpp3Dom) childPlugin.getConfiguration();
-                            Xpp3Dom parentConfig = (Xpp3Dom) plugin.getConfiguration();
-                            childPlugin.setConfiguration( Xpp3Dom.mergeXpp3Dom( childConfig, parentConfig ) );
+                            Goal goal = (Goal) itGoals.next();
+                            mappedChildGoals.put( goal.getId(), goal );
                         }
+
+                        for ( Iterator itGoals = plugin.getGoals().iterator(); itGoals.hasNext(); )
+                        {
+                            Goal parentGoal = (Goal) itGoals.next();
+                            Goal childGoal = (Goal) mappedChildGoals.get( parentGoal.getId() );
+
+                            if ( childGoal == null )
+                            {
+                                childPlugin.addGoal( parentGoal );
+                            }
+                            else
+                            {
+                                Xpp3Dom childDom = (Xpp3Dom) childGoal.getConfiguration();
+                                Xpp3Dom parentDom = (Xpp3Dom) parentGoal.getConfiguration();
+                                childGoal.setConfiguration( Xpp3Dom.mergeXpp3Dom( childDom, parentDom ) );
+                            }
+                        }
+
+                        Xpp3Dom childConfig = (Xpp3Dom) childPlugin.getConfiguration();
+                        Xpp3Dom parentConfig = (Xpp3Dom) plugin.getConfiguration();
+                        childPlugin.setConfiguration( Xpp3Dom.mergeXpp3Dom( childConfig, parentConfig ) );
                     }
                 }
             }
@@ -336,61 +314,62 @@ public class DefaultModelInheritanceAssembler
 
         if ( childBuild == null )
         {
-            child.setBuild( parentBuild );
+            child.setBuild( new Build() );
         }
-        else
+        // The build has been set but we want to step in here and fill in
+        // values
+        // that have not been set by the child.
+
+        if ( childBuild.getDirectory() == null )
         {
-            // The build has been set but we want to step in here and fill in
-            // values
-            // that have not been set by the child.
-
-            if ( childBuild.getDirectory() == null )
-            {
-                childBuild.setDirectory( parentBuild.getDirectory() );
-            }
-
-            if ( childBuild.getSourceDirectory() == null )
-            {
-                childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
-            }
-
-            if ( childBuild.getScriptSourceDirectory() == null )
-            {
-                childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
-            }
-
-            if ( childBuild.getTestSourceDirectory() == null )
-            {
-                childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
-            }
-
-            if ( childBuild.getOutputDirectory() == null )
-            {
-                childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
-            }
-
-            if ( childBuild.getTestOutputDirectory() == null )
-            {
-                childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
-            }
-
-            if ( childBuild.getFinalName() == null )
-            {
-                childBuild.setFinalName( parentBuild.getFinalName() );
-            }
-
-            List resources = childBuild.getResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                childBuild.setResources( parentBuild.getResources() );
-            }
-
-            resources = childBuild.getTestResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                childBuild.setTestResources( parentBuild.getTestResources() );
-            }
+            childBuild.setDirectory( parentBuild.getDirectory() );
         }
+
+        if ( childBuild.getSourceDirectory() == null )
+        {
+            childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
+        }
+
+        if ( childBuild.getScriptSourceDirectory() == null )
+        {
+            childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
+        }
+
+        if ( childBuild.getTestSourceDirectory() == null )
+        {
+            childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
+        }
+
+        if ( childBuild.getOutputDirectory() == null )
+        {
+            childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
+        }
+
+        if ( childBuild.getTestOutputDirectory() == null )
+        {
+            childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
+        }
+
+        if ( childBuild.getFinalName() == null )
+        {
+            childBuild.setFinalName( parentBuild.getFinalName() );
+        }
+
+        List resources = childBuild.getResources();
+        if ( resources == null || resources.isEmpty() )
+        {
+            childBuild.setResources( parentBuild.getResources() );
+        }
+
+        resources = childBuild.getTestResources();
+        if ( resources == null || resources.isEmpty() )
+        {
+            childBuild.setTestResources( parentBuild.getTestResources() );
+        }
+
+        // Plugins are not aggregated, but management is
+
+        assemblePluginManagementInheritance( childBuild, parentBuild );
     }
 
     private void assembleScmInheritance( Model child, Model parent )
