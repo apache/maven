@@ -158,8 +158,6 @@ public class PluginDescriptorBuilder
             {
                 String editable = d.getChild("editable").getValue();
                 
-                System.out.println("Value of editable attribute for parameter: " + parameter.getName() + " is: " + editable);
-                
                 parameter.setEditable( editable == null || "true".equals( editable ) );
             }
             
