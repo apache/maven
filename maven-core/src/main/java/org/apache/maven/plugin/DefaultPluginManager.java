@@ -733,7 +733,7 @@ public class DefaultPluginManager
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
                                                               "maven-settings", "maven-monitor", "maven-plugin-api",
                                                               "maven-plugin-descriptor", "plexus-container-default",
-                                                              "maven-project", "plexus-artifact-container",
+                                                              "maven-project", "plexus-container-artifact",
                                                               "wagon-provider-api", "classworlds", "maven-plugin"} );
     }
 
