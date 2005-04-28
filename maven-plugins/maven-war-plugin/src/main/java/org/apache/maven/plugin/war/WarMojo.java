@@ -41,110 +41,80 @@ import java.util.Set;
  * @goal war
  * @phase package
  * @description build a war/webapp
- * @parameter name="warName"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.finalName"
- * description=""
- * deprecated="Please use the finalName element of build instead"
- * @parameter name="archive"
- * type=""
- * required="false"
- * expression=""
- * validator=""
- * description=""
- * @parameter name="warSourceDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="#basedir/src/main/webapp"
- * description=""
- * @parameter name="warSourceIncludes"
- * type="String"
- * required="false"
- * validator=""
- * expression=""
- * default="**"
- * description=""
- * @parameter name="warSourceExcludes"
- * type="String"
- * required="false"
- * validator=""
- * expression=""
- * description=""
- * @parameter name="webXml"
- * type="String"
- * required="false"
- * validator=""
- * expression="#maven.war.webxml"
- * description=""
- * @parameter name="webappDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.directory/#project.build.finalName"
- * description=""
- * @parameter name="mode"
- * type="String"
- * required="true"
- * validator=""
- * expression=""
- * default="war"
- * description=""
- * @parameter name="classesDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.outputDirectory"
- * description=""
- * @parameter name="outputDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.directory"
- * description=""
- * @parameter name="project"
- * type="org.apache.maven.project.MavenProject"
- * required="true"
- * validator=""
- * expression="#project"
- * description="current MavenProject instance"
  */
 public class WarMojo
     extends AbstractPlugin
 {
     public static final String WEB_INF = "WEB-INF";
 
-    private String mode;
+    /**
+     * @parameter
+     */
+    private String mode = "war";
 
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
     private MavenProject project;
 
     /**
-     * @todo File
+     * @todo Convert to File
+     * 
+     * @parameter expression="${project.build.outputDirectory}"
+     * @required
+     * @readonly
      */
     private String classesDirectory;
 
+    /**
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
     private String outputDirectory;
 
     /**
-     * @todo File
+     * @todo Convert to File
+     * 
+     * @parameter expression="${project.build.directory}/${project.build.finalName}"
+     * @required
      */
     private String webappDirectory;
 
     /**
-     * @todo File
+     * @todo Convert to File
+     * 
+     * @parameter expression="${basedir}/src/main/webapp"
+     * @required
      */
     private String warSourceDirectory;
 
-    private String warSourceIncludes;
+    /**
+     * @parameter alias="includes"
+     */
+    private String warSourceIncludes = "**";
 
+    /**
+     * @parameter alias="excludes"
+     */
     private String warSourceExcludes;
 
+    /**
+     * @parameter expression="${maven.war.webxml}"
+     */
     private String webXml;
 
+    /**
+     * @parameter expression="${project.build.finalName}"
+     * @required
+     * @deprecated "Please use the finalName element of build instead"
+     */
     private String warName;
 
+    /**
+     * @parameter
+     */
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     private static final String[] EMPTY_STRING_ARRAY = {};

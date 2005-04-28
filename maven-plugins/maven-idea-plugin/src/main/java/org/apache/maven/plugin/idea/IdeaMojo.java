@@ -41,17 +41,16 @@ import java.util.Iterator;
  * @executePhase generate-sources
  * @requiresDependencyResolution test
  * @description Goal for generating IDEA files from a POM
- * @parameter name="project"
- * type="org.apache.maven.project.MavenProject"
- * required="true"
- * validator=""
- * expression="#project"
- * description=""
  * @todo use dom4j or something. Xpp3Dom can't cope properly with entities and so on
  */
 public class IdeaMojo
     extends AbstractPlugin
 {
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
     private MavenProject project;
 
     public void execute()

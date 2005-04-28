@@ -20,6 +20,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.util.PluginUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
@@ -178,50 +179,57 @@ public class PluginDescriptorGenerator
         {
             Parameter parameter = (Parameter) parameters.get( j );
 
-            w.startElement( "parameter" );
-
-            element( w, "name", parameter.getName() );
+            String expression = parameter.getExpression();
             
-            if( parameter.getAlias() != null )
+            if ( StringUtils.isNotEmpty( expression )
+                && ( expression.startsWith( "${component." ) || expression.startsWith( "#component." ) ) )
             {
-                element( w, "alias", parameter.getAlias() );
-            }
+                // treat it as a component...a requirement, in other words.
 
-            element( w, "type", parameter.getType() );
-
-            if ( parameter.getDeprecated() != null )
-            {
-                element( w, "deprecated", parameter.getDeprecated() );
-            }
-
-            element( w, "validator", parameter.getValidator() );
-
-            String value = null;
-            if ( parameter.getExpression().startsWith( "#component." ) ||
-                parameter.getExpression().startsWith( "${component." ) )
-            {
                 requirements.add( parameter );
             }
             else
             {
+                // treat it as a normal parameter.
+
+                w.startElement( "parameter" );
+
+                element( w, "name", parameter.getName() );
+
+                if ( parameter.getAlias() != null )
+                {
+                    element( w, "alias", parameter.getAlias() );
+                }
+
+                element( w, "type", parameter.getType() );
+
+                if ( parameter.getDeprecated() != null )
+                {
+                    element( w, "deprecated", parameter.getDeprecated() );
+                }
+
+                // TODO: do we still need this?
+                element( w, "validator", parameter.getValidator() );
+
                 element( w, "required", Boolean.toString( parameter.isRequired() ) );
 
-                value = parameter.getExpression();
+                element( w, "editable", Boolean.toString( parameter.isEditable() ) );
+
+                element( w, "description", parameter.getDescription() );
+
+                if ( StringUtils.isEmpty( expression ) )
+                {
+                    expression = parameter.getDefaultValue();
+                }
+
+                if ( expression != null && expression.length() > 0 )
+                {
+                    configuration.put( parameter, expression );
+                }
+
+                w.endElement();
             }
 
-            element( w, "description", parameter.getDescription() );
-
-            if ( value == null || value.length() == 0 )
-            {
-                value = parameter.getDefaultValue();
-            }
-
-            if ( value != null && value.length() > 0 )
-            {
-                configuration.put( parameter, value );
-            }
-
-            w.endElement();
         }
 
         w.endElement();

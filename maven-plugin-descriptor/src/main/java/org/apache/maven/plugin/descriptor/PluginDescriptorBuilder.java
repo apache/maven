@@ -142,16 +142,27 @@ public class PluginDescriptorBuilder
             Parameter parameter = new Parameter();
 
             parameter.setName( d.getChild( "name" ).getValue() );
+            
+            parameter.setAlias( d.getChild( "alias" ).getValue() );
 
             parameter.setType( d.getChild( "type" ).getValue() );
 
-            String s = d.getChild( "required" ).getValue();
+            String required = d.getChild( "required" ).getValue();
 
-            if ( s != null )
+            parameter.setRequired( "true".equals( required ) );
+            
+            PlexusConfiguration editableConfig = d.getChild("editable");
+            
+            // we need the null check for pre-build legacy plugins...
+            if(editableConfig != null)
             {
-                parameter.setRequired( s.equals( "true" ) ? true : false );
+                String editable = d.getChild("editable").getValue();
+                
+                System.out.println("Value of editable attribute for parameter: " + parameter.getName() + " is: " + editable);
+                
+                parameter.setEditable( editable == null || "true".equals( editable ) );
             }
-
+            
             parameter.setValidator( d.getChild( "validator" ).getValue() );
 
             parameter.setDescription( d.getChild( "description" ).getValue() );

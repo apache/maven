@@ -30,55 +30,47 @@ import java.io.File;
  * @goal jar
  * @phase package
  * @description build a jar
- * @parameter name="jarName"
- * type="String"
- * required="true"
- * validator=""
- * expression="${project.build.finalName}"
- * description=""
- * @parameter name="archive"
- * type=""
- * required="false"
- * expression=""
- * validator=""
- * description=""
- * @parameter name="outputDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="${project.build.outputDirectory}"
- * description=""
- * @parameter name="basedir"
- * type="String"
- * required="true"
- * validator=""
- * expression="${project.build.directory}"
- * description=""
- * @parameter name="project"
- * type="org.apache.maven.project.MavenProject"
- * required="true"
- * validator=""
- * expression="${project}"
- * description="current MavenProject instance"
  */
 public class JarMojo
     extends AbstractPlugin
 {
-    /**
-     * @todo File
-     */
-    private String basedir;
-
-    private String jarName;
-
-    private String outputDirectory;
-
+    
     private static final String[] DEFAULT_EXCLUDES = new String[]{"**/package.html"};
 
     private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
 
+    /**
+     * @todo Change type to File
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     * @readonly
+     */
+    private String basedir;
+
+    /**
+     * @parameter alias="jarName" expression="${project.build.finalName}"
+     * @required
+     */
+    private String finalName;
+
+    /**
+     * @parameter expression="${project.build.outputDirectory}"
+     * @required
+     * @readonly
+     */
+    private String outputDirectory;
+
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
     private MavenProject project;
 
+    /**
+     * @parameter
+     */
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     /**
@@ -87,7 +79,7 @@ public class JarMojo
     public void execute()
         throws PluginExecutionException
     {
-        File jarFile = new File( basedir, jarName + ".jar" );
+        File jarFile = new File( basedir, finalName + ".jar" );
 
         MavenArchiver archiver = new MavenArchiver();
 

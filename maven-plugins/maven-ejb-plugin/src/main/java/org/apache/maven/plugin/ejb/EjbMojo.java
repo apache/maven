@@ -30,43 +30,6 @@ import java.io.File;
  * @goal ejb
  * @phase package
  * @description build an ejb
- * @parameter name="jarName"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.finalName"
- * description=""
- * @parameter name="archive"
- * type=""
- * required="false"
- * expression=""
- * validator=""
- * description=""
- * @parameter name="generateClient"
- * type="String"
- * required="false"
- * validator=""
- * expression=""
- * default="false"
- * description=""
- * @parameter name="outputDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.outputDirectory"
- * description=""
- * @parameter name="basedir"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.directory"
- * description=""
- * @parameter name="project"
- * type="org.apache.maven.project.MavenProject"
- * required="true"
- * validator=""
- * expression="#project"
- * description="current MavenProject instance"
  */
 public class EjbMojo
     extends AbstractPlugin
@@ -79,20 +42,42 @@ public class EjbMojo
 
     /**
      * @todo File instead
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     * @readonly
      */
     private String basedir;
 
+    /**
+     * @parameter expression="${project.build.outputDirectory}"
+     * @required
+     */
     private String outputDirectory;
 
+    /**
+     * @parameter expression="${project.build.finalName}"
+     * @required
+     */
     private String jarName;
 
     /**
      * @todo boolean instead
+     * 
+     * @parameter
      */
-    private String generateClient;
+    private String generateClient = Boolean.FALSE.toString();
 
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
     private MavenProject project;
 
+    /**
+     * @parameter
+     */
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     /**

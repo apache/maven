@@ -26,18 +26,19 @@ import java.io.File;
  * @version $Id$
  * @goal clean
  * @description Goal which cleans the build
- * @parameter name="outputDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="${project.build.directory}"
- * description=""
  */
 public class CleanPlugin
     extends AbstractPlugin
 {
     private static final int DELETE_RETRY_SLEEP_MILLIS = 10;
 
+    /** 
+     * This is where compiled classes go.
+     * 
+     * @parameter expression="${project.build.directory}"
+     * @required
+     * @readonly
+     */
     private String outputDirectory;
 
     // TODO: not in the descriptor previously

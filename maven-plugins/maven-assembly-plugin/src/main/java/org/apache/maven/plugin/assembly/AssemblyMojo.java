@@ -55,31 +55,51 @@ import java.util.jar.JarFile;
  * @goal assembly
  * @requiresDependencyResolution test
  * @description assemble an application bundle or distribution
- * @parameter name="basedir" type="String" required="true" validator="" expression="#basedir" description=""
- * @parameter name="outputDirectory" type="java.io.File" required="true" validator="" expression="#project.build.directory" description=""
- * @parameter name="workDirectory" type="java.io.File" required="true" validator="" expression="#project.build.directory/assembly/work" description="Directory to unpack JARs into if needed"
- * @parameter name="descriptor" type="java.io.File" required="false" validator="" expression="#maven.assembly.descriptor" description=""
- * @parameter name="finalName" type="String" required="true" validator="" expression="#project.build.finalName" description=""
- * @parameter name="descriptorId" type="String" required="false" validator="" expression="#maven.assembly.descriptorId" description=""
- * @parameter name="dependencies" type="java.util.Set" required="false" validator="" expression="#project.artifacts" description=""
  */
 public class AssemblyMojo
     extends AbstractPlugin
 {
     private static final String[] EMPTY_STRING_ARRAY = {};
 
+    /**
+    * @parameter expression="${basedir}"
+    * @required
+    */
     private String basedir;
 
+    /**
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
     private File outputDirectory;
 
+    /**
+     * @parameter expression="${maven.assembly.descriptor}"
+     */
     private File descriptor;
 
+    /**
+     * @parameter expression="${maven.assembly.descriptorId}"
+     */
     private String descriptorId;
 
+    /**
+     * @parameter expression="${project.build.finalName}"
+     * @required
+     */
     private String finalName;
 
+    /**
+     * @parameter expression="${project.artifacts}"
+     */
     private Set dependencies;
 
+    /** 
+     * Directory to unpack JARs into if needed
+     * 
+     * @parameter expression="${project.build.directory}/assembly/work"
+     * @required
+     */
     private File workDirectory;
 
     public void execute()

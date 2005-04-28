@@ -34,82 +34,67 @@ import java.util.StringTokenizer;
  * @version $Id$
  * @goal test
  * @description Run tests using surefire
- * @parameter name="basedir"
- * type="String"
- * required="true"
- * validator="validator"
- * expression="${basedir}"
- * description=""
- * @parameter name="classesDirectory"
- * type="String"
- * required="true"
- * validator="validator"
- * expression="${project.build.outputDirectory}"
- * description=""
- * @parameter name="testClassesDirectory"
- * type="String"
- * required="true"
- * validator="validator"
- * expression="${project.build.testOutputDirectory}"
- * description=""
- * @parameter name="includes"
- * type="java.util.List"
- * required="false"
- * validator=""
- * description=""
- * expression=""
- * @parameter name="excludes"
- * type="java.util.List"
- * required="false"
- * validator=""
- * description=""
- * expression=""
- * @parameter name="classpathElements"
- * type="java.util.List"
- * required="true"
- * validator=""
- * expression="${project.testClasspathElements}"
- * description=""
- * @parameter name="reportsDirectory"
- * type="String"
- * required="false"
- * validator=""
- * expression="${project.build.directory/surefire-reports}"
- * description="Base directory where all reports are written to."
- * @parameter name="test"
- * type="String"
- * required="false"
- * validator=""
- * expression="${test}"
- * description="Specify this parameter if you want to use the test regex notation to select tests to run."
- * @parameter name="localRepository"
- * type="org.apache.maven.artifact.repository.ArtifactRepository"
- * required="true"
- * validator=""
- * expression="${localRepository}"
- * description=""
  * @todo make version of junit and surefire configurable
  * @todo make report to be produced configurable
  */
 public class SurefirePlugin
     extends AbstractPlugin
 {
+    
+    /**
+     * @parameter expression="${basedir}"
+     * @required
+     */
     private String basedir;
 
+    /**
+     * @parameter expression="${project.build.outputDirectory}"
+     * @required
+     */
     private String classesDirectory;
 
+    /**
+     * @parameter expression="${project.build.testOutputDirectory}"
+     * @required
+     */
     private String testClassesDirectory;
 
+    /**
+     * @parameter expression="${project.testClasspathElements}"
+     * @required
+     * @readonly
+     */
     private List classpathElements;
 
+    /**
+     * Base directory where all reports are written to.
+     * 
+     * @parameter expression="${project.build.directory}/surefire-reports"
+     */
     private String reportsDirectory;
 
+    /**
+     * Specify this parameter if you want to use the test regex notation to select tests to run.
+     * 
+     * @parameter
+     */
     private String test;
 
+    /**
+     * @parameter
+     */
     private List includes;
 
+    /**
+     * @parameter
+     */
     private List excludes;
 
+    /**
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
     private ArtifactRepository localRepository;
 
     public void execute()

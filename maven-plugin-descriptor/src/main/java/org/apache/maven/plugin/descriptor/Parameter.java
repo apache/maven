@@ -29,6 +29,8 @@ public class Parameter
     private String type;
 
     private boolean required;
+    
+    private boolean editable = true;
 
     private String validator;
 
@@ -142,5 +144,15 @@ public class Parameter
     public void setAlias( String alias )
     {
         this.alias = alias;
+    }
+
+    public boolean isEditable()
+    {
+        return editable;
+    }
+
+    public void setEditable( boolean editable )
+    {
+        this.editable = editable;
     }
 }

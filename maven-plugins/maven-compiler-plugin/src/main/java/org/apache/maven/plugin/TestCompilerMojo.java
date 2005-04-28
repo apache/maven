@@ -1,5 +1,7 @@
 package org.apache.maven.plugin;
 
+import java.util.List;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -22,32 +24,44 @@ package org.apache.maven.plugin;
  * @goal testCompile
  * @description Compiles test sources
  * @requiresDependencyResolution test
- * @parameter name="compileSourceRoots"
- * type="java.util.List"
- * required="true"
- * validator=""
- * expression="${project.testCompileSourceRoots}"
- * description=""
- * @parameter name="outputDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="${project.build.testOutputDirectory}"
- * description=""
- * @parameter name="classpathElements"
- * type="List"
- * required="true"
- * validator=""
- * expression="${project.testClasspathElements}"
- * description=""
- * @parameter name="debug"
- * type="String"
- * required="false"
- * validator=""
- * expression="${maven.compiler.debug}"
- * description="Whether to include debugging information in the compiled class files; the default value is false"
  */
 public class TestCompilerMojo
-    extends CompilerMojo
+    extends AbstractCompilerMojo
 {
+    /**
+     * @parameter expression="${project.testCompileSourceRoots}"
+     * @required
+     * @readonly
+     */
+    private List compileSourceRoots;
+
+    /**
+     * @parameter expression="${project.testClasspathElements}"
+     * @required
+     * @readonly
+     */
+    private List classpathElements;
+
+    /**
+     * @parameter expression="${project.build.testOutputDirectory}"
+     * @required
+     * @readonly
+     */
+    private String outputDirectory;
+
+    protected List getCompileSourceRoots()
+    {
+        return compileSourceRoots;
+    }
+
+    protected List getClasspathElements()
+    {
+        return classpathElements;
+    }
+
+    protected String getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
 }

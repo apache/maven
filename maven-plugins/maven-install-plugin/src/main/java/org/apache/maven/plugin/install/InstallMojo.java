@@ -24,7 +24,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
 import java.io.File;
@@ -34,42 +33,80 @@ import java.io.File;
  * @version $Id$
  * @goal install
  * @description installs project's main artifact in local repository
- * @parameter name="project"
- * type="org.apache.maven.project.MavenProject"
- * required="true"
- * validator=""
- * expression="${project}"
- * description=""
- * @parameter name="installer"
- * type="org.apache.maven.artifact.installer.ArtifactInstaller"
- * required="true"
- * validator=""
- * expression="${component.org.apache.maven.artifact.installer.ArtifactInstaller}"
- * description=""
- * @parameter name="localRepository"
- * type="org.apache.maven.artifact.repository.ArtifactRepository"
- * required="true"
- * validator=""
- * expression="${localRepository}"
- * description=""
  */
 public class InstallMojo
     extends AbstractPlugin
 {
-    private MavenProject project;
+    
+    /**
+     * @parameter expression="${project.groupId}"
+     * @required
+     * @readonly
+     */
+    private String groupId;
 
+    /**
+     * @parameter expression="${project.artifactId}"
+     * @required
+     * @readonly
+     */
+    private String artifactId;
+
+    /**
+     * @parameter expression="${project.version}"
+     * @required
+     * @readonly
+     */
+    private String version;
+
+    /**
+     * @parameter expression="${project.packaging}"
+     * @required
+     * @readonly
+     */
+    private String packaging;
+
+    /**
+     * @parameter expression="${project.file.parentFile}"
+     * @required
+     * @readonly
+     */
+    private File parentDir;
+
+    /**
+     * @parameter expression="${project.build.directory}"
+     * @required
+     * @readonly
+     */
+    private String buildDirectory;
+
+    /**
+     * @parameter alias="archiveName" expression="${project.build.finalName}"
+     * @required
+     */
+    private String finalName;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.installer.ArtifactInstaller}"
+     * @required
+     * @readonly
+     */
     private ArtifactInstaller installer;
 
+    /**
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
     private ArtifactRepository localRepository;
 
     public void execute()
         throws PluginExecutionException
     {
-        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
-                                                 project.getPackaging() );
+        Artifact artifact = new DefaultArtifact( groupId, artifactId, version, packaging );
 
-        boolean isPomArtifact = "pom".equals( project.getPackaging() );
-        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+        boolean isPomArtifact = "pom".equals( packaging );
+        File pom = new File( parentDir, "pom.xml" );
         if ( !isPomArtifact )
         {
             ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom );
@@ -81,8 +118,7 @@ public class InstallMojo
             if ( !isPomArtifact )
             {
                 // TODO: would be something nice to get back from the project to get the full filename (the OGNL feedback thing)
-                installer.install( project.getBuild().getDirectory(), project.getBuild().getFinalName(), artifact,
-                                   localRepository );
+                installer.install( buildDirectory, finalName, artifact, localRepository );
             }
             else
             {

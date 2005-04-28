@@ -60,12 +60,14 @@ public class JavaMojoDescriptorExtractor
     public static final String MAVEN_PLUGIN_MODE = "maven.plugin.mode";
 
     public static final String PARAMETER = "parameter";
-    
+
     public static final String PARAMETER_EXPRESSION = "expression";
-    
+
     public static final String REQUIRED = "required";
 
     public static final String DEPRECATED = "deprecated";
+
+    public static final String READONLY = "readonly";
 
     public static final String GOAL = "goal";
 
@@ -96,13 +98,6 @@ public class JavaMojoDescriptorExtractor
         if ( type == null )
         {
             throw new InvalidParameterException( "type", i );
-        }
-
-        String expression = parameter.getExpression();
-
-        if ( expression == null )
-        {
-            throw new InvalidParameterException( "expression", i );
         }
 
         // TODO: remove when backward compatibility is no longer an issue.
@@ -261,10 +256,10 @@ public class JavaMojoDescriptorExtractor
                     System.err.println( message );
                 }
 
-                rawParams.put( tag.getNamedParameter("name"), tag );
+                rawParams.put( tag.getNamedParameter( "name" ), tag );
             }
         }
-        
+
         extractFieldParameterTags( javaClass, rawParams );
 
         Set parameters = new HashSet();
@@ -273,9 +268,9 @@ public class JavaMojoDescriptorExtractor
         {
             Map.Entry entry = (Entry) it.next();
             String paramName = (String) entry.getKey();
-            
+
             Object val = entry.getValue();
-            
+
             JavaField field = null;
             DocletTag parameter = null;
 
@@ -301,26 +296,28 @@ public class JavaMojoDescriptorExtractor
 
                 pd.setType( parameter.getNamedParameter( "type" ) );
 
-                pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
-                
                 pd.setDescription( parameter.getNamedParameter( "description" ) );
+
+                pd.setRequired( parameter.getNamedParameter( REQUIRED ).equals( "true" ) ? true : false );
+
+                pd.setDeprecated( parameter.getNamedParameter( DEPRECATED ) );
                 
-                pd.setRequired( parameter.getNamedParameter( "required" ).equals( "true" ) ? true : false );
-                
-                pd.setDeprecated( parameter.getNamedParameter( "deprecated" ) );
+                pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
             }
             else
             {
                 pd.setName( paramName );
 
                 pd.setType( field.getType().getValue() );
-                
+
                 pd.setDescription( field.getComment() );
-                
-                pd.setRequired( field.getTagByName(REQUIRED) != null );
+
+                pd.setRequired( field.getTagByName( REQUIRED ) != null );
+
+                pd.setEditable( field.getTagByName( READONLY ) == null );
                 
                 DocletTag deprecationTag = field.getTagByName( DEPRECATED );
-                if( deprecationTag != null)
+                if ( deprecationTag != null )
                 {
                     pd.setDeprecated( deprecationTag.getValue() );
                 }

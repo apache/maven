@@ -29,36 +29,30 @@ import java.io.FileWriter;
  * @phase process-sources
  *
  * @description Goal which cleans the build
- *
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.directory"
- *  description=""
- * 
- * @parameter
- *  name="basedirAlignmentDirectory"
- *  type="java.io.File"
- *  required="true"
- *  validator=""
- *  expression="target/test-basedir-alignment"
- *  description=""
- *
- * @parameter name="pluginItem" type="String" required="false" validator="" description="" expression="" defaultValue="foo"
- * @parameter name="goalItem" type="String" required="false" validator="" description="" expression="bar"
  */
 public class CoreItMojo
     extends AbstractPlugin
 {
+    /**
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
     private String outputDirectory;
 
+    /**
+     * @parameter expression="target/test-basedir-alignment"
+     */
     private File basedirAlignmentDirectory;
 
-    private String pluginItem;
+    /**
+     * @parameter
+     */
+    private String pluginItem = "foo";
 
-    private String goalItem;
+    /**
+     * @parameter
+     */
+    private String goalItem = "bar";
 
     public void execute()
         throws PluginExecutionException

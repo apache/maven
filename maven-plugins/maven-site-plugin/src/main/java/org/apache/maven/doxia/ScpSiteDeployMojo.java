@@ -4,17 +4,14 @@
 package org.apache.maven.doxia;
 
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.plugin.Plugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.WagonUtils;
 import org.apache.maven.wagon.observers.Debug;
-import org.apache.maven.wagon.providers.ssh.SshCommandExecutor;
 import org.apache.maven.wagon.providers.ssh.ScpWagon;
+import org.apache.maven.wagon.providers.ssh.SshCommandExecutor;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -36,40 +33,32 @@ import java.util.zip.ZipOutputStream;
  * then archive is transfred to remote host, nextly it is un-archived.
  * This method of deployment should normally be much faster
  * then making file by file copy.
- * @parameter name="inputDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.directory/site"
- * description=""
- * @parameter name="workingDirectory"
- * type="String"
- * required="true"
- * validator=""
- * expression="#project.build.directory"
- * description=""
- * @parameter name="unzipCommand"
- * type="String"
- * required="true"
- * validator=""
- * expression="unzip -o"
- * description=""
- * @parameter name="project"
- * type="org.apache.maven.project.MavenProject"
- * required="true"
- * validator=""
- * expression="#project"
- * description=""
  */
 public class ScpSiteDeployMojo
     extends AbstractPlugin
 {
+    /**
+     * @parameter alias="siteDirectory" expression="${project.build.directory}/site"
+     * @required
+     */
     private String inputDirectory;
 
+    /**
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
     private String workingDirectory;
 
-    private String unzipCommand;
+    /**
+     * @parameter
+     */
+    private String unzipCommand = "unzip -o";
 
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
     private MavenProject project;
 
     public void execute()

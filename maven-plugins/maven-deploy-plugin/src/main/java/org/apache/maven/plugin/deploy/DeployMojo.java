@@ -24,50 +24,88 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractPlugin;
 import org.apache.maven.plugin.PluginExecutionException;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
 import java.io.File;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @author <a href="mailto:jdcasey@apache.org">John Casey (refactoring only)</a>
  * @version $Id$
  * @goal deploy
  * @description deploys an artifact to remote repository
- * @parameter name="project"
- * type="org.apache.maven.project.MavenProject"
- * required="true"
- * validator=""
- * expression="${project}"
- * description=""
- * @parameter name="deployer"
- * type="org.apache.maven.artifact.deployer.ArtifactDeployer"
- * required="true"
- * validator=""
- * expression="${component.org.apache.maven.artifact.deployer.ArtifactDeployer}"
- * description=""
- * @parameter name="deploymentRepository"
- * type="org.apache.maven.artifact.repository.ArtifactRepository"
- * required="true"
- * validator=""
- * expression="${project.distributionManagementArtifactRepository}"
- * description=""
- * @parameter name="localRepository"
- * type="org.apache.maven.artifact.repository.ArtifactRepository"
- * required="true"
- * validator=""
- * expression="${localRepository}"
- * description=""
  */
 public class DeployMojo
     extends AbstractPlugin
 {
-    private MavenProject project;
 
+    /**
+     * @parameter expression="${project.groupId}"
+     * @required
+     * @readonly
+     */
+    private String groupId;
+
+    /**
+     * @parameter expression="${project.artifactId}"
+     * @required
+     * @readonly
+     */
+    private String artifactId;
+
+    /**
+     * @parameter expression="${project.version}"
+     * @required
+     * @readonly
+     */
+    private String version;
+
+    /**
+     * @parameter expression="${project.packaging}"
+     * @required
+     * @readonly
+     */
+    private String packaging;
+
+    /**
+     * @parameter expression="${project.file.parentFile}"
+     * @required
+     * @readonly
+     */
+    private File parentDir;
+
+    /**
+     * @parameter expression="${project.build.directory}"
+     * @required
+     * @readonly
+     */
+    private String buildDirectory;
+
+    /**
+     * @parameter alias="archiveName" expression="${project.build.finalName}"
+     * @required
+     */
+    private String finalName;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.deployer.ArtifactDeployer}"
+     * @required
+     * @readonly
+     */
     private ArtifactDeployer deployer;
 
+    /**
+     * @parameter expression="${project.distributionManagementArtifactRepository}"
+     * @required
+     * @readonly
+     */
     private ArtifactRepository deploymentRepository;
 
+    /**
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
     private ArtifactRepository localRepository;
 
     public void execute()
@@ -75,16 +113,15 @@ public class DeployMojo
     {
         if ( deploymentRepository == null )
         {
-            String msg = "Deployment failed: repository element was not specified in the pom inside" +
-                " distributionManagement element";
+            String msg = "Deployment failed: repository element was not specified in the pom inside"
+                + " distributionManagement element";
             throw new PluginExecutionException( msg );
         }
 
         // Deploy the POM
-        Artifact artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
-                                                 project.getPackaging() );
-        boolean isPomArtifact = "pom".equals( project.getPackaging() );
-        File pom = new File( project.getFile().getParentFile(), "pom.xml" );
+        Artifact artifact = new DefaultArtifact( groupId, artifactId, version, packaging );
+        boolean isPomArtifact = "pom".equals( packaging );
+        File pom = new File( parentDir, "pom.xml" );
         if ( !isPomArtifact )
         {
             ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom );
@@ -95,8 +132,7 @@ public class DeployMojo
         {
             if ( !isPomArtifact )
             {
-                deployer.deploy( project.getBuild().getDirectory(), project.getBuild().getFinalName(), artifact,
-                                 deploymentRepository, localRepository );
+                deployer.deploy( buildDirectory, finalName, artifact, deploymentRepository, localRepository );
             }
             else
             {

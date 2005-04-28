@@ -30,11 +30,19 @@ import java.util.Set;
 public abstract class AbstractGeneratorMojo
     extends AbstractPlugin
 {
-    protected String outputDirectory;
-
+    /**
+     * @parameter expression="${project}"
+     * @required
+     */
     protected MavenProject project;
 
+    /**
+     * @parameter expression="${component.org.apache.maven.tools.plugin.scanner.MojoScanner}"
+     * @required
+     */
     protected MojoScanner mojoScanner;
+    
+    protected abstract String getOutputDirectory();
 
     protected abstract void generate( String outputDirectory, Set mavenMojoDescriptors, MavenProject project )
         throws Exception;
@@ -46,7 +54,7 @@ public abstract class AbstractGeneratorMojo
         {
             Set mavenMojoDescriptors = mojoScanner.execute( project );
 
-            generate( outputDirectory, mavenMojoDescriptors, project );
+            generate( getOutputDirectory(), mavenMojoDescriptors, project );
         }
         catch ( Exception e )
         {
