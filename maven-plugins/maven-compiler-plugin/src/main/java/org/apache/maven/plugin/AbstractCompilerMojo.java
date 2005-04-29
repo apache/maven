@@ -189,6 +189,11 @@ public abstract class AbstractCompilerMojo
 
             File rootFile = new File( sourceRoot );
 
+            if ( !rootFile.isDirectory() )
+            {
+                continue;
+            }
+
             try
             {
                 staleSources.addAll( scanner.getIncludedSources( rootFile, outDir ) );
