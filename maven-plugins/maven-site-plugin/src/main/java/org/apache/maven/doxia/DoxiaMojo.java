@@ -8,6 +8,7 @@ import org.apache.maven.reporting.MavenReportConfiguration;
 import org.apache.maven.reporting.manager.MavenReportManager;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
