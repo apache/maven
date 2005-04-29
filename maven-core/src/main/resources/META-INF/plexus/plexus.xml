@@ -2,7 +2,7 @@
   <component-discoverer-manager implementation="org.codehaus.plexus.component.discovery.DefaultComponentDiscovererManager">
     <listeners>
       <listener implementation="org.codehaus.plexus.component.discovery.DiscoveryListenerDescriptor">
-        <role>org.apache.maven.plugin.PluginManager</role>
+        <role>org.apache.maven.plugin.MojoManager</role>
       </listener>
     </listeners>
     <component-discoverers>
@@ -18,7 +18,7 @@
   </component-factory-manager>
   <components>
     <component>
-      <role>org.apache.maven.plugin.PluginManager</role>
+      <role>org.apache.maven.plugin.MojoManager</role>
       <implementation>org.apache.maven.plugin.DefaultPluginManager</implementation>
       <requirements>
         <requirement>

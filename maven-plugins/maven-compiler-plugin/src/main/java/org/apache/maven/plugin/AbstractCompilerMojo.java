@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractCompilerMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
 
     private Compiler compiler = new JavacCompiler();
@@ -79,7 +79,7 @@ public abstract class AbstractCompilerMojo
     protected abstract String getOutputDirectory();
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         // ----------------------------------------------------------------------
         //
@@ -134,7 +134,7 @@ public abstract class AbstractCompilerMojo
         catch ( Exception e )
         {
             // TODO: don't catch Exception
-            throw new PluginExecutionException( "Fatal error compiling", e );
+            throw new MojoExecutionException( "Fatal error compiling", e );
         }
 
         boolean compilationError = false;
@@ -156,7 +156,7 @@ public abstract class AbstractCompilerMojo
     }
 
     private Set computeStaleSources()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         long staleTime = 0;
 
@@ -168,7 +168,7 @@ public abstract class AbstractCompilerMojo
             }
             catch ( NumberFormatException e )
             {
-                throw new PluginExecutionException( "Invalid staleMillis plugin parameter value: \'" + staleMillis
+                throw new MojoExecutionException( "Invalid staleMillis plugin parameter value: \'" + staleMillis
                     + "\'", e );
             }
 
@@ -195,7 +195,7 @@ public abstract class AbstractCompilerMojo
             }
             catch ( InclusionScanException e )
             {
-                throw new PluginExecutionException( "Error scanning source root: \'" + sourceRoot
+                throw new MojoExecutionException( "Error scanning source root: \'" + sourceRoot
                     + "\' for stale files to recompile.", e );
             }
         }

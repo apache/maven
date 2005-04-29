@@ -22,25 +22,25 @@ package org.apache.maven.plugin;
  * @author Brett Porter
  * @version $Id$
  */
-public class PluginExecutionException extends Exception
+public class MojoExecutionException extends Exception
 {
     private Object source;
 
     private String longMessage;
 
-    public PluginExecutionException( Object source, String shortMessage, String longMessage )
+    public MojoExecutionException( Object source, String shortMessage, String longMessage )
     {
         super( shortMessage );
         this.source = source;
         this.longMessage = longMessage;
     }
 
-    public PluginExecutionException( String message, Exception cause )
+    public MojoExecutionException( String message, Exception cause )
     {
         super( message, cause );
     }
 
-    public PluginExecutionException( String message )
+    public MojoExecutionException( String message )
     {
         super( message );
     }

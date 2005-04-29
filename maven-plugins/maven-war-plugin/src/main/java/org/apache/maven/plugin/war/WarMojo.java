@@ -20,8 +20,8 @@ import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.ManifestException;
@@ -43,7 +43,7 @@ import java.util.Set;
  * @description build a war/webapp
  */
 public class WarMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     public static final String WEB_INF = "WEB-INF";
 
@@ -203,7 +203,7 @@ public class WarMojo
     }
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         File warFile = new File( outputDirectory, warName + ".war" );
 
@@ -214,7 +214,7 @@ public class WarMojo
         catch ( Exception e )
         {
             // TODO: improve error handling
-            throw new PluginExecutionException( "Error assembling WAR", e );
+            throw new MojoExecutionException( "Error assembling WAR", e );
         }
     }
 

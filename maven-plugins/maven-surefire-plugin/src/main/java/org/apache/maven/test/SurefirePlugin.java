@@ -19,8 +19,8 @@ package org.apache.maven.test;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.surefire.SurefireBooter;
 
 import java.io.File;
@@ -38,7 +38,7 @@ import java.util.StringTokenizer;
  * @todo make report to be produced configurable
  */
 public class SurefirePlugin
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     
     /**
@@ -98,7 +98,7 @@ public class SurefirePlugin
     private ArtifactRepository localRepository;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         // ----------------------------------------------------------------------
         // Setup the surefire booter
@@ -169,7 +169,7 @@ public class SurefirePlugin
         }
         catch ( ArtifactPathFormatException e )
         {
-            throw new PluginExecutionException( "Error finding surefire JAR", e );
+            throw new MojoExecutionException( "Error finding surefire JAR", e );
         }
 
         surefireBooter.addClassPathUrl( new File( classesDirectory ).getPath() );
@@ -193,12 +193,12 @@ public class SurefirePlugin
         catch ( Exception e )
         {
             // TODO: better handling
-            throw new PluginExecutionException( "Error executing surefire", e );
+            throw new MojoExecutionException( "Error executing surefire", e );
         }
 
         if ( !success )
         {
-            throw new PluginExecutionException( "There are some test failures." );
+            throw new MojoExecutionException( "There are some test failures." );
         }
     }
 

@@ -18,8 +18,8 @@ package org.apache.maven.plugin.idea;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -44,7 +44,7 @@ import java.util.Iterator;
  * @todo use dom4j or something. Xpp3Dom can't cope properly with entities and so on
  */
 public class IdeaMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     /**
      * @parameter expression="${project}"
@@ -54,7 +54,7 @@ public class IdeaMojo
     private MavenProject project;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         rewriteModule();
 
@@ -64,7 +64,7 @@ public class IdeaMojo
     }
 
     private void rewriteWorkspace()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         File workspaceFile = new File( project.getBasedir(), project.getArtifactId() + ".iws" );
         if ( !workspaceFile.exists() )
@@ -77,7 +77,7 @@ public class IdeaMojo
             }
             catch ( IOException e )
             {
-                throw new PluginExecutionException( "Unable to create workspace file", e );
+                throw new MojoExecutionException( "Unable to create workspace file", e );
             }
             finally
             {
@@ -88,7 +88,7 @@ public class IdeaMojo
     }
 
     private void rewriteProject()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         try
         {
@@ -148,16 +148,16 @@ public class IdeaMojo
         }
         catch ( XmlPullParserException e )
         {
-            throw new PluginExecutionException( "Error parsing existing IML file", e );
+            throw new MojoExecutionException( "Error parsing existing IML file", e );
         }
         catch ( IOException e )
         {
-            throw new PluginExecutionException( "Error parsing existing IML file", e );
+            throw new MojoExecutionException( "Error parsing existing IML file", e );
         }
     }
 
     private void rewriteModule()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         try
         {
@@ -262,11 +262,11 @@ public class IdeaMojo
         }
         catch ( XmlPullParserException e )
         {
-            throw new PluginExecutionException( "Error parsing existing IML file", e );
+            throw new MojoExecutionException( "Error parsing existing IML file", e );
         }
         catch ( IOException e )
         {
-            throw new PluginExecutionException( "Error parsing existing IML file", e );
+            throw new MojoExecutionException( "Error parsing existing IML file", e );
         }
     }
 

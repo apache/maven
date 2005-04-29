@@ -37,7 +37,7 @@ import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.logging.DefaultLog;
-import org.apache.maven.plugin.Plugin;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Profile;
@@ -264,7 +264,7 @@ public class MavenCli
         }
 
         // TODO [BP]: do we set one per mojo? where to do it?
-        Logger logger = manager.getLoggerForComponent( Plugin.ROLE );
+        Logger logger = manager.getLoggerForComponent( Mojo.ROLE );
         if ( logger != null )
         {
             request.setLog( new DefaultLog( logger ) );

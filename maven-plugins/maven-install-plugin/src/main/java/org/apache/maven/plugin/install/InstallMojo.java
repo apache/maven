@@ -22,8 +22,8 @@ import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
 import java.io.File;
@@ -35,7 +35,7 @@ import java.io.File;
  * @description installs project's main artifact in local repository
  */
 public class InstallMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     
     /**
@@ -101,7 +101,7 @@ public class InstallMojo
     private ArtifactRepository localRepository;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         Artifact artifact = new DefaultArtifact( groupId, artifactId, version, packaging );
 
@@ -128,7 +128,7 @@ public class InstallMojo
         catch ( ArtifactInstallationException e )
         {
             // TODO: install exception that does not give a trace
-            throw new PluginExecutionException( "Error installing artifact", e );
+            throw new MojoExecutionException( "Error installing artifact", e );
         }
     }
 }

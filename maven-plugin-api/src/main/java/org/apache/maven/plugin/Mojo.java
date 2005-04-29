@@ -16,34 +16,23 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import java.util.Map;
+import org.apache.maven.monitor.logging.Log;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
- * @deprecated
  */
-public class PluginExecutionRequest
+public interface Mojo
 {
-    private Map parameters;
+    String ROLE = Mojo.class.getName();
 
-    public PluginExecutionRequest( Map parameters )
-    {
-        this.parameters = parameters;
-    }
+    void execute()
+        throws MojoExecutionException;
 
-    public Map getParameters()
-    {
-        return parameters;
-    }
+    /** @deprecated */
+    void execute( MojoExecutionRequest request )
+        throws MojoExecutionException;
 
-    public void setParameters( Map parameters )
-    {
-        this.parameters = parameters;
-    }
-
-    public Object getParameter( String key )
-    {
-        return parameters.get( key );
-    }
+    // TODO: not sure about this here, and may want a getLog on here as well/instead
+    void setLog( Log log );
 }

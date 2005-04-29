@@ -22,8 +22,8 @@ import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
 import java.io.File;
@@ -36,7 +36,7 @@ import java.io.File;
  * @description deploys an artifact to remote repository
  */
 public class DeployMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
 
     /**
@@ -109,13 +109,13 @@ public class DeployMojo
     private ArtifactRepository localRepository;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         if ( deploymentRepository == null )
         {
             String msg = "Deployment failed: repository element was not specified in the pom inside"
                 + " distributionManagement element";
-            throw new PluginExecutionException( msg );
+            throw new MojoExecutionException( msg );
         }
 
         // Deploy the POM
@@ -142,7 +142,7 @@ public class DeployMojo
         catch ( ArtifactDeploymentException e )
         {
             // TODO: deployment exception that does not give a trace
-            throw new PluginExecutionException( "Error deploying artifact", e );
+            throw new MojoExecutionException( "Error deploying artifact", e );
         }
     }
 }

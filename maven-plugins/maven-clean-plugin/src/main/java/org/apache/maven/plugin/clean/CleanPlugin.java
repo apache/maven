@@ -16,8 +16,8 @@ package org.apache.maven.plugin.clean;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 
@@ -28,7 +28,7 @@ import java.io.File;
  * @description Goal which cleans the build
  */
 public class CleanPlugin
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     private static final int DELETE_RETRY_SLEEP_MILLIS = 10;
 
@@ -45,7 +45,7 @@ public class CleanPlugin
 //    private boolean failOnError;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         if ( outputDirectory != null )
         {

@@ -1,8 +1,8 @@
 package org.apache.maven.doxia;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReportConfiguration;
 import org.apache.maven.reporting.manager.MavenReportManager;
@@ -16,7 +16,7 @@ import java.util.List;
  * @description Doxia plugin
  */
 public class DoxiaMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     /**
      * @parameter expression="${basedir}/src/site"
@@ -77,7 +77,7 @@ public class DoxiaMojo
     private List remoteRepositories;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         try
         {

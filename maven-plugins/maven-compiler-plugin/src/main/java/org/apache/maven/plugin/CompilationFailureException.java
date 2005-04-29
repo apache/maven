@@ -10,7 +10,7 @@ import java.util.List;
  * @version $Id$
  */
 public class CompilationFailureException
-    extends PluginExecutionException
+    extends MojoExecutionException
 {
     private static final String LS = System.getProperty( "line.separator" );
 

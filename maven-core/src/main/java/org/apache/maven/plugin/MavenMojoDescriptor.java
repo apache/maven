@@ -58,7 +58,7 @@ public class MavenMojoDescriptor
 
     public String getRole()
     {
-        return Plugin.ROLE;
+        return Mojo.ROLE;
     }
 
     public String getRoleHint()

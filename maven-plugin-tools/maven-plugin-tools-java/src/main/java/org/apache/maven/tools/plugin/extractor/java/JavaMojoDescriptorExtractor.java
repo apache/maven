@@ -110,7 +110,7 @@ public class JavaMojoDescriptorExtractor
     }
 
     // ----------------------------------------------------------------------
-    // Plugin descriptor creation from @tags
+    // Mojo descriptor creation from @tags
     // ----------------------------------------------------------------------
 
     private MojoDescriptor createMojoDescriptor( JavaSource javaSource, MavenProject project )

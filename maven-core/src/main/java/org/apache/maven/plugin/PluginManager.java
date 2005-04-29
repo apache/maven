@@ -31,7 +31,7 @@ public interface PluginManager
     String ROLE = PluginManager.class.getName();
 
     void executeMojo( MavenSession session, MojoDescriptor mojoDescriptor )
-        throws PluginExecutionException, PluginManagerException, ArtifactResolutionException;
+        throws MojoExecutionException, PluginManagerException, ArtifactResolutionException;
 
     MojoDescriptor getMojoDescriptor( String goalId );
 

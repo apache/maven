@@ -18,8 +18,8 @@ package org.apache.maven.plugin.jar;
 
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -32,7 +32,7 @@ import java.io.File;
  * @description build a jar
  */
 public class JarMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     
     private static final String[] DEFAULT_EXCLUDES = new String[]{"**/package.html"};
@@ -77,7 +77,7 @@ public class JarMojo
      * @todo Add license files in META-INF directory.
      */
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         File jarFile = new File( basedir, finalName + ".jar" );
 
@@ -102,7 +102,7 @@ public class JarMojo
         catch ( Exception e )
         {
             // TODO: improve error handling
-            throw new PluginExecutionException( "Error assembling JAR", e );
+            throw new MojoExecutionException( "Error assembling JAR", e );
         }
     }
 

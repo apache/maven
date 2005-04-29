@@ -17,8 +17,8 @@ package org.apache.maven.plugin.resources;
  */
 
 import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -41,7 +41,7 @@ import java.util.TreeMap;
  * @description copy application resources
  */
 public class ResourcesMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     /**
      * The output directory into which to copy the resources.
@@ -60,13 +60,13 @@ public class ResourcesMojo
     private List resources;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         copyResources( resources, outputDirectory );
     }
 
     protected void copyResources( List resources, String outputDirectory )
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         try
         {
@@ -89,7 +89,7 @@ public class ResourcesMojo
         catch ( Exception e )
         {
             // TODO: handle exception
-            throw new PluginExecutionException( "Error copying resources", e );
+            throw new MojoExecutionException( "Error copying resources", e );
         }
     }
 

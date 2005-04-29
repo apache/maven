@@ -22,8 +22,8 @@ import org.apache.maven.monitor.logging.SystemStreamLog;
 /**
  * @version $Id$
  */
-public abstract class AbstractPlugin
-    implements Plugin
+public abstract class AbstractMojo
+    implements Mojo
 {
     private Log log;
 
@@ -32,21 +32,21 @@ public abstract class AbstractPlugin
      *
      * @deprecated
      */
-    public void execute( PluginExecutionRequest request )
-        throws PluginExecutionException
+    public void execute( MojoExecutionRequest request )
+        throws MojoExecutionException
     {
-        PluginExecutionResponse response = new PluginExecutionResponse();
+        MojoExecutionResponse response = new MojoExecutionResponse();
         try
         {
             execute( request, response );
         }
         catch ( Exception e )
         {
-            throw new PluginExecutionException( e.getMessage(), e );
+            throw new MojoExecutionException( e.getMessage(), e );
         }
         if ( response.isExecutionFailure() )
         {
-            throw new PluginExecutionException( response.getFailureResponse().getSource(),
+            throw new MojoExecutionException( response.getFailureResponse().getSource(),
                                                 response.getFailureResponse().shortMessage(),
                                                 response.getFailureResponse().longMessage() );
         }
@@ -55,7 +55,7 @@ public abstract class AbstractPlugin
     /**
      * @deprecated
      */
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
+    public void execute( MojoExecutionRequest request, MojoExecutionResponse response )
         throws Exception
     {
         throw new UnsupportedOperationException(
@@ -81,9 +81,9 @@ public abstract class AbstractPlugin
     }
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
-        throw new PluginExecutionException( "You must override execute() if you implement the new paradigm" );
+        throw new MojoExecutionException( "You must override execute() if you implement the new paradigm" );
     }
 
 }

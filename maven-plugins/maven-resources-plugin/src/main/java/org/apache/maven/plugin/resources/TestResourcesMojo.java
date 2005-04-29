@@ -1,6 +1,6 @@
 package org.apache.maven.plugin.resources;
 
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class TestResourcesMojo
     private List resources;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         copyResources( resources, outputDirectory );
     }

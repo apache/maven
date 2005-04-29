@@ -18,8 +18,8 @@ package org.apache.maven.plugin.ejb;
 
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -32,7 +32,7 @@ import java.io.File;
  * @description build an ejb
  */
 public class EjbMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     // TODO: will null work instead?
     private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
@@ -84,7 +84,7 @@ public class EjbMojo
      * @todo Add license files in META-INF directory.
      */
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         getLog().info( "Building ejb " + jarName );
 
@@ -126,7 +126,7 @@ public class EjbMojo
         catch ( Exception e )
         {
             // TODO: improve error handling
-            throw new PluginExecutionException( "Error assembling EJB", e );
+            throw new MojoExecutionException( "Error assembling EJB", e );
         }
     }
 

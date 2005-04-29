@@ -159,7 +159,7 @@ public class DefaultPluginManager
     }
 
     // ----------------------------------------------------------------------
-    // Plugin discovery
+    // Mojo discovery
     // ----------------------------------------------------------------------
 
     public void componentDiscovered( ComponentDiscoveryEvent event )
@@ -314,13 +314,13 @@ public class DefaultPluginManager
     }
 
     // ----------------------------------------------------------------------
-    // Plugin execution
+    // Mojo execution
     // ----------------------------------------------------------------------
 
     public void executeMojo( MavenSession session, MojoDescriptor mojoDescriptor )
-        throws ArtifactResolutionException, PluginManagerException, PluginExecutionException
+        throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
-        PluginExecutionRequest request = null;
+        MojoExecutionRequest request = null;
 
         if ( mojoDescriptor.getRequiresDependencyResolution() != null )
         {
@@ -354,13 +354,13 @@ public class DefaultPluginManager
             }
         }
 
-        Plugin plugin = null;
+        Mojo plugin = null;
 
         String goalName = mojoDescriptor.getId();
 
         try
         {
-            plugin = (Plugin) container.lookup( Plugin.ROLE, goalName );
+            plugin = (Mojo) container.lookup( Mojo.ROLE, goalName );
 
             plugin.setLog( session.getLog() );
 
@@ -420,7 +420,7 @@ public class DefaultPluginManager
             }
             catch ( ExpressionEvaluationException e )
             {
-                throw new PluginExecutionException( "Unable to configure plugin", e );
+                throw new MojoExecutionException( "Unable to configure plugin", e );
             }
 
             // !! This is ripe for refactoring to an aspect.
@@ -442,7 +442,7 @@ public class DefaultPluginManager
 
                 dispatcher.dispatchEnd( event, goalName );
             }
-            catch ( PluginExecutionException e )
+            catch ( MojoExecutionException e )
             {
                 session.getEventDispatcher().dispatchError( event, goalName, e );
                 throw e;
@@ -453,11 +453,11 @@ public class DefaultPluginManager
         catch ( PluginConfigurationException e )
         {
             String msg = "Error configuring plugin for execution of '" + goalName + "'.";
-            throw new PluginExecutionException( msg, e );
+            throw new MojoExecutionException( msg, e );
         }
         catch ( ComponentLookupException e )
         {
-            throw new PluginExecutionException( "Error looking up plugin: ", e );
+            throw new MojoExecutionException( "Error looking up plugin: ", e );
         }
         finally
         {
@@ -564,7 +564,7 @@ public class DefaultPluginManager
             // intentionally ignored
 
             Class superclass = aClass.getSuperclass();
-            if ( superclass != AbstractPlugin.class )
+            if ( superclass != AbstractMojo.class )
             {
                 return checkMojoTechnique( superclass );
             }
@@ -582,7 +582,7 @@ public class DefaultPluginManager
      * @return
      * @deprecated
      */
-    private static PluginExecutionRequest createPluginRequest( PlexusConfiguration configuration, Map map )
+    private static MojoExecutionRequest createPluginRequest( PlexusConfiguration configuration, Map map )
     {
         Map parameters = new HashMap();
         PlexusConfiguration[] children = configuration.getChildren();
@@ -592,10 +592,10 @@ public class DefaultPluginManager
             parameters.put( child.getName(), child.getValue( null ) );
         }
         map = CollectionUtils.mergeMaps( map, parameters );
-        return new PluginExecutionRequest( map );
+        return new MojoExecutionRequest( map );
     }
 
-    private void populatePluginFields( Plugin plugin, PlexusConfiguration configuration, Map map,
+    private void populatePluginFields( Mojo plugin, PlexusConfiguration configuration, Map map,
                                       ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {

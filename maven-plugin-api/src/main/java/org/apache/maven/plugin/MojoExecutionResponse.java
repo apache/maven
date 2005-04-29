@@ -21,7 +21,7 @@ package org.apache.maven.plugin;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class PluginExecutionResponse
+public class MojoExecutionResponse
 {
     private FailureResponse failureResponse = null;
 

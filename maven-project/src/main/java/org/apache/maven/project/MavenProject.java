@@ -709,7 +709,7 @@ public class MavenProject
         Xpp3Dom dom = null;
 
         // ----------------------------------------------------------------------
-        // I would like to be able to lookup the Plugin object using a key but
+        // I would like to be able to lookup the Mojo object using a key but
         // we have a limitation in modello that will be remedied shortly. So
         // for now I have to iterate through and see what we have.
         // ----------------------------------------------------------------------

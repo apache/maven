@@ -29,7 +29,7 @@ public class PluginNotFoundException
 {
     public PluginNotFoundException( String groupId, String artifactId, String version, ArtifactResolutionException e )
     {
-        super( "Plugin could not be found - check that the goal name is correct", groupId, artifactId, version,
+        super( "Mojo could not be found - check that the goal name is correct", groupId, artifactId, version,
                "maven-plugin", e );
     }
 }

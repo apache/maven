@@ -27,7 +27,7 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -236,11 +236,11 @@ public class DefaultMaven
             // TODO: yuck! Revisit when cleaning up the exception handling from the top down
             Throwable exception = response.getException();
 
-            if ( exception instanceof PluginExecutionException )
+            if ( exception instanceof MojoExecutionException )
             {
                 if ( exception.getCause() == null )
                 {
-                    PluginExecutionException e = (PluginExecutionException) exception;
+                    MojoExecutionException e = (MojoExecutionException) exception;
                     logFailure( response, e, e.getLongMessage() );
                 }
                 else

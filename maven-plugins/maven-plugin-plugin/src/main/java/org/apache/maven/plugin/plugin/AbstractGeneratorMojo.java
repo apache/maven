@@ -16,8 +16,8 @@ package org.apache.maven.plugin.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.scanner.MojoScanner;
 
@@ -28,7 +28,7 @@ import java.util.Set;
  * @version $Id$
  */
 public abstract class AbstractGeneratorMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     /**
      * @parameter expression="${project}"
@@ -48,7 +48,7 @@ public abstract class AbstractGeneratorMojo
         throws Exception;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         try
         {
@@ -59,7 +59,7 @@ public abstract class AbstractGeneratorMojo
         catch ( Exception e )
         {
             // TODO: improve error handling
-            throw new PluginExecutionException( "Error generating plugin descriptor", e );
+            throw new MojoExecutionException( "Error generating plugin descriptor", e );
         }
     }
 }

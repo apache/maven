@@ -21,8 +21,8 @@ import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.IncludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.assembly.model.Assembly;
 import org.apache.maven.plugins.assembly.model.DependencySet;
 import org.apache.maven.plugins.assembly.model.FileSet;
@@ -57,7 +57,7 @@ import java.util.jar.JarFile;
  * @description assemble an application bundle or distribution
  */
 public class AssemblyMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     private static final String[] EMPTY_STRING_ARRAY = {};
 
@@ -106,7 +106,7 @@ public class AssemblyMojo
     private File workDirectory;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         try
         {
@@ -115,7 +115,7 @@ public class AssemblyMojo
         catch ( Exception e )
         {
             // TODO: don't catch exception
-            throw new PluginExecutionException( "Error creating assembly", e );
+            throw new MojoExecutionException( "Error creating assembly", e );
         }
     }
 
@@ -133,14 +133,14 @@ public class AssemblyMojo
             InputStream resourceAsStream = getClass().getResourceAsStream( "/assemblies/" + descriptorId + ".xml" );
             if ( resourceAsStream == null )
             {
-                throw new PluginExecutionException( "Descriptor with ID '" + descriptorId + "' not found" );
+                throw new MojoExecutionException( "Descriptor with ID '" + descriptorId + "' not found" );
             }
             r = new InputStreamReader( resourceAsStream );
         }
         else
         {
             // TODO: better exception
-            throw new PluginExecutionException( "You must specify descriptor or descriptorId" );
+            throw new MojoExecutionException( "You must specify descriptor or descriptorId" );
         }
 
         try

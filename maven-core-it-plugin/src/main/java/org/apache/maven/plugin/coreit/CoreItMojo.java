@@ -16,8 +16,8 @@ package org.apache.maven.plugin.coreit;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.IOException;
 import java.io.File;
@@ -31,7 +31,7 @@ import java.io.FileWriter;
  * @description Goal which cleans the build
  */
 public class CoreItMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     /**
      * @parameter expression="${project.build.directory}"
@@ -55,7 +55,7 @@ public class CoreItMojo
     private String goalItem = "bar";
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         touch( new File( outputDirectory ), "touch.txt" );
 
@@ -64,7 +64,7 @@ public class CoreItMojo
 
         if ( basedirAlignmentDirectory.getPath().equals( "target/test-basedir-alignment" ) )
         {
-            throw new PluginExecutionException( "basedirAlignmentDirectory not aligned" );
+            throw new MojoExecutionException( "basedirAlignmentDirectory not aligned" );
         }
         
         touch( basedirAlignmentDirectory, "touch.txt" );
@@ -82,7 +82,7 @@ public class CoreItMojo
     }
 
     private static void touch( File dir, String file )
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         try
         {
@@ -101,7 +101,7 @@ public class CoreItMojo
         }
         catch ( IOException e )
         {
-            throw new PluginExecutionException( "Error touching file", e );
+            throw new MojoExecutionException( "Error touching file", e );
         }
     }
 }

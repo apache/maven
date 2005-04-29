@@ -151,7 +151,7 @@ public class DefaultModelInheritanceAssembler
             }
         }
 
-        // Plugin Repositories :: aggregate
+        // Mojo Repositories :: aggregate
         List parentPluginRepositories = parent.getPluginRepositories();
         List childPluginRepositories = child.getPluginRepositories();
 

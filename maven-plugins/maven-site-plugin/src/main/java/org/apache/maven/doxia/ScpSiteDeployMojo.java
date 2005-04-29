@@ -4,8 +4,8 @@
 package org.apache.maven.doxia;
 
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.WagonUtils;
@@ -35,7 +35,7 @@ import java.util.zip.ZipOutputStream;
  * then making file by file copy.
  */
 public class ScpSiteDeployMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     /**
      * @parameter alias="siteDirectory" expression="${project.build.directory}/site"
@@ -62,7 +62,7 @@ public class ScpSiteDeployMojo
     private MavenProject project;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
         File baseDir = new File( inputDirectory );
 
@@ -74,7 +74,7 @@ public class ScpSiteDeployMojo
         }
         catch ( IOException e )
         {
-            throw new PluginExecutionException( "Cannot create site archive!", e );
+            throw new MojoExecutionException( "Cannot create site archive!", e );
         }
 
         SshCommandExecutor commandExecutor = new ScpWagon();
@@ -89,7 +89,7 @@ public class ScpSiteDeployMojo
                 String msg = "distributionManagement element is missing in the POM: "
                     + project.getId();
 
-                throw new PluginExecutionException( msg );
+                throw new MojoExecutionException( msg );
 
             }
 
@@ -98,7 +98,7 @@ public class ScpSiteDeployMojo
                 String msg = "distributionManagement/repository element is missing in the POM: "
                     + project.getId();
 
-                throw new PluginExecutionException( msg );
+                throw new MojoExecutionException( msg );
 
             }
 
@@ -111,7 +111,7 @@ public class ScpSiteDeployMojo
                 String msg = "distributionManagement/site/url element is missing in the POM: "
                     + project.getId();
 
-                throw new PluginExecutionException( msg );
+                throw new MojoExecutionException( msg );
 
             }
 
@@ -149,7 +149,7 @@ public class ScpSiteDeployMojo
         }
         catch( Exception e )
         {
-            throw new PluginExecutionException( "Error transfering site archive!", e );
+            throw new MojoExecutionException( "Error transfering site archive!", e );
         }
         finally
         {

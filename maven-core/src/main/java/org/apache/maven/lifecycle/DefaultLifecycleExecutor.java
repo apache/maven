@@ -28,7 +28,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -93,7 +93,7 @@ public class DefaultLifecycleExecutor
         {
             processGoals( session, tasks );
         }
-        catch ( PluginExecutionException e )
+        catch ( MojoExecutionException e )
         {
             response.setException( e );
         }
@@ -115,7 +115,7 @@ public class DefaultLifecycleExecutor
 
     private void processGoals( MavenSession session, List tasks )
         throws ArtifactHandlerNotFoundException, LifecycleExecutionException, PluginNotFoundException,
-        PluginExecutionException, ArtifactResolutionException
+        MojoExecutionException, ArtifactResolutionException
     {
         Map phaseMap = new HashMap();
 
@@ -406,7 +406,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void executePhase( String phase, MavenSession session, Map phaseMap )
-        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
+        throws MojoExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
         LifecycleExecutionException
     {
         // only execute up to the given phase
@@ -437,7 +437,7 @@ public class DefaultLifecycleExecutor
                     }
                 }
             }
-            catch ( PluginExecutionException e )
+            catch ( MojoExecutionException e )
             {
                 dispatcher.dispatchError( event, p.getId(), e );
                 throw e;
@@ -458,7 +458,7 @@ public class DefaultLifecycleExecutor
     }
 
     protected void executeMojo( String id, MavenSession session )
-        throws PluginExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
+        throws MojoExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
         LifecycleExecutionException
     {
         // ----------------------------------------------------------------------
@@ -481,7 +481,7 @@ public class DefaultLifecycleExecutor
 
         if ( mojoDescriptor == null )
         {
-            throw new PluginExecutionException( "Unable to find goal: " + id );
+            throw new MojoExecutionException( "Unable to find goal: " + id );
         }
 
         if ( mojoDescriptor.getExecutePhase() != null )
