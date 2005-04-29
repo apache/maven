@@ -72,9 +72,14 @@
 
     <delete dir="${basedir}/target/local-repo-scm" />
 
+    <!-- Could the SCM provider initialise this? -->
+    <exec executable="svn" dir="${basedir}/target" failonerror="true">
+      <arg line="co ${scm.url} -N local-repo-scm" />
+    </exec>
+
     <artifact:localRepository id="local.repository.scm" location="${basedir}/target/local-repo-scm" layout="default"/>
 
-    <artifact:dependencies pathId="dependency.classpath">
+    <artifact:dependencies pathId="dependency.classpath.scm">
       <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
       <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
       <localRepository refid="local.repository.scm"/>
