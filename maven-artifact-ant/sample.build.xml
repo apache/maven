@@ -37,5 +37,55 @@
       <pom refid="maven.project"/>
     </artifact:deploy>
   </target>
+
+  <target name="test-scm">
+    <mkdir dir="target" />
+
+    <pathconvert targetos="unix" property="repo.path.unix">
+      <map from="c:" to=""/>
+      <path>
+        <pathelement location="${basedir}/target/deployment-repo-scm" />
+      </path>
+    </pathconvert>
+
+    <property name="scm.url" value="file://${repo.path.unix}" />
+
+    <delete dir="${repo.path.unix}" />
+
+    <exec executable="svnadmin" failonerror="true">
+      <arg line="create ${repo.path.unix}" />
+    </exec>
+
+    <artifact:localRepository id="local.repository" location="${basedir}/target/local-repo" layout="default"/>
+
+    <artifact:remoteRepository id="deploy.repository" url="scm:svn:${scm.url}" layout="default"/>
+
+    <artifact:dependencies pathId="dependency.classpath">
+      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
+      <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
+      <localRepository refid="local.repository"/>
+    </artifact:dependencies>
+
+    <exec executable="svn" dir="${basedir}/target/local-repo" failonerror="true">
+      <arg line="import -m 'import' ${scm.url}" />
+    </exec>
+
+    <delete dir="${basedir}/target/local-repo-scm" />
+
+    <artifact:localRepository id="local.repository.scm" location="${basedir}/target/local-repo-scm" layout="default"/>
+
+    <artifact:dependencies pathId="dependency.classpath">
+      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
+      <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
+      <localRepository refid="local.repository.scm"/>
+      <remoteRepository refid="deploy.repository"/>
+    </artifact:dependencies>
+
+    <artifact:deploy file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
+      <localRepository refid="local.repository.scm"/>
+      <remoteRepository refid="deploy.repository" />
+      <pom refid="maven.project"/>
+    </artifact:deploy>
+  </target>
 </project>
 

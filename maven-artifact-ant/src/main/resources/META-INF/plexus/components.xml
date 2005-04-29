@@ -9,7 +9,7 @@
      -->
     <component>
       <role>org.apache.maven.artifact.manager.WagonManager</role>
-      <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
+      <implementation>org.apache.maven.artifact.ant.CustomWagonManager</implementation>
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
@@ -278,6 +278,17 @@
 
     <component>
       <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>scm</role-hint>
+      <implementation>org.apache.maven.wagon.providers.scm.ScmWagon</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <requirements>
+        <requirement> 
+          <role>org.apache.maven.scm.manager.ScmManager</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.apache.maven.wagon.Wagon</role>
       <role-hint>scp</role-hint>
       <implementation>org.apache.maven.wagon.providers.ssh.ScpWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
@@ -293,6 +304,131 @@
       <implementation>org.apache.maven.wagon.providers.ssh.ScpWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
-  </components>
 
+    <component>
+      <role>org.apache.maven.scm.manager.ScmManager</role>
+      <implementation>org.apache.maven.scm.manager.DefaultScmManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.scm.provider.ScmProvider</role>
+          <field-name>scmProviders</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.ScmProvider</role>
+      <role-hint>cvs</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.CvsScmProvider</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+          <field-name>commands</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+      <role-hint>add</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.command.add.CvsAddCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+      <role-hint>change-log</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.command.changelog.CvsChangeLogCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+      <role-hint>check-in</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.command.checkin.CvsCheckInCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+      <role-hint>check-out</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.command.checkout.CvsCheckOutCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+      <role-hint>diff</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.command.diff.CvsDiffCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+      <role-hint>status</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.command.status.CvsStatusCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+      <role-hint>tag</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.command.tag.CvsTagCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
+      <role-hint>update</role-hint>
+      <implementation>org.apache.maven.scm.provider.cvslib.command.update.CvsUpdateCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.ScmProvider</role>
+      <role-hint>svn</role-hint>
+      <implementation>org.apache.maven.scm.provider.svn.SvnScmProvider</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
+          <field-name>commands</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
+      <role-hint>add</role-hint>
+      <implementation>org.apache.maven.scm.provider.svn.command.add.SvnAddCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
+      <role-hint>check-in</role-hint>
+      <implementation>org.apache.maven.scm.provider.svn.command.checkin.SvnCheckInCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
+      <role-hint>check-out</role-hint>
+      <implementation>org.apache.maven.scm.provider.svn.command.checkout.SvnCheckOutCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
+      <role-hint>diff</role-hint>
+      <implementation>org.apache.maven.scm.provider.svn.command.diff.SvnDiffCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
+      <role-hint>status</role-hint>
+      <implementation>org.apache.maven.scm.provider.svn.command.status.SvnStatusCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
+      <role-hint>tag</role-hint>
+      <implementation>org.apache.maven.scm.provider.svn.command.tag.SvnTagCommand</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
+      <role-hint>update</role-hint>
+      <implementation>org.apache.maven.scm.provider.svn.command.update.SvnUpdateCommand</implementation>
+    </component>
+
+  </components>
 </component-set>

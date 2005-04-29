@@ -46,6 +46,12 @@
       <version>1.0-alpha-3-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-scm</artifactId>
+      <version>1.0-alpha-3-SNAPSHOT</version>
+      <!-- temporarily compile time scope>runtime</scope -->
+    </dependency>
   </dependencies>
   <build>
     <plugins>
