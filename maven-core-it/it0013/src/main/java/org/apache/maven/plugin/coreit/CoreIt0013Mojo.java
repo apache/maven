@@ -16,9 +16,9 @@ package org.apache.maven.plugin.coreit;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionRequest;
+import org.apache.maven.plugin.MojoExecutionResponse;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -37,11 +37,11 @@ import java.io.FileWriter;
  *  description=""
  */
 public class CoreIt0013Mojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
     private static final int DELETE_RETRY_SLEEP_MILLIS = 10;
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
+    public void execute( MojoExecutionRequest request, MojoExecutionResponse response )
         throws Exception
     {
         String outputDirectory = (String) request.getParameter( "outputDirectory" );
