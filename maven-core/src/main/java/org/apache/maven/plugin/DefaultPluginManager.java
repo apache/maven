@@ -228,8 +228,8 @@ public class DefaultPluginManager
                 if ( StringUtils.isEmpty( pluginConfig.getVersion() ) )
                 {
                     // The model/project builder should have validated this already
-                    String message = "The maven plugin with groupId: '" + groupId + "' and artifactId: '" + artifactId
-                        + "' which was configured for use in this project does not have a version associated with it.";
+                    String message = "The maven plugin with groupId: '" + groupId + "' and artifactId: '" + artifactId +
+                        "' which was configured for use in this project does not have a version associated with it.";
                     throw new IllegalStateException( message );
                 }
                 else
@@ -247,14 +247,13 @@ public class DefaultPluginManager
             }
             catch ( ArtifactEnabledContainerException e )
             {
-                throw new PluginManagerException(
-                                                  "Error occurred in the artifact container attempting to download plugin "
-                                                      + groupId + ":" + artifactId, e );
+                throw new PluginManagerException( "Error occurred in the artifact container attempting to download plugin " +
+                                                  groupId + ":" + artifactId, e );
             }
             catch ( ArtifactResolutionException e )
             {
-                if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() )
-                    && version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
+                if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
+                    version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
                 {
                     throw new PluginNotFoundException( groupId, artifactId, version, e );
                 }
@@ -265,8 +264,8 @@ public class DefaultPluginManager
             }
             catch ( ComponentLookupException e )
             {
-                throw new PluginManagerException( "Internal configuration error while retrieving " + groupId + ":"
-                    + artifactId, e );
+                throw new PluginManagerException( "Internal configuration error while retrieving " + groupId + ":" +
+                                                  artifactId, e );
             }
         }
     }
@@ -285,8 +284,10 @@ public class DefaultPluginManager
 
             MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
-            ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact, artifactResolver, session
-                .getPluginRepositories(), session.getLocalRepository(), metadataSource, artifactFilter );
+            ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact, artifactResolver,
+                                                                   session.getPluginRepositories(),
+                                                                   session.getLocalRepository(), metadataSource,
+                                                                   artifactFilter );
         }
         finally
         {
@@ -333,8 +334,8 @@ public class DefaultPluginManager
                 artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
                 mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
-                resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder, mojoDescriptor
-                    .getRequiresDependencyResolution() );
+                resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder,
+                                               mojoDescriptor.getRequiresDependencyResolution() );
                 downloadDependencies( session, artifactResolver );
             }
             catch ( ComponentLookupException e )
@@ -396,23 +397,23 @@ public class DefaultPluginManager
 
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator );
 
-            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration, mojoDescriptor
-                .getConfiguration() );
+            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
+                                                                          mojoDescriptor.getConfiguration() );
 
             try
             {
                 if ( newMojoTechnique )
                 {
-                    Map map = getPluginConfigurationFromExpressions( mojoDescriptor, mergedConfiguration,
+                    Map map = getPluginConfigurationFromExpressions( plugin, mojoDescriptor, mergedConfiguration,
                                                                      expressionEvaluator );
 
-                    populatePluginFields( plugin, pomConfiguration, map, expressionEvaluator );
+                    populatePluginFields( plugin, pomConfiguration, expressionEvaluator );
                 }
                 else
                 {
                     getLogger().warn( "WARNING: The mojo " + mojoDescriptor.getId() + " is using the OLD API" );
 
-                    Map map = getPluginConfigurationFromExpressions( mojoDescriptor, mergedConfiguration,
+                    Map map = getPluginConfigurationFromExpressions( plugin, mojoDescriptor, mergedConfiguration,
                                                                      expressionEvaluator );
 
                     request = createPluginRequest( pomConfiguration, map );
@@ -488,11 +489,11 @@ public class DefaultPluginManager
             }
 
             // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM 
-            if ( !editable
-                && ( pomConfiguration.getChild( lookupKey, false ) != null || pomConfiguration.getChild( key, false ) != null ) )
+            if ( !editable && ( pomConfiguration.getChild( lookupKey, false ) != null ||
+                pomConfiguration.getChild( key, false ) != null ) )
             {
-                StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " )
-                    .append( key );
+                StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " ).append(
+                    key );
 
                 if ( !lookupKey.equals( key ) )
                 {
@@ -595,8 +596,8 @@ public class DefaultPluginManager
         return new MojoExecutionRequest( map );
     }
 
-    private void populatePluginFields( Mojo plugin, PlexusConfiguration configuration, Map map,
-                                      ExpressionEvaluator expressionEvaluator )
+    private void populatePluginFields( Mojo plugin, PlexusConfiguration configuration,
+                                       ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
         try
@@ -606,49 +607,6 @@ public class DefaultPluginManager
         catch ( ComponentConfigurationException e )
         {
             throw new PluginConfigurationException( "Unable to parse the created DOM for plugin configuration", e );
-        }
-
-        // Configuration does not store objects, so the non-String fields are configured here
-        // TODO: remove - this is for plugins built with alpha-1
-        for ( Iterator i = map.keySet().iterator(); i.hasNext(); )
-        {
-            String key = (String) i.next();
-
-            if ( configuration.getChild( key, false ) != null )
-            {
-                continue;
-            }
-
-            Object value = map.get( key );
-
-            if ( value != null )
-            {
-                Class clazz = plugin.getClass();
-                try
-                {
-                    Field f = findPluginField( clazz, key );
-                    boolean accessible = f.isAccessible();
-                    if ( !accessible )
-                    {
-                        f.setAccessible( true );
-                    }
-
-                    f.set( plugin, value );
-
-                    if ( !accessible )
-                    {
-                        f.setAccessible( false );
-                    }
-                }
-                catch ( NoSuchFieldException e )
-                {
-                    throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'", e );
-                }
-                catch ( IllegalAccessException e )
-                {
-                    throw new PluginConfigurationException( "Unable to set field '" + key + "' on '" + clazz + "'", e );
-                }
-            }
         }
     }
 
@@ -676,8 +634,9 @@ public class DefaultPluginManager
     /**
      * @deprecated [JC] in favor of what?
      */
-    private Map getPluginConfigurationFromExpressions( MojoDescriptor goal, PlexusConfiguration mergedConfiguration,
-                                                      ExpressionEvaluator expressionEvaluator )
+    private Map getPluginConfigurationFromExpressions( Mojo plugin, MojoDescriptor goal,
+                                                       PlexusConfiguration mergedConfiguration,
+                                                       ExpressionEvaluator expressionEvaluator )
         throws ExpressionEvaluationException, PluginConfigurationException
     {
         List parameters = goal.getParameters();
@@ -724,8 +683,8 @@ public class DefaultPluginManager
             {
                 PlexusConfiguration goalConfiguration = goal.getConfiguration();
 
-                if ( !expression.equals( goalConfiguration.getChild( lookupKey, false ).getValue( null ) )
-                    && !expression.equals( goalConfiguration.getChild( key, false ).getValue( null ) ) )
+                if ( !expression.equals( goalConfiguration.getChild( lookupKey, false ).getValue( null ) ) &&
+                    !expression.equals( goalConfiguration.getChild( key, false ).getValue( null ) ) )
                 {
                     StringBuffer message = new StringBuffer().append( "DEPRECATED: " ).append( key );
 
@@ -744,11 +703,38 @@ public class DefaultPluginManager
 
             getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
 
+            // TODO: remove. If there is a default value, required should have been removed by the descriptor generator
             if ( value == null )
             {
-                if ( parameter.getDefaultValue() != null )
+                Object defaultValue;
+                try
                 {
-                    value = expressionEvaluator.evaluate( parameter.getDefaultValue() );
+                    Field pluginField = findPluginField( plugin.getClass(), parameter.getName() );
+                    boolean accessible = pluginField.isAccessible();
+                    if ( !accessible )
+                    {
+                        pluginField.setAccessible( true );
+                    }
+                    defaultValue = pluginField.get( plugin );
+                    if ( !accessible )
+                    {
+                        pluginField.setAccessible( false );
+                    }
+                }
+                catch ( IllegalAccessException e )
+                {
+                    String message = "Error finding field for parameter '" + parameter.getName() + "'";
+                    throw new PluginConfigurationException( message, e );
+                }
+                catch ( NoSuchFieldException e )
+                {
+                    String message = "Error finding field for parameter '" + parameter.getName() + "'";
+                    throw new PluginConfigurationException( message, e );
+                }
+                if ( defaultValue != null )
+                {
+                    // TODO: allow expressions?
+                    value = defaultValue;
                 }
             }
 
@@ -763,7 +749,8 @@ public class DefaultPluginManager
 
             if ( value == null && parameter.isRequired() )
             {
-                throw new PluginConfigurationException( createPluginParameterRequiredMessage( goal, parameter, expression ) );
+                throw new PluginConfigurationException(
+                    createPluginParameterRequiredMessage( goal, parameter, expression ) );
             }
 
             map.put( key, value );
@@ -771,7 +758,8 @@ public class DefaultPluginManager
         return map;
     }
 
-    public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter, String expression )
+    public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter,
+                                                               String expression )
     {
         StringBuffer message = new StringBuffer();
 
@@ -798,20 +786,11 @@ public class DefaultPluginManager
     {
         // TODO: configure this from bootstrap or scan lib
         // TODO: Note: maven-plugin just re-added until all plugins are switched over...
-        artifactFilter = new ExclusionSetFilter( new String[] {
-            "maven-core",
-            "maven-artifact",
-            "maven-model",
-            "maven-settings",
-            "maven-monitor",
-            "maven-plugin-api",
-            "maven-plugin-descriptor",
-            "plexus-container-default",
-            "maven-project",
-            "plexus-container-artifact",
-            "wagon-provider-api",
-            "classworlds",
-            "maven-plugin" } );
+        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
+                                                              "maven-settings", "maven-monitor", "maven-plugin-api",
+                                                              "maven-plugin-descriptor", "plexus-container-default",
+                                                              "maven-project", "plexus-container-artifact",
+                                                              "wagon-provider-api", "classworlds", "maven-plugin"} );
     }
 
     // ----------------------------------------------------------------------
@@ -819,7 +798,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
-                                               MavenProjectBuilder mavenProjectBuilder, String scope )
+                                                MavenProjectBuilder mavenProjectBuilder, String scope )
         throws ArtifactResolutionException
     {
         MavenProject project = context.getProject();
@@ -830,8 +809,10 @@ public class DefaultPluginManager
 
         boolean systemOnline = !context.getSettings().getActiveProfile().isOffline();
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(), context
-            .getRemoteRepositories(), context.getLocalRepository(), sourceReader, filter );
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
+                                                                                context.getRemoteRepositories(),
+                                                                                context.getLocalRepository(),
+                                                                                sourceReader, filter );
 
         project.addArtifacts( result.getArtifacts().values(), artifactFactory );
     }
