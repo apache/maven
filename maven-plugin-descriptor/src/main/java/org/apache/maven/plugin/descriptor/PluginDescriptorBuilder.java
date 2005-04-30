@@ -184,7 +184,10 @@ public class PluginDescriptorBuilder
         // Configuration
         // ----------------------------------------------------------------------
 
-        mojo.setConfiguration( c.getChild( "configuration" ) );
+        mojo.setMojoConfiguration( c.getChild( "configuration" ) );
+        
+        // TODO: Go back to this when we get the container ready to configure mojos...
+//        mojo.setConfiguration( c.getChild( "configuration" ) );
 
         // ----------------------------------------------------------------------
         // Requirements

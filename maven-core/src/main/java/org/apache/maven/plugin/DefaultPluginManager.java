@@ -72,9 +72,6 @@ public class DefaultPluginManager
     extends AbstractLogEnabled
     implements PluginManager, ComponentDiscoveryListener, Initializable, Contextualizable
 {
-    // TODO: share with type handler
-    static String MAVEN_PLUGIN = "maven-plugin";
-
     protected Map mojoDescriptors;
 
     protected Map pluginDescriptors;
@@ -148,9 +145,7 @@ public class DefaultPluginManager
 
         for ( Iterator it = mavenPluginDescriptor.getMavenMojoDescriptors().iterator(); it.hasNext(); )
         {
-            MavenMojoDescriptor mavenMojoDescriptor = (MavenMojoDescriptor) it.next();
-
-            MojoDescriptor mojoDescriptor = mavenMojoDescriptor.getMojoDescriptor();
+            MojoDescriptor mojoDescriptor = (MojoDescriptor) it.next();
 
             mojoDescriptors.put( mojoDescriptor.getId(), mojoDescriptor );
         }
@@ -241,7 +236,7 @@ public class DefaultPluginManager
             try
             {
                 Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version, null,
-                                                                          MAVEN_PLUGIN, null );
+                                                                          MojoDescriptor.MAVEN_PLUGIN, null );
 
                 addPlugin( pluginArtifact, session );
             }
@@ -398,7 +393,11 @@ public class DefaultPluginManager
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator );
 
             PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
-                                                                          mojoDescriptor.getConfiguration() );
+                                                                          mojoDescriptor.getMojoConfiguration() );
+
+            // TODO: Go back to this when we get the container ready to configure mojos...
+//            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
+//                                                                          mojoDescriptor.getConfiguration() );
 
             try
             {
@@ -681,7 +680,10 @@ public class DefaultPluginManager
 
             if ( foundInConfiguration && expression != null && parameter.getDeprecated() != null )
             {
-                PlexusConfiguration goalConfiguration = goal.getConfiguration();
+                PlexusConfiguration goalConfiguration = goal.getMojoConfiguration();
+                
+                // TODO: Go back to this when we get the container ready to configure mojos...
+//                PlexusConfiguration goalConfiguration = goal.getConfiguration();
 
                 if ( !expression.equals( goalConfiguration.getChild( lookupKey, false ).getValue( null ) ) &&
                     !expression.equals( goalConfiguration.getChild( key, false ).getValue( null ) ) )

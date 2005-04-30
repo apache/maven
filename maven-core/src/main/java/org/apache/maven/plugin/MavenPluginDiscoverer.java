@@ -22,7 +22,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.codehaus.plexus.component.discovery.AbstractComponentDiscoverer;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
@@ -103,9 +102,7 @@ public class MavenPluginDiscoverer
 
         for ( Iterator iterator = pluginDescriptor.getMojos().iterator(); iterator.hasNext(); )
         {
-            ComponentDescriptor cd = new MavenMojoDescriptor( (MojoDescriptor) iterator.next() );
-
-            componentDescriptors.add( cd );
+            componentDescriptors.add( (MojoDescriptor) iterator.next() );
         }
 
         componentSet.setComponents( componentDescriptors );

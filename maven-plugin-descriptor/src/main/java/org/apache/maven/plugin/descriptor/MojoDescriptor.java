@@ -16,10 +16,11 @@ package org.apache.maven.plugin.descriptor;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.component.repository.ComponentRequirement;
+import org.apache.maven.plugin.Mojo;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,25 +32,25 @@ import java.util.Map;
  * @todo is there a need for the delegation of MavenMojoDescriptor to this? Why not just extend ComponentDescriptor here?
  */
 public class MojoDescriptor
+    extends ComponentDescriptor
     implements Cloneable
 {
+    // TODO: share with type handler
+    public static String MAVEN_PLUGIN = "maven-plugin";
+
     public static final String SINGLE_PASS_EXEC_STRATEGY = "once-per-session";
 
     public static final String MULTI_PASS_EXEC_STRATEGY = "always";
 
+    private static final String DEFAULT_INSTANTIATION_STRATEGY = "per-lookup";
+
     private static final String DEFAULT_LANGUAGE = "java";
-
-    private String implementation;
-
-    private String description;
 
     private String id;
 
     private List parameters;
 
     private Map parameterMap;
-
-    private String instantiationStrategy = "per-lookup";
 
     private String executionStrategy = SINGLE_PASS_EXEC_STRATEGY;
 
@@ -58,8 +59,6 @@ public class MojoDescriptor
     private String phase;
 
     private String executePhase;
-
-    private List requirements;
 
     private String deprecated;
 
@@ -73,52 +72,26 @@ public class MojoDescriptor
 
     private boolean requiresOnline = false;
 
-    private String language = DEFAULT_LANGUAGE;
+    private PlexusConfiguration mojoConfiguration;
 
-    private PlexusConfiguration configuration;
+    public MojoDescriptor()
+    {
+        setInstantiationStrategy( DEFAULT_INSTANTIATION_STRATEGY );
+        setComponentFactory( DEFAULT_LANGUAGE );
+    }
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    public String getImplementation()
-    {
-        return implementation;
-    }
-
-    public void setImplementation( String implementation )
-    {
-        this.implementation = implementation;
-    }
-
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public void setDescription( String description )
-    {
-        this.description = description;
-    }
-
-    public String getInstantiationStrategy()
-    {
-        return instantiationStrategy;
-    }
-
-    public void setInstantiationStrategy( String instantiationStrategy )
-    {
-        this.instantiationStrategy = instantiationStrategy;
-    }
-
     public String getLanguage()
     {
-        return language;
+        return getComponentFactory();
     }
 
     public void setLanguage( String language )
     {
-        this.language = language;
+        setComponentFactory( language );
     }
 
     public String getId()
@@ -218,20 +191,6 @@ public class MojoDescriptor
         return requiresOnline;
     }
 
-    public void setRequirements( List requirements )
-    {
-        this.requirements = requirements;
-    }
-
-    public List getRequirements()
-    {
-        if ( requirements == null )
-        {
-            requirements = new ArrayList();
-        }
-        return requirements;
-    }
-
     public String getPhase()
     {
         return phase;
@@ -277,18 +236,33 @@ public class MojoDescriptor
         this.executionStrategy = executionStrategy;
     }
 
-    public void addRequirement( ComponentRequirement cr )
+    public PlexusConfiguration getMojoConfiguration()
     {
-        getRequirements().add( cr );
+        if ( mojoConfiguration == null )
+        {
+            mojoConfiguration = new XmlPlexusConfiguration( "configuration" );
+        }
+        return mojoConfiguration;
     }
 
-    public void setConfiguration( PlexusConfiguration configuration )
+    public void setMojoConfiguration( PlexusConfiguration mojoConfiguration )
     {
-        this.configuration = configuration;
+        this.mojoConfiguration = mojoConfiguration;
     }
 
-    public PlexusConfiguration getConfiguration()
+    public String getRole()
     {
-        return configuration;
+        return Mojo.ROLE;
     }
+
+    public String getRoleHint()
+    {
+        return getId();
+    }
+
+    public String getComponentType()
+    {
+        return MAVEN_PLUGIN;
+    }
+
 }

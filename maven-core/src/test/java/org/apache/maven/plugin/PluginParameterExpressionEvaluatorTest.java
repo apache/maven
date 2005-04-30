@@ -65,13 +65,8 @@ public class PluginParameterExpressionEvaluatorTest
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
 
-        Object value = expressionEvaluator.evaluate( "#project.build.directory/classes" );
+        Object value = expressionEvaluator.evaluate( "${project.build.directory}/classes" );
         String actual = new File( value.toString() ).getCanonicalPath();
-
-        assertEquals( expected, actual );
-
-        value = expressionEvaluator.evaluate( "${project.build.directory}/classes" );
-        actual = new File( value.toString() ).getCanonicalPath();
 
         assertEquals( expected, actual );
     }
@@ -93,11 +88,10 @@ public class PluginParameterExpressionEvaluatorTest
         ArtifactRepository repo = new ArtifactRepository( "test", "http://www.test.com", repoLayout );
 
         PlexusContainer container = getContainer();
-        MavenSession session = createSession( null, container, repo );
+        MavenSession session = createSession( new MavenProject(new Model()), container, repo );
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
 
-        assertNotNull( expressionEvaluator.evaluate( "#component.org.apache.maven.project.MavenProjectBuilder" ) );
         assertNotNull( expressionEvaluator.evaluate( "${component.org.apache.maven.project.MavenProjectBuilder}" ) );
     }
 
@@ -110,10 +104,10 @@ public class PluginParameterExpressionEvaluatorTest
         ArtifactRepository repo = new ArtifactRepository( "local", "target/repo", repoLayout );
 
         PlexusContainer container = getContainer();
-        MavenSession session = createSession( null, container, repo );
+        MavenSession session = createSession( new MavenProject(new Model()), container, repo );
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
-        Object value = expressionEvaluator.evaluate( "#localRepository" );
+        Object value = expressionEvaluator.evaluate( "${localRepository}" );
 
         assertEquals( "local", ( (ArtifactRepository) value ).getId() );
     }
