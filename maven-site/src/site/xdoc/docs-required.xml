@@ -29,6 +29,8 @@
       <p style="font-size: larger; font-weight: bold">Documentation for Maven developers</p>
       <ul>
         <li>Lifecycle architecture</li>
+        <li>High level architecture, components explanation</li>
+        <li>contributors guide (add to current and consolidate, walk through some first steps)</li>
       </ul>
     </section>
   </body>
