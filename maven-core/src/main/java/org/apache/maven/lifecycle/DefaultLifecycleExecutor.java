@@ -316,6 +316,7 @@ public class DefaultLifecycleExecutor
      * @param mojoDescriptor
      */
     private void configureMojo( MojoDescriptor mojoDescriptor, Map phaseMap, Settings settings )
+        throws LifecycleExecutionException
     {
         if ( settings.getActiveProfile().isOffline() && mojoDescriptor.requiresOnline() )
         {
@@ -328,6 +329,10 @@ public class DefaultLifecycleExecutor
             {
                 Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
 
+                if ( phase == null )
+                {
+                    throw new LifecycleExecutionException( "Required phase '" + mojoDescriptor.getPhase() + "' not found" );
+                }
                 phase.getGoals().add( mojoDescriptor.getId() );
             }
         }
