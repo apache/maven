@@ -1,32 +1,27 @@
 
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+import org.apache.maven.plugin.AbstractMojo;
 
 /**
+ * Create an IDEA project file from a Maven project.
  * @goal ideaTwo
- * @description Create an IDEA project file from a Maven project.
  * @requiresDependencyResolution compile
- * @prereq foo
- * @prereq bar
- * @parameter name="project"
- * type="String[]"
- * required="true"
- * validator="org.foo.validator"
- * expression="#project"
- * description="Maven project used to generate IDEA project files."
  */
 public class JavaExtractorTestTwo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
-    protected String var;
+
+    /**
+     * Maven project used to generate IDEA project files.
+     * @parameter expression="#project"
+     * @required
+     */
+    private String[] project;
 
     public JavaExtractorTestTwo()
     {
     }
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute()
     {
     }
 }

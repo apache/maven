@@ -1,36 +1,29 @@
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
+
+import org.apache.maven.plugin.AbstractMojo;
 
 /**
- * @goal ideaOne
+ * Create an IDEA project file from a Maven project.
  *
- * @description Create an IDEA project file from a Maven project.
+ * @goal ideaOne
  *
  * @requiresDependencyResolution
  *
- * @prereq foo
- * @prereq bar
- *
- * @parameter
- *   name="project"
- *   type="String[]"
- *   required="true"
- *   validator="org.foo.validator"
- *   expression="#project"
- *   description="Maven project used to generate IDEA project files."
  */
 public class JavaExtractorTestOne
-    extends AbstractPlugin
+    extends AbstractMojo
 {
-    protected String var;
+    /**
+     * Maven project used to generate IDEA project files.
+     * @parameter expression="#project"
+     * @required
+     */
+    protected String[] project;
 
     public JavaExtractorTestOne()
     {
     }
 
-    public void execute( PluginExecutionRequest request, PluginExecutionResponse response )
-        throws Exception
+    public void execute()
     {
     }
 }
