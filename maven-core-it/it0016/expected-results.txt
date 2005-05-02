@@ -1,4 +1,6 @@
 target/classes/org/apache/maven/it0016/Person.class
+target/maven-core-it0016-1.0/index.html
+target/maven-core-it0016-1.0/WEB-INF/classes/Person.class
 target/maven-core-it0016-1.0.war
 target/maven-core-it0016-1.0.war!/index.html
 target/maven-core-it0016-1.0.war!/WEB-INF/classes/org/apache/maven/it0016/Person.class
