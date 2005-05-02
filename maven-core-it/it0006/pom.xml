@@ -1,0 +1,29 @@
+<model>
+  <parent>
+    <artifactId>maven-verifier-plugin</artifactId>
+    <groupId>org.apache.maven.plugins</groupId>
+    <version>1.0-alpha-2-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>maven-verifier-plugin-test</artifactId>
+  <name>Maven Verifier Plugin Test</name>
+  <version>1.0-alpha-2-SNAPSHOT</version>
+  <dependencies/>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-verifier-plugin</artifactId>
+        <!-- Problem here: if I specify a version, it won't build if the verifier plugin is not 
+             in the remote repo. If I don't specify a version, it fails... 
+             Now, even if I have built the verifier plugin locally m2 insist for downloading it
+             from the remote repo. Why is that? -->
+        <version>1.0-alpha-2-SNAPSHOT</version>       
+        <goals>
+          <goal>
+            <id>verify</id>
+          </goal>
+        </goals>        
+      </plugin>
+    </plugins>
+  </build>
+</model>

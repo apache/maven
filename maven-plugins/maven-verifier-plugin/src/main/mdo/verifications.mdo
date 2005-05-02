@@ -1,0 +1,65 @@
+<model>
+  <id>verifications</id>
+  <name>Verifications</name>
+  <description><![CDATA[
+    Project-specific configuration file for the Verifier plugin. It contains
+    definition of expected files and directories to be checked for after an
+    integration test has run. It can also check for file content against 
+    regexps.]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.plugin.verifier.model</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="verifications">
+      <name>Verifications</name>
+      <version>1.0.0</version>
+      <description>Root element of the project verification file.</description>
+      <fields>
+        <field>
+          <name>files</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            List of files and directories to check for.
+          ]]></description>
+          <association>
+            <type>File</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>File</name>
+      <version>1.0.0</version>
+      <fields>
+        <field>
+          <name>location</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <description><![CDATA[Location of the file or directory to check.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>contains</name>
+          <version>1.0.0</version>
+          <description><![CDATA[Check the content against this regexp.]]></description>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>exists</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            If true checks for file or directory existence, otherwise checks that the
+            file or directory doesn't exist.
+          ]]></description>
+          <defaultValue>true</defaultValue>
+          <type>boolean</type>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>

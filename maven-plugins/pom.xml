@@ -67,9 +67,7 @@
     </repository>
   </distributionManagement>
   <modules>
-<!--
     <module>maven-assembly-plugin</module>
--->
     <module>maven-clean-plugin</module>
     <module>maven-compiler-plugin</module>
     <module>maven-deploy-plugin</module>
@@ -82,6 +80,7 @@
     <module>maven-site-plugin</module>
     <module>maven-surefire-plugin</module>
     <module>maven-war-plugin</module>
+    <module>maven-verifier-plugin</module>
   </modules>
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-plugins</connection>

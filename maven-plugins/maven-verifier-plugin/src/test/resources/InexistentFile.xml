@@ -1,0 +1,8 @@
+<verifications>
+  <files>
+    <file>
+      <location>src/test/resources/Dummy.xml</location>
+      <exists>false</exists>
+    </file>
+  </files>
+</verifications>

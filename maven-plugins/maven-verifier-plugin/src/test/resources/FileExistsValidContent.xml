@@ -1,0 +1,8 @@
+<verifications>
+  <files>
+    <file>
+      <location>FileExistsValidContent.xml</location>
+      <contains><![CDATA[location>FileExists]]></contains>
+    </file>
+  </files>
+</verifications>
