@@ -193,7 +193,7 @@ public class PluginParameterExpressionEvaluator
             context.getLog().warn( "DEPRECATED: use ${} to delimit expressions instead of # for '" + expr + "'" );
             expr = expr.substring( 1 );
         }
-        else if ( expr.startsWith( "${" ) && expr.endsWith( "}" ) )
+        else if ( expr.startsWith( "${" ) && expr.indexOf( "}" ) == expr.length() - 1 )
         {
             expr = expr.substring( 2, expr.length() - 1 );
         }

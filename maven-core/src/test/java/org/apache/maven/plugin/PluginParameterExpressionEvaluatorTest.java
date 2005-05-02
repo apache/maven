@@ -45,13 +45,6 @@ public class PluginParameterExpressionEvaluatorTest
     {
         String expected = getTestFile( "target/test-classes/target/classes" ).getCanonicalPath();
 
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
-
-        ArtifactRepository repo = new ArtifactRepository( "local", "here", repoLayout );
-
-        PlexusContainer container = getContainer();
-
         Build build = new Build();
         build.setDirectory( expected.substring( 0, expected.length() - "/classes".length() ) );
 
@@ -61,9 +54,7 @@ public class PluginParameterExpressionEvaluatorTest
         MavenProject project = new MavenProject( model );
         project.setFile( new File( "pom.xml" ).getCanonicalFile() );
 
-        MavenSession session = createSession( project, container, repo );
-
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( project );
 
         Object value = expressionEvaluator.evaluate( "${project.build.directory}/classes" );
         String actual = new File( value.toString() ).getCanonicalPath();
@@ -88,7 +79,7 @@ public class PluginParameterExpressionEvaluatorTest
         ArtifactRepository repo = new ArtifactRepository( "test", "http://www.test.com", repoLayout );
 
         PlexusContainer container = getContainer();
-        MavenSession session = createSession( new MavenProject(new Model()), container, repo );
+        MavenSession session = createSession( createDefaultProject(), container, repo );
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
 
@@ -98,17 +89,47 @@ public class PluginParameterExpressionEvaluatorTest
     public void testLocalRepositoryExtraction()
         throws Exception
     {
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( createDefaultProject() );
+        Object value = expressionEvaluator.evaluate( "${localRepository}" );
+
+        assertEquals( "local", ( (ArtifactRepository) value ).getId() );
+    }
+
+    public void testTwoExpressions()
+        throws Exception
+    {
+        Build build = new Build();
+        build.setDirectory( "expected-directory" );
+        build.setFinalName( "expected-finalName" );
+
+        Model model = new Model();
+        model.setBuild( build );
+
+
+        ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( new MavenProject( model ) );
+
+        Object value = expressionEvaluator.evaluate( "${project.build.directory}/${project.build.finalName}" );
+
+        assertEquals( "expected-directory/expected-finalName", value );
+    }
+
+    private MavenProject createDefaultProject()
+    {
+        return new MavenProject( new Model() );
+    }
+
+    private ExpressionEvaluator createExpressionEvaluator( MavenProject project )
+        throws Exception
+    {
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
         ArtifactRepository repo = new ArtifactRepository( "local", "target/repo", repoLayout );
 
         PlexusContainer container = getContainer();
-        MavenSession session = createSession( new MavenProject(new Model()), container, repo );
+        MavenSession session = createSession( project, container, repo );
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
-        Object value = expressionEvaluator.evaluate( "${localRepository}" );
-
-        assertEquals( "local", ( (ArtifactRepository) value ).getId() );
+        return expressionEvaluator;
     }
 }
