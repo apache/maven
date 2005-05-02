@@ -58,81 +58,69 @@
       <configuration>
         <!-- START SNIPPET: lifecyle -->
         <phases>
-          <!-- 1 -->
           <phase>
             <id>generate-sources</id>
           </phase>
-          <!-- 2 -->
           <phase>
             <id>process-sources</id>
           </phase>
-          <!-- 3 -->
           <phase>
             <id>generate-resources</id>
           </phase>
-          <!-- 4 -->
           <phase>
             <id>process-resources</id>
             <goals>
               <goal implementation="java.lang.String">resources:resources</goal>
             </goals>
           </phase>
-          <!-- 5 -->
           <phase>
             <id>compile</id>
             <goals>
               <goal implementation="java.lang.String">compiler:compile</goal>
             </goals>
           </phase>
-          <!-- 6 -->
           <phase>
             <id>process-classes</id>
           </phase>
-          <!-- 7 -->
           <phase>
             <id>generate-test-sources</id>
           </phase>
-          <!-- 8 -->
           <phase>
             <id>process-test-sources</id>
           </phase>
-          <!-- 9 -->
           <phase>
             <id>generate-test-sources</id>
           </phase>
-          <!-- 10 -->
           <phase>
             <id>process-test-resources</id>
             <goals>
               <goal implementation="java.lang.String">resources:testResources</goal>
             </goals>
           </phase>
-          <!-- 11 -->
           <phase>
             <id>test-compile</id>
             <goals>
               <goal implementation="java.lang.String">compiler:testCompile</goal>
             </goals>
           </phase>
-          <!-- 12 -->
           <phase>
             <id>test</id>
             <goals>
               <goal implementation="java.lang.String">surefire:test</goal>
             </goals>
           </phase>
-          <!-- 13 -->
           <phase>
             <id>package</id>
           </phase>
-          <!-- 14 -->
+          <phase>
+            <id>integration-test</id>
+          </phase>
           <phase>
             <id>install</id>
             <goals>
               <goal implementation="java.lang.String">install:install</goal>
             </goals>
           </phase>
-          <!-- 15 -->
           <phase>
             <id>deploy</id>
             <goals>

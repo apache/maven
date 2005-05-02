@@ -30,7 +30,7 @@ public class LifecycleExecutorTest
     {
         LifecycleExecutor le = (LifecycleExecutor) lookup( LifecycleExecutor.ROLE );
 
-        assertEquals( 15, le.getPhases().size() );
+        assertEquals( 16, le.getPhases().size() );
 
         //le.execute( "test", createGoalExecutionContext().getSession() );
     }
