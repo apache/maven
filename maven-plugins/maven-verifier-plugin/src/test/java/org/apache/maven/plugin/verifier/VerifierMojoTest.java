@@ -39,11 +39,12 @@ public class VerifierMojoTest
     public void testDoNotPrefixWhenAbsolutePath()
     {
         VerifierMojo mojo = new VerifierMojo();
-        mojo.setBaseDir( "c:/some/path" );
+        mojo.setBaseDir( new File( "/some/path" ).getAbsolutePath() );
 
-        File result = mojo.getAbsoluteFileToCheck( new File( "c:/project/target/dummy.txt" ) );
+        File absoluteFile = new File( "/project/target/dummy.txt" ).getAbsoluteFile();
+        File result = mojo.getAbsoluteFileToCheck( absoluteFile );
 
-        File expectedResult = new File( "c:/project/target/dummy.txt" );
+        File expectedResult = absoluteFile;
         assertEquals( expectedResult.getPath(), result.getPath() );
     }
 
