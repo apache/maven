@@ -93,7 +93,6 @@ public class DoxiaMojo
             config.setOutputDirectory( new File( generatedSiteDirectory ) );
             if ( reports != null )
             {
-System.out.println(reports.size());
                 for ( Iterator i = reports.values().iterator(); i.hasNext(); )
                 {
                     MavenReport report = (MavenReport) i.next();
