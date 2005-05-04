@@ -39,6 +39,7 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -154,22 +155,26 @@ public class DefaultLifecycleExecutor
         {
             String task = (String) i.next();
 
-            processGoalChain( task, session, phaseMap );
+            List goals = processGoalChain( task, session, phaseMap );
 
-            try
+            for ( Iterator j = goals.iterator(); j.hasNext(); )
             {
-                if ( phaseMap.containsKey( task ) )
+                MojoDescriptor mojo = (MojoDescriptor) j.next();
+
+                if ( mojo.getExecutePhase() != null )
                 {
-                    executePhase( task, session, phaseMap );
+                    // TODO: is this too broad to execute?
+                    execute( Collections.singletonList( mojo.getExecutePhase() ), session );
                 }
-                else
+
+                try
                 {
-                    executeMojo( task, session );
+                    pluginManager.executeMojo( session, mojo );
                 }
-            }
-            catch ( PluginManagerException e )
-            {
-                throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+                catch ( PluginManagerException e )
+                {
+                    throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+                }
             }
         }
     }
@@ -282,7 +287,8 @@ public class DefaultLifecycleExecutor
             // TODO: remove later
             if ( mojoDescriptor.getGoal() == null )
             {
-                throw new LifecycleExecutionException( "The plugin " + artifactId + " was built with an older version of Maven" );
+                throw new LifecycleExecutionException(
+                    "The plugin " + artifactId + " was built with an older version of Maven" );
             }
 
             if ( plugin.getGoals().isEmpty() || plugin.getGoalsAsMap().containsKey( mojoDescriptor.getGoal() ) )
@@ -323,9 +329,11 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void processGoalChain( String task, MavenSession session, Map phaseMap )
+    private List processGoalChain( String task, MavenSession session, Map phaseMap )
         throws LifecycleExecutionException, ArtifactResolutionException
     {
+        List goals = new ArrayList();
+
         if ( phaseMap.containsKey( task ) )
         {
             // only execute up to the given phase
@@ -344,18 +352,20 @@ public class DefaultLifecycleExecutor
                     {
                         String goal = (String) k.next();
 
-                        configureMojo( goal, session, phaseMap );
+                        goals.add( configureMojo( goal, session, phaseMap ) );
+
                     }
                 }
             }
         }
         else
         {
-            configureMojo( task, session, phaseMap );
+            goals.add( configureMojo( task, session, phaseMap ) );
         }
+        return goals;
     }
 
-    private void configureMojo( String task, MavenSession session, Map phaseMap )
+    private MojoDescriptor configureMojo( String task, MavenSession session, Map phaseMap )
         throws LifecycleExecutionException, ArtifactResolutionException
     {
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
@@ -386,90 +396,9 @@ public class DefaultLifecycleExecutor
         }
 
         configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
+
+        return mojoDescriptor;
     }
-
-    private void executePhase( String phase, MavenSession session, Map phaseMap )
-        throws MojoExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
-        LifecycleExecutionException
-    {
-        // only execute up to the given phase
-        int index = phases.indexOf( phaseMap.get( phase ) );
-
-        EventDispatcher dispatcher = session.getEventDispatcher();
-
-        for ( int j = 0; j <= index; j++ )
-        {
-            Phase p = (Phase) phases.get( j );
-
-            p = (Phase) phaseMap.get( p.getId() );
-
-            String event = MavenEvents.PHASE_EXECUTION;
-
-            // !! This is ripe for refactoring to an aspect.
-            // Event monitoring.
-            dispatcher.dispatchStart( event, p.getId() );
-            try
-            {
-                if ( p.getGoals() != null )
-                {
-                    for ( Iterator i = p.getGoals().iterator(); i.hasNext(); )
-                    {
-                        String goal = (String) i.next();
-
-                        executeMojo( goal, session );
-                    }
-                }
-            }
-            catch ( MojoExecutionException e )
-            {
-                dispatcher.dispatchError( event, p.getId(), e );
-                throw e;
-            }
-            catch ( PluginManagerException e )
-            {
-                dispatcher.dispatchError( event, p.getId(), e );
-                throw e;
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                dispatcher.dispatchError( event, p.getId(), e );
-                throw e;
-            }
-
-            dispatcher.dispatchEnd( event, p.getId() );
-        }
-    }
-
-    protected void executeMojo( String id, MavenSession session )
-        throws MojoExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
-        LifecycleExecutionException
-    {
-        Logger logger = getLogger();
-        logger.debug( "Resolving artifacts from:" );
-        logger.debug( "\t{localRepository: " + session.getLocalRepository() + "}" );
-        logger.debug( "\t{remoteRepositories: " + session.getRemoteRepositories() + "}" );
-
-        pluginManager.verifyPluginForGoal( id, session );
-
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( id );
-
-        if ( mojoDescriptor == null )
-        {
-            throw new MojoExecutionException( "Unable to find goal: " + id );
-        }
-
-        if ( mojoDescriptor.getExecutePhase() != null )
-        {
-            // TODO: is this too broad to execute?
-            execute( Collections.singletonList( mojoDescriptor.getExecutePhase() ), session );
-        }
-
-        pluginManager.executeMojo( session, mojoDescriptor );
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
 
     public List getPhases()
     {
