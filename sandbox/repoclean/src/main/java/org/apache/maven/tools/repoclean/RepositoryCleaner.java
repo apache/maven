@@ -109,9 +109,9 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
                     artifactDiscoverer = (ArtifactDiscoverer) container.lookup( ArtifactDiscoverer.ROLE,
                                                                                 configuration.getSourceRepositoryLayout() );
 
-                    if ( logger.isInfoEnabled() )
+                    if ( logger.isDebugEnabled() )
                     {
-                        logger.info( "Discovering artifacts." );
+                        logger.debug( "Discovering artifacts." );
                     }
 
                     try
@@ -129,6 +129,8 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
                     catch ( Exception e )
                     {
                         repoReporter.error( "Error discovering artifacts in source repository.", e );
+                        
+                        throw e;
                     }
 
                 }
@@ -170,9 +172,9 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
                                                                                           targetRepositoryBase.getAbsolutePath(),
                                                                                 targetLayout );
 
-                        if ( logger.isInfoEnabled() )
+                        if ( logger.isDebugEnabled() )
                         {
-                            logger.info( "Rewriting POMs and artifact files." );
+                            logger.debug( "Rewriting POMs and artifact files." );
                         }
 
                         artifactIndexer.writeAritfactIndex( artifacts, targetRepositoryBase );
@@ -199,9 +201,9 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
                     logger.error( "Error encountered while converting source repository to target repository." );
                 }
 
-                if ( repoReporter.hasWarning() && logger.isWarnEnabled() )
+                if ( repoReporter.hasWarning() && logger.isDebugEnabled() )
                 {
-                    logger.warn(
+                    logger.debug(
                         "Warning encountered while rewriting one or more artifacts from source repository to target repository." );
                 }
             }
@@ -216,7 +218,7 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
             // if we wrote a repository report, and the configuration says to email the report, then do it.
             if ( repoReporter.hasError() && configuration.mailErrorReport() )
             {
-                logger.info( "Sending error report to " + configuration.getErrorReportToName() + " via email." );
+                logger.debug( "Sending error report to " + configuration.getErrorReportToName() + " via email." );
 
                 MailMessage message = new MailMessage();
 
@@ -240,6 +242,8 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
                 catch ( MailSenderException e )
                 {
                     logger.error( "An error occurred while trying to email repoclean report.", e );
+                    
+                    throw e;
                 }
             }
         }
@@ -258,7 +262,7 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
 
         try
         {
-            logger.info( "Rewriting up to " + artifacts.size() + " artifacts (Should be " + ( artifacts.size() * 2 ) +
+            logger.debug( "Rewriting up to " + artifacts.size() + " artifacts (Should be " + ( artifacts.size() * 2 ) +
                          " rewrites including POMs)." );
 
             int actualRewriteCount = 0;
@@ -408,9 +412,9 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
                 }
                 catch ( Exception e )
                 {
-                    repoReporter.warn( "Rolling back conversion for: " + artifact );
                     if ( !configuration.force() )
                     {
+                        repoReporter.warn( "Rolling back conversion for: " + artifact );
                         try
                         {
                             transaction.rollback();
@@ -419,6 +423,10 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
                         {
                             repoReporter.error( "Error rolling back conversion transaction.", re );
                         }
+                    }
+                    else
+                    {
+                        repoReporter.warn( "NOT Rolling back conversion for: " + artifact + "; we are in --force mode." );
                     }
 
                     artifactReporter.error( "Error while rewriting file or POM for artifact: \'" + artifact.getId() +
@@ -528,11 +536,11 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
 
         File targetRepositoryBase = new File( targetRepositoryPath );
 
-        logger.info( "Target repository is at: \'" + targetRepositoryBase + "\'" );
+        logger.debug( "Target repository is at: \'" + targetRepositoryBase + "\'" );
 
         if ( !targetRepositoryBase.exists() )
         {
-            logger.info( "Creating target repository at: \'" + targetRepositoryBase + "\'." );
+            logger.debug( "Creating target repository at: \'" + targetRepositoryBase + "\'." );
 
             targetRepositoryBase.mkdirs();
         }
@@ -553,7 +561,7 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
 
         File sourceRepositoryBase = new File( sourceRepositoryPath );
 
-        logger.info( "Source repository is at: \'" + sourceRepositoryBase + "\'" );
+        logger.debug( "Source repository is at: \'" + sourceRepositoryBase + "\'" );
 
         if ( !sourceRepositoryBase.exists() )
         {
@@ -591,7 +599,7 @@ public class RepositoryCleaner extends AbstractLogEnabled implements Contextuali
         }
         else
         {
-            logger.info( "Creating reports directory: \'" + reportsBase + "\'" );
+            logger.debug( "Creating reports directory: \'" + reportsBase + "\'" );
 
             reportsBase.mkdirs();
         }

@@ -219,8 +219,8 @@ public class LegacyArtifactDiscoverer extends AbstractArtifactDiscoverer
                 }
                 else
                 {
-                    getLogger().warn( "Cannot parse version from artifact path: \'" + path + "\'." );
-                    getLogger().info( "artifact-version-classifier-extension remaining tokens is: \'" + avceTokenList +
+                    getLogger().debug( "Cannot parse version from artifact path: \'" + path + "\'." );
+                    getLogger().debug( "artifact-version-classifier-extension remaining tokens is: \'" + avceTokenList +
                                       "\'" );
                 }
 
