@@ -1993,6 +1993,28 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    private Map goalMap = null;
+
+    public Map getGoalsAsMap()
+    {
+        if ( goalMap == null )
+        {
+            goalMap = new HashMap();
+            for ( Iterator i = goals.iterator(); i.hasNext(); )
+            {
+                Goal g = (Goal) i.next();
+                goalMap.put( g.getId(), g );
+            }
+        }
+        return goalMap;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Goal</name>

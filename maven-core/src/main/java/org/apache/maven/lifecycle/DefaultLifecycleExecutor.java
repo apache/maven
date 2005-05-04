@@ -23,7 +23,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -40,18 +39,18 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 /**
- * @todo there is some duplication between this and the plugin manager
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id: DefaultLifecycleExecutor.java,v 1.16 2005/03/04 09:04:25
  *          jdcasey Exp $
+ * @todo there is some duplication between this and the plugin manager
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
@@ -135,7 +134,7 @@ public class DefaultLifecycleExecutor
         {
             if ( artifactHandler.packageGoal() != null )
             {
-                verifyMojoPhase( artifactHandler.packageGoal(), session, phaseMap );
+                configureMojo( artifactHandler.packageGoal(), session, phaseMap );
             }
 
             if ( artifactHandler.additionalPlugin() != null )
@@ -149,7 +148,7 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        processPluginConfiguration( session.getProject(), session, phaseMap );
+        processPluginConfiguration( project, session, phaseMap );
 
         for ( Iterator i = tasks.iterator(); i.hasNext(); )
         {
@@ -177,6 +176,9 @@ public class DefaultLifecycleExecutor
 
     private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId )
     {
+        // TODO: use the model injector, or just lookup the versions from the project?
+        // They need to be injected, but we should track the required plugins first, then just sweep through.
+
         // TODO: this is a bit of a hack to get the version from plugin management - please fix
 
         Plugin plugin = findPlugin( project.getPlugins(), groupId, artifactId );
@@ -210,9 +212,10 @@ public class DefaultLifecycleExecutor
             if ( plugin.getVersion() == null )
             {
                 // TODO: this has probably supplanted the default in the plugin manager
-                plugin.setVersion( "1.0-SNAPSHOT" );
+                plugin.setVersion( PluginDescriptor.getDefaultPluginVersion() );
             }
         }
+
     }
 
     private static Plugin findPlugin( List plugins, String groupId, String artifactId )
@@ -272,38 +275,19 @@ public class DefaultLifecycleExecutor
         // mojos the user has specified and ignore the rest.
         // ----------------------------------------------------------------------
 
-        if ( plugin.getGoals().size() > 0 )
+        for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
         {
-            String pluginId = pluginDescriptor.getArtifactId();
+            MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
 
-            // TODO: Right now this maven-foo-plugin so this is a hack right now.
-
-            pluginId = PluginDescriptor.getPluginIdFromArtifactId( pluginId );
-
-            for ( Iterator i = plugin.getGoals().iterator(); i.hasNext(); )
+            // TODO: remove later
+            if ( mojoDescriptor.getGoal() == null )
             {
-                Goal goal = (Goal) i.next();
-
-                String mojoId = pluginId + ":" + goal.getId();
-
-                MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( mojoId );
-
-                if ( mojoDescriptor == null )
-                {
-                    throw new LifecycleExecutionException( "A goal '" + mojoId +
-                                                           "' was declared in pom.xml, but does not exist" );
-                }
-
-                configureMojo( mojoDescriptor, phaseMap, session.getSettings() );
+                throw new LifecycleExecutionException( "The plugin " + artifactId + " was built with an older version of Maven" );
             }
-        }
-        else
-        {
-            for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
-            {
-                MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
 
-                configureMojo( mojoDescriptor, phaseMap, session.getSettings() );
+            if ( plugin.getGoals().isEmpty() || plugin.getGoalsAsMap().containsKey( mojoDescriptor.getGoal() ) )
+            {
+                configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
             }
         }
     }
@@ -315,7 +299,7 @@ public class DefaultLifecycleExecutor
      *
      * @param mojoDescriptor
      */
-    private void configureMojo( MojoDescriptor mojoDescriptor, Map phaseMap, Settings settings )
+    private void configureMojoPhaseBinding( MojoDescriptor mojoDescriptor, Map phaseMap, Settings settings )
         throws LifecycleExecutionException
     {
         if ( settings.getActiveProfile().isOffline() && mojoDescriptor.requiresOnline() )
@@ -331,7 +315,8 @@ public class DefaultLifecycleExecutor
 
                 if ( phase == null )
                 {
-                    throw new LifecycleExecutionException( "Required phase '" + mojoDescriptor.getPhase() + "' not found" );
+                    throw new LifecycleExecutionException(
+                        "Required phase '" + mojoDescriptor.getPhase() + "' not found" );
                 }
                 phase.getGoals().add( mojoDescriptor.getId() );
             }
@@ -359,18 +344,18 @@ public class DefaultLifecycleExecutor
                     {
                         String goal = (String) k.next();
 
-                        verifyMojoPhase( goal, session, phaseMap );
+                        configureMojo( goal, session, phaseMap );
                     }
                 }
             }
         }
         else
         {
-            verifyMojoPhase( task, session, phaseMap );
+            configureMojo( task, session, phaseMap );
         }
     }
 
-    private void verifyMojoPhase( String task, MavenSession session, Map phaseMap )
+    private void configureMojo( String task, MavenSession session, Map phaseMap )
         throws LifecycleExecutionException, ArtifactResolutionException
     {
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
@@ -379,20 +364,13 @@ public class DefaultLifecycleExecutor
         {
             String groupId = PluginDescriptor.getDefaultPluginGroupId();
 
-            String pluginId = task;
-
-            if ( pluginId.indexOf( ":" ) > 0 )
-            {
-                pluginId = pluginId.substring( 0, pluginId.indexOf( ":" ) );
-            }
-
-            String artifactId = PluginDescriptor.getDefaultPluginArtifactId( pluginId );
+            String artifactId = PluginDescriptor.getPluginArtifactIdFromGoal( task );
 
             injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId );
 
             try
             {
-                pluginManager.verifyPluginForGoal( task, session );
+                pluginManager.verifyPlugin( groupId, artifactId, session );
             }
             catch ( PluginManagerException e )
             {
@@ -407,7 +385,7 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        configureMojo( mojoDescriptor, phaseMap, session.getSettings() );
+        configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
     }
 
     private void executePhase( String phase, MavenSession session, Map phaseMap )
@@ -466,15 +444,6 @@ public class DefaultLifecycleExecutor
         throws MojoExecutionException, PluginNotFoundException, PluginManagerException, ArtifactResolutionException,
         LifecycleExecutionException
     {
-        // ----------------------------------------------------------------------
-        // We have something of the form <pluginId>:<mojoId>, so this might be
-        // something like:
-        //
-        // clean:clean
-        // idea:idea
-        // archetype:create
-        // ----------------------------------------------------------------------
-
         Logger logger = getLogger();
         logger.debug( "Resolving artifacts from:" );
         logger.debug( "\t{localRepository: " + session.getLocalRepository() + "}" );

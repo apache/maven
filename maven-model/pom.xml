@@ -18,7 +18,10 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
+<!--
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+-->
         <artifactId>maven-modello-plugin</artifactId>
         <version>1.0-alpha-2-SNAPSHOT</version>
         <configuration>

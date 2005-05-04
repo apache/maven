@@ -101,7 +101,7 @@ public class PluginDescriptor
     /**
      * @todo remove - harcoding.
      */
-    public static String getPluginIdFromGoal( String goalName )
+    public static String getPluginArtifactIdFromGoal( String goalName )
     {
         String pluginId = goalName;
 
@@ -141,5 +141,24 @@ public class PluginDescriptor
         int lastHyphen = artifactId.lastIndexOf( "-" );
 
         return artifactId.substring( firstHyphen + 1, lastHyphen );
+    }
+
+    /**
+     * @todo remove - harcoding. What about clashes?
+     */
+    public static String getDefaultPluginVersion()
+    {
+        return "1.0-SNAPSHOT";
+    }
+
+    public static String getGoalIdFromFullGoal( String goalName )
+    {
+        // TODO: much less of this magic is needed - make the mojoDescriptor just store the first and second part
+        int index = goalName.indexOf( ':' );
+        if ( index >= 0 )
+        {
+            return goalName.substring( index + 1 );
+        }
+        return null;
     }
 }

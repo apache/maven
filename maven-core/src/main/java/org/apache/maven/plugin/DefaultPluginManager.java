@@ -97,15 +97,6 @@ public class DefaultPluginManager
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
     }
 
-    // ----------------------------------------------------------------------
-    // Goal descriptors
-    // ----------------------------------------------------------------------
-
-    public Map getMojoDescriptors()
-    {
-        return mojoDescriptors;
-    }
-
     /**
      * Mojo descriptors are looked up using their id which is of the form
      * <pluginId>: <mojoId>. So this might be archetype:create for example which
@@ -190,7 +181,7 @@ public class DefaultPluginManager
     public void verifyPluginForGoal( String goalName, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException
     {
-        String pluginId = PluginDescriptor.getPluginIdFromGoal( goalName );
+        String pluginId = PluginDescriptor.getPluginArtifactIdFromGoal( goalName );
 
         verifyPlugin( PluginDescriptor.getDefaultPluginGroupId(), pluginId, session );
     }
@@ -378,17 +369,10 @@ public class DefaultPluginManager
             // TODO: remove
             boolean newMojoTechnique = checkMojoTechnique( plugin.getClass() );
 
-            String goalId = null;
-
-            // TODO: much less of this magic is needed - make the mojoDescriptor just store the first and second part
-            int index = goalName.indexOf( ':' );
-            if ( index >= 0 )
-            {
-                goalId = goalName.substring( index + 1 );
-            }
+            String goalId = PluginDescriptor.getGoalIdFromFullGoal( goalName );
 
             // TODO: can probable refactor these a little when only the new plugin technique is in place
-            Xpp3Dom dom = session.getProject().getGoalConfiguration( PluginDescriptor.getPluginIdFromGoal( goalName ),
+            Xpp3Dom dom = session.getProject().getGoalConfiguration( PluginDescriptor.getPluginArtifactIdFromGoal( goalName ),
                                                                      goalId );
 
             PlexusConfiguration pomConfiguration;

@@ -98,6 +98,12 @@ public class PluginDescriptorGenerator
 
         w.endElement();
 
+        w.startElement( "goal" );
+
+        w.writeText( mojoDescriptor.getGoal() );
+
+        w.endElement();
+
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
