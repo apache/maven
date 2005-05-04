@@ -18,6 +18,7 @@ package org.apache.maven.tools.plugin.extractor.marmalade;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
 import org.codehaus.plexus.PlexusTestCase;
@@ -45,19 +46,21 @@ public class MarmaladeMojoDescriptorExtractorTest
 
         project.setFile( new File( basedir, "pom.xml" ) );
 
-        System.out.println("Basedir: " + basedir);
+        System.out.println( "Basedir: " + basedir );
         project.addScriptSourceRoot( basedir.getPath() );
 
         MarmaladeMojoDescriptorExtractor extractor = (MarmaladeMojoDescriptorExtractor) lookup(
             MojoDescriptorExtractor.ROLE, "marmalade" );
 
-        Set descriptors = extractor.execute( project );
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGoalPrefix( "test" );
+        Set descriptors = extractor.execute( project, pluginDescriptor );
 
         assertEquals( 1, descriptors.size() );
 
         MojoDescriptor descriptor = (MojoDescriptor) descriptors.iterator().next();
+        assertEquals( pluginDescriptor, descriptor.getPluginDescriptor() );
         assertEquals( "marmalade", descriptor.getLanguage() );
-        assertEquals( "testId", descriptor.getId() );
         assertEquals( "testGoal", descriptor.getGoal() );
         assertEquals( 1, descriptor.getParameters().size() );
     }

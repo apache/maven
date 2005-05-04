@@ -52,15 +52,10 @@ public abstract class AbstractGeneratorTestCase
     {
         setupGenerator();
 
-        String sourceDirectory = new File( basedir, "src/test/resources/source" ).getPath();
-
         String destinationDirectory = new File( basedir, "target" ).getPath();
-
-        String pom = new File( basedir, "src/test/resources/source/pom.xml" ).getPath();
 
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal( "testGoal" );
-        mojoDescriptor.setId( "test" );
         mojoDescriptor.setImplementation( "org.apache.maven.tools.plugin.generator.TestMojo" );
         mojoDescriptor.setRequiresDependencyResolution( "compile" );
 
@@ -68,10 +63,10 @@ public abstract class AbstractGeneratorTestCase
 
         Parameter param = new Parameter();
         param.setDefaultValue( "value" );
-        param.setExpression( "#project.build.directory" );
+        param.setExpression( "${project.build.directory}" );
         param.setName( "dir" );
         param.setRequired( true );
-        param.setType( "String" );
+        param.setType( "java.lang.String" );
         param.setDescription( "Test parameter description" );
 
         params.add( param );
@@ -93,7 +88,7 @@ public abstract class AbstractGeneratorTestCase
 
         MavenProject project = new MavenProject( model );
 
-        generator.execute( destinationDirectory, descriptors, project );
+        generator.execute( destinationDirectory, descriptors, project, "test" );
 
         validate();
     }

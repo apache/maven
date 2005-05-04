@@ -704,7 +704,7 @@ public class MavenProject
         return distMgmtArtifactRepository;
     }
 
-    public Xpp3Dom getGoalConfiguration( String pluginId, String goalName )
+    public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String goalId )
     {
         Xpp3Dom dom = null;
 
@@ -720,25 +720,20 @@ public class MavenProject
             {
                 Plugin plugin = (Plugin) iterator.next();
 
-                // TODO: groupID not handled
-                if ( pluginId.equals( plugin.getArtifactId() ) )
+                if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
                 {
                     dom = (Xpp3Dom) plugin.getConfiguration();
 
-                    if ( goalName != null )
+                    if ( goalId != null )
                     {
-                        for ( Iterator j = plugin.getGoals().iterator(); j.hasNext(); )
+                        Goal goal = (Goal) plugin.getGoalsAsMap().get( goalId );
+                        if ( goal != null )
                         {
-                            Goal goal = (Goal) j.next();
-                            if ( goal.getId().equals( goalName ) )
+                            Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
+                            if ( goalConfiguration != null )
                             {
-                                Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
-                                if ( goalConfiguration != null )
-                                {
-                                    Xpp3Dom newDom = new Xpp3Dom( goalConfiguration );
-                                    dom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
-                                }
-                                break;
+                                Xpp3Dom newDom = new Xpp3Dom( goalConfiguration );
+                                dom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
                             }
                         }
                     }

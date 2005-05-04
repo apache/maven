@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -18,7 +19,8 @@ public class DefaultMojoScannerTest
     extends TestCase
 {
 
-    public void testShouldFindOneDescriptorFromTestExtractor() throws Exception
+    public void testShouldFindOneDescriptorFromTestExtractor()
+        throws Exception
     {
         Map extractors = Collections.singletonMap( "test", new TestExtractor() );
 
@@ -33,12 +35,14 @@ public class DefaultMojoScannerTest
         MavenProject project = new MavenProject( model );
         project.setFile( new File( "." ) );
 
-        Set descriptors = scanner.execute( project );
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGoalPrefix( "testId" );
+        Set descriptors = scanner.execute( project, pluginDescriptor );
 
         assertEquals( 1, descriptors.size() );
 
         MojoDescriptor desc = (MojoDescriptor) descriptors.iterator().next();
-        assertEquals( "testPluginId", desc.getId() );
+        assertEquals( pluginDescriptor, desc.getPluginDescriptor() );
         assertEquals( "testGoal", desc.getGoal() );
     }
 

@@ -18,14 +18,17 @@ package org.apache.maven.tools.plugin.generator;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.util.PluginUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,8 +45,9 @@ import java.util.Set;
 public class PluginDescriptorGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project )
-        throws Exception
+    public void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project,
+                         String goalPrefix )
+        throws IOException
     {
         File f = new File( destinationDirectory, "plugin.xml" );
 
@@ -52,51 +56,52 @@ public class PluginDescriptorGenerator
             f.getParentFile().mkdirs();
         }
 
-        FileWriter writer = new FileWriter( f );
-
-        XMLWriter w = new PrettyPrintXMLWriter( writer );
-
-        w.startElement( "plugin" );
-
-        element( w, "groupId", project.getGroupId() );
-
-        element( w, "artifactId", project.getArtifactId() );
-
-        element( w, "isolatedRealm", "true" );
-
-        w.startElement( "mojos" );
-
-        for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
+        FileWriter writer = null;
+        try
         {
-            MojoDescriptor descriptor = (MojoDescriptor) it.next();
-            processPluginDescriptor( descriptor, w, project );
+            writer = new FileWriter( f );
+
+            XMLWriter w = new PrettyPrintXMLWriter( writer );
+
+            w.startElement( "plugin" );
+
+            element( w, "groupId", project.getGroupId() );
+
+            element( w, "artifactId", project.getArtifactId() );
+
+            element( w, "goalPrefix", goalPrefix );
+
+            element( w, "isolatedRealm", "true" );
+
+            w.startElement( "mojos" );
+
+            for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
+            {
+                MojoDescriptor descriptor = (MojoDescriptor) it.next();
+                processPluginDescriptor( descriptor, w, project );
+            }
+
+            w.endElement();
+
+            PluginUtils.writeDependencies( w, project );
+
+            w.endElement();
+
+            writer.flush();
         }
-
-        w.endElement();
-
-        PluginUtils.writeDependencies( w, project );
-
-        w.endElement();
-
-        writer.flush();
-
-        writer.close();
+        finally
+        {
+            IOUtil.close( writer );
+        }
     }
 
     protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w, MavenProject project )
-        throws Exception
     {
         w.startElement( "mojo" );
 
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
-
-        w.startElement( "id" );
-
-        w.writeText( mojoDescriptor.getId() + ":" + mojoDescriptor.getGoal() );
-
-        w.endElement();
 
         w.startElement( "goal" );
 
@@ -200,8 +205,8 @@ public class PluginDescriptorGenerator
 
             String expression = parameter.getExpression();
 
-            if ( StringUtils.isNotEmpty( expression )
-                && ( expression.startsWith( "${component." ) || expression.startsWith( "#component." ) ) )
+            if ( StringUtils.isNotEmpty( expression ) &&
+                ( expression.startsWith( "${component." ) || expression.startsWith( "#component." ) ) )
             {
                 // treat it as a component...a requirement, in other words.
 
@@ -267,7 +272,7 @@ public class PluginDescriptorGenerator
 
                 w.startElement( parameter.getName() );
 
-                String type = convertType( parameter.getType() );
+                String type = parameter.getType();
                 if ( type != null )
                 {
                     w.addAttribute( "implementation", type );
@@ -321,35 +326,6 @@ public class PluginDescriptorGenerator
         // ----------------------------------------------------------------------
 
         w.endElement();
-    }
-
-    /**
-     * @param type
-     * @return
-     * @deprecated - should force proper class specification
-     */
-    private static String convertType( String type )
-    {
-        if ( "String".equals( type ) )
-        {
-            return "java.lang.String";
-        }
-        else if ( "File".equals( type ) )
-        {
-            return "java.io.File";
-        }
-        else if ( "List".equals( type ) )
-        {
-            return "java.util.List";
-        }
-        else if ( "".equals( type ) )
-        {
-            return null;
-        }
-        else
-        {
-            return type;
-        }
     }
 
     public void element( XMLWriter w, String name, String value )

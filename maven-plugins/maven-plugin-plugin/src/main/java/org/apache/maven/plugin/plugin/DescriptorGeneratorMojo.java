@@ -18,6 +18,8 @@ package org.apache.maven.plugin.plugin;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.PluginDescriptorGenerator;
+import org.apache.maven.tools.plugin.generator.Generator;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.util.Set;
 
@@ -30,7 +32,6 @@ import java.util.Set;
  * @version $Id$
  * @goal descriptor
  * @phase process-classes
- * @description Goal for generating a plugin descriptor.
  */
 public class DescriptorGeneratorMojo
     extends AbstractGeneratorMojo
@@ -46,12 +47,8 @@ public class DescriptorGeneratorMojo
         return outputDirectory;
     }
 
-    protected void generate( String outputDirectory, Set mavenMojoDescriptors, MavenProject project )
-        throws Exception
+    protected Generator createGenerator()
     {
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator();
-
-        generator.execute( outputDirectory, mavenMojoDescriptors, project );
-
+        return new PluginDescriptorGenerator();
     }
 }

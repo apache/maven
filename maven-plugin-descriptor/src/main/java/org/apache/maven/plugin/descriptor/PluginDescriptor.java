@@ -35,6 +35,8 @@ public class PluginDescriptor
 
     private boolean isolatedRealm;
 
+    private String goalPrefix;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -134,7 +136,7 @@ public class PluginDescriptor
      *
      * @todo remove - harcoding. What about clashes?
      */
-    public static String getPluginIdFromArtifactId( String artifactId )
+    public static String getGoalPrefixFromArtifactId( String artifactId )
     {
         int firstHyphen = artifactId.indexOf( "-" );
 
@@ -160,5 +162,15 @@ public class PluginDescriptor
             return goalName.substring( index + 1 );
         }
         return null;
+    }
+
+    public String getGoalPrefix()
+    {
+        return goalPrefix;
+    }
+
+    public void setGoalPrefix( String goalPrefix )
+    {
+        this.goalPrefix = goalPrefix;
     }
 }

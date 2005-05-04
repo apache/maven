@@ -24,7 +24,7 @@ public class PluginUtilsTest
 
         MavenProject project = new MavenProject( model );
 
-        String pluginId = PluginDescriptor.getPluginIdFromArtifactId( project.getArtifactId() );
+        String pluginId = PluginDescriptor.getGoalPrefixFromArtifactId( project.getArtifactId() );
 
         assertEquals( "artifactId", pluginId );
     }

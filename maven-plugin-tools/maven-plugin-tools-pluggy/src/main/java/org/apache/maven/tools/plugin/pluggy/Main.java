@@ -18,6 +18,7 @@ package org.apache.maven.tools.plugin.pluggy;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.java.JavaMojoDescriptorExtractor;
 import org.apache.maven.tools.plugin.generator.BeanGenerator;
@@ -30,7 +31,6 @@ import org.apache.maven.tools.plugin.scanner.MojoScanner;
 
 import java.io.File;
 import java.io.FileReader;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 
@@ -45,7 +45,7 @@ public class Main
     {
         if ( args.length != 5 )
         {
-            System.err.println( "Usage: pluggy <mode> <source directory> <output directory> <pom> <local-repo>" );
+            System.err.println( "Usage: pluggy <mode> <source directory> <output directory> <pom>" );
 
             System.exit( 1 );
         }
@@ -59,12 +59,8 @@ public class Main
 
         String pom = args[3];
 
-        String localRepo = args[4];
-        
         // Massage the local-repo path into an ArtifactRepository.
-        File repoPath = new File( localRepo );
 
-        URL repoUrl = repoPath.toURL();
 
         MavenXpp3Reader modelReader = new MavenXpp3Reader();
         FileReader reader = new FileReader( pom );
@@ -90,7 +86,10 @@ public class Main
         MojoScanner scanner = new DefaultMojoScanner(
             Collections.singletonMap( "java", new JavaMojoDescriptorExtractor() ) );
 
-        Set descriptors = scanner.execute( project );
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        // TODO: should read this from the pom...
+        pluginDescriptor.setGoalPrefix( PluginDescriptor.getGoalPrefixFromArtifactId( project.getArtifactId() ) );
+        Set descriptors = scanner.execute( project, pluginDescriptor );
         
         // Create the generator.
         Generator generator = null;
@@ -114,6 +113,6 @@ public class Main
 
         // Use the generator to process the discovered descriptors and produce
         // something with them.
-        generator.execute( outputDirectory, descriptors, project );
+        generator.execute( outputDirectory, descriptors, project, pluginDescriptor.getGoalPrefix() );
     }
 }

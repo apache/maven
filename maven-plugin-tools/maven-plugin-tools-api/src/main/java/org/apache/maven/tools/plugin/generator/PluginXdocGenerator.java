@@ -20,11 +20,13 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +40,8 @@ import java.util.Set;
 public class PluginXdocGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project )
-        throws Exception
+    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project, String goalPrefix )
+        throws IOException
     {
         for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
         {
@@ -49,12 +51,27 @@ public class PluginXdocGenerator
     }
 
     protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, String destinationDirectory )
-        throws Exception
+        throws IOException
     {
-        String id = mojoDescriptor.getId();
+        String id = mojoDescriptor.getGoal();
 
-        FileWriter writer = new FileWriter( new File( destinationDirectory, id + "-plugin.xml" ) );
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter( new File( destinationDirectory, id + "-plugin.xml" ) );
 
+            writeBody( writer, id, mojoDescriptor );
+
+            writer.flush();
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
+    }
+
+    private void writeBody( FileWriter writer, String id, MojoDescriptor mojoDescriptor )
+    {
         XMLWriter w = new PrettyPrintXMLWriter( writer );
 
         w.startElement( "document" );
@@ -67,7 +84,7 @@ public class PluginXdocGenerator
 
         w.startElement( "title" );
 
-        w.writeText( "Documentation for the " + mojoDescriptor.getId() + " plugin." );
+        w.writeText( "Documentation for the " + id + " plugin." );
 
         w.endElement();
 
@@ -91,7 +108,7 @@ public class PluginXdocGenerator
 
         w.startElement( "p" );
 
-        w.writeText( "The goals for the " + mojoDescriptor.getId() + " are as follows:" );
+        w.writeText( "The goals for the " + id + " are as follows:" );
 
         w.endElement();
 
@@ -133,14 +150,9 @@ public class PluginXdocGenerator
         // ----------------------------------------------------------------------
 
         w.endElement();
-
-        writer.flush();
-
-        writer.close();
     }
 
     private void writeGoalParameterTable( MojoDescriptor mojoDescriptor, XMLWriter w )
-        throws Exception
     {
         w.startElement( "p" );
 

@@ -19,6 +19,7 @@ package org.apache.maven.tools.plugin.extractor.java;
 import junit.framework.TestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.io.File;
 import java.net.URL;
@@ -49,7 +50,9 @@ public class JavaMojoDescriptorExtractorTest
         project.setFile( new File( dir, "pom.xml" ) );
         project.addCompileSourceRoot( new File( dir, "source" ).getPath() );
 
-        Set results = extractor.execute( project );
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGoalPrefix( "test" );
+        Set results = extractor.execute( project, pluginDescriptor );
         assertEquals( 2, results.size() );
     }
 

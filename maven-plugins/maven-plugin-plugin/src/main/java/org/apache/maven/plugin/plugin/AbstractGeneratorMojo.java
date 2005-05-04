@@ -18,9 +18,13 @@ package org.apache.maven.plugin.plugin;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.scanner.MojoScanner;
+import org.apache.maven.tools.plugin.PluginToolsException;
 
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -41,25 +45,46 @@ public abstract class AbstractGeneratorMojo
      * @required
      */
     protected MojoScanner mojoScanner;
-    
+
+    /**
+     * The goal prefix that will appear before the ":".
+     */
+    protected String goalPrefix;
+
     protected abstract String getOutputDirectory();
 
-    protected abstract void generate( String outputDirectory, Set mavenMojoDescriptors, MavenProject project )
-        throws Exception;
+    protected abstract Generator createGenerator();
 
     public void execute()
         throws MojoExecutionException
     {
+        String defaultGoalPrefix = PluginDescriptor.getGoalPrefixFromArtifactId( project.getArtifactId() );
+        if ( goalPrefix == null )
+        {
+            goalPrefix = defaultGoalPrefix;
+        }
+        else
+        {
+            getLog().warn( "Goal prefix is: " + goalPrefix + "; Maven currently expects it to be " + defaultGoalPrefix );
+        }
+
+        // TODO: could use this more, eg in the writing of the plugin descriptor!
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGoalPrefix( goalPrefix );
+
         try
         {
-            Set mavenMojoDescriptors = mojoScanner.execute( project );
+            Set mavenMojoDescriptors = mojoScanner.execute( project, pluginDescriptor );
 
-            generate( getOutputDirectory(), mavenMojoDescriptors, project );
+            createGenerator().execute( getOutputDirectory(), mavenMojoDescriptors, project, goalPrefix );
         }
-        catch ( Exception e )
+        catch ( IOException e )
         {
-            // TODO: improve error handling
-            throw new MojoExecutionException( "Error generating plugin descriptor", e );
+            throw new MojoExecutionException( "Error writing plugin descriptor", e );
+        }
+        catch ( PluginToolsException e )
+        {
+            throw new MojoExecutionException( "Error creatin plugin descriptor", e );
         }
     }
 }

@@ -25,9 +25,11 @@ import org.codehaus.modello.generator.java.javasource.JMethod;
 import org.codehaus.modello.generator.java.javasource.JParameter;
 import org.codehaus.modello.generator.java.javasource.JSourceWriter;
 import org.codehaus.modello.generator.java.javasource.JType;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +44,8 @@ import java.util.Set;
 public class BeanGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project ) throws Exception
+    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project, String goalPrefix )
+        throws IOException
     {
         for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
         {
@@ -51,7 +54,8 @@ public class BeanGenerator
         }
     }
 
-    protected void processPluginDescriptor( MojoDescriptor descriptor, String destinationDirectory ) throws Exception
+    protected void processPluginDescriptor( MojoDescriptor descriptor, String destinationDirectory )
+        throws IOException
     {
         String implementation = descriptor.getImplementation();
 
@@ -95,7 +99,7 @@ public class BeanGenerator
         {
             Parameter parameter = (Parameter) parameters.get( i );
 
-            jClass.addMethod( createSetter( parameter, jClass ) );
+            jClass.addMethod( createSetter( parameter ) );
         }
 
         // ----------------------------------------------------------------------
@@ -111,18 +115,24 @@ public class BeanGenerator
             destination.getParentFile().mkdirs();
         }
 
-        FileWriter writer = new FileWriter( destination );
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter( destination );
 
-        JSourceWriter sourceWriter = new JSourceWriter( writer );
+            JSourceWriter sourceWriter = new JSourceWriter( writer );
 
-        jClass.print( sourceWriter );
+            jClass.print( sourceWriter );
 
-        writer.flush();
-
-        writer.close();
+            writer.flush();
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
     }
 
-    private JMethod createSetter( Parameter parameter, JClass jClass )
+    private JMethod createSetter( Parameter parameter )
     {
         String propertyName = capitalise( parameter.getName() );
 

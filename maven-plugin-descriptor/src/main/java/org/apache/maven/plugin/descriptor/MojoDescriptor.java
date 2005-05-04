@@ -46,8 +46,6 @@ public class MojoDescriptor
 
     private static final String DEFAULT_LANGUAGE = "java";
 
-    private String id;
-
     private List parameters;
 
     private Map parameterMap;
@@ -74,6 +72,8 @@ public class MojoDescriptor
 
     private PlexusConfiguration mojoConfiguration;
 
+    private PluginDescriptor pluginDescriptor;
+
     public MojoDescriptor()
     {
         setInstantiationStrategy( DEFAULT_INSTANTIATION_STRATEGY );
@@ -92,16 +92,6 @@ public class MojoDescriptor
     public void setLanguage( String language )
     {
         setComponentFactory( language );
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId( String id )
-    {
-        this.id = id;
     }
 
     public String getDeprecated()
@@ -257,7 +247,12 @@ public class MojoDescriptor
 
     public String getRoleHint()
     {
-        return getId() + ":" + getGoal();
+        return getFullGoalName();
+    }
+
+    public String getFullGoalName()
+    {
+        return getPluginDescriptor().getGoalPrefix() + ":" + getGoal();
     }
 
     public String getComponentType()
@@ -265,4 +260,13 @@ public class MojoDescriptor
         return MAVEN_PLUGIN;
     }
 
+    public PluginDescriptor getPluginDescriptor()
+    {
+        return pluginDescriptor;
+    }
+
+    public void setPluginDescriptor( PluginDescriptor pluginDescriptor )
+    {
+        this.pluginDescriptor = pluginDescriptor;
+    }
 }

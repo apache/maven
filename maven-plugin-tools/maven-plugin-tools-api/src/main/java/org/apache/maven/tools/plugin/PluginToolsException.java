@@ -1,7 +1,7 @@
-package org.apache.maven.script.marmalade.tags;
+package org.apache.maven.tools.plugin;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,22 @@ package org.apache.maven.script.marmalade.tags;
  * limitations under the License.
  */
 
-import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
-
 /**
- * @author jdcasey Created on Feb 8, 2005
+ * Error during the plugin tools.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @version $Id$
  */
-public class IdTag
-    extends AbstractStringValuedBodyTag
+public class PluginToolsException
+    extends Exception
 {
-
-    protected void setValue( String value ) throws MarmaladeExecutionException
+    public PluginToolsException( String message, Throwable throwable )
     {
-        MetadataTag metadataTag = (MetadataTag) requireParent( MetadataTag.class );
-        metadataTag.setId( value );
+        super( message, throwable );
     }
 
+    public PluginToolsException( String message )
+    {
+        super( message );    
+    }
 }

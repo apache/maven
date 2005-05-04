@@ -1,6 +1,7 @@
 package org.apache.maven.tools.plugin.scanner;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
 
@@ -14,11 +15,10 @@ public class TestExtractor
     implements MojoDescriptorExtractor
 {
 
-    public Set execute( MavenProject project )
-        throws Exception
+    public Set execute( MavenProject project, PluginDescriptor pluginDescriptor )
     {
         MojoDescriptor desc = new MojoDescriptor();
-        desc.setId( "testPluginId" );
+        desc.setPluginDescriptor( pluginDescriptor );
         desc.setGoal( "testGoal" );
 
         return Collections.singleton( desc );

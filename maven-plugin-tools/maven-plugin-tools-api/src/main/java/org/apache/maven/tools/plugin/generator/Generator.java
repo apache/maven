@@ -1,11 +1,7 @@
 package org.apache.maven.tools.plugin.generator;
 
-import org.apache.maven.project.MavenProject;
-
-import java.util.Set;
-
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +16,17 @@ import java.util.Set;
  * limitations under the License.
  */
 
+import org.apache.maven.project.MavenProject;
+
+import java.util.Set;
+import java.io.IOException;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
 public interface Generator
 {
-
-    void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project ) throws Exception;
-
+    void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project, String goalPrefix )
+        throws IOException;
 }

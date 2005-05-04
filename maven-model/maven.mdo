@@ -2004,10 +2004,13 @@
         if ( goalMap == null )
         {
             goalMap = new HashMap();
-            for ( Iterator i = goals.iterator(); i.hasNext(); )
+            if ( goals != null )
             {
-                Goal g = (Goal) i.next();
-                goalMap.put( g.getId(), g );
+                for ( Iterator i = goals.iterator(); i.hasNext(); )
+                {
+                    Goal g = (Goal) i.next();
+                    goalMap.put( g.getId(), g );
+                }
             }
         }
         return goalMap;

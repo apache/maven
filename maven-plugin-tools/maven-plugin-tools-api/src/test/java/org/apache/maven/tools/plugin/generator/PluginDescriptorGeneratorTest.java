@@ -91,7 +91,7 @@ public class PluginDescriptorGeneratorTest
 
     private void checkMojo( MojoDescriptor mojoDescriptor )
     {
-        assertEquals( "test:testGoal", mojoDescriptor.getId() );
+        assertEquals( "test:testGoal", mojoDescriptor.getFullGoalName() );
 
         assertEquals( "org.apache.maven.tools.plugin.generator.TestMojo", mojoDescriptor.getImplementation() );
 
@@ -107,7 +107,7 @@ public class PluginDescriptorGeneratorTest
     private void checkParameter( Parameter parameter )
     {
         assertEquals( "dir", parameter.getName() );
-        assertEquals( "String", parameter.getType() );
+        assertEquals( String.class.getName(), parameter.getType() );
         assertTrue( parameter.isRequired() );
     }
 

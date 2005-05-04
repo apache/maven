@@ -18,6 +18,7 @@ package org.apache.maven.plugin.plugin;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.jelly.JellyHarnessGenerator;
+import org.apache.maven.tools.plugin.generator.Generator;
 
 import java.util.Set;
 
@@ -25,7 +26,6 @@ import java.util.Set;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  * @goal jelly
- * @description Goal for generating a plugin descriptor.
  */
 public class JellyGeneratorMojo
     extends AbstractGeneratorMojo
@@ -41,11 +41,8 @@ public class JellyGeneratorMojo
         return outputDirectory;
     }
 
-    protected void generate( String outputDirectory, Set mavenMojoDescriptors, MavenProject project )
-        throws Exception
+    protected Generator createGenerator()
     {
-        JellyHarnessGenerator generator = new JellyHarnessGenerator();
-
-        generator.execute( outputDirectory, mavenMojoDescriptors, project );
+        return new JellyHarnessGenerator();
     }
 }

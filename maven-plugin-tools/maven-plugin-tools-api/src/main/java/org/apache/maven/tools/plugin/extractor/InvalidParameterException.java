@@ -1,5 +1,7 @@
 package org.apache.maven.tools.plugin.extractor;
 
+import org.apache.maven.tools.plugin.PluginToolsException;
+
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
  *
@@ -22,20 +24,11 @@ package org.apache.maven.tools.plugin.extractor;
  *          jdcasey Exp $
  */
 public class InvalidParameterException
-    extends Exception
+    extends PluginToolsException
 {
-    public InvalidParameterException()
-    {
-    }
-
     public InvalidParameterException( String element, int i )
     {
         super( "The " + element + " element in parameter # " + i + " is invalid. It cannot be null." );
-    }
-
-    public InvalidParameterException( Throwable cause )
-    {
-        super( cause );
     }
 
     public InvalidParameterException( String message, Throwable cause )

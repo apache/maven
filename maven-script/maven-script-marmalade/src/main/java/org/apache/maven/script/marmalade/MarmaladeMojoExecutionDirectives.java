@@ -30,6 +30,8 @@ public final class MarmaladeMojoExecutionDirectives
 
     public static final String RESPONSE_INVAR = "response";
 
+    public static final String PLUGIN_DESCRIPTOR = "pluginDescriptor";
+
     private MarmaladeMojoExecutionDirectives()
     {
     }

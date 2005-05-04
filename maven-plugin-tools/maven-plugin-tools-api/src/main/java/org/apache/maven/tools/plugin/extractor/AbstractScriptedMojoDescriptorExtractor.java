@@ -1,6 +1,8 @@
 package org.apache.maven.tools.plugin.extractor;
 
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.tools.plugin.PluginToolsException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.DirectoryScanner;
 
@@ -19,19 +21,19 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
     extends AbstractLogEnabled
     implements MojoDescriptorExtractor
 {
-    public Set execute( MavenProject project )
-        throws Exception
+    public Set execute( MavenProject project, PluginDescriptor pluginDescriptor )
+        throws PluginToolsException
     {
         Map scriptFilesKeyedByBasedir = gatherScriptSourcesByBasedir( project.getScriptSourceRoots(),
                                                                       getScriptFileExtension() );
 
-        Set mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir );
+        Set mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir, pluginDescriptor );
 
         return mojoDescriptors;
     }
 
-    protected abstract Set extractMojoDescriptors( Map scriptFilesKeyedByBasedir )
-        throws Exception;
+    protected abstract Set extractMojoDescriptors( Map scriptFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
+        throws PluginToolsException;
 
     protected abstract String getScriptFileExtension();
 

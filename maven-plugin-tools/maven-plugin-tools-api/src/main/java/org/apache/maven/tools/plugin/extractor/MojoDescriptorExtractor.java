@@ -17,6 +17,8 @@ package org.apache.maven.tools.plugin.extractor;
  */
 
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.tools.plugin.PluginToolsException;
 
 import java.util.Set;
 
@@ -25,10 +27,8 @@ import java.util.Set;
  */
 public interface MojoDescriptorExtractor
 {
-
     String ROLE = MojoDescriptorExtractor.class.getName();
 
-    Set execute( MavenProject project )
-        throws Exception;
-
+    Set execute( MavenProject project, PluginDescriptor pluginDescriptor )
+        throws PluginToolsException;
 }

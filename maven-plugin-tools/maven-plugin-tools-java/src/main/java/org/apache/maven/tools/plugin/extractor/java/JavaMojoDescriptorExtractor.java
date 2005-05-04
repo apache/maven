@@ -16,20 +16,20 @@ package org.apache.maven.tools.plugin.extractor.java;
  * limitations under the License.
  */
 
+import com.thoughtworks.qdox.JavaDocBuilder;
+import com.thoughtworks.qdox.model.DocletTag;
+import com.thoughtworks.qdox.model.JavaClass;
+import com.thoughtworks.qdox.model.JavaField;
+import com.thoughtworks.qdox.model.JavaSource;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.InvalidParameterException;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
+import org.apache.maven.tools.plugin.PluginToolsException;
 import org.codehaus.modello.StringUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-
-import com.thoughtworks.qdox.JavaDocBuilder;
-import com.thoughtworks.qdox.model.DocletTag;
-import com.thoughtworks.qdox.model.JavaClass;
-import com.thoughtworks.qdox.model.JavaField;
-import com.thoughtworks.qdox.model.JavaSource;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,9 +37,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -112,9 +112,10 @@ public class JavaMojoDescriptorExtractor
     // Mojo descriptor creation from @tags
     // ----------------------------------------------------------------------
 
-    private MojoDescriptor createMojoDescriptor( JavaSource javaSource, MavenProject project )
+    private MojoDescriptor createMojoDescriptor( JavaSource javaSource, PluginDescriptor pluginDescriptor )
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor( pluginDescriptor );
 
         JavaClass javaClass = getJavaClass( javaSource );
 
@@ -123,10 +124,6 @@ public class JavaMojoDescriptorExtractor
         mojoDescriptor.setImplementation( javaClass.getFullyQualifiedName() );
 
         DocletTag tag;
-
-        String pluginId = PluginDescriptor.getPluginIdFromArtifactId( project.getArtifactId() );
-
-        mojoDescriptor.setId( pluginId );
 
         tag = findInClassHierarchy( javaClass, MAVEN_PLUGIN_DESCRIPTION );
 
@@ -318,8 +315,8 @@ public class JavaMojoDescriptorExtractor
         return javaSource.getClasses()[0];
     }
 
-    public Set execute( MavenProject project )
-        throws Exception
+    public Set execute( MavenProject project, PluginDescriptor pluginDescriptor )
+        throws InvalidParameterException
     {
         JavaDocBuilder builder = new JavaDocBuilder();
 
@@ -346,7 +343,7 @@ public class JavaMojoDescriptorExtractor
 
             if ( tag != null )
             {
-                MojoDescriptor mojoDescriptor = createMojoDescriptor( javaSources[i], project );
+                MojoDescriptor mojoDescriptor = createMojoDescriptor( javaSources[i], pluginDescriptor );
 
                 // ----------------------------------------------------------------------
                 // Validate the descriptor as best we can before allowing it

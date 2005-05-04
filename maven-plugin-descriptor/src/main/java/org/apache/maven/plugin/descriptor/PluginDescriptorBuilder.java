@@ -25,18 +25,9 @@ public class PluginDescriptorBuilder
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
 
-        String id = c.getChild( "id" ).getValue();
-        if ( id != null )
-        {
-            // TODO: remove. This is old style mojos (alpha-1)
-            pluginDescriptor.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
-            pluginDescriptor.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( id ) );
-        }
-        else
-        {
-            pluginDescriptor.setGroupId( c.getChild( "groupId" ).getValue() );
-            pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
-        }
+        pluginDescriptor.setGroupId( c.getChild( "groupId" ).getValue() );
+        pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
+        pluginDescriptor.setGoalPrefix( c.getChild( "goalPrefix" ).getValue() );
 
         // ----------------------------------------------------------------------
         // Components
@@ -50,7 +41,7 @@ public class PluginDescriptorBuilder
         {
             PlexusConfiguration component = mojoConfigurations[i];
 
-            mojos.add( buildComponentDescriptor( component ) );
+            mojos.add( buildComponentDescriptor( component, pluginDescriptor ) );
         }
 
         pluginDescriptor.setMojos( mojos );
@@ -85,12 +76,11 @@ public class PluginDescriptorBuilder
         return pluginDescriptor;
     }
 
-    public MojoDescriptor buildComponentDescriptor( PlexusConfiguration c )
+    public MojoDescriptor buildComponentDescriptor( PlexusConfiguration c, PluginDescriptor pluginDescriptor )
         throws PlexusConfigurationException
     {
         MojoDescriptor mojo = new MojoDescriptor();
-
-        mojo.setId( c.getChild( "id" ).getValue() );
+        mojo.setPluginDescriptor( pluginDescriptor );
 
         mojo.setGoal( c.getChild( "goal" ).getValue() );
 

@@ -31,7 +31,6 @@ public class MojoDefinitionTagLibrary
         registerTag( "execute", ExecuteTag.class );
         registerTag( "executionStrategy", ExecutionStrategyTag.class );
         registerTag( "goal", GoalTag.class );
-        registerTag( "id", IdTag.class );
         registerTag( "instantiationStrategy", InstantiationStrategyTag.class );
         registerTag( "lifecyclePhase", LifecyclePhaseTag.class );
         registerTag( "metadata", MetadataTag.class );

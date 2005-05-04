@@ -18,6 +18,9 @@ package org.apache.maven.tools.plugin.scanner;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
+import org.apache.maven.tools.plugin.extractor.InvalidParameterException;
+import org.apache.maven.tools.plugin.PluginToolsException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,8 +45,8 @@ public class DefaultMojoScanner
     {
     }
 
-    public Set execute( MavenProject project )
-        throws Exception
+    public Set execute( MavenProject project, PluginDescriptor pluginDescriptor )
+        throws PluginToolsException
     {
         Set descriptors = new HashSet();
 
@@ -57,7 +60,7 @@ public class DefaultMojoScanner
 
             System.out.println( "Applying extractor for language: " + language );
 
-            Set extractorDescriptors = extractor.execute( project );
+            Set extractorDescriptors = extractor.execute( project, pluginDescriptor );
 
             System.out.println( "Extractor for language: " + language + " found " + extractorDescriptors.size() +
                                 " mojo descriptors." );

@@ -135,7 +135,7 @@ public class DefaultPluginManager
         {
             MojoDescriptor mojoDescriptor = (MojoDescriptor) it.next();
 
-            mojoDescriptors.put( mojoDescriptor.getId(), mojoDescriptor );
+            mojoDescriptors.put( mojoDescriptor.getFullGoalName(), mojoDescriptor );
         }
 
         pluginDescriptors.put( key, pluginDescriptor );
@@ -353,7 +353,7 @@ public class DefaultPluginManager
 
         Mojo plugin = null;
 
-        String goalName = mojoDescriptor.getId();
+        String goalName = mojoDescriptor.getFullGoalName();
 
         try
         {
@@ -364,8 +364,9 @@ public class DefaultPluginManager
             String goalId = mojoDescriptor.getGoal();
 
             // TODO: can probable refactor these a little when only the new plugin technique is in place
-            Xpp3Dom dom = session.getProject().getGoalConfiguration(
-                PluginDescriptor.getPluginArtifactIdFromGoal( goalName ), goalId );
+            PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+            Xpp3Dom dom = session.getProject().getGoalConfiguration( pluginDescriptor.getGroupId(),
+                                                                     pluginDescriptor.getArtifactId(), goalId );
 
             PlexusConfiguration pomConfiguration;
             if ( dom == null )
@@ -471,7 +472,7 @@ public class DefaultPluginManager
                     errorMessage.append( " (with alias: " ).append( lookupKey ).append( ")" );
                 }
 
-                errorMessage.append( " in goal: " ).append( goal.getId() );
+                errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
 
                 throw new PluginConfigurationException( errorMessage.toString() );
             }
@@ -724,7 +725,7 @@ public class DefaultPluginManager
 
         message.append( "The '" + parameter.getName() );
         message.append( "' parameter is required for the execution of the " );
-        message.append( mojo.getId() );
+        message.append( mojo.getFullGoalName() );
         message.append( " mojo and cannot be null." );
         message.append( " The retrieval expression was: " ).append( expression );
 

@@ -18,16 +18,17 @@ package org.apache.maven.tools.plugin.generator.jelly;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.util.PluginUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -48,26 +49,56 @@ public class JellyHarnessGenerator
         return pluginDescriptor.getImplementation() + "Bean";
     }
 
-    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project )
-        throws Exception
+    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project, String goalPrefix )
+        throws IOException
     {
-        FileWriter writer = new FileWriter( new File( destinationDirectory, "plugin.jelly" ) );
+        FileWriter writer = null;
+        PrettyPrintXMLWriter w;
+        try
+        {
+            writer = new FileWriter( new File( destinationDirectory, "plugin.jelly" ) );
 
-        PrettyPrintXMLWriter w = new PrettyPrintXMLWriter( writer );
+            w = new PrettyPrintXMLWriter( writer );
 
-        String pluginId = PluginDescriptor.getPluginIdFromArtifactId( project.getArtifactId() );
+            writePluginFile( w, goalPrefix, mojoDescriptors, project );
+
+            writer.flush();
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
 
         // ----------------------------------------------------------------------
-        //
+        // project.xml
         // ----------------------------------------------------------------------
 
+        writer = null;
+        try
+        {
+            writer = new FileWriter( new File( destinationDirectory, "project.xml" ) );
+
+            w = new PrettyPrintXMLWriter( writer );
+
+            writeProjectFile( w, project );
+
+            writer.flush();
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
+    }
+
+    private void writePluginFile( PrettyPrintXMLWriter w, String goalPrefix, Set mojoDescriptors, MavenProject project )
+    {
         w.startElement( "project" );
 
         w.addAttribute( "xmlns:j", "jelly:core" );
 
         w.addAttribute( "xmlns:d", "jelly:define" );
 
-        w.addAttribute( "xmlns:" + pluginId, pluginId );
+        w.addAttribute( "xmlns:" + goalPrefix, goalPrefix );
 
         // ----------------------------------------------------------------------
         //
@@ -75,7 +106,7 @@ public class JellyHarnessGenerator
 
         w.startElement( "d:taglib" );
 
-        w.addAttribute( "uri", pluginId );
+        w.addAttribute( "uri", goalPrefix );
 
         for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
         {
@@ -100,23 +131,10 @@ public class JellyHarnessGenerator
         // ----------------------------------------------------------------------
 
         w.endElement();
+    }
 
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        writer.flush();
-
-        writer.close();
-
-        // ----------------------------------------------------------------------
-        // project.xml
-        // ----------------------------------------------------------------------
-
-        writer = new FileWriter( new File( destinationDirectory, "project.xml" ) );
-
-        w = new PrettyPrintXMLWriter( writer );
-
+    private void writeProjectFile( PrettyPrintXMLWriter w, MavenProject project )
+    {
         w.startElement( "project" );
 
         w.startElement( "dependencies" );
@@ -126,18 +144,10 @@ public class JellyHarnessGenerator
         w.endElement();
 
         w.endElement();
-
-        writer.flush();
-
-        writer.close();
-
     }
 
     protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w, MavenProject project )
-        throws Exception
     {
-        String pluginId = PluginDescriptor.getPluginIdFromArtifactId( project.getArtifactId() );
-
         String goalName = mojoDescriptor.getGoal();
 
         // ----------------------------------------------------------------------
@@ -187,7 +197,7 @@ public class JellyHarnessGenerator
         //
         // ----------------------------------------------------------------------
 
-        w.startElement( pluginId + ":" + goalName + "Bean" );
+        w.startElement( mojoDescriptor.getFullGoalName() + "Bean" );
 
         List parameters = mojoDescriptor.getParameters();
 
@@ -196,12 +206,12 @@ public class JellyHarnessGenerator
             Parameter parameter = (Parameter) parameters.get( i );
 
             String paramName = parameter.getAlias();
-            
-            if( StringUtils.isEmpty( paramName ) )
+
+            if ( StringUtils.isEmpty( paramName ) )
             {
                 paramName = parameter.getName();
             }
-            
+
             w.addAttribute( paramName, "${" + paramName + "}" );
         }
 
@@ -216,18 +226,16 @@ public class JellyHarnessGenerator
 
     private void writeGoals( MojoDescriptor mojoDescriptor, XMLWriter w )
     {
-        String id = mojoDescriptor.getId();
-
         w.startElement( "goal" );
 
-        w.addAttribute( "name", id + ":" + mojoDescriptor.getGoal() );
+        w.addAttribute( "name", mojoDescriptor.getFullGoalName() );
 
         if ( mojoDescriptor.getDescription() != null )
         {
             w.addAttribute( "description", mojoDescriptor.getDescription() );
         }
 
-        w.startElement( id + ":" + mojoDescriptor.getGoal() + "Bean" );
+        w.startElement( mojoDescriptor.getFullGoalName() + "Bean" );
 
         List goalParameters = mojoDescriptor.getParameters();
 
@@ -243,11 +251,6 @@ public class JellyHarnessGenerator
             {
                 expression = expression.substring( 0, projectIndex ) + "pom" +
                     expression.substring( projectIndex + 7 );
-            }
-
-            if ( expression.startsWith( "#" ) )
-            {
-                expression = "${" + expression.substring( 1 ) + "}";
             }
 
             w.addAttribute( p.getName(), expression );

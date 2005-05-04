@@ -18,6 +18,8 @@ package org.apache.maven.plugin.plugin;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.BeanGenerator;
+import org.apache.maven.tools.plugin.generator.PluginDescriptorGenerator;
+import org.apache.maven.tools.plugin.generator.Generator;
 
 import java.util.Set;
 
@@ -25,7 +27,6 @@ import java.util.Set;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  * @goal bean
- * @description Goal for generating a plugin descriptor.
  */
 public class BeanGeneratorMojo
     extends AbstractGeneratorMojo
@@ -41,11 +42,8 @@ public class BeanGeneratorMojo
         return outputDirectory;
     }
 
-    protected void generate( String outputDirectory, Set mavenMojoDescriptors, MavenProject project )
-        throws Exception
+    protected Generator createGenerator()
     {
-        BeanGenerator generator = new BeanGenerator();
-
-        generator.execute( outputDirectory, mavenMojoDescriptors, project );
+        return new BeanGenerator();
     }
 }

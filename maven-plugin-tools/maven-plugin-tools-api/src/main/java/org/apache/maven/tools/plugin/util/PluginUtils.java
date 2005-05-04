@@ -60,7 +60,6 @@ public final class PluginUtils
     }
 
     public static void writeDependencies( XMLWriter w, MavenProject project )
-        throws Exception
     {
 
         w.startElement( "dependencies" );

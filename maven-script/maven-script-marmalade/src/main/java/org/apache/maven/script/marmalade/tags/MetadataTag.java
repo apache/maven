@@ -17,6 +17,7 @@ package org.apache.maven.script.marmalade.tags;
  */
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.script.marmalade.MarmaladeMojoExecutionDirectives;
 import org.codehaus.marmalade.model.AbstractMarmaladeTag;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
@@ -34,9 +35,6 @@ public class MetadataTag
     extends AbstractMarmaladeTag
     implements DescriptionParent
 {
-
-    private String id;
-
     private String goal;
 
     private String requiresDependencyResolution = null;
@@ -76,10 +74,8 @@ public class MetadataTag
         descriptor.setComponentComposer( "map-oriented" );
         descriptor.setComponentConfigurator( "map-oriented" );
 
-        if ( notEmpty( id ) )
-        {
-            descriptor.setId( id );
-        }
+        descriptor.setPluginDescriptor(
+            (PluginDescriptor) context.getVariable( MarmaladeMojoExecutionDirectives.PLUGIN_DESCRIPTOR, null ) );
 
         if ( notEmpty( goal ) )
         {
@@ -128,11 +124,6 @@ public class MetadataTag
     private boolean notEmpty( String test )
     {
         return test != null && test.trim().length() > 0;
-    }
-
-    public void setId( String id )
-    {
-        this.id = id;
     }
 
     public void setLifecyclePhase( String lifecyclePhase )
