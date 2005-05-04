@@ -351,7 +351,9 @@ public class DefaultLifecycleExecutor
         {
             String groupId = PluginDescriptor.getDefaultPluginGroupId();
 
-            String artifactId = PluginDescriptor.getPluginArtifactIdFromGoal( task );
+            String pluginId = PluginDescriptor.getPrefixFromGoal( task );
+
+            String artifactId = PluginDescriptor.getDefaultPluginArtifactId( pluginId );
 
             injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId );
 

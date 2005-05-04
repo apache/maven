@@ -103,16 +103,15 @@ public class PluginDescriptor
     /**
      * @todo remove - harcoding.
      */
-    public static String getPluginArtifactIdFromGoal( String goalName )
+    public static String getPrefixFromGoal( String goalName )
     {
-        String pluginId = goalName;
+        String prefix = goalName;
 
-        if ( pluginId.indexOf( ":" ) > 0 )
+        if ( prefix.indexOf( ":" ) > 0 )
         {
-            pluginId = pluginId.substring( 0, pluginId.indexOf( ":" ) );
+            prefix = prefix.substring( 0, prefix.indexOf( ":" ) );
         }
-
-        return getDefaultPluginArtifactId( pluginId );
+        return prefix;
     }
 
     /**
@@ -138,11 +137,7 @@ public class PluginDescriptor
      */
     public static String getGoalPrefixFromArtifactId( String artifactId )
     {
-        int firstHyphen = artifactId.indexOf( "-" );
-
-        int lastHyphen = artifactId.lastIndexOf( "-" );
-
-        return artifactId.substring( firstHyphen + 1, lastHyphen );
+        return artifactId.replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" );
     }
 
     /**

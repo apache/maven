@@ -19,14 +19,11 @@ public class PluginUtilsTest
 
     public void testShouldTrimArtifactIdToFindPluginId()
     {
-        Model model = new Model();
-        model.setArtifactId( "maven-artifactId-plugin" );
-
-        MavenProject project = new MavenProject( model );
-
-        String pluginId = PluginDescriptor.getGoalPrefixFromArtifactId( project.getArtifactId() );
-
-        assertEquals( "artifactId", pluginId );
+        assertEquals( "artifactId", PluginDescriptor.getGoalPrefixFromArtifactId( "maven-artifactId-plugin" ) );
+        assertEquals( "artifactId", PluginDescriptor.getGoalPrefixFromArtifactId( "maven-plugin-artifactId" ) );
+        assertEquals( "artifactId", PluginDescriptor.getGoalPrefixFromArtifactId( "artifactId-maven-plugin" ) );
+        assertEquals( "artifactId", PluginDescriptor.getGoalPrefixFromArtifactId( "artifactId" ) );
+        assertEquals( "artifactId", PluginDescriptor.getGoalPrefixFromArtifactId( "artifactId-plugin" ) );
     }
 
     public void testShouldWriteDependencies()
