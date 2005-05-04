@@ -250,6 +250,11 @@ public class Dependency
         return getGroupId() + ":" + getArtifactId() + ":" + getType();
     }
 
+    public String getDependencyConflictId()
+    {
+        return getGroupId() + ":" + getArtifactId() + ":" + getType() + ":" + getVersion();
+    }
+
     public void setResolvedVersion( String resolvedVersion )
     {
         this.resolvedVersion = resolvedVersion;

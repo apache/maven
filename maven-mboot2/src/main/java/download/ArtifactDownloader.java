@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArtifactDownloader
 {
@@ -36,7 +38,7 @@ public class ArtifactDownloader
 
     private static final String REPO_URL = "http://repo1.maven.org/maven2";
 
-    private Set downloadedArtifacts = new HashSet();
+    private Map downloadedArtifacts = new HashMap();
 
     public ArtifactDownloader( Repository localRepository, List remoteRepositories )
         throws Exception
@@ -72,7 +74,8 @@ public class ArtifactDownloader
         {
             Dependency dep = (Dependency) j.next();
 
-            if ( !downloadedArtifacts.contains( dep ) )
+            String dependencyConflictId = dep.getDependencyConflictId();
+            if ( !downloadedArtifacts.containsKey( dependencyConflictId ) )
             {
                 File destinationFile = localRepository.getArtifactFile( dep );
                 // The directory structure for this project may
@@ -97,7 +100,12 @@ public class ArtifactDownloader
                     throw new DownloadFailedException( "Failed to download " + dep );
                 }
 
-                downloadedArtifacts.add( dep );
+                downloadedArtifacts.put( dependencyConflictId, dep );
+            }
+            else
+            {
+                Dependency d = (Dependency) downloadedArtifacts.get( dependencyConflictId );
+                dep.setResolvedVersion( d.getResolvedVersion() );
             }
         }
     }
