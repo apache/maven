@@ -33,11 +33,6 @@ public class WarHandler
         return "wars";
     }
 
-    public String additionalPlugin()
-    {
-        return "war";
-    }
-
     public String packageGoal()
     {
         return "war:war";
