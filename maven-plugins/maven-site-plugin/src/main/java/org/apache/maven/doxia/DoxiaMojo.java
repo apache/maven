@@ -4,17 +4,21 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
-import org.apache.maven.reporting.manager.MavenReportManager;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @goal site
  * @description Doxia plugin
+ *
+ * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @version $Id$
  */
 public class DoxiaMojo
     extends AbstractMojo
@@ -32,7 +36,7 @@ public class DoxiaMojo
     private String generatedSiteDirectory;
 
     /**
-     * @parameter expressoin="${project.build.directory}/site"
+     * @parameter expression="${project.build.directory}/site"
      * @required
      */
     private String outputDirectory;
@@ -57,11 +61,11 @@ public class DoxiaMojo
     private MavenProject project;
 
     /**
-     * @parameter expression="${component.org.apache.maven.reporting.manager.MavenReportManager}"
+     * @parameter expression="${reports}"
      * @required
      * @readonly
      */
-    private MavenReportManager reportManager;
+    private Map reports;
 
     /**
      * @parameter expression="${localRepository}"
@@ -87,16 +91,16 @@ public class DoxiaMojo
             config.setModel( project.getModel() );
 
             config.setOutputDirectory( new File( generatedSiteDirectory ) );
-
-            if ( project.getReports() != null )
+            if ( reports != null )
             {
-                reportManager.addReports( project.getReports(), localRepository, remoteRepositories );
-
-                for ( Iterator i = reportManager.getReports().keySet().iterator(); i.hasNext(); )
+System.out.println(reports.size());
+                for ( Iterator i = reports.values().iterator(); i.hasNext(); )
                 {
-                    String reportName = (String) i.next();
+                    MavenReport report = (MavenReport) i.next();
 
-                    reportManager.executeReport( reportName, config );
+                    report.setConfiguration( config );
+
+                    report.generate();
                 }
             }
 

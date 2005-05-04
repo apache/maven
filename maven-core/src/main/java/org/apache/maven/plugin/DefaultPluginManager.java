@@ -216,6 +216,21 @@ public class DefaultPluginManager
                 }
             }
 
+            if ( project.getReports() != null )
+            {
+                for ( Iterator it = project.getReports().getPlugins().iterator(); it.hasNext(); )
+                {
+                    org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
+
+                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                    {
+                        pluginConfig = plugin;
+
+                        break;
+                    }
+                }
+            }
+
             String version = null;
 
             if ( pluginConfig != null )
@@ -791,7 +806,7 @@ public class DefaultPluginManager
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
                                                               "maven-settings", "maven-monitor", "maven-plugin-api",
                                                               "maven-plugin-descriptor", "plexus-container-default",
-                                                              "maven-project", "plexus-container-artifact",
+                                                              "maven-project", "plexus-container-artifact", "maven-reporting-api", "doxia-core",
                                                               "wagon-provider-api", "classworlds", "maven-plugin"} );
     }
 

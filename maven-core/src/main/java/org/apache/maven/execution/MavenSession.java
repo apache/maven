@@ -27,6 +27,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -124,6 +125,18 @@ public class MavenSession
         throws ComponentLookupException
     {
         return container.lookup( role, roleHint );
+    }
+
+    public List lookupList( String role )
+        throws ComponentLookupException
+    {
+        return container.lookupList( role );
+    }
+
+    public Map lookupMap( String role )
+        throws ComponentLookupException
+    {
+        return container.lookupMap( role );
     }
 
     public EventDispatcher getEventDispatcher()
