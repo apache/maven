@@ -170,17 +170,9 @@ public class DefaultPluginManager
     //
     // ----------------------------------------------------------------------
 
-    public boolean isPluginInstalled( String groupId, String artifactId )
+    private boolean isPluginInstalled( String groupId, String artifactId )
     {
         return pluginDescriptors.containsKey( PluginDescriptor.constructPluginKey( groupId, artifactId ) );
-    }
-
-    public void verifyPluginForGoal( String goalName, MavenSession session )
-        throws ArtifactResolutionException, PluginManagerException
-    {
-        String pluginId = PluginDescriptor.getPluginArtifactIdFromGoal( goalName );
-
-        verifyPlugin( PluginDescriptor.getDefaultPluginGroupId(), pluginId, session );
     }
 
     public void verifyPlugin( String groupId, String artifactId, MavenSession session )
