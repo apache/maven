@@ -1,6 +1,5 @@
 <mojo xmlns="marmalade:mojo">
   <metadata>
-    <id>it0015</id>
     <goal>it0015</goal>
     <description>Output a file with specified contents to [outDir]</description>
     <parameters>
