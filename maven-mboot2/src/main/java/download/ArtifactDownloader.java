@@ -92,9 +92,7 @@ public class ArtifactDownloader
                     continue;
                 }
 
-                getRemoteArtifact( dep, destinationFile );
-
-                if ( !destinationFile.exists() )
+                if ( !getRemoteArtifact( dep, destinationFile ) )
                 {
                     throw new DownloadFailedException( "Failed to download " + dep );
                 }
