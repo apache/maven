@@ -17,40 +17,32 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionRequest;
-import org.apache.maven.plugin.MojoExecutionResponse;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @goal it0013
  *
  * @description touches a test file
  *
- * @parameter
- *  name="outputDirectory"
- *  type="String"
- *  required="true"
- *  validator=""
- *  expression="#project.build.directory"
- *  description=""
  */
 public class CoreIt0013Mojo
     extends AbstractMojo
 {
     private static final int DELETE_RETRY_SLEEP_MILLIS = 10;
+    
+    /**
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private String outputDirectory;
 
-    public void execute( MojoExecutionRequest request, MojoExecutionResponse response )
-        throws Exception
+    public void execute()
+        throws MojoExecutionException
     {
-        String outputDirectory = (String) request.getParameter( "outputDirectory" );
-
-        if ( outputDirectory == null || outputDirectory.length() == 0 )
-        {
-            throw new Exception( "outputDirectory must be specified" );
-        }
-
         getLog().info( "outputDirectory = " + outputDirectory );
 
         File f = new File( outputDirectory );
@@ -62,10 +54,17 @@ public class CoreIt0013Mojo
         
         File touch = new File( f, "it0013-verify" );
         
-        FileWriter w = new FileWriter( touch );
-        
-        w.write( "it0013-verify" );
-        
-        w.close();                
+        try
+        {
+            FileWriter w = new FileWriter( touch );
+
+            w.write( "it0013-verify" );
+
+            w.close(); 
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error writing verification file.", e );
+        }                
     }
 }

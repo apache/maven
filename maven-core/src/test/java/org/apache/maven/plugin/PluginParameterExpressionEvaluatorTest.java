@@ -69,23 +69,6 @@ public class PluginParameterExpressionEvaluatorTest
                                  new DefaultLog( container.getLogger() ), Collections.EMPTY_LIST );
     }
 
-    public void testParameterThatIsAComponent()
-        throws Exception
-    {
-
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
-
-        ArtifactRepository repo = new ArtifactRepository( "test", "http://www.test.com", repoLayout );
-
-        PlexusContainer container = getContainer();
-        MavenSession session = createSession( createDefaultProject(), container, repo );
-
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null );
-
-        assertNotNull( expressionEvaluator.evaluate( "${component.org.apache.maven.project.MavenProjectBuilder}" ) );
-    }
-
     public void testLocalRepositoryExtraction()
         throws Exception
     {

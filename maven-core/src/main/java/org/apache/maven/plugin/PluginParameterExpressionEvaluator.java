@@ -77,23 +77,7 @@ public class PluginParameterExpressionEvaluator
             return expression;
         }
 
-        if ( expression.startsWith( "component" ) )
-        {
-            context.getLog().warn( "WARNING: plugin is using deprecated expression " + expression );
-
-            // TODO: deprecated... and can remove the lookup method in context afterwards
-            String role = expression.substring( 10 );
-
-            try
-            {
-                value = context.lookup( role );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new ExpressionEvaluationException( "Cannot lookup component: " + role + ".", e );
-            }
-        }
-        else if (expression.equals( "reports" ) )
+        if (expression.equals( "reports" ) )
         {
             String role = PluginManager.ROLE;
             try
@@ -131,11 +115,6 @@ public class PluginParameterExpressionEvaluator
         else if ( expression.equals( "localRepository" ) )
         {
             value = context.getLocalRepository();
-        }
-        else if ( expression.equals( "maven.final.name" ) )
-        {
-            // TODO: remove this alias
-            value = context.getProject().getBuild().getFinalName();
         }
         else if ( expression.equals( "project" ) )
         {
@@ -202,21 +181,18 @@ public class PluginParameterExpressionEvaluator
             // TODO: without #, this could just be an evaluate call...
 
             String val = (String) value;
-            int sharpSeparator = val.indexOf( "#" );
-            if ( sharpSeparator < 0 )
-            {
-                sharpSeparator = val.indexOf( "${" );
-            }
+            
+            int exprStartDelimiter = val.indexOf( "${" );
 
-            if ( sharpSeparator >= 0 )
+            if ( exprStartDelimiter >= 0 )
             {
-                if ( sharpSeparator > 0 )
+                if ( exprStartDelimiter > 0 )
                 {
-                    value = val.substring( 0, sharpSeparator ) + evaluate( val.substring( sharpSeparator ) );
+                    value = val.substring( 0, exprStartDelimiter ) + evaluate( val.substring( exprStartDelimiter ) );
                 }
                 else
                 {
-                    value = evaluate( val.substring( sharpSeparator ) );
+                    value = evaluate( val.substring( exprStartDelimiter ) );
                 }
             }
         }
@@ -226,12 +202,7 @@ public class PluginParameterExpressionEvaluator
 
     private String stripTokens( String expr )
     {
-        if ( expr.startsWith( "#" ) )
-        {
-            context.getLog().warn( "DEPRECATED: use ${} to delimit expressions instead of # for '" + expr + "'" );
-            expr = expr.substring( 1 );
-        }
-        else if ( expr.startsWith( "${" ) && expr.indexOf( "}" ) == expr.length() - 1 )
+        if ( expr.startsWith( "${" ) && expr.indexOf( "}" ) == expr.length() - 1 )
         {
             expr = expr.substring( 2, expr.length() - 1 );
         }

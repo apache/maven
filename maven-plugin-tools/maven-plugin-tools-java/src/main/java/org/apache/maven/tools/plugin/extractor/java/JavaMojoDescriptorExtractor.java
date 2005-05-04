@@ -24,7 +24,6 @@ import org.apache.maven.tools.plugin.extractor.InvalidParameterException;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
 import org.codehaus.modello.StringUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.DocletTag;
@@ -233,33 +232,6 @@ public class JavaMojoDescriptorExtractor
 
         Map rawParams = new TreeMap();
 
-        // for backward compat, we'll toss on the params declared at the class level.
-        DocletTag[] classLevelParams = javaClass.getTagsByName( PARAMETER );
-        if ( classLevelParams != null )
-        {
-            for ( int i = 0; i < classLevelParams.length; i++ )
-            {
-                DocletTag tag = classLevelParams[i];
-
-                String message = "DEPRECATED: Use field-level annotations "
-                    + "for parameters instead of class-level annotations. (parameter \'"
-                    + tag.getNamedParameter( "name" ) + "\'; class \'" + javaClass.getFullyQualifiedName() + ")";
-
-                Logger logger = getLogger();
-                if ( logger != null )
-                {
-                    logger.warn( message );
-                }
-                else
-                {
-                    // we're being used from pluggy, so this is okay...
-                    System.err.println( message );
-                }
-
-                rawParams.put( tag.getNamedParameter( "name" ), tag );
-            }
-        }
-
         extractFieldParameterTags( javaClass, rawParams );
 
         Set parameters = new HashSet();
@@ -269,58 +241,26 @@ public class JavaMojoDescriptorExtractor
             Map.Entry entry = (Entry) it.next();
             String paramName = (String) entry.getKey();
 
-            Object val = entry.getValue();
+            JavaField field = (JavaField) entry.getValue();
 
-            JavaField field = null;
-            DocletTag parameter = null;
-
-            // FIXME: ICK! This is only here for backward compatibility to the class-level annotations of params.
-            if ( val instanceof JavaField )
-            {
-                field = (JavaField) val;
-
-                parameter = field.getTagByName( PARAMETER );
-            }
-            else
-            {
-                parameter = (DocletTag) val;
-            }
+            DocletTag parameter = field.getTagByName( PARAMETER );
 
             Parameter pd = new Parameter();
 
-            // if the field is null, then we're using a deprecated annotation pattern...
-            // TODO: remove when backward compatibility is no longer an issue.
-            if ( field == null )
+            pd.setName( paramName );
+
+            pd.setType( field.getType().getValue() );
+
+            pd.setDescription( field.getComment() );
+
+            pd.setRequired( field.getTagByName( REQUIRED ) != null );
+
+            pd.setEditable( field.getTagByName( READONLY ) == null );
+
+            DocletTag deprecationTag = field.getTagByName( DEPRECATED );
+            if ( deprecationTag != null )
             {
-                pd.setName( paramName );
-
-                pd.setType( parameter.getNamedParameter( "type" ) );
-
-                pd.setDescription( parameter.getNamedParameter( "description" ) );
-
-                pd.setRequired( parameter.getNamedParameter( REQUIRED ).equals( "true" ) ? true : false );
-
-                pd.setDeprecated( parameter.getNamedParameter( DEPRECATED ) );
-
-                pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
-            }
-            else
-            {
-                pd.setName( paramName );
-
-                pd.setType( field.getType().getValue() );
-
-                pd.setDescription( field.getComment() );
-
-                pd.setRequired( field.getTagByName( REQUIRED ) != null );
-
-                pd.setEditable( field.getTagByName( READONLY ) == null );
-
-                DocletTag deprecationTag = field.getTagByName( DEPRECATED );
-                if ( deprecationTag != null )
-                {
-                    pd.setDeprecated( deprecationTag.getValue() );
-                }
+                pd.setDeprecated( deprecationTag.getValue() );
             }
 
             String alias = parameter.getNamedParameter( "alias" );

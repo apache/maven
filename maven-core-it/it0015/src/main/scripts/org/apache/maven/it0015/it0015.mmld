@@ -6,7 +6,7 @@
     <parameters>
       <parameter>
         <name>outDir</name>
-        <expression>#project.build.directory</expression>
+        <expression>${project.build.directory}</expression>
         <default>target</default>
         <description>Output directory for files.</description>
       </parameter>
