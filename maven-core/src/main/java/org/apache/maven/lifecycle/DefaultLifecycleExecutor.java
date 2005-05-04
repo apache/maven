@@ -35,6 +35,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -68,6 +69,8 @@ public class DefaultLifecycleExecutor
     private MavenProjectBuilder projectBuilder;
 
     private PluginManager pluginManager;
+
+    private ModelDefaultsInjector modelDefaultsInjector;
 
     private List phases;
 
@@ -196,31 +199,15 @@ public class DefaultLifecycleExecutor
             project.addPlugin( plugin );
         }
 
+        // TODO: shouldn't have to call all the time
+        modelDefaultsInjector.injectDefaults( project.getModel() );
+
+        // TODO: remove - should discover the version
+        plugin = findPlugin( project.getPlugins(), groupId, artifactId );
         if ( plugin.getVersion() == null )
         {
-            while ( project != null )
-            {
-                PluginManagement pluginManagement = project.getPluginManagement();
-
-                if ( pluginManagement != null )
-                {
-                    Plugin management = findPlugin( pluginManagement.getPlugins(), groupId, artifactId );
-                    if ( management != null && management.getVersion() != null )
-                    {
-                        plugin.setVersion( management.getVersion() );
-                        break;
-                    }
-                }
-                project = project.getParent();
-            }
-
-            if ( plugin.getVersion() == null )
-            {
-                // TODO: this has probably supplanted the default in the plugin manager
-                plugin.setVersion( PluginDescriptor.getDefaultPluginVersion() );
-            }
+            plugin.setVersion( PluginDescriptor.getDefaultPluginVersion() );
         }
-
     }
 
     private static Plugin findPlugin( List plugins, String groupId, String artifactId )
