@@ -55,7 +55,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -320,8 +319,6 @@ public class DefaultPluginManager
     public void executeMojo( MavenSession session, MojoDescriptor mojoDescriptor )
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
-        MojoExecutionRequest request = null;
-
         if ( mojoDescriptor.getRequiresDependencyResolution() != null )
         {
 
@@ -364,14 +361,11 @@ public class DefaultPluginManager
 
             plugin.setLog( session.getLog() );
 
-            // TODO: remove
-            boolean newMojoTechnique = checkMojoTechnique( plugin.getClass() );
-
-            String goalId = PluginDescriptor.getGoalIdFromFullGoal( goalName );
+            String goalId = mojoDescriptor.getGoal();
 
             // TODO: can probable refactor these a little when only the new plugin technique is in place
-            Xpp3Dom dom = session.getProject().getGoalConfiguration( PluginDescriptor.getPluginArtifactIdFromGoal( goalName ),
-                                                                     goalId );
+            Xpp3Dom dom = session.getProject().getGoalConfiguration(
+                PluginDescriptor.getPluginArtifactIdFromGoal( goalName ), goalId );
 
             PlexusConfiguration pomConfiguration;
             if ( dom == null )
@@ -398,22 +392,10 @@ public class DefaultPluginManager
 
             try
             {
-                if ( newMojoTechnique )
-                {
-                    Map map = getPluginConfigurationFromExpressions( plugin, mojoDescriptor, mergedConfiguration,
-                                                                     expressionEvaluator );
+                getPluginConfigurationFromExpressions( plugin, mojoDescriptor, mergedConfiguration,
+                                                       expressionEvaluator );
 
-                    populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, expressionEvaluator );
-                }
-                else
-                {
-                    getLogger().warn( "WARNING: The mojo " + mojoDescriptor.getId() + " is using the OLD API" );
-
-                    Map map = getPluginConfigurationFromExpressions( plugin, mojoDescriptor, mergedConfiguration,
-                                                                     expressionEvaluator );
-
-                    request = createPluginRequest( pomConfiguration, map );
-                }
+                populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, expressionEvaluator );
             }
             catch ( ExpressionEvaluationException e )
             {
@@ -428,14 +410,7 @@ public class DefaultPluginManager
             dispatcher.dispatchStart( event, goalName );
             try
             {
-                if ( newMojoTechnique )
-                {
-                    plugin.execute();
-                }
-                else
-                {
-                    plugin.execute( request );
-                }
+                plugin.execute();
 
                 dispatcher.dispatchEnd( event, goalName );
             }
@@ -545,55 +520,12 @@ public class DefaultPluginManager
         return dom;
     }
 
-    /**
-     * @deprecated
-     */
-    private static boolean checkMojoTechnique( Class aClass )
-    {
-        boolean newMojoTechnique = false;
-        try
-        {
-            aClass.getDeclaredMethod( "execute", new Class[0] );
-            newMojoTechnique = true;
-        }
-        catch ( NoSuchMethodException e )
-        {
-            // intentionally ignored
-
-            Class superclass = aClass.getSuperclass();
-            if ( superclass != AbstractMojo.class )
-            {
-                return checkMojoTechnique( superclass );
-            }
-        }
-        return newMojoTechnique;
-    }
-
     // ----------------------------------------------------------------------
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
 
-    /**
-     * @param configuration
-     * @param map
-     * @return
-     * @deprecated
-     */
-    private static MojoExecutionRequest createPluginRequest( PlexusConfiguration configuration, Map map )
-    {
-        Map parameters = new HashMap();
-        PlexusConfiguration[] children = configuration.getChildren();
-        for ( int i = 0; i < children.length; i++ )
-        {
-            PlexusConfiguration child = children[i];
-            parameters.put( child.getName(), child.getValue( null ) );
-        }
-        map = CollectionUtils.mergeMaps( map, parameters );
-        return new MojoExecutionRequest( map );
-    }
-
     private void populatePluginFields( Mojo plugin, MojoDescriptor mojoDescriptor, PlexusConfiguration configuration,
-                                      ExpressionEvaluator expressionEvaluator )
+                                       ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
         ComponentConfigurator configurator = null;
@@ -621,8 +553,7 @@ public class DefaultPluginManager
         catch ( ComponentLookupException e )
         {
             throw new PluginConfigurationException(
-                                                    "Unable to retrieve component configurator for plugin configuration",
-                                                    e );
+                "Unable to retrieve component configurator for plugin configuration", e );
         }
         finally
         {
@@ -663,14 +594,12 @@ public class DefaultPluginManager
     /**
      * @deprecated [JC] in favor of what?
      */
-    private Map getPluginConfigurationFromExpressions( Mojo plugin, MojoDescriptor goal,
-                                                       PlexusConfiguration mergedConfiguration,
-                                                       ExpressionEvaluator expressionEvaluator )
+    private void getPluginConfigurationFromExpressions( Mojo plugin, MojoDescriptor goal,
+                                                        PlexusConfiguration mergedConfiguration,
+                                                        ExpressionEvaluator expressionEvaluator )
         throws ExpressionEvaluationException, PluginConfigurationException
     {
         List parameters = goal.getParameters();
-
-        Map map = new HashMap();
 
         for ( int i = 0; i < parameters.size(); i++ )
         {
@@ -785,9 +714,7 @@ public class DefaultPluginManager
                     createPluginParameterRequiredMessage( goal, parameter, expression ) );
             }
 
-            map.put( key, value );
         }
-        return map;
     }
 
     public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter,
@@ -821,7 +748,8 @@ public class DefaultPluginManager
         artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
                                                               "maven-settings", "maven-monitor", "maven-plugin-api",
                                                               "maven-plugin-descriptor", "plexus-container-default",
-                                                              "maven-project", "plexus-container-artifact", "maven-reporting-api", "doxia-core",
+                                                              "maven-project", "plexus-container-artifact",
+                                                              "maven-reporting-api", "doxia-core",
                                                               "wagon-provider-api", "classworlds", "maven-plugin",
                                                               "plexus-marmalade-factory", "maven-script-marmalade",
                                                               "marmalade-core"} );
