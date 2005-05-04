@@ -43,13 +43,7 @@
       <implementation>org.apache.maven.lifecycle.DefaultLifecycleExecutor</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.project.MavenProjectBuilder</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.PluginManager</role>

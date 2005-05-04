@@ -62,15 +62,11 @@ public class DefaultLifecycleExecutor
     // Components
     // ----------------------------------------------------------------------
 
-    private ArtifactResolver artifactResolver;
-
-    private ArtifactHandlerManager artifactHandlerManager;
-
-    private MavenProjectBuilder projectBuilder;
+    private ModelDefaultsInjector modelDefaultsInjector;
 
     private PluginManager pluginManager;
 
-    private ModelDefaultsInjector modelDefaultsInjector;
+    private ArtifactHandlerManager artifactHandlerManager;
 
     private List phases;
 
