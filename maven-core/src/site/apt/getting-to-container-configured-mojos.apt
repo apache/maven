@@ -5,7 +5,7 @@
   ---
   29-April-2005
 
-* Abstract
+Abstract
 
   We're moving toward integrating mojos as first-class plexus components, while
   at the same time avoiding introducing required plexus dependencies into the
@@ -22,9 +22,9 @@
   there, we need to do several things to add capability to the default 
   configuration of plexus. This document will detail those changes.
 
-* Container Enhancements
+Container Enhancements
 
-** ExpressionEvaluator
+* ExpressionEvaluator
 
   Currently, the expression evaluator used to resolve configuration values
   is the DefaultExpressionEvaluator, which is a local variable within the
@@ -36,7 +36,7 @@
   We need a replacement for DefaultExpressionEvaluator that is capable of
   traversing an object graph and extracting Object values, not just Strings.
 
-** ComponentConfigurator
+* ComponentConfigurator
 
   Currently, the container uses BasicComponentConfigurator, to configure
   components. This wouldn't be a problem, except for the local instance of
@@ -45,7 +45,7 @@
   implementation under a different roleHint, or else replace the 
   BasicComponentConfigurator.
 
-** Other
+* Other
 
   We may need to define a new lifecycle/phase to contextualize a mojo right
   before it's used, and reset it's state afterward. Up to now, the approach
@@ -55,9 +55,9 @@
   run a reactorized project...the successive calls may leave behind configuration
   artifacts from invocation to invocation.
 
-* Maven Modifications
+Maven Modifications
 
-** DefaultPluginManager
+* DefaultPluginManager
 
   s/getMojoConfiguration()/getConfiguration()/g
 
@@ -66,17 +66,17 @@
   some way of recontextualizing the mojo, and all we would need to do is inject
   POM configuration via the lookup method or something.
 
-** PluginDescriptorBuilder
+* PluginDescriptorBuilder
 
   s/getMojoConfiguration()/getConfiguration()/g
 
   That should be all there is to it.
 
-** MojoDescriptor
+* MojoDescriptor
 
   Remove set/getMojoConfiguration(..), as it will become obsolete.
 
-** MavenSession
+* MavenSession
 
   We may need to enable the context injection here, since this will be 
   instantiated per-project. If we always inject the same context parameters,
