@@ -405,12 +405,12 @@ public class DefaultMavenProjectBuilder
         catch ( IOException e )
         {
             throw new ProjectBuildingException(
-                "Error while reading model from file '" + file.getAbsolutePath() + "'.", e );
+                "Failed to build model from file '" + file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         catch ( XmlPullParserException e )
         {
             throw new ProjectBuildingException(
-                "Error while parsing model from file '" + file.getAbsolutePath() + "'.", e );
+                "Failed to parse model from file '" + file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         finally
         {
@@ -429,11 +429,11 @@ public class DefaultMavenProjectBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "Error while building model from " + url.toExternalForm(), e );
+            throw new ProjectBuildingException( "Failed build model from URL \'" + url.toExternalForm() + "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException( "Error while building model from " + url.toExternalForm(), e );
+            throw new ProjectBuildingException( "Failed to parse model from URL \'" + url.toExternalForm() + "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         finally
         {
