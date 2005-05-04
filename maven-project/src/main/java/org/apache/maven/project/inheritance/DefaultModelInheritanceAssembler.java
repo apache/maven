@@ -206,40 +206,26 @@ public class DefaultModelInheritanceAssembler
             }
             else
             {
-                List childPlugins = childPluginMgmt.getPlugins();
-
-                Map mappedChildPlugins = new TreeMap();
-                for ( Iterator it = childPlugins.iterator(); it.hasNext(); )
-                {
-                    Plugin plugin = (Plugin) it.next();
-                    mappedChildPlugins.put( constructPluginKey( plugin ), plugin );
-                }
+                Map mappedChildPlugins = childPluginMgmt.getPluginsAsMap();
 
                 for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
                 {
                     Plugin plugin = (Plugin) it.next();
 
-                    String pluginKey = constructPluginKey( plugin );
-
-                    if ( !mappedChildPlugins.containsKey( pluginKey ) )
+                    if ( !mappedChildPlugins.containsKey( plugin.getKey() ) )
                     {
                         childPluginMgmt.addPlugin( plugin );
                     }
                     else
                     {
-                        Plugin childPlugin = (Plugin) mappedChildPlugins.get( pluginKey );
+                        Plugin childPlugin = (Plugin) mappedChildPlugins.get( plugin.getKey() );
 
                         if ( childPlugin.getVersion() == null )
                         {
                             childPlugin.setVersion( childPlugin.getVersion() );
                         }
 
-                        Map mappedChildGoals = new TreeMap();
-                        for ( Iterator itGoals = childPlugin.getGoals().iterator(); itGoals.hasNext(); )
-                        {
-                            Goal goal = (Goal) itGoals.next();
-                            mappedChildGoals.put( goal.getId(), goal );
-                        }
+                        Map mappedChildGoals = childPlugin.getGoalsAsMap();
 
                         for ( Iterator itGoals = plugin.getGoals().iterator(); itGoals.hasNext(); )
                         {
@@ -265,11 +251,6 @@ public class DefaultModelInheritanceAssembler
                 }
             }
         }
-    }
-
-    private String constructPluginKey( Plugin plugin )
-    {
-        return plugin.getGroupId() + ":" + plugin.getArtifactId();
     }
 
     private void assembleDependencyManagementInheritance( Model child, Model parent )

@@ -17,6 +17,7 @@ package org.apache.maven.project.injection;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 
 /**
  * @author jdcasey Created on Feb 1, 2005
@@ -26,4 +27,6 @@ public interface ModelDefaultsInjector
     String ROLE = ModelDefaultsInjector.class.getName();
 
     void injectDefaults( Model model );
+
+    void mergePluginWithDefaults( Plugin plugin, Plugin def );    
 }

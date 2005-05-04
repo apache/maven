@@ -178,6 +178,7 @@ public class DefaultPluginManager
     public void verifyPlugin( String groupId, String artifactId, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException
     {
+        // TODO: we should we support concurrent versions
         if ( !isPluginInstalled( groupId, artifactId ) )
         {
             MavenProject project = session.getProject();
@@ -217,10 +218,8 @@ public class DefaultPluginManager
             {
                 if ( StringUtils.isEmpty( pluginConfig.getVersion() ) )
                 {
-                    // The model/project builder should have validated this already
-                    String message = "The maven plugin with groupId: '" + groupId + "' and artifactId: '" + artifactId +
-                        "' which was configured for use in this project does not have a version associated with it.";
-                    throw new IllegalStateException( message );
+                    // TODO: this is where we go searching the repo for more information
+                    version = PluginDescriptor.getDefaultPluginVersion();
                 }
                 else
                 {

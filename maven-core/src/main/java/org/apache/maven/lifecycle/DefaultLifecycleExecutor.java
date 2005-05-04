@@ -174,45 +174,23 @@ public class DefaultLifecycleExecutor
 
     private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId )
     {
-        // TODO: use the model injector, or just lookup the versions from the project?
-        // They need to be injected, but we should track the required plugins first, then just sweep through.
-
-        // TODO: this is a bit of a hack to get the version from plugin management - please fix
-
-        Plugin plugin = findPlugin( project.getPlugins(), groupId, artifactId );
+        String key = Plugin.constructKey( groupId, artifactId );
+        Plugin plugin = (Plugin) project.getBuild().getPluginsAsMap().get( key );
 
         if ( plugin == null )
         {
             plugin = new Plugin();
             plugin.setGroupId( groupId );
             plugin.setArtifactId( artifactId );
+
+            Plugin def = (Plugin) project.getPluginManagement().getPluginsAsMap().get( key );
+            if ( def != null )
+            {
+                modelDefaultsInjector.mergePluginWithDefaults( plugin, def );
+            }
+
             project.addPlugin( plugin );
         }
-
-        // TODO: shouldn't have to call all the time
-        modelDefaultsInjector.injectDefaults( project.getModel() );
-
-        // TODO: remove - should discover the version
-        plugin = findPlugin( project.getPlugins(), groupId, artifactId );
-        if ( plugin.getVersion() == null )
-        {
-            plugin.setVersion( PluginDescriptor.getDefaultPluginVersion() );
-        }
-    }
-
-    private static Plugin findPlugin( List plugins, String groupId, String artifactId )
-    {
-        Plugin plugin = null;
-
-        for ( Iterator i = plugins.iterator(); i.hasNext() && plugin == null; )
-        {
-            Plugin p = (Plugin) i.next();
-            if ( groupId.equals( p.getGroupId() ) && artifactId.equals( p.getArtifactId() ) )
-            {
-                plugin = p;
-            }
-        }
-        return plugin;
     }
 
     private void processPluginConfiguration( MavenProject project, MavenSession mavenSession, Map phaseMap )

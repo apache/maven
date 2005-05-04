@@ -657,8 +657,54 @@
       </fields>
     </class>
     <class>
+      <name>PluginContainer</name>
+      <version>3.0.0+</version>
+      <fields>
+        <field>
+          <name>plugins</name>
+          <version>4.0.0</version>
+          <description>
+            The plugins specified here are not validated until they
+            are referenced in a POM within the group. This allows the
+            specification of a "standard" version for a particular
+            plugin.
+          </description>
+          <association>
+            <type>Plugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    Map pluginMap;
+
+    public Map getPluginsAsMap()
+    {
+        if ( pluginMap == null )
+        {
+            pluginMap = new HashMap();
+            if ( plugins != null )
+            {
+                for ( Iterator it = plugins.iterator(); it.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) it.next();
+                    pluginMap.put( plugin.getKey(), plugin );
+                }
+            }
+        }
+        return pluginMap;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
       <name>Build</name>
       <version>3.0.0+</version>
+      <superClass>PluginContainer</superClass>
       <fields>
         <field>
           <name>nagEmailAddress</name>
@@ -840,17 +886,6 @@
             The directory where compiled test classes are placed.
           ]]></description>
           <type>String</type>
-        </field>
-        <field>
-          <name>plugins</name>
-          <version>4.0.0</version>
-          <description><![CDATA[
-            Configuration for plugins to be used to build this project.
-          ]]></description>
-          <association>
-            <type>Plugin</type>
-            <multiplicity>*</multiplicity>
-          </association>
         </field>
         <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
          | plugins to be used in sub-projects. -->
@@ -2015,6 +2050,16 @@
         }
         return goalMap;
     }
+
+    public String getKey()
+    {
+        return constructKey( groupId, artifactId );
+    }
+
+    public static String constructKey( String groupId, String artifactId )
+    {
+        return groupId + ":" + artifactId;
+    }
           ]]></code>
         </codeSegment>
       </codeSegments>
@@ -2060,25 +2105,10 @@
     <class>
       <name>PluginManagement</name>
       <version>4.0.0</version>
+      <superClass>PluginContainer</superClass>
       <description>
         Section for management of default plugin information for use in a group of POMs.
       </description>
-      <fields>
-        <field>
-          <name>plugins</name>
-          <version>4.0.0</version>
-          <description>
-            The dependencies specified here are not validated until they
-            are referenced in a POM within the group. This allows the
-            specification of a "standard" version for a particular
-            dependency.
-          </description>
-          <association>
-            <type>Plugin</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-      </fields>
     </class>
     <class>
       <name>Reports</name>

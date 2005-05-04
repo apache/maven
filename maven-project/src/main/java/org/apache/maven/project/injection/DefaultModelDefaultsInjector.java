@@ -41,11 +41,11 @@ public class DefaultModelDefaultsInjector
         injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );
         if ( model.getBuild() != null )
         {
-            injectPluginDefaults( model.getBuild().getPlugins(), model.getBuild().getPluginManagement() );
+            injectPluginDefaults( model.getBuild().getPluginsAsMap(), model.getBuild().getPluginManagement() );
         }
     }
 
-    private void injectPluginDefaults( List plugins, PluginManagement pluginManagement )
+    private void injectPluginDefaults( Map pluginMap, PluginManagement pluginManagement )
     {
         if ( pluginManagement != null )
         {
@@ -55,22 +55,13 @@ public class DefaultModelDefaultsInjector
             // of
             // those specified in defaults.
 
-            // TODO: share with inheritence assembler
-            Map pluginMap = new TreeMap();
-            for ( Iterator it = plugins.iterator(); it.hasNext(); )
-            {
-                Plugin plugin = (Plugin) it.next();
-                pluginMap.put( constructPluginKey( plugin ), plugin );
-            }
-
             List managedPlugins = pluginManagement.getPlugins();
 
             for ( Iterator it = managedPlugins.iterator(); it.hasNext(); )
             {
                 Plugin def = (Plugin) it.next();
-                String key = constructPluginKey( def );
 
-                Plugin plugin = (Plugin) pluginMap.get( key );
+                Plugin plugin = (Plugin) pluginMap.get( def.getKey() );
                 if ( plugin != null )
                 {
                     mergePluginWithDefaults( plugin, def );
@@ -79,31 +70,14 @@ public class DefaultModelDefaultsInjector
         }
     }
 
-    private static String constructPluginKey( Plugin plugin )
-    {
-        return plugin.getGroupId() + ":" + plugin.getArtifactId();
-    }
-
-    private void mergePluginWithDefaults( Plugin plugin, Plugin def )
+    public void mergePluginWithDefaults( Plugin plugin, Plugin def )
     {
         if ( plugin.getVersion() == null && def.getVersion() != null )
         {
             plugin.setVersion( def.getVersion() );
         }
 
-        Map defaultGoals = new TreeMap();
-
-        List defGoalList = def.getGoals();
-
-        if ( defGoalList != null )
-        {
-            for ( Iterator it = defGoalList.iterator(); it.hasNext(); )
-            {
-                Goal defaultGoal = (Goal) it.next();
-
-                defaultGoals.put( defaultGoal.getId(), defaultGoal );
-            }
-        }
+        Map defaultGoals = def.getGoalsAsMap();
 
         List pluginGoals = plugin.getGoals();
 
