@@ -257,7 +257,7 @@ public class MojoDescriptor
 
     public String getRoleHint()
     {
-        return getId();
+        return getId() + ":" + getGoal();
     }
 
     public String getComponentType()

@@ -20,19 +20,15 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.script.marmalade.MarmaladeMojoExecutionDirectives;
 import org.apache.maven.script.marmalade.tags.MojoTag;
 import org.apache.maven.tools.plugin.extractor.AbstractScriptedMojoDescriptorExtractor;
-import org.codehaus.marmalade.metamodel.ScriptBuilder;
+import org.codehaus.marmalade.launch.MarmaladeLauncher;
 import org.codehaus.marmalade.model.MarmaladeScript;
 import org.codehaus.marmalade.model.MarmaladeTag;
-import org.codehaus.marmalade.parsing.DefaultParsingContext;
-import org.codehaus.marmalade.parsing.MarmaladeParsingContext;
-import org.codehaus.marmalade.parsing.ScriptParser;
 import org.codehaus.marmalade.runtime.DefaultContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
-import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.component.factory.marmalade.PlexusIntegratedLog;
+import org.codehaus.plexus.logging.Logger;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -72,7 +68,20 @@ public class MarmaladeMojoDescriptorExtractor
                 {
                     File scriptFile = (File) it.next();
 
-                    MarmaladeScript script = parse( scriptFile );
+                    MarmaladeLauncher launcher = new MarmaladeLauncher().withInputFile( scriptFile );
+
+                    Logger logger = getLogger();
+
+                    if ( logger != null )
+                    {
+                        PlexusIntegratedLog log = new PlexusIntegratedLog();
+
+                        log.enableLogging( logger );
+
+                        launcher = launcher.withLog( log );
+                    }
+
+                    MarmaladeScript script = launcher.getMarmaladeScript();
 
                     MarmaladeTag rootTag = script.getRoot();
                     if ( rootTag instanceof MojoTag )
@@ -86,15 +95,15 @@ public class MarmaladeMojoDescriptorExtractor
 
                         contextMap = context.getExternalizedVariables();
 
-                        MojoDescriptor descriptor = (MojoDescriptor) contextMap.get(
-                            MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
+                        MojoDescriptor descriptor = (MojoDescriptor) contextMap
+                            .get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
 
                         descriptors.add( descriptor );
                     }
                     else
                     {
-                        System.out.println( "This script is not a mojo. Its root tag is {element: " +
-                                            rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}" );
+                        System.out.println( "This script is not a mojo. Its root tag is {element: "
+                            + rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}" );
                     }
                 }
             }
@@ -104,34 +113,6 @@ public class MarmaladeMojoDescriptorExtractor
         finally
         {
             Thread.currentThread().setContextClassLoader( oldCl );
-        }
-    }
-
-    private MarmaladeScript parse( File scriptFile )
-        throws Exception
-    {
-        BufferedReader reader = null;
-
-        try
-        {
-            reader = new BufferedReader( new FileReader( scriptFile ) );
-
-            MarmaladeParsingContext parsingContext = new DefaultParsingContext();
-
-            parsingContext.setInputLocation( scriptFile.getPath() );
-            parsingContext.setInput( reader );
-
-            ScriptParser parser = new ScriptParser();
-
-            ScriptBuilder builder = parser.parse( parsingContext );
-
-            MarmaladeScript script = builder.build();
-
-            return script;
-        }
-        finally
-        {
-            IOUtil.close( reader );
         }
     }
 

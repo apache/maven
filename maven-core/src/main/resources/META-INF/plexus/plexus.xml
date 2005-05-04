@@ -25,9 +25,6 @@
           <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
         <requirement>
-          <role>org.codehaus.plexus.component.configurator.ComponentConfigurator</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
       </requirements>

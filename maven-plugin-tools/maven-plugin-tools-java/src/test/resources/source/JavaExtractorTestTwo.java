@@ -12,7 +12,7 @@ public class JavaExtractorTestTwo
 
     /**
      * Maven project used to generate IDEA project files.
-     * @parameter expression="#project"
+     * @parameter
      * @required
      */
     private String[] project;

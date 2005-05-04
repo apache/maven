@@ -1,6 +1,7 @@
 package org.apache.maven.tools.plugin.extractor;
 
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.DirectoryScanner;
 
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.TreeMap;
  * @author jdcasey
  */
 public abstract class AbstractScriptedMojoDescriptorExtractor
+    extends AbstractLogEnabled
     implements MojoDescriptorExtractor
 {
     public Set execute( MavenProject project )
@@ -42,7 +44,9 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
             Set sources = new HashSet();
 
             String resourceDir = (String) it.next();
-            File dir = new File( resourceDir );
+            File dir = new File( resourceDir ).getAbsoluteFile();
+            
+            resourceDir = dir.getPath();
 
             if ( dir.exists() )
             {
@@ -57,7 +61,7 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
                 for ( int i = 0; i < relativePaths.length; i++ )
                 {
                     String relativePath = relativePaths[i];
-                    File scriptFile = new File( dir, relativePath );
+                    File scriptFile = new File( dir, relativePath ).getAbsoluteFile();
 
                     if ( scriptFile.isFile() && relativePath.endsWith( scriptFileExtension ) )
                     {

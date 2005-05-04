@@ -12,7 +12,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -104,6 +103,13 @@ public class PluginDescriptorBuilder
             mojo.setLanguage( langConfig.getValue() );
         }
 
+        PlexusConfiguration configuratorConfig = c.getChild( "configurator" );
+
+        if ( configuratorConfig != null )
+        {
+            mojo.setComponentConfigurator( configuratorConfig.getValue() );
+        }
+
         String phase = c.getChild( "phase" ).getValue();
 
         if ( phase != null )
@@ -144,7 +150,7 @@ public class PluginDescriptorBuilder
             Parameter parameter = new Parameter();
 
             parameter.setName( d.getChild( "name" ).getValue() );
-            
+
             parameter.setAlias( d.getChild( "alias" ).getValue() );
 
             parameter.setType( d.getChild( "type" ).getValue() );
@@ -152,17 +158,17 @@ public class PluginDescriptorBuilder
             String required = d.getChild( "required" ).getValue();
 
             parameter.setRequired( "true".equals( required ) );
-            
-            PlexusConfiguration editableConfig = d.getChild("editable");
-            
+
+            PlexusConfiguration editableConfig = d.getChild( "editable" );
+
             // we need the null check for pre-build legacy plugins...
-            if(editableConfig != null)
+            if ( editableConfig != null )
             {
-                String editable = d.getChild("editable").getValue();
-                
+                String editable = d.getChild( "editable" ).getValue();
+
                 parameter.setEditable( editable == null || "true".equals( editable ) );
             }
-            
+
             parameter.setValidator( d.getChild( "validator" ).getValue() );
 
             parameter.setDescription( d.getChild( "description" ).getValue() );
@@ -187,9 +193,9 @@ public class PluginDescriptorBuilder
         // ----------------------------------------------------------------------
 
         mojo.setMojoConfiguration( c.getChild( "configuration" ) );
-        
+
         // TODO: Go back to this when we get the container ready to configure mojos...
-//        mojo.setConfiguration( c.getChild( "configuration" ) );
+        //        mojo.setConfiguration( c.getChild( "configuration" ) );
 
         // ----------------------------------------------------------------------
         // Requirements

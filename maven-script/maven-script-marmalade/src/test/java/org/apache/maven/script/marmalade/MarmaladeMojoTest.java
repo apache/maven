@@ -17,8 +17,6 @@ package org.apache.maven.script.marmalade;
  */
 
 import junit.framework.TestCase;
-import org.apache.maven.plugin.PluginExecutionRequest;
-import org.apache.maven.plugin.PluginExecutionResponse;
 import org.codehaus.marmalade.metamodel.ScriptBuilder;
 import org.codehaus.marmalade.model.MarmaladeScript;
 import org.codehaus.marmalade.parsing.DefaultParsingContext;
@@ -50,12 +48,9 @@ public class MarmaladeMojoTest
 
         MarmaladeMojo mojo = new MarmaladeMojo( script );
 
-        PluginExecutionRequest request = new PluginExecutionRequest( Collections.EMPTY_MAP );
-        request.setParameters( Collections.singletonMap( "param", "paramValue" ) );
+        mojo.setComponentConfiguration( Collections.singletonMap( "param", "paramValue" ) );
 
-        PluginExecutionResponse response = new PluginExecutionResponse();
-
-        mojo.execute( request, response );
+        mojo.execute();
 
         // TODO: need to be able to pass back results
 //        Object result = request.getContextValue( "testvar" );

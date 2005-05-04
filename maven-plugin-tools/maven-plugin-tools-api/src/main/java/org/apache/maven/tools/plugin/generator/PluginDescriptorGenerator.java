@@ -155,6 +155,19 @@ public class PluginDescriptorGenerator
         //
         // ----------------------------------------------------------------------
 
+        if ( mojoDescriptor.getComponentConfigurator() != null )
+        {
+            w.startElement( "configurator" );
+
+            w.writeText( mojoDescriptor.getComponentConfigurator() );
+
+            w.endElement();
+        }
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
         w.startElement( "instantiationStrategy" );
 
         w.writeText( mojoDescriptor.getInstantiationStrategy() );
@@ -186,7 +199,7 @@ public class PluginDescriptorGenerator
             Parameter parameter = (Parameter) parameters.get( j );
 
             String expression = parameter.getExpression();
-            
+
             if ( StringUtils.isNotEmpty( expression )
                 && ( expression.startsWith( "${component." ) || expression.startsWith( "#component." ) ) )
             {

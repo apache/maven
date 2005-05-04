@@ -84,8 +84,6 @@ public class DefaultPluginManager
 
     protected PathTranslator pathTranslator;
 
-    protected ComponentConfigurator configurator;
-
     private ArtifactFactory artifactFactory;
 
     public DefaultPluginManager()
@@ -362,7 +360,7 @@ public class DefaultPluginManager
 
         try
         {
-            plugin = (Mojo) container.lookup( Mojo.ROLE, goalName );
+            plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
 
             plugin.setLog( session.getLog() );
 
@@ -405,7 +403,7 @@ public class DefaultPluginManager
                     Map map = getPluginConfigurationFromExpressions( plugin, mojoDescriptor, mergedConfiguration,
                                                                      expressionEvaluator );
 
-                    populatePluginFields( plugin, pomConfiguration, expressionEvaluator );
+                    populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, expressionEvaluator );
                 }
                 else
                 {
@@ -594,17 +592,50 @@ public class DefaultPluginManager
         return new MojoExecutionRequest( map );
     }
 
-    private void populatePluginFields( Mojo plugin, PlexusConfiguration configuration,
-                                       ExpressionEvaluator expressionEvaluator )
+    private void populatePluginFields( Mojo plugin, MojoDescriptor mojoDescriptor, PlexusConfiguration configuration,
+                                      ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
+        ComponentConfigurator configurator = null;
+
         try
         {
+            String configuratorId = mojoDescriptor.getComponentConfigurator();
+
+            if ( StringUtils.isNotEmpty( configuratorId ) )
+            {
+                configurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE, configuratorId );
+            }
+            else
+            {
+                configurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE );
+            }
+
             configurator.configureComponent( plugin, configuration, expressionEvaluator );
+
         }
         catch ( ComponentConfigurationException e )
         {
             throw new PluginConfigurationException( "Unable to parse the created DOM for plugin configuration", e );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new PluginConfigurationException(
+                                                    "Unable to retrieve component configurator for plugin configuration",
+                                                    e );
+        }
+        finally
+        {
+            if ( configurator != null )
+            {
+                try
+                {
+                    container.release( configurator );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                }
+            }
         }
     }
 
@@ -791,7 +822,9 @@ public class DefaultPluginManager
                                                               "maven-settings", "maven-monitor", "maven-plugin-api",
                                                               "maven-plugin-descriptor", "plexus-container-default",
                                                               "maven-project", "plexus-container-artifact", "maven-reporting-api", "doxia-core",
-                                                              "wagon-provider-api", "classworlds", "maven-plugin"} );
+                                                              "wagon-provider-api", "classworlds", "maven-plugin",
+                                                              "plexus-marmalade-factory", "maven-script-marmalade",
+                                                              "marmalade-core"} );
     }
 
     // ----------------------------------------------------------------------

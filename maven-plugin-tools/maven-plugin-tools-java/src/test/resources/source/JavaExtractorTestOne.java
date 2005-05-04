@@ -14,7 +14,7 @@ public class JavaExtractorTestOne
 {
     /**
      * Maven project used to generate IDEA project files.
-     * @parameter expression="#project"
+     * @parameter
      * @required
      */
     protected String[] project;

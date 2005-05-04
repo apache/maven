@@ -301,7 +301,7 @@ public class JavaMojoDescriptorExtractor
                 pd.setRequired( parameter.getNamedParameter( REQUIRED ).equals( "true" ) ? true : false );
 
                 pd.setDeprecated( parameter.getNamedParameter( DEPRECATED ) );
-                
+
                 pd.setDefaultValue( parameter.getNamedParameter( "default" ) );
             }
             else
@@ -315,7 +315,7 @@ public class JavaMojoDescriptorExtractor
                 pd.setRequired( field.getTagByName( REQUIRED ) != null );
 
                 pd.setEditable( field.getTagByName( READONLY ) == null );
-                
+
                 DocletTag deprecationTag = field.getTagByName( DEPRECATED );
                 if ( deprecationTag != null )
                 {
@@ -400,7 +400,9 @@ public class JavaMojoDescriptorExtractor
 
         for ( int i = 0; i < javaSources.length; i++ )
         {
-            DocletTag tag = getJavaClass( javaSources[i] ).getTagByName( GOAL );
+            JavaClass javaClass = getJavaClass( javaSources[i] );
+
+            DocletTag tag = javaClass.getTagByName( GOAL );
 
             if ( tag != null )
             {
