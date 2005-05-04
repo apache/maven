@@ -36,6 +36,8 @@ public class ArtifactDownloader
 
     private static final String REPO_URL = "http://repo1.maven.org/maven2";
 
+    private Set downloadedArtifacts = new HashSet();
+
     public ArtifactDownloader( Repository localRepository, List remoteRepositories )
         throws Exception
     {
@@ -53,8 +55,6 @@ public class ArtifactDownloader
         System.out.println( "Using the following for your local repository: " + localRepository );
         System.out.println( "Using the following for your remote repositories: " + remoteRepos );
     }
-
-    private Set downloadedArtifacts = new HashSet();
 
     public void setProxy( String host, String port, String userName, String password )
     {
@@ -157,6 +157,7 @@ public class ArtifactDownloader
                                            proxyPassword, false );
                         version = FileUtils.fileRead( file );
                         log( "Resolved version: " + version );
+                        dep.setResolvedVersion( version );
                         String ver = version.substring( version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
                         String extension = url.substring( url.length() - 4 );
                         url = getSnapshotMetadataFile( url, ver + extension );
@@ -170,7 +171,7 @@ public class ArtifactDownloader
                 {
                     File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
                                                                  dep.getVersion(), dep.getType(),
-                                                                 dep.getArtifactId() + "-" + dep.getVersion() + ".pom" );
+                                                                 dep.getArtifactId() + "-" + dep.getResolvedVersion() + ".pom" );
 
                     file.getParentFile().mkdirs();
 
@@ -194,6 +195,7 @@ public class ArtifactDownloader
                     }
                 }
 
+                destinationFile = localRepository.getArtifactFile( dep );
                 if ( !destinationFile.exists() || version.indexOf( "SNAPSHOT" ) >= 0 )
                 {
                     log( "Downloading " + url );

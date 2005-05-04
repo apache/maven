@@ -407,7 +407,7 @@ public class ModelReader
             Repository localRepository = downloader.getLocalRepository();
             p.parse(
                 localRepository.getMetadataFile( groupId, artifactId, version, type,
-                                                 artifactId + "-" + version + ".pom" ) );
+                                                 artifactId + "-" + pom.getResolvedVersion() + ".pom" ) );
         }
         catch ( IOException e )
         {

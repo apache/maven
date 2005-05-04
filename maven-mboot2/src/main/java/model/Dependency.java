@@ -39,6 +39,8 @@ public class Dependency
 
     private String scope = "compile";
 
+    private String resolvedVersion;
+
     public Dependency()
     {
     }
@@ -109,11 +111,11 @@ public class Dependency
 
         if ( isValid( getArtifactId() ) )
         {
-            artifact = getArtifactId() + "-" + getVersion() + ".";
+            artifact = getArtifactId() + "-" + getResolvedVersion() + ".";
         }
         else
         {
-            artifact = getId() + "-" + getVersion() + ".";
+            artifact = getId() + "-" + getResolvedVersion() + ".";
         }
 
         if ( "jar".equals( getType() ) || "maven-plugin".equals( getType() ) )
@@ -246,5 +248,19 @@ public class Dependency
     public String getConflictId()
     {
         return getGroupId() + ":" + getArtifactId() + ":" + getType();
+    }
+
+    public void setResolvedVersion( String resolvedVersion )
+    {
+        this.resolvedVersion = resolvedVersion;
+    }
+
+    public String getResolvedVersion()
+    {
+        if ( resolvedVersion == null )
+        {
+            resolvedVersion = getVersion();
+        }
+        return resolvedVersion;
     }
 }
