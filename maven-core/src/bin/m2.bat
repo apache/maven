@@ -41,6 +41,8 @@ if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
 @REM set local scope for the variables with windows NT shell
 if "%OS%"=="Windows_NT" @setlocal
 
+set ERROR_CODE=0
+
 @REM ==== START VALIDATION ====
 if not "%JAVA_HOME%" == "" goto OkJHome
 
@@ -49,6 +51,7 @@ echo ERROR: JAVA_HOME not found in your environment.
 echo Please set the JAVA_HOME variable in your environment to match the
 echo location of your Java installation
 echo.
+set ERROR_CODE=1
 goto end
 
 :OkJHome
@@ -60,6 +63,7 @@ echo JAVA_HOME = %JAVA_HOME%
 echo Please set the JAVA_HOME variable in your environment to match the
 echo location of your Java installation
 echo.
+set ERROR_CODE=1
 goto end
 
 :chkMHome
@@ -73,6 +77,7 @@ echo ERROR: M2_HOME not found in your environment.
 echo Please set the M2_HOME variable in your environment to match the
 echo location of the Maven installation
 echo.
+set ERROR_CODE=1
 goto end
 
 :valMHome
@@ -84,6 +89,7 @@ echo M2_HOME = %M2_HOME%
 echo Please set the M2_HOME variable in your environment to match the
 echo location of the Maven installation
 echo.
+set ERROR_CODE=1
 goto end
 @REM ==== END VALIDATION ====
 
@@ -122,7 +128,11 @@ SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
 @REM Start MAVEN2
 %MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %M2_HOME%\core\boot\classworlds-*.jar "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
-goto :end
+goto end
+
+:error
+if "%OS%"=="Windows_NT" @endlocal
+set ERROR_CODE=1
 
 :end
 @REM set local scope for the variables with windows NT shell
@@ -141,4 +151,6 @@ goto postExec
 if exist "%HOME%\mavenrc_post.bat" call "%HOME%\mavenrc_post.bat"
 @REM pause the batch file if MAVEN_BATCH_PAUSE is set to 'on'
 if "%MAVEN_BATCH_PAUSE%" == "on" pause
+
+exit /B %ERROR_CODE%
 
