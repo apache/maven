@@ -126,8 +126,9 @@ public class SnapshotTransformation
                             artifact.setRepository( remoteRepository );
 
                             localMetadata = remoteMetadata;
+
+                            checkedUpdates = true;
                         }
-                        checkedUpdates = true;
                     }
                 }
 
