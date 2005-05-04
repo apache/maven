@@ -17,8 +17,9 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-modello-plugin</artifactId>
-        <version>1.0-alpha-1</version>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <version>1.0-alpha-2-SNAPSHOT</version>
         <goals>
           <goal>
             <id>xpp3-writer</id>
