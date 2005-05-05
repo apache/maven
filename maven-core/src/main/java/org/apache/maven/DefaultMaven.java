@@ -36,6 +36,7 @@ import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -85,6 +86,15 @@ public class DefaultMaven
         if ( request.getSettings().getActiveProfile().isOffline() )
         {
             getLogger().info( "Maven is running in offline mode." );
+        }
+
+        try
+        {
+            resolveParameters( request.getSettings() );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new ReactorException( "Unable to configure Maven for execution", e );
         }
 
         EventDispatcher dispatcher = request.getEventDispatcher();
@@ -200,15 +210,6 @@ public class DefaultMaven
 
         MavenSession session = createSession( request, project );
 
-        try
-        {
-            resolveParameters( request );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new LifecycleExecutionException( "Unable to configure Maven for execution", e );
-        }
-
         // !! This is ripe for refactoring to an aspect.
         // Event monitoring.
         String event = MavenEvents.PROJECT_EXECUTION;
@@ -304,12 +305,10 @@ public class DefaultMaven
      * @todo [JC] we should at least provide a mapping of protocol-to-proxy for
      * the wagons, shouldn't we?
      */
-    private void resolveParameters( MavenExecutionRequest request )
+    private void resolveParameters( Settings settings )
         throws ComponentLookupException
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-
-        Settings settings = request.getSettings();
 
         Proxy proxy = settings.getActiveProxy();
 
@@ -325,6 +324,13 @@ public class DefaultMaven
 
             wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
                                                 server.getPrivateKey(), server.getPassphrase() );
+        }
+
+        for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
+        {
+            Mirror mirror = (Mirror) i.next();
+
+            wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
         }
     }
 

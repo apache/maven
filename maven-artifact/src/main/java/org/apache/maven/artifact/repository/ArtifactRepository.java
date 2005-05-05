@@ -75,4 +75,9 @@ public class ArtifactRepository
     {
         return snapshotPolicy;
     }
+
+    public ArtifactRepository createMirror( Repository mirror )
+    {
+        return new ArtifactRepository( mirror.getId(), mirror.getUrl(), layout, snapshotPolicy );
+    }
 }

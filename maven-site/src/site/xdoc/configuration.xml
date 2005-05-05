@@ -93,13 +93,17 @@
   .
   .]]></source>
       <p style="font-weight: bold; font-size: larger">
-        Deployment Settings
+        Security and Deployment Settings
       </p>
       <p>
         Repositories to deploy to are defined in a project in the <code>&lt;distributionManagement&gt;</code> section.
         However, you cannot put your username, password, or other security settings in that project. For that reason,
         you should add a server definition to your own settings with an <code>id</code> that matches that of the
         deployment repository in the project.
+      </p>
+      <p>
+        In addition, some repositories may require authorisation to download from, so the corresponding settings can
+        be specified in a <code>server</code> element in the same way.
       </p>
       <p>
         Which settings are required will depend on the type of repository you are deploying to. As of the first release,
@@ -123,6 +127,47 @@
   </servers>
   .
   .]]></source>
+      <p style="font-weight: bold; font-size: larger">
+        Using Mirrors for Repositories
+      </p>
+      <p>
+        Repositories are declared inside a project, which means that if you have your own custom repositories, those
+        sharing your project easily get the right settings out of the box. However, you may want to use an alternative
+        mirror for a particular repository without changing the project files.
+      </p>
+      <p>
+        Some reasons to use a mirror are:
+      </p>
+      <ul>
+        <li>There is a synchronized mirror on the internet that is geographically closer and faster</li>
+        <li>You want to replace a particular repository with your own internal repository which you have greater
+          control over</li>
+        <li>You want to run maven-proxy to provide a local cache to a mirror and need to use it's URL instead</li>
+      </ul>
+      <p>
+        To configure a mirror of a given repository, you provide it in your settings file, giving the new repository
+        it's own <code>id</code> and <code>url</code>, and specify the <code>mirrorOf</code> setting that is the ID of
+        the repository you are using a mirror of. For example, the ID of the main Maven repository included by default is
+        <code>central</code>, so to use an Australian mirror, you would configure the following:
+      </p>
+      <source><![CDATA[
+<settings>
+  .
+  .
+  <mirrors>
+   <mirror>
+      <id>planetmirror</id>
+      <name>Australian Mirror of http://repo1.maven.org/maven2/</name>
+      <url>http://public.planetmirror.com/maven2/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+  .
+  .]]></source>
+      <p>
+        <i>Please note:</i> this particular is not actually set up for Maven 2 yet, so this should be treated as an
+        example only.
+      </p>
     </section>
   </body>
 </document>

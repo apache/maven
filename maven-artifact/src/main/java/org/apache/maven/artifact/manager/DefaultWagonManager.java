@@ -33,6 +33,7 @@ import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.ChecksumObserver;
 import org.apache.maven.wagon.proxy.ProxyInfo;
+import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -57,10 +58,13 @@ public class DefaultWagonManager
 {
     private PlexusContainer container;
 
-    // TODO: proxies and authentication are via settings, and should come in via an alternate method - perhaps attached to ArtifactRepository before the method is called (so AR would be composed of WR, not inherit it)
+    // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
+    // attached to ArtifactRepository before the method is called (so AR would be composed of WR, not inherit it)
     private Map proxies = new HashMap();
 
     private Map authenticationInfoMap = new HashMap();
+
+    private Map mirrors = new HashMap();
 
     private TransferListener downloadMonitor;
 
@@ -115,10 +119,12 @@ public class DefaultWagonManager
                                 TransferListener downloadMonitor )
         throws TransferFailedException
     {
+        String protocol = repository.getProtocol();
+
         Wagon wagon = null;
         try
         {
-            wagon = getWagon( repository.getProtocol() );
+            wagon = getWagon( protocol );
         }
         catch ( UnsupportedProtocolException e )
         {
@@ -149,8 +155,7 @@ public class DefaultWagonManager
 
         try
         {
-            wagon.connect( repository, getAuthenticationInfo( repository.getId() ),
-                           getProxy( repository.getProtocol() ) );
+            wagon.connect( repository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
             wagon.put( source, remotePath );
 
@@ -271,9 +276,10 @@ public class DefaultWagonManager
 
         Wagon wagon;
 
+        String protocol = repository.getProtocol();
         try
         {
-            wagon = getWagon( repository.getProtocol() );
+            wagon = getWagon( protocol );
         }
         catch ( UnsupportedProtocolException e )
         {
@@ -308,8 +314,13 @@ public class DefaultWagonManager
 
         try
         {
-            wagon.connect( repository, getAuthenticationInfo( repository.getId() ),
-                           getProxy( repository.getProtocol() ) );
+            Repository mirror = getMirror( repository.getId() );
+            if ( mirror != null )
+            {
+                repository = repository.createMirror( mirror );
+            }
+
+            wagon.connect( repository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
             wagon.get( remotePath, temp );
 
@@ -421,6 +432,11 @@ public class DefaultWagonManager
         return (AuthenticationInfo) authenticationInfoMap.get( id );
     }
 
+    private Repository getMirror( String mirrorOf )
+    {
+        return (Repository) mirrors.get( mirrorOf );
+    }
+
     /**
      * Set the proxy used for a particular protocol.
      *
@@ -475,5 +491,12 @@ public class DefaultWagonManager
         authInfo.setPassphrase( passphrase );
 
         authenticationInfoMap.put( repositoryId, authInfo );
+    }
+
+    public void addMirror( String id, String mirrorOf, String url )
+    {
+        Repository mirror = new Repository( id, url );
+
+        mirrors.put( mirrorOf, mirror );
     }
 }
