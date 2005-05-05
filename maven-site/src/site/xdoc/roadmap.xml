@@ -1,0 +1,107 @@
+<document>
+  <properties>
+    <title>Road Map</title>
+    <author email="brett@apache.org">Brett Porter</author>
+  </properties>
+  <body>
+    <section name="Development Road Map for Maven 2.0">
+      <p>
+        This document discusses the release plans and current roadmap for Maven 2.0.
+      </p>
+      <p>
+        We are working to a 4-5 week release cycle, meaning that there will be at least one release per month.
+      </p>
+      <p>
+        The first releases such as the technology preview will be designated "alpha" releases, indicating that
+        they are not yet feature complete and there are outstanding bugs. Following that, "beta" releases will be
+        made available where introduction of new features will be restricted and the focus on improving usability and
+        stability. Finally, one or more release candidates will be distributed for testing that are genuinely believed
+        to be final, with the expectation that a final release would be available shortly afterwards.
+      </p>
+      <p>
+        We will continue with the successful technique from Maven 1.0 of making plugins available on a separate
+        release schedule so that new features can be obtained as they are ready and tested.
+      </p>
+      <subsection name="Maven 2.0 alpha 2">
+        <p>
+          <i>Expected Release: </i> 13 May 2005
+        </p>
+        <p>
+          <i>Aims and features:</i> This release is expected to be much more architecturally stable, making early adoption
+          a real possiblity. At this point, there are still only the core plugins available.
+        </p>
+        <ul>
+          <li>Basic site generation</li>
+          <li>Improved error handling</li>
+          <li>Published Mojo and Plugin API</li>
+          <li>Inclusion of Ant tasks for Maven 2.0</li>
+          <li>Preliminary Beanshell Mojo support</li>
+          <li>Miscellaneous feature updates</li>
+          <li>Bugfixes</li>
+        </ul>
+      </subsection>
+      <subsection name="Maven 2.0 alpha 3">
+        <p>
+          <i>Expected Release: </i> mid-June 2005
+        </p>
+        <p>
+          <i>Aims and features:</i> This release is aims to finalise the major features of Maven 2.0.
+          (<b>Note:</b> depending on the quality of this release, it may be labelled as beta 1, with the following
+          release being beta 2).
+        </p>
+        <ul>
+          <li>Remaining planned dependency management features - conflict management and version mediation</li>
+          <li>Outstanding issues for the build lifecycle</li>
+          <li>Build profiles for different environments</li>
+          <li>Improved site and report functionality</li>
+          <li>Multiple project aggregation features</li>
+          <li>Plugin development to meet Maven 1.0 functionality will be underway</li>
+          <li>Release assistance</li>
+          <li>Miscellaneous feature updates</li>
+          <li>Bugfixes</li>
+        </ul>
+      </subsection>
+      <subsection name="Maven 2.0 beta 1">
+        <p>
+          <i>Expected Release: </i> mid-July 2005
+        </p>
+        <p>
+          <i>Aims and features:</i> This should be feature complete and mostly stable. There are expected to be
+          bug fixes and cosmetic changes, but no new major features beyond this release.
+        </p>
+        <ul>
+          <li>Plugins will be nearing their first final releases</li>
+          <li>Shared development environment support</li>
+          <li>Minor cosmetic features</li>
+          <li>Bugfixes</li>
+        </ul>
+      </subsection>
+      <subsection name="Maven 2.0 Final">
+        <p>
+          <i>Expected Release: </i> early August 2005, following a release candidate
+        </p>
+        <p>
+          <i>Aims and features:</i> Final release, a suitable replacement for Maven 1.1 as the stable release for new
+          projects.
+        </p>
+        <ul>
+          <li>Plugin releases</li>
+          <li>Bugfixes</li>
+        </ul>
+      </subsection>
+      <subsection name="Maven 2.0.x">
+        <p>
+          <i>Aims and features:</i> Bugfixes found in the Maven core will be released as interim updates leading up
+          to the Maven 2.1 development stream.
+        </p>
+      </subsection>
+      <subsection name="Maven 2.1">
+        <p>
+          <i>Aims and features:</i> Features to be added after the July freeze on Maven 2.0 will be slated for a 2.1
+          release later in 2005.
+        </p>
+      </subsection>
+    </section>
+  </body>
+</document>
+
