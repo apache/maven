@@ -61,7 +61,13 @@ public abstract class AbstractMavenReport
     public Sink getSink( String outputName )
         throws IOException
     {
-        FileWriter writer = new FileWriter( new File( config.getOutputDirectory(), "xdoc/" + outputName + ".xml" ) );
+        File outputDir = new File( config.getOutputDirectory(), "xdoc/" );
+
+        outputDir.mkdirs();
+
+        File outputFile = new File( outputDir, outputName + ".xml" );
+
+        FileWriter writer = new FileWriter( outputFile );
 
         return new XdocSink( writer );
     }
