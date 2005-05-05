@@ -11,31 +11,11 @@
       <implementation>org.apache.maven.reports.projectinfo.DependenciesReport</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
+    <component>
+      <role>org.apache.maven.reporting.MavenReport</role>
+      <role-hint>mail-lists</role-hint>
+      <implementation>org.apache.maven.reports.projectinfo.MailingListsReport</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+    </component>
   </components>
-  <dependencies>
-    <dependency>
-      <groupId>doxia</groupId>
-      <artifactId>doxia-core</artifactId>
-      <type>jar</type>
-      <version>1.0-alpha-2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.reporting</groupId>
-      <artifactId>maven-reporting-api</artifactId>
-      <type>jar</type>
-      <version>2.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-      <type>jar</type>
-      <version>2.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-      <type>jar</type>
-      <version>2.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 </component-set>
