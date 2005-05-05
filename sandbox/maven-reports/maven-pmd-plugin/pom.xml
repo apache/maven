@@ -5,10 +5,10 @@
     <groupId>org.apache.maven.plugins</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>maven-project-info-reports-plugin</artifactId>
+  <artifactId>maven-pmd-plugin</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
-  <name>Maven Project Info Reports Plugin</name>
+  <name>Maven PMD Plugin</name>
   <inceptionYear>2005</inceptionYear>
   <dependencies>
     <dependency>
@@ -27,9 +27,24 @@
       <version>2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <groupId>pmd</groupId>
+      <artifactId>pmd</artifactId>
+      <version>2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>jaxen</groupId>
+      <artifactId>jaxen</artifactId>
+      <version>1.0-FCS</version>
+    </dependency>
+    <dependency>
+      <groupId>saxpath</groupId>
+      <artifactId>saxpath</artifactId>
+      <version>1.0-FCS</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0-alpha-2</version>
     </dependency>
   </dependencies>
 </project>
