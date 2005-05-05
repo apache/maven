@@ -111,6 +111,9 @@
           We will continue with the successful technique from Maven 1.0 of making plugins available on a separate
           release schedule so that new features can be obtained as they are ready and tested.
         </p>
+        <p>
+          For more information, consult the <a href="roadmap.html">Road Map</a>.
+        </p>
       </answer>
     </faq>
 
