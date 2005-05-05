@@ -718,7 +718,10 @@ public class DefaultPluginManager
         message.append( "' parameter is required for the execution of the " );
         message.append( mojo.getFullGoalName() );
         message.append( " mojo and cannot be null." );
-        message.append( " The retrieval expression was: " ).append( expression );
+        if ( expression != null )
+        {
+            message.append( " The retrieval expression was: " ).append( expression );
+        }
 
         return message.toString();
     }
