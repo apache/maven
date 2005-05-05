@@ -100,7 +100,6 @@ public class DefaultMaven
         EventDispatcher dispatcher = request.getEventDispatcher();
         String event = MavenEvents.REACTOR_EXECUTION;
 
-        // TODO: goals are outer loop
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
         List projects;
