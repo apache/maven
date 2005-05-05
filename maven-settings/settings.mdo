@@ -62,6 +62,17 @@
           </association>
         </field>
         <field>
+          <name>mirrors</name>
+          <version>1.0.0</version>
+          <description>
+          	Configuration of download mirrors for repositories.
+          </description>
+          <association>
+            <type>Mirror</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
           <name>profiles</name>
           <version>1.0.0</version>
           <description><![CDATA[
@@ -346,6 +357,62 @@
           <type>boolean</type>
           <defaultValue>false</defaultValue>
         </field>
+      </fields>
+    </class>
+    <class>
+      <name>Mirror</name>
+      <version>1.0.0</version>
+      <description>
+        A download mirror for a given repository.
+      </description>
+      <fields>
+        <field>
+          <name>id</name>
+          <required>true</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The server ID of this mirror. This must -not- be the same as that of the repository you are mirroring.
+          </description>
+        </field>
+        <field>
+          <name>mirrorOf</name>
+          <required>true</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The server ID of the repository being mirrored, eg "central".
+          </description>
+        </field>
+        <field>
+          <name>name</name>
+          <required>false</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The optional name that describes the mirror.
+          </description>
+        </field>
+        <field>
+          <name>url</name>
+          <required>true</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>
+            The URL of the mirror repository.
+          </description>
+        </field>
+<!--
+        <field>
+          <name>allowOriginal</name>
+          <version>1.0.0</version>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+          <description>
+            Whether to allow the user of the original as a fallback if an artifact is not found on the mirror.
+          </description>
+        </field>
+-->
       </fields>
     </class>
   </classes>

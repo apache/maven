@@ -9,18 +9,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ArtifactDownloader
 {
     public static final String SNAPSHOT_SIGNATURE = "-SNAPSHOT";
-
-    private List remoteRepos;
 
     private boolean useTimestamp = true;
 
@@ -40,11 +36,11 @@ public class ArtifactDownloader
 
     private Map downloadedArtifacts = new HashMap();
 
-    public ArtifactDownloader( Repository localRepository, List remoteRepositories )
+    private List remoteRepositories;
+
+    public ArtifactDownloader( Repository localRepository )
         throws Exception
     {
-        setRemoteRepos( remoteRepositories );
-
         if ( localRepository == null )
         {
             System.err.println( "local repository not specified" );
@@ -53,9 +49,6 @@ public class ArtifactDownloader
         }
 
         this.localRepository = localRepository;
-
-        System.out.println( "Using the following for your local repository: " + localRepository );
-        System.out.println( "Using the following for your remote repositories: " + remoteRepos );
     }
 
     public void setProxy( String host, String port, String userName, String password )
@@ -115,28 +108,11 @@ public class ArtifactDownloader
         return dep.getVersion().indexOf( SNAPSHOT_SIGNATURE ) >= 0;
     }
 
-    private void setRemoteRepos( List repositories )
-    {
-        remoteRepos = new ArrayList();
-
-        if ( repositories != null )
-        {
-            remoteRepos.addAll( repositories );
-        }
-
-        if ( repositories.isEmpty() )
-        {
-            // TODO: use super POM?
-            Repository repository = new Repository( REPO_URL, Repository.LAYOUT_DEFAULT );
-            remoteRepos.add( repository );
-        }
-    }
-
     private boolean getRemoteArtifact( Dependency dep, File destinationFile )
     {
         boolean fileFound = false;
 
-        for ( Iterator i = remoteRepos.iterator(); i.hasNext(); )
+        for ( Iterator i = getRemoteRepositories().iterator(); i.hasNext(); )
         {
             Repository remoteRepo = (Repository) i.next();
 
@@ -177,7 +153,8 @@ public class ArtifactDownloader
                 {
                     File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
                                                                  dep.getVersion(), dep.getType(),
-                                                                 dep.getArtifactId() + "-" + dep.getResolvedVersion() + ".pom" );
+                                                                 dep.getArtifactId() + "-" + dep.getResolvedVersion() +
+                                                                 ".pom" );
 
                     file.getParentFile().mkdirs();
 
@@ -250,19 +227,6 @@ public class ArtifactDownloader
         return filename.substring( 0, index ) + s;
     }
 
-    private String replace( String text, String repl, String with )
-    {
-        StringBuffer buf = new StringBuffer( text.length() );
-        int start = 0, end = 0;
-        while ( ( end = text.indexOf( repl, start ) ) != -1 )
-        {
-            buf.append( text.substring( start, end ) ).append( with );
-            start = end + repl.length();
-        }
-        buf.append( text.substring( start ) );
-        return buf.toString();
-    }
-
     private void log( String message )
     {
         System.out.println( message );
@@ -271,5 +235,26 @@ public class ArtifactDownloader
     public Repository getLocalRepository()
     {
         return localRepository;
+    }
+
+    public List getRemoteRepositories()
+    {
+        if ( remoteRepositories == null )
+        {
+            remoteRepositories = new ArrayList();
+        }
+
+        if ( remoteRepositories.isEmpty() )
+        {
+            // TODO: use super POM?
+            remoteRepositories.add( new Repository( "central", REPO_URL, Repository.LAYOUT_DEFAULT ) );
+        }
+
+        return remoteRepositories;
+    }
+
+    public void setRemoteRepositories( List remoteRepositories )
+    {
+        this.remoteRepositories = remoteRepositories;
     }
 }

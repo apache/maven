@@ -34,12 +34,15 @@ public class Repository
 
     private String layout;
 
+    private String id;
+
     public Repository()
     {
     }
 
-    public Repository( String basedir, String layout )
+    public Repository( String id, String basedir, String layout )
     {
+        this.id = id;
         this.basedir = basedir;
         this.layout = layout;
     }
@@ -135,4 +138,18 @@ public class Repository
         this.layout = layout;
     }
 
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId( String id )
+    {
+        this.id = id;
+    }
+
+    public String getLayout()
+    {
+        return layout;
+    }
 }

@@ -312,7 +312,11 @@ public class ModelReader
         }
         else if ( insideRepository )
         {
-            if ( rawName.equals( "url" ) )
+            if ( rawName.equals( "id" ) )
+            {
+                currentRepository.setId( getBodyText() );
+            }
+            else if ( rawName.equals( "url" ) )
             {
                 currentRepository.setBasedir( getBodyText() );
             }

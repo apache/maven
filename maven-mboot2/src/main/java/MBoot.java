@@ -242,16 +242,44 @@ public class MBoot
             online = false;
         }
 
-        Repository localRepository = new Repository( mavenRepoLocal, Repository.LAYOUT_DEFAULT );
+        Repository localRepository = new Repository( "local", mavenRepoLocal, Repository.LAYOUT_DEFAULT );
 
         if ( online )
         {
-            downloader = new ArtifactDownloader( localRepository, Collections.EMPTY_LIST );
+            downloader = new ArtifactDownloader( localRepository );
             if ( userModelReader.getActiveProxy() != null )
             {
                 Proxy proxy = userModelReader.getActiveProxy();
                 downloader.setProxy( proxy.getHost(), proxy.getPort(), proxy.getUserName(), proxy.getPassword() );
             }
+
+            List remoteRepos = downloader.getRemoteRepositories();
+            List newRemoteRepos = new ArrayList();
+
+            for ( Iterator i = remoteRepos.iterator(); i.hasNext(); )
+            {
+                Repository repo = (Repository) i.next();
+
+                boolean foundMirror = false;
+                for ( Iterator j = userModelReader.getMirrors().iterator(); j.hasNext() && !foundMirror; )
+                {
+                    Mirror m = (Mirror) j.next();
+                    if ( m.getMirrorOf().equals( repo.getId() ) )
+                    {
+                        newRemoteRepos.add( new Repository( m.getId(), m.getUrl(), repo.getLayout() ) );
+                        foundMirror = true;
+                    }
+                }
+                if ( !foundMirror )
+                {
+                    newRemoteRepos.add( repo );
+                }
+            }
+
+            downloader.setRemoteRepositories( newRemoteRepos );
+
+            System.out.println( "Using the following for your local repository: " + localRepository );
+            System.out.println( "Using the following for your remote repository: " + newRemoteRepos );
         }
 
         String basedir = System.getProperty( "user.dir" );
@@ -948,6 +976,8 @@ public class MBoot
     class SettingsReader
         extends AbstractReader
     {
+        private List mirrors = new ArrayList();
+
         private List profiles = new ArrayList();
 
         private Profile currentProfile = null;
@@ -961,6 +991,8 @@ public class MBoot
         private Profile activeProfile = null;
 
         private Proxy activeProxy = null;
+
+        private Mirror currentMirror;
 
         public Profile getActiveProfile()
         {
@@ -1018,7 +1050,7 @@ public class MBoot
                 }
                 else
                 {
-                    throw new SAXException( "Invalid proxy entry. Missing one or more " + "fields: {host, port}." );
+                    throw new SAXException( "Invalid proxy entry. Missing one or more fields: {host, port}." );
                 }
             }
             else if ( currentProxy != null )
@@ -1047,6 +1079,41 @@ public class MBoot
                 {
                 }
                 else if ( "nonProxyHosts".equals( rawName ) )
+                {
+                }
+                else
+                {
+                    throw new SAXException( "Illegal element inside proxy: \'" + rawName + "\'" );
+                }
+            }
+            else if ( "mirror".equals( rawName ) )
+            {
+                if ( notEmpty( currentMirror.getId() ) && notEmpty( currentMirror.getMirrorOf() ) &&
+                    notEmpty( currentMirror.getUrl() ) )
+                {
+                    mirrors.add( currentMirror );
+                    currentMirror = null;
+                }
+                else
+                {
+                    throw new SAXException( "Invalid mirror entry. Missing one or more fields: {id, mirrorOf, url}." );
+                }
+            }
+            else if ( currentMirror != null )
+            {
+                if ( "id".equals( rawName ) )
+                {
+                    currentMirror.setId( currentBody.toString().trim() );
+                }
+                else if ( "mirrorOf".equals( rawName ) )
+                {
+                    currentMirror.setMirrorOf( currentBody.toString().trim() );
+                }
+                else if ( "url".equals( rawName ) )
+                {
+                    currentMirror.setUrl( currentBody.toString().trim() );
+                }
+                else if ( "name".equals( rawName ) )
                 {
                 }
                 else
@@ -1103,6 +1170,10 @@ public class MBoot
             {
                 currentProxy = new Proxy();
             }
+            else if ( "mirror".equals( rawName ) )
+            {
+                currentMirror = new Mirror();
+            }
         }
 
         public void reset()
@@ -1111,8 +1182,15 @@ public class MBoot
             this.activeProfile = null;
             this.activeProxy = null;
             this.currentProfile = null;
+            this.currentMirror = null;
             this.profiles.clear();
             this.proxies.clear();
+            this.mirrors.clear();
+        }
+
+        public List getMirrors()
+        {
+            return mirrors;
         }
     }
 
@@ -1143,7 +1221,7 @@ public class MBoot
         }
     }
 
-    public class Proxy
+    public static class Proxy
     {
         private boolean active;
 
@@ -1206,4 +1284,42 @@ public class MBoot
         }
     }
 
+    public static class Mirror
+    {
+        private String id;
+
+        private String mirrorOf;
+
+        private String url;
+
+        public String getId()
+        {
+            return id;
+        }
+
+        public void setId( String id )
+        {
+            this.id = id;
+        }
+
+        public void setMirrorOf( String mirrorOf )
+        {
+            this.mirrorOf = mirrorOf;
+        }
+
+        public void setUrl( String url )
+        {
+            this.url = url;
+        }
+
+        public String getMirrorOf()
+        {
+            return mirrorOf;
+        }
+
+        public String getUrl()
+        {
+            return url;
+        }
+    }
 }
