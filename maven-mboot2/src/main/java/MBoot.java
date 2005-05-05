@@ -142,32 +142,24 @@ public class MBoot
 
         SettingsReader userModelReader = new SettingsReader();
 
-        if ( mavenRepoLocal == null )
+        String userHome = System.getProperty( "user.home" );
+
+        File settingsXml = new File( userHome, ".m2/settings.xml" );
+
+        if ( settingsXml.exists() )
         {
-            try
+            userModelReader.parse( settingsXml );
+
+            Profile activeProfile = userModelReader.getActiveProfile();
+
+            if ( mavenRepoLocal == null )
             {
-                String userHome = System.getProperty( "user.home" );
-
-                File settingsXml = new File( userHome, ".m2/settings.xml" );
-
-                if ( settingsXml.exists() )
-                {
-                    userModelReader.parse( settingsXml );
-
-                    Profile activeProfile = userModelReader.getActiveProfile();
-
-                    mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
-                }
-            }
-            catch ( Exception e )
-            {
-                e.printStackTrace();
+                mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
             }
         }
 
         if ( mavenRepoLocal == null )
         {
-            String userHome = System.getProperty( "user.home" );
             String m2LocalRepoPath = "/.m2/repository";
 
             File repoDir = new File( userHome, m2LocalRepoPath );
