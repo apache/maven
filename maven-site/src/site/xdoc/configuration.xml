@@ -128,7 +128,7 @@
   .
   .]]></source>
       <p style="font-weight: bold; font-size: larger">
-        Using Mirrors for Repositories
+        Using Mirrors for Repositories <span style="font-size: smaller"><em>(alpha-2 and above only)</em></span>
       </p>
       <p>
         Repositories are declared inside a project, which means that if you have your own custom repositories, those
