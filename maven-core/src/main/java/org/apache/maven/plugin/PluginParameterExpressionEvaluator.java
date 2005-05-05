@@ -27,6 +27,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -106,6 +107,11 @@ public class PluginParameterExpressionEvaluator
             try
             {
                 value = context.lookupMap( role );
+                for ( Iterator i = ((Map) value).keySet().iterator(); i.hasNext(); )
+                {
+                    String key = (String) i.next();
+                    context.getLog().debug( key + " report is found." );
+                }
             }
             catch ( ComponentLookupException cle )
             {
