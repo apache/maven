@@ -46,7 +46,8 @@ import java.util.Map;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id: DefaultLifecycleExecutor.java,v 1.16 2005/03/04 09:04:25
  *          jdcasey Exp $
- * @todo there is some duplication between this and the plugin manager
+ * @todo this is structured somewhat confusingly. Attempt to "flatten out" to reduce the number of paths through by
+ * compiling the list of plugins/tasks first.
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled

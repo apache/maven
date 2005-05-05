@@ -101,6 +101,7 @@ public class DefaultPluginManager
      *
      * @param name
      * @return
+     * @todo remove
      */
     public MojoDescriptor getMojoDescriptor( String name )
     {
