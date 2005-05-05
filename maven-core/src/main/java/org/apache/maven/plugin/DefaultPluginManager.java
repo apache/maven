@@ -654,10 +654,10 @@ public class DefaultPluginManager
 
             Object value = expressionEvaluator.evaluate( expression );
 
-            getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value );
+            getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value + " for parameter: \'" + key + "\'" );
 
             // TODO: remove. If there is a default value, required should have been removed by the descriptor generator
-            if ( value == null )
+            if ( value == null && !"map-oriented".equals( goal.getComponentConfigurator() ) )
             {
                 Object defaultValue;
                 try

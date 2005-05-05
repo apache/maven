@@ -154,7 +154,7 @@ public class MojoDescriptor
         this.requiresProject = requiresProject;
     }
 
-    public boolean isRequiresProject()
+    public boolean getRequiresProject()
     {
         return requiresProject;
     }

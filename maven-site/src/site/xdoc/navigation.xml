@@ -17,7 +17,7 @@
       <item name="Getting Started" href="getting-started.html"/>
       <item name="Configuration" href="configuration.html"/>
       <item name="Dependency Mechanism" href="dependencies.html"/>
-      <item name="Developing Plugins with Marmalade" href="developing-plugins-with-marmalade.html"/>
+      <item name="Developing Plugins with Marmalade" href="developers/developing-plugins-with-marmalade.html"/>
     </menu>
     <menu name="Reference">
       <item name="Project Descriptor" href="project-descriptor.html"/>

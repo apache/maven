@@ -71,9 +71,7 @@ public class PluginDescriptorGenerator
 
             element( w, "goalPrefix", goalPrefix );
 
-            element( w, "isolatedRealm", "true" );
-
-            w.startElement( "mojos" );
+             w.startElement( "mojos" );
 
             for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
             {
@@ -117,6 +115,18 @@ public class PluginDescriptorGenerator
         {
             element( w, "requiresDependencyResolution", mojoDescriptor.getRequiresDependencyResolution() );
         }
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        element( w, "requiresProject", "" + mojoDescriptor.getRequiresProject() );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        element( w, "requiresOnline", "" + mojoDescriptor.requiresOnline() );
 
         // ----------------------------------------------------------------------
         //
@@ -173,6 +183,19 @@ public class PluginDescriptorGenerator
         //
         // ----------------------------------------------------------------------
 
+        if ( mojoDescriptor.getComponentComposer() != null )
+        {
+            w.startElement( "composer" );
+
+            w.writeText( mojoDescriptor.getComponentComposer() );
+
+            w.endElement();
+        }
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
         w.startElement( "instantiationStrategy" );
 
         w.writeText( mojoDescriptor.getInstantiationStrategy() );
@@ -205,8 +228,7 @@ public class PluginDescriptorGenerator
 
             String expression = parameter.getExpression();
 
-            if ( StringUtils.isNotEmpty( expression ) &&
-                ( expression.startsWith( "${component." ) || expression.startsWith( "#component." ) ) )
+            if ( StringUtils.isNotEmpty( expression ) && expression.startsWith( "${component." ) )
             {
                 // treat it as a component...a requirement, in other words.
 
@@ -240,11 +262,6 @@ public class PluginDescriptorGenerator
                 element( w, "editable", Boolean.toString( parameter.isEditable() ) );
 
                 element( w, "description", parameter.getDescription() );
-
-                if ( StringUtils.isEmpty( expression ) )
-                {
-                    expression = parameter.getDefaultValue();
-                }
 
                 if ( expression != null && expression.length() > 0 )
                 {
@@ -300,17 +317,10 @@ public class PluginDescriptorGenerator
 
                 w.startElement( "requirement" );
 
-                String role;
                 // remove "component." plus expression delimiters
                 String expression = requirement.getExpression();
-                if ( expression.startsWith( "${" ) )
-                {
-                    role = expression.substring( "${component.".length(), expression.length() - 1 );
-                }
-                else
-                {
-                    role = expression.substring( "#component.".length() );
-                }
+                String role = expression.substring( "${component.".length(), expression.length() - 1 );
+
                 element( w, "role", role );
 
                 element( w, "field-name", requirement.getName() );

@@ -50,13 +50,7 @@ public class JavaMojoDescriptorExtractor
     extends AbstractLogEnabled
     implements MojoDescriptorExtractor
 {
-    public static final String MAVEN_PLUGIN_ID = "maven.plugin.id";
-
-    public static final String MAVEN_PLUGIN_DESCRIPTION = "maven.plugin.description";
-
-    public static final String MAVEN_PLUGIN_INSTANTIATION = "maven.plugin.instantiation";
-
-    public static final String MAVEN_PLUGIN_MODE = "maven.plugin.mode";
+    public static final String MAVEN_PLUGIN_INSTANTIATION = "instantiationStrategy";
 
     public static final String PARAMETER = "parameter";
 
@@ -77,6 +71,10 @@ public class JavaMojoDescriptorExtractor
     public static final String GOAL_DESCRIPTION = "description";
 
     public static final String GOAL_REQUIRES_DEPENDENCY_RESOLUTION = "requiresDependencyResolution";
+
+    public static final String GOAL_REQUIRES_PROJECT = "requiresProject";
+
+    public static final String GOAL_REQUIRES_ONLINE = "requiresOnline";
 
     public static final String GOAL_MULTI_EXECUTION_STRATEGY = "attainAlways";
 
@@ -123,16 +121,9 @@ public class JavaMojoDescriptorExtractor
 
         mojoDescriptor.setImplementation( javaClass.getFullyQualifiedName() );
 
-        DocletTag tag;
+        mojoDescriptor.setDescription( javaClass.getComment() );
 
-        tag = findInClassHierarchy( javaClass, MAVEN_PLUGIN_DESCRIPTION );
-
-        if ( tag != null )
-        {
-            mojoDescriptor.setDescription( tag.getValue() );
-        }
-
-        tag = findInClassHierarchy( javaClass, MAVEN_PLUGIN_INSTANTIATION );
+        DocletTag tag = findInClassHierarchy( javaClass, MAVEN_PLUGIN_INSTANTIATION );
 
         if ( tag != null )
         {
@@ -197,6 +188,28 @@ public class JavaMojoDescriptorExtractor
                 value = "runtime";
             }
             mojoDescriptor.setRequiresDependencyResolution( value );
+        }
+
+        // ----------------------------------------------------------------------
+        // Project flag
+        // ----------------------------------------------------------------------
+
+        DocletTag requiresProject = findInClassHierarchy( javaClass, GOAL_REQUIRES_PROJECT );
+
+        if ( requiresProject != null )
+        {
+            mojoDescriptor.setRequiresProject( true );
+        }
+
+        // ----------------------------------------------------------------------
+        // Online flag
+        // ----------------------------------------------------------------------
+
+        DocletTag requiresOnline = findInClassHierarchy( javaClass, GOAL_REQUIRES_ONLINE );
+
+        if ( requiresOnline != null )
+        {
+            mojoDescriptor.setRequiresOnline( true );
         }
 
         extractParameters( mojoDescriptor, javaClass );

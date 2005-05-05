@@ -5,8 +5,8 @@
     <parameters>
       <parameter>
         <name>outDir</name>
+        <type>java.lang.String</type>
         <expression>${project.build.directory}</expression>
-        <default>target</default>
         <description>Output directory for files.</description>
       </parameter>
     </parameters>

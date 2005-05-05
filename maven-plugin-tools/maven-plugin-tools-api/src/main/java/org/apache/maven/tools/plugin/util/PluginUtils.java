@@ -16,6 +16,7 @@ package org.apache.maven.tools.plugin.util;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.DirectoryScanner;
@@ -67,17 +68,21 @@ public final class PluginUtils
         for ( Iterator it = project.getDependencies().iterator(); it.hasNext(); )
         {
             Dependency dep = (Dependency) it.next();
-            w.startElement( "dependency" );
+            
+            if ( !Artifact.SCOPE_TEST.equals( dep.getScope() ) )
+            {
+                w.startElement( "dependency" );
 
-            PluginUtils.element( w, "groupId", dep.getGroupId() );
+                PluginUtils.element( w, "groupId", dep.getGroupId() );
 
-            PluginUtils.element( w, "artifactId", dep.getArtifactId() );
+                PluginUtils.element( w, "artifactId", dep.getArtifactId() );
 
-            PluginUtils.element( w, "type", dep.getType() );
+                PluginUtils.element( w, "type", dep.getType() );
 
-            PluginUtils.element( w, "version", dep.getVersion() );
+                PluginUtils.element( w, "version", dep.getVersion() );
 
-            w.endElement();
+                w.endElement();
+            }
         }
 
         w.endElement();

@@ -100,6 +100,13 @@ public class PluginDescriptorBuilder
             mojo.setComponentConfigurator( configuratorConfig.getValue() );
         }
 
+        PlexusConfiguration composerConfig = c.getChild( "composer" );
+
+        if ( composerConfig != null )
+        {
+            mojo.setComponentComposer( composerConfig.getValue() );
+        }
+
         String phase = c.getChild( "phase" ).getValue();
 
         if ( phase != null )
@@ -123,6 +130,20 @@ public class PluginDescriptorBuilder
         if ( dependencyResolution != null )
         {
             mojo.setRequiresDependencyResolution( dependencyResolution );
+        }
+
+        String requiresProject = c.getChild( "requiresProject" ).getValue();
+
+        if ( requiresProject != null )
+        {
+            mojo.setRequiresProject( "true".equals( requiresProject ) );
+        }
+
+        String requiresOnline = c.getChild( "requiresOnline" ).getValue();
+
+        if ( requiresOnline != null )
+        {
+            mojo.setRequiresOnline( "true".equals( requiresOnline ) );
         }
 
         // ----------------------------------------------------------------------
@@ -163,11 +184,7 @@ public class PluginDescriptorBuilder
 
             parameter.setDescription( d.getChild( "description" ).getValue() );
 
-            // TODO: remove
             parameter.setExpression( d.getChild( "expression" ).getValue() );
-
-            // TODO: remove
-            parameter.setDefaultValue( d.getChild( "default" ).getValue() );
 
             parameter.setDeprecated( d.getChild( "deprecated" ).getValue() );
 

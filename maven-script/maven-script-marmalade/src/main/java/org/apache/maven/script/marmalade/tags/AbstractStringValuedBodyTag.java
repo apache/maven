@@ -34,7 +34,7 @@ public abstract class AbstractStringValuedBodyTag
 
     protected void doExecute( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
     {
-        String bodyValue = (String) getBody( context, String.class );
+        String bodyValue = getRawBody( context );
 
         setValue( bodyValue );
     }
