@@ -107,11 +107,16 @@ public class DoxiaMojo
             config.setModel( project.getModel() );
 
             config.setOutputDirectory( new File( generatedSiteDirectory ) );
+
             if ( reports != null )
             {
-                for ( Iterator i = reports.values().iterator(); i.hasNext(); )
+                for ( Iterator i = reports.keySet().iterator(); i.hasNext(); )
                 {
-                    MavenReport report = (MavenReport) i.next();
+                    String reportKey = (String) i.next();
+
+                    getLog().info( "Generate " + reportKey + " report." );
+
+                    MavenReport report = (MavenReport) reports.get( reportKey );
 
                     report.setConfiguration( config );
 
