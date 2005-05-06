@@ -40,7 +40,6 @@ import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusContainerException;
@@ -192,9 +191,16 @@ public class MavenCli
         MavenExecutionRequest request = null;
         try
         {
-            maven = createMavenInstance( embedder );
+            // logger must be created first
+            LoggerManager manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
+            if ( debug )
+            {
+                manager.setThreshold( Logger.LEVEL_DEBUG );
+            }
 
-            request = createRequest( projectFiles, embedder, commandLine, settings, eventDispatcher, debug );
+            request = createRequest( projectFiles, embedder, commandLine, settings, eventDispatcher, manager );
+
+            maven = createMavenInstance( embedder );
         }
         catch ( ComponentLookupException e )
         {
@@ -247,7 +253,7 @@ public class MavenCli
 
     private static MavenExecutionRequest createRequest( List files, ArtifactEnabledEmbedder embedder,
                                                         CommandLine commandLine, Settings settings,
-                                                        EventDispatcher eventDispatcher, boolean debug )
+                                                        EventDispatcher eventDispatcher, LoggerManager manager )
         throws ComponentLookupException
     {
         MavenExecutionRequest request = null;
@@ -256,12 +262,6 @@ public class MavenCli
 
         request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
                                                     commandLine.getArgList(), files, userDir.getPath() );
-
-        LoggerManager manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
-        if ( debug )
-        {
-            manager.setThreshold( Logger.LEVEL_DEBUG );
-        }
 
         // TODO [BP]: do we set one per mojo? where to do it?
         Logger logger = manager.getLoggerForComponent( Mojo.ROLE );
