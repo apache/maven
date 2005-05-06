@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
@@ -253,6 +254,38 @@ public class MavenProject
         return list;
     }
 
+    public List getCompileDependencies()
+    {
+        Set artifacts = getArtifacts();
+        
+        if(artifacts == null || artifacts.isEmpty())
+        {
+            return Collections.EMPTY_LIST;
+        }
+        
+        List list = new ArrayList( artifacts.size() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            // TODO: let the scope handler deal with this
+            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) )
+            {
+                Dependency dependency = new Dependency();
+
+                dependency.setArtifactId( a.getArtifactId() );
+                dependency.setGroupId( a.getGroupId() );
+                dependency.setVersion( a.getVersion() );
+                dependency.setScope( a.getScope() );
+                dependency.setType( a.getType() );
+
+                list.add( dependency );
+            }
+        }
+        return list;
+    }
+
     public List getTestClasspathElements()
         throws DependencyResolutionRequiredException
     {
@@ -267,8 +300,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
-                    Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
                     File file = a.getFile();
                     if ( file == null )
@@ -277,6 +310,39 @@ public class MavenProject
                     }
                     list.add( file.getPath() );
                 }
+            }
+        }
+        return list;
+    }
+
+    public List getTestDependencies()
+    {
+        Set artifacts = getArtifacts();
+        
+        if(artifacts == null || artifacts.isEmpty())
+        {
+            return Collections.EMPTY_LIST;
+        }
+        
+        List list = new ArrayList( artifacts.size() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            // TODO: let the scope handler deal with this
+            if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+            {
+                Dependency dependency = new Dependency();
+
+                dependency.setArtifactId( a.getArtifactId() );
+                dependency.setGroupId( a.getGroupId() );
+                dependency.setVersion( a.getVersion() );
+                dependency.setScope( a.getScope() );
+                dependency.setType( a.getType() );
+
+                list.add( dependency );
             }
         }
         return list;
@@ -305,6 +371,38 @@ public class MavenProject
                     }
                     list.add( file.getPath() );
                 }
+            }
+        }
+        return list;
+    }
+
+    public List getRuntimeDependencies()
+    {
+        Set artifacts = getArtifacts();
+        
+        if(artifacts == null || artifacts.isEmpty())
+        {
+            return Collections.EMPTY_LIST;
+        }
+        
+        List list = new ArrayList( artifacts.size() );
+
+        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            // TODO: let the scope handler deal with this
+            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+            {
+                Dependency dependency = new Dependency();
+
+                dependency.setArtifactId( a.getArtifactId() );
+                dependency.setGroupId( a.getGroupId() );
+                dependency.setVersion( a.getVersion() );
+                dependency.setScope( a.getScope() );
+                dependency.setType( a.getType() );
+
+                list.add( dependency );
             }
         }
         return list;
@@ -649,14 +747,13 @@ public class MavenProject
             {
                 Artifact existing = (Artifact) artifacts.get( id );
                 boolean updateScope = false;
-                if ( Artifact.SCOPE_RUNTIME.equals( a.getScope() ) &&
-                    Artifact.SCOPE_TEST.equals( existing.getScope() ) )
+                if ( Artifact.SCOPE_RUNTIME.equals( a.getScope() ) && Artifact.SCOPE_TEST.equals( existing.getScope() ) )
                 {
                     updateScope = true;
                 }
 
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) &&
-                    !Artifact.SCOPE_COMPILE.equals( existing.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                    && !Artifact.SCOPE_COMPILE.equals( existing.getScope() ) )
                 {
                     updateScope = true;
                 }
@@ -667,8 +764,8 @@ public class MavenProject
                     // TODO: [jc] Is this a better way to centralize artifact construction here?
                     Artifact artifact = artifactFactory.createArtifact( existing.getGroupId(),
                                                                         existing.getArtifactId(),
-                                                                        existing.getVersion(), a.getScope(),
-                                                                        existing.getType() );
+                                                                        existing.getVersion(), a.getScope(), existing
+                                                                            .getType() );
 
                     artifact.setFile( existing.getFile() );
                     artifact.setBaseVersion( existing.getBaseVersion() );
@@ -749,4 +846,3 @@ public class MavenProject
         return model.getPluginRepositories();
     }
 }
-
