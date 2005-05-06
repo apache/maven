@@ -20,25 +20,22 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.script.marmalade.MarmaladeMojoExecutionDirectives;
 import org.apache.maven.script.marmalade.tags.MojoTag;
-import org.apache.maven.tools.plugin.extractor.AbstractScriptedMojoDescriptorExtractor;
 import org.apache.maven.tools.plugin.PluginToolsException;
-import org.codehaus.marmalade.launch.MarmaladeLauncher;
+import org.apache.maven.tools.plugin.extractor.AbstractScriptedMojoDescriptorExtractor;
 import org.codehaus.marmalade.launch.MarmaladeLaunchException;
+import org.codehaus.marmalade.launch.MarmaladeLauncher;
 import org.codehaus.marmalade.model.MarmaladeScript;
 import org.codehaus.marmalade.model.MarmaladeTag;
-import org.codehaus.marmalade.runtime.DefaultContext;
-import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
-import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
 import org.codehaus.plexus.component.factory.marmalade.PlexusIntegratedLog;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * @author jdcasey
@@ -52,7 +49,7 @@ public class MarmaladeMojoDescriptorExtractor
         return ".mmld";
     }
 
-    protected Set extractMojoDescriptors( Map sourceFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
+    protected List extractMojoDescriptors( Map sourceFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
         throws PluginToolsException
     {
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
@@ -60,7 +57,7 @@ public class MarmaladeMojoDescriptorExtractor
         {
             Thread.currentThread().setContextClassLoader( MarmaladeMojoDescriptorExtractor.class.getClassLoader() );
 
-            Set descriptors = new HashSet();
+            List descriptors = new ArrayList();
 
             for ( Iterator mapIterator = sourceFilesKeyedByBasedir.entrySet().iterator(); mapIterator.hasNext(); )
             {
@@ -73,60 +70,58 @@ public class MarmaladeMojoDescriptorExtractor
                 {
                     File scriptFile = (File) it.next();
 
-                    MarmaladeLauncher launcher = new MarmaladeLauncher().withInputFile( scriptFile );
-
-                    Logger logger = getLogger();
-
-                    if ( logger != null )
+                    try
                     {
-                        PlexusIntegratedLog log = new PlexusIntegratedLog();
+                        MarmaladeLauncher launcher = new MarmaladeLauncher().withInputFile( scriptFile );
 
-                        log.enableLogging( logger );
+                        Logger logger = getLogger();
 
-                        launcher = launcher.withLog( log );
+                        if ( logger != null )
+                        {
+                            PlexusIntegratedLog log = new PlexusIntegratedLog();
+
+                            log.enableLogging( logger );
+
+                            launcher = launcher.withLog( log );
+                        }
+
+                        MarmaladeScript script = launcher.getMarmaladeScript();
+
+                        MarmaladeTag rootTag = script.getRoot();
+                        if ( rootTag instanceof MojoTag )
+                        {
+                            launcher.withVariable( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR, basedir );
+                            launcher
+                                .withVariable( MarmaladeMojoExecutionDirectives.PLUGIN_DESCRIPTOR, pluginDescriptor );
+
+                            Map contextMap = launcher.run();
+
+                            MojoDescriptor descriptor = (MojoDescriptor) contextMap
+                                .get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
+
+                            descriptors.add( descriptor );
+                        }
+                        else
+                        {
+                            getLogger().debug(
+                                               "Found non-mojo marmalade script at: " + scriptFile
+                                                   + ".\nIts root tag is {element: "
+                                                   + rootTag.getTagInfo().getElement() + ", class: "
+                                                   + rootTag.getClass().getName() + "}" );
+                        }
                     }
-
-                    MarmaladeScript script = launcher.getMarmaladeScript();
-
-                    MarmaladeTag rootTag = script.getRoot();
-                    if ( rootTag instanceof MojoTag )
+                    catch ( IOException e )
                     {
-                        Map contextMap = new TreeMap();
-                        contextMap.put( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR, basedir );
-                        contextMap.put( MarmaladeMojoExecutionDirectives.PLUGIN_DESCRIPTOR, pluginDescriptor );
-
-                        MarmaladeExecutionContext context = new DefaultContext( contextMap );
-
-                        script.execute( context );
-
-                        contextMap = context.getExternalizedVariables();
-
-                        MojoDescriptor descriptor = (MojoDescriptor) contextMap
-                            .get( MarmaladeMojoExecutionDirectives.METADATA_OUTVAR );
-
-                        descriptors.add( descriptor );
+                        throw new PluginToolsException( "Error reading descriptor Marmalade mojo in: " + scriptFile, e );
                     }
-                    else
+                    catch ( MarmaladeLaunchException e )
                     {
-                        System.out.println( "This script is not a mojo. Its root tag is {element: "
-                            + rootTag.getTagInfo().getElement() + ", class: " + rootTag.getClass().getName() + "}" );
+                        throw new PluginToolsException( "Error extracting descriptor Marmalade mojo from: " + scriptFile, e );
                     }
                 }
             }
 
             return descriptors;
-        }
-        catch ( IOException e )
-        {
-            throw new PluginToolsException( "Error reading Marmalade for extracting mojo descriptor", e );
-        }
-        catch ( MarmaladeExecutionException e )
-        {
-            throw new PluginToolsException( "Error executing Marmalade for extracting mojo descriptor", e );
-        }
-        catch ( MarmaladeLaunchException e )
-        {
-            throw new PluginToolsException( "Error executing Marmalade for extracting mojo descriptor", e );
         }
         finally
         {

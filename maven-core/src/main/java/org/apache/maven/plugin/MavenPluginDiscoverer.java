@@ -17,18 +17,12 @@ package org.apache.maven.plugin;
  * ====================================================================
  */
 
-import org.apache.maven.plugin.descriptor.Dependency;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.codehaus.plexus.component.discovery.AbstractComponentDiscoverer;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -53,60 +47,6 @@ public class MavenPluginDiscoverer
     public ComponentSetDescriptor createComponentDescriptors( Reader componentDescriptorConfiguration, String source )
         throws PlexusConfigurationException
     {
-        PluginDescriptor pluginDescriptor;
-
-        try
-        {
-            pluginDescriptor = builder.build( componentDescriptorConfiguration );
-        }
-        catch ( PlexusConfigurationException e )
-        {
-            // If the plugin is not valid, we cannot continue as it may make the lifecycle ebhave differently than expected
-            throw new PlexusConfigurationException( "Cannot process plugin descriptor: " + source, e );
-        }
-
-        // ----------------------------------------------------------------------
-        // We take the plugin descriptor as it has been built by the maven-plugin-descriptor
-        // code. This descriptor is specific to maven-plugin-descriptor and we are now
-        // going to adapt it into a ComponentSetDescriptor that can be
-        // utlized by Plexus.
-        // ----------------------------------------------------------------------
-
-        ComponentSetDescriptor componentSet = new MavenPluginDescriptor( pluginDescriptor );
-
-        // TODO: no group
-        componentSet.setId( pluginDescriptor.getArtifactId() );
-
-        // ----------------------------------------------------------------------
-        // If the ComponentSet states any dependencies then we want to collect
-        // them and store them for later use.
-        // ----------------------------------------------------------------------
-
-        if ( pluginDescriptor.getDependencies() != null )
-        {
-            List dependencies = new ArrayList();
-
-            for ( Iterator it = pluginDescriptor.getDependencies().iterator(); it.hasNext(); )
-            {
-                dependencies.add( new MavenPluginDependency( (Dependency) it.next() ) );
-            }
-
-            componentSet.setDependencies( dependencies );
-        }
-
-        // ----------------------------------------------------------------------
-        // Process each of the component descriptors within the ComponentSet.
-        // ----------------------------------------------------------------------
-
-        List componentDescriptors = new ArrayList();
-
-        for ( Iterator iterator = pluginDescriptor.getMojos().iterator(); iterator.hasNext(); )
-        {
-            componentDescriptors.add( (MojoDescriptor) iterator.next() );
-        }
-
-        componentSet.setComponents( componentDescriptors );
-
-        return componentSet;
+        return builder.build( componentDescriptorConfiguration );
     }
 }

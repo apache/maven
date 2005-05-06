@@ -20,12 +20,12 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.tools.plugin.PluginToolsException;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.scanner.MojoScanner;
-import org.apache.maven.tools.plugin.PluginToolsException;
+import org.apache.maven.tools.plugin.util.PluginUtils;
 
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -70,13 +70,20 @@ public abstract class AbstractGeneratorMojo
 
         // TODO: could use this more, eg in the writing of the plugin descriptor!
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        
+        pluginDescriptor.setGroupId( project.getGroupId() );
+        
+        pluginDescriptor.setArtifactId( project.getArtifactId() );
+        
         pluginDescriptor.setGoalPrefix( goalPrefix );
 
         try
         {
-            Set mavenMojoDescriptors = mojoScanner.execute( project, pluginDescriptor );
+            pluginDescriptor.setDependencies( PluginUtils.toComponentDependencies( project.getRuntimeDependencies() ) );
+            
+            mojoScanner.populatePluginDescriptor( project, pluginDescriptor );
 
-            createGenerator().execute( getOutputDirectory(), mavenMojoDescriptors, project, goalPrefix );
+            createGenerator().execute( getOutputDirectory(), pluginDescriptor );
         }
         catch ( IOException e )
         {

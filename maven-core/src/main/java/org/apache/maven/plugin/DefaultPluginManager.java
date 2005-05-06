@@ -119,10 +119,9 @@ public class DefaultPluginManager
 
     private Set pluginsInProcess = new HashSet();
 
-    public void processPluginDescriptor( MavenPluginDescriptor mavenPluginDescriptor )
+    public void processPluginDescriptor( PluginDescriptor pluginDescriptor )
         throws CycleDetectedException
     {
-        PluginDescriptor pluginDescriptor = mavenPluginDescriptor.getPluginDescriptor();
         String key = pluginDescriptor.getId();
 
         if ( pluginsInProcess.contains( key ) )
@@ -132,7 +131,7 @@ public class DefaultPluginManager
 
         pluginsInProcess.add( key );
 
-        for ( Iterator it = mavenPluginDescriptor.getMavenMojoDescriptors().iterator(); it.hasNext(); )
+        for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
         {
             MojoDescriptor mojoDescriptor = (MojoDescriptor) it.next();
 
@@ -150,12 +149,12 @@ public class DefaultPluginManager
     {
         ComponentSetDescriptor componentSetDescriptor = event.getComponentSetDescriptor();
 
-        if ( !( componentSetDescriptor instanceof MavenPluginDescriptor ) )
+        if ( !( componentSetDescriptor instanceof PluginDescriptor ) )
         {
             return;
         }
 
-        MavenPluginDescriptor pluginDescriptor = (MavenPluginDescriptor) componentSetDescriptor;
+        PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
 
         try
         {

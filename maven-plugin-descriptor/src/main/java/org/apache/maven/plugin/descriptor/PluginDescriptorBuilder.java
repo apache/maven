@@ -1,5 +1,6 @@
 package org.apache.maven.plugin.descriptor;
 
+import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
@@ -35,16 +36,14 @@ public class PluginDescriptorBuilder
 
         PlexusConfiguration[] mojoConfigurations = c.getChild( "mojos" ).getChildren( "mojo" );
 
-        List mojos = new ArrayList();
-
         for ( int i = 0; i < mojoConfigurations.length; i++ )
         {
             PlexusConfiguration component = mojoConfigurations[i];
 
-            mojos.add( buildComponentDescriptor( component, pluginDescriptor ) );
+            MojoDescriptor mojoDescriptor = buildComponentDescriptor( component, pluginDescriptor );
+            
+            pluginDescriptor.addMojo( mojoDescriptor );
         }
-
-        pluginDescriptor.setMojos( mojos );
 
         // ----------------------------------------------------------------------
         // Dependencies
@@ -58,7 +57,7 @@ public class PluginDescriptorBuilder
         {
             PlexusConfiguration d = dependencyConfigurations[i];
 
-            Dependency cd = new Dependency();
+            ComponentDependency cd = new ComponentDependency();
 
             cd.setArtifactId( d.getChild( "artifactId" ).getValue() );
 

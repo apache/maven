@@ -16,12 +16,8 @@ package org.apache.maven.plugin.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.BeanGenerator;
-import org.apache.maven.tools.plugin.generator.PluginDescriptorGenerator;
 import org.apache.maven.tools.plugin.generator.Generator;
-
-import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

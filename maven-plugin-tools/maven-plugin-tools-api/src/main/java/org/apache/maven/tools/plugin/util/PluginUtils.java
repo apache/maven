@@ -16,14 +16,16 @@ package org.apache.maven.tools.plugin.util;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author jdcasey
@@ -60,32 +62,50 @@ public final class PluginUtils
         return scanner.getIncludedFiles();
     }
 
-    public static void writeDependencies( XMLWriter w, MavenProject project )
+    public static void writeDependencies( XMLWriter w, PluginDescriptor pluginDescriptor )
     {
 
         w.startElement( "dependencies" );
 
-        for ( Iterator it = project.getDependencies().iterator(); it.hasNext(); )
+        for ( Iterator it = pluginDescriptor.getDependencies().iterator(); it.hasNext(); )
         {
-            Dependency dep = (Dependency) it.next();
+            ComponentDependency dep = (ComponentDependency) it.next();
             
-            if ( !Artifact.SCOPE_TEST.equals( dep.getScope() ) )
-            {
-                w.startElement( "dependency" );
+            w.startElement( "dependency" );
 
-                PluginUtils.element( w, "groupId", dep.getGroupId() );
+            PluginUtils.element( w, "groupId", dep.getGroupId() );
 
-                PluginUtils.element( w, "artifactId", dep.getArtifactId() );
+            PluginUtils.element( w, "artifactId", dep.getArtifactId() );
 
-                PluginUtils.element( w, "type", dep.getType() );
+            PluginUtils.element( w, "type", dep.getType() );
 
-                PluginUtils.element( w, "version", dep.getVersion() );
+            PluginUtils.element( w, "version", dep.getVersion() );
 
-                w.endElement();
-            }
+            w.endElement();
         }
 
         w.endElement();
+    }
+    
+    public static List toComponentDependencies(List dependencies)
+    {
+        List componentDeps = new LinkedList();
+
+        for ( Iterator it = dependencies.iterator(); it.hasNext(); )
+        {
+            Dependency dependency = (Dependency) it.next();
+            
+            ComponentDependency cd = new ComponentDependency();
+
+            cd.setArtifactId( dependency.getArtifactId() );
+            cd.setGroupId( dependency.getGroupId() );
+            cd.setVersion( dependency.getVersion() );
+            cd.setType( dependency.getType() );
+
+            componentDeps.add( cd );
+        }
+        
+        return componentDeps;
     }
 
     private static void element( XMLWriter w, String name, String value )

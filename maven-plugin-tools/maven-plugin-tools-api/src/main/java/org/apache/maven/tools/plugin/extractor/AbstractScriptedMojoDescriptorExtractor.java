@@ -21,18 +21,18 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
     extends AbstractLogEnabled
     implements MojoDescriptorExtractor
 {
-    public Set execute( MavenProject project, PluginDescriptor pluginDescriptor )
+    public List execute( MavenProject project, PluginDescriptor pluginDescriptor )
         throws PluginToolsException
     {
         Map scriptFilesKeyedByBasedir = gatherScriptSourcesByBasedir( project.getScriptSourceRoots(),
                                                                       getScriptFileExtension() );
 
-        Set mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir, pluginDescriptor );
+        List mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir, pluginDescriptor );
 
         return mojoDescriptors;
     }
 
-    protected abstract Set extractMojoDescriptors( Map scriptFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
+    protected abstract List extractMojoDescriptors( Map scriptFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
         throws PluginToolsException;
 
     protected abstract String getScriptFileExtension();

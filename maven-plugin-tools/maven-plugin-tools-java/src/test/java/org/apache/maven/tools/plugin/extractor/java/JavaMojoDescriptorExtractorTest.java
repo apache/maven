@@ -23,7 +23,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author jdcasey
@@ -52,7 +52,7 @@ public class JavaMojoDescriptorExtractorTest
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         pluginDescriptor.setGoalPrefix( "test" );
-        Set results = extractor.execute( project, pluginDescriptor );
+        List results = extractor.execute( project, pluginDescriptor );
         assertEquals( 2, results.size() );
     }
 

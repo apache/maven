@@ -1,4 +1,4 @@
-package org.apache.maven.tools.plugin.generator;
+package org.apache.maven.plugin.descriptor;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,16 +16,13 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-
-import java.io.IOException;
-
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id$
- */
-public interface Generator
+public class DuplicateMojoDescriptorException
+    extends PluginConfigurationException
 {
-    void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
-        throws IOException;
+
+    public DuplicateMojoDescriptorException( String goalPrefix, String goal, String existingImplementation, String newImplementation )
+    {
+        super( "Goal: " + goal + " already exists in the plugin descriptor for prefix: " + goalPrefix + "\nExisting implementation is: " + existingImplementation + "\nConflicting implementation is: " + newImplementation );
+    }
+
 }

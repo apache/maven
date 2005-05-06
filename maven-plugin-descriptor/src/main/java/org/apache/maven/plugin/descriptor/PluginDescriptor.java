@@ -16,7 +16,9 @@ package org.apache.maven.plugin.descriptor;
  * limitations under the License.
  */
 
-import java.util.LinkedList;
+import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -24,9 +26,8 @@ import java.util.List;
  * @version $Id$
  */
 public class PluginDescriptor
+    extends ComponentSetDescriptor
 {
-    private List mojos;
-
     private String groupId;
 
     private String artifactId;
@@ -43,12 +44,41 @@ public class PluginDescriptor
 
     public List getMojos()
     {
-        return mojos;
+        return getComponents();
     }
 
     public void setMojos( List mojos )
+        throws DuplicateMojoDescriptorException
     {
-        this.mojos = new LinkedList( mojos );
+        for ( Iterator it = mojos.iterator(); it.hasNext(); )
+        {
+            MojoDescriptor descriptor = (MojoDescriptor) it.next();
+
+            addMojo( descriptor );
+        }
+    }
+
+    public void addMojo( MojoDescriptor mojoDescriptor )
+        throws DuplicateMojoDescriptorException
+    {
+        // this relies heavily on the equals() and hashCode() for ComponentDescriptor, 
+        // which uses role:roleHint for identity...and roleHint == goalPrefix:goal.
+        // role does not vary for Mojos.
+        List mojos = getComponents();
+
+        if ( mojos != null && mojos.contains( mojoDescriptor ) )
+        {
+            int indexOf = mojos.indexOf( mojoDescriptor );
+
+            MojoDescriptor existing = (MojoDescriptor) mojos.get( indexOf );
+
+            throw new DuplicateMojoDescriptorException( getGoalPrefix(), mojoDescriptor.getGoal(), existing
+                .getImplementation(), mojoDescriptor.getImplementation() );
+        }
+        else
+        {
+            addComponentDescriptor( mojoDescriptor );
+        }
     }
 
     public String getGroupId()
@@ -69,21 +99,13 @@ public class PluginDescriptor
     public void setArtifactId( String artifactId )
     {
         this.artifactId = artifactId;
+
+        setId( artifactId );
     }
 
     // ----------------------------------------------------------------------
     // Dependencies
     // ----------------------------------------------------------------------
-
-    public List getDependencies()
-    {
-        return dependencies;
-    }
-
-    public void setDependencies( List dependencies )
-    {
-        this.dependencies = new LinkedList( dependencies );
-    }
 
     public boolean isIsolatedRealm()
     {
@@ -137,7 +159,14 @@ public class PluginDescriptor
      */
     public static String getGoalPrefixFromArtifactId( String artifactId )
     {
-        return artifactId.replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" );
+        if ( "maven-plugin-plugin".equals( artifactId ) )
+        {
+            return "plugin";
+        }
+        else
+        {
+            return artifactId.replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" );
+        }
     }
 
     /**

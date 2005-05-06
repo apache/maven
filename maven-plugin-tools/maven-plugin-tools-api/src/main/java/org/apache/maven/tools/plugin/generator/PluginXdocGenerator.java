@@ -18,9 +18,9 @@ package org.apache.maven.tools.plugin.generator;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -40,10 +39,10 @@ import java.util.Set;
 public class PluginXdocGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project, String goalPrefix )
+    public void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
-        for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
+        for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
         {
             MojoDescriptor descriptor = (MojoDescriptor) it.next();
             processPluginDescriptor( descriptor, destinationDirectory );

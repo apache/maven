@@ -1,4 +1,6 @@
-package org.apache.maven.tools.plugin.generator;
+package org.apache.maven.plugin.descriptor;
+
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,16 +18,18 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-
-import java.io.IOException;
-
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id$
- */
-public interface Generator
+public class PluginConfigurationException
+    extends PlexusConfigurationException
 {
-    void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
-        throws IOException;
+
+    public PluginConfigurationException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
+
+    public PluginConfigurationException( String message )
+    {
+        super( message );
+    }
+
 }

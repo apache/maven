@@ -25,7 +25,7 @@ import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author jdcasey
@@ -54,7 +54,7 @@ public class MarmaladeMojoDescriptorExtractorTest
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         pluginDescriptor.setGoalPrefix( "test" );
-        Set descriptors = extractor.execute( project, pluginDescriptor );
+        List descriptors = extractor.execute( project, pluginDescriptor );
 
         assertEquals( 1, descriptors.size() );
 

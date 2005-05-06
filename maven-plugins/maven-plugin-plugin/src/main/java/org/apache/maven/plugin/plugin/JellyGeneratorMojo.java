@@ -16,11 +16,8 @@ package org.apache.maven.plugin.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.tools.plugin.generator.jelly.JellyHarnessGenerator;
 import org.apache.maven.tools.plugin.generator.Generator;
-
-import java.util.Set;
+import org.apache.maven.tools.plugin.generator.jelly.JellyHarnessGenerator;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

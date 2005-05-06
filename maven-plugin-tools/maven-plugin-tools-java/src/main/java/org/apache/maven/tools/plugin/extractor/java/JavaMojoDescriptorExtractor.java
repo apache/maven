@@ -16,20 +16,20 @@ package org.apache.maven.tools.plugin.extractor.java;
  * limitations under the License.
  */
 
-import com.thoughtworks.qdox.JavaDocBuilder;
-import com.thoughtworks.qdox.model.DocletTag;
-import com.thoughtworks.qdox.model.JavaClass;
-import com.thoughtworks.qdox.model.JavaField;
-import com.thoughtworks.qdox.model.JavaSource;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.InvalidParameterException;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
-import org.apache.maven.tools.plugin.PluginToolsException;
 import org.codehaus.modello.StringUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+
+import com.thoughtworks.qdox.JavaDocBuilder;
+import com.thoughtworks.qdox.model.DocletTag;
+import com.thoughtworks.qdox.model.JavaClass;
+import com.thoughtworks.qdox.model.JavaField;
+import com.thoughtworks.qdox.model.JavaSource;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,9 +37,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -328,16 +328,12 @@ public class JavaMojoDescriptorExtractor
         return javaSource.getClasses()[0];
     }
 
-    public Set execute( MavenProject project, PluginDescriptor pluginDescriptor )
+    public List execute( MavenProject project, PluginDescriptor pluginDescriptor )
         throws InvalidParameterException
     {
         JavaDocBuilder builder = new JavaDocBuilder();
 
         File basedir = project.getBasedir();
-
-        System.out.println( "Project basedir: " + basedir );
-
-        System.out.println( "Source directory for java mojo extraction: " + project.getCompileSourceRoots() );
 
         for ( Iterator i = project.getCompileSourceRoots().iterator(); i.hasNext(); )
         {
@@ -346,7 +342,7 @@ public class JavaMojoDescriptorExtractor
 
         JavaSource[] javaSources = builder.getSources();
 
-        Set descriptors = new HashSet();
+        List descriptors = new ArrayList();
 
         for ( int i = 0; i < javaSources.length; i++ )
         {
@@ -365,9 +361,12 @@ public class JavaMojoDescriptorExtractor
 
                 List parameters = mojoDescriptor.getParameters();
 
-                for ( int j = 0; j < parameters.size(); j++ )
+                if ( parameters != null )
                 {
-                    validateParameter( (Parameter) parameters.get( j ), j );
+                    for ( int j = 0; j < parameters.size(); j++ )
+                    {
+                        validateParameter( (Parameter) parameters.get( j ), j );
+                    }
                 }
 
                 //                Commented because it causes a VerifyError:

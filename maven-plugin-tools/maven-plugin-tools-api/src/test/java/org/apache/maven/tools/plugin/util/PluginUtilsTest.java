@@ -1,14 +1,14 @@
 package org.apache.maven.tools.plugin.util;
 
-import junit.framework.TestCase;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.util.xml.CompactXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 import java.io.StringWriter;
+import java.util.Collections;
+
+import junit.framework.TestCase;
 
 /**
  * @author jdcasey
@@ -24,26 +24,25 @@ public class PluginUtilsTest
         assertEquals( "artifactId", PluginDescriptor.getGoalPrefixFromArtifactId( "artifactId-maven-plugin" ) );
         assertEquals( "artifactId", PluginDescriptor.getGoalPrefixFromArtifactId( "artifactId" ) );
         assertEquals( "artifactId", PluginDescriptor.getGoalPrefixFromArtifactId( "artifactId-plugin" ) );
+        assertEquals( "plugin", PluginDescriptor.getGoalPrefixFromArtifactId( "maven-plugin-plugin" ) );
     }
 
     public void testShouldWriteDependencies()
         throws Exception
     {
-        Dependency dependency = new Dependency();
+        ComponentDependency dependency = new ComponentDependency();
         dependency.setArtifactId( "testArtifactId" );
         dependency.setGroupId( "testGroupId" );
         dependency.setType( "pom" );
         dependency.setVersion( "0.0.0" );
-
-        Model model = new Model();
-        model.addDependency( dependency );
-
-        MavenProject project = new MavenProject( model );
+        
+        PluginDescriptor descriptor = new PluginDescriptor();
+        descriptor.setDependencies( Collections.singletonList( dependency ) );
 
         StringWriter sWriter = new StringWriter();
         XMLWriter writer = new CompactXMLWriter( sWriter );
 
-        PluginUtils.writeDependencies( writer, project );
+        PluginUtils.writeDependencies( writer, descriptor );
 
         String output = sWriter.toString();
 

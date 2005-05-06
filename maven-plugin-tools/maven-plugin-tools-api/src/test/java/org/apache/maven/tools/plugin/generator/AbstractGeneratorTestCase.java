@@ -16,18 +16,18 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
-import junit.framework.TestCase;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.component.repository.ComponentDependency;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -52,8 +52,6 @@ public abstract class AbstractGeneratorTestCase
     {
         setupGenerator();
 
-        String destinationDirectory = new File( basedir, "target" ).getPath();
-
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal( "testGoal" );
         mojoDescriptor.setImplementation( "org.apache.maven.tools.plugin.generator.TestMojo" );
@@ -74,23 +72,27 @@ public abstract class AbstractGeneratorTestCase
         mojoDescriptor.setParameters( params );
 
         Set descriptors = Collections.singleton( mojoDescriptor );
+        
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        
+        pluginDescriptor.addMojo(mojoDescriptor);
 
-        Model model = new Model();
+        pluginDescriptor.setArtifactId( "maven-unitTesting-plugin" );
+        pluginDescriptor.setGoalPrefix( "test" );
 
-        model.setArtifactId( "maven-unitTesting-plugin" );
-
-        Dependency dependency = new Dependency();
+        ComponentDependency dependency = new ComponentDependency();
         dependency.setGroupId( "testGroup" );
         dependency.setArtifactId( "testArtifact" );
         dependency.setVersion( "0.0.0" );
 
-        model.addDependency( dependency );
+        pluginDescriptor.setDependencies( Collections.singletonList( dependency ) );
 
-        MavenProject project = new MavenProject( model );
-
-        generator.execute( destinationDirectory, descriptors, project, "test" );
-
-        validate();
+        File tempFile = File.createTempFile( "testGenerator-outDir", ".marker.txt" ).getAbsoluteFile();
+        File destinationDirectory = tempFile.getParentFile();
+        
+        generator.execute( destinationDirectory.getAbsolutePath(), pluginDescriptor );
+        
+        validate(destinationDirectory);
     }
 
     // ----------------------------------------------------------------------
@@ -122,7 +124,7 @@ public abstract class AbstractGeneratorTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected void validate()
+    protected void validate(File destinationDirectory)
         throws Exception
     {
         // empty

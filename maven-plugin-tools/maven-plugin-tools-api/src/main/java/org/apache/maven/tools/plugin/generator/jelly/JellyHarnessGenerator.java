@@ -18,6 +18,7 @@ package org.apache.maven.tools.plugin.generator.jelly;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.util.PluginUtils;
@@ -49,7 +50,7 @@ public class JellyHarnessGenerator
         return pluginDescriptor.getImplementation() + "Bean";
     }
 
-    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project, String goalPrefix )
+    public void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
         FileWriter writer = null;
@@ -60,7 +61,7 @@ public class JellyHarnessGenerator
 
             w = new PrettyPrintXMLWriter( writer );
 
-            writePluginFile( w, goalPrefix, mojoDescriptors, project );
+            writeProjectFile( w, pluginDescriptor );
 
             writer.flush();
         }
@@ -80,7 +81,7 @@ public class JellyHarnessGenerator
 
             w = new PrettyPrintXMLWriter( writer );
 
-            writeProjectFile( w, project );
+            writeProjectFile( w, pluginDescriptor );
 
             writer.flush();
         }
@@ -133,13 +134,13 @@ public class JellyHarnessGenerator
         w.endElement();
     }
 
-    private void writeProjectFile( PrettyPrintXMLWriter w, MavenProject project )
+    private void writeProjectFile( PrettyPrintXMLWriter w, PluginDescriptor pluginDescriptor )
     {
         w.startElement( "project" );
 
         w.startElement( "dependencies" );
 
-        PluginUtils.writeDependencies( w, project );
+        PluginUtils.writeDependencies( w, pluginDescriptor );
 
         w.endElement();
 

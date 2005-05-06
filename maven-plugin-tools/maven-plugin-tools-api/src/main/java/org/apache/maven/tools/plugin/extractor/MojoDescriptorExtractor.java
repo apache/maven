@@ -16,11 +16,11 @@ package org.apache.maven.tools.plugin.extractor;
  * limitations under the License.
  */
 
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.PluginToolsException;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author jdcasey
@@ -29,6 +29,6 @@ public interface MojoDescriptorExtractor
 {
     String ROLE = MojoDescriptorExtractor.class.getName();
 
-    Set execute( MavenProject project, PluginDescriptor pluginDescriptor )
+    List execute( MavenProject project, PluginDescriptor pluginDescriptor )
         throws PluginToolsException;
 }

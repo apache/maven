@@ -28,11 +28,11 @@ import org.apache.maven.tools.plugin.generator.PluginXdocGenerator;
 import org.apache.maven.tools.plugin.generator.jelly.JellyHarnessGenerator;
 import org.apache.maven.tools.plugin.scanner.DefaultMojoScanner;
 import org.apache.maven.tools.plugin.scanner.MojoScanner;
+import org.apache.maven.tools.plugin.util.PluginUtils;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.Collections;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -87,9 +87,17 @@ public class Main
             Collections.singletonMap( "java", new JavaMojoDescriptorExtractor() ) );
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        
+        pluginDescriptor.setGroupId(project.getGroupId());
+        
+        pluginDescriptor.setArtifactId(project.getArtifactId());
+        
         // TODO: should read this from the pom...
         pluginDescriptor.setGoalPrefix( PluginDescriptor.getGoalPrefixFromArtifactId( project.getArtifactId() ) );
-        Set descriptors = scanner.execute( project, pluginDescriptor );
+        
+        pluginDescriptor.setDependencies( PluginUtils.toComponentDependencies( project.getDependencies() ) );
+        
+        scanner.populatePluginDescriptor( project, pluginDescriptor );
         
         // Create the generator.
         Generator generator = null;
@@ -113,6 +121,6 @@ public class Main
 
         // Use the generator to process the discovered descriptors and produce
         // something with them.
-        generator.execute( outputDirectory, descriptors, project, pluginDescriptor.getGoalPrefix() );
+        generator.execute( outputDirectory, pluginDescriptor );
     }
 }

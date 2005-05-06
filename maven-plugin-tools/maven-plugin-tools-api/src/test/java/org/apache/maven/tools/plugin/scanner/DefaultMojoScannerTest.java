@@ -1,6 +1,5 @@
 package org.apache.maven.tools.plugin.scanner;
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -9,8 +8,10 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import junit.framework.TestCase;
 
 /**
  * @author jdcasey
@@ -37,8 +38,11 @@ public class DefaultMojoScannerTest
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         pluginDescriptor.setGoalPrefix( "testId" );
-        Set descriptors = scanner.execute( project, pluginDescriptor );
+        
+        scanner.populatePluginDescriptor( project, pluginDescriptor );
 
+        List descriptors = pluginDescriptor.getMojos();
+        
         assertEquals( 1, descriptors.size() );
 
         MojoDescriptor desc = (MojoDescriptor) descriptors.iterator().next();

@@ -16,11 +16,11 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.descriptor.Dependency;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.codehaus.plexus.component.repository.ComponentDependency;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,17 +39,19 @@ import java.util.List;
 public class PluginDescriptorGeneratorTest
     extends AbstractGeneratorTestCase
 {
-    protected void validate()
+    protected void validate(File destinationDirectory)
         throws Exception
     {
         PluginDescriptorBuilder pdb = new PluginDescriptorBuilder();
 
-        File pluginDescriptorFile = new File( basedir, "target/plugin.xml" );
+        File pluginDescriptorFile = new File( destinationDirectory, "plugin.xml" );
 
         String pd = readFile( pluginDescriptorFile );
 
         PluginDescriptor pluginDescriptor = pdb.build( new StringReader( pd ) );
 
+        assertEquals( 1, pluginDescriptor.getMojos().size() );
+        
         MojoDescriptor mojoDescriptor = (MojoDescriptor) pluginDescriptor.getMojos().get( 0 );
 
         checkMojo( mojoDescriptor );
@@ -60,11 +62,11 @@ public class PluginDescriptorGeneratorTest
 
         List dependencies = pluginDescriptor.getDependencies();
 
-        checkDependency( "testGroup", "testArtifact", "0.0.0", (Dependency) dependencies.get( 0 ) );
+        checkDependency( "testGroup", "testArtifact", "0.0.0", (ComponentDependency) dependencies.get( 0 ) );
 
         assertEquals( 1, dependencies.size() );
 
-        Dependency dependency = (Dependency) dependencies.get( 0 );
+        ComponentDependency dependency = (ComponentDependency) dependencies.get( 0 );
         assertEquals( "testGroup", dependency.getGroupId() );
         assertEquals( "testArtifact", dependency.getArtifactId() );
         assertEquals( "0.0.0", dependency.getVersion() );
@@ -111,7 +113,7 @@ public class PluginDescriptorGeneratorTest
         assertTrue( parameter.isRequired() );
     }
 
-    private void checkDependency( String groupId, String artifactId, String version, Dependency dependency )
+    private void checkDependency( String groupId, String artifactId, String version, ComponentDependency dependency )
     {
         assertNotNull( dependency );
 

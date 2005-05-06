@@ -18,7 +18,7 @@ package org.apache.maven.tools.plugin.generator;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.modello.generator.java.javasource.JClass;
 import org.codehaus.modello.generator.java.javasource.JConstructor;
 import org.codehaus.modello.generator.java.javasource.JMethod;
@@ -32,7 +32,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * [JC] Is this class defunct now? I can't find o.a.m.plugin.BeanPluginAdapter in the codebase...
@@ -44,10 +43,10 @@ import java.util.Set;
 public class BeanGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mojoDescriptors, MavenProject project, String goalPrefix )
+    public void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
-        for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
+        for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
         {
             MojoDescriptor descriptor = (MojoDescriptor) it.next();
             processPluginDescriptor( descriptor, destinationDirectory );

@@ -19,7 +19,6 @@ package org.apache.maven.tools.plugin.generator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.util.PluginUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -35,7 +34,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -45,8 +43,7 @@ import java.util.Set;
 public class PluginDescriptorGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, Set mavenMojoDescriptors, MavenProject project,
-                         String goalPrefix )
+    public void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
         File f = new File( destinationDirectory, "plugin.xml" );
@@ -65,23 +62,23 @@ public class PluginDescriptorGenerator
 
             w.startElement( "plugin" );
 
-            element( w, "groupId", project.getGroupId() );
+            element( w, "groupId", pluginDescriptor.getGroupId() );
 
-            element( w, "artifactId", project.getArtifactId() );
+            element( w, "artifactId", pluginDescriptor.getArtifactId() );
 
-            element( w, "goalPrefix", goalPrefix );
+            element( w, "goalPrefix", pluginDescriptor.getGoalPrefix() );
 
              w.startElement( "mojos" );
 
-            for ( Iterator it = mavenMojoDescriptors.iterator(); it.hasNext(); )
+            for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
             {
                 MojoDescriptor descriptor = (MojoDescriptor) it.next();
-                processPluginDescriptor( descriptor, w, project );
+                processMojoDescriptor( descriptor, w );
             }
 
             w.endElement();
 
-            PluginUtils.writeDependencies( w, project );
+            PluginUtils.writeDependencies( w, pluginDescriptor );
 
             w.endElement();
 
@@ -93,7 +90,7 @@ public class PluginDescriptorGenerator
         }
     }
 
-    protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w, MavenProject project )
+    protected void processMojoDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w )
     {
         w.startElement( "mojo" );
 
@@ -221,56 +218,61 @@ public class PluginDescriptorGenerator
         w.startElement( "parameters" );
 
         Collection requirements = new ArrayList();
-        Map configuration = new HashMap( parameters.size() );
-        for ( int j = 0; j < parameters.size(); j++ )
+        
+        Map configuration = new HashMap();
+        
+        if( parameters != null )
         {
-            Parameter parameter = (Parameter) parameters.get( j );
-
-            String expression = parameter.getExpression();
-
-            if ( StringUtils.isNotEmpty( expression ) && expression.startsWith( "${component." ) )
+            for ( int j = 0; j < parameters.size(); j++ )
             {
-                // treat it as a component...a requirement, in other words.
+                Parameter parameter = (Parameter) parameters.get( j );
 
-                requirements.add( parameter );
+                String expression = parameter.getExpression();
+
+                if ( StringUtils.isNotEmpty( expression ) && expression.startsWith( "${component." ) )
+                {
+                    // treat it as a component...a requirement, in other words.
+
+                    requirements.add( parameter );
+                }
+                else
+                {
+                    // treat it as a normal parameter.
+
+                    w.startElement( "parameter" );
+
+                    element( w, "name", parameter.getName() );
+
+                    if ( parameter.getAlias() != null )
+                    {
+                        element( w, "alias", parameter.getAlias() );
+                    }
+
+                    element( w, "type", parameter.getType() );
+
+                    if ( parameter.getDeprecated() != null )
+                    {
+                        element( w, "deprecated", parameter.getDeprecated() );
+                    }
+
+                    // TODO: do we still need this?
+                    element( w, "validator", parameter.getValidator() );
+
+                    element( w, "required", Boolean.toString( parameter.isRequired() ) );
+
+                    element( w, "editable", Boolean.toString( parameter.isEditable() ) );
+
+                    element( w, "description", parameter.getDescription() );
+
+                    if ( expression != null && expression.length() > 0 )
+                    {
+                        configuration.put( parameter, expression );
+                    }
+
+                    w.endElement();
+                }
+
             }
-            else
-            {
-                // treat it as a normal parameter.
-
-                w.startElement( "parameter" );
-
-                element( w, "name", parameter.getName() );
-
-                if ( parameter.getAlias() != null )
-                {
-                    element( w, "alias", parameter.getAlias() );
-                }
-
-                element( w, "type", parameter.getType() );
-
-                if ( parameter.getDeprecated() != null )
-                {
-                    element( w, "deprecated", parameter.getDeprecated() );
-                }
-
-                // TODO: do we still need this?
-                element( w, "validator", parameter.getValidator() );
-
-                element( w, "required", Boolean.toString( parameter.isRequired() ) );
-
-                element( w, "editable", Boolean.toString( parameter.isEditable() ) );
-
-                element( w, "description", parameter.getDescription() );
-
-                if ( expression != null && expression.length() > 0 )
-                {
-                    configuration.put( parameter, expression );
-                }
-
-                w.endElement();
-            }
-
         }
 
         w.endElement();
