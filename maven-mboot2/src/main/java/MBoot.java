@@ -152,7 +152,7 @@ public class MBoot
 
             Profile activeProfile = userModelReader.getActiveProfile();
 
-            if ( mavenRepoLocal == null )
+            if ( mavenRepoLocal == null && activeProfile != null )
             {
                 mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
             }
