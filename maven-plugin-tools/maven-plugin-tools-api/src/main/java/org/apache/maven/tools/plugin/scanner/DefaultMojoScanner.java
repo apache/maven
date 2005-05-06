@@ -16,11 +16,11 @@ package org.apache.maven.tools.plugin.scanner;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.descriptor.DuplicateMojoDescriptorException;
+import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.tools.plugin.PluginToolsException;
+import org.apache.maven.tools.plugin.extractor.ExtractionException;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -52,7 +52,7 @@ public class DefaultMojoScanner
     }
 
     public void populatePluginDescriptor( MavenProject project, PluginDescriptor pluginDescriptor )
-        throws PluginToolsException
+        throws ExtractionException, InvalidPluginDescriptorException
     {
         Logger logger = getLogger();
 
@@ -79,15 +79,7 @@ public class DefaultMojoScanner
 
                 descriptor.setPluginDescriptor( pluginDescriptor );
 
-                try
-                {
-                    pluginDescriptor.addMojo( descriptor );
-                }
-                catch ( DuplicateMojoDescriptorException e )
-                {
-                    throw new PluginToolsException( "Duplicate goal specification detected.\nError was: "
-                        + e.getLocalizedMessage(), e );
-                }
+                pluginDescriptor.addMojo( descriptor );
             }
         }
     }

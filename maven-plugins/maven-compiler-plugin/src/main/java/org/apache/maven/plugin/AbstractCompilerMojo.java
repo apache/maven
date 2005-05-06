@@ -121,7 +121,7 @@ public abstract class AbstractCompilerMojo
             compilerConfiguration.addCompilerOption( "-target", target );
         }
 
-        if ( debug != null && "true".equals( debug ) )
+        if ( debug != null && Boolean.valueOf( debug ).booleanValue() )
         {
             compilerConfiguration.setDebug( true );
         }

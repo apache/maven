@@ -1,8 +1,8 @@
 package org.apache.maven.tools.plugin.extractor;
 
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.tools.plugin.PluginToolsException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.DirectoryScanner;
 
@@ -22,7 +22,7 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
     implements MojoDescriptorExtractor
 {
     public List execute( MavenProject project, PluginDescriptor pluginDescriptor )
-        throws PluginToolsException
+        throws ExtractionException, InvalidPluginDescriptorException
     {
         Map scriptFilesKeyedByBasedir = gatherScriptSourcesByBasedir( project.getScriptSourceRoots(),
                                                                       getScriptFileExtension() );
@@ -33,7 +33,7 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
     }
 
     protected abstract List extractMojoDescriptors( Map scriptFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
-        throws PluginToolsException;
+        throws ExtractionException, InvalidPluginDescriptorException;
 
     protected abstract String getScriptFileExtension();
 
@@ -47,7 +47,7 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
 
             String resourceDir = (String) it.next();
             File dir = new File( resourceDir ).getAbsoluteFile();
-            
+
             resourceDir = dir.getPath();
 
             if ( dir.exists() )

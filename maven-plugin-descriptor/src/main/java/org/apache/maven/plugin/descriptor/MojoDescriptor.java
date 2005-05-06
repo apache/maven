@@ -23,6 +23,7 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,11 +65,11 @@ public class MojoDescriptor
     //
     // ----------------------------------------------------------------------
 
-    private String requiresDependencyResolution = null;
+    private String dependencyResolutionRequired = null;
 
-    private boolean requiresProject = true;
+    private boolean projectRequired = true;
 
-    private boolean requiresOnline = false;
+    private boolean onlineRequired = false;
 
     private PlexusConfiguration mojoConfiguration;
 
@@ -110,8 +111,33 @@ public class MojoDescriptor
     }
 
     public void setParameters( List parameters )
+        throws DuplicateParameterException
     {
-        this.parameters = parameters;
+        for ( Iterator it = parameters.iterator(); it.hasNext(); )
+        {
+            Parameter parameter = (Parameter) it.next();
+            addParameter( parameter );
+        }
+    }
+    
+    public void addParameter( Parameter parameter )
+        throws DuplicateParameterException
+    {
+        if ( parameters != null && parameters.contains( parameter ) )
+        {
+            throw new DuplicateParameterException( parameter.getName()
+                + " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: "
+                + getImplementation() + ")" );
+        }
+        else
+        {
+            if ( parameters == null )
+            {
+                parameters = new LinkedList();
+            }
+
+            parameters.add( parameter );
+        }
     }
 
     public Map getParameterMap()
@@ -135,50 +161,50 @@ public class MojoDescriptor
     // Dependency requirement
     // ----------------------------------------------------------------------
 
-    public void setRequiresDependencyResolution( String requiresDependencyResolution )
+    public void setDependencyResolutionRequired( String requiresDependencyResolution )
     {
-        this.requiresDependencyResolution = requiresDependencyResolution;
+        this.dependencyResolutionRequired = requiresDependencyResolution;
     }
 
-    public String getRequiresDependencyResolution()
+    public String isDependencyResolutionRequired()
     {
-        return requiresDependencyResolution;
+        return dependencyResolutionRequired;
     }
 
     // ----------------------------------------------------------------------
     // Project requirement
     // ----------------------------------------------------------------------
 
-    public void setRequiresProject( boolean requiresProject )
+    public void setProjectRequired( boolean requiresProject )
     {
-        this.requiresProject = requiresProject;
+        this.projectRequired = requiresProject;
     }
 
-    public boolean getRequiresProject()
+    public boolean isProjectRequired()
     {
-        return requiresProject;
+        return projectRequired;
     }
 
     // ----------------------------------------------------------------------
     // Online vs. Offline requirement
     // ----------------------------------------------------------------------
 
-    public void setRequiresOnline( boolean requiresOnline )
+    public void setOnlineRequired( boolean requiresOnline )
     {
-        this.requiresOnline = requiresOnline;
+        this.onlineRequired = requiresOnline;
     }
 
     // blech! this isn't even intelligible as a method name. provided for
     // consistency...
-    public boolean isRequiresOnline()
+    public boolean isOnlineRequired()
     {
-        return requiresOnline;
+        return onlineRequired;
     }
 
     // more english-friendly method...keep the code clean! :)
     public boolean requiresOnline()
     {
-        return requiresOnline;
+        return onlineRequired;
     }
 
     public String getPhase()

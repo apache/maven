@@ -17,6 +17,7 @@ package org.apache.maven.project.validation;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,6 +45,11 @@ public class ModelValidationResult
     public String getMessage( int i )
     {
         return messages.get( i ).toString();
+    }
+    
+    public List getMessages()
+    {
+        return Collections.unmodifiableList( messages );
     }
 
     public void addMessage( String message )

@@ -16,11 +16,12 @@ package org.apache.maven.tools.plugin.extractor.java;
  * limitations under the License.
  */
 
+import org.apache.maven.plugin.descriptor.InvalidParameterException;
+import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.tools.plugin.extractor.InvalidParameterException;
 import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
 import org.codehaus.modello.StringUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -33,13 +34,12 @@ import com.thoughtworks.qdox.model.JavaSource;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -110,7 +110,7 @@ public class JavaMojoDescriptorExtractor
     // Mojo descriptor creation from @tags
     // ----------------------------------------------------------------------
 
-    private MojoDescriptor createMojoDescriptor( JavaSource javaSource, PluginDescriptor pluginDescriptor )
+    private MojoDescriptor createMojoDescriptor( JavaSource javaSource, PluginDescriptor pluginDescriptor ) throws InvalidPluginDescriptorException
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setPluginDescriptor( pluginDescriptor );
@@ -187,7 +187,7 @@ public class JavaMojoDescriptorExtractor
             {
                 value = "runtime";
             }
-            mojoDescriptor.setRequiresDependencyResolution( value );
+            mojoDescriptor.setDependencyResolutionRequired( value );
         }
 
         // ----------------------------------------------------------------------
@@ -198,7 +198,7 @@ public class JavaMojoDescriptorExtractor
 
         if ( requiresProject != null )
         {
-            mojoDescriptor.setRequiresProject( true );
+            mojoDescriptor.setProjectRequired( true );
         }
 
         // ----------------------------------------------------------------------
@@ -209,7 +209,7 @@ public class JavaMojoDescriptorExtractor
 
         if ( requiresOnline != null )
         {
-            mojoDescriptor.setRequiresOnline( true );
+            mojoDescriptor.setOnlineRequired( true );
         }
 
         extractParameters( mojoDescriptor, javaClass );
@@ -234,7 +234,7 @@ public class JavaMojoDescriptorExtractor
         return tag;
     }
 
-    private void extractParameters( MojoDescriptor mojoDescriptor, JavaClass javaClass )
+    private void extractParameters( MojoDescriptor mojoDescriptor, JavaClass javaClass ) throws InvalidPluginDescriptorException
     {
         // ---------------------------------------------------------------------------------
         // We're resolving class-level, ancestor-class-field, local-class-field order here.
@@ -243,8 +243,6 @@ public class JavaMojoDescriptorExtractor
         Map rawParams = new TreeMap();
 
         extractFieldParameterTags( javaClass, rawParams );
-
-        Set parameters = new HashSet();
 
         for ( Iterator it = rawParams.entrySet().iterator(); it.hasNext(); )
         {
@@ -282,14 +280,7 @@ public class JavaMojoDescriptorExtractor
 
             pd.setExpression( parameter.getNamedParameter( PARAMETER_EXPRESSION ) );
 
-            parameters.add( pd );
-        }
-
-        if ( !parameters.isEmpty() )
-        {
-            List paramList = new ArrayList( parameters );
-
-            mojoDescriptor.setParameters( paramList );
+            mojoDescriptor.addParameter( pd );
         }
     }
 
@@ -329,7 +320,7 @@ public class JavaMojoDescriptorExtractor
     }
 
     public List execute( MavenProject project, PluginDescriptor pluginDescriptor )
-        throws InvalidParameterException
+        throws InvalidPluginDescriptorException
     {
         JavaDocBuilder builder = new JavaDocBuilder();
 

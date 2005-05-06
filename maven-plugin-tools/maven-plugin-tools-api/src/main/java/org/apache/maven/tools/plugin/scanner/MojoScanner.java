@@ -16,9 +16,10 @@ package org.apache.maven.tools.plugin.scanner;
  * limitations under the License.
  */
 
+import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.tools.plugin.PluginToolsException;
+import org.apache.maven.tools.plugin.extractor.ExtractionException;
 
 /**
  * @author jdcasey
@@ -28,6 +29,6 @@ public interface MojoScanner
     String ROLE = MojoScanner.class.getName();
 
     void populatePluginDescriptor( MavenProject project, PluginDescriptor pluginDescriptor )
-        throws PluginToolsException;
+        throws ExtractionException, InvalidPluginDescriptorException;
 
 }

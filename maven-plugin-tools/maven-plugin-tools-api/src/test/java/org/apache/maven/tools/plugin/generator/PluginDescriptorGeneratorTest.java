@@ -100,7 +100,7 @@ public class PluginDescriptorGeneratorTest
         // The following should be defaults
         assertEquals( "per-lookup", mojoDescriptor.getInstantiationStrategy() );
 
-        assertNotNull( mojoDescriptor.getRequiresDependencyResolution() );
+        assertNotNull( mojoDescriptor.isDependencyResolutionRequired() );
 
         // check the parameter.
         checkParameter( (Parameter) mojoDescriptor.getParameters().get( 0 ) );

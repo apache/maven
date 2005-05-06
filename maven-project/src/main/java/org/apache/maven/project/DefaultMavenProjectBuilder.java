@@ -150,7 +150,7 @@ public class DefaultMavenProjectBuilder
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
-        MavenProject project = build( model, localRepository );
+        MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository );
 
         // Only translate the base directory for files in the source tree
         pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
@@ -173,7 +173,7 @@ public class DefaultMavenProjectBuilder
 
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-        return build( model, localRepository );
+        return build( "Artifact [" + artifact.getId() + "]", model, localRepository );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -201,7 +201,7 @@ public class DefaultMavenProjectBuilder
         return model;
     }
 
-    private MavenProject build( Model model, ArtifactRepository localRepository )
+    private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -225,11 +225,11 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( project, aggregatedRemoteWagonRepositories );
+            project = processProjectLogic( pomLocation, project, aggregatedRemoteWagonRepositories );
         }
         catch ( ModelInterpolationException e )
         {
-            throw new ProjectBuildingException( "Error building project: " + model.getId(), e );
+            throw new ProjectBuildingException( "Error building project from \'" + pomLocation + "\': " + model.getId(), e );
         }
         return project;
     }
@@ -241,7 +241,7 @@ public class DefaultMavenProjectBuilder
      * the resolved source roots, etc for the parent - that occurs for the parent when it is constructed independently
      * and projects are not cached or reused
      */
-    private MavenProject processProjectLogic( MavenProject project, List remoteRepositories )
+    private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories )
         throws ProjectBuildingException, ModelInterpolationException
     {
         Model model = project.getModel();
@@ -277,7 +277,7 @@ public class DefaultMavenProjectBuilder
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            throw new ProjectBuildingException( "Exception while building project: " + validationResult.toString() );
+            throw new ProjectBuildingException( "Exception while building project from \'" + pomLocation + "\': " + validationResult.toString() );
         }
 
         return project;
@@ -489,7 +489,7 @@ public class DefaultMavenProjectBuilder
 
             List remoteRepositories = buildArtifactRepositories( superModel.getRepositories() );
 
-            project = processProjectLogic( project, remoteRepositories );
+            project = processProjectLogic( "<Super-POM>", project, remoteRepositories );
 
             return project;
         }

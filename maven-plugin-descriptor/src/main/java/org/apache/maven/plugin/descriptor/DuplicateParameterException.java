@@ -1,7 +1,5 @@
 package org.apache.maven.plugin.descriptor;
 
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -18,16 +16,11 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
  * limitations under the License.
  */
 
-public class PluginConfigurationException
-    extends PlexusConfigurationException
+public class DuplicateParameterException
+    extends InvalidPluginDescriptorException
 {
 
-    public PluginConfigurationException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
-
-    public PluginConfigurationException( String message )
+    public DuplicateParameterException( String message )
     {
         super( message );
     }

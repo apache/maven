@@ -110,22 +110,22 @@ public class PluginDescriptorGenerator
         //
         // ----------------------------------------------------------------------
 
-        if ( mojoDescriptor.getRequiresDependencyResolution() != null )
+        if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
-            element( w, "requiresDependencyResolution", mojoDescriptor.getRequiresDependencyResolution() );
+            element( w, "requiresDependencyResolution", mojoDescriptor.isDependencyResolutionRequired() );
         }
 
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
-        element( w, "requiresProject", "" + mojoDescriptor.getRequiresProject() );
+        element( w, "requiresProject", "" + mojoDescriptor.isProjectRequired() );
 
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
-        element( w, "requiresOnline", "" + mojoDescriptor.requiresOnline() );
+        element( w, "requiresOnline", "" + mojoDescriptor.isOnlineRequired() );
 
         // ----------------------------------------------------------------------
         //

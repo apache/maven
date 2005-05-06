@@ -1,6 +1,4 @@
-package org.apache.maven.tools.plugin.extractor;
-
-import org.apache.maven.tools.plugin.PluginToolsException;
+package org.apache.maven.plugin.descriptor;
 
 /*
  * Copyright 2001-2004 The Apache Software Foundation.
@@ -24,7 +22,7 @@ import org.apache.maven.tools.plugin.PluginToolsException;
  *          jdcasey Exp $
  */
 public class InvalidParameterException
-    extends PluginToolsException
+    extends InvalidPluginDescriptorException
 {
     public InvalidParameterException( String element, int i )
     {

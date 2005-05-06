@@ -268,7 +268,7 @@ public class DefaultLifecycleExecutor
     private void configureMojoPhaseBinding( MojoDescriptor mojoDescriptor, Map phaseMap, Settings settings )
         throws LifecycleExecutionException
     {
-        if ( settings.getActiveProfile().isOffline() && mojoDescriptor.requiresOnline() )
+        if ( settings.getActiveProfile().isOffline() && mojoDescriptor.isOnlineRequired() )
         {
             String goal = mojoDescriptor.getGoal();
             getLogger().warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );

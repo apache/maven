@@ -307,7 +307,7 @@ public class DefaultPluginManager
     public void executeMojo( MavenSession session, MojoDescriptor mojoDescriptor )
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
-        if ( mojoDescriptor.getRequiresDependencyResolution() != null )
+        if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
 
             ArtifactResolver artifactResolver = null;
@@ -319,7 +319,7 @@ public class DefaultPluginManager
                 mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
                 resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder,
-                                               mojoDescriptor.getRequiresDependencyResolution() );
+                                               mojoDescriptor.isDependencyResolutionRequired() );
                 downloadDependencies( session, artifactResolver );
             }
             catch ( ComponentLookupException e )

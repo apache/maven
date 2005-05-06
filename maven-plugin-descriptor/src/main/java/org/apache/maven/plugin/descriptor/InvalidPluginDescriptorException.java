@@ -1,5 +1,7 @@
 package org.apache.maven.plugin.descriptor;
 
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -16,13 +18,18 @@ package org.apache.maven.plugin.descriptor;
  * limitations under the License.
  */
 
-public class DuplicateMojoDescriptorException
-    extends InvalidPluginDescriptorException
+public class InvalidPluginDescriptorException
+    extends PlexusConfigurationException
 {
 
-    public DuplicateMojoDescriptorException( String goalPrefix, String goal, String existingImplementation, String newImplementation )
+    public InvalidPluginDescriptorException( String message, Throwable cause )
     {
-        super( "Goal: " + goal + " already exists in the plugin descriptor for prefix: " + goalPrefix + "\nExisting implementation is: " + existingImplementation + "\nConflicting implementation is: " + newImplementation );
+        super( message, cause );
+    }
+
+    public InvalidPluginDescriptorException( String message )
+    {
+        super( message );
     }
 
 }

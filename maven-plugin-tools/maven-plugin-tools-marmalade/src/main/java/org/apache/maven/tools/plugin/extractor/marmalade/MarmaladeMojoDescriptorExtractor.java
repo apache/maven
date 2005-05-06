@@ -16,12 +16,13 @@ package org.apache.maven.tools.plugin.extractor.marmalade;
  * limitations under the License.
  */
 
+import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.script.marmalade.MarmaladeMojoExecutionDirectives;
 import org.apache.maven.script.marmalade.tags.MojoTag;
-import org.apache.maven.tools.plugin.PluginToolsException;
 import org.apache.maven.tools.plugin.extractor.AbstractScriptedMojoDescriptorExtractor;
+import org.apache.maven.tools.plugin.extractor.ExtractionException;
 import org.codehaus.marmalade.launch.MarmaladeLaunchException;
 import org.codehaus.marmalade.launch.MarmaladeLauncher;
 import org.codehaus.marmalade.model.MarmaladeScript;
@@ -49,8 +50,8 @@ public class MarmaladeMojoDescriptorExtractor
         return ".mmld";
     }
 
-    protected List extractMojoDescriptors( Map sourceFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )
-        throws PluginToolsException
+    protected List extractMojoDescriptors( Map sourceFilesKeyedByBasedir, PluginDescriptor pluginDescriptor ) 
+        throws ExtractionException, InvalidPluginDescriptorException
     {
         ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
         try
@@ -112,11 +113,20 @@ public class MarmaladeMojoDescriptorExtractor
                     }
                     catch ( IOException e )
                     {
-                        throw new PluginToolsException( "Error reading descriptor Marmalade mojo in: " + scriptFile, e );
+                        throw new ExtractionException( "Error extracting mojo descriptor from Marmalade script: " + scriptFile, e );
                     }
                     catch ( MarmaladeLaunchException e )
                     {
-                        throw new PluginToolsException( "Error extracting descriptor Marmalade mojo from: " + scriptFile, e );
+                        Throwable cause = e.getCause();
+                        
+                        if ( cause instanceof InvalidPluginDescriptorException )
+                        {
+                            throw (InvalidPluginDescriptorException) cause;
+                        }
+                        else
+                        {
+                            throw new ExtractionException( "Error extracting mojo descriptor from Marmalade script: " + scriptFile, e );
+                        }
                     }
                 }
             }

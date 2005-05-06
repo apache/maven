@@ -129,21 +129,21 @@ public class PluginDescriptorBuilder
 
         if ( dependencyResolution != null )
         {
-            mojo.setRequiresDependencyResolution( dependencyResolution );
+            mojo.setDependencyResolutionRequired( dependencyResolution );
         }
 
         String requiresProject = c.getChild( "requiresProject" ).getValue();
 
         if ( requiresProject != null )
         {
-            mojo.setRequiresProject( "true".equals( requiresProject ) );
+            mojo.setProjectRequired( Boolean.valueOf( requiresProject ).booleanValue() );
         }
 
         String requiresOnline = c.getChild( "requiresOnline" ).getValue();
 
         if ( requiresOnline != null )
         {
-            mojo.setRequiresOnline( "true".equals( requiresOnline ) );
+            mojo.setOnlineRequired( Boolean.valueOf( requiresOnline ).booleanValue() );
         }
 
         // ----------------------------------------------------------------------
@@ -168,7 +168,7 @@ public class PluginDescriptorBuilder
 
             String required = d.getChild( "required" ).getValue();
 
-            parameter.setRequired( "true".equals( required ) );
+            parameter.setRequired( Boolean.valueOf( required ).booleanValue() );
 
             PlexusConfiguration editableConfig = d.getChild( "editable" );
 
@@ -177,7 +177,7 @@ public class PluginDescriptorBuilder
             {
                 String editable = d.getChild( "editable" ).getValue();
 
-                parameter.setEditable( editable == null || "true".equals( editable ) );
+                parameter.setEditable( editable == null || Boolean.valueOf( editable ).booleanValue() );
             }
 
             parameter.setValidator( d.getChild( "validator" ).getValue() );

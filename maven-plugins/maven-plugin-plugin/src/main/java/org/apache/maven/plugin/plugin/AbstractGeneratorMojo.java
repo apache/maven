@@ -18,9 +18,10 @@ package org.apache.maven.plugin.plugin;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.tools.plugin.PluginToolsException;
+import org.apache.maven.tools.plugin.extractor.ExtractionException;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.scanner.MojoScanner;
 import org.apache.maven.tools.plugin.util.PluginUtils;
@@ -91,9 +92,13 @@ public abstract class AbstractGeneratorMojo
         {
             throw new MojoExecutionException( "Error writing plugin descriptor", e );
         }
-        catch ( PluginToolsException e )
+        catch ( InvalidPluginDescriptorException e )
         {
-            throw new MojoExecutionException( "Error creatin plugin descriptor", e );
+            throw new MojoExecutionException( "Error extracting plugin descriptor: \'" + e.getLocalizedMessage() + "\'", e );
+        }
+        catch ( ExtractionException e )
+        {
+            throw new MojoExecutionException( "Error extracting plugin descriptor: \'" + e.getLocalizedMessage() + "\'", e );
         }
     }
 }

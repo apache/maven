@@ -1,4 +1,4 @@
-package org.apache.maven.tools.plugin;
+package org.apache.maven.tools.plugin.extractor;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,22 +16,18 @@ package org.apache.maven.tools.plugin;
  * limitations under the License.
  */
 
-/**
- * Error during the plugin tools.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- */
-public class PluginToolsException
+public class ExtractionException
     extends Exception
 {
-    public PluginToolsException( String message, Throwable throwable )
+
+    public ExtractionException( String message, Throwable cause )
     {
-        super( message, throwable );
+        super( message, cause );
     }
 
-    public PluginToolsException( String message )
+    public ExtractionException( String message )
     {
-        super( message );    
+        super( message );
     }
+
 }

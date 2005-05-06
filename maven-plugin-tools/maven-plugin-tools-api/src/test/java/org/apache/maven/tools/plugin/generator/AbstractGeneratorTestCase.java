@@ -53,7 +53,7 @@ public abstract class AbstractGeneratorTestCase
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal( "testGoal" );
         mojoDescriptor.setImplementation( "org.apache.maven.tools.plugin.generator.TestMojo" );
-        mojoDescriptor.setRequiresDependencyResolution( "compile" );
+        mojoDescriptor.setDependencyResolutionRequired( "compile" );
 
         List params = new ArrayList();
 

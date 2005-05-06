@@ -22,6 +22,7 @@ import org.apache.maven.project.MavenProjectTestCase;
 
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -33,6 +34,15 @@ public class DefaultModelValidatorTest
     private Model model;
 
     private ModelValidator validator;
+    
+    public void testMissingModelVersion() throws Exception
+    {
+        ModelValidationResult result = validate( "missing-modelVersion-pom.xml" );
+
+        assertEquals( 1, result.getMessageCount() );
+
+        assertEquals( "'modelVersion' is missing.", result.getMessage( 0 ) );
+    }
 
     public void testMissingArtifactId()
         throws Exception
@@ -79,18 +89,21 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-1-pom.xml" );
 
-        assertEquals( 3, result.getMessageCount() );
+        assertEquals( 4, result.getMessageCount() );
 
-        assertEquals( "'groupId' is missing.", result.getMessage( 0 ) );
-        assertEquals( "'artifactId' is missing.", result.getMessage( 1 ) );
+        List messages = result.getMessages();
+        
+        assertTrue( messages.contains("\'modelVersion\' is missing."));
+        assertTrue( messages.contains("\'groupId\' is missing."));
+        assertTrue( messages.contains("\'artifactId\' is missing."));
+        assertTrue( messages.contains("\'version\' is missing."));
         // type is inherited from the super pom
-        assertEquals( "'version' is missing.", result.getMessage( 2 ) );
     }
 
     private ModelValidationResult validate( String testName )
         throws Exception
     {
-        Reader input = new FileReader( getTestFile( "src/test/resources/validation/" + testName ) );
+        Reader input = new FileReader( getFileForClasspathResource( "/validation/" + testName ) );
 
         MavenXpp3Reader reader = new MavenXpp3Reader();
 
