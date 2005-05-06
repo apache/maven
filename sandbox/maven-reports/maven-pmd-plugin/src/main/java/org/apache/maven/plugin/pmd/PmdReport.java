@@ -171,6 +171,6 @@ public class PmdReport
             excludesStr.append( DEFAULT_EXCLUDES[i] );
         }
 
-        return FileUtils.getFiles( new File( getConfiguration().getSourceDirectory() ), "**/*", excludesStr.toString() );
+        return FileUtils.getFiles( new File( getConfiguration().getSourceDirectory() ), includes, excludesStr.toString() );
     }
 }
