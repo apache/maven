@@ -30,6 +30,7 @@ import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultLogger;
 import com.puppycrawl.tools.checkstyle.ModuleFactory;
 import com.puppycrawl.tools.checkstyle.PackageNamesLoader;
+import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.XMLLogger;
 
 import java.io.File;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
@@ -46,33 +48,23 @@ import java.util.List;
 public class CheckstyleReport
     extends AbstractMavenReport
 {
-    protected static final String[] DEFAULT_EXCLUDES = {
-        // Miscellaneous typical temporary files
-        "**/*~",
-        "**/#*#",
-        "**/.#*",
-        "**/%*%",
-        "**/._*",
+    protected static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
+        "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
 
         // CVS
-        "**/CVS",
-        "**/CVS/**",
-        "**/.cvsignore",
+        "**/CVS", "**/CVS/**", "**/.cvsignore",
 
         // SCCS
-        "**/SCCS",
-        "**/SCCS/**",
+        "**/SCCS", "**/SCCS/**",
 
         // Visual SourceSafe
         "**/vssver.scc",
 
         // Subversion
-        "**/.svn",
-        "**/.svn/**",
+        "**/.svn", "**/.svn/**",
 
         // Mac
-        "**/.DS_Store"
-    };
+        "**/.DS_Store"};
 
     private URL configFile = getClass().getResource( "/config/sun_checks.xml" );
 
@@ -140,8 +132,8 @@ public class CheckstyleReport
 
         try
         {
-            //TODO: implements a PropertyResolver for resolve property like ${checkstyle.cache.file}
-            config = ConfigurationLoader.loadConfiguration( configFile.toString(), null );
+            config = ConfigurationLoader.loadConfiguration( configFile.toString(),
+                                                            new PropertiesExpander( createOverridingProperties() ) );
         }
         catch ( CheckstyleException e )
         {
@@ -172,17 +164,14 @@ public class CheckstyleReport
 
             checker.configure( config );
 
-            FileOutputStream xmlOut = new FileOutputStream( new File( getConfiguration().getOutputDirectory(), "checkstyle-result.xml" ) );
-
-            //TODO: Use a Listener with sink
-            AuditListener xmlListener = new XMLLogger( xmlOut, true );
+            AuditListener sinkListener = new CheckstyleReportListener( getSink(), getConfiguration().getSourceDirectory() );
 
             if ( listener != null )
             {
                 checker.addListener( listener );
             }
 
-            checker.addListener( xmlListener );
+            checker.addListener( sinkListener );
         }
         catch ( Exception e )
         {
@@ -225,5 +214,13 @@ public class CheckstyleReport
         }
 
         return FileUtils.getFiles( new File( getConfiguration().getSourceDirectory() ), includes, excludesStr.toString() );
+    }
+
+    private Properties createOverridingProperties()
+    {
+        Properties props = new Properties();
+        props.setProperty( "checkstyle.header.file", "LICENSE.txt" );
+        props.setProperty( "checkstyle.cache.file", "target/checkstyle-cachefile" );
+        return props;
     }
 }
