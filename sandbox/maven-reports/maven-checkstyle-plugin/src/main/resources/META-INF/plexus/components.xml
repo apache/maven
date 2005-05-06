@@ -1,0 +1,15 @@
+<component-set>
+  <!-- TODO:
+   - this should be generated using cdc
+   - need to configure the reports
+   - the hint should perhaps use a qualifier -> this is equivalent to how we must deal with plugins outside of the maven group ID
+  -->
+  <components>
+    <component>
+      <role>org.apache.maven.reporting.MavenReport</role>
+      <role-hint>checkstyle</role-hint>
+      <implementation>org.apache.maven.plugin.checkstyle.CheckstyleReport</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+    </component>
+  </components>
+</component-set>
