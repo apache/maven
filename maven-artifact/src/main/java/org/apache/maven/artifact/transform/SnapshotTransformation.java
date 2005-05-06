@@ -121,12 +121,19 @@ public class SnapshotTransformation
                         SnapshotArtifactMetadata remoteMetadata = SnapshotArtifactMetadata.retrieveFromRemoteRepository(
                             artifact, remoteRepository, wagonManager );
 
-                        if ( remoteMetadata.compareTo( localMetadata ) > 0 )
+                        int difference = remoteMetadata.compareTo( localMetadata );
+                        if ( difference > 0 )
                         {
+                            // remote is newer
                             artifact.setRepository( remoteRepository );
 
                             localMetadata = remoteMetadata;
 
+                            checkedUpdates = true;
+                        }
+                        else if ( difference == 0 )
+                        {
+                            // Identical, simply touch the file to prevent re-checking
                             checkedUpdates = true;
                         }
                     }
