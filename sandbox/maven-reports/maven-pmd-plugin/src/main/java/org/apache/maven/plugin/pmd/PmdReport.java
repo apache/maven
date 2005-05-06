@@ -102,7 +102,7 @@ public class PmdReport
         List files;
         try
         {
-            files = getFiles( "**/*.java", null );
+            files = getFilesToProcess( "**/*.java", null );
         }
         catch( IOException e )
         {
@@ -154,7 +154,7 @@ public class PmdReport
         return "pmd";
     }
 
-    private List getFiles( String includes, String excludes )
+    private List getFilesToProcess( String includes, String excludes )
         throws IOException
     {
         StringBuffer excludesStr = new StringBuffer();
