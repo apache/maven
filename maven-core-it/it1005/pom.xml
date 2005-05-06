@@ -1,0 +1,16 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-it1005-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0-SNAPSHOT</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</model>
