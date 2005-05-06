@@ -65,21 +65,31 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
             String groupId = format( v3Model.getGroupId() );
             String artifactId = format( v3Model.getArtifactId() );
 
-            String id = format( v3Model.getId() );
+            String id = v3Model.getId();
+            
             if ( StringUtils.isNotEmpty( id ) )
             {
                 if ( StringUtils.isEmpty( groupId ) )
                 {
-                    groupId = id;
+                    int plusIdx = id.indexOf("+");
+                    if(plusIdx > -1)
+                    {
+                        groupId = id.substring(0, plusIdx);
+                    }
+                    else
+                    {
+                        groupId = id;
+                    }
                 }
 
                 if ( StringUtils.isEmpty( artifactId ) )
                 {
-                    artifactId = id;
+                    artifactId = format( id );
                 }
             }
 
             String version = format( v3Model.getCurrentVersion() );
+            
             if ( version == null )
             {
                 version = format( v3Model.getVersion() );
@@ -503,18 +513,27 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
                 String groupId = format( v3Dep.getGroupId() );
                 String artifactId = format( v3Dep.getArtifactId() );
 
-                String id = format( v3Dep.getId() );
+                String id = v3Dep.getId();
 
                 if ( StringUtils.isNotEmpty( id ) )
                 {
                     if ( StringUtils.isEmpty( groupId ) )
                     {
-                        groupId = id;
+                        int plusIdx = id.indexOf("+");
+                        
+                        if(plusIdx > -1)
+                        {
+                            groupId = id.substring(0, plusIdx);
+                        }
+                        else
+                        {
+                            groupId = id;
+                        }
                     }
 
                     if ( StringUtils.isEmpty( artifactId ) )
                     {
-                        artifactId = id;
+                        artifactId = format( id );
                     }
                 }
 
