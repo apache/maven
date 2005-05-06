@@ -29,8 +29,9 @@
     <dependency>
       <groupId>pmd</groupId>
       <artifactId>pmd</artifactId>
-      <version>2.3</version>
+      <version>3.0</version>
     </dependency>
+<!-- TODO: should be in PMD pom -->
     <dependency>
       <groupId>jaxen</groupId>
       <artifactId>jaxen</artifactId>

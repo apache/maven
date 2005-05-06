@@ -32,7 +32,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,33 +45,23 @@ import java.util.List;
 public class PmdReport
     extends AbstractMavenReport
 {
-    protected static final String[] DEFAULT_EXCLUDES = {
-        // Miscellaneous typical temporary files
-        "**/*~",
-        "**/#*#",
-        "**/.#*",
-        "**/%*%",
-        "**/._*",
+    protected static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
+        "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
 
         // CVS
-        "**/CVS",
-        "**/CVS/**",
-        "**/.cvsignore",
+        "**/CVS", "**/CVS/**", "**/.cvsignore",
 
         // SCCS
-        "**/SCCS",
-        "**/SCCS/**",
+        "**/SCCS", "**/SCCS/**",
 
         // Visual SourceSafe
         "**/vssver.scc",
 
         // Subversion
-        "**/.svn",
-        "**/.svn/**",
+        "**/.svn", "**/.svn/**",
 
         // Mac
-        "**/.DS_Store"
-    };
+        "**/.DS_Store"};
 
     public void execute()
         throws MavenReportException
@@ -81,7 +71,7 @@ public class PmdReport
         {
             sink = getSink();
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             throw new MavenReportException( "Can't obtain sink for PMD report.", e );
         }
@@ -94,8 +84,8 @@ public class PmdReport
         ruleContext.setReport( report );
 
         RuleSetFactory ruleSetFactory = new RuleSetFactory();
-        RuleSet ruleSet = ruleSetFactory.createRuleSet(
-            pmd.getClass().getResourceAsStream( "/rulesets/controversial.xml" ) );
+        InputStream rulesInput = pmd.getClass().getResourceAsStream( "/rulesets/controversial.xml" );
+        RuleSet ruleSet = ruleSetFactory.createRuleSet( rulesInput );
 
         reportSink.beginDocument();
 
@@ -104,7 +94,7 @@ public class PmdReport
         {
             files = getFilesToProcess( "**/*.java", null );
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             throw new MavenReportException( "Can't parse " + getConfiguration().getSourceDirectory(), e );
         }
@@ -132,7 +122,12 @@ public class PmdReport
             }
             catch ( PMDException e )
             {
-                throw new MavenReportException( "Failure executing PMD for: " + file, e );
+                Exception ex = e;
+                if ( e.getReason() != null )
+                {
+                    ex = e.getReason();
+                }
+                throw new MavenReportException( "Failure executing PMD for: " + file, ex );
             }
             finally
             {
@@ -160,7 +155,7 @@ public class PmdReport
         StringBuffer excludesStr = new StringBuffer();
         if ( StringUtils.isNotEmpty( excludes ) )
         {
-            excludesStr.append(excludes);
+            excludesStr.append( excludes );
         }
         for ( int i = 0; i < DEFAULT_EXCLUDES.length; i++ )
         {
@@ -171,6 +166,7 @@ public class PmdReport
             excludesStr.append( DEFAULT_EXCLUDES[i] );
         }
 
-        return FileUtils.getFiles( new File( getConfiguration().getSourceDirectory() ), includes, excludesStr.toString() );
+        return FileUtils.getFiles( new File( getConfiguration().getSourceDirectory() ), includes,
+                                   excludesStr.toString() );
     }
 }
