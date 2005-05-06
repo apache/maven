@@ -247,7 +247,12 @@ public class MojoDescriptor
 
     public String getRoleHint()
     {
-        return getFullGoalName();
+        return getId();
+    }
+
+    public String getId()
+    {
+        return getPluginDescriptor().getId() + ":" + getGoal();
     }
 
     public String getFullGoalName()

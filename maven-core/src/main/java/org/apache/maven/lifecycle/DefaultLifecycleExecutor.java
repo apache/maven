@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -139,7 +140,7 @@ public class DefaultLifecycleExecutor
                 String additionalPluginArtifactId = PluginDescriptor.getDefaultPluginArtifactId(
                     artifactHandler.additionalPlugin() );
 
-                injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId );
+                injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId, null );
             }
         }
 
@@ -173,7 +174,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId )
+    private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId,
+                                                   String version )
     {
         String key = Plugin.constructKey( groupId, artifactId );
         Plugin plugin = (Plugin) project.getBuild().getPluginsAsMap().get( key );
@@ -183,6 +185,7 @@ public class DefaultLifecycleExecutor
             plugin = new Plugin();
             plugin.setGroupId( groupId );
             plugin.setArtifactId( artifactId );
+            plugin.setVersion( version );
 
             Plugin def = (Plugin) project.getPluginManagement().getPluginsAsMap().get( key );
             if ( def != null )
@@ -219,16 +222,17 @@ public class DefaultLifecycleExecutor
 
         String artifactId = plugin.getArtifactId();
 
+        String version = plugin.getVersion();
+
+        PluginDescriptor pluginDescriptor;
         try
         {
-            pluginManager.verifyPlugin( groupId, artifactId, session );
+            pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session );
         }
         catch ( PluginManagerException e )
         {
             throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
         }
-
-        PluginDescriptor pluginDescriptor = pluginManager.getPluginDescriptor( groupId, artifactId );
 
         // ----------------------------------------------------------------------
         // Look to see if the plugin configuration specifies particular mojos
@@ -277,10 +281,10 @@ public class DefaultLifecycleExecutor
 
                 if ( phase == null )
                 {
-                    throw new LifecycleExecutionException(
-                        "Required phase '" + mojoDescriptor.getPhase() + "' not found" );
+                    String message = "Required phase '" + mojoDescriptor.getPhase() + "' not found";
+                    throw new LifecycleExecutionException( message );
                 }
-                phase.getGoals().add( mojoDescriptor.getFullGoalName() );
+                phase.getGoals().add( mojoDescriptor.getId() );
             }
         }
     }
@@ -324,38 +328,66 @@ public class DefaultLifecycleExecutor
     private MojoDescriptor configureMojo( String task, MavenSession session, Map phaseMap )
         throws LifecycleExecutionException, ArtifactResolutionException
     {
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( task );
-
-        if ( mojoDescriptor == null )
-        {
-            String groupId = PluginDescriptor.getDefaultPluginGroupId();
-
-            String pluginId = PluginDescriptor.getPrefixFromGoal( task );
-
-            String artifactId = PluginDescriptor.getDefaultPluginArtifactId( pluginId );
-
-            injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId );
-
-            try
-            {
-                pluginManager.verifyPlugin( groupId, artifactId, session );
-            }
-            catch ( PluginManagerException e )
-            {
-                throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
-            }
-
-            mojoDescriptor = pluginManager.getMojoDescriptor( task );
-
-            if ( mojoDescriptor == null )
-            {
-                throw new LifecycleExecutionException( "Required goal not found: " + task );
-            }
-        }
+        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
 
         configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
 
         return mojoDescriptor;
+    }
+
+    private MojoDescriptor getMojoDescriptor( String task, MavenSession session )
+        throws ArtifactResolutionException, LifecycleExecutionException
+    {
+        String groupId = null;
+        String artifactId = null;
+        String version = null;
+        String goal = null;
+
+        StringTokenizer tok = new StringTokenizer( task, ":" );
+        int numTokens = tok.countTokens();
+        if ( numTokens == 2 )
+        {
+            // TODO: look up registered aliases in plugin manager instead
+            groupId = PluginDescriptor.getDefaultPluginGroupId();
+            artifactId = PluginDescriptor.getDefaultPluginArtifactId( tok.nextToken() );
+            goal = tok.nextToken();
+        }
+        else if ( numTokens == 4 )
+        {
+            groupId = tok.nextToken();
+            artifactId = tok.nextToken();
+            version = tok.nextToken();
+            goal = tok.nextToken();
+        }
+        else
+        {
+            String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or" +
+                " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+            throw new LifecycleExecutionException( message );
+        }
+
+        // TODO: this shouldn't be necessary all the time.
+        injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
+
+        try
+        {
+            PluginDescriptor pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session );
+            // TODO: should be able to create a Map from this
+            for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
+            {
+                MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
+                if ( mojoDescriptor.getGoal().equals( goal ) )
+                {
+                    return mojoDescriptor;
+                }
+            }
+        }
+        catch ( PluginManagerException e )
+        {
+            throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+        }
+
+        throw new LifecycleExecutionException( "Required goal not found: " + task );
     }
 
     public List getPhases()

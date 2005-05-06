@@ -87,16 +87,18 @@ public class Main
             Collections.singletonMap( "java", new JavaMojoDescriptorExtractor() ) );
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
-        
-        pluginDescriptor.setGroupId(project.getGroupId());
-        
-        pluginDescriptor.setArtifactId(project.getArtifactId());
-        
+
+        pluginDescriptor.setGroupId( project.getGroupId() );
+
+        pluginDescriptor.setArtifactId( project.getArtifactId() );
+
+        pluginDescriptor.setVersion( project.getVersion() );
+
         // TODO: should read this from the pom...
         pluginDescriptor.setGoalPrefix( PluginDescriptor.getGoalPrefixFromArtifactId( project.getArtifactId() ) );
-        
+
         pluginDescriptor.setDependencies( PluginUtils.toComponentDependencies( project.getDependencies() ) );
-        
+
         scanner.populatePluginDescriptor( project, pluginDescriptor );
         
         // Create the generator.

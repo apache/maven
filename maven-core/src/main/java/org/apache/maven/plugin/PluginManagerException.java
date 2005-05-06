@@ -27,5 +27,6 @@ public class PluginManagerException
 {
     public PluginManagerException( String message, Exception e )
     {
+        super( message, e );
     }
 }

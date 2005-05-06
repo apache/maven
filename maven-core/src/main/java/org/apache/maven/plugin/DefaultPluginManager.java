@@ -56,7 +56,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.lang.reflect.Field;
@@ -71,7 +70,6 @@ public class DefaultPluginManager
     extends AbstractLogEnabled
     implements PluginManager, ComponentDiscoveryListener, Initializable, Contextualizable
 {
-    protected Map mojoDescriptors;
 
     protected Map pluginDescriptors;
 
@@ -87,30 +85,15 @@ public class DefaultPluginManager
 
     public DefaultPluginManager()
     {
-        mojoDescriptors = new HashMap();
-
         pluginDescriptors = new HashMap();
 
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
     }
 
-    /**
-     * Mojo descriptors are looked up using their id which is of the form
-     * <pluginId>: <mojoId>. So this might be archetype:create for example which
-     * is the create mojo that resides in the archetype plugin.
-     *
-     * @param name
-     * @return
-     * @todo remove
-     */
-    public MojoDescriptor getMojoDescriptor( String name )
+    private PluginDescriptor getPluginDescriptor( String groupId, String artifactId, String version )
     {
-        return (MojoDescriptor) mojoDescriptors.get( name );
-    }
-
-    public PluginDescriptor getPluginDescriptor( String groupId, String artifactId )
-    {
-        return (PluginDescriptor) pluginDescriptors.get( PluginDescriptor.constructPluginKey( groupId, artifactId ) );
+        return (PluginDescriptor) pluginDescriptors.get(
+            PluginDescriptor.constructPluginKey( groupId, artifactId, version ) );
     }
 
     // ----------------------------------------------------------------------
@@ -118,28 +101,6 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private Set pluginsInProcess = new HashSet();
-
-    public void processPluginDescriptor( PluginDescriptor pluginDescriptor )
-        throws CycleDetectedException
-    {
-        String key = pluginDescriptor.getId();
-
-        if ( pluginsInProcess.contains( key ) )
-        {
-            return;
-        }
-
-        pluginsInProcess.add( key );
-
-        for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
-        {
-            MojoDescriptor mojoDescriptor = (MojoDescriptor) it.next();
-
-            mojoDescriptors.put( mojoDescriptor.getFullGoalName(), mojoDescriptor );
-        }
-
-        pluginDescriptors.put( key, pluginDescriptor );
-    }
 
     // ----------------------------------------------------------------------
     // Mojo discovery
@@ -149,20 +110,26 @@ public class DefaultPluginManager
     {
         ComponentSetDescriptor componentSetDescriptor = event.getComponentSetDescriptor();
 
-        if ( !( componentSetDescriptor instanceof PluginDescriptor ) )
+        if ( componentSetDescriptor instanceof PluginDescriptor )
         {
-            return;
-        }
+            PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
 
-        PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
+            if ( pluginDescriptor.getVersion() == null )
+            {
+                // TODO: temporary - until we're done testing that version is always written
+                throw new NullPointerException(
+                    "Version was null - check your plugin '" + pluginDescriptor.getId() +
+                    "' was built with Maven 2.0 Alpha 2" );
+            }
 
-        try
-        {
-            processPluginDescriptor( pluginDescriptor );
-        }
-        catch ( CycleDetectedException e )
-        {
-            getLogger().error( "A cycle was detected in the goal graph: ", e );
+            String key = pluginDescriptor.getId();
+
+            if ( !pluginsInProcess.contains( key ) )
+            {
+                pluginsInProcess.add( key );
+
+                pluginDescriptors.put( key, pluginDescriptor );
+            }
         }
     }
 
@@ -170,16 +137,16 @@ public class DefaultPluginManager
     //
     // ----------------------------------------------------------------------
 
-    private boolean isPluginInstalled( String groupId, String artifactId )
+    private boolean isPluginInstalled( String groupId, String artifactId, String version )
     {
-        return pluginDescriptors.containsKey( PluginDescriptor.constructPluginKey( groupId, artifactId ) );
+        return pluginDescriptors.containsKey( PluginDescriptor.constructPluginKey( groupId, artifactId, version ) );
     }
 
-    public void verifyPlugin( String groupId, String artifactId, MavenSession session )
+    public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException
     {
-        // TODO: we should we support concurrent versions
-        if ( !isPluginInstalled( groupId, artifactId ) )
+        // TODO: this should be possibly outside
+        if ( version == null )
         {
             MavenProject project = session.getProject();
 
@@ -212,8 +179,6 @@ public class DefaultPluginManager
                 }
             }
 
-            String version = null;
-
             if ( pluginConfig != null )
             {
                 if ( StringUtils.isEmpty( pluginConfig.getVersion() ) )
@@ -226,7 +191,10 @@ public class DefaultPluginManager
                     version = pluginConfig.getVersion();
                 }
             }
+        }
 
+        if ( !isPluginInstalled( groupId, artifactId, version ) )
+        {
             try
             {
                 Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version, null,
@@ -257,6 +225,7 @@ public class DefaultPluginManager
                                                   artifactId, e );
             }
         }
+        return getPluginDescriptor( groupId, artifactId, version );
     }
 
     protected void addPlugin( Artifact pluginArtifact, MavenSession session )
@@ -654,7 +623,8 @@ public class DefaultPluginManager
 
             Object value = expressionEvaluator.evaluate( expression );
 
-            getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value + " for parameter: \'" + key + "\'" );
+            getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value +
+                               " for parameter: \'" + key + "\'" );
 
             // TODO: remove. If there is a default value, required should have been removed by the descriptor generator
             if ( value == null && !"map-oriented".equals( goal.getComponentConfigurator() ) )

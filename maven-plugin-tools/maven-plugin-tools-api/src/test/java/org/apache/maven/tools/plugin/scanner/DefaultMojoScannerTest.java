@@ -37,6 +37,9 @@ public class DefaultMojoScannerTest
         project.setFile( new File( "." ) );
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGroupId( "groupId" );
+        pluginDescriptor.setArtifactId( "artifactId" );
+        pluginDescriptor.setVersion( "version" );
         pluginDescriptor.setGoalPrefix( "testId" );
         
         scanner.populatePluginDescriptor( project, pluginDescriptor );

@@ -18,7 +18,6 @@ package org.apache.maven.plugin.descriptor;
 
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,6 +30,8 @@ public class PluginDescriptor
     private String groupId;
 
     private String artifactId;
+
+    private String version;
 
     private List dependencies;
 
@@ -47,17 +48,6 @@ public class PluginDescriptor
         return getComponents();
     }
 
-    public void setMojos( List mojos )
-        throws DuplicateMojoDescriptorException
-    {
-        for ( Iterator it = mojos.iterator(); it.hasNext(); )
-        {
-            MojoDescriptor descriptor = (MojoDescriptor) it.next();
-
-            addMojo( descriptor );
-        }
-    }
-
     public void addMojo( MojoDescriptor mojoDescriptor )
         throws DuplicateMojoDescriptorException
     {
@@ -72,8 +62,7 @@ public class PluginDescriptor
 
             MojoDescriptor existing = (MojoDescriptor) mojos.get( indexOf );
 
-            throw new DuplicateMojoDescriptorException( getGoalPrefix(), mojoDescriptor.getGoal(), existing
-                .getImplementation(), mojoDescriptor.getImplementation() );
+            throw new DuplicateMojoDescriptorException( getGoalPrefix(), mojoDescriptor.getGoal(), existing.getImplementation(), mojoDescriptor.getImplementation() );
         }
         else
         {
@@ -99,8 +88,6 @@ public class PluginDescriptor
     public void setArtifactId( String artifactId )
     {
         this.artifactId = artifactId;
-
-        setId( artifactId );
     }
 
     // ----------------------------------------------------------------------
@@ -112,28 +99,19 @@ public class PluginDescriptor
         return isolatedRealm;
     }
 
-    public static String constructPluginKey( String groupId, String artifactId )
+    public static String constructPluginKey( String groupId, String artifactId, String version )
     {
-        return groupId + ":" + artifactId;
+        return groupId + ":" + artifactId + ":" + version;
     }
 
     public String getId()
     {
-        return constructPluginKey( groupId, artifactId );
-    }
-
-    /**
-     * @todo remove - harcoding.
-     */
-    public static String getPrefixFromGoal( String goalName )
-    {
-        String prefix = goalName;
-
-        if ( prefix.indexOf( ":" ) > 0 )
+        String id = constructPluginKey( groupId, artifactId, version );
+        if ( groupId == null || artifactId == null || version == null )
         {
-            prefix = prefix.substring( 0, prefix.indexOf( ":" ) );
+            throw new IllegalStateException( "Plugin descriptor ID incomplete: " + id );
         }
-        return prefix;
+        return id;
     }
 
     /**
@@ -155,7 +133,7 @@ public class PluginDescriptor
     /**
      * Parse maven-...-plugin.
      *
-     * @todo remove - harcoding. What about clashes?
+     * @todo move to plugin-tools-api as a default only
      */
     public static String getGoalPrefixFromArtifactId( String artifactId )
     {
@@ -177,17 +155,6 @@ public class PluginDescriptor
         return "1.0-SNAPSHOT";
     }
 
-    public static String getGoalIdFromFullGoal( String goalName )
-    {
-        // TODO: much less of this magic is needed - make the mojoDescriptor just store the first and second part
-        int index = goalName.indexOf( ':' );
-        if ( index >= 0 )
-        {
-            return goalName.substring( index + 1 );
-        }
-        return null;
-    }
-
     public String getGoalPrefix()
     {
         return goalPrefix;
@@ -196,5 +163,15 @@ public class PluginDescriptor
     public void setGoalPrefix( String goalPrefix )
     {
         this.goalPrefix = goalPrefix;
+    }
+
+    public void setVersion( String version )
+    {
+        this.version = version;
+    }
+
+    public String getVersion()
+    {
+        return version;
     }
 }

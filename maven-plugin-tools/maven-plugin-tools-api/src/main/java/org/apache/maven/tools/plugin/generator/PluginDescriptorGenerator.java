@@ -66,6 +66,8 @@ public class PluginDescriptorGenerator
 
             element( w, "artifactId", pluginDescriptor.getArtifactId() );
 
+            element( w, "version", pluginDescriptor.getVersion() );
+
             element( w, "goalPrefix", pluginDescriptor.getGoalPrefix() );
 
              w.startElement( "mojos" );

@@ -28,6 +28,7 @@ public class PluginDescriptorBuilder
 
         pluginDescriptor.setGroupId( c.getChild( "groupId" ).getValue() );
         pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
+        pluginDescriptor.setVersion( c.getChild( "version" ).getValue() );
         pluginDescriptor.setGoalPrefix( c.getChild( "goalPrefix" ).getValue() );
 
         // ----------------------------------------------------------------------

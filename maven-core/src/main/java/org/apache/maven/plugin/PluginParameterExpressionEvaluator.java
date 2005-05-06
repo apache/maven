@@ -78,7 +78,7 @@ public class PluginParameterExpressionEvaluator
             return expression;
         }
 
-        if (expression.equals( "reports" ) )
+        if ( expression.equals( "reports" ) )
         {
             String role = PluginManager.ROLE;
             try
@@ -87,7 +87,8 @@ public class PluginParameterExpressionEvaluator
                 for ( Iterator it = context.getProject().getReports().getPlugins().iterator(); it.hasNext(); )
                 {
                     org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
-                    pluginManager.verifyPlugin( plugin.getGroupId(), plugin.getArtifactId(), context );
+                    pluginManager.verifyPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
+                                                context );
                 }
             }
             catch ( ComponentLookupException cle )
@@ -107,7 +108,7 @@ public class PluginParameterExpressionEvaluator
             try
             {
                 value = context.lookupMap( role );
-                for ( Iterator i = ((Map) value).keySet().iterator(); i.hasNext(); )
+                for ( Iterator i = ( (Map) value ).keySet().iterator(); i.hasNext(); )
                 {
                     String key = (String) i.next();
                     context.getLog().debug( key + " report is found." );
@@ -187,7 +188,7 @@ public class PluginParameterExpressionEvaluator
             // TODO: without #, this could just be an evaluate call...
 
             String val = (String) value;
-            
+
             int exprStartDelimiter = val.indexOf( "${" );
 
             if ( exprStartDelimiter >= 0 )

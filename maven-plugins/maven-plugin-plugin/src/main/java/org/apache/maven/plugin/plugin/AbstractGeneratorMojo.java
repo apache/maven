@@ -74,7 +74,9 @@ public abstract class AbstractGeneratorMojo
         pluginDescriptor.setGroupId( project.getGroupId() );
         
         pluginDescriptor.setArtifactId( project.getArtifactId() );
-        
+
+        pluginDescriptor.setVersion( project.getVersion() );
+
         pluginDescriptor.setGoalPrefix( goalPrefix );
 
         try

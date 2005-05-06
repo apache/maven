@@ -16,6 +16,7 @@ package org.apache.maven.tools.plugin.generator;
  * limitations under the License.
  */
 
+import junit.framework.TestCase;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -25,9 +26,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -71,11 +69,9 @@ public abstract class AbstractGeneratorTestCase
 
         mojoDescriptor.setParameters( params );
 
-        Set descriptors = Collections.singleton( mojoDescriptor );
-        
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
-        
-        pluginDescriptor.addMojo(mojoDescriptor);
+
+        pluginDescriptor.addMojo( mojoDescriptor );
 
         pluginDescriptor.setArtifactId( "maven-unitTesting-plugin" );
         pluginDescriptor.setGoalPrefix( "test" );
@@ -89,10 +85,10 @@ public abstract class AbstractGeneratorTestCase
 
         File tempFile = File.createTempFile( "testGenerator-outDir", ".marker.txt" ).getAbsoluteFile();
         File destinationDirectory = tempFile.getParentFile();
-        
+
         generator.execute( destinationDirectory.getAbsolutePath(), pluginDescriptor );
-        
-        validate(destinationDirectory);
+
+        validate( destinationDirectory );
     }
 
     // ----------------------------------------------------------------------
@@ -124,7 +120,7 @@ public abstract class AbstractGeneratorTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected void validate(File destinationDirectory)
+    protected void validate( File destinationDirectory )
         throws Exception
     {
         // empty
