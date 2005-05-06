@@ -33,6 +33,8 @@ public interface PluginManager
     void executeMojo( MavenSession session, MojoDescriptor mojoDescriptor )
         throws MojoExecutionException, PluginManagerException, ArtifactResolutionException;
 
+    PluginDescriptor verifyPlugin( String prefix );
+
     PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException;
 }

@@ -73,6 +73,8 @@ public class DefaultPluginManager
 
     protected Map pluginDescriptors;
 
+    protected Map pluginDescriptorsByPrefix;
+
     protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
@@ -87,6 +89,8 @@ public class DefaultPluginManager
     {
         pluginDescriptors = new HashMap();
 
+        pluginDescriptorsByPrefix = new HashMap();
+
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
     }
 
@@ -94,6 +98,11 @@ public class DefaultPluginManager
     {
         return (PluginDescriptor) pluginDescriptors.get(
             PluginDescriptor.constructPluginKey( groupId, artifactId, version ) );
+    }
+
+    private PluginDescriptor getPluginDescriptor( String prefix )
+    {
+        return (PluginDescriptor) pluginDescriptorsByPrefix.get( prefix );
     }
 
     // ----------------------------------------------------------------------
@@ -117,9 +126,8 @@ public class DefaultPluginManager
             if ( pluginDescriptor.getVersion() == null )
             {
                 // TODO: temporary - until we're done testing that version is always written
-                throw new NullPointerException(
-                    "Version was null - check your plugin '" + pluginDescriptor.getId() +
-                    "' was built with Maven 2.0 Alpha 2" );
+                throw new NullPointerException( "Version was null - check your plugin '" + pluginDescriptor.getId() +
+                                                "' was built with Maven 2.0 Alpha 2" );
             }
 
             String key = pluginDescriptor.getId();
@@ -129,6 +137,12 @@ public class DefaultPluginManager
                 pluginsInProcess.add( key );
 
                 pluginDescriptors.put( key, pluginDescriptor );
+
+                // TODO: throw an (not runtime) exception if there is a prefix overlap - means doing so elsewhere
+                if ( !pluginDescriptorsByPrefix.containsKey( pluginDescriptor.getGoalPrefix() ) )
+                {
+                    pluginDescriptorsByPrefix.put( pluginDescriptor.getGoalPrefix(), pluginDescriptor );
+                }
             }
         }
     }
@@ -140,6 +154,20 @@ public class DefaultPluginManager
     private boolean isPluginInstalled( String groupId, String artifactId, String version )
     {
         return pluginDescriptors.containsKey( PluginDescriptor.constructPluginKey( groupId, artifactId, version ) );
+    }
+
+    private boolean isPluginInstalled( String prefix )
+    {
+        return pluginDescriptorsByPrefix.containsKey( prefix );
+    }
+
+    public PluginDescriptor verifyPlugin( String prefix )
+    {
+        if ( !isPluginInstalled( prefix ) )
+        {
+            // TODO: lookup remotely
+        }
+        return getPluginDescriptor( prefix );
     }
 
     public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenSession session )

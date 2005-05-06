@@ -343,14 +343,22 @@ public class DefaultLifecycleExecutor
         String version = null;
         String goal = null;
 
+        PluginDescriptor pluginDescriptor = null;
+
         StringTokenizer tok = new StringTokenizer( task, ":" );
         int numTokens = tok.countTokens();
         if ( numTokens == 2 )
         {
-            // TODO: look up registered aliases in plugin manager instead
-            groupId = PluginDescriptor.getDefaultPluginGroupId();
-            artifactId = PluginDescriptor.getDefaultPluginArtifactId( tok.nextToken() );
+            String prefix = tok.nextToken();
             goal = tok.nextToken();
+
+            pluginDescriptor = pluginManager.verifyPlugin( prefix );
+
+            if ( pluginDescriptor == null )
+            {
+                groupId = PluginDescriptor.getDefaultPluginGroupId();
+                artifactId = PluginDescriptor.getDefaultPluginArtifactId( prefix );
+            }
         }
         else if ( numTokens == 4 )
         {
@@ -366,28 +374,37 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( message );
         }
 
-        // TODO: this shouldn't be necessary all the time.
-        injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
-
-        try
+        if ( pluginDescriptor == null )
         {
-            PluginDescriptor pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session );
-            // TODO: should be able to create a Map from this
-            for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
+            injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
+            try
             {
-                MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
-                if ( mojoDescriptor.getGoal().equals( goal ) )
-                {
-                    return mojoDescriptor;
-                }
+                pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session );
+            }
+            catch ( PluginManagerException e )
+            {
+                throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
             }
         }
-        catch ( PluginManagerException e )
+
+        MojoDescriptor mojoDescriptor = null;
+
+        // TODO: should be able to create a Map from this
+        for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
         {
-            throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+            MojoDescriptor desc = (MojoDescriptor) i.next();
+            if ( desc.getGoal().equals( goal ) )
+            {
+                mojoDescriptor = desc;
+            }
         }
 
-        throw new LifecycleExecutionException( "Required goal not found: " + task );
+        if ( mojoDescriptor == null )
+        {
+            throw new LifecycleExecutionException( "Required goal not found: " + task );
+        }
+
+        return mojoDescriptor;
     }
 
     public List getPhases()
