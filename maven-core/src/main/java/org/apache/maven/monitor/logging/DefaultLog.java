@@ -76,4 +76,24 @@ public class DefaultLog
         logger.error( "", error );
     }
 
+    public boolean isDebugEnabled()
+    {
+        return logger.isDebugEnabled();
+    }
+
+    public boolean isInfoEnabled()
+    {
+        return logger.isInfoEnabled();
+    }
+
+    public boolean isWarnEnabled()
+    {
+        return logger.isWarnEnabled();
+    }
+
+    public boolean isErrorEnabled()
+    {
+        return logger.isErrorEnabled();
+    }
+
 }

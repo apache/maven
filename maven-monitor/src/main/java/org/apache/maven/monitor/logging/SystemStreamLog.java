@@ -105,4 +105,25 @@ public class SystemStreamLog
         System.out.println( "[" + prefix + "] " + content.toString() + "\n\n" + sWriter.toString() );
     }
 
+    public boolean isDebugEnabled()
+    {
+        // TODO: Not sure how best to set these for this implementation...
+        return false;
+    }
+
+    public boolean isInfoEnabled()
+    {
+        return true;
+    }
+
+    public boolean isWarnEnabled()
+    {
+        return true;
+    }
+
+    public boolean isErrorEnabled()
+    {
+        return true;
+    }
+
 }
