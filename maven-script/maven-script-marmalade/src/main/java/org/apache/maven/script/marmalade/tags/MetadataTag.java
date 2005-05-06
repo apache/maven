@@ -16,12 +16,14 @@ package org.apache.maven.script.marmalade.tags;
  * limitations under the License.
  */
 
+import org.apache.maven.plugin.descriptor.DuplicateParameterException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.script.marmalade.MarmaladeMojoExecutionDirectives;
 import org.codehaus.marmalade.model.AbstractMarmaladeTag;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
+import org.codehaus.marmalade.runtime.TagExecutionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,9 +99,17 @@ public class MetadataTag
             descriptor.setInstantiationStrategy( instantiationStrategy );
         }
 
-        descriptor.setParameters( parameters );
-        descriptor.setRequiresDependencyResolution( requiresDependencyResolution );
-        descriptor.setRequiresProject( requiresProject );
+        try
+        {
+            descriptor.setParameters( parameters );
+        }
+        catch ( DuplicateParameterException e )
+        {
+            throw new TagExecutionException( getTagInfo(), "One or more mojo parameters is invalid.", e );
+        }
+        
+        descriptor.setDependencyResolutionRequired( requiresDependencyResolution );
+        descriptor.setProjectRequired( requiresProject );
 
         String basePath = (String) context.getVariable( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR,
                                                         getExpressionEvaluator() );
