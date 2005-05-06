@@ -188,7 +188,7 @@ public class DefaultMaven
                 for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
                 {
                     String name = (String) i.next();
-                    if ( name.indexOf( '/' ) >= 0 )
+                    if ( name.indexOf( ".." ) >= 0 )
                     {
                         String message = "Illegal module name: " + name + " (cannot contain path characters)";
                         throw new ReactorException( message );
