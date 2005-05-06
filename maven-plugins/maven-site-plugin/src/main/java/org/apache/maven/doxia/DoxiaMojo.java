@@ -128,8 +128,8 @@ public class DoxiaMojo
         }
         catch ( Exception e )
         {
-            // TODO: handle it
-            e.printStackTrace();
+            // TODO: handle it better
+            throw new MojoExecutionException( "Error during site generation", e );
         }
     }
 }
