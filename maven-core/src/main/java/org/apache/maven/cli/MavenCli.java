@@ -291,6 +291,9 @@ public class MavenCli
             String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
             files = FileUtils.getFiles( userDir, includes, excludes );
+
+            // make sure there is consistent ordering on all platforms, rather than using the filesystem ordering
+            Collections.sort( files );
         }
         else
         {

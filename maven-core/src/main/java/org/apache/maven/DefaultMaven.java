@@ -33,10 +33,10 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.reactor.ReactorException;
+import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -45,8 +45,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
@@ -183,14 +181,21 @@ public class DefaultMaven
                 // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
                 project.setPackaging( "pom" );
 
-                String includes = StringUtils.join( project.getModules().iterator(), "/pom.xml," ) + "/pom.xml";
+                File basedir = file.getParentFile();
 
-                if ( includes.indexOf( ".." ) >= 0 )
+                // Initial ordering is as declared in the modules section
+                List moduleFiles = new ArrayList( project.getModules().size() );
+                for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
                 {
-                    throw new ProjectBuildingException( "Modules may not include '..'" );
+                    String name = (String) i.next();
+                    if ( name.indexOf( '/' ) >= 0 )
+                    {
+                        String message = "Illegal module name: " + name + " (cannot contain path characters)";
+                        throw new ReactorException( message );
+                    }
+                    moduleFiles.add( new File( basedir, name + "/pom.xml" ) );
                 }
 
-                List moduleFiles = FileUtils.getFiles( project.getFile().getParentFile(), includes, null );
                 List collectedProjects = collectProjects( moduleFiles, localRepository, recursive );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
@@ -276,7 +281,7 @@ public class DefaultMaven
         {
             if ( pom.length() == 0 )
             {
-                throw new ProjectBuildingException( i18n.format( "empty.descriptor.error", pom.getName() ) );
+                throw new ProjectBuildingException( i18n.format( "empty.descriptor.error", pom ) );
             }
         }
 
