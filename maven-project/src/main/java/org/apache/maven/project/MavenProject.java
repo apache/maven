@@ -677,7 +677,16 @@ public class MavenProject
     // Plugins
     // ----------------------------------------------------------------------
 
-    public List getPlugins()
+    public List getReportPlugins()
+    {
+        if ( model.getReports() == null )
+        {
+            return null;
+        }
+        return model.getReports().getPlugins();
+
+    }
+    public List getBuildPlugins()
     {
         if ( model.getBuild() == null )
         {
@@ -811,9 +820,9 @@ public class MavenProject
         // for now I have to iterate through and see what we have.
         // ----------------------------------------------------------------------
 
-        if ( getPlugins() != null )
+        if ( getBuildPlugins() != null )
         {
-            for ( Iterator iterator = getPlugins().iterator(); iterator.hasNext(); )
+            for ( Iterator iterator = getBuildPlugins().iterator(); iterator.hasNext(); )
             {
                 Plugin plugin = (Plugin) iterator.next();
 
@@ -845,4 +854,5 @@ public class MavenProject
     {
         return model.getPluginRepositories();
     }
+
 }

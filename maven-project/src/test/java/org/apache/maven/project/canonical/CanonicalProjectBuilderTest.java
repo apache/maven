@@ -49,7 +49,7 @@ public class CanonicalProjectBuilderTest
         // Plugins
         // ----------------------------------------------------------------------
 
-        List plugins = project.getPlugins();
+        List plugins = project.getBuildPlugins();
 
         // Plugin0 [plexus]
 

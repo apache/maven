@@ -152,7 +152,7 @@ public class DefaultPluginManager
 
             org.apache.maven.model.Plugin pluginConfig = null;
 
-            for ( Iterator it = project.getPlugins().iterator(); it.hasNext(); )
+            for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
             {
                 org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
 

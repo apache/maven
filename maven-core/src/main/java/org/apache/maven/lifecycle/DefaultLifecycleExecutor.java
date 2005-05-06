@@ -200,7 +200,7 @@ public class DefaultLifecycleExecutor
     private void processPluginConfiguration( MavenProject project, MavenSession mavenSession, Map phaseMap )
         throws LifecycleExecutionException, ArtifactResolutionException
     {
-        for ( Iterator i = project.getPlugins().iterator(); i.hasNext(); )
+        for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
 

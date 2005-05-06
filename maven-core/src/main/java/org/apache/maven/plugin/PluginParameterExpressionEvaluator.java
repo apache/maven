@@ -28,6 +28,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -84,11 +85,15 @@ public class PluginParameterExpressionEvaluator
             try
             {
                 PluginManager pluginManager = (PluginManager) context.lookup( role );
-                for ( Iterator it = context.getProject().getReports().getPlugins().iterator(); it.hasNext(); )
+                List reportPlugins = context.getProject().getReportPlugins();
+                if ( reportPlugins != null )
                 {
-                    org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
-                    pluginManager.verifyPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
-                                                context );
+                    for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
+                    {
+                        org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
+                        pluginManager.verifyPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
+                                                    context );
+                    }
                 }
             }
             catch ( ComponentLookupException cle )
