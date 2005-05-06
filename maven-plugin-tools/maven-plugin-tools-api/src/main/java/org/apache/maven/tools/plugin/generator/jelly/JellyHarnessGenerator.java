@@ -1,7 +1,7 @@
 package org.apache.maven.tools.plugin.generator.jelly;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.apache.maven.tools.plugin.generator.jelly;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.util.PluginUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -32,7 +31,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @todo use the descriptions in the descriptor for the javadoc pushed into the
@@ -61,7 +59,7 @@ public class JellyHarnessGenerator
 
             w = new PrettyPrintXMLWriter( writer );
 
-            writeProjectFile( w, pluginDescriptor );
+            writePluginFile( w, pluginDescriptor );
 
             writer.flush();
         }
@@ -91,7 +89,7 @@ public class JellyHarnessGenerator
         }
     }
 
-    private void writePluginFile( PrettyPrintXMLWriter w, String goalPrefix, Set mojoDescriptors, MavenProject project )
+    private void writePluginFile( PrettyPrintXMLWriter w, PluginDescriptor pluginDescriptor )
     {
         w.startElement( "project" );
 
@@ -99,7 +97,7 @@ public class JellyHarnessGenerator
 
         w.addAttribute( "xmlns:d", "jelly:define" );
 
-        w.addAttribute( "xmlns:" + goalPrefix, goalPrefix );
+        w.addAttribute( "xmlns:" + pluginDescriptor.getGoalPrefix(), pluginDescriptor.getGoalPrefix() );
 
         // ----------------------------------------------------------------------
         //
@@ -107,12 +105,12 @@ public class JellyHarnessGenerator
 
         w.startElement( "d:taglib" );
 
-        w.addAttribute( "uri", goalPrefix );
+        w.addAttribute( "uri", pluginDescriptor.getGoalPrefix() );
 
-        for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
+        for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
         {
             MojoDescriptor descriptor = (MojoDescriptor) it.next();
-            processPluginDescriptor( descriptor, w, project );
+            processMojoDescriptor( descriptor, w );
         }
 
         w.endElement();
@@ -121,7 +119,7 @@ public class JellyHarnessGenerator
         //
         // ----------------------------------------------------------------------
 
-        for ( Iterator it = mojoDescriptors.iterator(); it.hasNext(); )
+        for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
         {
             MojoDescriptor descriptor = (MojoDescriptor) it.next();
             writeGoals( descriptor, w );
@@ -147,7 +145,7 @@ public class JellyHarnessGenerator
         w.endElement();
     }
 
-    protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w, MavenProject project )
+    protected void processMojoDescriptor( MojoDescriptor mojoDescriptor, XMLWriter w )
     {
         String goalName = mojoDescriptor.getGoal();
 
