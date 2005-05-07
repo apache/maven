@@ -22,11 +22,17 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
 import org.apache.maven.reporting.MavenReportException;
+import org.codehaus.doxia.module.xhtml.XhtmlSink;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringInputStream;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.InputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @goal pmd
@@ -39,10 +45,34 @@ public class PmdReportMojo
     extends AbstractMojo
 {
     /**
-     * @parameter alias="workingDirectory" expression="${project.build.directory}/site-generated"
+     * @parameter expression="${basedir}"
+     * @required
+     */
+    private String basedir;
+
+    /**
+     * @parameter expression="${basedir}/src/site"
+     * @required
+     */
+    private String siteDirectory;
+
+    /**
+     * @parameter expression="${project.build.directory}/site"
      * @required
      */
     private String outputDirectory;
+
+    /**
+     * @parameter alias="flavor"
+     */
+    private String flavour = "maven";
+
+    /**
+     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
+     * @required
+     * @readonly
+     */
+    private  SiteRenderer siteRenderer;
 
     /**
      * @parameter expression="${project}"
@@ -66,11 +96,61 @@ public class PmdReportMojo
 
         try
         {
-            report.generate();
+            XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), siteDirectory,
+                                                      report.getOutputName() + ".html",
+                                                      outputDirectory, getSiteDescriptor(), flavour );
+
+            report.generate( sink );
+
+            siteRenderer.copyResources( siteDirectory, outputDirectory, flavour );
         }
-        catch ( MavenReportException e )
+        catch ( Exception e )
         {
             throw new MojoExecutionException( "An error is occurred in the PMD report generation.", e );
         }
+    }
+
+    private String getReportsMenu()
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append( "<menu name=\"Project Documentation\">\n" );
+        buffer.append( "    <item name=\"About " + project.getName() + "\" href=\"/index.html\"/>\n");
+        buffer.append( "    <item name=\"Project reports\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
+
+        buffer.append( "        <item name=\"PMD report\" href=\"/pmd.html\"/>\n" );
+
+        buffer.append( "    </item>\n" );
+        buffer.append( "</menu>\n" );
+        return buffer.toString();
+    }
+
+    private InputStream getSiteDescriptor()
+        throws MojoExecutionException
+    {
+        File siteDescriptor = new File( siteDirectory, "site.xml" );
+
+        if ( !siteDescriptor.exists() )
+        {
+            throw new MojoExecutionException( "The site descriptor is not present!" );
+        }
+
+        String siteDescriptorContent = "";
+
+        try
+        {
+            siteDescriptorContent = FileUtils.fileRead( siteDescriptor );
+        }
+        catch( IOException e )
+        {
+            throw new MojoExecutionException( "The site descriptor cannot be read!", e );
+        }
+
+        Map props = new HashMap();
+
+        props.put( "reports", getReportsMenu() );
+
+        siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
+
+        return new StringInputStream( siteDescriptorContent );
     }
 }
