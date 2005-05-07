@@ -23,8 +23,12 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringInputStream;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -124,12 +128,44 @@ public class DoxiaMojo
                 }
             }
 
-            siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour );
+            File siteDescriptor = new File( siteDirectory, "site.xml" );
+            if ( !siteDescriptor.exists() )
+            {
+                throw new MojoExecutionException( "The site descriptor is not present!" );
+            }
+            String siteDescriptorContent = FileUtils.fileRead( siteDescriptor );
+            Map props = new HashMap();
+            if ( reports != null )
+            {
+                props.put( "reports", getReportsMenu() );
+            }
+            siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
+            StringInputStream siteDescriptorStream = new StringInputStream( siteDescriptorContent );
+
+            siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour,
+                                 siteDescriptorStream );
         }
         catch ( Exception e )
         {
             // TODO: handle it better
             throw new MojoExecutionException( "Error during site generation", e );
         }
+    }
+    private String getReportsMenu()
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append( "<menu name=\"Project Documentation\">\n" );
+        buffer.append( "    <item name=\"About " + project.getName() + "\" href=\"/index.html\"/>\n");
+        buffer.append( "    <item name=\"Project reports\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
+
+        for ( Iterator i = reports.keySet().iterator(); i.hasNext(); )
+        {
+            String reportKey = (String) i.next();
+            buffer.append( "        <item name=\"" + reportKey + "\" href=\"/" + reportKey + ".html\"/>\n" );
+        }
+
+        buffer.append( "    </item>\n" );
+        buffer.append( "</menu>\n" );
+        return buffer.toString();
     }
 }
