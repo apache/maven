@@ -29,13 +29,14 @@ import java.util.StringTokenizer;
 /**
  * @author jdcasey
  */
-public class DefaultArtifactDiscoverer extends AbstractArtifactDiscoverer
+public class DefaultArtifactDiscoverer
+    extends AbstractArtifactDiscoverer
 {
 
     private ArtifactFactory artifactFactory;
 
     public List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns,
-                                   PathLister excludeLister, PathLister kickoutLister )
+                                  PathLister excludeLister, PathLister kickoutLister )
         throws Exception
     {
         List artifacts = new ArrayList();

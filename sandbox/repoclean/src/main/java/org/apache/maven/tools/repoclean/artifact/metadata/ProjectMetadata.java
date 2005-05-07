@@ -28,7 +28,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class ProjectMetadata implements ArtifactMetadata
+public class ProjectMetadata
+    implements ArtifactMetadata
 {
     private final Artifact artifact;
 

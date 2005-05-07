@@ -68,8 +68,8 @@ public class Digestor
             }
             catch ( IOException e )
             {
-                throw new DigestException( "Cannot verify digest for artifact file: \'" + artifactFile +
-                                           "\' against digest file: \'" + digestFile + "\' using algorithm: \'" + algorithm + "\'", e );
+                throw new DigestException( "Cannot verify digest for artifact file: \'" + artifactFile
+                    + "\' against digest file: \'" + digestFile + "\' using algorithm: \'" + algorithm + "\'", e );
             }
             finally
             {
@@ -137,7 +137,7 @@ public class Digestor
                 {
                     t = "0" + t;
                 }
-                
+
                 out.write( t );
             }
         }

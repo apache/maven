@@ -20,7 +20,8 @@ package org.apache.maven.tools.repoclean.digest;
 /**
  * @author jdcasey
  */
-public class DigestException extends Exception
+public class DigestException
+    extends Exception
 {
 
     public DigestException( String message )

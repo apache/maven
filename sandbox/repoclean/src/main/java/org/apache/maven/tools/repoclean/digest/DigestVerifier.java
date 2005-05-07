@@ -41,7 +41,7 @@ public class DigestVerifier
     }
 
     public void verifyDigest( File source, File target, RewriteTransaction transaction, Reporter reporter,
-                              boolean reportOnly )
+                             boolean reportOnly )
         throws DigestException, ReportWriteException, IOException
     {
         verifyDigestFile( source, target, transaction, reporter, reportOnly, ".md5", Digestor.MD5 );
@@ -50,7 +50,7 @@ public class DigestVerifier
     }
 
     private void verifyDigestFile( File artifactSource, File artifactTarget, RewriteTransaction transaction,
-                                   Reporter reporter, boolean reportOnly, String digestExt, String digestAlgorithm )
+                                  Reporter reporter, boolean reportOnly, String digestExt, String digestAlgorithm )
         throws DigestException, ReportWriteException, IOException
     {
         // create the digest source file from which to copy/verify.
@@ -78,8 +78,8 @@ public class DigestVerifier
                     }
                     catch ( IOException e )
                     {
-                        reporter.error( "Cannot copy digest file for path [" + artifactSource +
-                                        "] from source to target for digest algorithm: \'" + digestAlgorithm + "\'.", e );
+                        reporter.error( "Cannot copy digest file for path [" + artifactSource
+                            + "] from source to target for digest algorithm: \'" + digestAlgorithm + "\'.", e );
 
                         throw e;
                     }

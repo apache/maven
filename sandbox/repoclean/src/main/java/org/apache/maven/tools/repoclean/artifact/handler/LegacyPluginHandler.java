@@ -22,7 +22,8 @@ import org.apache.maven.artifact.handler.AbstractArtifactHandler;
 /**
  * @author jdcasey
  */
-public class LegacyPluginHandler extends AbstractArtifactHandler
+public class LegacyPluginHandler
+    extends AbstractArtifactHandler
 {
 
     public String directory()

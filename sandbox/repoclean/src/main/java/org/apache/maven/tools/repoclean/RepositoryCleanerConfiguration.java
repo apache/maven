@@ -27,8 +27,6 @@ public class RepositoryCleanerConfiguration
 
     private String sourceRepositoryLayout;
 
-    private String sourcePomVersion;
-
     private String targetRepositoryPath;
 
     private String targetRepositoryLayout;
@@ -73,16 +71,6 @@ public class RepositoryCleanerConfiguration
     public String getSourceRepositoryLayout()
     {
         return sourceRepositoryLayout;
-    }
-
-    public void setSourcePomVersion( String sourcePomVersion )
-    {
-        this.sourcePomVersion = sourcePomVersion;
-    }
-
-    public String getSourcePomVersion()
-    {
-        return sourcePomVersion;
     }
 
     public void setTargetRepositoryPath( String targetRepositoryPath )

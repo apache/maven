@@ -19,7 +19,8 @@ import org.apache.maven.artifact.handler.AbstractArtifactHandler;
 /**
  * @author jdcasey
  */
-public class JarDistroHandler extends AbstractArtifactHandler
+public class JarDistroHandler
+    extends AbstractArtifactHandler
 {
 
     public String directory()

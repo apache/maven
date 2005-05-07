@@ -50,7 +50,8 @@ import java.util.regex.Pattern;
 /**
  * @author jdcasey
  */
-public class PomV3ToV4Translator extends AbstractLogEnabled
+public class PomV3ToV4Translator
+    extends AbstractLogEnabled
 {
 
     public static final String ROLE = PomV3ToV4Translator.class.getName();
@@ -66,15 +67,15 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
             String artifactId = format( v3Model.getArtifactId() );
 
             String id = v3Model.getId();
-            
+
             if ( StringUtils.isNotEmpty( id ) )
             {
                 if ( StringUtils.isEmpty( groupId ) )
                 {
-                    int plusIdx = id.indexOf("+");
-                    if(plusIdx > -1)
+                    int plusIdx = id.indexOf( "+" );
+                    if ( plusIdx > -1 )
                     {
-                        groupId = id.substring(0, plusIdx);
+                        groupId = id.substring( 0, plusIdx );
                     }
                     else
                     {
@@ -89,7 +90,7 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
             }
 
             String version = format( v3Model.getCurrentVersion() );
-            
+
             if ( version == null )
             {
                 version = format( v3Model.getVersion() );
@@ -186,8 +187,8 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
 
         if ( StringUtils.isNotEmpty( v3Model.getGumpRepositoryId() ) )
         {
-            reporter.warn( "Ignoring gump repository id: \'" + v3Model.getGumpRepositoryId() +
-                           "\'. This is not supported in v4 POMs." );
+            reporter.warn( "Ignoring gump repository id: \'" + v3Model.getGumpRepositoryId()
+                + "\'. This is not supported in v4 POMs." );
         }
 
         if ( notEmpty( v3Model.getVersions() ) )
@@ -261,8 +262,8 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
                 String reportPluginName = null;
                 if ( !matcher.matches() )
                 {
-                    reporter.warn( "Non-standard report name: \'" + reportName +
-                                   "\'. Using entire name for plugin artifactId." );
+                    reporter.warn( "Non-standard report name: \'" + reportName
+                        + "\'. Using entire name for plugin artifactId." );
 
                     reportPluginName = reportName;
                 }
@@ -281,11 +282,11 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
 
                 StringBuffer info = new StringBuffer();
 
-                info.append( "Using some contrived information for report: \'" ).append( reportName ).append( "\'.\n" ).append(
-                    "\to groupId: \'maven\'\n" ).append( "\to artifactId: \'" ).append( reportPluginName ).append(
-                        "\'\n" ).append( "\to version: \'1.0-SNAPSHOT\'\n" ).append( "\to goal: \'report\'\n" ).append(
-                            "\n" ).append(
-                                "These values were extracted using the v3 report naming convention, but may be wrong." );
+                info.append( "Using some contrived information for report: \'" ).append( reportName ).append( "\'.\n" )
+                    .append( "\to groupId: \'maven\'\n" ).append( "\to artifactId: \'" ).append( reportPluginName )
+                    .append( "\'\n" ).append( "\to version: \'1.0-SNAPSHOT\'\n" ).append( "\to goal: \'report\'\n" )
+                    .append( "\n" )
+                    .append( "These values were extracted using the v3 report naming convention, but may be wrong." );
 
                 reporter.warn( info.toString() );
 
@@ -303,7 +304,8 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
     }
 
     private org.apache.maven.model.Organization translateOrganization(
-        org.apache.maven.model.v3_0_0.Organization v3Organization, Reporter reporter )
+                                                                      org.apache.maven.model.v3_0_0.Organization v3Organization,
+                                                                      Reporter reporter )
         throws ReportWriteException
     {
         Organization organization = null;
@@ -332,7 +334,8 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
         {
             for ( Iterator it = v3MailingLists.iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.v3_0_0.MailingList v3List = (org.apache.maven.model.v3_0_0.MailingList) it.next();
+                org.apache.maven.model.v3_0_0.MailingList v3List = (org.apache.maven.model.v3_0_0.MailingList) it
+                    .next();
                 MailingList list = new MailingList();
                 list.setArchive( v3List.getArchive() );
                 list.setName( v3List.getName() );
@@ -382,7 +385,7 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
     }
 
     private DistributionManagement translateDistributionManagement( PomKey pomKey,
-                                                                    org.apache.maven.model.v3_0_0.Model v3Model )
+                                                                   org.apache.maven.model.v3_0_0.Model v3Model )
         throws PomTranslationException
     {
         DistributionManagement distributionManagement = new DistributionManagement();
@@ -481,7 +484,8 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
         {
             for ( Iterator it = v3Developers.iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.v3_0_0.Developer v3Developer = (org.apache.maven.model.v3_0_0.Developer) it.next();
+                org.apache.maven.model.v3_0_0.Developer v3Developer = (org.apache.maven.model.v3_0_0.Developer) it
+                    .next();
 
                 Developer developer = new Developer();
 
@@ -519,11 +523,11 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
                 {
                     if ( StringUtils.isEmpty( groupId ) )
                     {
-                        int plusIdx = id.indexOf("+");
-                        
-                        if(plusIdx > -1)
+                        int plusIdx = id.indexOf( "+" );
+
+                        if ( plusIdx > -1 )
                         {
-                            groupId = id.substring(0, plusIdx);
+                            groupId = id.substring( 0, plusIdx );
                         }
                         else
                         {
@@ -603,7 +607,8 @@ public class PomV3ToV4Translator extends AbstractLogEnabled
         {
             for ( Iterator it = v3Contributors.iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.v3_0_0.Contributor v3Contributor = (org.apache.maven.model.v3_0_0.Contributor) it.next();
+                org.apache.maven.model.v3_0_0.Contributor v3Contributor = (org.apache.maven.model.v3_0_0.Contributor) it
+                    .next();
 
                 Contributor contributor = new Contributor();
 

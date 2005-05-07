@@ -22,7 +22,8 @@ import org.apache.maven.artifact.handler.AbstractArtifactHandler;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class DtdHandler extends AbstractArtifactHandler
+public class DtdHandler
+    extends AbstractArtifactHandler
 {
     public String directory()
     {

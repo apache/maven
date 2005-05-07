@@ -63,7 +63,8 @@ public class MavenXpp3Writer
      * @param writer
      * @param model
      */
-    public void write( Writer writer, Model model ) throws Exception
+    public void write( Writer writer, Model model )
+        throws Exception
     {
         serializer = new MXSerializer();
         serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
@@ -79,7 +80,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeBranch( Branch branch, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeBranch( Branch branch, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( branch != null )
         {
@@ -99,7 +101,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeBuild( Build build, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeBuild( Build build, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( build != null )
         {
@@ -107,28 +110,28 @@ public class MavenXpp3Writer
             if ( build.getNagEmailAddress() != null )
             {
                 serializer.startTag( NAMESPACE, "nagEmailAddress" ).text( build.getNagEmailAddress() )
-                          .endTag( NAMESPACE, "nagEmailAddress" );
+                    .endTag( NAMESPACE, "nagEmailAddress" );
             }
             if ( build.getSourceDirectory() != null )
             {
                 serializer.startTag( NAMESPACE, "sourceDirectory" ).text( build.getSourceDirectory() )
-                          .endTag( NAMESPACE, "sourceDirectory" );
+                    .endTag( NAMESPACE, "sourceDirectory" );
             }
             if ( build.getUnitTestSourceDirectory() != null )
             {
                 serializer.startTag( NAMESPACE, "unitTestSourceDirectory" ).text( build.getUnitTestSourceDirectory() )
-                          .endTag( NAMESPACE, "unitTestSourceDirectory" );
+                    .endTag( NAMESPACE, "unitTestSourceDirectory" );
             }
             if ( build.getAspectSourceDirectory() != null )
             {
                 serializer.startTag( NAMESPACE, "aspectSourceDirectory" ).text( build.getAspectSourceDirectory() )
-                          .endTag( NAMESPACE, "aspectSourceDirectory" );
+                    .endTag( NAMESPACE, "aspectSourceDirectory" );
             }
             if ( build.getIntegrationUnitTestSourceDirectory() != null )
             {
                 serializer.startTag( NAMESPACE, "integrationUnitTestSourceDirectory" )
-                          .text( build.getIntegrationUnitTestSourceDirectory() )
-                          .endTag( NAMESPACE, "integrationUnitTestSourceDirectory" );
+                    .text( build.getIntegrationUnitTestSourceDirectory() )
+                    .endTag( NAMESPACE, "integrationUnitTestSourceDirectory" );
             }
             if ( build.getSourceModifications() != null && build.getSourceModifications().size() > 0 )
             {
@@ -165,7 +168,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeContributor( Contributor contributor, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeContributor( Contributor contributor, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( contributor != null )
         {
@@ -185,7 +189,7 @@ public class MavenXpp3Writer
             if ( contributor.getOrganization() != null )
             {
                 serializer.startTag( NAMESPACE, "organization" ).text( contributor.getOrganization() )
-                          .endTag( NAMESPACE, "organization" );
+                    .endTag( NAMESPACE, "organization" );
             }
             if ( contributor.getRoles() != null && contributor.getRoles().size() > 0 )
             {
@@ -213,7 +217,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeDependency( Dependency dependency, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeDependency( Dependency dependency, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( dependency != null )
         {
@@ -271,7 +276,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeDeveloper( Developer developer, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeDeveloper( Developer developer, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( developer != null )
         {
@@ -295,7 +301,7 @@ public class MavenXpp3Writer
             if ( developer.getOrganization() != null )
             {
                 serializer.startTag( NAMESPACE, "organization" ).text( developer.getOrganization() )
-                          .endTag( NAMESPACE, "organization" );
+                    .endTag( NAMESPACE, "organization" );
             }
             if ( developer.getRoles() != null && developer.getRoles().size() > 0 )
             {
@@ -323,7 +329,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeFileSet( FileSet fileSet, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeFileSet( FileSet fileSet, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( fileSet != null )
         {
@@ -364,7 +371,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeLicense( License license, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeLicense( License license, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( license != null )
         {
@@ -380,7 +388,7 @@ public class MavenXpp3Writer
             if ( license.getDistribution() != null )
             {
                 serializer.startTag( NAMESPACE, "distribution" ).text( license.getDistribution() )
-                          .endTag( NAMESPACE, "distribution" );
+                    .endTag( NAMESPACE, "distribution" );
             }
             if ( license.getComments() != null )
             {
@@ -398,7 +406,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeMailingList( MailingList mailingList, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeMailingList( MailingList mailingList, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( mailingList != null )
         {
@@ -415,7 +424,7 @@ public class MavenXpp3Writer
             if ( mailingList.getUnsubscribe() != null )
             {
                 serializer.startTag( NAMESPACE, "unsubscribe" ).text( mailingList.getUnsubscribe() )
-                          .endTag( NAMESPACE, "unsubscribe" );
+                    .endTag( NAMESPACE, "unsubscribe" );
             }
             if ( mailingList.getArchive() != null )
             {
@@ -433,7 +442,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeModel( Model model, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeModel( Model model, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( model != null )
         {
@@ -467,12 +477,12 @@ public class MavenXpp3Writer
             if ( model.getCurrentVersion() != null )
             {
                 serializer.startTag( NAMESPACE, "currentVersion" ).text( model.getCurrentVersion() )
-                          .endTag( NAMESPACE, "currentVersion" );
+                    .endTag( NAMESPACE, "currentVersion" );
             }
             if ( model.getShortDescription() != null )
             {
                 serializer.startTag( NAMESPACE, "shortDescription" ).text( model.getShortDescription() )
-                          .endTag( NAMESPACE, "shortDescription" );
+                    .endTag( NAMESPACE, "shortDescription" );
             }
             if ( model.getDescription() != null )
             {
@@ -490,17 +500,17 @@ public class MavenXpp3Writer
             if ( model.getIssueTrackingUrl() != null )
             {
                 serializer.startTag( NAMESPACE, "issueTrackingUrl" ).text( model.getIssueTrackingUrl() )
-                          .endTag( NAMESPACE, "issueTrackingUrl" );
+                    .endTag( NAMESPACE, "issueTrackingUrl" );
             }
             if ( model.getInceptionYear() != null )
             {
                 serializer.startTag( NAMESPACE, "inceptionYear" ).text( model.getInceptionYear() )
-                          .endTag( NAMESPACE, "inceptionYear" );
+                    .endTag( NAMESPACE, "inceptionYear" );
             }
             if ( model.getGumpRepositoryId() != null )
             {
                 serializer.startTag( NAMESPACE, "gumpRepositoryId" ).text( model.getGumpRepositoryId() )
-                          .endTag( NAMESPACE, "gumpRepositoryId" );
+                    .endTag( NAMESPACE, "gumpRepositoryId" );
             }
             if ( model.getSiteAddress() != null )
             {
@@ -510,17 +520,17 @@ public class MavenXpp3Writer
             if ( model.getSiteDirectory() != null )
             {
                 serializer.startTag( NAMESPACE, "siteDirectory" ).text( model.getSiteDirectory() )
-                          .endTag( NAMESPACE, "siteDirectory" );
+                    .endTag( NAMESPACE, "siteDirectory" );
             }
             if ( model.getDistributionSite() != null )
             {
                 serializer.startTag( NAMESPACE, "distributionSite" ).text( model.getDistributionSite() )
-                          .endTag( NAMESPACE, "distributionSite" );
+                    .endTag( NAMESPACE, "distributionSite" );
             }
             if ( model.getDistributionDirectory() != null )
             {
                 serializer.startTag( NAMESPACE, "distributionDirectory" ).text( model.getDistributionDirectory() )
-                          .endTag( NAMESPACE, "distributionDirectory" );
+                    .endTag( NAMESPACE, "distributionDirectory" );
             }
             if ( model.getMailingLists() != null && model.getMailingLists().size() > 0 )
             {
@@ -638,7 +648,7 @@ public class MavenXpp3Writer
             if ( model.getPackageName() != null )
             {
                 serializer.startTag( NAMESPACE, "package" ).text( model.getPackageName() )
-                          .endTag( NAMESPACE, "package" );
+                    .endTag( NAMESPACE, "package" );
             }
             serializer.endTag( NAMESPACE, tagName );
         }
@@ -706,7 +716,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writePatternSet( PatternSet patternSet, String tagName, XmlSerializer serializer ) throws Exception
+    private void writePatternSet( PatternSet patternSet, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( patternSet != null )
         {
@@ -742,7 +753,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeRepository( Repository repository, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeRepository( Repository repository, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( repository != null )
         {
@@ -755,7 +767,7 @@ public class MavenXpp3Writer
             if ( repository.getDeveloperConnection() != null )
             {
                 serializer.startTag( NAMESPACE, "developerConnection" ).text( repository.getDeveloperConnection() )
-                          .endTag( NAMESPACE, "developerConnection" );
+                    .endTag( NAMESPACE, "developerConnection" );
             }
             if ( repository.getUrl() != null )
             {
@@ -772,7 +784,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeResource( Resource resource, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeResource( Resource resource, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( resource != null )
         {
@@ -785,7 +798,7 @@ public class MavenXpp3Writer
             if ( resource.isFiltering() != false )
             {
                 serializer.startTag( NAMESPACE, "filtering" ).text( String.valueOf( resource.isFiltering() ) )
-                          .endTag( NAMESPACE, "filtering" );
+                    .endTag( NAMESPACE, "filtering" );
             }
             if ( resource.getDirectory() != null )
             {
@@ -824,7 +837,8 @@ public class MavenXpp3Writer
      * @param tagName
      */
     private void writeSourceModification( SourceModification sourceModification, String tagName,
-                                         XmlSerializer serializer ) throws Exception
+                                         XmlSerializer serializer )
+        throws Exception
     {
         if ( sourceModification != null )
         {
@@ -832,17 +846,17 @@ public class MavenXpp3Writer
             if ( sourceModification.getClassName() != null )
             {
                 serializer.startTag( NAMESPACE, "className" ).text( sourceModification.getClassName() )
-                          .endTag( NAMESPACE, "className" );
+                    .endTag( NAMESPACE, "className" );
             }
             if ( sourceModification.getProperty() != null )
             {
                 serializer.startTag( NAMESPACE, "property" ).text( sourceModification.getProperty() )
-                          .endTag( NAMESPACE, "property" );
+                    .endTag( NAMESPACE, "property" );
             }
             if ( sourceModification.getDirectory() != null )
             {
                 serializer.startTag( NAMESPACE, "directory" ).text( sourceModification.getDirectory() )
-                          .endTag( NAMESPACE, "directory" );
+                    .endTag( NAMESPACE, "directory" );
             }
             if ( sourceModification.getIncludes() != null && sourceModification.getIncludes().size() > 0 )
             {
@@ -875,7 +889,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeUnitTest( UnitTest unitTest, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeUnitTest( UnitTest unitTest, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( unitTest != null )
         {
@@ -921,7 +936,8 @@ public class MavenXpp3Writer
      * @param serializer
      * @param tagName
      */
-    private void writeVersion( Version version, String tagName, XmlSerializer serializer ) throws Exception
+    private void writeVersion( Version version, String tagName, XmlSerializer serializer )
+        throws Exception
     {
         if ( version != null )
         {

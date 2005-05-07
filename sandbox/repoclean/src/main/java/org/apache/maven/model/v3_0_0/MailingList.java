@@ -8,7 +8,6 @@ package org.apache.maven.model.v3_0_0;
 //- Imported classes and packages -/
 //---------------------------------/
 
-
 /**
  * Class MailingList.
  * 

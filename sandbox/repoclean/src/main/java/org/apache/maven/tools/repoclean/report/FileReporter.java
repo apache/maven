@@ -32,7 +32,8 @@ import java.util.List;
 /**
  * @author jdcasey
  */
-public class FileReporter implements Reporter
+public class FileReporter
+    implements Reporter
 {
 
     private static final String WARN_LEVEL = "[WARNING] ";
@@ -61,9 +62,9 @@ public class FileReporter implements Reporter
 
         if ( !parentDir.isDirectory() )
         {
-            throw new IllegalArgumentException( "path: \'" + parentDir.getAbsolutePath() +
-                                                "\' refers to a file, not a directory.\n" + "Cannot write report file: \'" +
-                                                reportsFile.getAbsolutePath() + "\'." );
+            throw new IllegalArgumentException( "path: \'" + parentDir.getAbsolutePath()
+                + "\' refers to a file, not a directory.\n" + "Cannot write report file: \'"
+                + reportsFile.getAbsolutePath() + "\'." );
         }
     }
 
@@ -170,7 +171,8 @@ public class FileReporter implements Reporter
         return sWriter.toString();
     }
 
-    private static class AppendingList extends ArrayList
+    private static class AppendingList
+        extends ArrayList
     {
         public AppendingList()
         {

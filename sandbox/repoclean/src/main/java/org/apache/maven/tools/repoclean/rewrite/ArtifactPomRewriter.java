@@ -1,9 +1,10 @@
 package org.apache.maven.tools.repoclean.rewrite;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.tools.repoclean.report.FileReporter;
+import org.apache.maven.tools.repoclean.report.Reporter;
 
-import java.io.File;
+import java.io.Reader;
+import java.io.Writer;
 
 /* ====================================================================
  *   Copyright 2001-2004 The Apache Software Foundation.
@@ -30,7 +31,11 @@ public interface ArtifactPomRewriter
 
     public static final String ROLE = ArtifactPomRewriter.class.getName();
 
-    void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly )
+    public static final String V3_POM = "v3";
+
+    public static final String V4_POM = "v4";
+
+    void rewrite( Artifact artifact, Reader from, Writer to, Reporter reporter, boolean reportOnly )
         throws Exception;
 
 }

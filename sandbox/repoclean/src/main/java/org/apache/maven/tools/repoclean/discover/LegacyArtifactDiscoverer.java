@@ -30,13 +30,14 @@ import java.util.StringTokenizer;
 /**
  * @author jdcasey
  */
-public class LegacyArtifactDiscoverer extends AbstractArtifactDiscoverer
+public class LegacyArtifactDiscoverer
+    extends AbstractArtifactDiscoverer
 {
 
     private ArtifactFactory artifactFactory;
 
     public List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns,
-                                   PathLister excludeLister, PathLister kickoutLister )
+                                  PathLister excludeLister, PathLister kickoutLister )
         throws Exception
     {
         List artifacts = new ArrayList();
@@ -133,13 +134,13 @@ public class LegacyArtifactDiscoverer extends AbstractArtifactDiscoverer
                 }
             }
 
-            String validVersionParts = "([Dd][Ee][Vv][_.0-9]*)|" + "([Ss][Nn][Aa][Pp][Ss][Hh][Oo][Tt])|" +
-                "([0-9][_.0-9a-zA-Z]*)|" + "([Gg]?[_.0-9ab]*([Pp][Rr][Ee]|[Rr][Cc]|[Gg]|[Mm])[_.0-9]*)|" +
-                "([Aa][Ll][Pp][Hh][Aa][_.0-9]*)|" + "([Bb][Ee][Tt][Aa][_.0-9]*)|" + "([Rr][Cc][_.0-9]*)|" +
-                "([Tt][Ee][Ss][Tt][_.0-9]*)|" + "([Dd][Ee][Bb][Uu][Gg][_.0-9]*)|" +
-                "([Uu][Nn][Oo][Ff][Ff][Ii][Cc][Ii][Aa][Ll][_.0-9]*)|" + "([Cc][Uu][Rr][Rr][Ee][Nn][Tt])|" +
-                "([Ll][Aa][Tt][Ee][Ss][Tt])|" + "([Ff][Cc][Ss])|" + "([Rr][Ee][Ll][Ee][Aa][Ss][Ee][_.0-9]*)|" +
-                "([Nn][Ii][Gg][Hh][Tt][Ll][Yy])";
+            String validVersionParts = "([Dd][Ee][Vv][_.0-9]*)|" + "([Ss][Nn][Aa][Pp][Ss][Hh][Oo][Tt])|"
+                + "([0-9][_.0-9a-zA-Z]*)|" + "([Gg]?[_.0-9ab]*([Pp][Rr][Ee]|[Rr][Cc]|[Gg]|[Mm])[_.0-9]*)|"
+                + "([Aa][Ll][Pp][Hh][Aa][_.0-9]*)|" + "([Bb][Ee][Tt][Aa][_.0-9]*)|" + "([Rr][Cc][_.0-9]*)|"
+                + "([Tt][Ee][Ss][Tt][_.0-9]*)|" + "([Dd][Ee][Bb][Uu][Gg][_.0-9]*)|"
+                + "([Uu][Nn][Oo][Ff][Ff][Ii][Cc][Ii][Aa][Ll][_.0-9]*)|" + "([Cc][Uu][Rr][Rr][Ee][Nn][Tt])|"
+                + "([Ll][Aa][Tt][Ee][Ss][Tt])|" + "([Ff][Cc][Ss])|" + "([Rr][Ee][Ll][Ee][Aa][Ss][Ee][_.0-9]*)|"
+                + "([Nn][Ii][Gg][Hh][Tt][Ll][Yy])";
 
             // let's discover the version, and whatever's leftover will be either
             // a classifier, or part of the artifactId, depending on position.
@@ -196,15 +197,17 @@ public class LegacyArtifactDiscoverer extends AbstractArtifactDiscoverer
                 tokensIterated++;
             }
 
-            getLogger().debug( "After parsing loop, state of buffers:\no  Version Buffer: \'" + versionBuffer +
-                               "\'\no  Classifier Buffer: \'" + classifierBuffer +
-                               "\'\no Number of Tokens Iterated: " + tokensIterated );
+            getLogger().debug(
+                               "After parsing loop, state of buffers:\no  Version Buffer: \'" + versionBuffer
+                                   + "\'\no  Classifier Buffer: \'" + classifierBuffer
+                                   + "\'\no Number of Tokens Iterated: " + tokensIterated );
 
             // Now, restore the proper ordering so we can build the artifactId.
             Collections.reverse( avceTokenList );
 
-            getLogger().debug( "Before repairing bad version and/or cleaning up used tokens, avce token list is:\n" +
-                               avceTokenList );
+            getLogger().debug(
+                               "Before repairing bad version and/or cleaning up used tokens, avce token list is:\n"
+                                   + avceTokenList );
 
             // if we didn't find a version, then punt. Use the last token
             // as the version, and set the classifier empty.
@@ -220,8 +223,9 @@ public class LegacyArtifactDiscoverer extends AbstractArtifactDiscoverer
                 else
                 {
                     getLogger().debug( "Cannot parse version from artifact path: \'" + path + "\'." );
-                    getLogger().debug( "artifact-version-classifier-extension remaining tokens is: \'" + avceTokenList +
-                                      "\'" );
+                    getLogger().debug(
+                                       "artifact-version-classifier-extension remaining tokens is: \'" + avceTokenList
+                                           + "\'" );
                 }
 
                 classifierBuffer.setLength( 0 );
@@ -232,8 +236,7 @@ public class LegacyArtifactDiscoverer extends AbstractArtifactDiscoverer
 
                 // if everything is kosher, then pop off all the classifier and
                 // version tokens, leaving the naked artifact id in the list.
-                avceTokenList =
-                    new LinkedList( avceTokenList.subList( 0, avceTokenList.size() - ( tokensIterated ) ) );
+                avceTokenList = new LinkedList( avceTokenList.subList( 0, avceTokenList.size() - ( tokensIterated ) ) );
             }
 
             getLogger().debug( "Now, remainder of avce token list is:\n" + avceTokenList );
@@ -272,10 +275,11 @@ public class LegacyArtifactDiscoverer extends AbstractArtifactDiscoverer
                 version = null;
             }
 
-            getLogger().debug( "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n" +
-                               "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n" +
-                               "version: \'" + version + "\'\n" + "classifier: \'" + classifierBuffer.toString() +
-                               "\'" );
+            getLogger().debug(
+                               "Extracted artifact information from path:\n" + "groupId: \'" + groupId + "\'\n"
+                                   + "artifactId: \'" + artifactId + "\'\n" + "type: \'" + type + "\'\n"
+                                   + "version: \'" + version + "\'\n" + "classifier: \'" + classifierBuffer.toString()
+                                   + "\'" );
 
             Artifact result = null;
 
@@ -284,16 +288,17 @@ public class LegacyArtifactDiscoverer extends AbstractArtifactDiscoverer
                 getLogger().debug( "Creating artifact with classifier." );
 
                 result = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version,
-                                                                       Artifact.SCOPE_RUNTIME, type,
-                                                                       classifierBuffer.toString() );
+                                                                       Artifact.SCOPE_RUNTIME, type, classifierBuffer
+                                                                           .toString() );
             }
             else
             {
                 result = artifactFactory.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME, type );
             }
 
-            getLogger().debug( "Resulting artifact is: " + result.getId() + " and has classifier of: " +
-                               result.getClassifier() + "\n\n" );
+            getLogger().debug(
+                               "Resulting artifact is: " + result.getId() + " and has classifier of: "
+                                   + result.getClassifier() + "\n\n" );
 
             return result;
         }

@@ -23,11 +23,12 @@ import java.io.File;
  * limitations under the License.
  */
 
-public abstract class AbstractArtifactDiscoverer extends AbstractLogEnabled implements ArtifactDiscoverer
+public abstract class AbstractArtifactDiscoverer
+    extends AbstractLogEnabled
+    implements ArtifactDiscoverer
 {
 
-    protected String[] scanForArtifactPaths( File repositoryBase, String blacklistedPatterns,
-                                             PathLister excludesLister )
+    protected String[] scanForArtifactPaths( File repositoryBase, String blacklistedPatterns, PathLister excludesLister )
         throws ReportWriteException
     {
         String[] blacklisted = null;

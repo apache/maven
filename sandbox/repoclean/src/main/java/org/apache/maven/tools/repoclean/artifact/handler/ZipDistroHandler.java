@@ -19,7 +19,8 @@ import org.apache.maven.artifact.handler.AbstractArtifactHandler;
 /**
  * @author jdcasey
  */
-public class ZipDistroHandler extends AbstractArtifactHandler
+public class ZipDistroHandler
+    extends AbstractArtifactHandler
 {
 
     public String directory()

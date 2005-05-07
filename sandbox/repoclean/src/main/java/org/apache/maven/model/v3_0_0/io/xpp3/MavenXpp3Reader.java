@@ -72,7 +72,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Branch parseBranch( String tagName, XmlPullParser parser ) throws Exception
+    private Branch parseBranch( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Branch branch = new Branch();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -98,7 +99,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Build parseBuild( String tagName, XmlPullParser parser ) throws Exception
+    private Build parseBuild( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Build build = new Build();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -176,7 +178,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Contributor parseContributor( String tagName, XmlPullParser parser ) throws Exception
+    private Contributor parseContributor( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Contributor contributor = new Contributor();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -234,7 +237,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Dependency parseDependency( String tagName, XmlPullParser parser ) throws Exception
+    private Dependency parseDependency( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Dependency dependency = new Dependency();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -293,7 +297,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Developer parseDeveloper( String tagName, XmlPullParser parser ) throws Exception
+    private Developer parseDeveloper( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Developer developer = new Developer();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -355,7 +360,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private FileSet parseFileSet( String tagName, XmlPullParser parser ) throws Exception
+    private FileSet parseFileSet( String tagName, XmlPullParser parser )
+        throws Exception
     {
         FileSet fileSet = new FileSet();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -413,7 +419,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private License parseLicense( String tagName, XmlPullParser parser ) throws Exception
+    private License parseLicense( String tagName, XmlPullParser parser )
+        throws Exception
     {
         License license = new License();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -451,7 +458,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private MailingList parseMailingList( String tagName, XmlPullParser parser ) throws Exception
+    private MailingList parseMailingList( String tagName, XmlPullParser parser )
+        throws Exception
     {
         MailingList mailingList = new MailingList();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -489,7 +497,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Model parseModel( String tagName, XmlPullParser parser ) throws Exception
+    private Model parseModel( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Model model = new Model();
         int eventType = parser.getEventType();
@@ -753,7 +762,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Organization parseOrganization( String tagName, XmlPullParser parser ) throws Exception
+    private Organization parseOrganization( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Organization organization = new Organization();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -787,7 +797,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private PackageGroup parsePackageGroup( String tagName, XmlPullParser parser ) throws Exception
+    private PackageGroup parsePackageGroup( String tagName, XmlPullParser parser )
+        throws Exception
     {
         PackageGroup packageGroup = new PackageGroup();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -817,7 +828,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private PatternSet parsePatternSet( String tagName, XmlPullParser parser ) throws Exception
+    private PatternSet parsePatternSet( String tagName, XmlPullParser parser )
+        throws Exception
     {
         PatternSet patternSet = new PatternSet();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -871,7 +883,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Repository parseRepository( String tagName, XmlPullParser parser ) throws Exception
+    private Repository parseRepository( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Repository repository = new Repository();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -905,7 +918,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Resource parseResource( String tagName, XmlPullParser parser ) throws Exception
+    private Resource parseResource( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Resource resource = new Resource();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -971,7 +985,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private SourceModification parseSourceModification( String tagName, XmlPullParser parser ) throws Exception
+    private SourceModification parseSourceModification( String tagName, XmlPullParser parser )
+        throws Exception
     {
         SourceModification sourceModification = new SourceModification();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -1037,7 +1052,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private UnitTest parseUnitTest( String tagName, XmlPullParser parser ) throws Exception
+    private UnitTest parseUnitTest( String tagName, XmlPullParser parser )
+        throws Exception
     {
         UnitTest unitTest = new UnitTest();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -1107,7 +1123,8 @@ public class MavenXpp3Reader
      * @param tagName
      * @param parser
      */
-    private Version parseVersion( String tagName, XmlPullParser parser ) throws Exception
+    private Version parseVersion( String tagName, XmlPullParser parser )
+        throws Exception
     {
         Version version = new Version();
         while ( parser.nextTag() == XmlPullParser.START_TAG )
@@ -1140,7 +1157,8 @@ public class MavenXpp3Reader
      * 
      * @param reader
      */
-    public Model read( Reader reader ) throws Exception
+    public Model read( Reader reader )
+        throws Exception
     {
         XmlPullParser parser = new MXParser();
         parser.setInput( reader );

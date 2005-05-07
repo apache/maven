@@ -21,50 +21,39 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.tools.repoclean.report.FileReporter;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.maven.tools.repoclean.report.Reporter;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * @author jdcasey
  */
-public class V4PomRewriter implements ArtifactPomRewriter
+public class V4PomRewriter
+    implements ArtifactPomRewriter
 {
-    public void rewrite( Artifact artifact, File from, File to, FileReporter reporter, boolean reportOnly )
+    public void rewrite( Artifact artifact, Reader from, Writer to, Reporter reporter, boolean reportOnly )
         throws Exception
     {
         Model model = null;
 
-        if ( from.exists() )
+        if( from != null )
         {
-            FileReader fromReader = null;
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+
             try
             {
-                fromReader = new FileReader( from );
-
-                MavenXpp3Reader reader = new MavenXpp3Reader();
-
-                try
-                {
-                    model = reader.read( fromReader );
-                }
-                catch ( Exception e )
-                {
-                    reporter.error( "Invalid v4 POM at \'" + from + "\'. Cannot read.", e );
-                }
+                model = reader.read( from );
             }
-            finally
+            catch ( Exception e )
             {
-                IOUtil.close( fromReader );
+                reporter.error( "Invalid v4 POM at \'" + from + "\'. Cannot read.", e );
             }
         }
         else
         {
-            reporter.error( "POM for artifact[" + artifact.getId() + "] does not exist in source repository!" );
+            model = new Model();
         }
 
         if ( model != null )
@@ -73,28 +62,13 @@ public class V4PomRewriter implements ArtifactPomRewriter
 
             if ( !reportOnly )
             {
-                File toParent = to.getParentFile();
-                if ( !toParent.exists() )
-                {
-                    toParent.mkdirs();
-                }
-
-                FileWriter toWriter = null;
-                try
-                {
-                    toWriter = new FileWriter( to );
-                    MavenXpp3Writer writer = new MavenXpp3Writer();
-                    writer.write( toWriter, model );
-                }
-                finally
-                {
-                    IOUtil.close( toWriter );
-                }
+                MavenXpp3Writer writer = new MavenXpp3Writer();
+                writer.write( to, model );
             }
         }
     }
 
-    private void validateBasics( Model model, Artifact artifact, FileReporter reporter )
+    private void validateBasics( Model model, Artifact artifact, Reporter reporter )
         throws Exception
     {
         if ( StringUtils.isEmpty( model.getModelVersion() ) )

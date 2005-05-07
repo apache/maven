@@ -16,7 +16,8 @@ package org.apache.maven.tools.repoclean.transaction;
  * limitations under the License.
  */
 
-public class RollbackException extends Exception
+public class RollbackException
+    extends Exception
 {
 
     public RollbackException( String message, Throwable cause )

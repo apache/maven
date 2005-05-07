@@ -27,15 +27,30 @@ public interface ArtifactDiscoverer
 {
     public static final String ROLE = ArtifactDiscoverer.class.getName();
 
-    public static final String[] STANDARD_DISCOVERY_EXCLUDES = {"bin/**", "reports/**", ".maven/**", "**/poms/*.pom",
-                                                                "**/*.md5", "**/*.MD5", "**/*.sha1", "**/*.SHA1",
-                                                                "**/*snapshot-version", "*/website/**",
-                                                                "*/licenses/**", "*/licences/**", "**/.htaccess",
-                                                                "**/*.html", "**/*.asc", "**/*.txt", "**/*.xml",
-                                                                "**/README*", "**/CHANGELOG*", "**/KEYS*"};
+    public static final String[] STANDARD_DISCOVERY_EXCLUDES = {
+        "bin/**",
+        "reports/**",
+        ".maven/**",
+        "**/poms/*.pom",
+        "**/*.md5",
+        "**/*.MD5",
+        "**/*.sha1",
+        "**/*.SHA1",
+        "**/*snapshot-version",
+        "*/website/**",
+        "*/licenses/**",
+        "*/licences/**",
+        "**/.htaccess",
+        "**/*.html",
+        "**/*.asc",
+        "**/*.txt",
+        "**/*.xml",
+        "**/README*",
+        "**/CHANGELOG*",
+        "**/KEYS*" };
 
     List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns,
-                            PathLister excludeLister, PathLister kickoutLister )
+                           PathLister excludeLister, PathLister kickoutLister )
         throws Exception;
 
 }

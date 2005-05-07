@@ -136,15 +136,14 @@ public class Main
         RepositoryCleanerConfiguration config = new RepositoryCleanerConfiguration();
         config.setSourceRepositoryPath( props.getProperty( "sourceRepositoryPath" ) );
         config.setSourceRepositoryLayout( props.getProperty( "sourceRepositoryLayout", "legacy" ) );
-        config.setSourcePomVersion( props.getProperty( "sourcePomVersion", "v3" ) );
         config.setTargetRepositoryPath( props.getProperty( "targetRepositoryPath" ) );
         config.setTargetRepositoryLayout( props.getProperty( "targetRepositoryLayout", "default" ) );
         config.setReportsPath( props.getProperty( "reportsPath" ) );
         config.setBlacklistedPatterns( props.getProperty( "blacklistedPatterns" ) );
         config.setReportOnly( Boolean.valueOf( props.getProperty( "reportOnly" ) ).booleanValue() );
 
-        config.setMailErrorReport(
-            Boolean.valueOf( props.getProperty( "errorReport.mailOnError", "false" ) ).booleanValue() );
+        config.setMailErrorReport( Boolean.valueOf( props.getProperty( "errorReport.mailOnError", "false" ) )
+            .booleanValue() );
         config.setErrorReportFromAddress( props.getProperty( "errorReport.fromAddress" ) );
         config.setErrorReportFromName( props.getProperty( "errorReport.fromName" ) );
         config.setErrorReportSubject( props.getProperty( "errorReport.subject" ) );
@@ -157,25 +156,34 @@ public class Main
 
     private static void printHelp()
     {
-        System.out.println( "repoclean: Repository Cleaner/Converter.\n\n" +
-                            "Usage: repoclean -h|-template|<configuration-properties-file>\n\n" +
-                            "---------------------------------------------------------------------------\n" +
-                            "  Use the '-template' option to see sample configuration file options.\n" + "\n" );
+        System.out.println( "repoclean: Repository Cleaner/Converter.\n\n"
+            + "Usage: repoclean -h|-template|<configuration-properties-file>\n\n"
+            + "---------------------------------------------------------------------------\n"
+            + "  Use the '-template' option to see sample configuration file options.\n" + "\n" );
     }
 
     private static void printTemplate()
     {
-        System.out.println( "# ---------------------------------------------------------------------------\n" +
-                            "# repoclean: Repository Cleaner/Converter.\n" + "# This configuration auto-generated on: " + new java.util.Date() + "\n" +
-                            "# ---------------------------------------------------------------------------\n\n" +
-                            "# [REQUIRED OPTIONS]\n" + "sourceRepositoryPath=/path/to/repository/root\n" + "targetRepositoryPath=/path/to/repository/root\n" + "reportsPath=/path/to/reports/directory\n" + "reportOnly=[true|false]\n" + "\n" + "errorReport.mailOnError=[true|false]\n" + "errorReport.fromAddress=admin@somewhere.com\n" + "errorReport.fromName=Admin\n" + "errorReport.subject=[REPOCLEAN] Error!\n" + "errorReport.toAddress=dev@somewhere.com\n" + "errorReport.toName=Developers List\n" + "\n" + "# [DEFAULT VALUE: legacy]\n" + "#sourceRepositoryLayout=[legacy|default]\n\n" + "# [DEFAULT VALUE: v3]\n" + "#sourcePomType=[v3|v4]\n\n" + "# [DEFAULT VALUE: default]\n" + "#targetRepositoryLayout=[legacy|default]\n" + "# [DEFAULT VALUE: localhost]\n" + "#errorReport.smtpHost=<hostname>\n" + "\n" );
+        System.out.println( "# ---------------------------------------------------------------------------\n"
+            + "# repoclean: Repository Cleaner/Converter.\n" + "# This configuration auto-generated on: "
+            + new java.util.Date() + "\n"
+            + "# ---------------------------------------------------------------------------\n\n"
+            + "# [REQUIRED OPTIONS]\n" + "sourceRepositoryPath=/path/to/repository/root\n"
+            + "targetRepositoryPath=/path/to/repository/root\n" + "reportsPath=/path/to/reports/directory\n"
+            + "reportOnly=[true|false]\n" + "\n" + "errorReport.mailOnError=[true|false]\n"
+            + "errorReport.fromAddress=admin@somewhere.com\n" + "errorReport.fromName=Admin\n"
+            + "errorReport.subject=[REPOCLEAN] Error!\n" + "errorReport.toAddress=dev@somewhere.com\n"
+            + "errorReport.toName=Developers List\n" + "\n" + "# [DEFAULT VALUE: legacy]\n"
+            + "#sourceRepositoryLayout=[legacy|default]\n\n" + "# [DEFAULT VALUE: v3]\n"
+            + "# [DEFAULT VALUE: default]\n" + "#targetRepositoryLayout=[legacy|default]\n"
+            + "# [DEFAULT VALUE: localhost]\n" + "#errorReport.smtpHost=<hostname>\n" + "\n" );
     }
 
     private static void printUsage()
     {
-        System.out.println( "Required input is missing.\n\n" + "Usage:\n" +
-                            "--------------------------------------------------\n\n" +
-                            "repoclean -h|-template|<configuration-properties-file>\n" );
+        System.out.println( "Required input is missing.\n\n" + "Usage:\n"
+            + "--------------------------------------------------\n\n"
+            + "repoclean -h|-template|<configuration-properties-file>\n" );
     }
 
 }

@@ -19,7 +19,8 @@ import org.apache.maven.artifact.handler.AbstractArtifactHandler;
 /**
  * @author jdcasey
  */
-public class TgzDistroHandler extends AbstractArtifactHandler
+public class TgzDistroHandler
+    extends AbstractArtifactHandler
 {
 
     public String directory()
