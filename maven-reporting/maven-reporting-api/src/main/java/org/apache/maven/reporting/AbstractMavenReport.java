@@ -23,10 +23,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * The basis for a Maven report.
+ *
+ * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
+ * @version $Id: MavenReport.java 163376 2005-02-23 00:06:06Z brett $
+ */
 public abstract class AbstractMavenReport
     implements MavenReport
 {
     private MavenReportConfiguration config;
+
+    private Sink sink;
 
     public MavenReportConfiguration getConfiguration()
     {
@@ -38,12 +46,21 @@ public abstract class AbstractMavenReport
         this.config = config;
     }
 
-    public void generate()
+    public void generate( Sink sink )
         throws MavenReportException
     {
         if ( config == null )
         {
             throw new MavenReportException( "You must specify a report configuration." );
+        }
+
+        if ( sink == null )
+        {
+            throw new MavenReportException( "You must specify a sink configuration." );
+        }
+        else
+        {
+            this.sink = sink;
         }
 
         execute();
@@ -55,20 +72,6 @@ public abstract class AbstractMavenReport
     public Sink getSink()
         throws IOException
     {
-        return getSink( getOutputName() );
-    }
-
-    public Sink getSink( String outputName )
-        throws IOException
-    {
-        File outputDir = new File( config.getOutputDirectory(), "xdoc/" );
-
-        outputDir.mkdirs();
-
-        File outputFile = new File( outputDir, outputName + ".xml" );
-
-        FileWriter writer = new FileWriter( outputFile );
-
-        return new XdocSink( writer );
+        return sink;
     }
 }

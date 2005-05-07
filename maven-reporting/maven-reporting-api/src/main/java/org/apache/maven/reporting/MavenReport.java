@@ -36,14 +36,11 @@ public interface MavenReport
 
     void setConfiguration( MavenReportConfiguration config );
 
-    void generate()
+    void generate( Sink sink )
         throws MavenReportException;
 
     String getOutputName();
 
     Sink getSink()
-        throws IOException;
-
-    Sink getSink( String outputName )
         throws IOException;
 }
