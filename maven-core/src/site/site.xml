@@ -24,5 +24,6 @@
       <item name="Plugin descriptors" href="/plugin-descriptors.html"/>
       <item name="Mojos" href="/mojos.html"/>
     </menu>
+    ${reports}
   </body>
 </project>
