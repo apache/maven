@@ -50,7 +50,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo "-----------------------------------------------------------------------"  
 
   cd maven-plugins
-  m2 -X clean:clean install
+  m2 clean:clean install
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
