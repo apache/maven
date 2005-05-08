@@ -48,6 +48,9 @@ it0013: Test plugin-plugin, which tests maven-plugin-tools-api and
         maven-plugin-tools-java. This will generate a plugin descriptor from 
         java-based mojo sources, install the plugin, and then use it.
 
+it0014: Test POM configuration by settings the -source and -target for the
+        compiler to 1.4
+
 it0015: Test marmalade-driven mojo support. This will compile supporting java
         classes (mmld tag & taglib), generate plugin descriptor from mmld script,
         install the plugin, and finally use the new plugin.
