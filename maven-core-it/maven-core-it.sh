@@ -26,8 +26,8 @@ if $cygwin ; then
 fi
 
 if [ ! -z "$M2_HOME" ]; then
-  jvm_args="$jvm_args -Dmaven.home=$M2_HOME"
+  jvm_m2_home="-Dmaven.home=$M2_HOME"
 fi
 
-java $jvm_args -cp "$cp" $verifier
+java "$jvm_m2_home" $jvm_args -cp "$cp" $verifier
 

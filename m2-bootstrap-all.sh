@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Check to make sure  JAVA_HOME is set
-[ -z $JAVA_HOME ] && echo && echo 'You must set $JAVA_HOME to use mboot!' && echo && exit 1
+[ -z "$JAVA_HOME" ] && echo && echo 'You must set $JAVA_HOME to use mboot!' && echo && exit 1
 
 JAVACMD=$JAVA_HOME/bin/java
 
@@ -19,7 +19,11 @@ if $cygwin ; then
 fi
 
 if [ ! -z "$M2_HOME" ]; then
-  ARGS="$ARGS -Dmaven.home=$M2_HOME"
+  if [ -n "$ARGS" ]; then
+    ARGS="$ARGS -Dmaven.home=$M2_HOME"
+  else
+    ARGS="-Dmaven.home=$M2_HOME"
+  fi
 fi
 
 # Build and install mboot
@@ -39,7 +43,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo " Building maven2 components ... "
   echo "-----------------------------------------------------------------------"  
 
-  $JAVACMD $ARGS $MAVEN_OPTS -jar mboot.jar
+  "$JAVACMD" "$ARGS" $MAVEN_OPTS -jar mboot.jar
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
