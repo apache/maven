@@ -16,6 +16,19 @@ package org.apache.maven.archetype;
  * limitations under the License.
  */
 
+import org.apache.maven.archetype.descriptor.ArchetypeDescriptor;
+import org.apache.maven.archetype.descriptor.ArchetypeDescriptorBuilder;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.context.Context;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.velocity.VelocityComponent;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
@@ -26,20 +39,6 @@ import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.archetype.descriptor.ArchetypeDescriptor;
-import org.apache.maven.archetype.descriptor.ArchetypeDescriptorBuilder;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.construction.ArtifactConstructionSupport;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.context.Context;
-
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.velocity.VelocityComponent;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -53,14 +52,14 @@ public class DefaultArchetype
     // ----------------------------------------------------------------------
 
     private VelocityComponent velocity;
-    
+
     private ArtifactResolver artifactResolver;
 
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------
-    
-    private ArtifactConstructionSupport artifactConstructionSupport = new ArtifactConstructionSupport();
+
+    private ArtifactFactory artifactFactory;
 
     // groupId = maven
     // artifactId = maven-foo-archetype
@@ -74,8 +73,8 @@ public class DefaultArchetype
         // Download the archetype
         // ----------------------------------------------------------------------
 
-        Artifact archetypeArtifact =
-            artifactConstructionSupport.createArtifact( archetypeGroupId, archetypeArtifactId, archetypeVersion, Artifact.SCOPE_RUNTIME, "jar" );
+        Artifact archetypeArtifact = artifactFactory.createArtifact( archetypeGroupId, archetypeArtifactId,
+                                                                     archetypeVersion, Artifact.SCOPE_RUNTIME, "jar" );
 
         try
         {
@@ -114,7 +113,8 @@ public class DefaultArchetype
 
             if ( is == null )
             {
-                throw new ArchetypeDescriptorException( "The " + ARCHETYPE_DESCRIPTOR + " descriptor cannot be found." );
+                throw new ArchetypeDescriptorException( "The " + ARCHETYPE_DESCRIPTOR +
+                    " descriptor cannot be found." );
             }
 
             descriptor = (ArchetypeDescriptor) builder.build( new InputStreamReader( is ) );
@@ -197,7 +197,8 @@ public class DefaultArchetype
         }
     }
 
-    protected void processTemplate( String outputDirectory, Context context, String template, boolean packageInFileName, String packageName )
+    protected void processTemplate( String outputDirectory, Context context, String template, boolean packageInFileName,
+                                    String packageName )
         throws Exception
     {
         File f;
