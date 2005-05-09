@@ -155,4 +155,9 @@ public class Parameter
     {
         this.editable = editable;
     }
+    
+    public String toString()
+    {
+        return "Mojo parameter [name: \'" + getName() + "\'; alias: \'" + getAlias() + "\']";
+    }
 }

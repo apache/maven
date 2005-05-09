@@ -277,7 +277,7 @@ public class DefaultMavenProjectBuilder
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            throw new ProjectBuildingException( "Exception while building project from \'" + pomLocation + "\': " + validationResult.toString() );
+            throw new ProjectBuildingException( "Failed to validate POM for \'" + pomLocation + "\'.\n\n  Reason(s):\n" + validationResult.render( "  " ) );
         }
 
         return project;

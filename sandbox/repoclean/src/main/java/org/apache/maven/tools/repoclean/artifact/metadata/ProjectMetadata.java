@@ -63,4 +63,29 @@ public class ProjectMetadata
     {
         // this should be immutable...
     }
+
+    public boolean exists()
+    {
+        return false;
+    }
+
+    public String getGroupId()
+    {
+        return null;
+    }
+
+    public String getArtifactId()
+    {
+        return null;
+    }
+
+    public String getVersion()
+    {
+        return null;
+    }
+
+    public String getBaseVersion()
+    {
+        return null;
+    }
 }

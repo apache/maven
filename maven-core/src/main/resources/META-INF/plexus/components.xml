@@ -18,7 +18,31 @@
         <requirement>
           <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.usability.ErrorDiagnoser</role>
+          <field-name>errorDiagnosers</field-name>
+        </requirement>
       </requirements>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role-hint>plugin-configuration</role-hint>
+      <implementation>org.apache.maven.usability.PluginConfigurationDiagnoser</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role-hint>artifact-resolution</role-hint>
+      <implementation>org.apache.maven.usability.ArtifactResolverDiagnoser</implementation>
     </component>
     <!--
      |

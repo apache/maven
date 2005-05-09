@@ -1,6 +1,5 @@
 package org.apache.maven.tools.repoclean.artifact.layout;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
@@ -28,13 +27,11 @@ public class AlphaBridgingRepositoryLayout
     public String pathOfMetadata( ArtifactMetadata metadata )
         throws ArtifactPathFormatException
     {
-        Artifact artifact = metadata.getArtifact();
-
         StringBuffer path = new StringBuffer();
 
-        path.append( artifact.getGroupId().replace( '.', '/' ) ).append( '/' );
-        path.append( artifact.getArtifactId() ).append( '/' );
-        path.append( artifact.getBaseVersion() ).append( '/' );
+        path.append( metadata.getGroupId().replace( '.', '/' ) ).append( '/' );
+        path.append( metadata.getArtifactId() ).append( '/' );
+        path.append( metadata.getBaseVersion() ).append( '/' );
         path.append( metadata.getFilename() );
 
         return path.toString();

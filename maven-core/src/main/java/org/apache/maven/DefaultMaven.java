@@ -37,6 +37,7 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.usability.ErrorDiagnoser;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -53,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -73,6 +75,8 @@ public class DefaultMaven
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
+    
+    protected Map errorDiagnosers;
 
     // ----------------------------------------------------------------------
     // Project execution
@@ -376,22 +380,28 @@ public class DefaultMaven
         getLogger().info( "BUILD FAILURE" );
 
         line();
-
-        getLogger().info( "Reason: " + e.getMessage() );
-
-        getLogger().info( "Found these embedded error messages:\n" );
         
-        Throwable cause = e.getCause();
-        
-        int depth = 0;
-        
-        while( cause != null )
+        String message = null;
+        if(errorDiagnosers != null)
         {
-            getLogger().info( "\t[" + ( depth++ ) + "]  " + cause.getMessage() );
-            
-            cause = cause.getCause();
+            for ( Iterator it = errorDiagnosers.values().iterator(); it.hasNext(); )
+            {
+                ErrorDiagnoser diagnoser = (ErrorDiagnoser) it.next();
+                
+                if( diagnoser.canDiagnose( e ) )
+                {
+                    message = diagnoser.diagnose( e );
+                }
+            }
         }
         
+        if( message == null )
+        {
+            message = "Reason: " + e.getMessage();
+        }
+
+        getLogger().info( message );
+
         line();
         
         if ( longMessage != null )

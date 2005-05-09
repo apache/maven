@@ -60,6 +60,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -592,6 +593,8 @@ public class DefaultPluginManager
     {
         List parameters = goal.getParameters();
 
+        List invalidParameters = new ArrayList();
+        
         for ( int i = 0; i < parameters.size(); i++ )
         {
             Parameter parameter = (Parameter) parameters.get( i );
@@ -702,10 +705,14 @@ public class DefaultPluginManager
 
             if ( value == null && parameter.isRequired() )
             {
-                throw new PluginConfigurationException(
-                    createPluginParameterRequiredMessage( goal, parameter, expression ) );
+                invalidParameters.add( parameter );
             }
 
+        }
+        
+        if( !invalidParameters.isEmpty() )
+        {
+            throw new PluginParameterException( goal, invalidParameters );
         }
     }
 

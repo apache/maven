@@ -59,25 +59,30 @@ public class ModelValidationResult
 
     public String toString()
     {
+        return render( "" );
+    }
+    
+    public String render( String indentation )
+    {
         if ( messages.size() == 0 )
         {
-            return "There was no validation errors.";
+            return indentation + "There were no validation errors.";
         }
 
         StringBuffer message = new StringBuffer();
 
-        if ( messages.size() == 1 )
-        {
-            message.append( "There was 1 validation error: " );
-        }
-        else
-        {
-            message.append( "There was " + messages.size() + " validation errors: " + NEWLINE );
-        }
-
+//        if ( messages.size() == 1 )
+//        {
+//            message.append( "There was 1 validation error: " );
+//        }
+//        else
+//        {
+//            message.append( "There was " + messages.size() + " validation errors: " + NEWLINE );
+//        }
+//
         for ( int i = 0; i < messages.size(); i++ )
         {
-            message.append( "#" + ( i + 1 ) + ": " + messages.get( i ).toString() + NEWLINE );
+            message.append( indentation + "[" + i + "]  " + messages.get( i ).toString() + NEWLINE );
         }
 
         return message.toString();
