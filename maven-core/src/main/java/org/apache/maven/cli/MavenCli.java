@@ -117,7 +117,14 @@ public class MavenCli
         initializeSystemProperties( commandLine );
 
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
+        
+        boolean showErrors = debug || commandLine.hasOption( CLIManager.ERRORS );
 
+        if(showErrors)
+        {
+            System.out.println("+ Error stacktraces are turned on.");
+        }
+        
         // ----------------------------------------------------------------------
         // Process particular command line options
         // ----------------------------------------------------------------------
@@ -149,7 +156,7 @@ public class MavenCli
         }
         catch ( PlexusContainerException e )
         {
-            showFatalError( "Unable to start the embedded plexus container", e, debug );
+            showFatalError( "Unable to start the embedded plexus container", e, showErrors );
             return 1;
         }
 
@@ -162,17 +169,17 @@ public class MavenCli
         }
         catch ( IOException e )
         {
-            showFatalError( "Unable to read settings.xml", e, debug );
+            showFatalError( "Unable to read settings.xml", e, showErrors );
             return 1;
         }
         catch ( XmlPullParserException e )
         {
-            showFatalError( "Unable to read settings.xml", e, debug );
+            showFatalError( "Unable to read settings.xml", e, showErrors );
             return 1;
         }
         catch ( ComponentLookupException e )
         {
-            showFatalError( "Unable to read settings.xml", e, debug );
+            showFatalError( "Unable to read settings.xml", e, showErrors );
             return 1;
         }
 
@@ -183,7 +190,7 @@ public class MavenCli
         }
         catch ( IOException e )
         {
-            showFatalError( "Error locating project files for reactor execution", e, debug );
+            showFatalError( "Error locating project files for reactor execution", e, showErrors );
             return 1;
         }
 
@@ -204,7 +211,7 @@ public class MavenCli
         }
         catch ( ComponentLookupException e )
         {
-            showFatalError( "Unable to configure the Maven application", e, debug );
+            showFatalError( "Unable to configure the Maven application", e, showErrors );
             return 1;
         }
 
@@ -224,7 +231,7 @@ public class MavenCli
         }
         catch ( ReactorException e )
         {
-            showFatalError( "Error executing Maven for a project", e, debug );
+            showFatalError( "Error executing Maven for a project", e, showErrors );
             return 1;
         }
 
@@ -238,11 +245,13 @@ public class MavenCli
         }
     }
 
-    private static void showFatalError( String message, Exception e, boolean debug )
+    private static void showFatalError( String message, Exception e, boolean show )
     {
         System.err.println( "FATAL ERROR: " + message );
-        if ( debug )
+        if ( show )
         {
+            System.err.println("Error stacktrace:");
+            
             e.printStackTrace();
         }
         else
@@ -441,6 +450,9 @@ public class MavenCli
         public static final char REACTOR = 'r';
 
         public static final char DEBUG = 'X';
+        
+        // TODO: [jc] Is there a better switch than '-e' for this?
+        public static final char ERRORS = 'e';
 
         public static final char HELP = 'h';
 
@@ -469,6 +481,8 @@ public class MavenCli
                 VERSION ) );
             options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
                 DEBUG ) );
+            options.addOption( OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create(
+                ERRORS ) );
             options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
                 "Execute goals for project found in the reactor" ).create( REACTOR ) );
             options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(

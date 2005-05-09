@@ -436,6 +436,8 @@ public class Verifier
             }
 
             cli.setExecutable( executable );
+            
+            cli.createArgument().setValue( "-e" );
 
             for ( Iterator i = allGoals.iterator(); i.hasNext(); )
             {

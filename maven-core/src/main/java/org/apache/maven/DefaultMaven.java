@@ -379,8 +379,21 @@ public class DefaultMaven
 
         getLogger().info( "Reason: " + e.getMessage() );
 
+        getLogger().info( "Found these embedded error messages:\n" );
+        
+        Throwable cause = e.getCause();
+        
+        int depth = 0;
+        
+        while( cause != null )
+        {
+            getLogger().info( "\t[" + ( depth++ ) + "]  " + cause.getMessage() );
+            
+            cause = cause.getCause();
+        }
+        
         line();
-
+        
         if ( longMessage != null )
         {
             getLogger().info( longMessage );
