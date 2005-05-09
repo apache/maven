@@ -85,7 +85,7 @@ public class DefaultArtifactResolver
         }
         catch ( ArtifactPathFormatException e )
         {
-            throw new ArtifactResolutionException( "Error resolving artifact: ", e );
+            throw new ArtifactResolutionException( e.getMessage(), e );
         }
 
         artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
@@ -100,7 +100,7 @@ public class DefaultArtifactResolver
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                throw new ArtifactResolutionException( "Unable to transform artifact", e );
+                throw new ArtifactResolutionException( e.getMessage(), e );
             }
         }
 

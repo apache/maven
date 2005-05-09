@@ -16,17 +16,10 @@ package org.apache.maven.artifact.metadata;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.artifact.Artifact;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,20 +34,15 @@ import java.util.regex.Pattern;
  * @version $Id$
  */
 public class SnapshotArtifactMetadata
-    extends AbstractArtifactMetadata
-    implements Comparable
+    extends AbstractVersionArtifactMetadata
 {
     private String timestamp = null;
 
     private int buildNumber = 0;
 
-    private static final String SNAPSHOT_VERSION_FILE = "version.txt";
-
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
-
-    private long lastModified = 0;
 
     public static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
@@ -64,51 +52,6 @@ public class SnapshotArtifactMetadata
     public SnapshotArtifactMetadata( Artifact artifact )
     {
         super( artifact, artifact.getArtifactId() + "-" + artifact.getBaseVersion() + "." + SNAPSHOT_VERSION_FILE );
-    }
-
-    public static SnapshotArtifactMetadata readFromLocalRepository( Artifact artifact,
-                                                                    ArtifactRepository localRepository )
-        throws ArtifactPathFormatException, IOException
-    {
-        SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
-        File f = metadata.getLocalRepositoryLocation( localRepository );
-        if ( f.exists() )
-        {
-            metadata.readFromFile( f );
-        }
-        return metadata;
-    }
-
-    public void storeInLocalRepository( ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
-    {
-        try
-        {
-            if ( timestamp == null )
-            {
-                timestamp = getSessionTimestamp();
-            }
-            String path = getLocalRepositoryLocation( localRepository ).getPath();
-            File file = new File( path );
-            // TODO: this should be centralised before the resolution of the artifact
-            file.getParentFile().mkdirs();
-            FileUtils.fileWrite( path, constructVersion() );
-            lastModified = file.lastModified();
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
-        }
-    }
-
-    private File getLocalRepositoryLocation( ArtifactRepository localRepository )
-        throws ArtifactPathFormatException
-    {
-        return new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
     }
 
     public String constructVersion()
@@ -129,53 +72,9 @@ public class SnapshotArtifactMetadata
         return version;
     }
 
-    /**
-     * Retrieve the metadata from the remote repository into the local repository.
-     *
-     * @param remoteRepository the remote repository
-     * @param wagonManager     the wagon manager to use to retrieve the metadata
-     */
-    public static SnapshotArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
-                                                                         ArtifactRepository remoteRepository,
-                                                                         WagonManager wagonManager )
-        throws ArtifactMetadataRetrievalException
+    protected void setContent( String content )
     {
-        SnapshotArtifactMetadata snapshotMetadata = new SnapshotArtifactMetadata( artifact );
-
-        try
-        {
-            // TODO: shouldn't need a file intermediatary - improve wagon to take a stream
-            File destination = File.createTempFile( "maven-artifact", null );
-            destination.deleteOnExit();
-
-            wagonManager.getArtifactMetadata( snapshotMetadata, remoteRepository, destination );
-
-            snapshotMetadata.readFromFile( destination );
-        }
-        catch ( ResourceDoesNotExistException e )
-        {
-            // No problem...
-            // this just means that there is no snapshot version file, so we keep timestamp = null, build = 0
-        }
-        catch ( TransferFailedException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
-        }
-
-        return snapshotMetadata;
-    }
-
-    private void readFromFile( File file )
-        throws IOException
-    {
-        String version = FileUtils.fileRead( file );
-        lastModified = file.lastModified();
-
-        Matcher matcher = VERSION_FILE_PATTERN.matcher( version );
+        Matcher matcher = VERSION_FILE_PATTERN.matcher( content );
         if ( matcher.matches() )
         {
             timestamp = matcher.group( 2 );
@@ -235,11 +134,6 @@ public class SnapshotArtifactMetadata
         {
             return timestamp.compareTo( metadata.timestamp );
         }
-    }
-
-    public long getLastModified()
-    {
-        return lastModified;
     }
 
     public boolean newerThanFile( File file )

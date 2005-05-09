@@ -17,7 +17,9 @@ package org.apache.maven.artifact;
  */
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -293,5 +295,19 @@ public class DefaultArtifact
             }
         }
         return result;
+    }
+
+    public void updateVersion( String version, ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        setVersion( version );
+        try
+        {
+            setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );
+        }
+        catch ( ArtifactPathFormatException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
+        }
     }
 }

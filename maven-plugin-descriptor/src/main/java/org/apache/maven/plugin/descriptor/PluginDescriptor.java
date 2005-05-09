@@ -149,14 +149,6 @@ public class PluginDescriptor
         }
     }
 
-    /**
-     * @todo remove - harcoding. What about clashes?
-     */
-    public static String getDefaultPluginVersion()
-    {
-        return "1.0-SNAPSHOT";
-    }
-
     public String getGoalPrefix()
     {
         return goalPrefix;

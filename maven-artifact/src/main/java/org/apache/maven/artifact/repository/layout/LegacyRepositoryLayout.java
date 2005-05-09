@@ -68,11 +68,9 @@ public class LegacyRepositoryLayout
     public String pathOfMetadata( ArtifactMetadata metadata )
         throws ArtifactPathFormatException
     {
-        Artifact artifact = metadata.getArtifact();
-
         StringBuffer path = new StringBuffer();
 
-        path.append( artifact.getGroupId() ).append( "/poms/" );
+        path.append( metadata.getGroupId() ).append( "/poms/" );
         path.append( metadata.getFilename() );
 
         return path.toString();

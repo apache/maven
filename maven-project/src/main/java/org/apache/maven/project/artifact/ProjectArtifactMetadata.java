@@ -53,7 +53,12 @@ public class ProjectArtifactMetadata
 
     public String getFilename()
     {
-        return getArtifact().getArtifactId() + "-" + getArtifact().getVersion() + ".pom";
+        return getArtifactId() + "-" + getVersion() + ".pom";
+    }
+
+    public boolean exists()
+    {
+        return file.exists();
     }
 
     public void storeInLocalRepository( ArtifactRepository localRepository )
@@ -80,7 +85,7 @@ public class ProjectArtifactMetadata
 
             MavenXpp3Reader modelReader = new MavenXpp3Reader();
             Model model = modelReader.read( reader );
-            model.setVersion( getArtifact().getVersion() );
+            model.setVersion( getVersion() );
 
             MavenXpp3Writer modelWriter = new MavenXpp3Writer();
             modelWriter.write( writer, model );

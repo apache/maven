@@ -24,6 +24,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -70,7 +71,6 @@ public class DefaultPluginManager
     extends AbstractLogEnabled
     implements PluginManager, ComponentDiscoveryListener, Initializable, Contextualizable
 {
-
     protected Map pluginDescriptors;
 
     protected Map pluginDescriptorsByPrefix;
@@ -211,8 +211,7 @@ public class DefaultPluginManager
             {
                 if ( StringUtils.isEmpty( pluginConfig.getVersion() ) )
                 {
-                    // TODO: this is where we go searching the repo for more information
-                    version = PluginDescriptor.getDefaultPluginVersion();
+                    version = ReleaseArtifactTransformation.RELEASE_VERSION;
                 }
                 else
                 {
@@ -221,14 +220,16 @@ public class DefaultPluginManager
             }
         }
 
+        // TODO: this might result in an artifact "RELEASE" being resolved continuously
         if ( !isPluginInstalled( groupId, artifactId, version ) )
         {
             try
             {
                 Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version, null,
                                                                           MojoDescriptor.MAVEN_PLUGIN, null );
-
                 addPlugin( pluginArtifact, session );
+
+                version = pluginArtifact.getBaseVersion();
             }
             catch ( ArtifactEnabledContainerException e )
             {

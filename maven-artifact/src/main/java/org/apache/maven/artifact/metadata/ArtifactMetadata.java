@@ -19,6 +19,9 @@ package org.apache.maven.artifact.metadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.io.File;
+import java.util.Date;
+
 /**
  * Contains metadata about an artifact, and methods to retrieve/store it from an artifact repository.
  *
@@ -39,19 +42,11 @@ public interface ArtifactMetadata
         throws ArtifactMetadataRetrievalException;
 
     /**
-     * Get the associated artifact.
-     *
-     * @return the artifact
-     */
-    Artifact getArtifact();
-
-    /**
      * Get the filename of this metadata.
      *
      * @return the filename
      */
     String getFilename();
-
 
     /**
      * Set the associated artifact.
@@ -60,4 +55,18 @@ public interface ArtifactMetadata
      * @todo prefer not to have this, and just modify the artifacts as they are transformed
      */
     void setArtifact( Artifact artifact );
+
+    /**
+     * Whether the artifact metadata exists.
+     * @return true or false
+     */
+    boolean exists();
+
+    String getGroupId();
+
+    String getArtifactId();
+
+    String getVersion();
+
+    String getBaseVersion();
 }

@@ -22,6 +22,7 @@
      -->
     <component>
       <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>snapshot</role-hint>
       <implementation>org.apache.maven.artifact.transform.SnapshotTransformation</implementation>
       <requirements>
         <requirement>
@@ -30,6 +31,16 @@
       </requirements>
     </component>
 
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>release</role-hint>
+      <implementation>org.apache.maven.artifact.transform.ReleaseArtifactTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
     <!--
      |
      | Resolver

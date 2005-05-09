@@ -17,7 +17,9 @@ package org.apache.maven.artifact;
  */
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 
 import java.io.File;
 import java.util.List;
@@ -85,4 +87,7 @@ public interface Artifact
     void setRepository( ArtifactRepository remoteRepository );
 
     ArtifactRepository getRepository();
+
+    void updateVersion( String version, ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException;
 }

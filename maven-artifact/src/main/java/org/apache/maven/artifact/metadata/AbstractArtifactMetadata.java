@@ -42,13 +42,28 @@ public abstract class AbstractArtifactMetadata
         this.artifact = artifact;
     }
 
-    public Artifact getArtifact()
-    {
-        return artifact;
-    }
-
     public String getFilename()
     {
         return filename;
+    }
+
+    public String getGroupId()
+    {
+        return artifact.getGroupId();
+    }
+
+    public String getArtifactId()
+    {
+        return artifact.getArtifactId();
+    }
+
+    public String getVersion()
+    {
+        return artifact.getVersion();
+    }
+
+    public String getBaseVersion()
+    {
+        return artifact.getBaseVersion();
     }
 }

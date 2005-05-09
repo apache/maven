@@ -17,21 +17,16 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
+import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.io.File;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 
 /**
@@ -41,15 +36,9 @@ import java.util.regex.Matcher;
  *          jvanzyl Exp $
  */
 public class SnapshotTransformation
-    extends AbstractLogEnabled
-    implements ArtifactTransformation
+    extends AbstractVersionTransformation
 {
-    private WagonManager wagonManager;
-
-    /**
-     * @todo very primitve. Probably we can cache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
-     */
-    private static Set resolvedArtifactCache = new HashSet();
+    public static final String SNAPSHOT_VERSION = "SNAPSHOT";
 
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
@@ -58,157 +47,13 @@ public class SnapshotTransformation
         if ( m.matches() )
         {
             // This corrects the base version, but ensure it is not resolved again
-            artifact.setBaseVersion( m.group( 1 ) + "-SNAPSHOT" );
+            artifact.setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
         }
         else if ( isSnapshot( artifact ) )
         {
-            SnapshotArtifactMetadata localMetadata;
-            try
-            {
-                localMetadata = SnapshotArtifactMetadata.readFromLocalRepository( artifact, localRepository );
-            }
-            catch ( ArtifactPathFormatException e )
-            {
-                throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
-            }
-            catch ( IOException e )
-            {
-                throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
-            }
-
-            boolean alreadyResolved = alreadyResolved( artifact );
-            if ( !alreadyResolved )
-            {
-                boolean checkedUpdates = false;
-                for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
-                {
-                    ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
-
-                    String snapshotPolicy = remoteRepository.getSnapshotPolicy();
-                    // TODO: should be able to calculate this less often
-                    boolean checkForUpdates = false;
-                    if ( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS.equals( snapshotPolicy ) )
-                    {
-                        checkForUpdates = true;
-                    }
-                    else if ( ArtifactRepository.SNAPSHOT_POLICY_DAILY.equals( snapshotPolicy ) )
-                    {
-                        // Note that if last modified is 0, it didn't exist, so this will be true
-                        if ( getMidnightBoundary().after( new Date( localMetadata.getLastModified() ) ) )
-                        {
-                            checkForUpdates = true;
-                        }
-                    }
-                    else if ( snapshotPolicy.startsWith( ArtifactRepository.SNAPSHOT_POLICY_INTERVAL ) )
-                    {
-                        String s = snapshotPolicy.substring( ArtifactRepository.SNAPSHOT_POLICY_INTERVAL.length() + 1 );
-                        int minutes = Integer.valueOf( s ).intValue();
-                        Calendar cal = Calendar.getInstance();
-                        cal.add( Calendar.MINUTE, -minutes );
-                        // Note that if last modified is 0, it didn't exist, so this will be true
-                        if ( cal.getTime().after( new Date( localMetadata.getLastModified() ) ) )
-                        {
-                            checkForUpdates = true;
-                        }
-                    }
-                    // else assume "never"
-
-                    if ( checkForUpdates )
-                    {
-                        getLogger().info(
-                            artifact.getArtifactId() + ": checking for updates from " + remoteRepository.getId() );
-
-                        SnapshotArtifactMetadata remoteMetadata = SnapshotArtifactMetadata.retrieveFromRemoteRepository(
-                            artifact, remoteRepository, wagonManager );
-
-                        int difference = remoteMetadata.compareTo( localMetadata );
-                        if ( difference > 0 )
-                        {
-                            // remote is newer
-                            artifact.setRepository( remoteRepository );
-
-                            localMetadata = remoteMetadata;
-
-                            checkedUpdates = true;
-                        }
-                        else if ( difference == 0 )
-                        {
-                            // Identical, simply touch the file to prevent re-checking
-                            checkedUpdates = true;
-                        }
-                    }
-                }
-
-                if ( checkedUpdates )
-                {
-                    localMetadata.storeInLocalRepository( localRepository );
-                }
-
-                resolvedArtifactCache.add( getCacheKey( artifact ) );
-            }
-
-            String version = localMetadata.constructVersion();
-
-            // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
-            if ( !artifact.getFile().exists() || localMetadata.newerThanFile( artifact.getFile() ) )
-            {
-                if ( getLogger().isInfoEnabled() && !alreadyResolved )
-                {
-                    if ( !version.equals( artifact.getBaseVersion() ) )
-                    {
-                        String message = artifact.getArtifactId() + ": resolved to version " + version;
-                        if ( artifact.getRepository() != null )
-                        {
-                            message += " from repository " + artifact.getRepository().getId();
-                        }
-                        else
-                        {
-                            message += " from local repository";
-                        }
-                        getLogger().info( message );
-                    }
-                }
-
-                artifact.setVersion( version );
-                try
-                {
-                    artifact.setFile( new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) ) );
-                }
-                catch ( ArtifactPathFormatException e )
-                {
-                    throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
-                }
-            }
-            else
-            {
-                if ( getLogger().isInfoEnabled() && !alreadyResolved )
-                {
-                    // Locally installed file is newer, don't use the resolved version
-                    getLogger().info( artifact.getArtifactId() + ": using locally installed snapshot" );
-                }
-            }
+            String version = resolveVersion( artifact, localRepository, remoteRepositories );
+            artifact.updateVersion( version, localRepository );
         }
-    }
-
-    private Date getMidnightBoundary()
-    {
-        Calendar cal = Calendar.getInstance();
-        cal.set( Calendar.HOUR_OF_DAY, 0 );
-        cal.set( Calendar.MINUTE, 0 );
-        cal.set( Calendar.SECOND, 0 );
-        cal.set( Calendar.MILLISECOND, 0 );
-        return cal.getTime();
-    }
-
-    private boolean alreadyResolved( Artifact artifact )
-    {
-        return resolvedArtifactCache.contains( getCacheKey( artifact ) );
-    }
-
-    private static String getCacheKey( Artifact artifact )
-    {
-        // No type - one per POM
-        return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
@@ -217,13 +62,12 @@ public class SnapshotTransformation
         Matcher m = SnapshotArtifactMetadata.VERSION_FILE_PATTERN.matcher( artifact.getBaseVersion() );
         if ( m.matches() )
         {
-            artifact.setBaseVersion( m.group( 1 ) + "-SNAPSHOT" );
+            artifact.setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
         }
         try
         {
-            SnapshotArtifactMetadata metadata = SnapshotArtifactMetadata.readFromLocalRepository( artifact,
-                                                                                                  localRepository );
-            if ( metadata.getLastModified() == 0 )
+            VersionArtifactMetadata metadata = readFromLocalRepository( artifact, localRepository );
+            if ( !metadata.exists() )
             {
                 // doesn't exist - create to avoid an old snapshot download later
                 metadata.storeInLocalRepository( localRepository );
@@ -246,13 +90,12 @@ public class SnapshotTransformation
         if ( m.matches() )
         {
             // This corrects the base version, but ensure it is not updated again
-            artifact.setBaseVersion( m.group( 1 ) + "-SNAPSHOT" );
+            artifact.setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
         }
         else if ( isSnapshot( artifact ) )
         {
-            SnapshotArtifactMetadata metadata = SnapshotArtifactMetadata.retrieveFromRemoteRepository( artifact,
-                                                                                                       remoteRepository,
-                                                                                                       wagonManager );
+            SnapshotArtifactMetadata metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact,
+                                                                                                         remoteRepository );
             metadata.update();
 
             artifact.setVersion( metadata.constructVersion() );
@@ -263,6 +106,31 @@ public class SnapshotTransformation
 
     private static boolean isSnapshot( Artifact artifact )
     {
-        return artifact.getVersion().endsWith( "SNAPSHOT" );
+        return artifact.getVersion().endsWith( SNAPSHOT_VERSION );
+    }
+
+    protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
+                                                                    ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
+        try
+        {
+            metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            // No problem...
+            // this just means that there is no snapshot version file, so we keep timestamp = null, build = 0
+        }
+        return metadata;
+    }
+
+    protected VersionArtifactMetadata readFromLocalRepository( Artifact artifact, ArtifactRepository localRepository )
+        throws IOException, ArtifactPathFormatException
+    {
+        SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
+        metadata.readFromLocalRepository( localRepository );
+        return metadata;
     }
 }

@@ -57,6 +57,4 @@ public interface MavenProjectBuilder
 
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
-
-    ArtifactResolver getArtifactResolver();
 }

@@ -21,6 +21,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 
 /**
  * @author jdcasey
@@ -72,15 +73,16 @@ public class DefaultRepositoryLayout
     public String pathOfMetadata( ArtifactMetadata metadata )
         throws ArtifactPathFormatException
     {
-        Artifact artifact = metadata.getArtifact();
-
         StringBuffer path = new StringBuffer();
 
-        path.append( artifact.getGroupId().replace( '.', '/' ) ).append( '/' );
+        path.append( metadata.getGroupId().replace( '.', '/' ) ).append( '/' );
 //        if ( !artifact.getType().equals( "pom" ) )
 //        {
-        path.append( artifact.getArtifactId() ).append( '/' );
-        path.append( artifact.getBaseVersion() ).append( '/' );
+        path.append( metadata.getArtifactId() ).append( '/' );
+        if ( !metadata.getBaseVersion().equals( ReleaseArtifactTransformation.RELEASE_VERSION ) )
+        {
+            path.append( metadata.getBaseVersion() ).append( '/' );
+        }
 //        }
 
         path.append( metadata.getFilename() );

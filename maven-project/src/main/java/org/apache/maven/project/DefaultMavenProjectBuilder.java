@@ -499,15 +499,6 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    /**
-     * @return
-     * @todo remove
-     */
-    public ArtifactResolver getArtifactResolver()
-    {
-        return artifactResolver;
-    }
-
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
