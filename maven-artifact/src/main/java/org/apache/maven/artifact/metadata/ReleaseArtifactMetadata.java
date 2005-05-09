@@ -47,6 +47,7 @@ public class ReleaseArtifactMetadata
     {
         ReleaseArtifactMetadata metadata = (ReleaseArtifactMetadata) o;
 
+        // TODO: we need some more complicated version comparison
         if ( version == null )
         {
             if ( metadata.version == null )
@@ -58,9 +59,17 @@ public class ReleaseArtifactMetadata
                 return -1;
             }
         }
-
-        // TODO: we need some more complicated version comparison
-        return version.compareTo( metadata.version );
+        else
+        {
+            if ( metadata.version == null )
+            {
+                return 1;
+            }
+            else
+            {
+                return version.compareTo( metadata.version );
+            }
+        }
     }
 
     public boolean newerThanFile( File file )
