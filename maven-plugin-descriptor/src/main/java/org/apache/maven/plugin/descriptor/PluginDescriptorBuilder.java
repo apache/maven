@@ -22,10 +22,17 @@ public class PluginDescriptorBuilder
     public PluginDescriptor build( Reader reader )
         throws PlexusConfigurationException
     {
+        return build( reader, null );
+    }
+
+    public PluginDescriptor build( Reader reader, String source )
+        throws PlexusConfigurationException
+    {
         PlexusConfiguration c = buildConfiguration( reader );
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
 
+        pluginDescriptor.setSource( source );
         pluginDescriptor.setGroupId( c.getChild( "groupId" ).getValue() );
         pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
         pluginDescriptor.setVersion( c.getChild( "version" ).getValue() );

@@ -47,6 +47,6 @@ public class MavenPluginDiscoverer
     public ComponentSetDescriptor createComponentDescriptors( Reader componentDescriptorConfiguration, String source )
         throws PlexusConfigurationException
     {
-        return builder.build( componentDescriptorConfiguration );
+        return builder.build( componentDescriptorConfiguration, source );
     }
 }

@@ -39,6 +39,8 @@ public class PluginDescriptor
 
     private String goalPrefix;
 
+    private String source;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -109,7 +111,7 @@ public class PluginDescriptor
         String id = constructPluginKey( groupId, artifactId, version );
         if ( groupId == null || artifactId == null || version == null )
         {
-            throw new IllegalStateException( "Plugin descriptor ID incomplete: " + id );
+            throw new IllegalStateException( "Plugin descriptor ID incomplete: " + id + " in " + getSource() );
         }
         return id;
     }
@@ -173,5 +175,15 @@ public class PluginDescriptor
     public String getVersion()
     {
         return version;
+    }
+
+    public void setSource( String source )
+    {
+        this.source = source;
+    }
+
+    public String getSource()
+    {
+        return source;
     }
 }
