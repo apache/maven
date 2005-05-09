@@ -127,7 +127,8 @@ if "%MAVEN_OPTS%"=="" SET MAVEN_OPTS="-Xmx256m"
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
 @REM Start MAVEN2
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath "%M2_HOME%"\core\boot\classworlds-* "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
+for %%i in ("%M2_HOME%"\core\boot\classworlds-*) do set CLASSWORLDS_JAR="%%i"
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" org.codehaus.classworlds.Launcher %MAVEN_CMD_LINE_ARGS%
 goto end
 
 :error
