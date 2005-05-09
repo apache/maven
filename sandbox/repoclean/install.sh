@@ -65,8 +65,6 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
     cp -f $2/org/apache/maven/wagon/wagon-file/1.0-alpha-2/wagon-file-1.0-alpha-2.jar $1/lib
 
-    cp -f $2/org/apache/maven/wagon/wagon-http-lightweight/1.0-alpha-2/wagon-http-lightweight-1.0-alpha-2.jar $1/lib
-
     echo "Copying startup script, and changing its permissions to '+x'..."
     echo ""
     

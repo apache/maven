@@ -18,6 +18,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.tools.repoclean.report.PathLister;
 import org.apache.maven.tools.repoclean.report.Reporter;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -293,18 +294,23 @@ public class LegacyArtifactDiscoverer
             }
             else
             {
-                result = artifactFactory.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME, type );
+                if ( StringUtils.isNotEmpty( groupId ) && StringUtils.isNotEmpty( artifactId )
+                    && StringUtils.isNotEmpty( version ) && StringUtils.isNotEmpty( type ) )
+                {
+                    result = artifactFactory
+                        .createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME, type );
+                }
             }
 
-            getLogger().debug(
-                               "Resulting artifact is: " + result.getId() + " and has classifier of: "
-                                   + result.getClassifier() + "\n\n" );
+//            getLogger().debug(
+//                               "Resulting artifact is: " + result + " and has classifier of: "
+//                                   + result.getClassifier() + "\n\n" );
 
             return result;
         }
         catch ( RuntimeException e )
         {
-            getLogger().error( "While parsing artifact path: \'" + path + "\'...\n\n", e );
+            getLogger().error( "While parsing artifact path: \'" + path + "\'...", e );
 
             throw e;
         }

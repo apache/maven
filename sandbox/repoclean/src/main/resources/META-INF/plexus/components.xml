@@ -5,18 +5,44 @@
       <implementation>org.apache.maven.tools.repoclean.RepositoryCleaner</implementation>
       <requirements>
         <requirement>
+          <role>org.apache.maven.tools.repoclean.index.ArtifactIndexer</role>
+        </requirement>
+        <requirement>
+          <role>org.codehaus.plexus.mailsender.MailSender</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.tools.repoclean.phase.DiscoveryPhase</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.tools.repoclean.phase.RewritePhase</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.repoclean.phase.DiscoveryPhase</role>
+      <implementation>org.apache.maven.tools.repoclean.phase.DiscoveryPhase</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.repoclean.phase.RewritePhase</role>
+      <implementation>org.apache.maven.tools.repoclean.phase.RewritePhase</implementation>
+      <requirements>
+        <requirement>
           <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
           <role-hint>alpha-bridging</role-hint>
           <field-name>bridgingLayout</field-name>
         </requirement>
         <requirement>
           <role>org.apache.maven.tools.repoclean.digest.DigestVerifier</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.tools.repoclean.index.ArtifactIndexer</role>
-        </requirement>
-        <requirement>
-          <role>org.codehaus.plexus.mailsender.MailSender</role>
         </requirement>
       </requirements>
     </component>
