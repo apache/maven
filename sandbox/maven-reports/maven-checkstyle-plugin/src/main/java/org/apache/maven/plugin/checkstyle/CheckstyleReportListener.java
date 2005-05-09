@@ -59,9 +59,9 @@ public class CheckstyleReportListener
         sink.body();
 
         sink.section1();
-        sink.sectionTitle();
+        sink.sectionTitle1();
         sink.text( TITLE );
-        sink.sectionTitle_();
+        sink.sectionTitle1_();
 
         sink.paragraph();
         sink.text( "The following document contains the results of " );
@@ -73,9 +73,9 @@ public class CheckstyleReportListener
         // TODO overall summary
 
         sink.section1_();
-        sink.sectionTitle();
+        sink.sectionTitle1();
         sink.text( "Files" );
-        sink.sectionTitle_();
+        sink.sectionTitle1_();
 
         // TODO files summary
     }
@@ -109,9 +109,9 @@ public class CheckstyleReportListener
             if ( !fileInitialized )
             {
                 sink.section2();
-                sink.sectionTitle();
+                sink.sectionTitle2();
                 sink.text( currentFilename );
-                sink.sectionTitle_();
+                sink.sectionTitle2_();
 
                 sink.table();
                 sink.tableRow();

@@ -63,6 +63,16 @@ public class PmdReport
         // Mac
         "**/.DS_Store"};
 
+    public String getName()
+    {
+        return "PMD report";
+    }
+
+    public String getDescription()
+    {
+        return "Verification of coding rules.";
+    }
+
     public void execute()
         throws MavenReportException
     {

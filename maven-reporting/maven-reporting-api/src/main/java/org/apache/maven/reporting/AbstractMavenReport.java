@@ -74,4 +74,9 @@ public abstract class AbstractMavenReport
     {
         return sink;
     }
+
+    public String getCategoryName()
+    {
+        return CATEGORY_PROJECT_REPORTS;
+    }
 }

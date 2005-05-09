@@ -28,6 +28,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.ArrayList;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -110,17 +111,23 @@ public class DoxiaMojo
      */
     private List remoteRepositories;
 
+    private List projectInfos = new ArrayList();
+    private List projectReports = new ArrayList();
+
     public void execute()
         throws MojoExecutionException
     {
         try
         {
+            categorizeReports();
+
             MavenReportConfiguration config = new MavenReportConfiguration();
 
             config.setModel( project.getModel() );
 
             config.setOutputDirectory( new File( generatedSiteDirectory ) );
 
+            //Generate reports
             if ( reports != null )
             {
                 for ( Iterator i = reports.keySet().iterator(); i.hasNext(); )
@@ -141,8 +148,35 @@ public class DoxiaMojo
                 }
             }
 
-            siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour,
-                                 getSiteDescriptor() );
+            //Generate overview pages
+            if ( projectInfos.size() > 0 )
+            {
+                try
+                {
+                    generateProjectInfoPage( getSiteDescriptor() );
+                }
+                catch ( Exception e )
+                {
+                    e.printStackTrace();
+                    throw new MojoExecutionException( "An error is occurred in project info page generation.", e );
+                }
+            }
+
+            if ( projectReports.size() > 0 )
+            {
+                try
+                {
+                    generateProjectReportsPage( getSiteDescriptor() );
+                }
+                catch ( Exception e )
+                {
+                    e.printStackTrace();
+                    throw new MojoExecutionException( "An error is occurred in project reports page generation.", e );
+                }
+            }
+
+            //Generate static site
+            siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour, getSiteDescriptor() );
         }
         catch ( Exception e )
         {
@@ -151,21 +185,67 @@ public class DoxiaMojo
         }
     }
 
+    private void categorizeReports()
+        throws MojoExecutionException
+    {
+        for ( Iterator i = reports.values().iterator(); i.hasNext(); )
+        {
+            MavenReport report = (MavenReport) i.next();
+            if ( MavenReport.CATEGORY_PROJECT_INFORMATION.equals( report.getCategoryName() ) )
+            {
+                projectInfos.add( report );
+            }
+            else if ( MavenReport.CATEGORY_PROJECT_REPORTS.equals( report.getCategoryName() ) )
+            {
+                projectReports.add( report );
+            }
+            else
+            {
+                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for " +
+                                                  report.getName() + " mojo isn't valid." );
+            }
+        }
+    }
+
     private String getReportsMenu()
+        throws MojoExecutionException
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"Project Documentation\">\n" );
         buffer.append( "    <item name=\"About " + project.getName() + "\" href=\"/index.html\"/>\n");
-        buffer.append( "    <item name=\"Project reports\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
 
-        for ( Iterator i = reports.keySet().iterator(); i.hasNext(); )
+        if ( projectInfos.size() > 0 )
         {
-            String reportKey = (String) i.next();
-            buffer.append( "        <item name=\"" + reportKey + "\" href=\"/" + reportKey + ".html\"/>\n" );
+            buffer.append( "    <item name=\"" + MavenReport.CATEGORY_PROJECT_INFORMATION +
+                           "\" href=\"/project-info.html\" collapse=\"true\">\n" );
+
+            for ( Iterator i = projectInfos.iterator(); i.hasNext(); )
+            {
+                MavenReport report = (MavenReport) i.next();
+                buffer.append( "        <item name=\"" + report.getName() + "\" href=\"/" +
+                               report.getOutputName() + ".html\"/>\n" );
+            }
+
+            buffer.append( "    </item>\n" );
         }
 
-        buffer.append( "    </item>\n" );
+        if ( projectReports.size() > 0 )
+        {
+            buffer.append( "    <item name=\"" + MavenReport.CATEGORY_PROJECT_REPORTS +
+                           "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
+
+            for ( Iterator i = projectReports.iterator(); i.hasNext(); )
+            {
+                MavenReport report = (MavenReport) i.next();
+                buffer.append( "        <item name=\"" + report.getName() + "\" href=\"/" +
+                               report.getOutputName() + ".html\"/>\n" );
+            }
+
+            buffer.append( "    </item>\n" );
+        }
+
         buffer.append( "</menu>\n" );
+
         return buffer.toString();
     }
 
@@ -198,7 +278,150 @@ public class DoxiaMojo
         }
 
         siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
-
+        
         return new StringInputStream( siteDescriptorContent );
+    }
+
+    private void generateProjectInfoPage( InputStream siteDescriptor )
+        throws Exception
+    {
+        XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), siteDirectory,
+                                                  "project-info.html",
+                                                  outputDirectory, siteDescriptor, flavour );
+
+        String title = "General Project Information";
+
+        sink.head();
+        sink.title();
+        sink.text( title );
+        sink.title_();
+        sink.head_();
+        sink.body();
+
+        sink.section1();
+        sink.sectionTitle1();
+        sink.text( title );
+        sink.sectionTitle1_();
+
+        sink.paragraph();
+        sink.text( "This document provides an overview of the various documents and links that are part " +
+                   "of this project's general information. All of this content is automatically generated by ");
+        sink.link( "http://maven.apache.org" );
+        sink.text( "Maven" );
+        sink.link_();
+        sink.text( " on behalf of the project." );
+        sink.paragraph_();
+
+        sink.section2();
+
+        sink.sectionTitle2();
+        sink.text( "Overview" );
+        sink.sectionTitle2_();
+
+        sink.table();
+
+        sink.tableRow();
+        sink.tableHeaderCell();
+        sink.text( "Document" );
+        sink.tableHeaderCell_();
+        sink.tableHeaderCell();
+        sink.text( "Description" );
+        sink.tableHeaderCell_();
+        sink.tableRow_();
+
+        for ( Iterator i = projectInfos.iterator(); i.hasNext(); )
+        {
+            MavenReport report = (MavenReport) i.next();
+
+            sink.tableRow();
+            sink.tableCell();
+            sink.link( report.getOutputName() + ".html" );
+            sink.text( report.getName() );
+            sink.link_();
+            sink.tableCell_();
+            sink.tableCell();
+            sink.text( report.getDescription() );
+            sink.tableCell_();
+            sink.tableRow_();
+        }
+
+        sink.table_();
+        
+        sink.section2_();
+
+        sink.section1_();
+
+        sink.body_();
+    }
+
+    private void generateProjectReportsPage( InputStream siteDescriptor)
+        throws Exception
+    {
+        XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), siteDirectory,
+                                                  "maven-reports.html",
+                                                  outputDirectory, siteDescriptor, flavour );
+
+        String title = "Maven Generated Reports";
+
+        sink.head();
+        sink.title();
+        sink.text( title );
+        sink.title_();
+        sink.head_();
+        sink.body();
+
+        sink.section1();
+        sink.sectionTitle1();
+        sink.text( title );
+        sink.sectionTitle1_();
+
+        sink.paragraph();
+        sink.text( "This document provides an overview of the various reports that are automatically generated by " );
+        sink.link( "http://maven.apache.org" );
+        sink.text( "Maven" );
+        sink.link_();
+        sink.text( ". Each report is briefly described below." );
+        sink.paragraph_();
+
+        sink.section2();
+
+        sink.sectionTitle2();
+        sink.text( "Overview" );
+        sink.sectionTitle2_();
+
+        sink.table();
+
+        sink.tableRow();
+        sink.tableHeaderCell();
+        sink.text( "Document" );
+        sink.tableHeaderCell_();
+        sink.tableHeaderCell();
+        sink.text( "Description" );
+        sink.tableHeaderCell_();
+        sink.tableRow_();
+
+        for ( Iterator i = projectReports.iterator(); i.hasNext(); )
+        {
+            MavenReport report = (MavenReport) i.next();
+
+            sink.tableRow();
+            sink.tableCell();
+            sink.link( report.getOutputName() + ".html" );
+            sink.text( report.getName() );
+            sink.link_();
+            sink.tableCell_();
+            sink.tableCell();
+            sink.text( report.getDescription() );
+            sink.tableCell_();
+            sink.tableRow_();
+        }
+
+        sink.table_();
+        
+        sink.section2_();
+
+        sink.section1_();
+
+        sink.body_();
     }
 }

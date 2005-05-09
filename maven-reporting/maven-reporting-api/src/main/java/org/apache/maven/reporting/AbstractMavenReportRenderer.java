@@ -73,18 +73,23 @@ public abstract class AbstractMavenReportRenderer
         {
             case 1:
                 sink.section1();
+                sink.sectionTitle1();
                 break;
             case 2:
                 sink.section2();
+                sink.sectionTitle2();
                 break;
             case 3:
                 sink.section3();
+                sink.sectionTitle3();
                 break;
             case 4:
                 sink.section4();
+                sink.sectionTitle4();
                 break;
             case 5:
                 sink.section5();
+                sink.sectionTitle5();
                 break;
 
             default:
@@ -92,11 +97,30 @@ public abstract class AbstractMavenReportRenderer
                 break;
         }
 
-        sink.sectionTitle();
-
         sink.text( name );
 
-        sink.sectionTitle_();
+        switch ( section )
+        {
+            case 1:
+                sink.sectionTitle1_();
+                break;
+            case 2:
+                sink.sectionTitle2_();
+                break;
+            case 3:
+                sink.sectionTitle3_();
+                break;
+            case 4:
+                sink.sectionTitle4_();
+                break;
+            case 5:
+                sink.sectionTitle5_();
+                break;
+
+            default:
+                // TODO: warning - just don't start a section
+                break;
+        }
     }
 
     protected void endSection()

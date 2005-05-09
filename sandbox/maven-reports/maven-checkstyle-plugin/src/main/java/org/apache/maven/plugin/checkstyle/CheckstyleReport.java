@@ -76,6 +76,16 @@ public class CheckstyleReport
 
     private boolean failedOnError = false;
 
+    public String getName()
+    {
+        return "Checkstyle";
+    }
+
+    public String getDescription()
+    {
+        return "Report on coding style conventions.";
+    }
+
     public void execute()
         throws MavenReportException
     {
@@ -91,6 +101,8 @@ public class CheckstyleReport
             File resultFile = new File( getConfiguration().getOutputDirectory(), resultFileName );
             try
             {
+                File parentFile = resultFile.getParentFile();
+                parentFile.mkdirs();
                 out = new FileOutputStream( resultFile );
             }
             catch( IOException e )

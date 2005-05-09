@@ -32,6 +32,10 @@ public interface MavenReport
 {
     String ROLE = MavenReport.class.getName();
 
+    String CATEGORY_PROJECT_INFORMATION = "Project Info";
+
+    String CATEGORY_PROJECT_REPORTS = "Project Reports";
+
     MavenReportConfiguration getConfiguration();
 
     void setConfiguration( MavenReportConfiguration config );
@@ -40,6 +44,12 @@ public interface MavenReport
         throws MavenReportException;
 
     String getOutputName();
+
+    String getName();
+
+    String getCategoryName();
+
+    String getDescription();
 
     Sink getSink()
         throws IOException;

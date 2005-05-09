@@ -69,9 +69,9 @@ public class PmdReportListener
         sink.body();
 
         sink.section1();
-        sink.sectionTitle();
+        sink.sectionTitle1();
         sink.text( TITLE );
-        sink.sectionTitle_();
+        sink.sectionTitle1_();
 
         sink.paragraph();
         sink.text( "The following document contains the results of " );
@@ -83,9 +83,9 @@ public class PmdReportListener
         // TODO overall summary
 
         sink.section1_();
-        sink.sectionTitle();
+        sink.sectionTitle1();
         sink.text( "Files" );
-        sink.sectionTitle_();
+        sink.sectionTitle1_();
 
         // TODO files summary
     }
@@ -93,9 +93,9 @@ public class PmdReportListener
     public void beginFile( File file )
     {
         sink.section2();
-        sink.sectionTitle();
+        sink.sectionTitle2();
         sink.text( file.getPath() );
-        sink.sectionTitle_();
+        sink.sectionTitle2_();
 
         sink.table();
         sink.tableRow();

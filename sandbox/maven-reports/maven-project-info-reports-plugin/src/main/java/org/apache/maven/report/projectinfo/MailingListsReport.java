@@ -33,6 +33,21 @@ import java.util.Iterator;
 public class MailingListsReport
     extends AbstractMavenReport
 {
+    public String getName()
+    {
+        return "Mailing Lists";
+    }
+
+    public String getCategoryName()
+    {
+        return CATEGORY_PROJECT_INFORMATION;
+    }
+
+    public String getDescription()
+    {
+        return "This document provides subscription and archive information for this project's mailing lists.";
+    }
+
     public void execute()
         throws MavenReportException
     {

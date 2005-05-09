@@ -34,6 +34,21 @@ import java.util.Iterator;
 public class DependenciesReport
     extends AbstractMavenReport
 {
+    public String getName()
+    {
+        return "Dependencies";
+    }
+
+    public String getCategoryName()
+    {
+        return CATEGORY_PROJECT_INFORMATION;
+    }
+
+    public String getDescription()
+    {
+        return "This document lists the projects dependencies and provides information on each dependency.";
+    }
+
     public void execute()
         throws MavenReportException
     {
@@ -76,20 +91,30 @@ public class DependenciesReport
         {
             startSection( getTitle() );
 
-            startTable();
-
-            tableCaption( "Declared Dependencies" );
-
-            tableHeader( new String[]{"GroupId", "ArtifactId", "Version"} );
-
-            for ( Iterator i = model.getDependencies().iterator(); i.hasNext(); )
+            if ( model.getDependencies().isEmpty() )
             {
-                Dependency d = (Dependency) i.next();
-
-                tableRow( new String[]{d.getGroupId(), d.getArtifactId(), d.getVersion()} );
+                // TODO: should the report just be excluded?
+                paragraph( "There are no dependencies for this project. It is a standalone " +
+                           "application that does not depend on any other project." );
             }
+            else
+            {
+                startTable();
 
-            endTable();
+                tableCaption( "The following is a list of dependencies for this project. These dependencies " +
+                              "are required to compile and run the application:" );
+
+                tableHeader( new String[]{"GroupId", "ArtifactId", "Version"} );
+
+                for ( Iterator i = model.getDependencies().iterator(); i.hasNext(); )
+                {
+                    Dependency d = (Dependency) i.next();
+
+                    tableRow( new String[]{d.getGroupId(), d.getArtifactId(), d.getVersion()} );
+                }
+
+                endTable();
+            }
 
             endSection();
         }
