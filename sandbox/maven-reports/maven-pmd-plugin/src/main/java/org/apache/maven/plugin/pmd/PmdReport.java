@@ -127,6 +127,7 @@ public class PmdReport
                 // TODO: lazily call beginFile in case there are no rules
 
                 reportSink.beginFile( file );
+                ruleContext.setSourceCodeFilename( file.getAbsolutePath() );
                 pmd.processFile( fileReader, ruleSet, ruleContext );
                 reportSink.endFile( file );
             }
