@@ -6,6 +6,7 @@
 JAVACMD=$JAVA_HOME/bin/java
 
 ARGS="$@"
+ORIG_ARGS="$ARGS"
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;
@@ -64,7 +65,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo
   echo "Running maven-core integration tests ..."
   echo 
-  ./maven-core-it.sh $ARGS
+  ./maven-core-it.sh "$ORIG_ARGS"
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi

@@ -9,7 +9,7 @@ verifier=org.apache.maven.it.Verifier
 jvm_args="$@"
 
 if [ ! -z "$MAVEN_OPTS" ]; then
-  jvm_args="$jvm_args $MAVEN_OPTS"
+  jvm_args="$MAVEN_OPTS $jvm_args"
 fi
 
 # OS specific support.  $var _must_ be set to either true or false.
