@@ -847,6 +847,13 @@ public class MavenProject
                 }
             }
         }
+
+        if ( dom != null )
+        {
+            // make a copy so the original in the POM doesn't get messed with
+            dom = new Xpp3Dom( dom );
+        }
+
         return dom;
     }
 
