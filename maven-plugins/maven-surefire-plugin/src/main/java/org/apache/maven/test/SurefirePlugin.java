@@ -25,6 +25,7 @@ import org.codehaus.surefire.SurefireBooter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -40,7 +41,7 @@ import java.util.StringTokenizer;
 public class SurefirePlugin
     extends AbstractMojo
 {
-    
+
     /**
      * @parameter expression="${basedir}"
      * @required
@@ -68,14 +69,14 @@ public class SurefirePlugin
 
     /**
      * Base directory where all reports are written to.
-     * 
+     *
      * @parameter expression="${project.build.directory}/surefire-reports"
      */
     private String reportsDirectory;
 
     /**
      * Specify this parameter if you want to use the test regex notation to select tests to run.
-     * 
+     *
      * @parameter
      */
     private String test;
@@ -83,12 +84,12 @@ public class SurefirePlugin
     /**
      * @parameter
      */
-    private List includes;
+    private List includes = new ArrayList( Collections.singletonList( "**/*Test.java" ) );
 
     /**
      * @parameter
      */
-    private List excludes;
+    private List excludes = new ArrayList( Collections.singletonList( "**/Abstract*Test.java" ) );
 
     /**
      * @parameter expression="${localRepository}"

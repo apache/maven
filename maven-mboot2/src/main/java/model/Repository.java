@@ -107,7 +107,11 @@ public class Repository
             repositoryPath = dependency.getGroupId().replace( '.', '/' );
 //            if ( !dependency.getType().equals( "pom" ) )
 //            {
-            repositoryPath = repositoryPath + "/" + dependency.getArtifactId() + "/" + dependency.getVersion();
+            repositoryPath = repositoryPath + "/" + dependency.getArtifactId();
+            if ( version != null )
+            {
+                repositoryPath = repositoryPath + "/" + dependency.getVersion();
+            }
 //            }
             repositoryPath = repositoryPath + "/" + filename;
         }

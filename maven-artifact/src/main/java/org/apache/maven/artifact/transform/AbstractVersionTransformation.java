@@ -22,6 +22,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.File;
@@ -107,7 +108,7 @@ public abstract class AbstractVersionTransformation
                     getLogger().info(
                         artifact.getArtifactId() + ": checking for updates from " + remoteRepository.getId() );
 
-                    VersionArtifactMetadata remoteMetadata = retrieveFromRemoteRepository( artifact, remoteRepository );
+                    VersionArtifactMetadata remoteMetadata = retrieveFromRemoteRepository( artifact, remoteRepository, localMetadata );
 
                     int difference = remoteMetadata.compareTo( localMetadata );
                     if ( difference > 0 )
@@ -171,7 +172,8 @@ public abstract class AbstractVersionTransformation
     }
 
     protected abstract VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
-                                                                             ArtifactRepository remoteRepository )
+                                                                             ArtifactRepository remoteRepository,
+                                                                             VersionArtifactMetadata localMetadata )
         throws ArtifactMetadataRetrievalException;
 
     protected abstract VersionArtifactMetadata readFromLocalRepository( Artifact artifact,

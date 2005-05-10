@@ -81,7 +81,8 @@ public class ReleaseArtifactTransformation
     }
 
     protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
-                                                                    ArtifactRepository remoteRepository )
+                                                                    ArtifactRepository remoteRepository,
+                                                                    VersionArtifactMetadata localMetadata )
         throws ArtifactMetadataRetrievalException
     {
         AbstractVersionArtifactMetadata metadata = new ReleaseArtifactMetadata( artifact );
@@ -91,7 +92,11 @@ public class ReleaseArtifactTransformation
         }
         catch ( ResourceDoesNotExistException e )
         {
-            throw new ArtifactMetadataRetrievalException( "No releases could be detected for the artifact", e );
+            if ( localMetadata.constructVersion() == null )
+            {
+                throw new ArtifactMetadataRetrievalException( "Unable to find release for artifact " + artifact, e );
+            }
+            // otherwise, ignore - use the local one
         }
         return metadata;
     }

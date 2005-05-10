@@ -25,7 +25,6 @@ import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 import java.io.IOException;
-import java.io.File;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -94,8 +93,8 @@ public class SnapshotTransformation
         }
         else if ( isSnapshot( artifact ) )
         {
-            SnapshotArtifactMetadata metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact,
-                                                                                                         remoteRepository );
+            SnapshotArtifactMetadata metadata = null;
+            metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null );
             metadata.update();
 
             artifact.setVersion( metadata.constructVersion() );
@@ -110,7 +109,8 @@ public class SnapshotTransformation
     }
 
     protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
-                                                                    ArtifactRepository remoteRepository )
+                                                                    ArtifactRepository remoteRepository,
+                                                                    VersionArtifactMetadata localMetadata )
         throws ArtifactMetadataRetrievalException
     {
         SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );

@@ -23,6 +23,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
@@ -188,10 +189,14 @@ public class DefaultLifecycleExecutor
             plugin.setArtifactId( artifactId );
             plugin.setVersion( version );
 
-            Plugin def = (Plugin) project.getPluginManagement().getPluginsAsMap().get( key );
-            if ( def != null )
+            PluginManagement pluginManagement = project.getPluginManagement();
+            if ( pluginManagement != null )
             {
-                modelDefaultsInjector.mergePluginWithDefaults( plugin, def );
+                Plugin def = (Plugin) pluginManagement.getPluginsAsMap().get( key );
+                if ( def != null )
+                {
+                    modelDefaultsInjector.mergePluginWithDefaults( plugin, def );
+                }
             }
 
             project.addPlugin( plugin );

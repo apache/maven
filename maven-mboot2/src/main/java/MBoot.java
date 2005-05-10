@@ -636,8 +636,6 @@ public class MBoot
 
         installPom( basedir, localRepository, reader );
 
-        String artifactId = reader.getArtifactId();
-
         install( basedir, localRepository, reader, reader.getPackaging() );
 
         return reader;
@@ -742,7 +740,6 @@ public class MBoot
         throws Exception
     {
         installPomFile( reader, localRepository, new File( basedir, "pom.xml" ) );
-
     }
 
     private void installPomFile( ModelReader reader, Repository localRepository, File source )
@@ -789,6 +786,8 @@ public class MBoot
 
         FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + finalName + ".jar" ), file );
 
+        file = localRepository.getMetadataFile( groupId, artifactId, null, type, artifactId + "-RELEASE.version.txt" );
+        IOUtil.copy( new StringReader( version ), new FileWriter( file ) );
     }
 
     private void runTests( String basedir, String classes, String testClasses, ModelReader reader,
@@ -807,7 +806,7 @@ public class MBoot
 
         excludes = new ArrayList();
 
-        excludes.add( "**/*Abstract*.java" );
+        excludes.add( "**/Abstract*Test.java" );
 
         String reportsDir = new File( basedir, "target/surefire-reports" ).getAbsolutePath();
 
