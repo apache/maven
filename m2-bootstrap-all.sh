@@ -16,7 +16,7 @@ esac
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin ; then
-  [ -n "$M2_HOME" ] && M2_HOME=`cygpath -w "$M2_HOME"`
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath -psw "$M2_HOME"`
 fi
 
 if [ ! -z "$M2_HOME" ]; then
@@ -44,7 +44,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo " Building maven2 components ... "
   echo "-----------------------------------------------------------------------"  
 
-  "$JAVACMD" "$ARGS" $MAVEN_OPTS -jar mboot.jar
+  "$JAVACMD" $ARGS $MAVEN_OPTS -jar mboot.jar
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -65,7 +65,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo
   echo "Running maven-core integration tests ..."
   echo 
-  ./maven-core-it.sh "$ORIG_ARGS"
+  ./maven-core-it.sh $ORIG_ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
