@@ -6,7 +6,6 @@
 JAVACMD=$JAVA_HOME/bin/java
 
 ARGS="$@"
-ORIG_ARGS="$ARGS"
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;
@@ -16,15 +15,11 @@ esac
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin ; then
-  [ -n "$M2_HOME" ] && M2_HOME=`cygpath -psw "$M2_HOME"`
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath -pw "$M2_HOME"`
 fi
 
 if [ ! -z "$M2_HOME" ]; then
-  if [ -n "$ARGS" ]; then
-    ARGS="$ARGS -Dmaven.home=$M2_HOME"
-  else
-    ARGS="-Dmaven.home=$M2_HOME"
-  fi
+  HOME_ARGS="-Dmaven.home=$M2_HOME"
 fi
 
 # Build and install mboot
@@ -34,7 +29,7 @@ fi
   echo "-----------------------------------------------------------------------"  
 
   cd ./maven-mboot2
-  ./build $ARGS
+  ./build $ARGS "$HOME_ARGS"
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -44,7 +39,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo " Building maven2 components ... "
   echo "-----------------------------------------------------------------------"  
 
-  "$JAVACMD" $ARGS $MAVEN_OPTS -jar mboot.jar
+  "$JAVACMD" $ARGS "$HOME_ARGS" $MAVEN_OPTS -jar mboot.jar
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -65,7 +60,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo
   echo "Running maven-core integration tests ..."
   echo 
-  ./maven-core-it.sh $ORIG_ARGS
+  ./maven-core-it.sh "$HOME_ARGS" $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi

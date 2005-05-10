@@ -6,12 +6,6 @@ cp=../maven-core-it-verifier/target/maven-core-it-verifier-1.0.jar
 
 verifier=org.apache.maven.it.Verifier
 
-jvm_args="$@"
-
-if [ ! -z "$MAVEN_OPTS" ]; then
-  jvm_args="$MAVEN_OPTS $jvm_args"
-fi
-
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;
 case "`uname`" in
@@ -29,5 +23,5 @@ if [ ! -z "$M2_HOME" ]; then
   jvm_m2_home="-Dmaven.home=$M2_HOME"
 fi
 
-java "$jvm_m2_home" $jvm_args -cp "$cp" $verifier
+java "$jvm_m2_home" $MAVEN_OPTS "$@" -cp "$cp" $verifier
 
