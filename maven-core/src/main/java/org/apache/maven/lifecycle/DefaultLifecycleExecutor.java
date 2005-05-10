@@ -130,6 +130,7 @@ public class DefaultLifecycleExecutor
         {
             if ( artifactHandler.packageGoal() != null )
             {
+                // TODO: need to inject plugin configuration here
                 configureMojo( artifactHandler.packageGoal(), session, phaseMap );
             }
 

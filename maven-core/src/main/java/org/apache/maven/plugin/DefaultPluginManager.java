@@ -86,6 +86,8 @@ public class DefaultPluginManager
 
     private ArtifactFactory artifactFactory;
 
+    private Set pluginsInProcess = new HashSet();
+
     public DefaultPluginManager()
     {
         pluginDescriptors = new HashMap();
@@ -94,23 +96,6 @@ public class DefaultPluginManager
 
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
     }
-
-    private PluginDescriptor getPluginDescriptor( String groupId, String artifactId, String version )
-    {
-        return (PluginDescriptor) pluginDescriptors.get(
-            PluginDescriptor.constructPluginKey( groupId, artifactId, version ) );
-    }
-
-    private PluginDescriptor getPluginDescriptor( String prefix )
-    {
-        return (PluginDescriptor) pluginDescriptorsByPrefix.get( prefix );
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    private Set pluginsInProcess = new HashSet();
 
     // ----------------------------------------------------------------------
     // Mojo discovery
@@ -131,7 +116,9 @@ public class DefaultPluginManager
                                                 "' was built with Maven 2.0 Alpha 2" );
             }
 
-            String key = pluginDescriptor.getId();
+//            String key = pluginDescriptor.getId();
+            // TODO: see comment in getPluginDescriptor
+            String key = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId();
 
             if ( !pluginsInProcess.contains( key ) )
             {
@@ -152,9 +139,27 @@ public class DefaultPluginManager
     //
     // ----------------------------------------------------------------------
 
+    private PluginDescriptor getPluginDescriptor( String groupId, String artifactId, String version )
+    {
+//        String key = PluginDescriptor.constructPluginKey( groupId, artifactId, version );
+        // TODO: include version, but can't do this in the plugin manager as it is not resolved to the right version
+        // at that point. Instead, move the duplication check to the artifact container, or store it locally based on
+        // the unresolved version?
+        String key = groupId + ":" + artifactId;
+        return (PluginDescriptor) pluginDescriptors.get( key );
+    }
+
+    private PluginDescriptor getPluginDescriptor( String prefix )
+    {
+        return (PluginDescriptor) pluginDescriptorsByPrefix.get( prefix );
+    }
+
     private boolean isPluginInstalled( String groupId, String artifactId, String version )
     {
-        return pluginDescriptors.containsKey( PluginDescriptor.constructPluginKey( groupId, artifactId, version ) );
+//        String key = PluginDescriptor.constructPluginKey( groupId, artifactId, version );
+        // TODO: see comment in getPluginDescriptor
+        String key = groupId + ":" + artifactId;
+        return pluginDescriptors.containsKey( key );
     }
 
     private boolean isPluginInstalled( String prefix )
