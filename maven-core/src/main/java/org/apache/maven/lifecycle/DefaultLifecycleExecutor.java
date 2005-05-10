@@ -382,15 +382,21 @@ public class DefaultLifecycleExecutor
 
         if ( pluginDescriptor == null )
         {
-            injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
             try
             {
+                injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
+
                 pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session );
             }
             catch ( PluginManagerException e )
             {
                 throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
             }
+        }
+        else
+        {
+            injectHandlerPluginConfiguration( session.getProject(), pluginDescriptor.getGroupId(),
+                                              pluginDescriptor.getArtifactId(), pluginDescriptor.getVersion() );
         }
 
         MojoDescriptor mojoDescriptor = null;
