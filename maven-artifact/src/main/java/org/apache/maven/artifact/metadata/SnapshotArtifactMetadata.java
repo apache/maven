@@ -128,7 +128,18 @@ public class SnapshotArtifactMetadata
         }
         else if ( timestamp == null )
         {
-            return -1;
+            if ( metadata.timestamp == null )
+            {
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        else if ( metadata.timestamp == null )
+        {
+            return 1;
         }
         else
         {
