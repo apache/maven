@@ -168,12 +168,15 @@ public class SurefirePlugin
         System.setProperty( "basedir", basedir );
 
         // Add all system properties configured by the user
-        Enumeration propertyKeys = systemProperties.propertyNames();
-        while ( propertyKeys.hasMoreElements() )
+        if ( systemProperties != null )
         {
-            String key = (String) propertyKeys.nextElement();
-            System.setProperty( key, systemProperties.getProperty( key ) );
-            getLog().debug( "Setting system property [" + key + "]=[" + systemProperties.getProperty( key ) + "]" );
+            Enumeration propertyKeys = systemProperties.propertyNames();
+            while ( propertyKeys.hasMoreElements() )
+            {
+                String key = (String) propertyKeys.nextElement();
+                System.setProperty( key, systemProperties.getProperty( key ) );
+                getLog().debug( "Setting system property [" + key + "]=[" + systemProperties.getProperty( key ) + "]" );
+            }
         }
 
         // TODO: we should really just trust the plugin classloader?
