@@ -90,8 +90,8 @@
     <repository>
       <id>repo1</id>
       <name>Maven Central Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
-      <layout>default</layout>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven</url>
+      <layout>legacy</layout>
     </repository>
   </distributionManagement>
   <modules>
