@@ -21,10 +21,11 @@
         <li>dependency management</li>
         <li>plugin management</li>
         <li>plugin configuration</li>
+        <li>plugin downloading</li>
       </ul>
       <p style="font-size: larger; font-weight: bold">Documentation for plugin authors</p>
       <ul>
-        <li>plugin architecture</li>
+        <li>plugin writing guide</li>
       </ul>
       <p style="font-size: larger; font-weight: bold">Documentation for Maven developers</p>
       <ul>

@@ -91,15 +91,13 @@
             </lt>
             <li>
               <code> 
-                void&nbsp;setLog(&nbsp;org.apache.maven.monitor.logging.Log&nbsp;) 
+                void setLog( org.apache.maven.monitor.logging.Log )
                 </code>
               <p>Inject a standard Maven logging mechanism to allow this Mojo 
                 to communicate events and feedback to the user.</p>
             </li>
             <li>
-              <code> 
-                void&nbsp;execute()&nbsp;throws&nbsp;org.apache.maven.plugin.MojoExecutionException 
-                </code>
+              <code>void execute() throws org.apache.maven.plugin.MojoExecutionException</code>
               <p>Perform whatever build-process behavior this Mojo implements. 
                 This is the main trigger for the Mojo inside the Maven system, 
                 and allows the Mojo to communicate fatal errors by throwing an 
@@ -130,7 +128,7 @@
             </lt>
             <li>
               <code> 
-                public&nbsp;void&nbsp;setLog(&nbsp;org.apache.maven.monitor.logging.Log&nbsp;) 
+                public void setLog( org.apache.maven.monitor.logging.Log )
                 </code>
               <p>
                 <b>[IMPLEMENTED]</b>
@@ -139,7 +137,7 @@
                 to communicate events and feedback to the user.</p>
             </li>
             <li>
-              <code>protected&nbsp;Log&nbsp;getLog()</code>
+              <code>protected Log getLog()</code>
               <p>
                 <b>[IMPLEMENTED]</b>
               </p>
@@ -148,7 +146,7 @@
             </li>
             <li>
               <code> 
-                void&nbsp;execute()&nbsp;throws&nbsp;org.apache.maven.plugin.MojoExecutionException 
+                void execute() throws org.apache.maven.plugin.MojoExecutionException
                 </code>
               <p>
                 <b>[ABSTRACT]</b>
@@ -175,73 +173,73 @@
               <b>Method Summary:</b>
             </lt>
             <li>
-              <code> void&nbsp;debug(&nbsp;java.lang.CharSequence&nbsp;) </code>
+              <code> void debug( java.lang.CharSequence ) </code>
               <p>Send a message to the user in the <b>debug</b> error level.</p>
             </li>
             <li>
               <code> 
-                void&nbsp;debug(&nbsp;java.lang.CharSequence,&nbsp;java.lang.Throwable&nbsp;) 
+                void debug( java.lang.CharSequence, java.lang.Throwable )
                 </code>
               <p>Send a message (and accompanying exception) to the user in the 
                 <b>debug</b> error level. The error's stacktrace will be output 
                 when this error level is enabled.</p>
             </li>
             <li>
-              <code> void&nbsp;debug(&nbsp;java.lang.Throwable&nbsp;) </code>
+              <code> void debug( java.lang.Throwable ) </code>
               <p>Send an exception to the user in the <b>debug</b> error level. 
                 The stack trace for this exception will be output when this 
                 error level is enabled.</p>
             </li>
             <li>
-              <code> void&nbsp;info(&nbsp;java.lang.CharSequence&nbsp;) </code>
+              <code> void info( java.lang.CharSequence ) </code>
               <p>Send a message to the user in the <b>info</b> error level.</p>
             </li>
             <li>
               <code> 
-                void&nbsp;info(&nbsp;java.lang.CharSequence,&nbsp;java.lang.Throwable&nbsp;) 
+                void info( java.lang.CharSequence, java.lang.Throwable )
                 </code>
               <p>Send a message (and accompanying exception) to the user in the 
                 <b>info</b> error level. The error's stacktrace will be output 
                 when this error level is enabled.</p>
             </li>
             <li>
-              <code> void&nbsp;info(&nbsp;java.lang.CharSequence&nbsp;) </code>
+              <code> void info( java.lang.CharSequence ) </code>
               <p>Send an exception to the user in the <b>info</b> error level. 
                 The stack trace for this exception will be output when this 
                 error level is enabled.</p>
             </li>
             <li>
-              <code> void&nbsp;warn(&nbsp;java.lang.CharSequence&nbsp;) </code>
+              <code> void warn( java.lang.CharSequence ) </code>
               <p>Send a message to the user in the <b>warn</b> error level.</p>
             </li>
             <li>
               <code> 
-                void&nbsp;warn(&nbsp;java.lang.CharSequence,&nbsp;java.lang.Throwable&nbsp;) 
+                void warn( java.lang.CharSequence, java.lang.Throwable )
                 </code>
               <p>Send a message (and accompanying exception) to the user in the 
                 <b>warn</b> error level. The error's stacktrace will be output 
                 when this error level is enabled.</p>
             </li>
             <li>
-              <code> void&nbsp;warn(&nbsp;java.lang.CharSequence&nbsp;) </code>
+              <code> void warn( java.lang.CharSequence ) </code>
               <p>Send an exception to the user in the <b>warn</b> error level. 
                 The stack trace for this exception will be output when this 
                 error level is enabled.</p>
             </li>
             <li>
-              <code> void&nbsp;error(&nbsp;java.lang.CharSequence&nbsp;) </code>
+              <code> void error( java.lang.CharSequence ) </code>
               <p>Send a message to the user in the <b>error</b> error level.</p>
             </li>
             <li>
               <code> 
-                void&nbsp;error(&nbsp;java.lang.CharSequence,&nbsp;java.lang.Throwable&nbsp;) 
+                void error( java.lang.CharSequence, java.lang.Throwable )
                 </code>
               <p>Send a message (and accompanying exception) to the user in the 
                 <b>error</b> error level. The error's stacktrace will be output 
                 when this error level is enabled.</p>
             </li>
             <li>
-              <code> void&nbsp;error(&nbsp;java.lang.CharSequence&nbsp;) </code>
+              <code> void error( java.lang.CharSequence ) </code>
               <p>Send an exception to the user in the <b>error</b> error level. 
                 The stack trace for this exception will be output when this 
                 error level is enabled.</p>
@@ -264,17 +262,17 @@
         element name along with a javadoc annotation (if applicable) supporting 
         that piece of the plugin descriptor. A couple of examples are: 
         <b>someElement 
-        (@annotation&nbsp;parameterName="parameterValue")</b> or 
+        (@annotation parameterName="parameterValue")</b> or
         <b>someOtherElement (@annotation &lt;rawAnnotationValue&gt;)</b>.</p>
       <p>The plugin descriptor must be provided in a jar resource with the 
         path: <code>META-INF/maven/plugin.xml</code>, and it must contain the 
         following:</p>
       <p>
         <ul>
-          <li><b>mojos</b>&nbsp;-&nbsp;Descriptors for each Mojo provided by 
+          <li><b>mojos</b> - Descriptors for each Mojo provided by
             the plugin, each inside a <b>mojo</b> sub-element. Mojo descriptors 
             are covered in detail below.</li>
-          <li><b>dependencies</b>&nbsp;-&nbsp;A set of dependencies which the 
+          <li><b>dependencies</b> - A set of dependencies which the
             plugin requires in order to function. Each dependency is provided 
             inside a <b>dependency</b> sub-element. Dependency specifications 
             are covered below. <i>Using the plugin toolset, these dependencies 
@@ -285,46 +283,46 @@
         following:</p>
       <p>
         <ul>
-          <li><b>goal. (@goal &lt;goalName&gt;)</b>&nbsp;-&nbsp;The name for 
+          <li><b>goal. (@goal &lt;goalName&gt;)</b> - The name for
             the Mojo that users will reference from the command line to execute 
             the Mojo directly, or inside a POM in order to provide 
             Mojo-specific configuration.</li>
-          <li><b>implementation (detected)</b>&nbsp;-&nbsp;The 
+          <li><b>implementation (detected)</b> - The
             Mojo's fully-qualified class name.</li>
-          <li><b>language (detected)</b>&nbsp;-&nbsp;The implementation 
+          <li><b>language (detected)</b> - The implementation
             language for this Mojo (marmalade, java, etc.). <i>Optional, 
             default is java.</i></li>
-          <li><b>configurator (detected)</b>&nbsp;-&nbsp;The configurator type 
+          <li><b>configurator (detected)</b> - The configurator type
             used to inject parameters into the Mojo. <i>Optional; will only be 
             used in very special cases, with a highly controlled vocabulary of 
             possible values. (Elements like this are why it's a good idea to 
             use the descriptor tools.)</i></li>
           <li><b>phase 
-            (@phase&nbsp;&lt;phaseName&gt;)</b>&nbsp;-&nbsp;Specifies to which 
+            (@phase &lt;phaseName&gt;)</b> - Specifies to which
             phase in the standard build lifecycle this Mojo binds. <i>Optional; 
             only required if this Mojo participates in the standard build 
             process.</i></li>
           <li><b>executePhase 
-            (@executePhase&nbsp;&lt;phaseName&gt;)</b>&nbsp;-&nbsp;Specifies 
+            (@executePhase &lt;phaseName&gt;)</b> - Specifies
             the last phase in the standard build lifecycle to execute before 
             executing this Mojo, when the Mojo's goal is invoked directly. 
             <i>Optional.</i></li>
           <li><b>instantiationStrategy 
-            (@instantiationStrategy&nbsp;&lt;strategyName&gt;)</b>&nbsp;-&nbsp;Specifies 
+            (@instantiationStrategy &lt;strategyName&gt;)</b> - Specifies
             the method Maven should use in instantiating this Mojo before it is 
             executed, which has implications for the Mojo's state and instance 
             reuse. <i>Optional. Currently, only "per-lookup" is suppported. 
             (<b>Brett:</b> Can we deprecate this before alpha-2 
             release?)</i></li>
           <li><b>requiresDependencyResolution 
-            (@requiresDependencyResolution&nbsp;&lt;requiredScope&gt;)</b>&nbsp;-&nbsp;Flags 
+            (@requiresDependencyResolution &lt;requiredScope&gt;)</b> - Flags
             this Mojo as requiring the specified scope of dependencies to be 
             resolved before it can execute. <i>Optional; Currently supports 
             "compile", "runtime", and "test" scopes.</i></li>
-          <li><b>description (detected)</b>&nbsp;-&nbsp;The description of the 
+          <li><b>description (detected)</b> - The description of the
             Mojo's functionality. <i>Using the toolset, this will be the 
             class-level javadoc description provided.</i></li>
-          <li><b>parameters</b>&nbsp;-&nbsp;Specifications for the parameters 
+          <li><b>parameters</b> - Specifications for the parameters
             which this Mojo uses. Each parameter is specified in a 
             <b>parameter</b> sub-element. Parameters are discusses in 
             detail below.</li>
@@ -347,47 +345,47 @@
         plugin descriptor as follows:</p>
       <p>
         <ul>
-          <li><b>name (detected)</b>&nbsp;-&nbsp;The name of the parameter, to 
+          <li><b>name (detected)</b> - The name of the parameter, to
             be used in configuring this parameter from the Mojo's declared 
             defaults (discussed below) or from the POM. <i>Using the toolset, 
             this is detected as the java field name. It cannot be 
             specified in an annotation.</i></li>
-          <li><b>alias (@parameter alias="myAlias")</b>&nbsp;-&nbsp;Specifies 
+          <li><b>alias (@parameter alias="myAlias")</b> - Specifies
             an alias which can be used to configure this parameter from the 
             POM. This is primarily useful to improve user-friendliness, where 
             Mojo field names are not intuitive to the user. 
             <i>Optional.</i></li>
-          <li><b>type (detected)</b>&nbsp;-&nbsp;The type of this parameter. 
+          <li><b>type (detected)</b> - The type of this parameter.
             This is used to validate the result of any expressions used to 
             calculate the value which should be injected into the Mojo for this 
             parameter. <i>Using the toolset, this is detected as the class of 
             this parameter's java field. It cannot be specified in an 
             annotation.</i></li>
-          <li><b>required (@required)</b>&nbsp;-&nbsp;Whether this parameter is 
+          <li><b>required (@required)</b> - Whether this parameter is
             required for the Mojo to function. This is used to validate the 
             configuration for a Mojo before it is injected, and before the Mojo 
             is executed from some half-state. <i>Optional. Specification of 
             this annotation flags the parameter as required; there is 
             no true/false value.</i></li>
-          <li><b>editable (@readonly)</b>&nbsp;-&nbsp;Specifies that this 
+          <li><b>editable (@readonly)</b> - Specifies that this
             parameter cannot be configured directly by the user (as in the case 
             of POM-specified configuration). This is useful when you want to 
             force the user to use common POM elements rather than plugin 
             configurations, as in the case where you want to use the artifact's 
             final name as a parameter. In this case, you want the user to 
-            modify &lt;build&gt;&lt;finalName/&gt;&lt/build&gt; rather than 
+            modify &lt;build&gt;&lt;finalName/&gt;&lt;/build&gt; rather than
             specifying a value for finalName directly in the plugin 
             configuration section. It is also useful to ensure that - for 
             example - a List-typed parameter which expects items of type 
             Artifact doesn't get a List full of Strings. <i>Optional. 
             Specification of this annotation flags the parameter as 
             non-editable; there is no true/false value.</i></li>
-          <li><b>description (detected)</b>&nbsp;-&nbsp;The description for 
+          <li><b>description (detected)</b> - The description for
             what this parameter is used for inside the Mojo. <i>Using the 
             toolset, this is detected as the javadoc description for 
             the field. It cannot be specified as an annotation.</i></li>
           <li><b>expression 
-            (@parameter&nbsp;expression="${someExpression}")</b>&nbsp;-&nbsp;Specifies 
+            (@parameter expression="${someExpression}")</b> - Specifies
             the expression used to calculate the value to be injected into this 
             parameter of the Mojo at buildtime. This is commonly used to refer 
             to specific elements in the POM, such as 
@@ -397,7 +395,7 @@
             assumed, which can only be satisfied from POM configuration or 
             System properties. The use of '${' and '}' is required to 
             delimit actual expressions which may be evaluated.</i></li>
-          <li><b>deprecated (@deprecated)</b>&nbsp;-&nbsp;Marks a parameter as 
+          <li><b>deprecated (@deprecated)</b> - Marks a parameter as
             deprecated. The rules on deprecation are the same as normal java 
             with language elements. This will trigger a warning when a user 
             tries to configure a parameter marked as deprecated. 
