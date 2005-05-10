@@ -19,7 +19,6 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
@@ -45,13 +44,11 @@ public class MavenSession
 
     private EventDispatcher eventDispatcher;
 
-    private Log log;
-
     // TODO: make this the central one, get rid of build settings...
     private final Settings settings;
 
     public MavenSession( MavenProject project, PlexusContainer container, Settings settings,
-                         ArtifactRepository localRepository, EventDispatcher eventDispatcher, Log log, List goals )
+                         ArtifactRepository localRepository, EventDispatcher eventDispatcher, List goals )
     {
         this.project = project;
 
@@ -62,8 +59,6 @@ public class MavenSession
         this.localRepository = localRepository;
 
         this.eventDispatcher = eventDispatcher;
-
-        this.log = log;
 
         this.goals = goals;
         
@@ -142,11 +137,6 @@ public class MavenSession
     public EventDispatcher getEventDispatcher()
     {
         return eventDispatcher;
-    }
-
-    public Log getLog()
-    {
-        return log;
     }
 
     public Settings getSettings()

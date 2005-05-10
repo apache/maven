@@ -28,10 +28,12 @@ import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
+import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
@@ -54,6 +56,7 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
@@ -87,6 +90,8 @@ public class DefaultPluginManager
     private ArtifactFactory artifactFactory;
 
     private Set pluginsInProcess = new HashSet();
+
+    private Log mojoLogger;
 
     public DefaultPluginManager()
     {
@@ -353,8 +358,7 @@ public class DefaultPluginManager
         try
         {
             plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
-
-            plugin.setLog( session.getLog() );
+            plugin.setLog( mojoLogger );
 
             String goalId = mojoDescriptor.getGoal();
 
@@ -378,7 +382,8 @@ public class DefaultPluginManager
 //                validatePomConfiguration( mojoDescriptor, pomConfiguration );
             }
 
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator );
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator,
+                                                                                              getLogger() );
 
             PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
                                                                           mojoDescriptor.getMojoConfiguration() );
@@ -599,7 +604,7 @@ public class DefaultPluginManager
         List parameters = goal.getParameters();
 
         List invalidParameters = new ArrayList();
-        
+
         for ( int i = 0; i < parameters.size(); i++ )
         {
             Parameter parameter = (Parameter) parameters.get( i );
@@ -714,8 +719,8 @@ public class DefaultPluginManager
             }
 
         }
-        
-        if( !invalidParameters.isEmpty() )
+
+        if ( !invalidParameters.isEmpty() )
         {
             throw new PluginParameterException( goal, invalidParameters );
         }
@@ -746,6 +751,33 @@ public class DefaultPluginManager
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+
+        LoggerManager manager = null;
+
+        try
+        {
+            manager = (LoggerManager) container.lookup( LoggerManager.ROLE );
+
+            mojoLogger = new DefaultLog( manager.getLoggerForComponent( Mojo.ROLE ) );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new ContextException( "Error locating a logger manager", e );
+        }
+        finally
+        {
+            if ( manager != null )
+            {
+                try
+                {
+                    container.release( manager );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    getLogger().error( "Error releasing the logger manager - ignoring", e );
+                }
+            }
+        }
     }
 
     public void initialize()

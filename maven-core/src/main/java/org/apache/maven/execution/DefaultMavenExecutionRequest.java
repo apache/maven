@@ -20,7 +20,6 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.monitor.logging.Log;
 import org.apache.maven.settings.Settings;
 
 import java.util.List;
@@ -42,8 +41,6 @@ public class DefaultMavenExecutionRequest
     private final List files;
 
     protected MavenSession session;
-
-    private Log log;
 
     private final EventDispatcher eventDispatcher;
 
@@ -116,16 +113,6 @@ public class DefaultMavenExecutionRequest
     public void setSession( MavenSession session )
     {
         this.session = session;
-    }
-
-    public void setLog( Log log )
-    {
-        this.log = log;
-    }
-
-    public Log getLog()
-    {
-        return log;
     }
 
     public void addEventMonitor( EventMonitor monitor )

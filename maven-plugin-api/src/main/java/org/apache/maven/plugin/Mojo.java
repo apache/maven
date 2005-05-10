@@ -16,7 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.monitor.logging.Log;
+import org.apache.maven.plugin.logging.Log;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -27,10 +27,6 @@ public interface Mojo
     String ROLE = Mojo.class.getName();
 
     void execute()
-        throws MojoExecutionException;
-
-    /** @deprecated */
-    void execute( MojoExecutionRequest request )
         throws MojoExecutionException;
 
     // TODO: not sure about this here, and may want a getLog on here as well/instead

@@ -44,6 +44,7 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -117,14 +118,14 @@ public class MavenCli
         initializeSystemProperties( commandLine );
 
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
-        
+
         boolean showErrors = debug || commandLine.hasOption( CLIManager.ERRORS );
 
         if(showErrors)
         {
             System.out.println("+ Error stacktraces are turned on.");
         }
-        
+
         // ----------------------------------------------------------------------
         // Process particular command line options
         // ----------------------------------------------------------------------
@@ -196,10 +197,11 @@ public class MavenCli
 
         Maven maven = null;
         MavenExecutionRequest request = null;
+        LoggerManager manager = null;
         try
         {
             // logger must be created first
-            LoggerManager manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
+            manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
             if ( debug )
             {
                 manager.setThreshold( Logger.LEVEL_DEBUG );
@@ -213,6 +215,21 @@ public class MavenCli
         {
             showFatalError( "Unable to configure the Maven application", e, showErrors );
             return 1;
+        }
+        finally
+        {
+            if ( manager != null )
+            {
+                try
+                {
+                    embedder.release( manager );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    showFatalError( "Error releasing logging manager", e, showErrors );
+                    return 1;
+                }
+            }
         }
 
         // TODO: this should be in default maven, and should accommodate default goals
@@ -276,8 +293,6 @@ public class MavenCli
         Logger logger = manager.getLoggerForComponent( Mojo.ROLE );
         if ( logger != null )
         {
-            request.setLog( new DefaultLog( logger ) );
-
             request.addEventMonitor( new DefaultEventMonitor( logger ) );
         }
 

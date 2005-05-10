@@ -16,7 +16,7 @@ package org.apache.maven.plugin.verifier;
  * limitations under the License.
  */
 
-import org.apache.maven.monitor.logging.Log;
+import org.apache.maven.plugin.logging.Log;
 
 import java.util.Iterator;
 

@@ -16,8 +16,8 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.monitor.logging.Log;
-import org.apache.maven.monitor.logging.SystemStreamLog;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.SystemStreamLog;
 
 /**
  * @version $Id$
@@ -26,41 +26,6 @@ public abstract class AbstractMojo
     implements Mojo
 {
     private Log log;
-
-    /**
-     * Default behaviour to mimic old behaviour.
-     *
-     * @deprecated
-     */
-    public void execute( MojoExecutionRequest request )
-        throws MojoExecutionException
-    {
-        MojoExecutionResponse response = new MojoExecutionResponse();
-        try
-        {
-            execute( request, response );
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-        if ( response.isExecutionFailure() )
-        {
-            throw new MojoExecutionException( response.getFailureResponse().getSource(),
-                                                response.getFailureResponse().shortMessage(),
-                                                response.getFailureResponse().longMessage() );
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    public void execute( MojoExecutionRequest request, MojoExecutionResponse response )
-        throws Exception
-    {
-        throw new UnsupportedOperationException(
-            "If you are using the old technique, you must override execute(req,resp)" );
-    }
 
     public void setLog( Log log )
     {

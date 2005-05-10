@@ -304,7 +304,7 @@ public class DefaultMaven
     protected MavenSession createSession( MavenExecutionRequest request, MavenProject project )
     {
         return new MavenSession( project, container, request.getSettings(), request.getLocalRepository(),
-                                 request.getEventDispatcher(), request.getLog(), request.getGoals() );
+                                 request.getEventDispatcher(), request.getGoals() );
     }
 
     /**

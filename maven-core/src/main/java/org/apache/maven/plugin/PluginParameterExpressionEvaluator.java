@@ -23,12 +23,13 @@ import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -42,10 +43,13 @@ public class PluginParameterExpressionEvaluator
 
     private final MavenSession context;
 
-    public PluginParameterExpressionEvaluator( MavenSession context, PathTranslator pathTranslator )
+    private final Logger logger;
+
+    public PluginParameterExpressionEvaluator( MavenSession context, PathTranslator pathTranslator, Logger logger )
     {
         this.context = context;
         this.pathTranslator = pathTranslator;
+        this.logger = logger;
     }
 
     public Object evaluate( String expr )
@@ -116,7 +120,7 @@ public class PluginParameterExpressionEvaluator
                 for ( Iterator i = ( (Map) value ).keySet().iterator(); i.hasNext(); )
                 {
                     String key = (String) i.next();
-                    context.getLog().debug( key + " report is found." );
+                    logger.debug( key + " report is found." );
                 }
             }
             catch ( ComponentLookupException cle )
@@ -175,7 +179,7 @@ public class PluginParameterExpressionEvaluator
             }
             else
             {
-                context.getLog().error( "Got expression '" + expression + "' that was not recognised" );
+                logger.error( "Got expression '" + expression + "' that was not recognised" );
             }
         }
         else
