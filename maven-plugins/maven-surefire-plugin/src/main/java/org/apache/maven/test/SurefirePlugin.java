@@ -26,8 +26,10 @@ import org.codehaus.surefire.SurefireBooter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 /**
@@ -98,6 +100,13 @@ public class SurefirePlugin
      */
     private ArtifactRepository localRepository;
 
+    /**
+     * List of System properties to pass to the JUnit tests.
+     *
+     * @parameter
+     */
+    private Properties systemProperties;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -157,6 +166,15 @@ public class SurefirePlugin
         // ----------------------------------------------------------------------
 
         System.setProperty( "basedir", basedir );
+
+        // Add all system properties configured by the user
+        Enumeration propertyKeys = systemProperties.propertyNames();
+        while ( propertyKeys.hasMoreElements() )
+        {
+            String key = (String) propertyKeys.nextElement();
+            System.setProperty( key, systemProperties.getProperty( key ) );
+            getLog().debug( "Setting system property [" + key + "]=[" + systemProperties.getProperty( key ) + "]" );
+        }
 
         // TODO: we should really just trust the plugin classloader?
         try
