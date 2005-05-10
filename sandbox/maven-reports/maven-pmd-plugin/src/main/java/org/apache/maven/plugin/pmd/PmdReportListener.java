@@ -20,6 +20,7 @@ import net.sourceforge.pmd.ReportListener;
 import net.sourceforge.pmd.RuleViolation;
 import net.sourceforge.pmd.stat.Metric;
 import org.codehaus.doxia.sink.Sink;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 
@@ -32,16 +33,43 @@ import java.io.File;
 public class PmdReportListener
     implements ReportListener
 {
-    private Sink sink;
     private static final String TITLE = "PMD Results";
 
-    public PmdReportListener( Sink sink )
+    private Sink sink;
+
+    private String sourceDirectory;
+
+    private String currentFilename;
+
+    private boolean fileInitialized;
+
+    public PmdReportListener( Sink sink, String sourceDirectory )
     {
         this.sink = sink;
+        this.sourceDirectory = sourceDirectory;
     }
 
     public void ruleViolationAdded( RuleViolation ruleViolation )
     {
+        if ( ! fileInitialized )
+        {
+            sink.section2();
+            sink.sectionTitle2();
+            sink.text( currentFilename );
+            sink.sectionTitle2_();
+
+            sink.table();
+            sink.tableRow();
+            sink.tableHeaderCell();
+            sink.text( "Violation" );
+            sink.tableHeaderCell_();
+            sink.tableHeaderCell();
+            sink.text( "Line" );
+            sink.tableHeaderCell_();
+            sink.tableRow_();
+
+            fileInitialized = true;
+        }
         sink.tableRow();
         sink.tableCell();
         sink.text( ruleViolation.getDescription() );
@@ -92,26 +120,18 @@ public class PmdReportListener
 
     public void beginFile( File file )
     {
-        sink.section2();
-        sink.sectionTitle2();
-        sink.text( file.getPath() );
-        sink.sectionTitle2_();
-
-        sink.table();
-        sink.tableRow();
-        sink.tableHeaderCell();
-        sink.text( "Violation" );
-        sink.tableHeaderCell_();
-        sink.tableHeaderCell();
-        sink.text( "Line" );
-        sink.tableHeaderCell_();
-        sink.tableRow_();
+        currentFilename = StringUtils.substring( file.getAbsolutePath(), sourceDirectory.length() + 1 );
+        currentFilename = StringUtils.replace( currentFilename, "\\", "/" );
+        fileInitialized = false;
     }
 
     public void endFile( File file )
     {
-        sink.table_();
-        sink.section2_();
+        if ( fileInitialized )
+        {
+            sink.table_();
+            sink.section2_();
+        }
     }
 
     public void endDocument()

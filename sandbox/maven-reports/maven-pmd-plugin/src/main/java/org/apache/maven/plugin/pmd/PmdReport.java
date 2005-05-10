@@ -89,7 +89,7 @@ public class PmdReport
         PMD pmd = new PMD();
         RuleContext ruleContext = new RuleContext();
         Report report = new Report();
-        PmdReportListener reportSink = new PmdReportListener( sink );
+        PmdReportListener reportSink = new PmdReportListener( sink, getConfiguration().getSourceDirectory() );
         report.addListener( reportSink );
         ruleContext.setReport( report );
 
