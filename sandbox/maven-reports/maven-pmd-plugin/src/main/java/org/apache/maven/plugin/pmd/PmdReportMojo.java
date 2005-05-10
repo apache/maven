@@ -101,7 +101,7 @@ public class PmdReportMojo
 
             report.generate( sink );
 
-            siteRenderer.copyResources( siteDirectory, outputDirectory, flavour );
+            siteRenderer.copyResources( outputDirectory, flavour, siteDirectory );
         }
         catch ( Exception e )
         {

@@ -100,7 +100,7 @@ public class CheckstyleReportMojo
                                                       report.getOutputName() + ".html",
                                                       outputDirectory, getSiteDescriptor(), flavour );
 
-            siteRenderer.copyResources( siteDirectory, outputDirectory, flavour );
+            siteRenderer.copyResources( outputDirectory, flavour, siteDirectory );
 
             report.generate( sink );
         }

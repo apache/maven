@@ -112,7 +112,7 @@ public class ProjectReportsMojo
 
             mailingListsReport.generate( sink );
 
-            siteRenderer.copyResources( siteDirectory, outputDirectory, flavour );
+            siteRenderer.copyResources( outputDirectory, flavour, siteDirectory );
         }
         catch ( Exception e )
         {
