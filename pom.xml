@@ -90,8 +90,11 @@
     <repository>
       <id>repo1</id>
       <name>Maven Central Repository</name>
+<!-- Waiting for release files to be mirror
       <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven</url>
       <layout>legacy</layout>
+-->
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
   </distributionManagement>
   <modules>
