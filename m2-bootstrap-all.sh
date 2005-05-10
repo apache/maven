@@ -15,7 +15,7 @@ esac
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin ; then
-  [ -n "$M2_HOME" ] && M2_HOME=`cygpath -pw "$M2_HOME"`
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath -w "$M2_HOME"`
 fi
 
 if [ ! -z "$M2_HOME" ]; then
