@@ -272,7 +272,7 @@ public class MavenCli
         }
         else
         {
-            System.err.println( "For more information, run with the -X flag" );
+            System.err.println( "For more information, run with the -e flag" );
         }
     }
 

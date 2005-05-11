@@ -80,28 +80,26 @@ public class ArtifactResolutionException
             }
         }
 
-        // TODO: don't show this section for metadata
-        sb.append( LS );
-        sb.append( LS );
-        sb.append( "Try downloading the file manually" );
-        if ( downloadUrl != null )
+        if ( downloadUrl != null && !type.equals( "pom" ) )
         {
-            sb.append( " from " );
+            sb.append( LS );
+            sb.append( LS );
+            sb.append( "Try downloading the file manually from" );
             sb.append( LS );
             sb.append( "  " + downloadUrl );
+            sb.append( LS );
+            sb.append( "and install it using the command: " );
+            sb.append( LS );
+            sb.append( "  m2 install:install-file -DgroupId=" );
+            sb.append( groupId );
+            sb.append( " -DartifactId=" );
+            sb.append( artifactId );
+            sb.append( " -Dversion=" );
+            sb.append( version );
+            sb.append( " -Dpackaging=" );
+            sb.append( type );
+            sb.append( " -Dfile=/path/to/file" );
         }
-        sb.append( LS );
-        sb.append( "and install it using the command: " );
-        sb.append( LS );
-        sb.append( "  m2 install:install-file -DgroupId=" );
-        sb.append( groupId );
-        sb.append( " -DartifactId=" );
-        sb.append( artifactId );
-        sb.append( " -Dversion=" );
-        sb.append( version );
-        sb.append( " -Dpackaging=" );
-        sb.append( type );
-        sb.append( " -Dfile=/path/to/file" );
 
         return sb.toString();
     }

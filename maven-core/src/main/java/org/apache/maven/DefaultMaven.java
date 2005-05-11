@@ -58,6 +58,7 @@ import java.util.Map;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
+ * @todo unify error reporting. We should return one response, always - and let the CLI decide how to render it. The reactor response should contain individual project responses
  */
 public class DefaultMaven
     extends AbstractLogEnabled
@@ -120,17 +121,33 @@ public class DefaultMaven
         {
             throw new ReactorException( "Error processing projects for the reactor: ", e );
         }
-        catch ( ProjectBuildingException e )
-        {
-            throw new ReactorException( "Error processing projects for the reactor: ", e );
-        }
         catch ( CycleDetectedException e )
         {
             throw new ReactorException( "Error processing projects for the reactor: ", e );
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new ReactorException( "Error processing projects for the reactor: ", e );
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+            MavenExecutionResponse response = new MavenExecutionResponse();
+            response.setStart( new Date() );
+            response.setFinish( new Date() );
+            response.setException( e );
+            logFailure( response, e, null );
+
+            return response;
+        }
+        catch ( ProjectBuildingException e )
+        {
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+            MavenExecutionResponse response = new MavenExecutionResponse();
+            response.setStart( new Date() );
+            response.setFinish( new Date() );
+            response.setException( e );
+            logFailure( response, e, null );
+
+            return response;
         }
 
         try
@@ -150,6 +167,8 @@ public class DefaultMaven
                     MavenExecutionResponse response = processProject( request, project, dispatcher );
                     if ( response.isExecutionFailure() )
                     {
+                        dispatcher.dispatchError( event, request.getBaseDirectory(), response.getException() );
+
                         return response;
                     }
                 }
@@ -414,6 +433,7 @@ public class DefaultMaven
             line();
         }
 
+        // TODO: needs to honour -e
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Trace", e );
