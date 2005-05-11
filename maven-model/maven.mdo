@@ -42,7 +42,7 @@
       <fields>
         <field>
           <name>extend</name>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <description><![CDATA[
             The location of the parent project, if one exists. Values from the 
             parent project will be the default for this project if they are 
