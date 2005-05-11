@@ -100,7 +100,7 @@ public class DefaultArtifactResolver
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                throw new ArtifactResolutionException( e.getMessage(), e );
+                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
             }
         }
 
@@ -128,47 +128,17 @@ public class DefaultArtifactResolver
             }
             catch ( ResourceDoesNotExistException e )
             {
-                throw new ArtifactResolutionException( artifactNotFound( localPath, remoteRepositories ), artifact, e );
+                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
             }
             catch ( TransferFailedException e )
             {
-                throw new ArtifactResolutionException( e.getMessage(), artifact, e );
+                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                throw new ArtifactResolutionException( "Error downloading artifact " + artifact, e );
+                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
             }
         }
-    }
-
-    private static final String LS = System.getProperty( "line.separator" );
-
-    private String artifactNotFound( String path, List remoteRepositories )
-    {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append( "The artifact is not present locally as:" );
-        sb.append( LS );
-        sb.append( LS );
-        sb.append( path );
-        sb.append( LS );
-        sb.append( LS );
-        sb.append( "or in any of the specified remote repositories:" );
-        sb.append( LS );
-        sb.append( LS );
-
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
-        {
-            ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
-
-            sb.append( remoteRepository.getUrl() );
-            if ( i.hasNext() )
-            {
-                sb.append( ", " );
-            }
-        }
-
-        return sb.toString();
     }
 
     // ----------------------------------------------------------------------
@@ -182,14 +152,7 @@ public class DefaultArtifactResolver
     {
         ArtifactResolutionResult artifactResolutionResult;
 
-        try
-        {
-            artifactResolutionResult = collect( artifacts, localRepository, remoteRepositories, source, filter );
-        }
-        catch ( TransitiveArtifactResolutionException e )
-        {
-            throw new ArtifactResolutionException( "Error transitively resolving artifacts: ", e );
-        }
+        artifactResolutionResult = collect( artifacts, localRepository, remoteRepositories, source, filter );
 
         for ( Iterator i = artifactResolutionResult.getArtifacts().values().iterator(); i.hasNext(); )
         {
@@ -223,7 +186,7 @@ public class DefaultArtifactResolver
     private ArtifactResolutionResult collect( Set artifacts, ArtifactRepository localRepository,
                                               List remoteRepositories, ArtifactMetadataSource source,
                                               ArtifactFilter filter )
-        throws TransitiveArtifactResolutionException
+        throws ArtifactResolutionException
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
 
@@ -303,8 +266,8 @@ public class DefaultArtifactResolver
                     }
                     catch ( ArtifactMetadataRetrievalException e )
                     {
-                        throw new TransitiveArtifactResolutionException( "Error retrieving metadata [" + newArtifact +
-                                                                         "] : ", e );
+                        throw new TransitiveArtifactResolutionException( e.getMessage(), newArtifact,
+                                                                         remoteRepositories, e );
                     }
 
                     // the pom for given dependency exisit we will add it to the

@@ -74,7 +74,7 @@ public class MavenMetadataSource
     }
 
     public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
-        throws ArtifactMetadataRetrievalException
+        throws ArtifactMetadataRetrievalException, ArtifactResolutionException
     {
         // TODO: only metadata is really needed - resolve as metadata
         artifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
@@ -103,14 +103,7 @@ public class MavenMetadataSource
             // need to be able to not have a project builder
             // TODO: remove - which then makes this a very thin wrapper around a project builder - is it needed?
 
-            try
-            {
-                artifactResolver.resolve( artifact, remoteRepositories, localRepository );
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                throw new ArtifactMetadataRetrievalException( "Error while resolving metadata artifact", e );
-            }
+            artifactResolver.resolve( artifact, remoteRepositories, localRepository );
 
             FileReader reader = null;
             try

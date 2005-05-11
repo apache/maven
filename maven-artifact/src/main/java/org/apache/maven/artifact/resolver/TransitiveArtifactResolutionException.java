@@ -1,5 +1,9 @@
 package org.apache.maven.artifact.resolver;
 
+import org.apache.maven.artifact.Artifact;
+
+import java.util.List;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -21,16 +25,11 @@ package org.apache.maven.artifact.resolver;
  * @version $Id$
  */
 public class TransitiveArtifactResolutionException
-    extends Exception
+    extends ArtifactResolutionException
 {
-    public TransitiveArtifactResolutionException( String message )
+    public TransitiveArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
     {
-        super( message );
-    }
-
-    public TransitiveArtifactResolutionException( Throwable cause )
-    {
-        super( cause );
+        super( message, artifact, remoteRepositories, t );
     }
 
     public TransitiveArtifactResolutionException( String message, Throwable cause )

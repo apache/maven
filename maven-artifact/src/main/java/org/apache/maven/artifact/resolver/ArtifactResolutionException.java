@@ -1,6 +1,10 @@
 package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+import java.util.Iterator;
+import java.util.List;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -33,19 +37,55 @@ public class ArtifactResolutionException
 
     private String type;
 
-    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type, Throwable t )
+    private List remoteRepositories;
+
+    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
+                                        List remoteRepositories, Throwable t )
     {
-        super( "Unable to resolve artifact " + groupId + ":" + artifactId + ":" + version + ":" + type + "\n" + message, t );
+        super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories ), t );
 
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.type = type;
         this.version = version;
+        this.remoteRepositories = remoteRepositories;
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, Throwable t )
+    private static final String LS = System.getProperty( "line.separator" );
+
+    private static String constructMessage( String message, String groupId, String artifactId, String version,
+                                            String type, List remoteRepositories )
     {
-        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), t );
+        StringBuffer sb = new StringBuffer();
+
+        sb.append( message );
+        sb.append( LS );
+        sb.append( LS );
+        sb.append( groupId + ":" + artifactId + ":" + version + ":" + type );
+        sb.append( LS );
+        sb.append( LS );
+        sb.append( "from the specified remote repositories:" );
+        sb.append( LS );
+        sb.append( LS );
+
+        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+        {
+            ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
+
+            sb.append( remoteRepository.getUrl() );
+            if ( i.hasNext() )
+            {
+                sb.append( ", " );
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
+    {
+        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
+              remoteRepositories, t );
     }
 
     public ArtifactResolutionException( String message, Throwable cause )
@@ -71,5 +111,10 @@ public class ArtifactResolutionException
     public String getType()
     {
         return type;
+    }
+
+    public List getRemoteRepositories()
+    {
+        return remoteRepositories;
     }
 }

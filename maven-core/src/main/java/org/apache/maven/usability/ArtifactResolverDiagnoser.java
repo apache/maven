@@ -18,7 +18,11 @@ package org.apache.maven.usability;
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.TransitiveArtifactResolutionException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.ProjectBuildingException;
+
+import java.util.List;
+import java.util.Iterator;
 
 public class ArtifactResolverDiagnoser
     implements ErrorDiagnoser

@@ -128,6 +128,10 @@ public class DefaultMaven
         {
             throw new ReactorException( "Error processing projects for the reactor: ", e );
         }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new ReactorException( "Error processing projects for the reactor: ", e );
+        }
 
         try
         {
@@ -169,7 +173,7 @@ public class DefaultMaven
     }
 
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive )
-        throws ProjectBuildingException, ReactorException, IOException
+        throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException
     {
         List projects = new ArrayList( files.size() );
 
@@ -278,7 +282,7 @@ public class DefaultMaven
     }
 
     public MavenProject getProject( File pom, ArtifactRepository localRepository )
-        throws ProjectBuildingException
+        throws ProjectBuildingException, ArtifactResolutionException
     {
         if ( pom.exists() )
         {

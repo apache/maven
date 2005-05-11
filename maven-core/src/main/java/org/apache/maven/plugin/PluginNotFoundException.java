@@ -27,9 +27,9 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 public class PluginNotFoundException
     extends ArtifactResolutionException
 {
-    public PluginNotFoundException( String groupId, String artifactId, String version, ArtifactResolutionException e )
+    public PluginNotFoundException( ArtifactResolutionException e )
     {
-        super( "Mojo could not be found - check that the goal name is correct", groupId, artifactId, version,
-               "maven-plugin", e );
+        super( "Mojo could not be found - check that the goal name is correct", e.getGroupId(), e.getArtifactId(),
+               e.getVersion(), "maven-plugin", e.getRemoteRepositories(), e );
     }
 }

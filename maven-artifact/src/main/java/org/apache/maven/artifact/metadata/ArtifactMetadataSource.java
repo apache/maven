@@ -17,6 +17,7 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.List;
@@ -29,5 +30,5 @@ import java.util.Set;
 public interface ArtifactMetadataSource
 {
     Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
-        throws ArtifactMetadataRetrievalException;
+        throws ArtifactMetadataRetrievalException, ArtifactResolutionException;
 }

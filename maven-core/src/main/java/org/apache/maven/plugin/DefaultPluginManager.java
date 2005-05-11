@@ -252,7 +252,7 @@ public class DefaultPluginManager
                 if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
                     version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
                 {
-                    throw new PluginNotFoundException( groupId, artifactId, version, e );
+                    throw new PluginNotFoundException( e );
                 }
                 else
                 {
