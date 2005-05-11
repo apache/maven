@@ -1,9 +1,5 @@
 package org.apache.maven.plugin;
 
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-
-import java.util.List;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -20,36 +16,41 @@ import java.util.List;
  * limitations under the License.
  */
 
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+
+import java.util.List;
+
 public class PluginParameterException
     extends PluginConfigurationException
 {
 
     private final List parameters;
+
     private final MojoDescriptor mojo;
 
     public PluginParameterException( MojoDescriptor mojo, List parameters )
     {
         super( "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint() );
-        
+
         this.mojo = mojo;
-        
+
         this.parameters = parameters;
     }
 
     public PluginParameterException( MojoDescriptor mojo, List parameters, Throwable cause )
     {
         super( "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint(), cause );
-        
+
         this.mojo = mojo;
-        
+
         this.parameters = parameters;
     }
-    
+
     public MojoDescriptor getMojoDescriptor()
     {
         return mojo;
     }
-    
+
     public List getParameters()
     {
         return parameters;

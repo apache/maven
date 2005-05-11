@@ -1,7 +1,7 @@
 package org.apache.maven;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@ package org.apache.maven;
  * limitations under the License.
  */
 
-import java.io.File;
-
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.DefaultArtifactEnabledContainer;
 import org.codehaus.plexus.PlexusContainer;
 
+import java.io.File;
+
 /**
  * This is a utility class for helping to configure a PlexusTestCase for testing with maven.
- * 
+ *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */

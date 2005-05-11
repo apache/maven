@@ -1,19 +1,5 @@
 package org.apache.maven.usability;
 
-import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginParameterException;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.Parameter;
-import org.codehaus.plexus.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -29,6 +15,20 @@ import java.util.regex.Pattern;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.plugin.PluginConfigurationException;
+import org.apache.maven.plugin.PluginParameterException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.codehaus.plexus.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PluginConfigurationDiagnoser
     implements ErrorDiagnoser
@@ -73,9 +73,8 @@ public class PluginConfigurationDiagnoser
         List params = exception.getParameters();
         MojoDescriptor mojo = exception.getMojoDescriptor();
 
-        messageBuffer.append( "One or more required plugin parameters are invalid/missing for \'" )
-            .append( mojo.getPluginDescriptor().getGoalPrefix() ).append( ":" ).append( mojo.getGoal() )
-            .append( "\'\n" );
+        messageBuffer.append( "One or more required plugin parameters are invalid/missing for \'" ).append(
+            mojo.getPluginDescriptor().getGoalPrefix() ).append( ":" ).append( mojo.getGoal() ).append( "\'\n" );
 
         int idx = 0;
         for ( Iterator it = params.iterator(); it.hasNext(); )
@@ -93,7 +92,7 @@ public class PluginConfigurationDiagnoser
     }
 
     private void decomposeParameterIntoUserInstructions( MojoDescriptor mojo, Parameter param,
-                                                        StringBuffer messageBuffer )
+                                                         StringBuffer messageBuffer )
     {
         String expression = param.getExpression();
 
@@ -107,8 +106,8 @@ public class PluginConfigurationDiagnoser
                 messageBuffer.append( " (aliased as: <" + alias + ">VALUE</" + alias + ">)" );
             }
 
-            messageBuffer.append( "\n    inside the <configuration/> section for "
-                + mojo.getPluginDescriptor().getArtifactId() );
+            messageBuffer.append( "\n    inside the <configuration/> section for " +
+                                  mojo.getPluginDescriptor().getArtifactId() );
         }
 
         if ( StringUtils.isEmpty( expression ) )
@@ -149,8 +148,8 @@ public class PluginConfigurationDiagnoser
                 }
                 else if ( "reports".equals( firstPart ) )
                 {
-                    expressionMessageBuffer
-                        .append( "make sure the <reports/> section of the pom.xml contains valid report names\n" );
+                    expressionMessageBuffer.append(
+                        "make sure the <reports/> section of the pom.xml contains valid report names\n" );
                 }
                 else if ( UNMODIFIABLE_EXPRESSIONS.contains( subExpression ) )
                 {
@@ -158,8 +157,8 @@ public class PluginConfigurationDiagnoser
                 }
                 else
                 {
-                    expressionMessageBuffer.append( "Please provide the system property: " ).append( subExpression )
-                        .append( "\n    (specified as \'-D" + subExpression + "=VALUE\' on the command line)\n" );
+                    expressionMessageBuffer.append( "Please provide the system property: " ).append( subExpression ).append(
+                        "\n    (specified as \'-D" + subExpression + "=VALUE\' on the command line)\n" );
                 }
             }
 
@@ -169,8 +168,8 @@ public class PluginConfigurationDiagnoser
             }
             else
             {
-                messageBuffer.append( "    (found static expression: \'" + expression
-                    + "\' which may act as a default value).\n" );
+                messageBuffer.append( "    (found static expression: \'" + expression +
+                                      "\' which may act as a default value).\n" );
             }
 
             if ( unmodifiableElementsFound )
@@ -180,11 +179,10 @@ public class PluginConfigurationDiagnoser
                     messageBuffer.append( "    " );
                 }
 
-                messageBuffer
-                    .append( "NOTE: One or more purely derived expression elements were detected in \'"
-                        + expression
-                        + "\'.\n    If you continue to get this error after any other expression elements are specified correctly,"
-                        + "\n    please report this issue to the Maven development team.\n" );
+                messageBuffer.append( "NOTE: One or more purely derived expression elements were detected in \'" +
+                                      expression +
+                                      "\'.\n    If you continue to get this error after any other expression elements are specified correctly," +
+                                      "\n    please report this issue to the Maven development team.\n" );
             }
         }
     }

@@ -36,15 +36,14 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -121,9 +120,9 @@ public class MavenCli
 
         boolean showErrors = debug || commandLine.hasOption( CLIManager.ERRORS );
 
-        if(showErrors)
+        if ( showErrors )
         {
-            System.out.println("+ Error stacktraces are turned on.");
+            System.out.println( "+ Error stacktraces are turned on." );
         }
 
         // ----------------------------------------------------------------------
@@ -267,8 +266,8 @@ public class MavenCli
         System.err.println( "FATAL ERROR: " + message );
         if ( show )
         {
-            System.err.println("Error stacktrace:");
-            
+            System.err.println( "Error stacktrace:" );
+
             e.printStackTrace();
         }
         else
@@ -465,7 +464,7 @@ public class MavenCli
         public static final char REACTOR = 'r';
 
         public static final char DEBUG = 'X';
-        
+
         // TODO: [jc] Is there a better switch than '-e' for this?
         public static final char ERRORS = 'e';
 
@@ -496,8 +495,8 @@ public class MavenCli
                 VERSION ) );
             options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
                 DEBUG ) );
-            options.addOption( OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create(
-                ERRORS ) );
+            options.addOption( OptionBuilder.withLongOpt( "errors" ).withDescription(
+                "Produce execution error messages" ).create( ERRORS ) );
             options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
                 "Execute goals for project found in the reactor" ).create( REACTOR ) );
             options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(

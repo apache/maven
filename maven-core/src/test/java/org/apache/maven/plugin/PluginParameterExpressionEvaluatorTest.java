@@ -22,7 +22,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
@@ -65,7 +64,8 @@ public class PluginParameterExpressionEvaluatorTest
     private static MavenSession createSession( MavenProject project, PlexusContainer container,
                                                ArtifactRepository repo )
     {
-        return new MavenSession( project, container, new Settings(), repo, new DefaultEventDispatcher(), Collections.EMPTY_LIST );
+        return new MavenSession( project, container, new Settings(), repo, new DefaultEventDispatcher(),
+                                 Collections.EMPTY_LIST );
     }
 
     public void testLocalRepositoryExtraction()
@@ -86,7 +86,6 @@ public class PluginParameterExpressionEvaluatorTest
 
         Model model = new Model();
         model.setBuild( build );
-
 
         ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( new MavenProject( model ) );
 
@@ -111,7 +110,8 @@ public class PluginParameterExpressionEvaluatorTest
         PlexusContainer container = getContainer();
         MavenSession session = createSession( project, container, repo );
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null, container.getLogger() );
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, null,
+                                                                                          container.getLogger() );
         return expressionEvaluator;
     }
 }

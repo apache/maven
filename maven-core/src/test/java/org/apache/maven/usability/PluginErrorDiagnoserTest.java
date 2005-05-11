@@ -1,17 +1,5 @@
 package org.apache.maven.usability;
 
-import org.apache.maven.plugin.PluginParameterException;
-import org.apache.maven.plugin.descriptor.DuplicateParameterException;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import junit.framework.TestCase;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -27,6 +15,17 @@ import junit.framework.TestCase;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import junit.framework.TestCase;
+import org.apache.maven.plugin.PluginParameterException;
+import org.apache.maven.plugin.descriptor.DuplicateParameterException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class PluginErrorDiagnoserTest
     extends TestCase
@@ -224,9 +223,9 @@ public class PluginErrorDiagnoserTest
     {
         IllegalArgumentException marker = new IllegalArgumentException();
 
-        System.out.println( "---------------------------------------------------------------------\n"
-            + "Visual output for " + marker.getStackTrace()[1].getMethodName()
-            + ":\n---------------------------------------------------------------------" );
+        System.out.println( "---------------------------------------------------------------------\n" +
+                            "Visual output for " + marker.getStackTrace()[1].getMethodName() +
+                            ":\n---------------------------------------------------------------------" );
     }
 
 }

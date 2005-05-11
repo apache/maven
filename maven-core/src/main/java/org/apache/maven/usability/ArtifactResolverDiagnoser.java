@@ -1,9 +1,5 @@
 package org.apache.maven.usability;
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.TransitiveArtifactResolutionException;
-import org.apache.maven.project.ProjectBuildingException;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -19,6 +15,10 @@ import org.apache.maven.project.ProjectBuildingException;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.TransitiveArtifactResolutionException;
+import org.apache.maven.project.ProjectBuildingException;
 
 public class ArtifactResolverDiagnoser
     implements ErrorDiagnoser
@@ -41,8 +41,8 @@ public class ArtifactResolverDiagnoser
 
             if ( causalityChainContains( error, TransitiveArtifactResolutionException.class ) )
             {
-                messageBuffer
-                    .append( "Error while transitively resolving artifacts (transitive path trace currently unavailable):\n\n" );
+                messageBuffer.append(
+                    "Error while transitively resolving artifacts (transitive path trace currently unavailable):\n\n" );
             }
             else
             {

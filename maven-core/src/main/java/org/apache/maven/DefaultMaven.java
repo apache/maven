@@ -1,20 +1,19 @@
 package org.apache.maven;
 
-/* ====================================================================
- *   Copyright 2001-2004 The Apache Software Foundation.
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- * ====================================================================
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import org.apache.maven.artifact.manager.WagonManager;
@@ -75,7 +74,7 @@ public class DefaultMaven
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
-    
+
     protected Map errorDiagnosers;
 
     // ----------------------------------------------------------------------
@@ -380,22 +379,22 @@ public class DefaultMaven
         getLogger().info( "BUILD FAILURE" );
 
         line();
-        
+
         String message = null;
-        if(errorDiagnosers != null)
+        if ( errorDiagnosers != null )
         {
             for ( Iterator it = errorDiagnosers.values().iterator(); it.hasNext(); )
             {
                 ErrorDiagnoser diagnoser = (ErrorDiagnoser) it.next();
-                
-                if( diagnoser.canDiagnose( e ) )
+
+                if ( diagnoser.canDiagnose( e ) )
                 {
                     message = diagnoser.diagnose( e );
                 }
             }
         }
-        
-        if( message == null )
+
+        if ( message == null )
         {
             message = "Reason: " + e.getMessage();
         }
@@ -403,7 +402,7 @@ public class DefaultMaven
         getLogger().info( message );
 
         line();
-        
+
         if ( longMessage != null )
         {
             getLogger().info( longMessage );
