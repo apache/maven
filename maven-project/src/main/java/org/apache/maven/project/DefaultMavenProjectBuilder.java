@@ -170,7 +170,6 @@ public class DefaultMavenProjectBuilder
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         return build( "Artifact [" + artifact.getId() + "]", model, localRepository );
@@ -191,6 +190,23 @@ public class DefaultMavenProjectBuilder
             File file = artifact.getFile();
             model = readModel( file );
         }
+
+        // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
+        // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
+        String downloadUrl = null;
+        if ( model.getDistributionManagement() != null )
+        {
+            downloadUrl = model.getDistributionManagement().getDownloadUrl();
+        }
+        if ( downloadUrl != null )
+        {
+            artifact.setDownloadUrl( downloadUrl );
+        }
+        else
+        {
+            artifact.setDownloadUrl( model.getUrl() );
+        }
+
         return model;
     }
 

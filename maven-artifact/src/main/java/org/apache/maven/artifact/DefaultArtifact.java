@@ -56,6 +56,8 @@ public class DefaultArtifact
 
     private ArtifactRepository repository;
 
+    private String downloadUrl;
+
     /**
      * !!! WARNING !!! Never put <classifier/> in the POM. It is for mojo use
      * only. Classifier is for specifying derived artifacts, like ejb-client.
@@ -309,5 +311,15 @@ public class DefaultArtifact
         {
             throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
         }
+    }
+
+    public String getDownloadUrl()
+    {
+        return downloadUrl;
+    }
+
+    public void setDownloadUrl( String downloadUrl )
+    {
+        this.downloadUrl = downloadUrl;
     }
 }

@@ -90,4 +90,8 @@ public interface Artifact
 
     void updateVersion( String version, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException;
+
+    String getDownloadUrl();
+
+    void setDownloadUrl( String downloadUrl );
 }

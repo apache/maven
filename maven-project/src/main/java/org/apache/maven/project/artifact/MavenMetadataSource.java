@@ -77,7 +77,7 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException, ArtifactResolutionException
     {
         // TODO: only metadata is really needed - resolve as metadata
-        artifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+        Artifact pomArtifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
                                                    artifact.getVersion(), artifact.getScope(), "pom" );
 
         List dependencies = null;
@@ -88,9 +88,10 @@ public class MavenMetadataSource
         {
             try
             {
-                MavenProject p = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
+                MavenProject p = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories,
                                                                           localRepository );
                 dependencies = p.getDependencies();
+                artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
             }
             catch ( ProjectBuildingException e )
             {
@@ -103,14 +104,14 @@ public class MavenMetadataSource
             // need to be able to not have a project builder
             // TODO: remove - which then makes this a very thin wrapper around a project builder - is it needed?
 
-            artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+            artifactResolver.resolve( pomArtifact, remoteRepositories, localRepository );
 
             FileReader reader = null;
             try
             {
 //                String path = localRepository.pathOfMetadata( new ProjectArtifactMetadata( artifact, null ) );
 //                File file = new File( localRepository.getBasedir(), path );
-                File file = artifact.getFile();
+                File file = pomArtifact.getFile();
                 reader = new FileReader( file );
                 Model model = this.reader.read( reader );
                 dependencies = model.getDependencies();

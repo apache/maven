@@ -19,96 +19,63 @@ package org.apache.maven.plugin.install;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
-import org.apache.maven.artifact.installer.ArtifactInstaller;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
 import java.io.File;
 
 /**
- * Installs project's main artifact in local repository.
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * Installs a file in local repository.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
- * @goal install
+ * @goal install-file
  */
-public class InstallMojo
+public class InstallFileMojo
     extends AbstractInstallMojo
 {
     /**
-     * @parameter expression="${project.groupId}"
+     * @parameter expression="${groupId}"
      * @required
      * @readonly
      */
     protected String groupId;
 
     /**
-     * @parameter expression="${project.artifactId}"
+     * @parameter expression="${artifactId}"
      * @required
      * @readonly
      */
     protected String artifactId;
 
     /**
-     * @parameter expression="${project.version}"
+     * @parameter expression="${version}"
      * @required
      * @readonly
      */
     protected String version;
 
     /**
-     * @parameter expression="${project.packaging}"
+     * @parameter expression="${packaging}"
      * @required
      * @readonly
      */
     protected String packaging;
 
     /**
-     * @parameter expression="${basedir}"
+     * @parameter expression="${file}"
      * @required
      * @readonly
      */
-    private File basedir;
-
-    /**
-     * @parameter expression="${project.build.directory}"
-     * @required
-     * @readonly
-     */
-    private String buildDirectory;
-
-    /**
-     * @parameter alias="archiveName" expression="${project.build.finalName}"
-     * @required
-     */
-    private String finalName;
+    private File file;
 
     public void execute()
         throws MojoExecutionException
     {
         Artifact artifact = new DefaultArtifact( groupId, artifactId, version, packaging );
 
-        boolean isPomArtifact = "pom".equals( packaging );
-        File pom = new File( basedir, "pom.xml" );
-        if ( !isPomArtifact )
-        {
-            ArtifactMetadata metadata = new ProjectArtifactMetadata( artifact, pom );
-            artifact.addMetadata( metadata );
-        }
-
         try
         {
-            if ( !isPomArtifact )
-            {
-                // TODO: would be something nice to get back from the project to get the full filename (the OGNL feedback thing)
-                installer.install( buildDirectory, finalName, artifact, localRepository );
-            }
-            else
-            {
-                installer.install( pom, artifact, localRepository );
-            }
+            installer.install( file, artifact, localRepository );
         }
         catch ( ArtifactInstallationException e )
         {

@@ -1298,6 +1298,15 @@
             <type>Site</type>
           </association>
         </field>
+        <field>
+          <name>downloadUrl</name>
+          <version>4.0.0+</version>
+          <description><![CDATA[
+            The URL of the project's download page. If not given users will be referred to the homepage given by
+            <code>url</code>.
+          ]]></description>
+          <type>String</type>
+        </field>
       </fields>
     </class>
     <class>
@@ -1324,7 +1333,7 @@
         </field>
         <field>
           <name>distribution</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description><![CDATA[
               The primary method by which this project may be distributed.
             <dl>

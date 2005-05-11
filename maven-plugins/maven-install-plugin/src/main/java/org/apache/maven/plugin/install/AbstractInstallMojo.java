@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.plugin.install;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,20 +16,30 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.AbstractMojo;
 
 /**
- * Exception occurring trying to resolve a plugin.
+ * Common fields for installation mojos.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class PluginNotFoundException
-    extends ArtifactResolutionException
+public abstract class AbstractInstallMojo
+    extends AbstractMojo
 {
-    public PluginNotFoundException( ArtifactResolutionException e )
-    {
-        super( "Mojo could not be found - check that the goal name is correct", e.getGroupId(), e.getArtifactId(),
-               e.getVersion(), "maven-plugin", e.getRemoteRepositories(), e.getDownloadUrl(), e );
-    }
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.installer.ArtifactInstaller}"
+     * @required
+     * @readonly
+     */
+    protected ArtifactInstaller installer;
+
+    /**
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    protected ArtifactRepository localRepository;
 }
