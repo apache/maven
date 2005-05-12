@@ -6,9 +6,9 @@
   </properties>
   <body>
     <section name="Welcome to Maven 2">
-      <div style="float: right; margin: 0 10px 20px 20px; padding: 5px; border: 1px solid #999; background-color: #eee;">
-        <h5 style="margin: 0; font-size: smaller; border-bottom: 1px solid #aaaaaa">Get Maven 2.0</h5>
-        <p style="font-size: smaller">
+      <div id="downloadbox">
+        <h5>Get Maven 2.0</h5>
+        <p>
           <a href="download.html">
             <img valign="top" src="http://maven.apache.org/images/folder-open.gif" border="0" alt="" title="download"/>
             Download
@@ -16,14 +16,14 @@
           <small>(685K)</small>
           <br/>
         </p>
-        <ul style="margin-top: 0; list-style-type: disc">
-          <li style="font-size: smaller">
+        <ul>
+          <li>
             <a href="download.html#requirements">System Requirements</a>
           </li>
-          <li style="font-size: smaller">
+          <li>
             <a href="download.html#installation">Installation Instructions</a>
           </li>
-          <li style="font-size: smaller">
+          <li>
             <a href="getting-started.html">Getting Started</a>
           </li>
         </ul>
@@ -33,7 +33,7 @@
         (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
       </p>
       <p>
-        <b style="font-size: larger">About Maven 2.0</b>
+        <h4>About Maven 2.0</h4>
       </p>
       <p>
         Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
@@ -77,7 +77,7 @@
         </li>
       </ul>
       <p>
-        <b style="font-size: larger">Information for Maven 1.0 Users</b>
+        <h4>Information for Maven 1.0 Users</h4>
       </p>
       <p>
         Maven 1.0 users will likely have a lot of questions about Maven 2.0 and how it will impact the future of Maven
@@ -106,7 +106,7 @@
         </li>
       </ul>
       <p>
-        <b style="font-size: larger">User's Guide</b>
+        <h4>User's Guide</h4>
       </p>
       <p>
         Maven is now simpler than ever to use!
@@ -151,7 +151,7 @@
       </p>
       <subsection name="Developing Maven 2">
         <p>
-          <b style="font-size: larger">Developers and Prospective Contributors</b>
+          <h4>Developers and Prospective Contributors</h4>
         </p>
         <p>
           There is plenty of work to be done. If you are interested in getting involved, the following may help:

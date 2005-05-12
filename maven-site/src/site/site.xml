@@ -2,34 +2,40 @@
 <project name="Maven">
   <bannerLeft>
     <name>Maven</name>
-    <href>http://www.apache.org</href>
+    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <href>http://maven.apache.org/</href>
   </bannerLeft>
   <bannerRight>
-    <name>http://codehaus.org/codehaus-small.png</name>
-    <href>http://www.codehaus.org</href>
+    <src>http://maven.apache.org/images/maven-small.gif</src>
   </bannerRight>
   <body>
     <links>
+      <item name="Apache" href="http://www.apache.org/" />
       <item name="Maven 1.0" href="http://maven.apache.org/"/>
       <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
     </links>
+
     <menu name="Maven 2.0">
       <item name="Introduction" href="index.html"/>
       <item name="Download" href="download.html"/>
       <item name="General Information" href="about.html"/>
       <item name="For Maven 1.0 Users" href="maven1.html"/>
+      <item name="Road Map" href="roadmap.html" />
     </menu>
     <menu name="User's Guide">
       <item name="Getting Started" href="getting-started.html"/>
-      <!-- TODO
-            <item name="Configuration" href="configuration.html"/>
-      -->
-      <item name="Developing Plugins with Marmalade" href="developing-plugins-with-marmalade.html"/>
+      <item name="Configuration" href="configuration.html"/>
+      <item name="Dependency Mechanism" href="dependencies.html"/>
+      <item name="Developing Plugins with Marmalade" href="developers/developing-plugins-with-marmalade.html"/>
     </menu>
     <menu name="Reference">
       <item name="Project Descriptor" href="project-descriptor.html"/>
       <item name="Settings Descriptor" href="settings-descriptor.html"/>
       <item name="Available Plugins" href="plugin-list.html"/>
-    </menu>      
+      <item name="Ant Tasks" href="ant-tasks.html"/>
+    </menu>
+    <menu name="Developers">
+      <item name="Documentation Needed" href="docs-required.html"/>
+    </menu>
   </body>
 </project>
