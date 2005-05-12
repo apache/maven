@@ -48,7 +48,7 @@ public class JellyHarnessGenerator
         return pluginDescriptor.getImplementation() + "Bean";
     }
 
-    public void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
+    public void execute( File destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
         FileWriter writer = null;

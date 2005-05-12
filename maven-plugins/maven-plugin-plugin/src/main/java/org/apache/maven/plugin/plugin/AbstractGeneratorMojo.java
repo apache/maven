@@ -27,6 +27,7 @@ import org.apache.maven.tools.plugin.scanner.MojoScanner;
 import org.apache.maven.tools.plugin.util.PluginUtils;
 
 import java.io.IOException;
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -52,7 +53,7 @@ public abstract class AbstractGeneratorMojo
      */
     protected String goalPrefix;
 
-    protected abstract String getOutputDirectory();
+    protected abstract File getOutputDirectory();
 
     protected abstract Generator createGenerator();
 
@@ -85,6 +86,8 @@ public abstract class AbstractGeneratorMojo
             pluginDescriptor.setDependencies( PluginUtils.toComponentDependencies( project.getRuntimeDependencies() ) );
             
             mojoScanner.populatePluginDescriptor( project, pluginDescriptor );
+
+            getOutputDirectory().mkdirs();
 
             createGenerator().execute( getOutputDirectory(), pluginDescriptor );
         }

@@ -43,7 +43,7 @@ import java.util.Map;
 public class PluginDescriptorGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
+    public void execute( File destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
         File f = new File( destinationDirectory, "plugin.xml" );
@@ -256,9 +256,6 @@ public class PluginDescriptorGenerator
                     {
                         element( w, "deprecated", parameter.getDeprecated() );
                     }
-
-                    // TODO: do we still need this?
-                    element( w, "validator", parameter.getValidator() );
 
                     element( w, "required", Boolean.toString( parameter.isRequired() ) );
 

@@ -58,7 +58,6 @@ public abstract class AbstractGeneratorTestCase
         List params = new ArrayList();
 
         Parameter param = new Parameter();
-        param.setDefaultValue( "value" );
         param.setExpression( "${project.build.directory}" );
         param.setName( "dir" );
         param.setRequired( true );
@@ -70,6 +69,7 @@ public abstract class AbstractGeneratorTestCase
         mojoDescriptor.setParameters( params );
 
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        mojoDescriptor.setPluginDescriptor( pluginDescriptor );
 
         pluginDescriptor.addMojo( mojoDescriptor );
 
@@ -86,7 +86,7 @@ public abstract class AbstractGeneratorTestCase
         File tempFile = File.createTempFile( "testGenerator-outDir", ".marker.txt" ).getAbsoluteFile();
         File destinationDirectory = tempFile.getParentFile();
 
-        generator.execute( destinationDirectory.getAbsolutePath(), pluginDescriptor );
+        generator.execute( destinationDirectory, pluginDescriptor );
 
         validate( destinationDirectory );
     }

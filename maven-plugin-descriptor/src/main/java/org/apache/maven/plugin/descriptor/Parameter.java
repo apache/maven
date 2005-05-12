@@ -23,22 +23,18 @@ package org.apache.maven.plugin.descriptor;
 public class Parameter
 {
     private String alias;
-    
+
     private String name;
 
     private String type;
 
     private boolean required;
-    
-    private boolean editable = true;
 
-    private String validator;
+    private boolean editable = true;
 
     private String description;
 
     private String expression;
-
-    private String defaultValue;
 
     private String deprecated;
 
@@ -76,16 +72,6 @@ public class Parameter
         this.required = required;
     }
 
-    public String getValidator()
-    {
-        return validator;
-    }
-
-    public void setValidator( String validator )
-    {
-        this.validator = validator;
-    }
-
     public String getDescription()
     {
         return description;
@@ -106,16 +92,6 @@ public class Parameter
         this.expression = expression;
     }
 
-    public String getDefaultValue()
-    {
-        return defaultValue;
-    }
-
-    public void setDefaultValue( String defaultValue )
-    {
-        this.defaultValue = defaultValue;
-    }
-
     public String getDeprecated()
     {
         return deprecated;
@@ -131,9 +107,9 @@ public class Parameter
         return name.hashCode();
     }
 
-    public boolean equals(Object other)
+    public boolean equals( Object other )
     {
-        return (other instanceof Parameter) && getName().equals(((Parameter)other).getName());
+        return ( other instanceof Parameter ) && getName().equals( ( (Parameter) other ).getName() );
     }
 
     public String getAlias()
@@ -155,7 +131,7 @@ public class Parameter
     {
         this.editable = editable;
     }
-    
+
     public String toString()
     {
         return "Mojo parameter [name: \'" + getName() + "\'; alias: \'" + getAlias() + "\']";

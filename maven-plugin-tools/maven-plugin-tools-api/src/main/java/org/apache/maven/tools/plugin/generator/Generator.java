@@ -19,6 +19,7 @@ package org.apache.maven.tools.plugin.generator;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 import java.io.IOException;
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -26,6 +27,6 @@ import java.io.IOException;
  */
 public interface Generator
 {
-    void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
+    void execute( File destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException;
 }

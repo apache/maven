@@ -33,23 +33,23 @@ import java.util.Map;
 
 /**
  * @todo add example usage tag that can be shown in the doco
- * @todo need to add validation directives so that systems embedding maven2 can
- *       get validation directives to help users in IDEs.
  */
 public class PluginXdocGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
+    public void execute( File destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
+        // TODO: write an overview page
+
         for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
         {
             MojoDescriptor descriptor = (MojoDescriptor) it.next();
-            processPluginDescriptor( descriptor, destinationDirectory );
+            processMojoDescriptor( descriptor, destinationDirectory );
         }
     }
 
-    protected void processPluginDescriptor( MojoDescriptor mojoDescriptor, String destinationDirectory )
+    protected void processMojoDescriptor( MojoDescriptor mojoDescriptor, File destinationDirectory )
         throws IOException
     {
         String id = mojoDescriptor.getGoal();
@@ -57,7 +57,7 @@ public class PluginXdocGenerator
         FileWriter writer = null;
         try
         {
-            writer = new FileWriter( new File( destinationDirectory, id + "-plugin.xml" ) );
+            writer = new FileWriter( new File( destinationDirectory, id + "-mojo.xml" ) );
 
             writeBody( writer, id, mojoDescriptor );
 
@@ -83,15 +83,8 @@ public class PluginXdocGenerator
 
         w.startElement( "title" );
 
-        w.writeText( "Documentation for the " + id + " plugin." );
-
-        w.endElement();
-
-        w.startElement( "author" );
-
-        w.addAttribute( "email", "dev@maven.apache.org" );
-
-        w.writeText( "Maven development team." );
+        // TODO: need a friendly name for a plugin
+        w.writeText( mojoDescriptor.getPluginDescriptor().getArtifactId() + " - " + mojoDescriptor.getFullGoalName() );
 
         w.endElement();
 
@@ -103,34 +96,24 @@ public class PluginXdocGenerator
 
         w.startElement( "section" );
 
-        w.addAttribute( "name", "Goals" );
+        w.addAttribute( "name", mojoDescriptor.getFullGoalName() );
 
         w.startElement( "p" );
-
-        w.writeText( "The goals for the " + id + " are as follows:" );
-
-        w.endElement();
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        w.startElement( "subsection" );
-
-        w.addAttribute( "name", mojoDescriptor.getGoal() );
 
         if ( mojoDescriptor.getDescription() != null )
         {
-            w.startElement( "p" );
-
-            w.writeText( mojoDescriptor.getDescription() );
-
-            w.endElement();
+            w.writeMarkup( mojoDescriptor.getDescription() );
         }
+        else
+        {
+            w.writeText( "No description." );
+        }
+
+        w.endElement();
 
         w.startElement( "p" );
 
-        w.writeText( "These parameters for this goal: " );
+        w.writeText( "Parameters for the goal: " );
 
         w.endElement();
 
@@ -138,23 +121,11 @@ public class PluginXdocGenerator
 
         w.endElement();
 
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
-        w.endElement();
-
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
-
         w.endElement();
     }
 
     private void writeGoalParameterTable( MojoDescriptor mojoDescriptor, XMLWriter w )
     {
-        w.startElement( "p" );
-
         w.startElement( "table" );
 
         w.startElement( "tr" );
@@ -183,23 +154,9 @@ public class PluginXdocGenerator
 
         w.endElement();
 
-        w.startElement( "th" );
-
-        w.writeText( "Required?" );
-
-        w.endElement();
-
-        w.startElement( "th" );
-
-        w.writeText( "Deprecated?" );
-
-        w.endElement();
-
         w.endElement();
 
         List parameters = mojoDescriptor.getParameters();
-
-        Map parameterMap = mojoDescriptor.getParameterMap();
 
         for ( int i = 0; i < parameters.size(); i++ )
         {
@@ -220,7 +177,16 @@ public class PluginXdocGenerator
                 paramName = parameter.getName();
             }
 
+            w.startElement( "code" );
+
             w.writeText( paramName );
+
+            w.endElement();
+
+            if ( !parameter.isRequired() )
+            {
+                w.writeMarkup( " <i>(Optional)</i>");
+            }
 
             w.endElement();
 
@@ -229,18 +195,33 @@ public class PluginXdocGenerator
             // ----------------------------------------------------------------------
 
             w.startElement( "td" );
+
+            w.startElement( "code" );
 
             w.writeText( parameter.getType() );
 
             w.endElement();
 
+            w.endElement();
+
             // ----------------------------------------------------------------------
             //
             // ----------------------------------------------------------------------
 
             w.startElement( "td" );
 
-            w.writeText( parameter.getExpression() );
+            w.startElement( "code" );
+
+            if ( StringUtils.isNotEmpty( parameter.getExpression() ) )
+            {
+                w.writeText( parameter.getExpression() );
+            }
+            else
+            {
+                w.writeText( "-" );
+            }
+
+            w.endElement();
 
             w.endElement();
 
@@ -250,38 +231,32 @@ public class PluginXdocGenerator
 
             w.startElement( "td" );
 
-            w.writeText( parameter.getDescription() );
-
-            w.endElement();
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
-
-            w.startElement( "td" );
-
-            w.writeText( Boolean.toString( parameter.isRequired() ) );
-
-            w.endElement();
-
-            // ----------------------------------------------------------------------
-            //
-            // ----------------------------------------------------------------------
+            if ( StringUtils.isNotEmpty( parameter.getDescription() ) )
+            {
+                w.writeMarkup( parameter.getDescription() );
+            }
+            else
+            {
+                w.writeText( "No description." );
+            }
 
             String deprecationWarning = parameter.getDeprecated();
-            if ( StringUtils.isNotEmpty( deprecationWarning ) )
+            if ( deprecationWarning != null )
             {
-                w.startElement( "td" );
-
-                w.writeText( deprecationWarning );
+                w.writeMarkup( "<br/><b>Deprecated:</b> ");
+                w.writeMarkup( deprecationWarning );
+                if ( deprecationWarning.length() == 0 )
+                {
+                    w.writeText( "No reason given." );
+                }
 
                 w.endElement();
             }
 
             w.endElement();
-        }
 
-        w.endElement();
+            w.endElement();
+        }
 
         w.endElement();
     }

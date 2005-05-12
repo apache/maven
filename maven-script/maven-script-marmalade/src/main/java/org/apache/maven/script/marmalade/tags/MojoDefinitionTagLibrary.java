@@ -43,7 +43,6 @@ public class MojoDefinitionTagLibrary
         registerTag( "expression", ParamExpressionTag.class );
         registerTag( "type", ParamTypeTag.class );
         registerTag( "default", ParamDefaultTag.class );
-        registerTag( "validator", ParamValidatorTag.class );
         registerTag( "required", ParamRequiredTag.class );
     }
 

@@ -43,7 +43,7 @@ import java.util.List;
 public class BeanGenerator
     implements Generator
 {
-    public void execute( String destinationDirectory, PluginDescriptor pluginDescriptor )
+    public void execute( File destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
         for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
@@ -53,7 +53,7 @@ public class BeanGenerator
         }
     }
 
-    protected void processPluginDescriptor( MojoDescriptor descriptor, String destinationDirectory )
+    protected void processPluginDescriptor( MojoDescriptor descriptor, File destinationDirectory )
         throws IOException
     {
         String implementation = descriptor.getImplementation();

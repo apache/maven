@@ -123,6 +123,6 @@ public class Main
 
         // Use the generator to process the discovered descriptors and produce
         // something with them.
-        generator.execute( outputDirectory, pluginDescriptor );
+        generator.execute( new File( outputDirectory ), pluginDescriptor );
     }
 }

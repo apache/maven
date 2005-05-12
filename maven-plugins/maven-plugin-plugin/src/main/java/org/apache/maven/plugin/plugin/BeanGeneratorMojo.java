@@ -19,6 +19,8 @@ package org.apache.maven.plugin.plugin;
 import org.apache.maven.tools.plugin.generator.BeanGenerator;
 import org.apache.maven.tools.plugin.generator.Generator;
 
+import java.io.File;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -31,9 +33,9 @@ public class BeanGeneratorMojo
      * @parameter expression="${project.build.directory}/generated-sources"
      * @required
      */
-    protected String outputDirectory;
+    protected File outputDirectory;
 
-    protected String getOutputDirectory()
+    protected File getOutputDirectory()
     {
         return outputDirectory;
     }

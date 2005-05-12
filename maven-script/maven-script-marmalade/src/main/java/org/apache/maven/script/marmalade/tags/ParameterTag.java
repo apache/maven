@@ -37,10 +37,6 @@ public class ParameterTag
 
     private String expression;
 
-    private String validator;
-
-    private String defaultVal;
-
     private String deprecated;
 
     private boolean required = true;
@@ -61,12 +57,10 @@ public class ParameterTag
         Parameter param = new Parameter();
 
         param.setName( name );
-        param.setDefaultValue( defaultVal );
         param.setDescription( description );
         param.setExpression( expression );
         param.setRequired( required );
         param.setType( type );
-        param.setValidator( validator );
         param.setDeprecated( deprecated );
 
         return param;
@@ -92,14 +86,8 @@ public class ParameterTag
         this.expression = expression;
     }
 
-    public void setValidator( String validator )
-    {
-        this.validator = validator;
-    }
-
     public void setDefault( String defaultVal )
     {
-        this.defaultVal = defaultVal;
     }
 
     public void setRequired( boolean required )

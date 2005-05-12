@@ -187,8 +187,6 @@ public class PluginDescriptorBuilder
                 parameter.setEditable( editable == null || Boolean.valueOf( editable ).booleanValue() );
             }
 
-            parameter.setValidator( d.getChild( "validator" ).getValue() );
-
             parameter.setDescription( d.getChild( "description" ).getValue() );
 
             parameter.setExpression( d.getChild( "expression" ).getValue() );

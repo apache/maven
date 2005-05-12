@@ -17,20 +17,20 @@ package org.apache.maven.plugin.plugin;
  */
 
 import org.apache.maven.tools.plugin.generator.Generator;
-import org.apache.maven.tools.plugin.generator.jelly.JellyHarnessGenerator;
+import org.apache.maven.tools.plugin.generator.PluginXdocGenerator;
 
 import java.io.File;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
- * @goal jelly
+ * @goal xdoc
  */
-public class JellyGeneratorMojo
+public class XdocGeneratorMojo
     extends AbstractGeneratorMojo
 {
     /**
-     * @parameter expression="${project.build.directory}/generated-sources"
+     * @parameter expression="${project.build.directory}/generated-xdocs"
      * @required
      */
     protected File outputDirectory;
@@ -42,6 +42,6 @@ public class JellyGeneratorMojo
 
     protected Generator createGenerator()
     {
-        return new JellyHarnessGenerator();
+        return new PluginXdocGenerator();
     }
 }

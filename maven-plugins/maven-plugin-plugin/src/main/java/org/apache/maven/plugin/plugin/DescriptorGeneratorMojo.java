@@ -19,6 +19,8 @@ package org.apache.maven.plugin.plugin;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.generator.PluginDescriptorGenerator;
 
+import java.io.File;
+
 /**
  * Generate a plugin descriptor.
  * <p/>
@@ -36,9 +38,9 @@ public class DescriptorGeneratorMojo
      * @parameter expression="${project.build.outputDirectory}/META-INF/maven"
      * @required
      */
-    protected String outputDirectory;
+    protected File outputDirectory;
 
-    protected String getOutputDirectory()
+    protected File getOutputDirectory()
     {
         return outputDirectory;
     }
