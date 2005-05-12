@@ -241,9 +241,9 @@ public class PluginXdocGenerator
         // TODO: need a friendly name for a plugin
         w.writeText( mojoDescriptor.getPluginDescriptor().getArtifactId() + " - " + mojoDescriptor.getFullGoalName() );
 
-        w.endElement();
+        w.endElement(); // title
 
-        w.endElement();
+        w.endElement(); // properties
 
         // ----------------------------------------------------------------------
         //
@@ -266,19 +266,21 @@ public class PluginXdocGenerator
             w.writeText( "No description." );
         }
 
-        w.endElement();
+        w.endElement(); // p
 
         w.startElement( "p" );
 
         w.writeText( "Parameters for the goal: " );
 
-        w.endElement();
+        w.endElement(); // p
 
         writeGoalParameterTable( mojoDescriptor, w );
 
-        w.endElement();
+        w.endElement(); // section
 
-        w.endElement();
+        w.endElement(); // body
+
+        w.endElement(); // document
     }
 
     private void writeGoalParameterTable( MojoDescriptor mojoDescriptor, XMLWriter w )
@@ -291,27 +293,27 @@ public class PluginXdocGenerator
 
         w.writeText( "Parameter" );
 
-        w.endElement();
+        w.endElement(); // th
 
         w.startElement( "th" );
 
         w.writeText( "Type" );
 
-        w.endElement();
+        w.endElement(); // th
 
         w.startElement( "th" );
 
         w.writeText( "Expression" );
 
-        w.endElement();
+        w.endElement(); // th
 
         w.startElement( "th" );
 
         w.writeText( "Description" );
 
-        w.endElement();
+        w.endElement(); // th
 
-        w.endElement();
+        w.endElement(); // tr
 
         List parameters = mojoDescriptor.getParameters();
 
@@ -338,7 +340,7 @@ public class PluginXdocGenerator
 
             w.writeText( paramName );
 
-            w.endElement();
+            w.endElement(); // code
 
             if ( !parameter.isRequired() )
             {
@@ -350,7 +352,7 @@ public class PluginXdocGenerator
                 w.writeMarkup( " <i>(Discovered)</i>" );
             }
 
-            w.endElement();
+            w.endElement(); // td
 
             // ----------------------------------------------------------------------
             //
@@ -372,9 +374,9 @@ public class PluginXdocGenerator
                 w.writeText( parameter.getType() );
             }
 
-            w.endElement();
+            w.endElement(); // code
 
-            w.endElement();
+            w.endElement(); // td
 
             // ----------------------------------------------------------------------
             //
@@ -394,9 +396,9 @@ public class PluginXdocGenerator
                 w.writeText( "-" );
             }
 
-            w.endElement();
+            w.endElement(); // code
 
-            w.endElement();
+            w.endElement(); // td
 
             // ----------------------------------------------------------------------
             //
@@ -422,17 +424,13 @@ public class PluginXdocGenerator
                 {
                     w.writeText( "No reason given." );
                 }
-
-                w.endElement();
             }
 
-            w.endElement();
+            w.endElement(); // td
 
-            w.endElement();
+            w.endElement(); // tr
         }
 
-        w.endElement();
-
-        w.endElement();
+        w.endElement(); // table
     }
 }
