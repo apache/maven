@@ -60,6 +60,11 @@ public abstract class AbstractGeneratorMojo
     public void execute()
         throws MojoExecutionException
     {
+        if ( !project.getPackaging().equals( "maven-plugin" ) )
+        {
+            return;
+        }
+
         String defaultGoalPrefix = PluginDescriptor.getGoalPrefixFromArtifactId( project.getArtifactId() );
         if ( goalPrefix == null )
         {
