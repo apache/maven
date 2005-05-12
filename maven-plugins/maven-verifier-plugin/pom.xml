@@ -8,7 +8,7 @@
   <artifactId>maven-verifier-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven Verifier Plugin</name>
-  <version>1.0-alpha-2-SNAPSHOT</version>
+  <version>1.0-alpha-1-SNAPSHOT</version>
   <developers>
     <developer>
       <id>vmassol</id>

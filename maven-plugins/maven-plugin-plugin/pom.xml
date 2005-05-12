@@ -8,7 +8,7 @@
   <artifactId>maven-plugin-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven PLUGIN Plugin</name>
-  <version>1.0-alpha-2-SNAPSHOT</version>
+  <version>2.0-alpha-2-SNAPSHOT</version>
   <inceptionYear>2001</inceptionYear>
   <dependencies>
     <dependency>

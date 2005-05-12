@@ -8,7 +8,7 @@
   <artifactId>maven-war-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven War Plugin</name>
-  <version>1.0-alpha-2-SNAPSHOT</version>
+  <version>2.0-alpha-2-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
