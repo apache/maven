@@ -27,6 +27,7 @@ import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.util.ArrayList;
 import java.io.File;
@@ -60,7 +61,7 @@ public class DoxiaMojo
     private String siteDirectory;
 
     /**
-     * @parameter alias="workingDirectory" expression="${project.build.directory}/site-generated"
+     * @parameter alias="workingDirectory" expression="${project.build.directory}/generated-site"
      * @required
      */
     private String generatedSiteDirectory;
@@ -125,8 +126,6 @@ public class DoxiaMojo
 
             config.setModel( project.getModel() );
 
-            config.setOutputDirectory( new File( generatedSiteDirectory ) );
-
             //Generate reports
             if ( reports != null )
             {
@@ -157,7 +156,6 @@ public class DoxiaMojo
                 }
                 catch ( Exception e )
                 {
-                    e.printStackTrace();
                     throw new MojoExecutionException( "An error is occurred in project info page generation.", e );
                 }
             }
@@ -170,7 +168,6 @@ public class DoxiaMojo
                 }
                 catch ( Exception e )
                 {
-                    e.printStackTrace();
                     throw new MojoExecutionException( "An error is occurred in project reports page generation.", e );
                 }
             }
@@ -254,16 +251,18 @@ public class DoxiaMojo
     {
         File siteDescriptor = new File( siteDirectory, "site.xml" );
 
-        if ( !siteDescriptor.exists() )
-        {
-            throw new MojoExecutionException( "The site descriptor is not present!" );
-        }
-
         String siteDescriptorContent = "";
 
         try
         {
-            siteDescriptorContent = FileUtils.fileRead( siteDescriptor );
+            if ( siteDescriptor.exists() )
+            {
+                siteDescriptorContent = FileUtils.fileRead( siteDescriptor );
+            }
+            else
+            {
+                siteDescriptorContent = IOUtil.toString( getClass().getResourceAsStream( "/default-site.xml" ) );
+            }
         }
         catch( IOException e )
         {
@@ -277,8 +276,12 @@ public class DoxiaMojo
             props.put( "reports", getReportsMenu() );
         }
 
+        // TODO: interpolate ${project.*} in general
+        props.put( "project.name", project.getName() );
+        props.put( "project.url", project.getUrl() );
+
         siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
-        
+
         return new StringInputStream( siteDescriptorContent );
     }
 

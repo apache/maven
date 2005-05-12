@@ -30,7 +30,7 @@ public class XdocGeneratorMojo
     extends AbstractGeneratorMojo
 {
     /**
-     * @parameter expression="${project.build.directory}/generated-xdocs"
+     * @parameter expression="${project.build.directory}/generated-site/xdoc"
      * @required
      */
     protected File outputDirectory;

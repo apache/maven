@@ -30,19 +30,7 @@ public class MavenReportConfiguration
 {
     private Model model;
 
-    private File outputDirectory;
-
     private File basedir;
-
-    public File getOutputDirectory()
-    {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory( File outputDirectory )
-    {
-        this.outputDirectory = outputDirectory;
-    }
 
     public File getBasedir()
     {
