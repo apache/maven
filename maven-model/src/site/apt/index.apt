@@ -7,8 +7,14 @@
 Maven Model
  
  This is strictly the model for Maven, so really just plain objects.
- Eventually I would like to be able to generate these from a UML model but that can
- come later. In addition to generating the sources from a UML model I would
- like to generate the XSD or any other artifacts that may be required. This way
- we can keep things up-to-date instead of the disaster we have with the
- current incarnation of Maven.
+
+ The following are generated from this model:
+
+   * Java sources (will link to javadoc later)
+
+   * Reader and Writers for the Xpp3 XML parser
+
+   * A {{{maven.html}Descriptor Reference}}
+
+   * An XSD (link to it when available)
+
