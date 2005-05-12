@@ -438,9 +438,16 @@ public class DefaultModelInheritanceAssembler
             {
                 if ( parentDistMgmt.getSite() != null )
                 {
-                    childDistMgmt.setSite( parentDistMgmt.getSite() );
+                    Site site = new Site();
 
-                    Site site = childDistMgmt.getSite();
+                    childDistMgmt.setSite( site );
+
+                    site.setId( parentDistMgmt.getSite().getId() );
+
+                    site.setName( parentDistMgmt.getSite().getName() );
+
+                    site.setUrl( parentDistMgmt.getSite().getUrl() );
+
                     if ( site.getUrl() != null && site.getUrl().endsWith( "/" ) )
                     {
                         site.setUrl( site.getUrl() + child.getArtifactId() + "/" );
@@ -452,12 +459,19 @@ public class DefaultModelInheritanceAssembler
             {
                 if ( parentDistMgmt.getRepository() != null )
                 {
-                    childDistMgmt.setRepository( parentDistMgmt.getRepository() );
+                    Repository repository = new Repository();
 
-                    Repository repo = childDistMgmt.getRepository();
-                    if ( repo.getUrl() != null && repo.getUrl().endsWith( "/" ) )
+                    childDistMgmt.setRepository( repository );
+
+                    repository.setId( parentDistMgmt.getRepository().getId() );
+
+                    repository.setName( parentDistMgmt.getRepository().getName() );
+
+                    repository.setUrl( parentDistMgmt.getRepository().getUrl() );
+
+                    if ( repository.getUrl() != null && repository.getUrl().endsWith( "/" ) )
                     {
-                        repo.setUrl( repo.getUrl() + child.getArtifactId() + "/" );
+                        repository.setUrl( repository.getUrl() + child.getArtifactId() + "/" );
                     }
                 }
             }
