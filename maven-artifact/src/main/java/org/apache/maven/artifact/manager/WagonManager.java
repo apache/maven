@@ -23,6 +23,8 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.events.TransferListener;
 
 import java.io.File;
@@ -62,4 +64,8 @@ public interface WagonManager
     void addMirror( String id, String mirrorOf, String url );
 
     void setDownloadMonitor( TransferListener downloadMonitor );
+
+    ProxyInfo getProxy( String protocol );
+
+    AuthenticationInfo getAuthenticationInfo( String id );
 }

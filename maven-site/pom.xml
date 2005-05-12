@@ -12,7 +12,7 @@
   <distributionManagement>
     <site>
       <id>website</id>
-      <url>scp://people.apache.org/home/brett/public_html/maven-stage-site/maven2</url>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2</url>
     </site>
   </distributionManagement>
 </project>

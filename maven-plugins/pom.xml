@@ -64,6 +64,10 @@
 -->
       <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
+    <site>
+      <id>website</id>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/plugins/</url>
+    </site>
   </distributionManagement>
   <modules>
     <module>maven-assembly-plugin</module>

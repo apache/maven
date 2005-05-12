@@ -422,17 +422,17 @@ public class DefaultWagonManager
         }
     }
 
-    private ProxyInfo getProxy( String protocol )
+    public ProxyInfo getProxy( String protocol )
     {
         return (ProxyInfo) proxies.get( protocol );
     }
 
-    private AuthenticationInfo getAuthenticationInfo( String id )
+    public AuthenticationInfo getAuthenticationInfo( String id )
     {
         return (AuthenticationInfo) authenticationInfoMap.get( id );
     }
 
-    private Repository getMirror( String mirrorOf )
+    public Repository getMirror( String mirrorOf )
     {
         return (Repository) mirrors.get( mirrorOf );
     }

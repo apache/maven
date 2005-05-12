@@ -3,6 +3,7 @@
  */
 package org.apache.maven.doxia;
 
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,14 +26,14 @@ import java.util.zip.ZipOutputStream;
 
 
 /**
- * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
- * @version $Id$
- * @goal deploy
- * @description deploys website using scp protocol.
+ * Deploys website using scp protocol.
  * First website files are packaged into zip archive,
  * then archive is transfred to remote host, nextly it is un-archived.
  * This method of deployment should normally be much faster
  * then making file by file copy.
+ * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
+ * @version $Id$
+ * @goal deploy
  */
 public class ScpSiteDeployMojo
     extends AbstractMojo
@@ -61,6 +62,13 @@ public class ScpSiteDeployMojo
      */
     private MavenProject project;
 
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.manager.WagonManager}"
+     * @required
+     * @readonly
+     */
+    private WagonManager wagonManager;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -77,26 +85,21 @@ public class ScpSiteDeployMojo
             throw new MojoExecutionException( "Cannot create site archive!", e );
         }
 
-        SshCommandExecutor commandExecutor = new ScpWagon();
-
+        SshCommandExecutor commandExecutor = null;
         try
         {
             DistributionManagement distributionManagement = project.getDistributionManagement();
 
             if ( distributionManagement == null )
             {
-
-                String msg = "distributionManagement element is missing in the POM: "
-                    + project.getId();
+                String msg = "distributionManagement element is missing in the POM: " + project.getId();
 
                 throw new MojoExecutionException( msg );
-
             }
 
             if ( distributionManagement.getSite() == null )
             {
-                String msg = "distributionManagement/repository element is missing in the POM: "
-                    + project.getId();
+                String msg = "distributionManagement/site element is missing in the POM: " + project.getId();
 
                 throw new MojoExecutionException( msg );
 
@@ -108,8 +111,7 @@ public class ScpSiteDeployMojo
 
             if ( url == null )
             {
-                String msg = "distributionManagement/site/url element is missing in the POM: "
-                    + project.getId();
+                String msg = "distributionManagement/site/url element is missing in the POM: " + project.getId();
 
                 throw new MojoExecutionException( msg );
 
@@ -117,8 +119,9 @@ public class ScpSiteDeployMojo
 
             Repository repository = new Repository( id, url );
 
-            //@todo dirty hack to make artifact uploading work
-            commandExecutor.connect( repository, WagonUtils.getAuthInfo() );
+            commandExecutor = (SshCommandExecutor) wagonManager.getWagon( "scp" );
+
+            commandExecutor.connect( repository, wagonManager.getAuthenticationInfo( id ) );
 
             String basedir = repository.getBasedir();
 
@@ -147,7 +150,7 @@ public class ScpSiteDeployMojo
             commandExecutor.executeCommand( rmCommand );
 
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
             throw new MojoExecutionException( "Error transfering site archive!", e );
         }
