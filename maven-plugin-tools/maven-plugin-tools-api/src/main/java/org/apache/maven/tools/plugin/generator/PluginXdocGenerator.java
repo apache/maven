@@ -29,7 +29,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -40,7 +39,7 @@ public class PluginXdocGenerator
     public void execute( File destinationDirectory, PluginDescriptor pluginDescriptor )
         throws IOException
     {
-        // TODO: write an overview page
+        writeOverview( destinationDirectory, pluginDescriptor );
 
         for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
         {
@@ -52,14 +51,12 @@ public class PluginXdocGenerator
     protected void processMojoDescriptor( MojoDescriptor mojoDescriptor, File destinationDirectory )
         throws IOException
     {
-        String id = mojoDescriptor.getGoal();
-
         FileWriter writer = null;
         try
         {
-            writer = new FileWriter( new File( destinationDirectory, id + "-mojo.xml" ) );
+            writer = new FileWriter( new File( destinationDirectory, getMojoFilename( mojoDescriptor, "xml" ) ) );
 
-            writeBody( writer, id, mojoDescriptor );
+            writeBody( writer, mojoDescriptor );
 
             writer.flush();
         }
@@ -69,7 +66,165 @@ public class PluginXdocGenerator
         }
     }
 
-    private void writeBody( FileWriter writer, String id, MojoDescriptor mojoDescriptor )
+    private String getMojoFilename( MojoDescriptor mojo, String ext )
+    {
+        return mojo.getGoal() + "-mojo." + ext;
+    }
+
+    private void writeOverview( File destinationDirectory, PluginDescriptor pluginDescriptor )
+        throws IOException
+    {
+        FileWriter writer = null;
+        try
+        {
+            writer = new FileWriter( new File( destinationDirectory, "index.xml" ) );
+
+            writeOverview( writer, pluginDescriptor );
+
+            writer.flush();
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
+    }
+
+    private void writeOverview( FileWriter writer, PluginDescriptor pluginDescriptor )
+    {
+        XMLWriter w = new PrettyPrintXMLWriter( writer );
+
+        w.startElement( "document" );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        w.startElement( "properties" );
+
+        w.startElement( "title" );
+
+        // TODO: need a friendly name for a plugin
+        w.writeText( pluginDescriptor.getArtifactId() + " - Overview" );
+
+        w.endElement();
+
+        w.endElement();
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        w.startElement( "body" );
+
+        w.startElement( "section" );
+
+        // TODO: need a friendly name for a plugin
+        w.addAttribute( "name", pluginDescriptor.getArtifactId() );
+
+        // TODO: description of plugin, examples?
+
+        w.startElement( "p" );
+
+        w.writeText( "Goals available: " );
+
+        w.endElement();
+
+        writeGoalTable( pluginDescriptor, w );
+
+        w.endElement();
+
+        w.endElement();
+    }
+
+    private void writeGoalTable( PluginDescriptor pluginDescriptor, XMLWriter w )
+    {
+        w.startElement( "table" );
+
+        w.startElement( "tr" );
+
+        w.startElement( "th" );
+
+        w.writeText( "Goal" );
+
+        w.endElement();
+
+        w.startElement( "th" );
+
+        w.writeText( "Description" );
+
+        w.endElement();
+
+        w.endElement();
+
+        List mojos = pluginDescriptor.getMojos();
+
+        for ( Iterator i = mojos.iterator(); i.hasNext(); )
+        {
+            MojoDescriptor mojo = (MojoDescriptor) i.next();
+
+            w.startElement( "tr" );
+
+            // ----------------------------------------------------------------------
+            //
+            // ----------------------------------------------------------------------
+
+            w.startElement( "td" );
+
+            String paramName = mojo.getFullGoalName();
+
+            w.startElement( "a" );
+
+            w.addAttribute( "href", getMojoFilename( mojo, "html" ) );
+
+            w.startElement( "code" );
+
+            w.writeText( paramName );
+
+            w.endElement();
+
+            w.endElement();
+
+            w.endElement();
+
+            // ----------------------------------------------------------------------
+            //
+            // ----------------------------------------------------------------------
+
+            w.startElement( "td" );
+
+            if ( StringUtils.isNotEmpty( mojo.getDescription() ) )
+            {
+                w.writeMarkup( mojo.getDescription() );
+            }
+            else
+            {
+                w.writeText( "No description." );
+            }
+
+            String deprecationWarning = mojo.getDeprecated();
+            if ( deprecationWarning != null )
+            {
+                w.writeMarkup( "<br/><b>Deprecated:</b> " );
+                w.writeMarkup( deprecationWarning );
+                if ( deprecationWarning.length() == 0 )
+                {
+                    w.writeText( "No reason given." );
+                }
+
+                w.endElement();
+            }
+
+            w.endElement();
+
+            w.endElement();
+        }
+
+        w.endElement();
+
+        w.endElement();
+    }
+
+    private void writeBody( FileWriter writer, MojoDescriptor mojoDescriptor )
     {
         XMLWriter w = new PrettyPrintXMLWriter( writer );
 
@@ -93,6 +248,8 @@ public class PluginXdocGenerator
         // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
+
+        w.startElement( "body" );
 
         w.startElement( "section" );
 
@@ -185,7 +342,12 @@ public class PluginXdocGenerator
 
             if ( !parameter.isRequired() )
             {
-                w.writeMarkup( " <i>(Optional)</i>");
+                w.writeMarkup( " <i>(Optional)</i>" );
+            }
+
+            if ( parameter.getExpression() != null && parameter.getExpression().startsWith( "${component." ) )
+            {
+                w.writeMarkup( " <i>(Discovered)</i>" );
             }
 
             w.endElement();
@@ -198,7 +360,17 @@ public class PluginXdocGenerator
 
             w.startElement( "code" );
 
-            w.writeText( parameter.getType() );
+            w.addAttribute( "title", parameter.getType() );
+
+            int index = parameter.getType().lastIndexOf( "." );
+            if ( index >= 0 )
+            {
+                w.writeText( parameter.getType().substring( index + 1 ) );
+            }
+            else
+            {
+                w.writeText( parameter.getType() );
+            }
 
             w.endElement();
 
@@ -212,7 +384,8 @@ public class PluginXdocGenerator
 
             w.startElement( "code" );
 
-            if ( StringUtils.isNotEmpty( parameter.getExpression() ) )
+            if ( StringUtils.isNotEmpty( parameter.getExpression() ) &&
+                !parameter.getExpression().startsWith( "${component." ) )
             {
                 w.writeText( parameter.getExpression() );
             }
@@ -243,7 +416,7 @@ public class PluginXdocGenerator
             String deprecationWarning = parameter.getDeprecated();
             if ( deprecationWarning != null )
             {
-                w.writeMarkup( "<br/><b>Deprecated:</b> ");
+                w.writeMarkup( "<br/><b>Deprecated:</b> " );
                 w.writeMarkup( deprecationWarning );
                 if ( deprecationWarning.length() == 0 )
                 {
@@ -257,6 +430,8 @@ public class PluginXdocGenerator
 
             w.endElement();
         }
+
+        w.endElement();
 
         w.endElement();
     }
