@@ -13,6 +13,5 @@
   <inceptionYear>2005</inceptionYear>
   <modules>
     <module>maven-reporting-api</module>
-    <module>maven-reporting-manager</module>
   </modules>
 </project>
