@@ -1,0 +1,381 @@
+package org.apache.maven.plugin.eclipse;
+
+/*
+ * Copyright (c) 2004, Codehaus.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Resource;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
+import org.codehaus.plexus.util.xml.XMLWriter;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @version $Id$
+ */
+public class EclipseWriter
+{
+    public void write( MavenProject project )
+        throws EclipsePluginException
+    {
+        File basedir = project.getFile().getParentFile();
+
+        Map map = new HashMap();
+
+        assertNotEmpty( project.getGroupId(), "groupId" );
+
+        assertNotEmpty( project.getArtifactId(), "artifactId" );
+
+        map.put( "project.artifactId", project.getArtifactId() );
+
+        writeEclipseProject( basedir, project, map );
+
+        writeEclipseClasspath( basedir, project, map );
+
+        System.out.println( "Wrote Eclipse project for " + project.getArtifactId() + " to " + basedir.getAbsolutePath() );
+    }
+
+    // ----------------------------------------------------------------------
+    // .project
+    // ----------------------------------------------------------------------
+
+    protected void writeEclipseProject( File basedir, MavenProject project, Map map )
+        throws EclipsePluginException
+    {
+        FileWriter w;
+
+        try
+        {
+            w = new FileWriter( new File( basedir, ".project" ) );
+        }
+        catch ( IOException ex )
+        {
+            throw new EclipsePluginException( "Exception while opening file.", ex );
+        }
+
+        XMLWriter writer = new PrettyPrintXMLWriter( w );
+
+        writer.startElement( "projectDescription" );
+
+        writer.startElement( "name" );
+
+        if ( project.getArtifactId() == null )
+        {
+            throw new EclipsePluginException( "Missing element from the POM: artifactId." );
+        }
+
+        writer.writeText( project.getArtifactId() );
+
+        writer.endElement();
+
+        // TODO: this entire element might be dropped if the comment is null.
+        // but as the maven1 eclipse plugin does it, it's better to be safe than sorry
+        // A eclipse developer might want to look at this.
+        writer.startElement( "comment" );
+
+        if ( project.getDescription() != null )
+        {
+            writer.writeText( project.getDescription() );
+        }
+
+        writer.endElement();
+
+        // TODO: Add project dependencies here
+        // Should look in the reactor for other projects
+
+        writer.startElement( "projects" );
+
+        writer.endElement(); // projects
+
+        writer.startElement( "buildSpec" );
+
+        writer.startElement( "buildCommand" );
+
+        writer.startElement( "name" );
+
+        writer.writeText( "org.eclipse.jdt.core.javabuilder" );
+
+        writer.endElement(); // name
+
+        writer.startElement( "arguments" );
+
+        writer.endElement(); // arguments
+
+        writer.endElement(); // buildCommand
+
+        writer.endElement(); // buildSpec
+
+        writer.startElement( "natures" );
+
+        writer.startElement( "nature" );
+
+        writer.writeText( "org.eclipse.jdt.core.javanature" );
+
+        writer.endElement(); // nature
+
+        writer.endElement(); // natures
+
+        writer.endElement(); // projectDescription
+
+        close( w );
+    }
+
+    // ----------------------------------------------------------------------
+    // .classpath
+    // ----------------------------------------------------------------------
+
+    protected void writeEclipseClasspath( File basedir, MavenProject project, Map map )
+        throws EclipsePluginException
+    {
+        FileWriter w;
+
+        try
+        {
+            w = new FileWriter( new File( basedir, ".classpath" ) );
+        }
+        catch ( IOException ex )
+        {
+            throw new EclipsePluginException( "Exception while opening file.", ex );
+        }
+
+        XMLWriter writer = new PrettyPrintXMLWriter( w );
+
+        writer.startElement( "classpath" );
+
+        // ----------------------------------------------------------------------
+        // The source roots
+        // ----------------------------------------------------------------------
+
+        addSourceRoots( writer, project.getBasedir(),
+                        project.getCompileSourceRoots(),
+                        null );
+
+        addResources( writer, project.getBasedir(),
+                      project.getBuild().getResources(),
+                      null );
+
+        // ----------------------------------------------------------------------
+        // The test sources and resources
+        // ----------------------------------------------------------------------
+
+        addSourceRoots( writer, project.getBasedir(),
+                        project.getTestCompileSourceRoots(),
+                        project.getBuild().getTestOutputDirectory() );
+
+        addResources( writer, project.getBasedir(),
+                      project.getBuild().getTestResources(),
+                      project.getBuild().getTestOutputDirectory() );
+
+        // ----------------------------------------------------------------------
+        // The default output
+        // ----------------------------------------------------------------------
+
+        writer.startElement( "classpathentry" );
+
+        writer.addAttribute( "kind", "output" );
+
+        writer.addAttribute( "path", toRelative( basedir, project.getBuild().getOutputDirectory() ) );
+
+        writer.endElement();
+
+        // ----------------------------------------------------------------------
+        // The JRE reference
+        // ----------------------------------------------------------------------
+
+        writer.startElement( "classpathentry" );
+
+        writer.addAttribute( "kind", "var" );
+
+        writer.addAttribute( "rootpath", "JRE_SRCROOT" );
+
+        writer.addAttribute( "path", "JRE_LIB" );
+
+        writer.addAttribute( "sourcepath", "JRE_SRC" );
+
+        writer.endElement();
+
+        // ----------------------------------------------------------------------
+        // The dependencies
+        // ----------------------------------------------------------------------
+
+        Set artifacts = project.getArtifacts();
+
+        for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+        {
+            Artifact artifact = (Artifact) it.next();
+            
+            addDependency( writer, artifact );
+        }
+
+        writer.endElement();
+
+        close( w );
+    }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
+
+    private void addSourceRoots( XMLWriter writer, File basedir, List sourceRoots, String output )
+    {
+        for ( Iterator it = sourceRoots.iterator(); it.hasNext(); )
+        {
+            String sourceRoot = (String) it.next();
+
+            if ( new File( sourceRoot ).isDirectory() )
+            {
+                writer.startElement( "classpathentry" );
+
+                writer.addAttribute( "kind", "src" );
+
+                writer.addAttribute( "path", toRelative( basedir, sourceRoot ) );
+
+                if ( output != null )
+                {
+                    writer.addAttribute( "output", toRelative( basedir, output ) );
+                }
+
+                writer.endElement();
+            }
+        }
+    }
+
+    private void addResources( XMLWriter writer, File basedir, List resources, String output )
+    {
+        for ( Iterator it = resources.iterator(); it.hasNext(); )
+        {
+            Resource resource = (Resource) it.next();
+
+            if ( resource.getIncludes().size() != 0 )
+            {
+                System.err.println( "This plugin currently doesn't support include patterns for resources. Adding the entire directory." );
+            }
+
+            if ( resource.getExcludes().size() != 0 )
+            {
+                System.err.println( "This plugin currently doesn't support exclude patterns for resources. Adding the entire directory." );
+            }
+
+            if ( !StringUtils.isEmpty( resource.getTargetPath() ) )
+            {
+                System.err.println( "This plugin currently doesn't support target paths for resources." );
+
+                return;
+            }
+
+            File resourceDirectory = new File( resource.getDirectory() );
+
+            if ( !resourceDirectory.exists() || !resourceDirectory.isDirectory() )
+            {
+                continue;
+            }
+
+            writer.startElement( "classpathentry" );
+
+            writer.addAttribute( "kind", "src" );
+
+            writer.addAttribute( "path", toRelative( basedir, resource.getDirectory() ) );
+
+            if ( output != null )
+            {
+                writer.addAttribute( "output", toRelative( basedir, output ) );
+            }
+
+            writer.endElement();
+        }
+    }
+
+    private void addDependency( XMLWriter writer, Artifact artifact )
+    {
+        File path = artifact.getFile();
+
+        if ( path == null )
+        {
+            System.err.println( "The artifacts path was null. Artifact id: " + artifact.getId() );
+
+            return;
+        }
+
+        writer.startElement( "classpathentry" );
+
+        writer.addAttribute( "kind", "lib" );
+
+        writer.addAttribute( "path", path.getPath().replace( '\\', '/' ) );
+
+        writer.endElement();
+    }
+
+    private void close( Writer closeable )
+    {
+        if ( closeable == null )
+        {
+            return;
+        }
+
+        try
+        {
+            closeable.close();
+        }
+        catch ( Exception e )
+        {
+            // ignore
+        }
+    }
+
+    private String toRelative( File basedir, String absolutePath )
+    {
+        String relative;
+
+        if ( absolutePath.startsWith( basedir.getAbsolutePath() ) )
+        {
+            relative = absolutePath.substring( basedir.getAbsolutePath().length() + 1 );
+        }
+        else
+        {
+            relative = absolutePath;
+        }
+
+        relative = StringUtils.replace( relative, "\\", "/" );
+
+        return relative;
+    }
+
+    private void assertNotEmpty( String string, String elementName )
+        throws EclipsePluginException
+    {
+        if ( string == null )
+        {
+            throw new EclipsePluginException( "Missing element from the project descriptor: '" + elementName + "'." );
+        }
+    }
+}

@@ -1,0 +1,24 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>plexus</groupId>
+    <artifactId>plexus-root</artifactId>
+    <version>1.0</version>
+  </parent>
+  <groupId>plexus</groupId>
+  <artifactId>plexus-components</artifactId>
+  <version>1.0</version>
+  <name>Plexus Components Parent Project</name>
+  <dependencies>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
+    </dependency>    
+  </dependencies>
+</project>

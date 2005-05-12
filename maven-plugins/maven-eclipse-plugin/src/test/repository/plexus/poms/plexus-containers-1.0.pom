@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>plexus</groupId>
+    <artifactId>plexus-root</artifactId>
+    <version>1.0</version>
+  </parent>
+  <groupId>plexus</groupId>
+  <artifactId>plexus-containers</artifactId>
+  <name>Parent Plexus Container POM</name>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>

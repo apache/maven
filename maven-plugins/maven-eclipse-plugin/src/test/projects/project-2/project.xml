@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>eclipse</groupId>
+  <artifactId>maven-eclipse-plugin-test-project-2</artifactId>
+  <version>88.0</version>
+  <name>Maven</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
+
+</project>

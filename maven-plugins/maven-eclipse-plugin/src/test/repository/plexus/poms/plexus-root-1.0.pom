@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>plexus</groupId>  
+  <artifactId>plexus-root</artifactId>
+  <name>plexus</name>
+  <version>1.0</version>
+  <organization>
+    <name>Codehaus</name>
+    <url>http://www.codehaus.org/</url>
+    <logo>/images/codehaus-small.gif</logo>
+  </organization>
+  <inceptionYear>2001</inceptionYear>
+  <package>org.codehaus.plexus</package>
+  <logo>/images/plexus-logo.gif</logo>
+  <mailingLists>
+    <mailingList>
+      <name>Plexus Developer List</name>
+      <subscribe>http://lists.codehaus.org/mailman/listinfo/plexus-dev</subscribe>
+      <unsubscribe>http://lists.codehaus.org/mailman/listinfo/plexus-dev</unsubscribe>
+      <archive>http://lists.codehaus.org/pipermail/plexus-dev/</archive>
+    </mailingList>
+  </mailingLists>
+  <ciManagement>
+    <nagEmailAddress>dev@plexus.codehaus.org</nagEmailAddress>
+  </ciManagement>
+  <scm>
+    <connection>scm:cvs:pserver:anonymous@cvs.plexus.codehaus.org:/scm/plexus:plexus</connection>
+    <developerConnection>scm:cvs:ext:${maven.username}@cvs.plexus.codehaus.org:/scm/plexus:plexus</developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <name>Jason van Zyl</name>
+      <id>jvanzyl</id>
+      <email>jason@zenplex.com</email>
+      <organization>Zenplex</organization>
+      <roles>
+        <role>Developer</role>
+        <role>Release Manager</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Pete Kazmier</name>
+      <id>kaz</id>
+      <email></email>
+      <organization></organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>James Taylor</name>
+      <id>jtaylor</id>
+      <email>james@jamestaylor.org</email>
+      <organization></organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Dan Diephouse</name>
+      <id>dandiep</id>
+      <email>dan@envoisolutions.com</email>
+      <organization>Envoi solutions</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Kasper Nielsen</name>
+      <id>kasper</id>
+      <email>apache@kav.dk</email>
+      <organization></organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Ben Walding</name>
+      <id>bwalding</id>
+      <email>bwalding@codehaus.org</email>
+      <organization>Walding Consulting Services</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Mark Wilkinson</name>
+      <id>mhw</id>
+      <email>mhw@kremvax.net</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Michal Maczka</name>
+      <id>michal</id>
+      <email>mmaczka@interia.pl</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Emmanuel Venisse</name>
+      <id>evenisse</id>
+      <email>evenisse@codehaus.org</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  
+  <!--
+   |
+   | These are project wide default for Plexus as a whole. For
+   | artifacts that are used universally, say junit or classworlds,
+   | we want to define these once and only once if possible.
+   |
+   -->
+  
+  <dependencies>
+    <dependency>
+      <groupId>classworlds</groupId>
+      <artifactId>classworlds</artifactId>
+      <version>1.1-alpha-1</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>test</type>
+    </dependency>    
+  </dependencies>  
+</project>

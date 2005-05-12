@@ -1,0 +1,7 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>junit</groupId>
+  <artifactId>junit</artifactId>
+  <packaging>jar</packaging>
+  <version>2.0</version>
+</model>
