@@ -26,6 +26,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
+import org.apache.maven.model.Site;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -68,7 +69,14 @@ public class DefaultModelInheritanceAssembler
         // url
         if ( child.getUrl() == null )
         {
-            child.setUrl( parent.getUrl() );
+            if ( parent.getUrl() != null && parent.getUrl().endsWith( "/" ) )
+            {
+                child.setUrl( parent.getUrl() + child.getArtifactId() + "/" );
+            }
+            else
+            {
+                child.setUrl( parent.getUrl() );
+            }
         }
 
         // ----------------------------------------------------------------------
@@ -374,18 +382,39 @@ public class DefaultModelInheritanceAssembler
 
             if ( StringUtils.isEmpty( childScm.getConnection() ) && !StringUtils.isEmpty( parentScm.getConnection() ) )
             {
-                childScm.setConnection( parentScm.getConnection() + "/" + child.getArtifactId() );
+                if ( parentScm.getConnection().endsWith( "/" ) )
+                {
+                    childScm.setConnection( parentScm.getConnection() + child.getArtifactId() + "/" );
+                }
+                else
+                {
+                    childScm.setConnection( parentScm.getConnection() );
+                }
             }
 
             if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
                 !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
-                childScm.setDeveloperConnection( parentScm.getDeveloperConnection() + "/" + child.getArtifactId() );
+                if ( parentScm.getDeveloperConnection().endsWith( "/" ) )
+                {
+                    childScm.setDeveloperConnection( parentScm.getDeveloperConnection() + child.getArtifactId() + "/" );
+                }
+                else
+                {
+                    childScm.setDeveloperConnection( parentScm.getDeveloperConnection() );
+                }
             }
 
-            if ( StringUtils.isEmpty( childScm.getUrl() ) )
+            if ( StringUtils.isEmpty( childScm.getUrl() ) && !StringUtils.isEmpty( parentScm.getUrl() ) )
             {
-                childScm.setUrl( parentScm.getUrl() );
+                if ( parentScm.getUrl().endsWith( "/" ) )
+                {
+                    childScm.setUrl( parentScm.getUrl() + child.getArtifactId() + "/" );
+                }
+                else
+                {
+                    childScm.setUrl( parentScm.getUrl() );
+                }
             }
         }
     }
@@ -407,12 +436,30 @@ public class DefaultModelInheritanceAssembler
 
             if ( childDistMgmt.getSite() == null )
             {
-                childDistMgmt.setSite( parentDistMgmt.getSite() );
+                if ( parentDistMgmt.getSite() != null )
+                {
+                    childDistMgmt.setSite( parentDistMgmt.getSite() );
+
+                    Site site = childDistMgmt.getSite();
+                    if ( site.getUrl() != null && site.getUrl().endsWith( "/" ) )
+                    {
+                        site.setUrl( site.getUrl() + child.getArtifactId() + "/" );
+                    }
+                }
             }
 
             if ( childDistMgmt.getRepository() == null )
             {
-                childDistMgmt.setRepository( parentDistMgmt.getRepository() );
+                if ( parentDistMgmt.getRepository() != null )
+                {
+                    childDistMgmt.setRepository( parentDistMgmt.getRepository() );
+
+                    Repository repo = childDistMgmt.getRepository();
+                    if ( repo.getUrl() != null && repo.getUrl().endsWith( "/" ) )
+                    {
+                        repo.setUrl( repo.getUrl() + child.getArtifactId() + "/" );
+                    }
+                }
             }
         }
     }

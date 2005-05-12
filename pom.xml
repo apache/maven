@@ -78,8 +78,8 @@
     </dependency>
   </dependencies>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/</developerConnection>
     <url>http://svn.apache.org/viewcvs.cgi/maven/components/</url>
   </scm>
   <organization>
@@ -98,7 +98,7 @@
     </repository>
     <site>
       <id>website</id>
-      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2</url>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/</url>
     </site>
   </distributionManagement>
   <modules>
