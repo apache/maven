@@ -91,13 +91,15 @@
             </lt>
             <li>
               <code> 
-                void setLog( org.apache.maven.monitor.logging.Log )
+                void setLog( org.apache.maven.monitor.logging.Log ) 
                 </code>
               <p>Inject a standard Maven logging mechanism to allow this Mojo 
                 to communicate events and feedback to the user.</p>
             </li>
             <li>
-              <code>void execute() throws org.apache.maven.plugin.MojoExecutionException</code>
+              <code> 
+                void execute() throws org.apache.maven.plugin.MojoExecutionException 
+                </code>
               <p>Perform whatever build-process behavior this Mojo implements. 
                 This is the main trigger for the Mojo inside the Maven system, 
                 and allows the Mojo to communicate fatal errors by throwing an 
@@ -128,7 +130,7 @@
             </lt>
             <li>
               <code> 
-                public void setLog( org.apache.maven.monitor.logging.Log )
+                public void setLog( org.apache.maven.monitor.logging.Log ) 
                 </code>
               <p>
                 <b>[IMPLEMENTED]</b>
@@ -146,7 +148,7 @@
             </li>
             <li>
               <code> 
-                void execute() throws org.apache.maven.plugin.MojoExecutionException
+                void execute() throws org.apache.maven.plugin.MojoExecutionException 
                 </code>
               <p>
                 <b>[ABSTRACT]</b>
@@ -178,7 +180,7 @@
             </li>
             <li>
               <code> 
-                void debug( java.lang.CharSequence, java.lang.Throwable )
+                void debug( java.lang.CharSequence, java.lang.Throwable ) 
                 </code>
               <p>Send a message (and accompanying exception) to the user in the 
                 <b>debug</b> error level. The error's stacktrace will be output 
@@ -196,7 +198,7 @@
             </li>
             <li>
               <code> 
-                void info( java.lang.CharSequence, java.lang.Throwable )
+                void info( java.lang.CharSequence, java.lang.Throwable ) 
                 </code>
               <p>Send a message (and accompanying exception) to the user in the 
                 <b>info</b> error level. The error's stacktrace will be output 
@@ -214,7 +216,7 @@
             </li>
             <li>
               <code> 
-                void warn( java.lang.CharSequence, java.lang.Throwable )
+                void warn( java.lang.CharSequence, java.lang.Throwable ) 
                 </code>
               <p>Send a message (and accompanying exception) to the user in the 
                 <b>warn</b> error level. The error's stacktrace will be output 
@@ -232,7 +234,7 @@
             </li>
             <li>
               <code> 
-                void error( java.lang.CharSequence, java.lang.Throwable )
+                void error( java.lang.CharSequence, java.lang.Throwable ) 
                 </code>
               <p>Send a message (and accompanying exception) to the user in the 
                 <b>error</b> error level. The error's stacktrace will be output 
@@ -262,71 +264,127 @@
         element name along with a javadoc annotation (if applicable) supporting 
         that piece of the plugin descriptor. A couple of examples are: 
         <b>someElement 
-        (@annotation parameterName="parameterValue")</b> or
+        (@annotation parameterName="parameterValue")</b> or 
         <b>someOtherElement (@annotation &lt;rawAnnotationValue&gt;)</b>.</p>
       <p>The plugin descriptor must be provided in a jar resource with the 
         path: <code>META-INF/maven/plugin.xml</code>, and it must contain the 
         following:</p>
       <p>
-        <ul>
-          <li><b>mojos</b> - Descriptors for each Mojo provided by
-            the plugin, each inside a <b>mojo</b> sub-element. Mojo descriptors 
-            are covered in detail below.</li>
-          <li><b>dependencies</b> - A set of dependencies which the
-            plugin requires in order to function. Each dependency is provided 
-            inside a <b>dependency</b> sub-element. Dependency specifications 
-            are covered below. <i>Using the plugin toolset, these dependencies 
-            can be extracted from the POM's dependencies.</i></li>
-        </ul>
+        <table>
+          <tr>
+            <th>Descriptor Element</th>
+            <th>Required?</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>mojos</td>
+            <td>Yes</td>
+            <td>Descriptors for each Mojo provided by the plugin, each inside a 
+              <b>mojo</b> sub-element. Mojo descriptors are covered in detail 
+              below. Obviously, a plugin without any declared mojos doesn't 
+              make sense, so the <b>mojos</b> element is required, along with 
+              at least one <b>mojo</b> sub-element.</td>
+          </tr>
+          <tr>
+            <td>dependencies</td>
+            <td>Yes</td>
+            <td>A set of dependencies which the plugin requires in order to 
+              function. Each dependency is provided inside a <b>dependency</b> 
+              sub-element. Dependency specifications are covered below. Since 
+              all plugins must have a dependency on 
+              <code>maven-plugin-api</code>, this element is effectively 
+              required. <i>Using the plugin toolset, these dependencies can be 
+              extracted from the POM's dependencies.</i></td>
+          </tr>
+        </table>
       </p>
       <p>Each Mojo specified inside a plugin descriptor must provide the 
-        following:</p>
+        following (annotations specified here are at the class level):</p>
       <p>
-        <ul>
-          <li><b>goal. (@goal &lt;goalName&gt;)</b> - The name for
-            the Mojo that users will reference from the command line to execute 
-            the Mojo directly, or inside a POM in order to provide 
-            Mojo-specific configuration.</li>
-          <li><b>implementation (detected)</b> - The
-            Mojo's fully-qualified class name.</li>
-          <li><b>language (detected)</b> - The implementation
-            language for this Mojo (marmalade, java, etc.). <i>Optional, 
-            default is java.</i></li>
-          <li><b>configurator (detected)</b> - The configurator type
-            used to inject parameters into the Mojo. <i>Optional; will only be 
-            used in very special cases, with a highly controlled vocabulary of 
-            possible values. (Elements like this are why it's a good idea to 
-            use the descriptor tools.)</i></li>
-          <li><b>phase 
-            (@phase &lt;phaseName&gt;)</b> - Specifies to which
-            phase in the standard build lifecycle this Mojo binds. <i>Optional; 
-            only required if this Mojo participates in the standard build 
-            process.</i></li>
-          <li><b>executePhase 
-            (@executePhase &lt;phaseName&gt;)</b> - Specifies
-            the last phase in the standard build lifecycle to execute before 
-            executing this Mojo, when the Mojo's goal is invoked directly. 
-            <i>Optional.</i></li>
-          <li><b>instantiationStrategy 
-            (@instantiationStrategy &lt;strategyName&gt;)</b> - Specifies
-            the method Maven should use in instantiating this Mojo before it is 
-            executed, which has implications for the Mojo's state and instance 
-            reuse. <i>Optional. Currently, only "per-lookup" is suppported. 
-            (<b>Brett:</b> Can we deprecate this before alpha-2 
-            release?)</i></li>
-          <li><b>requiresDependencyResolution 
-            (@requiresDependencyResolution &lt;requiredScope&gt;)</b> - Flags
-            this Mojo as requiring the specified scope of dependencies to be 
-            resolved before it can execute. <i>Optional; Currently supports 
-            "compile", "runtime", and "test" scopes.</i></li>
-          <li><b>description (detected)</b> - The description of the
-            Mojo's functionality. <i>Using the toolset, this will be the 
-            class-level javadoc description provided.</i></li>
-          <li><b>parameters</b> - Specifications for the parameters
-            which this Mojo uses. Each parameter is specified in a 
-            <b>parameter</b> sub-element. Parameters are discusses in 
-            detail below.</li>
-        </ul>
+        <table>
+          <tr>
+            <th>Descriptor Element</th>
+            <th>Annotation</th>
+            <th>Required?</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>goal</td>
+            <td>@goal &lt;goalName&gt;</td>
+            <td>Yes</td>
+            <td>The name for the Mojo that users will reference from the 
+              command line to execute the Mojo directly, or inside a POM in 
+              order to provide Mojo-specific configuration.</td>
+          </tr>
+          <tr>
+            <td>implementation</td>
+            <td>none (detected)</td>
+            <td>Yes</td>
+            <td>The Mojo's fully-qualified class name (or script path in 
+              the case of non-java mojos).</td>
+          </tr>
+          <tr>
+            <td>language</td>
+            <td>none (detected)</td>
+            <td>No. Default: <code>java</code></td>
+            <td>The implementation language for this Mojo (marmalade, java, 
+              beanshell, etc.).</td>
+          </tr>
+          <tr>
+            <td>configurator</td>
+            <td>none (detected)</td>
+            <td>No</td>
+            <td>The configurator type to use when injecting parameter values 
+              into this Mojo. <i>NOTE: This will only be used in very special 
+              cases, using a highly controlled vocabulary of possible values. 
+              (Elements like this are why it's a good idea to use the 
+              descriptor tools.)</i></td>
+          </tr>
+          <tr>
+            <td>phase</td>
+            <td>@phase &lt;phaseName&gt;</td>
+            <td>No</td>
+            <td>Binds this Mojo to a particular phase of the standard build 
+              lifecycle, if specified. <i>NOTE: This is only required if this 
+              Mojo is to participate in the standard build process.</i></td>
+          </tr>
+          <tr>
+            <td>executePhase</td>
+            <td>@executePhase &lt;phaseName&gt;</td>
+            <td>No</td>
+            <td>When this Mojo's goal is invoked directly from the command 
+              line, <b>executePhase</b> specifies the last phase in the 
+              standard build lifecycle to execute before this Mojo 
+              executes.</td>
+          </tr>
+          <tr>
+            <td>requiresDependencyResolution</td>
+            <td>@requiresDependencyResolution &lt;requiredScope&gt;</td>
+            <td>No</td>
+            <td>Flags this Mojo as requiring the dependencies in the specified 
+              scope (or an implied scope) to be resolved before it can execute. 
+              <i>NOTE: Currently supports <b>compile</b>, 
+              <b>runtime</b>, and <b>test</b> scopes.</i></td>
+          </tr>
+          <tr>
+            <td>description</td>
+            <td>none (detected)</td>
+            <td>No</td>
+            <td>The description of this Mojo's functionality. <i>Using the 
+              toolset, this will be the class-level javadoc description 
+              provided. NOTE: While this is not a required part of the mojo 
+              specification, it SHOULD be provided to enable future 
+              tool support for browsing, etc. and for clarity.</i></td>
+          </tr>
+          <tr>
+            <td>parameters</td>
+            <td>N/A</td>
+            <td>No</td>
+            <td>Specifications for the parameters which this Mojo uses will be 
+              provided in <b>parameter</b> sub-elements in this section. 
+              <i>NOTE: Parameters are discussed in more detail below.</i></td>
+          </tr>
+        </table>
       </p>
       <p>Each Mojo specifies the parameters that it expects to be able to work 
         with. These parameters are the Mojo's link to the outside world, and 
@@ -344,63 +402,104 @@
       <p>Each parameter for a Mojo must be specified in the 
         plugin descriptor as follows:</p>
       <p>
-        <ul>
-          <li><b>name (detected)</b> - The name of the parameter, to
-            be used in configuring this parameter from the Mojo's declared 
-            defaults (discussed below) or from the POM. <i>Using the toolset, 
-            this is detected as the java field name. It cannot be 
-            specified in an annotation.</i></li>
-          <li><b>alias (@parameter alias="myAlias")</b> - Specifies
-            an alias which can be used to configure this parameter from the 
-            POM. This is primarily useful to improve user-friendliness, where 
-            Mojo field names are not intuitive to the user. 
-            <i>Optional.</i></li>
-          <li><b>type (detected)</b> - The type of this parameter.
-            This is used to validate the result of any expressions used to 
-            calculate the value which should be injected into the Mojo for this 
-            parameter. <i>Using the toolset, this is detected as the class of 
-            this parameter's java field. It cannot be specified in an 
-            annotation.</i></li>
-          <li><b>required (@required)</b> - Whether this parameter is
-            required for the Mojo to function. This is used to validate the 
-            configuration for a Mojo before it is injected, and before the Mojo 
-            is executed from some half-state. <i>Optional. Specification of 
-            this annotation flags the parameter as required; there is 
-            no true/false value.</i></li>
-          <li><b>editable (@readonly)</b> - Specifies that this
-            parameter cannot be configured directly by the user (as in the case 
-            of POM-specified configuration). This is useful when you want to 
-            force the user to use common POM elements rather than plugin 
-            configurations, as in the case where you want to use the artifact's 
-            final name as a parameter. In this case, you want the user to 
-            modify &lt;build&gt;&lt;finalName/&gt;&lt;/build&gt; rather than
-            specifying a value for finalName directly in the plugin 
-            configuration section. It is also useful to ensure that - for 
-            example - a List-typed parameter which expects items of type 
-            Artifact doesn't get a List full of Strings. <i>Optional. 
-            Specification of this annotation flags the parameter as 
-            non-editable; there is no true/false value.</i></li>
-          <li><b>description (detected)</b> - The description for
-            what this parameter is used for inside the Mojo. <i>Using the 
-            toolset, this is detected as the javadoc description for 
-            the field. It cannot be specified as an annotation.</i></li>
-          <li><b>expression 
-            (@parameter expression="${someExpression}")</b> - Specifies
-            the expression used to calculate the value to be injected into this 
-            parameter of the Mojo at buildtime. This is commonly used to refer 
-            to specific elements in the POM, such as 
-            ${project.build.resources}, which refers to the List of resources 
-            meant to accompany the classes in the resulting jar file. 
-            <i>Optional. If not specified, an expression of ${&lt;name&gt;} is 
-            assumed, which can only be satisfied from POM configuration or 
-            System properties. The use of '${' and '}' is required to 
-            delimit actual expressions which may be evaluated.</i></li>
-          <li><b>deprecated (@deprecated)</b> - Marks a parameter as
-            deprecated. The rules on deprecation are the same as normal java 
-            with language elements. This will trigger a warning when a user 
-            tries to configure a parameter marked as deprecated. 
-            <i>Optional.</i></li>
-        </ul>
+        <table>
+          <tr>
+            <th>Descriptor Element</th>
+            <th>Annotation</th>
+            <th>Required?</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>name</td>
+            <td>none (detected)</td>
+            <td>Yes</td>
+            <td>The name of the parameter, to be used in configuring this 
+              parameter from the Mojo's declared defaults (discussed below) or 
+              from the POM. <i>Using the toolset, this is detected as the 
+              java field name.</i></td>
+          </tr>
+          <tr>
+            <td>alias</td>
+            <td>@parameter alias="myAlias"</td>
+            <td>No</td>
+            <td>Specifies an alias which can be used to configure this 
+              parameter from the POM. This is primarily useful to improve 
+              user-friendliness, where Mojo field names are not intuitive to 
+              the user or are otherwise not conducive to configuration via 
+              the POM.</td>
+          </tr>
+          <tr>
+            <td>type</td>
+            <td>none (detected)</td>
+            <td>Yes</td>
+            <td>The java type for this parameter. This is used to validate the 
+              result of any expressions used to calculate the value which 
+              should be injected into the Mojo for this parameter. <i>Using the 
+              toolset, this is detected as the class of the java field 
+              corresponding to this parameter.</i></td>
+          </tr>
+          <tr>
+            <td>required</td>
+            <td>@required</td>
+            <td>No</td>
+            <td>Whether this parameter is required for the Mojo to function. 
+              This is used to validate the configuration for a Mojo before it 
+              is injected, and before the Mojo is executed from some 
+              half-state. <i>NOTE: Specification of this annotation flags 
+              the parameter as required; there is no true/false value.</i></td>
+          </tr>
+          <tr>
+            <td>editable</td>
+            <td>@readonly</td>
+            <td>No</td>
+            <td>Specifies that this parameter cannot be configured directly by 
+              the user (as in the case of POM-specified configuration). This is 
+              useful when you want to force the user to use common POM elements 
+              rather than plugin configurations, as in the case where you want 
+              to use the artifact's final name as a parameter. In this case, 
+              you want the user to modify 
+              &lt;build&gt;&lt;finalName/&gt;&lt/build&gt; rather than 
+              specifying a value for finalName directly in the plugin 
+              configuration section. It is also useful to ensure that - for 
+              example - a List-typed parameter which expects items of type 
+              Artifact doesn't get a List full of Strings. <i>NOTE: 
+              Specification of this annotation flags the parameter as 
+              non-editable; there is no true/false value.</i></td>
+          </tr>
+          <tr>
+            <td>description</td>
+            <td>none (detected)</td>
+            <td>No</td>
+            <td>The description of this parameter's use inside the Mojo. 
+              <i>Using the toolset, this is detected as the javadoc description 
+              for the field. NOTE: While this is not a required part of the 
+              parameter specification, it SHOULD be provided to enable future 
+              tool support for browsing, etc. and for clarity.</i></td>
+          </tr>
+          <tr>
+            <td>expression</td>
+            <td>@parameter expression="${someExpression}"</td>
+            <td>No</td>
+            <td>Specifies the expression used to calculate the value to be 
+              injected into this parameter of the Mojo at buildtime. This is 
+              commonly used to refer to specific elements in the POM, such as 
+              ${project.build.resources}, which refers to the List of resources 
+              meant to accompany the classes in the resulting jar file. 
+              <i>NOTE: If not specified, an expression of ${&lt;name&gt;} is 
+              assumed, which can only be satisfied from POM configuration or 
+              System properties. The use of '${' and '}' is required to delimit 
+              actual expressions which may be evaluated.</i></td>
+          </tr>
+          <tr>
+            <td>deprecated</td>
+            <td>@deprecated</td>
+            <td>No</td>
+            <td>Marks a parameter as deprecated. The rules on deprecation are 
+              the same as normal java with language elements. This will trigger 
+              a warning when a user tries to configure a parameter marked as 
+              deprecated. </td>
+          </tr>
+        </table>
       </p>
       <p>The final component of a plugin descriptor is the dependencies. This 
         enables the plugin to function independently of it's POM (or at least 
@@ -413,14 +512,17 @@
     </section>
     <section name="Plugin Tools">
       <p>By now, we've mentioned the plugin tools several times without telling 
-        you what they are or how to use them. instead of writing (and 
-        maintaining) this metadata file by hand, Maven 2.0 ships with some 
-        tools to aid developers in this task. In fact, the only thing a plugin 
-        developer needs to do is declare his project to be a plugin from within 
-        the POM. Once this is done, Maven will call the appropriate descriptor 
+        you what they are or how to use them. Instead of manually writing (and 
+        maintaining) the metadata detailed above, Maven 2.0 ships with some 
+        tools to aid in this task. In fact, the only thing a plugin developer 
+        needs to do is declare his project to be a plugin from within the POM. 
+        Once this is done, Maven will call the appropriate descriptor 
         generators, etc. to produce an artifact that is ready for use within 
-        Maven builds. The section below describes the changes to the POM 
-        which are necessary to create plugin artifacts.</p>
+        Maven builds. Optional metadata can be injected via javadoc annotation 
+        (and possibly jdk5 annotations in the future) as described above, 
+        enabling richer interactions between the Mojo and the user. The 
+        section below describes the changes to the POM which are necessary to 
+        create plugin artifacts.</p>
     </section>
     <section name="Project Descriptor (POM) Requirements">
       <p>From the POM, Maven plugin projects look quite similar to any other 
@@ -428,30 +530,52 @@
         for script-based plugins. The following details the POM elements 
         which are necessary to build a Maven plugin artifact.</p>
       <p>
-        <ul>
-          <li><b>packaging Element.</b> The POM must declare a packaging 
-            element which describes this project as a Maven plugin project. The 
-            element is specified as: 
-            <code>&lt;packaging&gt;maven-plugin&lt;/packaging&gt;</code></li>
-          <li><b>scriptSourceDirectory Element.</b> In the case of script-based 
-            Mojos (which are not covered in detail within this document), the 
-            POM must include an additional element to distinguish script 
-            sources from (optional) java supporting classes. This element is 
-            the scriptSourceDirectory, inside the build section. It is 
-            specified as: 
-            <code>&lt;scriptSourceDirectory&gt;src/main/scripts&lt;/scriptSourceDirectory&gt;</code>. 
-            This directory is included in the list of resources which accompany 
-            any compiled code in the resulting artifact. It is specified 
-            separately from the resources in the build section to denote its 
-            special status as an alternate source directory for scripts.</li>
-        </ul>
+        <table>
+          <tr>
+            <th>POM Element</th>
+            <th>Required for Java Mojos?</th>
+            <th>Sample Declaration</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>packaging</td>
+            <td>Yes</td>
+            <td><code>&lt;packaging&gt;maven-plugin&lt;/packaging&gt;</code></td>
+            <td>The POM must declare a packaging element which describes this 
+              project as a Maven plugin project.</td>
+          </tr>
+          <tr>
+            <td>scriptSourceDirectory</td>
+            <td>No</td>
+            <td><code>&lt;scriptSourceDirectory&gt;src/main/scripts&lt;/scriptSourceDirectory&gt;</code></td>
+            <td>In the case of script-based Mojos (which are not covered in 
+              detail within this document), the POM must include an additional 
+              element to distinguish script sources from (optional) java 
+              supporting classes. This element is the scriptSourceDirectory, 
+              inside the build section. This directory is included in the list 
+              of resources which accompany any compiled code in the resulting 
+              artifact. It is specified separately from the resources in the 
+              build section to denote its special status as an alternate source 
+              directory for scripts.</td>
+          </tr>
+        </table>
       </p>
-      <p>After making the changes above, the developer can simply call <code>m2 
-        install</code> to install the plugin to the local repository. (Any of 
-        the other standard lifecycle targets like package, deploy, etc. are 
-        also available in like fashion.)</p>
+      <p>After making the changes above, the developer can simply call 
+        <br/><br/><code>m2 install</code><br/><br/> to install the plugin to 
+        the local repository. (Any of the other standard lifecycle targets like 
+        package, deploy, etc. are also available in like fashion.)</p>
     </section>
     <section name="Resources">
+      <p>This section simply gives a listing of pointers for more 
+        information.</p>
+      <p>
+        <ul>
+          <li>M2 Plugin Overview [<a 
+            href="plugin-overview.html">link</a>]</li>
+          <li>QDox Project (javadoc annotations) [<a 
+            href="http://qdox.codehaus.org">link</a>]</li>
+        </ul>
+      </p>
     </section>
   </body>
 </document>
