@@ -117,14 +117,8 @@ public abstract class AbstractVersionTransformation
                         artifact.setRepository( remoteRepository );
 
                         localMetadata = remoteMetadata;
-
-                        checkedUpdates = true;
                     }
-                    else if ( difference == 0 )
-                    {
-                        // Identical, simply touch the file to prevent re-checking
-                        checkedUpdates = true;
-                    }
+                    checkedUpdates = true;
                 }
             }
 
