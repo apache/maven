@@ -1,0 +1,7 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>mojo-test</groupId>
+  <artifactId>maven-sources-plugin-test-zip</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+</model>
