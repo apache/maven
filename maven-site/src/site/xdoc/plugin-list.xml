@@ -15,15 +15,19 @@
       <table>
         <tr>
           <th>Plugin</th>
-          <th>Goals</th>
           <th>Description</th>
         </tr>
         <tr>
           <td>
-            assembly
+            <a href="plugins/maven-ant-plugin"><code>ant</code></a>
           </td>
           <td>
-            assembly:assembly
+            Generate an Ant build file for the project
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="plugins/maven-assembly-plugin"><code>assembly</code></a>
           </td>
           <td>
             Build an assembly (distribution) of sources and binaries.
@@ -31,10 +35,7 @@
         </tr>
         <tr>
           <td>
-            clean
-          </td>
-          <td>
-            clean:clean
+            <a href="plugins/maven-clean-plugin"><code>clean</code></a>
           </td>
           <td>
             Clean up after the build.
@@ -42,10 +43,7 @@
         </tr>
         <tr>
           <td>
-            compiler
-          </td>
-          <td>
-            compiler:compile, compiler:testCompile
+            <a href="plugins/maven-compiler-plugin"><code>compiler</code></a>
           </td>
           <td>
             Compiles Java sources.
@@ -53,10 +51,7 @@
         </tr>
         <tr>
           <td>
-            deploy
-          </td>
-          <td>
-            deploy:deploy
+            <a href="plugins/maven-deploy-plugin"><code>deploy</code></a>
           </td>
           <td>
             Deploy the built artifact to the remote repository.
@@ -64,10 +59,15 @@
         </tr>
         <tr>
           <td>
-            ejb
+            <a href="plugins/maven-eclipse-plugin"><code>eclipse</code></a>
           </td>
           <td>
-            ejb:ejb
+            Generate an Eclipse project file for the current project.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="plugins/maven-ejb-plugin"><code>ejb</code></a>
           </td>
           <td>
             Build an EJB (and optional client) from the current project.
@@ -75,10 +75,7 @@
         </tr>
         <tr>
           <td>
-            idea
-          </td>
-          <td>
-            idea:idea
+            <a href="plugins/maven-idea-plugin"><code>idea</code></a>
           </td>
           <td>
             Create/update an IDEA workspace for the current project (individual modules are created as IDEA modules)
@@ -86,10 +83,7 @@
         </tr>
         <tr>
           <td>
-            install
-          </td>
-          <td>
-            install:install
+            <a href="plugins/maven-install-plugin"><code>install</code></a>
           </td>
           <td>
             Install the built artifact into the local repository.
@@ -97,10 +91,7 @@
         </tr>
         <tr>
           <td>
-            jar
-          </td>
-          <td>
-            jar:jar
+            <a href="plugins/maven-jar-plugin"><code>jar</code></a>
           </td>
           <td>
             Build a JAR from the current project.
@@ -108,10 +99,7 @@
         </tr>
         <tr>
           <td>
-            plugin
-          </td>
-          <td>
-            plugin:descriptor
+            <a href="plugins/maven-plugin-plugin"><code>plugin</code></a>
           </td>
           <td>
             Create a Maven plugin descriptor for any Mojo's found in the source tree, to include in the JAR.
@@ -119,10 +107,7 @@
         </tr>
         <tr>
           <td>
-            resources
-          </td>
-          <td>
-            resources:resources, resources:testResources
+            <a href="plugins/maven-resources-plugin"><code>resources</code></a>
           </td>
           <td>
             Copy the resources to the output directory for including in the JAR.
@@ -130,10 +115,23 @@
         </tr>
         <tr>
           <td>
-            surefire
+            <a href="plugins/maven-site-plugin"><code>site</code></a>
           </td>
           <td>
-            surefire:test
+            Generate a site for the current project.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="plugins/maven-source-plugin"><code>source</code></a>
+          </td>
+          <td>
+            Build a JAR of sources for use in IDEs and distribution to the repository.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="plugins/maven-surefire-plugin"><code>surefire</code></a>
           </td>
           <td>
             Run the Junit tests in an isolated classloader.
@@ -141,10 +139,15 @@
         </tr>
         <tr>
           <td>
-            war
+            <a href="plugins/maven-verifier-plugin"><code>verifier</code></a>
           </td>
           <td>
-            war:war
+            Useful for integration tests - verifies the existence of certain conditions.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="plugins/maven-war-plugin"><code>war</code></a>
           </td>
           <td>
             Build a WAR from the current project.
