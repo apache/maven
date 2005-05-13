@@ -4,6 +4,8 @@
   <artifactId>${artifactId}</artifactId>
   <packaging>war</packaging>
   <version>${version}</version>
+  <name>Maven Webapp</name>
+  <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
