@@ -26,12 +26,14 @@
       <item name="Getting Started" href="getting-started.html"/>
       <item name="Configuration" href="configuration.html"/>
       <item name="Dependency Mechanism" href="dependencies.html"/>
+      <item name="Developing Plugins" href="developers/plugin-overview.html"/>
       <item name="Developing Plugins with Marmalade" href="developers/developing-plugins-with-marmalade.html"/>
     </menu>
     <menu name="Reference">
       <item name="Project Descriptor" href="project-descriptor.html"/>
       <item name="Settings Descriptor" href="settings-descriptor.html"/>
       <item name="Available Plugins" href="plugin-list.html"/>
+      <item name="Mojo API" href="developers/mojo-specification-api.html" />
       <item name="Ant Tasks" href="ant-tasks.html"/>
     </menu>
     <menu name="Developers">
