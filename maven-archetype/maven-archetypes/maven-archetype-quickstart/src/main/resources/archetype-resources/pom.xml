@@ -5,6 +5,7 @@
   <packaging>jar</packaging>
   <version>${version}</version>
   <name>Maven Quick Start</name>
+  <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
