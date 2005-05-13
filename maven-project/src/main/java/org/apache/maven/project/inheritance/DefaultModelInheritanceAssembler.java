@@ -468,11 +468,6 @@ public class DefaultModelInheritanceAssembler
                     repository.setName( parentDistMgmt.getRepository().getName() );
 
                     repository.setUrl( parentDistMgmt.getRepository().getUrl() );
-
-                    if ( repository.getUrl() != null && repository.getUrl().endsWith( "/" ) )
-                    {
-                        repository.setUrl( repository.getUrl() + child.getArtifactId() + "/" );
-                    }
                 }
             }
         }
