@@ -4,7 +4,7 @@
   <artifactId>${artifactId}</artifactId>
   <packaging>jar</packaging>
   <version>${version}</version>
-  <name>Maven Quick Start</name>
+  <name>Maven Quick Start Archetype</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>

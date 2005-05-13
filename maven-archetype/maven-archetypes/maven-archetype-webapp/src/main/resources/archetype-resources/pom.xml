@@ -4,7 +4,7 @@
   <artifactId>${artifactId}</artifactId>
   <packaging>war</packaging>
   <version>${version}</version>
-  <name>Maven Webapp</name>
+  <name>Maven Webapp Archetype</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
