@@ -31,25 +31,25 @@
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-http-lightweight</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-ssh</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-scm</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
       <!-- temporarily compile time scope>runtime</scope -->
     </dependency>
   </dependencies>
@@ -57,7 +57,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
         <configuration>
           <descriptor>src/main/assembly/dep.xml</descriptor>
         </configuration>

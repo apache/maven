@@ -11,17 +11,17 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

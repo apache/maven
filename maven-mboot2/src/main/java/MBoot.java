@@ -288,6 +288,9 @@ public class MBoot
         // Install maven-script-parent POM
         installPomFile( localRepository, new File( basedir, "maven-script/pom.xml" ) );
 
+        // Install maven-reporting parent POM
+        installPomFile( localRepository, new File( basedir, "maven-reporting/pom.xml" ) );
+
         // Install it-support POM
         installPomFile( localRepository, new File( basedir, "maven-core-it-support/pom.xml" ) );
 
@@ -414,7 +417,6 @@ public class MBoot
         // lib
         // ----------------------------------------------------------------------
 
-        // TODO: check this - we are transitively including in /lib...
         File lib = new File( dist, "lib" );
 
         lib.mkdirs();

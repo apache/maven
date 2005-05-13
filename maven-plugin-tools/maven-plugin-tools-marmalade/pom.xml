@@ -11,7 +11,7 @@
     <dependency>
       <groupId>marmalade</groupId>
       <artifactId>marmalade-core</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>

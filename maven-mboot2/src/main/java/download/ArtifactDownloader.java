@@ -135,14 +135,23 @@ public class ArtifactDownloader
                     log( "Downloading " + metaUrl );
                     try
                     {
-                        HttpUtils.getFile( metaUrl, file, ignoreErrors, false, proxyHost, proxyPort, proxyUserName,
+                        HttpUtils.getFile( metaUrl, file, ignoreErrors, true, proxyHost, proxyPort, proxyUserName,
                                            proxyPassword, false );
                         version = FileUtils.fileRead( file );
                         log( "Resolved version: " + version );
                         dep.setResolvedVersion( version );
-                        String ver = version.substring( version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
-                        String extension = url.substring( url.length() - 4 );
-                        url = getSnapshotMetadataFile( url, ver + extension );
+                        if ( !version.endsWith( "SNAPSHOT" ) )
+                        {
+                            String ver = version.substring(
+                                version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
+                            String extension = url.substring( url.length() - 4 );
+                            url = getSnapshotMetadataFile( url, ver + extension );
+                        }
+                        else if ( destinationFile.exists() )
+                        {
+                            // It's already there
+                            return true;
+                        }
                     }
                     catch ( IOException e )
                     {
@@ -151,10 +160,9 @@ public class ArtifactDownloader
                 }
                 if ( !dep.getType().equals( "pom" ) )
                 {
+                    String name = dep.getArtifactId() + "-" + dep.getResolvedVersion() + ".pom";
                     File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
-                                                                 dep.getVersion(), dep.getType(),
-                                                                 dep.getArtifactId() + "-" + dep.getResolvedVersion() +
-                                                                 ".pom" );
+                                                                 dep.getVersion(), dep.getType(), name );
 
                     file.getParentFile().mkdirs();
 
