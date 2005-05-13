@@ -2,13 +2,12 @@
 
 <mojo xmlns="marmalade:mojo">
   <metadata>
-    <id>myMojo</id>
     <goal>myMojo</goal>
     <description>Output a file with specified contents to [outputDirectory]/touch.txt</description>
     <parameters>
       <parameter>
         <name>outputDirectory</name>
-        <expression>#project.build.directory</expression>
+        <expression>${project.build.directory}</expression>
         <description>Output directory for files.</description>
       </parameter>
     </parameters>

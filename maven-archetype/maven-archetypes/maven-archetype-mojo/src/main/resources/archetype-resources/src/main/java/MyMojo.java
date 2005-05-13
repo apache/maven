@@ -16,37 +16,34 @@ package $package;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.AbstractPlugin;
-import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 /**
+ * Goal which touches a timestamp file.
+ *
  * @goal touch
  * 
  * @phase process-sources
- *
- * @description Goal which touches a timestamp file
- *
- * @parameter
- *  name="outputDirectory"
- *  type="java.io.File"
- *  required="true"
- *  validator=""
- *  expression="#project.build.directory"
- *  description=""
  */
 public class MyMojo
-    extends AbstractPlugin
+    extends AbstractMojo
 {
-    private String outputDirectory;
+    /**
+     * Location of the file.
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private File outputDirectory;
 
     public void execute()
-        throws PluginExecutionException
+        throws MojoExecutionException
     {
-        File f = new File( outputDirectory );
+        File f = outputDirectory;
 
         if ( !f.exists() )
         {
@@ -64,7 +61,7 @@ public class MyMojo
         }
         catch ( IOException e )
         {
-            throw new PluginExecutionException( "Error creating file " + touch, e );
+            throw new MojoExecutionException( "Error creating file " + touch, e );
         }
         finally
         {

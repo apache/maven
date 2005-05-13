@@ -13,14 +13,6 @@
     </dependency>
   </dependencies>
   <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>1.0-alpha-1</version>
-        <configuration>
-          <warName>${artifactId}</warName>
-        </configuration>
-      </plugin>
-    </plugins>
+    <finalName>${artifactId}</finalName>
   </build>
 </model>

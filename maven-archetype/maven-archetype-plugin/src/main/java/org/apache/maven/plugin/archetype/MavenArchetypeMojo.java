@@ -65,19 +65,19 @@ public class MavenArchetypeMojo
      * @parameter expression="${archetypeVersion}"
      * @required
      */
-    private String archetypeVersion = "1.0-alpha-1-SNAPSHOT";
+    private String archetypeVersion = "RELEASE";
 
     /**
      * @parameter expression="${groupId}"
      * @required
      */
-    private String groupId = "org.apache.maven.archetypes";
+    private String groupId;
 
     /**
      * @parameter expression="${artifactId}"
      * @required
      */
-    private String artifactId = "maven-archetype-quickstart";
+    private String artifactId;
 
     /**
      * @parameter expression="${version}"
@@ -86,7 +86,7 @@ public class MavenArchetypeMojo
     private String version = "1.0-SNAPSHOT";
 
     /**
-     * @parameter expression="${packageName}"
+     * @parameter expression="${packageName}" alias="package"
      * @required
      */
     private String packageName = "com.mycompany.app";
@@ -101,7 +101,6 @@ public class MavenArchetypeMojo
         throws MojoExecutionException
     {
         // TODO: prompt for missing values
-        // TODO: use new plugin type
         // TODO: configurable license
 
         // ----------------------------------------------------------------------
