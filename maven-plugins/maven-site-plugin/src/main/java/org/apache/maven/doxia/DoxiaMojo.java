@@ -277,8 +277,24 @@ public class DoxiaMojo
         }
 
         // TODO: interpolate ${project.*} in general
-        props.put( "project.name", project.getName() );
-        props.put( "project.url", project.getUrl() );
+
+        if ( project.getName() != null )
+        {
+            props.put( "project.name", project.getName() );
+        }
+        else
+        {
+            props.put( "project.name", "NO_PROJECT_NAME_SET" );
+        }
+
+        if ( project.getUrl() != null )
+        {
+            props.put( "project.url", project.getUrl() );
+        }
+        else
+        {
+            props.put( "project.url", "NO_PROJECT_URL_SET" );
+        }
 
         siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
 
