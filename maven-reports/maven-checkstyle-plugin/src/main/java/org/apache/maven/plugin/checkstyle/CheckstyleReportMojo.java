@@ -88,8 +88,6 @@ public class CheckstyleReportMojo
 
         config.setModel( project.getModel() );
 
-        config.setOutputDirectory( new File( outputDirectory ) );
-
         MavenReport report = new CheckstyleReport();
 
         report.setConfiguration( config );

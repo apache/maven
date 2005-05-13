@@ -8,13 +8,13 @@
     <component>
       <role>org.apache.maven.reporting.MavenReport</role>
       <role-hint>dependencies</role-hint>
-      <implementation>org.apache.maven.reports.projectinfo.DependenciesReport</implementation>
+      <implementation>org.apache.maven.report.projectinfo.DependenciesReport</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
     <component>
       <role>org.apache.maven.reporting.MavenReport</role>
       <role-hint>mail-lists</role-hint>
-      <implementation>org.apache.maven.reports.projectinfo.MailingListsReport</implementation>
+      <implementation>org.apache.maven.report.projectinfo.MailingListsReport</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
   </components>

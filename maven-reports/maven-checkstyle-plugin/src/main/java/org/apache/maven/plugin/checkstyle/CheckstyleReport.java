@@ -98,7 +98,8 @@ public class CheckstyleReport
         if ( StringUtils.isNotEmpty( extraFormatter ) )
         {
             FileOutputStream out;
-            File resultFile = new File( getConfiguration().getOutputDirectory(), resultFileName );
+            // TODO: I removed outputDirectory, and shouldn't have. Put it back here.
+            File resultFile = new File( getConfiguration().getModel().getBuild().getDirectory() + "/site", resultFileName );
             try
             {
                 File parentFile = resultFile.getParentFile();

@@ -1,4 +1,4 @@
-package org.apache.maven.reports.projectinfo;
+package org.apache.maven.report.projectinfo;
 
 /*
  * Copyright 2004-2005 The Apache Software Foundation.

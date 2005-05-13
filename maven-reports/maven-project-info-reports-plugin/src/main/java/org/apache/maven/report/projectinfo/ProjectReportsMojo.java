@@ -1,4 +1,4 @@
-package org.apache.maven.reports.projectinfo;
+package org.apache.maven.report.projectinfo;
 
 /*
  * Copyright 2005 The Apache Software Foundation.
@@ -21,7 +21,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
-import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.module.xhtml.XhtmlSink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
@@ -29,8 +28,8 @@ import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,8 +86,6 @@ public class ProjectReportsMojo
         MavenReportConfiguration config = new MavenReportConfiguration();
 
         config.setModel( project.getModel() );
-
-        config.setOutputDirectory( new File( outputDirectory ) );
 
         MavenReport dependenciesReport = new DependenciesReport();
 
