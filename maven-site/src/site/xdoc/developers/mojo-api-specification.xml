@@ -458,7 +458,7 @@
               rather than plugin configurations, as in the case where you want 
               to use the artifact's final name as a parameter. In this case, 
               you want the user to modify 
-              &lt;build&gt;&lt;finalName/&gt;&lt/build&gt; rather than 
+              &lt;build&gt;&lt;finalName/&gt;&lt;/build&gt; rather than 
               specifying a value for finalName directly in the plugin 
               configuration section. It is also useful to ensure that - for 
               example - a List-typed parameter which expects items of type 

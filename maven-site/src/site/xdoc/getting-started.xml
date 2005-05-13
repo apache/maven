@@ -51,7 +51,7 @@
 </project>]]></source>
         <p>
           You can get a full reference to the
-          <a href="project-descriptor.html">project descriptor</a> to see what other
+          <a href="maven-model/maven.html">project descriptor</a> to see what other
           elements are available.
         </p>
         <p>

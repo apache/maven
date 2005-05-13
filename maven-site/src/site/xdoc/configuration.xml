@@ -35,13 +35,11 @@
       </p>
       <p>
         You can specify your user configuration in <code>${user.home}/.m2/settings.xml</code>. A
-        <a href="settings-descriptor.html">full reference</a> to the
+        <a href="maven-settings/settings.html">full reference</a> to the
         configuration file is available. This section will show how to make some common configurations.
         Note that the file is not required - defaults will be used if it is not found.
       </p>
-      <p style="font-weight: bold; font-size: larger">
-        Configuring your Local Repository
-      </p>
+      <h4>Configuring your Local Repository</h4>
       <p>
         The local repository is part of a profile in your user configuration. You can have multiple profiles, with one
         set to active so that you can switch environments.
@@ -61,9 +59,7 @@
       <p>
         The local repository must be an absolute path.
       </p>
-      <p style="font-weight: bold; font-size: larger">
-        Configuring a Proxy
-      </p>
+      <h4>Configuring a Proxy</h4>
       <p>
         You can configure a proxy to use for some or all of your HTTP requests in Maven 2.0. The username and
         password are only required if your proxy requires basic authentication (note that later alphas will support

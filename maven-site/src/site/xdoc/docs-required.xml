@@ -11,7 +11,7 @@
         to let us know at the
         <a href="/mail-lists.html">Maven Users Mailing List</a>.
       </p>
-      <p style="font-size: larger; font-weight: bold">Documentation for users</p>
+      <h4>Documentation for users</h4>
       <ul>
         <li>new SNAPSHOT handling -
           <i>partially done on Brett's blog</i>
@@ -19,15 +19,19 @@
         <li>deployment mechanism</li>
         <li>build lifecycle documentation</li>
         <li>dependency management</li>
-        <li>plugin management</li>
+        <li>plugin management - <i>in progress by J Matthew Pryor and John Casey</i></li>
         <li>plugin configuration</li>
-        <li>plugin downloading</li>
+        <li>plugin downloading - <i>partial on Brett's blogs</i></li>
+        <li>site generation</li>
+        <li>report generation</li>
       </ul>
-      <p style="font-size: larger; font-weight: bold">Documentation for plugin authors</p>
+      <h4>Documentation for plugin authors</h4>
       <ul>
         <li>plugin writing guide</li>
+        <li>report writing guide</li>
+        <li>site customisation guide</li>
       </ul>
-      <p style="font-size: larger; font-weight: bold">Documentation for Maven developers</p>
+      <h4>Documentation for Maven developers</h4>
       <ul>
         <li>Lifecycle architecture</li>
         <li>High level architecture, components explanation</li>

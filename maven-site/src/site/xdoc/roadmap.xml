@@ -22,24 +22,6 @@
         We will continue with the successful technique from Maven 1.0 of making plugins available on a separate
         release schedule so that new features can be obtained as they are ready and tested.
       </p>
-      <subsection name="Maven 2.0 alpha 2">
-        <p>
-          <i>Expected Release: </i> 13 May 2005
-        </p>
-        <p>
-          <i>Aims and features:</i> This release is expected to be much more architecturally stable, making early adoption
-          a real possiblity. At this point, there are still only the core plugins available.
-        </p>
-        <ul>
-          <li>Basic site generation</li>
-          <li>Improved error handling</li>
-          <li>Published Mojo and Plugin API</li>
-          <li>Inclusion of Ant tasks for Maven 2.0</li>
-          <li>Preliminary Beanshell Mojo support</li>
-          <li>Miscellaneous feature updates</li>
-          <li>Bugfixes</li>
-        </ul>
-      </subsection>
       <subsection name="Maven 2.0 alpha 3">
         <p>
           <i>Expected Release: </i> mid-June 2005
@@ -59,6 +41,7 @@
           <li>Release assistance</li>
           <li>Miscellaneous feature updates</li>
           <li>Bugfixes</li>
+          <li>Preliminary Beanshell Mojo support</li>
         </ul>
       </subsection>
       <subsection name="Maven 2.0 beta 1">

@@ -1,0 +1,48 @@
+ ------
+Release Notes - Maven 2.0 Alpha 2
+ ------
+Brett Porter
+ ------
+13 May 2005
+ ------
+
+  The Apache Maven team are proud to announce the second alpha release of Maven 2.0.
+
+  Download it from {{http://maven.apache.org/maven2/download.html}}
+
+  Maven is a software project management and comprehension tool. Based on the concept of a project object model
+  (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
+
+  This release includes <<{{{http://jira.codehaus.org/secure/IssueNavigator.jspa?reset=true&pid=10500&fixfor=11020} 76 bug fixes and enhancements}}>> since the
+  first release on 8 April.
+
+  Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
+  basis to take it into the future.  While it can be considered quite stable, and future versions are now expected to
+  retain a high amount of backwards compatibility, this is still a technology preview, and not yet complete or
+  considered ready for a production environment.
+
+  The main new features in this release are:
+
+    * Basic site generation
+
+    * Improved error handling
+
+    * Automatic plugin updates
+
+    * Published Mojo and Plugin API
+
+    * Inclusion of Ant tasks for Maven 2.0
+
+  This release is expected to be much more architecturally stable, making early adoption
+  a possiblity. At this point, there are still only the core plugins available.
+
+  We hope you enjoy using Maven! If you have any questions, please consult:
+
+    * the web site: {{http://maven.apache.org/maven2/}}
+
+    * the maven-user mailing list: {{http://maven.apache.org/mail-lists.html}}
+
+  For news and information, see:
+
+    * Maven Blogs: {{http://www.mavenblogs.com/}}
+

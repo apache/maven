@@ -18,6 +18,7 @@
     <menu name="Maven 2.0">
       <item name="Introduction" href="index.html"/>
       <item name="Download" href="download.html"/>
+      <item name="Release Notes" href="release-notes.html" />
       <item name="General Information" href="about.html"/>
       <item name="For Maven 1.0 Users" href="maven1.html"/>
       <item name="Road Map" href="roadmap.html" />
@@ -28,12 +29,13 @@
       <item name="Dependency Mechanism" href="dependencies.html"/>
       <item name="Developing Plugins" href="developers/plugin-overview.html"/>
       <item name="Developing Plugins with Marmalade" href="developers/developing-plugins-with-marmalade.html"/>
+      <item name="Creating a Site" href="site.html"/>
     </menu>
     <menu name="Reference">
-      <item name="Project Descriptor" href="project-descriptor.html"/>
-      <item name="Settings Descriptor" href="settings-descriptor.html"/>
-      <item name="Available Plugins" href="plugin-list.html"/>
-      <item name="Mojo API" href="developers/mojo-specification-api.html" />
+      <item name="Project Descriptor" href="maven-model/maven.html"/>
+      <item name="Settings Descriptor" href="maven-settings/settings.html"/>
+      <item name="Available Plugins" href="plugins/index.html"/>
+      <item name="Mojo API" href="developers/mojo-api-specification.html" />
       <item name="Ant Tasks" href="ant-tasks.html"/>
     </menu>
     <menu name="Developers">

@@ -1,0 +1,141 @@
+ ------
+ Generating a Site
+ ------
+ Brett Porter
+ ------
+ 13 May 2005
+ ------
+
+Building a Site
+
+* Creating Content
+
+  The first step to creating your site is to create some content. In Maven 2.0, the site content is separated by format,
+  as there are several available.
+
+-------------------
++- src/
+   +- site/
+      +- apt/
+      |  +- index.apt
+      |
+      +- xdoc/
+      |  +- other.xml
+      |
+      +- fml/
+      |  +- general.fml
+      |  +- faq.fml
+      |
+      +- site.xml
+--------------------
+
+  The Xdoc format is the same as {{{http://maven.apache.org/using/site.html} used in Maven 1.0}}. However, <<<navigation.xml>>>
+  has been replaced by the site descriptor (see below).
+
+  The APT format, "Almost Plain Text", is a wiki-like format that allows you to write simple, structured documents (like this)
+  very quickly. A full reference of the {{{http://www.xmlmind.com/_aptconvert/docs/userguide2.html#id.s2} APT Format}} is available.
+
+  The FML format is the FAQ format, also used in Maven 1.0.
+
+  Other formats are available, but at this point these 3 are the best tested. There are also several possible output formats,
+  but as of alpha-2, only XHTML is available.
+
+  Note that all of the above is optional - just one index file is required in one of the input trees. Each of the paths will be merged
+  together to form the root directory of the site.
+
+* Generating The Site
+
+  Generating the site is very simple, and fast!
+
+---------------
+m2 site:site
+---------------
+
+  The resulting site will be in <<<target/site/...>>>
+
+  For more information on the site plugin, see the {{{plugins/maven-site-plugin/} plugin reference}}.
+
+* Deploying The Site
+
+  To be able to deploy the site, you must first declare a location to distribute to in your <<<pom.xml>>>, similar to the repository for
+  deployment.
+
+---------------
+<distributionManagement>
+  <site>
+    <id>website</id>
+    <url>scp://www.mycompany.com/www/docs/project/</url>
+  </site>
+</distributionManagement>
+---------------
+
+  The <<<id>>> element identifies the repository, so that you can attach credentials to it in your <<<settings.xml>>>
+  file in the same way as you would for any other repository. The URL gives the location to deploy to. Currently,
+  only SSH is supported, as above which copies to the host <<<www.mycompany.com>>> in the path <<</www/docs/project/>>>.
+
+  Deploying the site is done with the <<<site:deploy>>> goal. Note that you cannot just call the deployment goal on its own, however.
+  You must presently run the <<<site:site>>> goal independantly.
+
+---------------
+m2 site:site site:deploy
+---------------
+
+  <<Note:>> the trailing slash in the URL above indicates that any subprojects that inherit this value should append their artifact ID to
+  the path instead of using it as is.
+
+* Creating a Site Descriptor
+
+  The <<<site.xml>>> file is used to describe the layout of the site, and replaces the navigation file used in Maven 1.0.
+
+  A sample is given below:
+
+--------------------
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Maven">
+  <bannerLeft>
+    <name>Maven</name>
+    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <href>http://maven.apache.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>http://maven.apache.org/images/maven-small.gif</src>
+  </bannerRight>
+  <body>
+    <links>
+      <item name="Apache" href="http://www.apache.org/" />
+      <item name="Maven 1.0" href="http://maven.apache.org/"/>
+      <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
+    </links>
+
+    <menu name="Maven 2.0">
+      <item name="Introduction" href="index.html"/>
+      <item name="Download" href="download.html"/>
+      <item name="Release Notes" href="release-notes.html" />
+      <item name="General Information" href="about.html"/>
+      <item name="For Maven 1.0 Users" href="maven1.html"/>
+      <item name="Road Map" href="roadmap.html" />
+    </menu>
+    ...
+  </body>
+</project>
+--------------------
+
+  ~~TODO: deserves more explanation.
+
+* Adding Additional Resources
+
+  You can also add images and CSS to your site, by creating the following directories in your site sources:
+
+-------------------
++- src/
+   +- site/
+      +- css/
+      |  +- site.css
+      |
+      +- images/
+      |  +- pic1.jpg
+      |
+--------------------
+
+  The file <<<site.css>>> will be added to the default XHTML output, so can be used to adjust the default Maven stylesheets if desired.
+
