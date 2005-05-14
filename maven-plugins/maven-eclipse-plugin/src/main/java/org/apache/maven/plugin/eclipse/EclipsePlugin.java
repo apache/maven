@@ -60,6 +60,11 @@ public class EclipsePlugin
     public void execute()
         throws MojoExecutionException
     {
+        if ( project.getFile() == null || !project.getFile().exists() )
+        {
+            throw new MojoExecutionException( "There must be a POM in the current working directory for the Eclipse plugin to work." );
+        }
+
         try
         {
             eclipseWriter.write( project );

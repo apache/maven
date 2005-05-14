@@ -2,5 +2,5 @@
   <classpathentry kind="src" path="src/main/java"/>
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" rootpath="JRE_SRCROOT" path="JRE_LIB" sourcepath="JRE_SRC"/>
-  <classpathentry kind="lib" path="c:/home/Brett/cvs/maven-2/maven-components/maven-plugins/maven-eclipse-plugin/src/test/repository/maven/jars/maven-core-2.0-SNAPSHOT.jar"/>
+  <classpathentry kind="lib" path="/home/jvanzyl/js/org.apache.maven/components/trunk/maven-plugins/maven-eclipse-plugin/src/test/repository/maven/jars/maven-core-2.0-SNAPSHOT.jar"/>
 </classpath>
