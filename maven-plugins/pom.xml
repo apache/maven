@@ -6,7 +6,7 @@
   <version>2.0-SNAPSHOT</version>
   <name>Maven Plugins</name>
   <description>Maven plugin parent</description>
-  <url>http://maven.apache.org/maven2/</url>
+  <url>http://maven.apache.org/maven2/plugins/</url>
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
