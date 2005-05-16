@@ -145,8 +145,9 @@ public class CheckstyleReport
 
         try
         {
+            Properties overridingProperties = createOverridingProperties();
             config = ConfigurationLoader.loadConfiguration( configFile.toString(),
-                                                            new PropertiesExpander( createOverridingProperties() ) );
+                                                            new PropertiesExpander( overridingProperties ) );
         }
         catch ( CheckstyleException e )
         {
@@ -233,7 +234,8 @@ public class CheckstyleReport
     {
         Properties props = new Properties();
         props.setProperty( "checkstyle.header.file", "LICENSE.txt" );
-        props.setProperty( "checkstyle.cache.file", "target/checkstyle-cachefile" );
+        // TODO: explicit output directory when it is back
+        props.setProperty( "checkstyle.cache.file", getConfiguration().getModel().getBuild().getDirectory() + "/checkstyle-cachefile" );
         return props;
     }
 }
