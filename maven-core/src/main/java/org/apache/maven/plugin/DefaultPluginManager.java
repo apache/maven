@@ -839,7 +839,7 @@ public class DefaultPluginManager
             Artifact artifact = (Artifact) it.next();
 
             artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
-getLogger().info( "=======>" + artifact.getArtifactId() + "/" + artifact.getVersion() + "/" + artifact.getBaseVersion() );
+
             pluginArtifacts.add( artifact );
         }
         context.getProject().setPluginArtifacts( pluginArtifacts );
