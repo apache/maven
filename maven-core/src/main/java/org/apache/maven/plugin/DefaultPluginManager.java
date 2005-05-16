@@ -832,6 +832,19 @@ public class DefaultPluginManager
             // TODO: should I get the modified artifacts back into the project?
             artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
         }
+
+        Set pluginArtifacts = new HashSet();
+        for ( Iterator it = context.getProject().getPluginArtifacts().iterator(); it.hasNext(); )
+        {
+            Artifact artifact = (Artifact) it.next();
+
+            artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
+getLogger().info( "=======>" + artifact.getArtifactId() + "/" + artifact.getVersion() + "/" + artifact.getBaseVersion() );
+            pluginArtifacts.add( artifact );
+        }
+        context.getProject().setPluginArtifacts( pluginArtifacts );
+
+        artifactResolver.resolve( context.getProject().getParentArtifact(), context.getRemoteRepositories(), context.getLocalRepository() );
     }
 
 }

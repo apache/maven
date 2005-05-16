@@ -73,6 +73,10 @@ public class MavenProject
 
     private Set artifacts;
 
+    private Artifact parentArtifact;
+
+    private Set pluginArtifacts;
+
     private List remoteArtifactRepositories;
 
     private List collectedProjects = Collections.EMPTY_LIST;
@@ -666,6 +670,26 @@ public class MavenProject
     public Set getArtifacts()
     {
         return artifacts;
+    }
+
+    public void setPluginArtifacts( Set pluginArtifacts )
+    {
+        this.pluginArtifacts = pluginArtifacts;
+    }
+
+    public Set getPluginArtifacts()
+    {
+        return pluginArtifacts;
+    }
+
+    public void setParentArtifact( Artifact parentArtifact )
+    {
+        this.parentArtifact = parentArtifact;
+    }
+
+    public Artifact getParentArtifact()
+    {
+        return parentArtifact;
     }
 
     public List getRepositories()

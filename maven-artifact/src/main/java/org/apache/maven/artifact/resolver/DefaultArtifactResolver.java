@@ -67,6 +67,11 @@ public class DefaultArtifactResolver
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
+        if ( artifact == null )
+        {
+            return;
+        }
+
         // ----------------------------------------------------------------------
         // Check for the existence of the artifact in the specified local
         // ArtifactRepository. If it is present then simply return as the
