@@ -163,7 +163,7 @@ public class ReleaseMojo
     private void prepareRelease()
         throws MojoExecutionException
     {
-        //checkStatus();
+        checkStatus();
 
         checkDependencies();
 
@@ -171,13 +171,13 @@ public class ReleaseMojo
 
         //commit();
 
-        //tag();
+        tag();
     }
 
     private void performRelease()
         throws MojoExecutionException
     {
-        //checkout();
+        checkout();
     }
 
     private boolean isSnapshot( String version )
@@ -208,7 +208,7 @@ public class ReleaseMojo
 
             if ( isSnapshot( parentArtifact.getVersion() ) )
             {
-//                throw new MojoExecutionException( "Can't release project due to non released parent." );
+                throw new MojoExecutionException( "Can't release project due to non released parent." );
             }
 
             currentProject = project.getParent();
@@ -247,8 +247,8 @@ public class ReleaseMojo
                 message.append( artifact.getVersion() );
                 message.append( "\n" );
             }
-//            throw new MojoExecutionException( "Can't release project due to non released dependencies :\n" +
-//                                              message.toString() );
+            throw new MojoExecutionException( "Can't release project due to non released dependencies :\n" +
+                                              message.toString() );
         }
     }
 
@@ -326,7 +326,6 @@ public class ReleaseMojo
         }
 
         //Rewrite plugins version
-        //TODO Resolve version
         for ( Iterator i = plugins.iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
@@ -349,6 +348,7 @@ public class ReleaseMojo
         try
         {
 			//TODO: Write in pom file
+            //TODO: Write only necessary informations
             java.io.StringWriter writer = new java.io.StringWriter();
             modelWriter.write( writer, model );
             getLog().info( writer.toString() );
