@@ -1187,13 +1187,13 @@
         
             public String getExtension()
             {
-                if ("ejb".equals(getType()) || "plugin".equals(getType()) || "aspect".equals(getType())) return "jar";
+                if ("ejb".equals(getType()) || "plugin".equals(getType()) || "aspect".equals(getType()) || "uberjar".equals(getType())) return "jar";
                 return getType();
             }
         
             public boolean isAddedToClasspath()
             {
-                return ("jar".equals(getType()) || "ejb".equals(getType()));
+                return ("jar".equals(getType()) || "ejb".equals(getType()) || "sar".equals(getType()));
             }
         
             public boolean isPlugin()
