@@ -112,8 +112,6 @@ if [ -z "$JAVA_HOME" ] ; then
   echo "Warning: JAVA_HOME environment variable is not set."
 fi
 
-CLASSWORLDS_JAR=${M2_HOME}/core/boot/classworlds-*.jar
-CLASSWORLDS_CONF=${M2_HOME}/bin/m2.conf
 CLASSWORLDS_LAUNCHER=org.codehaus.classworlds.Launcher
 
 # For Cygwin, switch paths to Windows format before running java
