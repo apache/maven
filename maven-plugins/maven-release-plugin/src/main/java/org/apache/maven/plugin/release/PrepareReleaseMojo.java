@@ -23,17 +23,16 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.scm.ScmBean;
+import org.apache.maven.plugin.transformer.PomTransformer;
+import org.apache.maven.plugin.transformer.VersionTransformer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @goal prepare
@@ -73,7 +72,7 @@ public class PrepareReleaseMojo
 
         transformPom();
 
-        //checkin();
+        checkin();
 
         tag();
     }
@@ -228,16 +227,18 @@ public class PrepareReleaseMojo
             }
         }
 
+        //Write pom
         MavenXpp3Writer modelWriter = new MavenXpp3Writer();
         try
         {
-            //TODO: Write in pom file
-            //TODO: Write only necessary informations
-            StringWriter writer = new StringWriter();
-            modelWriter.write( writer, model );
-            getLog().info( writer.toString() );
+            PomTransformer transformer = new VersionTransformer();
+            transformer.setOutputFile( project.getFile() );
+            transformer.setProject( project.getFile() );
+            transformer.setUpdatedModel ( model );
+            transformer.transformNodes();
+            transformer.write();
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
             throw new MojoExecutionException( "Can't update pom.", e );
         }

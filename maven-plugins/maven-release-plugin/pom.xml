@@ -30,5 +30,15 @@
       <artifactId>maven-scm-provider-svn</artifactId>
       <version>1.0-alpha-1-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.4-dev-8</version>
+    </dependency>
+    <dependency>
+      <groupId>jaxen</groupId>
+      <artifactId>jaxen</artifactId>
+      <version>1.0-FCS</version>
+    </dependency>
   </dependencies>
 </project>

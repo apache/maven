@@ -92,6 +92,11 @@ public abstract class AbstractReleaseMojo
         return scmManager;
     }
 
+    public String getTag()
+    {
+        return tag;
+    }
+
     protected ScmBean getScm()
     {
         ScmBean scm = new ScmBean();
