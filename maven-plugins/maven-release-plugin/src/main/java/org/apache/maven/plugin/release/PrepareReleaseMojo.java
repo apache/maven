@@ -62,6 +62,8 @@ public class PrepareReleaseMojo
 
     private static final String SNAPSHOT = "-SNAPSHOT";
 
+    private String projectVersion;
+
     protected void executeTask()
         throws MojoExecutionException
     {
@@ -71,7 +73,7 @@ public class PrepareReleaseMojo
 
         transformPom();
 
-        //commit();
+        //checkin();
 
         tag();
     }
@@ -175,7 +177,8 @@ public class PrepareReleaseMojo
         }
 
         //Rewrite project version
-        model.setVersion( model.getVersion().substring( 0, model.getVersion().length() - SNAPSHOT.length() ) );
+        projectVersion = model.getVersion().substring( 0, model.getVersion().length() - SNAPSHOT.length() );
+        model.setVersion( projectVersion );
 
         //Rewrite parent version
         if ( project.hasParent() )
@@ -237,6 +240,19 @@ public class PrepareReleaseMojo
         catch ( IOException e )
         {
             throw new MojoExecutionException( "Can't update pom.", e );
+        }
+    }
+
+    private void checkin()
+        throws MojoExecutionException
+    {
+        try
+        {
+            getScm().checkin( "[maven-release-plugin] prepare release " + projectVersion, "pom.xml", null );
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "An error is occurred in the tag process.", e );
         }
     }
 

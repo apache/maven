@@ -22,6 +22,7 @@ import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmResult;
 import org.apache.maven.scm.provider.svn.repository.SvnScmProviderRepository;
+import org.apache.maven.scm.command.checkin.CheckInScmResult;
 import org.apache.maven.scm.command.checkout.CheckOutScmResult;
 import org.apache.maven.scm.command.status.StatusScmResult;
 import org.apache.maven.scm.command.tag.TagScmResult;
@@ -169,6 +170,17 @@ public class ScmBean
         changedFiles = result.getChangedFiles();
 
         return changedFiles;
+    }
+
+    public void checkin( String message, String includes, String excludes )
+        throws Exception
+    {
+        ScmRepository repository = getScmRepository();
+
+        CheckInScmResult result = getScmManager().checkIn( repository,
+                                                           new ScmFileSet( new File( workingDirectory ), includes, excludes ),
+                                                           tag, message );
+        checkResult( result );
     }
 
     public void tag()
