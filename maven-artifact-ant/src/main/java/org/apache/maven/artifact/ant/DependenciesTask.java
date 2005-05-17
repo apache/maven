@@ -29,6 +29,7 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.FileList;
 import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.types.FileSet;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,6 +53,8 @@ public class DependenciesTask
     private List remoteRepositories = new ArrayList();
 
     private String pathId;
+
+    private String filesetId;
 
     public void execute()
     {
@@ -99,8 +102,16 @@ public class DependenciesTask
             throw new BuildException( "Reference ID " + pathId + " already exists" );
         }
 
+        if ( getProject().getReference( filesetId ) != null )
+        {
+            throw new BuildException( "Reference ID " + filesetId + " already exists" );
+        }
+
         FileList fileList = new FileList();
         fileList.setDir( localRepository.getLocation() );
+
+        FileSet fileSet = new FileSet();
+        fileSet.setDir( fileList.getDir( getProject() ) );
 
         for ( Iterator i = result.getArtifacts().values().iterator(); i.hasNext(); )
         {
@@ -119,11 +130,21 @@ public class DependenciesTask
             file.setName( filename );
 
             fileList.addConfiguredFile( file );
+
+            fileSet.createInclude().setName( filename );
         }
 
-        Path path = new Path( getProject() );
-        path.addFilelist( fileList );
-        getProject().addReference( pathId, path );
+        if ( pathId != null )
+        {
+            Path path = new Path( getProject() );
+            path.addFilelist( fileList );
+            getProject().addReference( pathId, path );
+        }
+
+        if ( filesetId != null )
+        {
+            getProject().addReference( filesetId, fileSet );
+        }
     }
 
     private List createRemoteArtifactRepositories()
@@ -180,5 +201,15 @@ public class DependenciesTask
     public void setPathId( String pathId )
     {
         this.pathId = pathId;
+    }
+
+    public String getFilesetId()
+    {
+        return filesetId;
+    }
+
+    public void setFilesetId( String filesetId )
+    {
+        this.filesetId = filesetId;
     }
 }

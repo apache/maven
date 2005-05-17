@@ -12,11 +12,15 @@
 
     <artifact:pom file="pom.xml" id="maven.project"/>
 
-    <artifact:dependencies pathId="dependency.classpath">
+    <artifact:dependencies pathId="dependency.classpath" filesetId="dependency.fileset">
       <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
       <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
       <localRepository refid="local.repository"/>
     </artifact:dependencies>
+
+    <copy todir="target/files">
+      <fileset refid="dependency.fileset" />
+    </copy>
 
     <artifact:install file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
       <localRepository refid="local.repository"/>
