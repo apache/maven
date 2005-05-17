@@ -28,7 +28,11 @@ import org.apache.maven.plugin.transformer.VersionTransformer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
+import org.codehaus.plexus.util.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -67,15 +71,15 @@ public class PrepareReleaseMojo
     protected void executeTask()
         throws MojoExecutionException
     {
-        checkStatus();
+        //checkStatus();
 
-        checkDependencies();
+        //checkDependencies();
 
         transformPom();
 
-        checkin();
+        //checkin();
 
-        tag();
+        //tag();
     }
 
     private boolean isSnapshot( String version )
@@ -178,6 +182,20 @@ public class PrepareReleaseMojo
 
         //Rewrite project version
         projectVersion = model.getVersion().substring( 0, model.getVersion().length() - SNAPSHOT.length() );
+        try
+        {
+            getLog().info( "What is the new version? [" + projectVersion + "]" );
+            BufferedReader input = new BufferedReader( new InputStreamReader( System.in ) );
+            String inputVersion = input.readLine();
+            if ( !StringUtils.isEmpty( inputVersion ) )
+            {
+                projectVersion = inputVersion;
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Can't read user input.", e );
+        }
         model.setVersion( projectVersion );
 
         //Rewrite parent version
@@ -263,6 +281,12 @@ public class PrepareReleaseMojo
     {
         try
         {
+            if ( getScm().getTag() == null )
+            {
+                getLog().info( "What is the new tag name?" );
+                BufferedReader input = new BufferedReader( new InputStreamReader( System.in ) );
+                getScm().setTag( input.readLine() );
+            }
             getScm().tag();
         }
         catch ( Exception e )
