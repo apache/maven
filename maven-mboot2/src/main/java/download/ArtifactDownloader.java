@@ -187,7 +187,7 @@ public class ArtifactDownloader
                 }
 
                 destinationFile = localRepository.getArtifactFile( dep );
-                if ( !destinationFile.exists() || version.indexOf( "SNAPSHOT" ) >= 0 )
+                if ( !destinationFile.exists() )
                 {
                     log( "Downloading " + url );
                     HttpUtils.getFile( url, destinationFile, ignoreErrors, useTimestamp, proxyHost, proxyPort,
