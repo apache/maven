@@ -83,9 +83,25 @@ public abstract class AbstractReleaseMojo
      */
     private String tag;
 
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
+
     private PlexusContainer container;
 
     private ScmManager scmManager;
+
+    public MavenProject getProject()
+    {
+        return project;
+    }
+    public String getWorkingDirectory()
+    {
+        return workingDirectory;
+    }
 
     protected ScmManager getScmManager()
     {

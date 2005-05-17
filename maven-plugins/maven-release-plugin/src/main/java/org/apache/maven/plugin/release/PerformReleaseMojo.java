@@ -17,6 +17,16 @@ package org.apache.maven.plugin.release;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.DefaultConsumer;
+import org.codehaus.plexus.util.cli.StreamConsumer;
+
+import sun.security.action.GetLongAction;
+import sun.tools.jar.CommandLine;
 
 /**
  * @goal perform
@@ -29,10 +39,18 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class PerformReleaseMojo
     extends AbstractReleaseMojo
 {
+    /**
+     * @parameter expression="${goals}"
+     * @required
+     */
+    private String goals = "deploy site:site site:deploy";
+
     protected void executeTask()
         throws MojoExecutionException
     {
         checkout();
+
+        runGoals();
     }
 
     private void checkout()
@@ -45,6 +63,24 @@ public class PerformReleaseMojo
         catch ( Exception e )
         {
             throw new MojoExecutionException( "An error is occurred in the checkout process.", e );
+        }
+    }
+
+    private void runGoals()
+        throws MojoExecutionException
+    {
+        Commandline cl = new Commandline();
+        cl.setExecutable( "m2" );
+        cl.setWorkingDirectory( getWorkingDirectory() );
+        cl.createArgument().setLine( goals );
+        StreamConsumer consumer = new DefaultConsumer();
+        try
+        {
+            CommandLineUtils.executeCommandLine( cl, consumer, consumer );
+        }
+        catch ( CommandLineException e )
+        {
+            throw new MojoExecutionException( "Can't run goal " + goals, e );
         }
     }
 }
