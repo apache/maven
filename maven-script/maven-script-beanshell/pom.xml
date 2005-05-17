@@ -1,0 +1,22 @@
+<model>
+  <parent>
+    <artifactId>maven-script</artifactId>
+    <groupId>org.apache.maven</groupId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>maven-script-beanshell</artifactId>
+  <name>Maven Beanshell Mojo Support</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-bsh-factory</artifactId>
+      <version>1.0-alpha-6-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</model>

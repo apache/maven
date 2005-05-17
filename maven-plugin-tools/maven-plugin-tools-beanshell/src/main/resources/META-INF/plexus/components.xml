@@ -1,0 +1,17 @@
+<component-set>
+  <components>
+
+    <!--
+     |
+     | BeanshellMojoDescriptorExtractor, a MojoDescriptor extractor to read
+     | descriptors from java sources.
+     |
+     -->
+    <component>
+      <role>org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor</role>
+      <role-hint>bsh</role-hint>
+      <implementation>org.apache.maven.tools.plugin.extractor.beanshell.BeanshellMojoDescriptorExtractor</implementation>
+    </component>
+    
+  </components>
+</component-set>

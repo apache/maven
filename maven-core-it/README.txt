@@ -64,6 +64,9 @@ it0018: Ensure that managed dependencies for dependency POMs are calculated
         redownloaded.
 
 it0019: Test that a version is managed by pluginManagement in the super POM
+
+it0020: Test beanshell mojo support.
+
 -------------------------------------------------------------------------------
 
 - generated sources

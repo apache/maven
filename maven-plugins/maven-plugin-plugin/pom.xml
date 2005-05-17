@@ -18,6 +18,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-tools-beanshell</artifactId>
+      <version>2.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-tools-java</artifactId>
       <version>2.0-alpha-2</version>
       <scope>runtime</scope>

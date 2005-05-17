@@ -9,13 +9,6 @@
       <component-discoverer implementation="org.apache.maven.plugin.MavenPluginDiscoverer"/>
     </component-discoverers>
   </component-discoverer-manager>
-  <!-- component-factory-manager implementation="org.codehaus.plexus.component.factory.DefaultComponentFactoryManager">
-    <component-factories>
-      <component-factory implementation="org.codehaus.plexus.component.factory.marmalade.MarmaladeClasspathComponentFactory">
-        <id>marmalade</id>
-      </component-factory>
-    </component-factories>
-  </component-factory-manager -->
   <components>
     <component>
       <role>org.apache.maven.plugin.PluginManager</role>

@@ -273,7 +273,7 @@ public class JavaMojoDescriptorExtractor
 
             String alias = parameter.getNamedParameter( "alias" );
 
-            if ( StringUtils.isEmpty( alias ) )
+            if ( !StringUtils.isEmpty( alias ) )
             {
                 pd.setAlias( alias );
             }

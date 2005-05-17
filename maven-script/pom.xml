@@ -10,5 +10,6 @@
   <name>Maven Script Support Root</name>
   <modules>
     <module>maven-script-marmalade</module>
+    <module>maven-script-beanshell</module>
   </modules>
 </project>

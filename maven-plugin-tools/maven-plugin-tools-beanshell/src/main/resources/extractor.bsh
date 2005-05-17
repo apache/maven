@@ -1,0 +1,152 @@
+import bsh.*;
+import java.util.regex.Pattern;
+import java.io.FileReader;
+import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.plugin.descriptor.Parameter;
+
+// only on start of line
+this.tag = "\\r?\\n\\s*\\*?\\s*@(\\w+)";
+// zero width lookahead to next tag or end of comment
+this.tagOrEndComment = "(?=" + tag + "|\\*/)";
+this.commentTextPattern = Pattern.compile( "(?s)/\\*\\*(.*?)" + tagOrEndComment );
+this.tagsPattern = Pattern.compile( "(?s)" + tag + "\\s*(.*?)" + tagOrEndComment );
+this.descriptionPattern = Pattern.compile( "(?s)\\r?\\n\\s*\\*" );
+this.typePattern = Pattern.compile( "type\\s*=\\s*\"(.*?)\"" );
+this.expressionPattern = Pattern.compile( "expression\\s*=\\s*\"(.*?)\"" );
+
+setAccessibility( true );
+
+createParameter( text, method )
+{
+    if ( method.startsWith( "set" ) )
+    {
+        this.name = StringUtils.uncapitalise( method.substring( 3 ) );
+        this.desc = getDescription( text );
+        this.tags = getTags( text );
+
+        this.parameter = new Parameter();
+        parameter.setName( name );
+        parameter.setDescription( desc );
+        parameter.setRequired( tags.containsKey( "required" ) );
+        parameter.setEditable( !tags.containsKey( "readonly" ) );
+        this.deprecation = tags.get( "deprecated" );
+        if ( deprecation != null )
+        {
+            parameter.setDeprecated( deprecation );
+        }
+        this.alias = tags.get( "alias" );
+        if ( alias != null )
+        {
+            parameter.setAlias( alias );
+        }
+        this.value = tags.get( "parameter" );
+        if ( value != null )
+        {
+            m = typePattern.matcher( value );
+            if ( m.find() )
+            {
+                parameter.setType( m.group( 1 ) );
+            }
+            else
+            {
+                parameter.setType( "java.lang.Object" );
+            }
+            m = expressionPattern.matcher( value );
+            if ( m.find() )
+            {
+                parameter.setExpression( m.group( 1 ) );
+            }
+        }
+        return parameter;
+    }
+    return null;
+}
+
+getTags( text )
+{
+    this.matcher = tagsPattern.matcher( text );
+    this.tags = new HashMap();
+    while ( matcher.find() )
+    {
+        this.tagname = matcher.group( 1 );
+        this.tagvalue = matcher.group( 2 );
+        tags.put( tagname, tagvalue.trim() );
+    }
+    return tags;
+}
+
+getDescription( text )
+{
+    this.matcher = commentTextPattern.matcher( text );
+    if ( matcher.find() )
+    {
+        this.input = matcher.group( 1 );
+        return descriptionPattern.matcher( input ).replaceAll( "" ).trim();
+    }
+    else
+    {
+        return "";
+    }
+}
+
+extract( file, mojoDescriptor )
+{
+    this.parser = new Parser( new FileReader( file ) );
+    parser.setRetainComments( true );
+
+    this.lastNode = null;
+    this.firstComment = null;
+    while ( !parser.Line() )
+    {
+        this.node = parser.popNode();
+
+        if ( node instanceof BSHFormalComment && firstComment == null )
+        {
+            firstComment = node;
+        }
+
+        if ( node instanceof BSHMethodDeclaration )
+        {
+            if ( lastNode instanceof BSHFormalComment )
+            {
+                this.text = lastNode.text;
+
+                this.method = node.name;
+
+                this.parameter = createParameter( text, method );
+                if ( parameter != null )
+                {
+                    mojoDescriptor.addParameter( parameter );
+                }
+
+                if ( firstComment == lastNode )
+                {
+                    firstComment = null;
+                }
+            }
+        }
+        lastNode = node;
+    }
+    if ( firstComment != null )
+    {
+        this.text = firstComment.text;
+
+        mojoDescriptor.setDescription( getDescription( text ) );
+        this.tags = getTags( text );
+        mojoDescriptor.setGoal( tags.get( "goal" ) );
+        mojoDescriptor.setPhase( tags.get( "phase" ) );
+        mojoDescriptor.setExecutePhase( tags.get( "executePhase" ) );
+        this.value = tags.get( "requiresDependencyResolution" );
+        // TODO: share with java extractor
+        if ( value == null || value.length() == 0 )
+        {
+            value = "runtime";
+        }
+        mojoDescriptor.setDependencyResolutionRequired( value );
+
+        mojoDescriptor.setProjectRequired( tags.containsKey( "requiresProject" ) );
+        mojoDescriptor.setOnlineRequired( tags.containsKey( "requiresOnline" ) );
+    }
+}
+
+extract( file, mojoDescriptor );

@@ -536,6 +536,7 @@ public class DefaultPluginManager
         {
             String configuratorId = mojoDescriptor.getComponentConfigurator();
 
+            // TODO: should this be known to the component factory instead? And if so, should configuration be part of lookup?
             if ( StringUtils.isNotEmpty( configuratorId ) )
             {
                 configurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE, configuratorId );
@@ -670,7 +671,7 @@ public class DefaultPluginManager
                                " for parameter: \'" + key + "\'" );
 
             // TODO: remove. If there is a default value, required should have been removed by the descriptor generator
-            if ( value == null && !"map-oriented".equals( goal.getComponentConfigurator() ) )
+            if ( value == null && goal.getComponentConfigurator() == null )
             {
                 Object defaultValue;
                 try
@@ -791,6 +792,7 @@ public class DefaultPluginManager
                                                               "maven-reporting-api", "doxia-core",
                                                               "wagon-provider-api", "classworlds", "maven-plugin",
                                                               "plexus-marmalade-factory", "maven-script-marmalade",
+                                                              "maven-script-beanshell", "plexus-bsh-factory", "bsh",
                                                               "marmalade-core"} );
     }
 
