@@ -254,7 +254,7 @@ public class PrepareReleaseMojo
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "An error is occurred in the tag process.", e );
+            throw new MojoExecutionException( "An error is occurred in the checkin process.", e );
         }
     }
 

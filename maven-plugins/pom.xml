@@ -88,6 +88,7 @@
     <module>maven-install-plugin</module>
     <module>maven-jar-plugin</module>
     <module>maven-plugin-plugin</module>
+    <module>maven-release-plugin</module>
     <module>maven-resources-plugin</module>
     <module>maven-site-plugin</module>
     <module>maven-source-plugin</module>
