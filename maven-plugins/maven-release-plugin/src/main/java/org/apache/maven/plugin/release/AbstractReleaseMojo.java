@@ -16,32 +16,16 @@ package org.apache.maven.plugin.release;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.scm.ScmBean;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.scm.ScmException;
-import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.manager.ScmManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
@@ -98,6 +82,7 @@ public abstract class AbstractReleaseMojo
     {
         return project;
     }
+
     public String getWorkingDirectory()
     {
         return workingDirectory;

@@ -18,7 +18,6 @@ package org.apache.maven.plugin.scm;
  */
 
 import org.apache.maven.scm.ScmException;
-import org.apache.maven.scm.ScmFile;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmResult;
 import org.apache.maven.scm.provider.svn.repository.SvnScmProviderRepository;
@@ -28,10 +27,7 @@ import org.apache.maven.scm.command.status.StatusScmResult;
 import org.apache.maven.scm.command.tag.TagScmResult;
 import org.apache.maven.scm.command.update.UpdateScmResult;
 import org.apache.maven.scm.manager.ScmManager;
-import org.apache.maven.scm.manager.NoSuchScmProviderException;
 import org.apache.maven.scm.repository.ScmRepository;
-import org.apache.maven.scm.repository.ScmRepositoryException;
-import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;

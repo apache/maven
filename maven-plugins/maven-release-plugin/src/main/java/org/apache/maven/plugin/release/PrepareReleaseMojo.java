@@ -35,8 +35,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Prepare for a release in SCM
+ *
  * @goal prepare
- * @description Prepare for a release in SCM
  * @requiresDependencyResolution test
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>

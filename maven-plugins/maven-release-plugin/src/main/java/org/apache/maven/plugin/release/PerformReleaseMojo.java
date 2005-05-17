@@ -17,21 +17,16 @@ package org.apache.maven.plugin.release;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
-import sun.security.action.GetLongAction;
-import sun.tools.jar.CommandLine;
-
 /**
+ * Perform a release from SCM
+ *
  * @goal perform
- * @description Perform a release from SCM
- * @requiresDependencyResolution test
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id: DoxiaMojo.java 169372 2005-05-09 22:47:34Z evenisse $
@@ -41,7 +36,6 @@ public class PerformReleaseMojo
 {
     /**
      * @parameter expression="${goals}"
-     * @required
      */
     private String goals = "deploy site:site site:deploy";
 
