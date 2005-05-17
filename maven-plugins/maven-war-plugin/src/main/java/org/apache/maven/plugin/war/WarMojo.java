@@ -36,11 +36,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Build a war/webapp.
+ *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
  * @goal war
  * @phase package
- * @description build a war/webapp
+ * @requiresDependencyResolution runtime
  */
 public class WarMojo
     extends AbstractMojo
