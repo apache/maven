@@ -28,6 +28,7 @@ import org.apache.maven.plugin.transformer.VersionTransformer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
+import org.codehaus.plexus.components.inputhandler.InputHandler;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.BufferedReader;
@@ -71,15 +72,15 @@ public class PrepareReleaseMojo
     protected void executeTask()
         throws MojoExecutionException
     {
-        //checkStatus();
+        checkStatus();
 
-        //checkDependencies();
+        checkDependencies();
 
         transformPom();
 
-        //checkin();
+        checkin();
 
-        //tag();
+        tag();
     }
 
     private boolean isSnapshot( String version )
@@ -185,14 +186,14 @@ public class PrepareReleaseMojo
         try
         {
             getLog().info( "What is the new version? [" + projectVersion + "]" );
-            BufferedReader input = new BufferedReader( new InputStreamReader( System.in ) );
-            String inputVersion = input.readLine();
+            InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
+            String inputVersion = handler.readLine();
             if ( !StringUtils.isEmpty( inputVersion ) )
             {
                 projectVersion = inputVersion;
             }
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
             throw new MojoExecutionException( "Can't read user input.", e );
         }
@@ -284,8 +285,8 @@ public class PrepareReleaseMojo
             if ( getScm().getTag() == null )
             {
                 getLog().info( "What is the new tag name?" );
-                BufferedReader input = new BufferedReader( new InputStreamReader( System.in ) );
-                getScm().setTag( input.readLine() );
+                InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
+                getScm().setTag( handler.readLine() );
             }
             getScm().tag();
         }

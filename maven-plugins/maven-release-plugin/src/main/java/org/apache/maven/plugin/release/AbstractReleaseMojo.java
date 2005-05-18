@@ -111,6 +111,11 @@ public abstract class AbstractReleaseMojo
         return scm;
     }
 
+    public PlexusContainer getContainer()
+    {
+        return container;
+    }
+
     public void execute()
         throws MojoExecutionException
     {
