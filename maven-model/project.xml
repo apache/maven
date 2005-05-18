@@ -11,13 +11,13 @@
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-modello-plugin</artifactId>
-      <version>0.9-SNAPSHOT</version>
+      <version>1.0-alpha-1-SNAPSHOT</version>
       <type>plugin</type>
     </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
+      <version>1.0-alpha-3</version>
     </dependency>
   </dependencies>
 </project>

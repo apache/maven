@@ -528,7 +528,7 @@
           <name>organization</name>
           <version>3.0.0+</version>
           <description><![CDATA[
-            This element describes various attributes of the organziation to
+            This element describes various attributes of the organization to
             which the project belongs.  These attributes are utilized when
             documentation is created (for copyright notices and links).
           ]]></description>
@@ -707,6 +707,14 @@
       <superClass>PluginContainer</superClass>
       <fields>
         <field>
+          <name>defaultGoal</name>
+          <version>3.0.0+</version>
+          <description><![CDATA[
+            The default goal (or phase in Maven 2) to execute when none is specified for the project.
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
           <name>nagEmailAddress</name>
           <version>3.0.0</version>
           <description><![CDATA[
@@ -718,7 +726,6 @@
             target.
           ]]></description>
           <type>String</type>
-          <comment>This should be moved out of the build section. Vestigal for use with Gump.</comment>
         </field>
         <field>
           <name>sourceDirectory</name>
@@ -996,10 +1003,17 @@
           <description><![CDATA[The URL for the homepage of the contributor.]]></description>
           <type>String</type>
         </field>
+        <!-- TODO: should this just be a single Organization element -->
         <field>
           <name>organization</name>
           <version>3.0.0+</version>
           <description><![CDATA[The organization to which the contributor belongs.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>organizationUrl</name>
+          <version>3.0.0+</version>
+          <description><![CDATA[The URL of the organization.]]></description>
           <type>String</type>
         </field>
         <field>
@@ -1022,6 +1036,18 @@
             The timezone the contributor is in. This is a number in the range -11 to 12.
           ]]></description>
           <type>String</type>
+        </field>
+        <field>
+          <name>properties</name>
+          <version>3.0.0+</version>
+          <description><![CDATA[
+            Properties about the contributor, such as an instant messenger handle.
+          ]]></description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
     </class>
@@ -1396,7 +1422,7 @@
         </field>
         <field>
           <name>post</name>
-          <version>3.1.0+</version>
+          <version>3.0.0+</version>
           <description><![CDATA[
             The email address or link that can be used to post to
             the mailing list.  If this is an email address, a
@@ -1415,7 +1441,7 @@
         </field>
         <field>
           <name>otherArchives</name>
-          <version>3.1.0+</version>
+          <version>3.0.0+</version>
           <description><![CDATA[
             The link to other URLs where you can browse the list archive.
           ]]></description>
