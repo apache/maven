@@ -85,7 +85,9 @@ public class EclipsePluginTest
         }
 
         plugin.setProject( project );
-        
+
+        plugin.setLocalRepository( localRepository );
+
         plugin.execute();
 
         assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ), new File( basedir, ".project" ) );
@@ -128,7 +130,7 @@ public class EclipsePluginTest
 
         while ( (line = reader.readLine()) != null )
         {
-            lines.add( StringUtils.replace( line, "#ArtifactRepositoryPath#", mavenRepo.replace( '\\', '/' ) ) );
+            lines.add( line );//StringUtils.replace( line, "#ArtifactRepositoryPath#", mavenRepo.replace( '\\', '/' ) ) );
         }
 
         return lines;

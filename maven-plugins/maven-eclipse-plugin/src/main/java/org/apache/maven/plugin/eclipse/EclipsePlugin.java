@@ -22,9 +22,12 @@ package org.apache.maven.plugin.eclipse;
  * SOFTWARE.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+
+import java.io.File;
 
 /**
  * A Maven2 plugin which integrates the use of Maven2 with Eclipse.
@@ -47,6 +50,13 @@ public class EclipsePlugin
      */
     private MavenProject project;
 
+    /**
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    private ArtifactRepository localRepository;
+
     public EclipsePlugin()
     {
         eclipseWriter = new EclipseWriter();
@@ -55,6 +65,11 @@ public class EclipsePlugin
     public void setProject( MavenProject project )
     {
         this.project = project;
+    }
+
+    public void setLocalRepository( ArtifactRepository localRepository )
+    {
+        this.localRepository = localRepository;
     }
 
     public void execute()
@@ -67,6 +82,8 @@ public class EclipsePlugin
 
         try
         {
+            eclipseWriter.setLocalRepositoryFile( new File ( localRepository.getBasedir() ) );
+
             eclipseWriter.write( project );
         }
         catch ( EclipsePluginException e )

@@ -45,6 +45,13 @@ import java.util.Set;
  */
 public class EclipseWriter
 {
+    private File localRepository;
+
+    public void setLocalRepositoryFile( File localRepository )
+    {
+        this.localRepository = localRepository;
+    }
+
     public void write( MavenProject project )
         throws EclipsePluginException
     {
@@ -330,7 +337,7 @@ public class EclipseWriter
 
         writer.addAttribute( "kind", "lib" );
 
-        writer.addAttribute( "path", path.getPath().replace( '\\', '/' ) );
+        writer.addAttribute( "path", "M2_REPO/" + toRelative( localRepository, path.getPath() ) );
 
         writer.endElement();
     }
