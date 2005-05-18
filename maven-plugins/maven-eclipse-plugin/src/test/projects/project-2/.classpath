@@ -1,9 +1,0 @@
-<classpath>
-  <classpathentry kind="src" path="src/main/java"/>
-  <classpathentry kind="src" path="src/main/resources"/>
-  <classpathentry kind="src" path="src/test/java" output="target/test-classes"/>
-  <classpathentry kind="src" path="src/test/resources" output="target/test-classes"/>
-  <classpathentry kind="output" path="target/classes"/>
-  <classpathentry kind="var" rootpath="JRE_SRCROOT" path="JRE_LIB" sourcepath="JRE_SRC"/>
-  <classpathentry kind="lib" path="/home/jvanzyl/js/org.apache.maven/components/trunk/maven-plugins/maven-eclipse-plugin/src/test/repository/junit/jars/junit-2.0.jar"/>
-</classpath>
