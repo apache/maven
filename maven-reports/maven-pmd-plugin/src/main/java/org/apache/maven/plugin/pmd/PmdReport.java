@@ -33,18 +33,21 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Implement the PMD report.
  *
+ * @todo needs to support the multiple source roots
  * @author Brett Porter
  * @version $Id: PmdReport.java,v 1.3 2005/02/23 00:08:53 brett Exp $
  */
 public class PmdReport
     extends AbstractMavenReport
 {
+    /** @todo share, use default excludes from plexus utils. */
     protected static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
         "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
 
@@ -163,6 +166,12 @@ public class PmdReport
     private List getFilesToProcess( String includes, String excludes )
         throws IOException
     {
+        File dir = new File( getConfiguration().getSourceDirectory() );
+        if ( !dir.exists() )
+        {
+            return Collections.EMPTY_LIST;
+        }
+
         StringBuffer excludesStr = new StringBuffer();
         if ( StringUtils.isNotEmpty( excludes ) )
         {
@@ -177,7 +186,6 @@ public class PmdReport
             excludesStr.append( DEFAULT_EXCLUDES[i] );
         }
 
-        return FileUtils.getFiles( new File( getConfiguration().getSourceDirectory() ), includes,
-                                   excludesStr.toString() );
+        return FileUtils.getFiles( dir, includes, excludesStr.toString() );
     }
 }
