@@ -84,6 +84,7 @@ public abstract class AbstractGeneratorTestCase
         pluginDescriptor.setDependencies( Collections.singletonList( dependency ) );
 
         File tempFile = File.createTempFile( "testGenerator-outDir", ".marker.txt" ).getAbsoluteFile();
+        tempFile.deleteOnExit();
         File destinationDirectory = tempFile.getParentFile();
 
         generator.execute( destinationDirectory, pluginDescriptor );
