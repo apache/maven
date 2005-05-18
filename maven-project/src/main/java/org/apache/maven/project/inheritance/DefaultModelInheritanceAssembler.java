@@ -312,6 +312,11 @@ public class DefaultModelInheritanceAssembler
             // values
             // that have not been set by the child.
 
+            if ( childBuild.getDefaultGoal() == null )
+            {
+                childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
+            }
+
             if ( childBuild.getDirectory() == null )
             {
                 childBuild.setDirectory( parentBuild.getDirectory() );
