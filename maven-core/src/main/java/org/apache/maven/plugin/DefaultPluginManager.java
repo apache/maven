@@ -605,6 +605,10 @@ public class DefaultPluginManager
         List parameters = goal.getParameters();
 
         List invalidParameters = new ArrayList();
+        if ( parameters.isEmpty() )
+        {
+            return;
+        }
 
         for ( int i = 0; i < parameters.size(); i++ )
         {
