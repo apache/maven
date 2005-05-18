@@ -329,7 +329,7 @@ public class EclipseWriter
 
         writer.startElement( "classpathentry" );
 
-        writer.addAttribute( "kind", "lib" );
+        writer.addAttribute( "kind", "var" );
 
         writer.addAttribute( "path", "M2_REPO/" + toRelative( localRepository, path.getPath() ) );
 

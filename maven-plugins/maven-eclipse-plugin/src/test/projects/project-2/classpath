@@ -5,5 +5,5 @@
   <classpathentry kind="src" path="src/test/resources" output="target/test-classes"/>
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" rootpath="JRE_SRCROOT" path="JRE_LIB" sourcepath="JRE_SRC"/>
-  <classpathentry kind="lib" path="M2_REPO/junit/jars/junit-2.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/jars/junit-2.0.jar"/>
 </classpath>
