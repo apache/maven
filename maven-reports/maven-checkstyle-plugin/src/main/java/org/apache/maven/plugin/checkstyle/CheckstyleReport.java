@@ -18,7 +18,6 @@ package org.apache.maven.plugin.checkstyle;
 
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.codehaus.doxia.sink.Sink;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 

@@ -21,7 +21,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
-import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.module.xhtml.XhtmlSink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
