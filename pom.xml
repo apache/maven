@@ -102,17 +102,22 @@
     </site>
   </distributionManagement>
   <modules>
+    <module>maven-archetype</module>
     <module>maven-archiver</module>
     <module>maven-artifact</module>
+    <module>maven-artifact-ant</module>
     <module>maven-artifact-test</module>
+    <module>maven-core</module>
     <module>maven-model</module>
     <module>maven-monitor</module>
     <module>maven-plugin-api</module>
     <module>maven-plugin-descriptor</module>
+    <module>maven-plugins</module>
+    <module>maven-plugin-tools</module>
     <module>maven-project</module>
-    <module>maven-core</module>
+    <module>maven-reporting</module>
+    <module>maven-reports</module>
     <module>maven-settings</module>
     <module>maven-script</module>
-    <module>maven-reporting</module>
   </modules>
 </project>
