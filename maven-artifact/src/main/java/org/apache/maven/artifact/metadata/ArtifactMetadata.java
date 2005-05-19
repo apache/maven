@@ -19,9 +19,6 @@ package org.apache.maven.artifact.metadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-import java.io.File;
-import java.util.Date;
-
 /**
  * Contains metadata about an artifact, and methods to retrieve/store it from an artifact repository.
  *
