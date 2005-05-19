@@ -124,7 +124,9 @@ public class DoxiaMojo
 
             MavenReportConfiguration config = new MavenReportConfiguration();
 
-            config.setModel( project.getModel() );
+            config.setProject( project );
+
+            config.setReportOutputDirectory( new File( outputDirectory ) );
 
             //Generate reports
             if ( reports != null )

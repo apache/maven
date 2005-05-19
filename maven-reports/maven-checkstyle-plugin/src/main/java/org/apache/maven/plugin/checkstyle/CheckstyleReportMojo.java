@@ -86,7 +86,7 @@ public class CheckstyleReportMojo
     {
         MavenReportConfiguration config = new MavenReportConfiguration();
 
-        config.setModel( project.getModel() );
+        config.setProject( project );
 
         MavenReport report = new CheckstyleReport();
 

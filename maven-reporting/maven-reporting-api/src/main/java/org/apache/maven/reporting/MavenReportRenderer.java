@@ -16,8 +16,6 @@ package org.apache.maven.reporting;
  * limitations under the License.
  */
 
-import org.codehaus.doxia.sink.Sink;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>

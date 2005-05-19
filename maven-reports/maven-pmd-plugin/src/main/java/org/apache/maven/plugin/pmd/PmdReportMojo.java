@@ -85,7 +85,9 @@ public class PmdReportMojo
     {
         MavenReportConfiguration config = new MavenReportConfiguration();
 
-        config.setModel( project.getModel() );
+        config.setProject( project );
+
+        config.setReportOutputDirectory( new File( outputDirectory ) );
 
         MavenReport report = new PmdReport();
 

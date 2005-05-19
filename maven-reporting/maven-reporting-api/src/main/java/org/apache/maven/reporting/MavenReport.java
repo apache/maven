@@ -18,7 +18,6 @@ package org.apache.maven.reporting;
 
 import org.codehaus.doxia.sink.Sink;
 
-import java.io.File;
 import java.io.IOException;
 
 /**

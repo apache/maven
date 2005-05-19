@@ -18,6 +18,7 @@ package org.apache.maven.reporting;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Scm;
+import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.util.List;
@@ -28,9 +29,21 @@ import java.util.List;
  */
 public class MavenReportConfiguration
 {
-    private Model model;
+    private MavenProject project;
 
     private File basedir;
+
+    private File outputDirectory;
+
+    public void setReportOutputDirectory( File outputDirectory )
+    {
+        this.outputDirectory = outputDirectory;
+    }
+
+    public File getReportOutputDirectory()
+    {
+        return outputDirectory;
+    }
 
     public File getBasedir()
     {
@@ -44,17 +57,17 @@ public class MavenReportConfiguration
 
     public Model getModel()
     {
-        if ( model == null )
-        {
-            model = new Model();
-        }
-
-        return model;
+        return project.getModel();
     }
 
-    public void setModel( Model model )
+    public void setProject( MavenProject project )
     {
-        this.model = model;
+        this.project = project;
+    }
+
+    public MavenProject getProject()
+    {
+        return project;
     }
 
     public List getDependencies()
@@ -87,6 +100,11 @@ public class MavenReportConfiguration
         getModel().getBuild().setSourceDirectory( sourceDirectory );
     }
 
+    public List getCompileSourceRoots()
+    {
+        return project.getCompileSourceRoots();
+    }
+
     public String getScriptSourceDirectory()
     {
         return getModel().getBuild().getScriptSourceDirectory();
@@ -106,4 +124,10 @@ public class MavenReportConfiguration
     {
         getModel().getBuild().setTestSourceDirectory( testSourceDirectory );
     }
+
+    public List getTestCompileSourceRoots()
+    {
+        return project.getTestCompileSourceRoots();
+    }
+
 }

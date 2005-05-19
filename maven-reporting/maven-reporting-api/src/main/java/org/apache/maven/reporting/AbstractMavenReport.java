@@ -17,10 +17,7 @@ package org.apache.maven.reporting;
  */
 
 import org.codehaus.doxia.sink.Sink;
-import org.codehaus.doxia.module.xdoc.XdocSink;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 /**
