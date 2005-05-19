@@ -88,9 +88,7 @@
   </proxies>
   .
   .]]></source>
-      <p style="font-weight: bold; font-size: larger">
-        Security and Deployment Settings
-      </p>
+      <h4>Security and Deployment Settings</h4>
       <p>
         Repositories to deploy to are defined in a project in the <code>&lt;distributionManagement&gt;</code> section.
         However, you cannot put your username, password, or other security settings in that project. For that reason,
@@ -123,9 +121,7 @@
   </servers>
   .
   .]]></source>
-      <p style="font-weight: bold; font-size: larger">
-        Using Mirrors for Repositories <span style="font-size: smaller"><em>(alpha-2 and above only)</em></span>
-      </p>
+      <h4>Using Mirrors for Repositories</h4>
       <p>
         Repositories are declared inside a project, which means that if you have your own custom repositories, those
         sharing your project easily get the right settings out of the box. However, you may want to use an alternative
