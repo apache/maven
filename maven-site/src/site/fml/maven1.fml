@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <faqs title="Information for Maven 1.0 Users">
 
   <part id="maven1">
@@ -6,7 +7,7 @@
       <answer>
         <p>
           Maven 2.0 will feel very different to a Maven 1.0 user - and perhaps a little strange. But it is a lot simpler
-          to work with! The key changes from Maven 1.0 are:
+          to work with, and closer to how Maven was always meant to be! The key changes from Maven 1.0 are:
         </p>
         <ul>
           <li>
@@ -137,6 +138,33 @@
           We recommend building your Jelly plugins as thin wrappers around Java beans that do not use Maven 1.0 API's,
           which will allow easy migration to Maven 2.0.
         </p>
+      </answer>
+    </faq>
+    <faq id="m1-maven-xml">
+      <question>How do I write custom scripts without a <code>maven.xml</code> file?</question>
+      <answer>
+        <p>Taken from <a href="http://mail-archives.apache.org/mod_mbox/maven-users/200504.mbox/%3c1113788711.5625.30.camel@172.16.1.36%3e">this post to the Maven User's List</a>:
+        </p>
+        <blockquote>
+Everything in m2 is a plugin so for doing any sort of custom work like
+that you will need to make a plugin. This 1) greatly reduces the
+complexity within m2 because we only deal with proper plugins. The
+maven.xml file in m1 was a psuedo plugin essentially and greatly
+complicated the internals and 2) it promotes the sharing of your work
+right from the get go. To start with you'll probably write a plugin that
+is only applicable to your specific requirements, or your team's work,
+but you'll see people asking for some functionality and you'll go "hey,
+I have something like that!" and hopefully people who have concrete
+solutions will generalize their solutions so they can be shared with
+others. That's what we're trying to encourage.
+        </blockquote>
+        <blockquote>
+We estimate that there's a lot of work bound up in project's maven.xml
+that is not being shared and we'd like to try and change that. We plan
+to make it dead simple to share plugins and hopefully people can use
+other project's plugins as a start for a plugin that they may need
+themselves.
+        </blockquote>
       </answer>
     </faq>
   </part>

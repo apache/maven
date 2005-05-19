@@ -6,13 +6,13 @@
   09-Feb-2005
   ---
   
-*Abstract
+Abstract
 
   Propose changing the structure of maven-plugin-tools to accommodate multiple
   plugin languages and their needs during the descriptor, etc. generation 
   process. Details below.
   
-*Refactor Details
+Refactor Details
 
   [[1]] Move the existing project (maven-plugin-tools) to 
         <<<maven-plugin-tools/maven-plugin-tools-java>>>. Adjust dependencies on 
