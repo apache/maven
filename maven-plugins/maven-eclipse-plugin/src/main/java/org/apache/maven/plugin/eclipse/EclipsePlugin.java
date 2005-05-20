@@ -26,10 +26,12 @@ import java.io.File;
 /**
  * A Maven2 plugin which integrates the use of Maven2 with Eclipse.
  *
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  * @goal eclipse
  * @requiresDependencyResolution
+ * @executePhase generate-sources
+ *
+ * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @version $Id$
  */
 public class EclipsePlugin
     extends AbstractMojo
