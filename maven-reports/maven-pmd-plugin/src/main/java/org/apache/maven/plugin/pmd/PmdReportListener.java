@@ -139,5 +139,9 @@ public class PmdReportListener
         sink.section1_();
 
         sink.body_();
+
+        sink.flush();
+
+        sink.close();
     }
 }

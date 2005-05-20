@@ -84,6 +84,8 @@ public class CheckstyleReportListener
     {
         sink.section1_();
         sink.body_();
+        sink.flush();
+        sink.close();
     }
 
     public void fileStarted( AuditEvent event )

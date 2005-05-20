@@ -373,6 +373,10 @@ public class DoxiaMojo
         sink.section1_();
 
         sink.body_();
+
+        sink.flush();
+
+        sink.close();
     }
 
     private void generateProjectReportsPage( InputStream siteDescriptor)

@@ -36,6 +36,8 @@ public class MultiPageSink
     public void closeSink()
     {
         sink.body_();
+        sink.flush();
+        sink.close();
     }
 
     /**
@@ -106,7 +108,6 @@ public class MultiPageSink
      */
     public void close()
     {
-        sink.close();
     }
 
     /**

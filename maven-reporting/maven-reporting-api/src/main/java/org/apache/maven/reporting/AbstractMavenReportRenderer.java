@@ -53,6 +53,10 @@ public abstract class AbstractMavenReportRenderer
         renderBody();
 
         sink.body_();
+
+        sink.flush();
+
+        sink.close();
     }
 
     protected void startTable()
