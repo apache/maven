@@ -1,7 +1,11 @@
 package org.apache.maven.reporting;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+import org.apache.maven.reporting.sink.MultiPageSink;
 import org.apache.maven.reporting.sink.SinkFactory;
 import org.codehaus.doxia.sink.Sink;
 
@@ -28,7 +32,9 @@ import org.codehaus.doxia.sink.Sink;
 public abstract class AbstractMavenMultiPageReport
     extends AbstractMavenReport
 {
-    SinkFactory factory;
+    private SinkFactory factory;
+
+    private List sinks = new ArrayList();
 
     public void setSinkFactory( SinkFactory factory )
     {
@@ -44,6 +50,7 @@ public abstract class AbstractMavenMultiPageReport
             factory.setSiteDescriptor( getSiteDescriptor() );
         }
     }
+
     public SinkFactory getSinkFactory()
     {
         return factory;
@@ -64,9 +71,58 @@ public abstract class AbstractMavenMultiPageReport
         return true;
     }
 
-    public Sink getSink( String outputName )
+    public abstract boolean usePageLinkBar();
+
+    private Sink getSink( String outputName )
         throws Exception
     {
         return factory.getSink( outputName );
+    }
+
+    public MultiPageSink startPage( String outputName )
+        throws Exception
+    {
+        return new MultiPageSink( outputName, getSink( outputName ) );
+    }
+
+    public void endPage( MultiPageSink sink )
+    {
+        if ( usePageLinkBar() )
+        {
+            sinks.add( sink );
+        }
+        else
+        {
+            sink.closeSink();
+        }
+    }
+
+    protected void closeReport()
+    {
+        int counter = 1;
+
+        if ( !sinks.isEmpty() )
+        {
+            for ( Iterator i = sinks.iterator(); i.hasNext(); )
+            {
+                MultiPageSink currentSink = (MultiPageSink) i.next();
+
+                currentSink.paragraph();
+                for ( Iterator j = sinks.iterator(); i.hasNext(); )
+                {
+                    if (counter>1)
+                    {
+                        currentSink.text( "&nbsp;" );
+                    }
+                    MultiPageSink sink = (MultiPageSink) i.next();
+                    sink.link( sink.getOutputName() + ".html" );
+                    sink.text( String.valueOf( counter++ ) );
+                    sink.link_();
+                    
+                }
+                currentSink.paragraph_();
+                currentSink.closeSink();
+            }
+        }
     }
 }

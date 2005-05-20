@@ -61,10 +61,16 @@ public abstract class AbstractMavenReport
         }
 
         execute();
+
+        closeReport();
     }
 
     protected abstract void execute()
         throws MavenReportException;
+
+    protected void closeReport()
+    {
+    }
 
     public Sink getSink()
         throws IOException
