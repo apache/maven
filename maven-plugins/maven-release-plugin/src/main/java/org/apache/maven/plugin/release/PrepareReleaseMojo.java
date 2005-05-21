@@ -70,15 +70,15 @@ public class PrepareReleaseMojo
     protected void executeTask()
         throws MojoExecutionException
     {
-        checkStatus();
+        checkForLocalModifications();
 
         checkForPresenceOfSnapshots();
 
         transformPom();
 
-        checkInPom();
+        checkInReleaseVersionPom();
 
-        tag();
+        tagRelease();
     }
 
     private boolean isSnapshot( String version )
@@ -86,7 +86,7 @@ public class PrepareReleaseMojo
         return version.endsWith( SNAPSHOT );
     }
 
-    private void checkStatus()
+    private void checkForLocalModifications()
         throws MojoExecutionException
     {
         getLog().info( "Verifying there are no local modifications ..." );
@@ -320,7 +320,7 @@ public class PrepareReleaseMojo
      *
      * @throws MojoExecutionException
      */
-    private void checkInPom()
+    private void checkInReleaseVersionPom()
         throws MojoExecutionException
     {
         try
@@ -348,7 +348,7 @@ public class PrepareReleaseMojo
      *
      * @throws MojoExecutionException
      */
-    private void tag()
+    private void tagRelease()
         throws MojoExecutionException
     {
 
