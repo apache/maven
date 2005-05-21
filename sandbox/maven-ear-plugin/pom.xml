@@ -1,0 +1,29 @@
+<model>
+  <parent>
+    <artifactId>maven-plugin-parent</artifactId>
+    <groupId>org.apache.maven.plugins</groupId>
+    <version>2.0-alpha-2</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>maven-ear-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <name>Maven Ear plugin</name>
+  <version>2.0-alpha-1-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-archiver</artifactId>
+      <version>2.0-alpha-2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.0-alpha-2</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0-alpha-3</version>
+    </dependency>
+  </dependencies>
+</model>
