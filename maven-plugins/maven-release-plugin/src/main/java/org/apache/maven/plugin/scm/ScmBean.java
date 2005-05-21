@@ -175,7 +175,8 @@ public class ScmBean
 
         CheckInScmResult result = getScmManager().checkIn( repository,
                                                            new ScmFileSet( new File( workingDirectory ), includes, excludes ),
-                                                           tag, message );
+                                                           tag,
+                                                           message );
         checkResult( result );
     }
 
@@ -217,6 +218,8 @@ public class ScmBean
 
     public void setWorkingDirectory( String workingDirectory )
     {
+        FileUtils.mkdir( workingDirectory );
+
         this.workingDirectory = workingDirectory;
     }
 

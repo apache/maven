@@ -338,6 +338,8 @@ public class PrepareReleaseMojo
         {
             ScmBean scm = getScm();
 
+            scm.setWorkingDirectory( basedir );
+
             if ( scm.getTag() == null )
             {
                 getLog().info( "What tag name should be used? [ " + tag + " ]" );
@@ -354,7 +356,7 @@ public class PrepareReleaseMojo
                 scm.setTag( tag );
             }
 
-            getScm().tag();
+            scm.tag();
         }
         catch ( Exception e )
         {
