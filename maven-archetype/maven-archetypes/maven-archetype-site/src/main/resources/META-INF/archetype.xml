@@ -1,0 +1,10 @@
+<archetype>
+  <id>plugin</id>
+  <siteResources>
+    <resource>src/site/site.xml</resource>
+    <resource>src/site/apt/index.apt</resource>
+    <resource>src/site/apt/format.apt</resource>    
+    <resource>src/site/fml/faq.fml</resource>
+    <resource>src/site/xdoc/xdoc.xml</resource>    
+  </siteResources>
+</archetype>
