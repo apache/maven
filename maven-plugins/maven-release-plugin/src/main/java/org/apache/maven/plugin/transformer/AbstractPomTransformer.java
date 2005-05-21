@@ -44,7 +44,7 @@ import java.util.Map;
  * go on in Maven internally, but this will serve as a start. An attempt is
  * made to make this tool GUI friendly.
  *
- * @author <a href="mailto:jason@zenplex.com">Jason van Zyl</a>
+ * @author <a href="mailto:jason --at-- maven.org">Jason van Zyl</a>
  *
  * @version $Id: AbstractPomTransformer.java 115932 2004-08-06 22:43:03Z carlos $
  */
