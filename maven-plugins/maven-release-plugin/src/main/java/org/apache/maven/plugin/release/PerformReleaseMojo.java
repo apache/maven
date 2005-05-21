@@ -37,7 +37,7 @@ public class PerformReleaseMojo
     /**
      * @parameter expression="${goals}"
      */
-    private String goals = "deploy site:site site:deploy";
+    private String goals = "deploy";
 
     protected void executeTask()
         throws MojoExecutionException
@@ -50,6 +50,8 @@ public class PerformReleaseMojo
     private void checkout()
         throws MojoExecutionException
     {
+        System.out.println( "Checking out the project to perform the release ..." );
+
         try
         {
             getScm().checkout();
@@ -63,11 +65,19 @@ public class PerformReleaseMojo
     private void runGoals()
         throws MojoExecutionException
     {
+        // TODO: we need to get a reference to the maven component and use that so this
+        // will work purely in an embedded mode.
+
         Commandline cl = new Commandline();
+
         cl.setExecutable( "m2" );
+
         cl.setWorkingDirectory( getWorkingDirectory() );
+
         cl.createArgument().setLine( goals );
+
         StreamConsumer consumer = new DefaultConsumer();
+
         try
         {
             CommandLineUtils.executeCommandLine( cl, consumer, consumer );
