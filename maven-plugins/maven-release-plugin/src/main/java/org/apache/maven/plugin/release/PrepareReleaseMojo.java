@@ -43,6 +43,7 @@ import java.util.List;
  * @requiresDependencyResolution test
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @author <a href="mailto:jason@maven.org>Jason van Zyl</a>
  * @version $Id: DoxiaMojo.java 169372 2005-05-09 22:47:34Z evenisse $
  */
 public class PrepareReleaseMojo
@@ -71,11 +72,11 @@ public class PrepareReleaseMojo
     {
         checkStatus();
 
-        checkDependencies();
+        checkForPresenceOfSnapshots();
 
         transformPom();
 
-        checkin();
+        checkInPom();
 
         tag();
     }
@@ -122,12 +123,21 @@ public class PrepareReleaseMojo
         }
     }
 
-    private void checkDependencies()
+    /**
+     * Check the POM in an attempt to remove all instances of SNAPSHOTs in preparation for a release. The goal
+     * is to make the build reproducable so the removal of SNAPSHOTs is a necessary one.
+     *
+     * A check is made to ensure any parents in the lineage are released, that all the dependencies are
+     * released and that any plugins utilized by this project are released.
+     *
+     * @throws MojoExecutionException
+     */
+    private void checkForPresenceOfSnapshots()
         throws MojoExecutionException
     {
         MavenProject currentProject = project;
 
-        getLog().info( "Checking lineage ..." );
+        getLog().info( "Checking lineage for snapshots ..." );
 
         while ( currentProject.hasParent() )
         {
@@ -141,7 +151,7 @@ public class PrepareReleaseMojo
             currentProject = currentProject.getParent();
         }
 
-        getLog().info( "Checking dependencies ..." );
+        getLog().info( "Checking dependencies for snapshots ..." );
 
         List snapshotDependencies = new ArrayList();
 
@@ -155,7 +165,7 @@ public class PrepareReleaseMojo
             }
         }
 
-        getLog().info( "Checking plugins ..." );
+        getLog().info( "Checking plugins for snapshots ..." );
 
         for ( Iterator i = project.getPluginArtifacts().iterator(); i.hasNext(); )
         {
@@ -304,7 +314,13 @@ public class PrepareReleaseMojo
         }
     }
 
-    private void checkin()
+    /**
+     * Check in the POM to SCM after it has been transformed where the version has been
+     * set to the release version.
+     *
+     * @throws MojoExecutionException
+     */
+    private void checkInPom()
         throws MojoExecutionException
     {
         try
@@ -321,12 +337,20 @@ public class PrepareReleaseMojo
         }
     }
 
+    /**
+     * Tag the release in preparation for performing the release.
+     *
+     * We will provide the user with a default tag name based on the artifact id
+     * and the version of the project being released.
+     *
+     * where artifactId is <code>plexus-action</code> and the version is <code>1.0-beta-4</code>, the
+     * the suggested tag will be <code>PLEXUS_ACTION_1_0_BETA_4</code>.
+     *
+     * @throws MojoExecutionException
+     */
     private void tag()
         throws MojoExecutionException
     {
-        // artifactId = plexus-action
-        //    version = 1.0-beta-4
-        //        tag = PLEXUS_ACTION_1_0_BETA_4
 
         String tag = project.getArtifactId().toUpperCase() + "_" + projectVersion.toUpperCase();
 
