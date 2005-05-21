@@ -8,11 +8,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-verifier-plugin</artifactId>
-        <!-- Problem here: if I specify a version, it won't build if the verifier plugin is not 
-             in the remote repo. If I don't specify a version, it fails... 
-             Now, even if I have built the verifier plugin locally m2 insist for downloading it
-             from the remote repo. Why is that? -->
-        <version>1.0-alpha-1-SNAPSHOT</version>       
         <goals>
           <goal>
             <id>verify</id>
