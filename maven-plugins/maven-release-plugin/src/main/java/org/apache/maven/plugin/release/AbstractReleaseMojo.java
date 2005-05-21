@@ -48,7 +48,8 @@ public abstract class AbstractReleaseMojo
     private String urlScm;
 
     /**
-     * @parameter expression="${username}"
+     * @parameter expression="${maven.username}"
+     * @required
      */
     private String username;
 
@@ -101,13 +102,21 @@ public abstract class AbstractReleaseMojo
     protected ScmBean getScm()
     {
         ScmBean scm = new ScmBean();
+
         scm.setScmManager( scmManager );
+
         scm.setUrl( urlScm );
+
         scm.setTag( tag );
+
         scm.setTagBase( tagBase );
+
         scm.setUsername( username );
+
         scm.setPassword( password );
+
         scm.setWorkingDirectory( workingDirectory );
+
         return scm;
     }
 

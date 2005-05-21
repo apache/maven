@@ -69,7 +69,7 @@ public class PrepareReleaseMojo
     protected void executeTask()
         throws MojoExecutionException
     {
-        //checkStatus();
+        checkStatus();
 
         checkDependencies();
 
@@ -131,8 +131,6 @@ public class PrepareReleaseMojo
 
         while ( currentProject.hasParent() )
         {
-            System.out.println( "currentProject = " + currentProject );
-
             Artifact parentArtifact = currentProject.getParentArtifact();
 
             if ( isSnapshot( parentArtifact.getVersion() ) )
@@ -203,6 +201,7 @@ public class PrepareReleaseMojo
         throws MojoExecutionException
     {
         Model model = project.getModel();
+
         if ( !isSnapshot( model.getVersion() ) )
         {
             throw new MojoExecutionException( "This project isn't a snapshot (" + model.getVersion() + ")." );
@@ -210,11 +209,15 @@ public class PrepareReleaseMojo
 
         //Rewrite project version
         projectVersion = model.getVersion().substring( 0, model.getVersion().length() - SNAPSHOT.length() );
+
         try
         {
             getLog().info( "What is the new version? [" + projectVersion + "]" );
+
             InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
+
             String inputVersion = handler.readLine();
+
             if ( !StringUtils.isEmpty( inputVersion ) )
             {
                 projectVersion = inputVersion;
@@ -224,6 +227,7 @@ public class PrepareReleaseMojo
         {
             throw new MojoExecutionException( "Can't read user input.", e );
         }
+
         model.setVersion( projectVersion );
 
         //Rewrite parent version
@@ -274,15 +278,24 @@ public class PrepareReleaseMojo
             }
         }
 
+        // TODO: should probably use a regex or something as most users will probably
+        // not want their comments removed and indenting changed. I don't think it's a big
+        // deal but lots of people complain.
+
         //Write pom
         MavenXpp3Writer modelWriter = new MavenXpp3Writer();
         try
         {
             PomTransformer transformer = new VersionTransformer();
+
             transformer.setOutputFile( project.getFile() );
+
             transformer.setProject( project.getFile() );
+
             transformer.setUpdatedModel ( model );
+
             transformer.transformNodes();
+
             transformer.write();
         }
         catch ( Exception e )
@@ -296,7 +309,11 @@ public class PrepareReleaseMojo
     {
         try
         {
-            getScm().checkin( "[maven-release-plugin] prepare release " + projectVersion, "pom.xml", null );
+            ScmBean scm = getScm();
+
+            scm.setWorkingDirectory( basedir );
+
+            scm.checkin( "[maven-release-plugin] prepare release " + projectVersion, "pom.xml", null );
         }
         catch ( Exception e )
         {
@@ -307,14 +324,36 @@ public class PrepareReleaseMojo
     private void tag()
         throws MojoExecutionException
     {
+        // artifactId = plexus-action
+        //    version = 1.0-beta-4
+        //        tag = PLEXUS_ACTION_1_0_BETA_4
+
+        String tag = project.getArtifactId().toUpperCase() + "_" + projectVersion.toUpperCase();
+
+        tag = tag.replace( '-', '_' );
+
+        tag = tag.replace( '.', '_' );
+
         try
         {
-            if ( getScm().getTag() == null )
+            ScmBean scm = getScm();
+
+            if ( scm.getTag() == null )
             {
-                getLog().info( "What is the new tag name?" );
+                getLog().info( "What tag name should be used? [ " + tag + " ]" );
+
                 InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
-                getScm().setTag( handler.readLine() );
+
+                String inputTag = handler.readLine();
+
+                if ( !StringUtils.isEmpty( inputTag ) )
+                {
+                    tag = inputTag;
+                }
+
+                scm.setTag( tag );
             }
+
             getScm().tag();
         }
         catch ( Exception e )
