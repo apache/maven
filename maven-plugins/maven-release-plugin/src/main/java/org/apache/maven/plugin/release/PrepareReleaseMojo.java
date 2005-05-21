@@ -288,12 +288,6 @@ public class PrepareReleaseMojo
             }
         }
 
-        // TODO: should probably use a regex or something as most users will probably
-        // not want their comments removed and indenting changed. I don't think it's a big
-        // deal but lots of people complain.
-
-        //Write pom
-        MavenXpp3Writer modelWriter = new MavenXpp3Writer();
         try
         {
             PomTransformer transformer = new VersionTransformer();
