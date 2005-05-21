@@ -69,7 +69,7 @@ public class PrepareReleaseMojo
     protected void executeTask()
         throws MojoExecutionException
     {
-        checkStatus();
+        //checkStatus();
 
         checkDependencies();
 
@@ -88,13 +88,16 @@ public class PrepareReleaseMojo
     private void checkStatus()
         throws MojoExecutionException
     {
-        getLog().info( "Verifying no modifications are present." );
+        getLog().info( "Verifying there are no local modifications ..." );
 
         List changedFiles;
+
         try
         {
             ScmBean scm = getScm();
+
             scm.setWorkingDirectory( basedir );
+
             changedFiles = scm.getStatus();
         }
         catch ( ScmException e )
@@ -105,13 +108,17 @@ public class PrepareReleaseMojo
         if ( !changedFiles.isEmpty() )
         {
             StringBuffer message = new StringBuffer();
+
             for ( Iterator i = changedFiles.iterator(); i.hasNext(); )
             {
                 ScmFile file = (ScmFile) i.next();
+
                 message.append( file.toString() );
+
                 message.append( "\n" );
             }
-            throw new MojoExecutionException( "Cannot prepare a release - You have some uncommitted files : \n" + message.toString() );
+
+            throw new MojoExecutionException( "Cannot prepare the release because you have local modifications : \n" + message.toString() );
         }
     }
 
@@ -119,8 +126,13 @@ public class PrepareReleaseMojo
         throws MojoExecutionException
     {
         MavenProject currentProject = project;
+
+        getLog().info( "Checking lineage ..." );
+
         while ( currentProject.hasParent() )
         {
+            System.out.println( "currentProject = " + currentProject );
+
             Artifact parentArtifact = currentProject.getParentArtifact();
 
             if ( isSnapshot( parentArtifact.getVersion() ) )
@@ -128,42 +140,60 @@ public class PrepareReleaseMojo
                 throw new MojoExecutionException( "Can't release project due to non released parent." );
             }
 
-            currentProject = project.getParent();
+            currentProject = currentProject.getParent();
         }
+
+        getLog().info( "Checking dependencies ..." );
 
         List snapshotDependencies = new ArrayList();
 
         for ( Iterator i = project.getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
+
             if ( isSnapshot( artifact.getVersion() ) )
             {
                 snapshotDependencies.add( artifact );
             }
         }
+
+        getLog().info( "Checking plugins ..." );
+
         for ( Iterator i = project.getPluginArtifacts().iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
+
             if ( isSnapshot( artifact.getVersion() ) )
             {
                 snapshotDependencies.add( artifact );
             }
         }
+
         if ( !snapshotDependencies.isEmpty() )
         {
             Collections.sort( snapshotDependencies );
+
             StringBuffer message = new StringBuffer();
+
             for ( Iterator i = snapshotDependencies.iterator(); i.hasNext(); )
             {
                 Artifact artifact = (Artifact) i.next();
+
                 message.append( "    " );
+
                 message.append( artifact.getGroupId() );
+
                 message.append( ":" );
+
                 message.append( artifact.getArtifactId() );
+
                 message.append( ":" );
+
                 message.append( artifact.getVersion() );
+
                 message.append( "\n" );
             }
+
             throw new MojoExecutionException( "Can't release project due to non released dependencies :\n"
                 + message.toString() );
         }
