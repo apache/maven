@@ -31,6 +31,8 @@ public class ArchetypeDescriptor
 
     private List testResources;
 
+    private List siteResources;
+
     public ArchetypeDescriptor()
     {
         sources = new ArrayList();
@@ -40,6 +42,8 @@ public class ArchetypeDescriptor
         testSources = new ArrayList();
 
         testResources = new ArrayList();
+
+        siteResources = new ArrayList();
     }
 
     // ----------------------------------------------------------------------
@@ -94,6 +98,16 @@ public class ArchetypeDescriptor
     public List getTestResources()
     {
         return testResources;
+    }
+
+    public void addSiteResource( String siteResource )
+    {
+        siteResources.add( siteResource );
+    }
+
+    public List getSiteResources()
+    {
+        return siteResources;
     }
 }
 

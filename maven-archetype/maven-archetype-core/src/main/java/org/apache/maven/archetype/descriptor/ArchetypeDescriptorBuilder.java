@@ -36,6 +36,10 @@ public class ArchetypeDescriptorBuilder
 
         descriptor.setId( dom.getChild( "id" ).getValue() );
 
+        // ----------------------------------------------------------------------
+        // Main
+        // ----------------------------------------------------------------------
+
         Xpp3Dom sources = dom.getChild( "sources" );
 
         if ( sources != null )
@@ -60,6 +64,10 @@ public class ArchetypeDescriptorBuilder
             }
         }
 
+        // ----------------------------------------------------------------------
+        // Test
+        // ----------------------------------------------------------------------
+
         Xpp3Dom testSources = dom.getChild( "testSources" );
 
         if ( testSources != null )
@@ -81,6 +89,22 @@ public class ArchetypeDescriptorBuilder
             for ( int i = 0; i < testResourceList.length; i++ )
             {
                 descriptor.addTestResource( testResourceList[i].getValue() );
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // Site
+        // ----------------------------------------------------------------------
+
+        Xpp3Dom siteResources = dom.getChild( "siteResources" );
+
+        if ( siteResources != null )
+        {
+            Xpp3Dom[] siteResourceList = siteResources.getChildren( "resource" );
+
+            for ( int i = 0; i < siteResourceList.length; i++ )
+            {
+                descriptor.addSiteResource( siteResourceList[i].getValue() );
             }
         }
 

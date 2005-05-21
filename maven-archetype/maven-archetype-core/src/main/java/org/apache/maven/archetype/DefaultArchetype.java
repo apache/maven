@@ -65,16 +65,23 @@ public class DefaultArchetype
     // artifactId = maven-foo-archetype
     // version = latest
 
-    public void createArchetype( String archetypeGroupId, String archetypeArtifactId, String archetypeVersion,
-                                 ArtifactRepository localRepository, List remoteRepositories, Map parameters )
+    public void createArchetype( String archetypeGroupId,
+                                 String archetypeArtifactId,
+                                 String archetypeVersion,
+                                 ArtifactRepository localRepository,
+                                 List remoteRepositories,
+                                 Map parameters )
         throws ArchetypeNotFoundException, ArchetypeDescriptorException, ArchetypeTemplateProcessingException
     {
         // ----------------------------------------------------------------------
         // Download the archetype
         // ----------------------------------------------------------------------
 
-        Artifact archetypeArtifact = artifactFactory.createArtifact( archetypeGroupId, archetypeArtifactId,
-                                                                     archetypeVersion, Artifact.SCOPE_RUNTIME, "jar" );
+        Artifact archetypeArtifact = artifactFactory.createArtifact( archetypeGroupId,
+                                                                     archetypeArtifactId,
+                                                                     archetypeVersion,
+                                                                     Artifact.SCOPE_RUNTIME,
+                                                                     "jar" );
 
         try
         {
@@ -92,8 +99,6 @@ public class DefaultArchetype
         String outputDirectory = (String) parameters.get( "outputDirectory" );
 
         String packageName = (String) parameters.get( "package" );
-
-        createProjectDirectoryStructure( outputDirectory );
 
         ArchetypeDescriptorBuilder builder = new ArchetypeDescriptorBuilder();
 
@@ -114,7 +119,7 @@ public class DefaultArchetype
             if ( is == null )
             {
                 throw new ArchetypeDescriptorException( "The " + ARCHETYPE_DESCRIPTOR +
-                    " descriptor cannot be found." );
+                                                        " descriptor cannot be found." );
             }
 
             descriptor = (ArchetypeDescriptor) builder.build( new InputStreamReader( is ) );
@@ -153,13 +158,51 @@ public class DefaultArchetype
         {
             processTemplate( outputDirectory, context, ARCHETYPE_POM, false, null );
 
-            processSources( outputDirectory, context, descriptor.getSources(), packageName );
+            // ----------------------------------------------------------------------
+            // Main
+            // ----------------------------------------------------------------------
 
-            processResources( outputDirectory, context, descriptor.getResources(), packageName );
+            if ( descriptor.getSources().size() > 0 )
+            {
+                FileUtils.mkdir( outputDirectory + "/src/main/java" );
 
-            processSources( outputDirectory, context, descriptor.getTestSources(), packageName );
+                processSources( outputDirectory, context, descriptor.getSources(), packageName );
+            }
 
-            processResources( outputDirectory, context, descriptor.getTestResources(), packageName );
+            if ( descriptor.getResources().size() > 0 )
+            {
+                FileUtils.mkdir( outputDirectory + "/src/main/resources" );
+
+                processResources( outputDirectory, context, descriptor.getResources(), packageName );
+            }
+
+            // ----------------------------------------------------------------------
+            // Test
+            // ----------------------------------------------------------------------
+
+            if ( descriptor.getTestSources().size() > 0 )
+            {
+                FileUtils.mkdir( outputDirectory + "/src/test/java" );
+
+                processSources( outputDirectory, context, descriptor.getTestSources(), packageName );
+            }
+
+            if ( descriptor.getTestResources().size() > 0 )
+            {
+                FileUtils.mkdir( outputDirectory + "/src/test/resources" );
+
+                processResources( outputDirectory, context, descriptor.getTestResources(), packageName );
+            }
+
+            // ----------------------------------------------------------------------
+            // Site
+            // ----------------------------------------------------------------------
+
+            if ( descriptor.getSiteResources().size() > 0 )
+            {
+                processResources( outputDirectory, context, descriptor.getSiteResources(), packageName );
+            }
+
         }
         catch ( Exception e )
         {
@@ -197,7 +240,10 @@ public class DefaultArchetype
         }
     }
 
-    protected void processTemplate( String outputDirectory, Context context, String template, boolean packageInFileName,
+    protected void processTemplate( String outputDirectory,
+                                    Context context,
+                                    String template,
+                                    boolean packageInFileName,
                                     String packageName )
         throws Exception
     {
@@ -240,13 +286,6 @@ public class DefaultArchetype
 
     protected void createProjectDirectoryStructure( String outputDirectory )
     {
-        FileUtils.mkdir( outputDirectory + "/src/main/java" );
-
-        FileUtils.mkdir( outputDirectory + "/src/main/resources" );
-
-        FileUtils.mkdir( outputDirectory + "/src/test/java" );
-
-        FileUtils.mkdir( outputDirectory + "/src/test/resources" );
     }
 
     private InputStream getStream( String name, ClassLoader loader )
