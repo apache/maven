@@ -27,6 +27,11 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
+import java.util.Properties;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.File;
+
 /**
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id: DoxiaMojo.java 169372 2005-05-09 22:47:34Z evenisse $
@@ -35,69 +40,58 @@ public abstract class AbstractReleaseMojo
     extends AbstractMojo
     implements Contextualizable
 {
+    public static final String RELEASE_PROPS = "release.properties";
+
+    public static final String USERNAME = "maven.username";
+
+    public static final String TAG = "tag";
+
+    public static final String SCM_URL = "scm.url";
+
     /**
      * @parameter expression="${project.build.directory}/checkout"
      * @required
      */
-    private String workingDirectory;
+    protected String workingDirectory;
 
     /**
      * @parameter expression="${project.scm.developerConnection}"
      * @required
      */
-    private String urlScm;
+    protected String urlScm;
 
     /**
      * @parameter expression="${maven.username}"
-     * @required
      */
-    private String username;
+    protected String username;
 
     /**
      * @parameter expression="${password}"
      */
-    private String password;
+    protected String password;
 
     /**
      * @parameter expression="${tagBase}"
      */
-    private String tagBase = "../tags";
+    protected String tagBase = "../tags";
 
     /**
      * @parameter expression="${tag}"
      */
-    private String tag;
+    protected String tag;
 
     /**
      * @parameter expression="${project}"
      * @required
      * @readonly
      */
-    private MavenProject project;
+    protected MavenProject project;
 
     private PlexusContainer container;
 
-    private ScmManager scmManager;
+    protected ScmManager scmManager;
 
-    public MavenProject getProject()
-    {
-        return project;
-    }
-
-    public String getWorkingDirectory()
-    {
-        return workingDirectory;
-    }
-
-    protected ScmManager getScmManager()
-    {
-        return scmManager;
-    }
-
-    public String getTag()
-    {
-        return tag;
-    }
+    private Properties releaseProperties;
 
     protected ScmBean getScm()
     {
@@ -105,11 +99,30 @@ public abstract class AbstractReleaseMojo
 
         scm.setScmManager( scmManager );
 
+        if ( releaseProperties != null )
+        {
+            urlScm = releaseProperties.getProperty( SCM_URL );
+        }
+
         scm.setUrl( urlScm );
+
+        System.out.println( "urlScm = " + urlScm );
+
+        if ( releaseProperties != null )
+        {
+            tag = releaseProperties.getProperty( TAG );
+        }
 
         scm.setTag( tag );
 
         scm.setTagBase( tagBase );
+
+        if ( releaseProperties != null )
+        {
+            username = releaseProperties.getProperty( USERNAME );
+        }
+
+        System.out.println( "username = " + username );
 
         scm.setUsername( username );
 
@@ -131,6 +144,23 @@ public abstract class AbstractReleaseMojo
         try
         {
             initScmManager();
+
+            // ----------------------------------------------------------------------
+            // The release properties file has been created by the prepare phase and
+            // wants to be shared with the perform.
+            // ----------------------------------------------------------------------
+
+            File releasePropertiesFile = new File( project.getFile().getParentFile(), RELEASE_PROPS );
+
+            if ( releasePropertiesFile.exists() )
+            {
+
+                releaseProperties = new Properties();
+
+                InputStream is = new FileInputStream( releasePropertiesFile );
+
+                releaseProperties.load( is );
+            }
         }
         catch ( Exception e )
         {

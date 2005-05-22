@@ -20,7 +20,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.scm.ScmBean;
 import org.apache.maven.plugin.transformer.PomTransformer;
@@ -31,10 +30,14 @@ import org.apache.maven.scm.ScmFile;
 import org.codehaus.plexus.components.inputhandler.InputHandler;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Prepare for a release in SCM
@@ -56,29 +59,30 @@ public class PrepareReleaseMojo
      */
     private String basedir;
 
-    /**
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
-
     private static final String SNAPSHOT = "-SNAPSHOT";
 
     private String projectVersion;
 
+    private Model model;
+
     protected void executeTask()
         throws MojoExecutionException
     {
+        model = project.getModel();
+
         checkForLocalModifications();
 
         checkForPresenceOfSnapshots();
 
-        transformPom();
+        transformPomToReleaseVersionPom();
 
         checkInReleaseVersionPom();
 
         tagRelease();
+
+        transformPomToSnapshotVersionPom();
+
+        checkInSnapshotVersionPom();
     }
 
     private boolean isSnapshot( String version )
@@ -207,11 +211,9 @@ public class PrepareReleaseMojo
         }
     }
 
-    private void transformPom()
+    private void transformPomToReleaseVersionPom()
         throws MojoExecutionException
     {
-        Model model = project.getModel();
-
         if ( !isSnapshot( model.getVersion() ) )
         {
             throw new MojoExecutionException( "This project isn't a snapshot (" + model.getVersion() + ")." );
@@ -239,6 +241,29 @@ public class PrepareReleaseMojo
         }
 
         model.setVersion( projectVersion );
+
+        try
+        {
+            Properties releaseProperties = new Properties();
+
+            releaseProperties.setProperty( "version", projectVersion );
+
+            releaseProperties.setProperty( USERNAME, username );
+
+            releaseProperties.setProperty( TAG, getTagLabel() );
+
+            releaseProperties.setProperty( SCM_URL, urlScm );
+
+            FileOutputStream os = new FileOutputStream( new File( project.getFile().getParentFile(), RELEASE_PROPS ) );
+
+            releaseProperties.store( os, "maven release plugin info" );
+
+            os.close();
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Cannote write release-version file.", e );
+        }
 
         //Rewrite parent version
         if ( project.hasParent() )
@@ -304,9 +329,69 @@ public class PrepareReleaseMojo
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "Can't update pom.", e );
+            throw new MojoExecutionException( "Can't transform pom to its release version form.", e );
         }
     }
+
+    private void transformPomToSnapshotVersionPom()
+        throws MojoExecutionException
+    {
+        // TODO: we will need to incorporate versioning strategies here because it is unlikely
+        // that everyone will be able to agree on a standard.
+
+        // releaseVersion = 1.0-beta-4
+        // snapshotVersion = 1.0-beta-5-SNAPSHOT
+
+        String nextVersionString = projectVersion.substring( projectVersion.lastIndexOf( "-" ) + 1 );
+
+        try
+        {
+            System.out.println( "nextVersionString = " + nextVersionString );
+
+            nextVersionString = Integer.toString( Integer.parseInt( nextVersionString ) + 1 );
+
+            System.out.println( "nextVersionString = " + nextVersionString );
+
+            projectVersion = projectVersion.substring( 0, projectVersion.lastIndexOf( "-" ) + 1 ) + nextVersionString + SNAPSHOT;
+        }
+        catch ( NumberFormatException e )
+        {
+            projectVersion = "";
+        }
+
+        try
+        {
+            getLog().info( "What is the new version? [" + projectVersion + "]" );
+
+            InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
+
+            String inputVersion = handler.readLine();
+
+            if ( !StringUtils.isEmpty( inputVersion ) )
+            {
+                projectVersion = inputVersion;
+            }
+
+            model.setVersion( projectVersion );
+
+            PomTransformer transformer = new VersionTransformer();
+
+            transformer.setOutputFile( project.getFile() );
+
+            transformer.setProject( project.getFile() );
+
+            transformer.setUpdatedModel ( model );
+
+            transformer.transformNodes();
+
+            transformer.write();
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Can't transform pom to its snapshot version form.", e );
+        }
+    }
+
 
     /**
      * Check in the POM to SCM after it has been transformed where the version has been
@@ -317,18 +402,41 @@ public class PrepareReleaseMojo
     private void checkInReleaseVersionPom()
         throws MojoExecutionException
     {
+        checkInPom( "[maven-release-plugin] prepare release " + projectVersion );
+    }
+
+    private void checkInSnapshotVersionPom()
+        throws MojoExecutionException
+    {
+        checkInPom( "[maven-release-plugin] prepare release " + projectVersion );
+    }
+
+    private void checkInPom( String message )
+        throws MojoExecutionException
+    {
         try
         {
             ScmBean scm = getScm();
 
             scm.setWorkingDirectory( basedir );
 
-            scm.checkin( "[maven-release-plugin] prepare release " + projectVersion, "pom.xml", null );
+            scm.checkin( message, "pom.xml", null );
         }
         catch ( Exception e )
         {
             throw new MojoExecutionException( "An error is occurred in the checkin process.", e );
         }
+    }
+
+    private String getTagLabel()
+    {
+        String tag = project.getArtifactId().toUpperCase() + "_" + projectVersion.toUpperCase();
+
+        tag = tag.replace( '-', '_' );
+
+        tag = tag.replace( '.', '_' );
+
+        return tag;
     }
 
     /**
@@ -345,12 +453,7 @@ public class PrepareReleaseMojo
     private void tagRelease()
         throws MojoExecutionException
     {
-
-        String tag = project.getArtifactId().toUpperCase() + "_" + projectVersion.toUpperCase();
-
-        tag = tag.replace( '-', '_' );
-
-        tag = tag.replace( '.', '_' );
+        String tag = getTagLabel();
 
         try
         {

@@ -1,6 +1,6 @@
 package org.apache.maven.plugin.scm;
 
-/* ====================================================================
+/* =========7===========================================================
  *   Copyright 2001-2005 The Apache Software Foundation.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -113,9 +113,13 @@ public class ScmBean
         {
             // TODO: improve error handling
             System.err.println( "Provider message:" );
+
             System.err.println( result.getProviderMessage() );
+
             System.err.println( "Command output:" );
+
             System.err.println( result.getCommandOutput() );
+
             throw new ScmException( "Error!" );
         }
     }
@@ -126,12 +130,19 @@ public class ScmBean
         ScmRepository repository = getScmRepository();
 
         checkoutDirectory = new File( workingDirectory );
-        if ( checkoutDirectory.exists() )
+
+        System.out.println( "workingDirectory = " + workingDirectory );
+
+        System.out.println( "tag = " + tag );
+
+        // TODO: sanity check that it is not . or .. or lower
+
+        if ( FileUtils.fileExists( workingDirectory ) )
         {
-            // TODO: sanity check that it is not . or .. or lower
-            FileUtils.deleteDirectory( checkoutDirectory );
+            FileUtils.deleteDirectory( workingDirectory );
+
+            FileUtils.mkdir( workingDirectory );
         }
-        checkoutDirectory.mkdirs();
 
         CheckOutScmResult result = getScmManager().checkOut( repository, new ScmFileSet( checkoutDirectory ), tag );
 

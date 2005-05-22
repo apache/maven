@@ -72,7 +72,7 @@ public class PerformReleaseMojo
 
         cl.setExecutable( "m2" );
 
-        cl.setWorkingDirectory( getWorkingDirectory() );
+        cl.setWorkingDirectory( workingDirectory );
 
         cl.createArgument().setLine( goals );
 
