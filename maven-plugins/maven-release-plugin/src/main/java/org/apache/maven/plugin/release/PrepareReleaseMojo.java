@@ -325,7 +325,7 @@ public class PrepareReleaseMojo
 
             transformer.transformNodes();
 
-            transformer.write();
+            transformer.write();                       
         }
         catch ( Exception e )
         {
@@ -473,7 +473,7 @@ public class PrepareReleaseMojo
                 scm.setTag( tag );
             }
 
-            getLog().info( "Tagging release with the label " + tag + "." );        
+            getLog().info( "Tagging release with the label " + tag + "." );
 
             scm.tag();
         }

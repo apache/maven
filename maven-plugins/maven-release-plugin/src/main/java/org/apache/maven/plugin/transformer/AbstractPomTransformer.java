@@ -75,100 +75,56 @@ public abstract class AbstractPomTransformer
     // Accessors
     // -------------------------------------------------------------------------
 
-    /**
-     *
-     * @param updatedModel
-     */
     public Model getUpdatedModel()
     {
         return updatedModel;
     }
 
-    /**
-     *
-     * @param updatedModel
-     */
     public void setUpdatedModel( Model updatedModel )
     {
         this.updatedModel = updatedModel;
     }
 
-    /**
-     *
-     * @return
-     */
     public Map getVariables()
     {
         return variables;
     }
 
-    /**
-     *
-     * @param variables
-     */
     public void setVariables( Map variables )
     {
         this.variables = variables;
     }
 
-    /**
-     *
-     * @param project
-     */
     public void setProject( File project )
     {
         this.project = project;
     }
 
-    /**
-     *
-     * @return
-     */
     public File getProject()
     {
         return project;
     }
 
-    /**
-     *
-     * @return
-     */
     public Document getDocument()
     {
         return document;
     }
 
-    /**
-     *
-     * @param document
-     */
     public void setDocument( Document document )
     {
         this.document = document;
     }
 
-    /**
-     *
-     * @return
-     */
     public File getOutputFile()
     {
         return outputFile;
     }
 
-    /**
-     *
-     * @param outputFile
-     */
     public void setOutputFile( File outputFile )
     {
         this.outputFile = outputFile;
     }
 
-    /**
-     *
-     * @return
-     */
     public List getSelectedNodes()
     {
         if ( selectedNodes == null )
@@ -185,28 +141,16 @@ public abstract class AbstractPomTransformer
         return selectedNodes;
     }
 
-    /**
-     *
-     * @param selectedNodes
-     */
     public void setSelectedNodes( List selectedNodes )
     {
         this.selectedNodes = selectedNodes;
     }
 
-    /**
-     *
-     * @return
-     */
     public int getSelectedNodeCount()
     {
         return getSelectedNodes().size();
     }
 
-    /**
-     *
-     * @return
-     */
     public List getTransformations()
     {
         if ( transformations == null )
@@ -217,9 +161,6 @@ public abstract class AbstractPomTransformer
         return transformations;
     }
 
-    /**
-     *
-     */
     public void createTransformations()
     {
         transformations = new ArrayList();
@@ -297,19 +238,28 @@ public abstract class AbstractPomTransformer
         throws Exception
     {
         SAXReader reader = new SAXReader();
+
         setDocument( reader.read( getProject() ) );
 
         // The selecting nodes with the xpath expression will give us a list
         // of dependencies elements where the version element is equal to 'SNAPSHOT'.
         // So we can get any information we need, and alter anything we need to before writing
         // the dom4j document back out.
+
         XPath pomXpath = new Dom4jXPath( selectProjectNodeXPathExpression() );
+
         XPath dependenciesXpath = new Dom4jXPath( selectDependenciesNodesXPathExpression() );
+
         XPath pluginsXpath = new Dom4jXPath( selectPluginsNodesXPathExpression() );
+
         List nodes = new ArrayList();
+
         nodes.addAll( pomXpath.selectNodes( getDocument() ) );
+
         nodes.addAll( dependenciesXpath.selectNodes( getDocument() ) );
+
         nodes.addAll( pluginsXpath.selectNodes( getDocument() ) );
+
         setSelectedNodes( nodes );
     }
 
@@ -336,14 +286,21 @@ public abstract class AbstractPomTransformer
         }
 
         OutputFormat format = new OutputFormat();
+
         format.setIndentSize( 2 );
+
         format.setNewlines( true );
+
         format.setTrimText( true );
 
         XMLWriter writer = new XMLWriter( format );
+
         writer.setOutputStream( os );
+
         writer.write( getDocument() );
+
         writer.flush();
+
         writer.close();
     }
 }
