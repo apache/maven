@@ -64,14 +64,10 @@ public class VersionTransformer
 
             if ( version != null )
             {
-                System.out.println( ">> We have a version element and we are changing it to " + getUpdatedModel().getVersion() );
-
                 version.setText( getUpdatedModel().getVersion() );
             }
             else
             {
-                System.out.println( ">> We are adding a version element and we are setting it to " + getUpdatedModel().getVersion() );
-
                 project.addElement( "version" ).addText( getUpdatedModel().getVersion() );
             }
         }

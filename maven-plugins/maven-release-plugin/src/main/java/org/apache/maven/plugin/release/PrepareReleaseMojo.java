@@ -325,7 +325,7 @@ public class PrepareReleaseMojo
 
             transformer.transformNodes();
 
-            transformer.write();                       
+            transformer.write();
         }
         catch ( Exception e )
         {
@@ -337,7 +337,8 @@ public class PrepareReleaseMojo
         throws MojoExecutionException
     {
         // TODO: we will need to incorporate versioning strategies here because it is unlikely
-        // that everyone will be able to agree on a standard.
+        // that everyone will be able to agree on a standard. This is extremely limited right
+        // now and really only works for the way maven is versioned.
 
         // releaseVersion = 1.0-beta-4
         // snapshotVersion = 1.0-beta-5-SNAPSHOT
