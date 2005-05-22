@@ -30,8 +30,6 @@ import org.dom4j.Node;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  *
  * @version $Id: VersionTransformer.java 115421 2004-06-01 02:20:18Z dion $
- * @todo check to make sure the basic structure of the document is good. just ran into a bug
- * with the first version of the converter and the root element was <model> not <project>.
  */
 public class VersionTransformer
     extends AbstractPomTransformer

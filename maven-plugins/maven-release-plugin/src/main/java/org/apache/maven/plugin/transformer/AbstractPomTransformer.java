@@ -187,6 +187,11 @@ public abstract class AbstractPomTransformer
     public void transformNodes()
         throws Exception
     {
+        if ( getSelectedNodes().isEmpty() )
+        {
+            throw new Exception( "Your pom doesn't respect the standard format." );
+        }
+
         for ( Iterator i = getSelectedNodes().iterator(); i.hasNext(); )
         {
             Object o = i.next();
