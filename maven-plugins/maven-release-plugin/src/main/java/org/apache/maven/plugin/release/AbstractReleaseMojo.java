@@ -106,8 +106,6 @@ public abstract class AbstractReleaseMojo
 
         scm.setUrl( urlScm );
 
-        System.out.println( "urlScm = " + urlScm );
-
         if ( releaseProperties != null )
         {
             tag = releaseProperties.getProperty( TAG );
@@ -121,8 +119,6 @@ public abstract class AbstractReleaseMojo
         {
             username = releaseProperties.getProperty( USERNAME );
         }
-
-        System.out.println( "username = " + username );
 
         scm.setUsername( username );
 

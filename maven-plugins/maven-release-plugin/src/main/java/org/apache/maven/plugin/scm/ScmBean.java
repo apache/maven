@@ -131,10 +131,6 @@ public class ScmBean
 
         checkoutDirectory = new File( workingDirectory );
 
-        System.out.println( "workingDirectory = " + workingDirectory );
-
-        System.out.println( "tag = " + tag );
-
         // TODO: sanity check that it is not . or .. or lower
 
         if ( FileUtils.fileExists( workingDirectory ) )

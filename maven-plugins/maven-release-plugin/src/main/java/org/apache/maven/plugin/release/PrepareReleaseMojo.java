@@ -346,11 +346,7 @@ public class PrepareReleaseMojo
 
         try
         {
-            System.out.println( "nextVersionString = " + nextVersionString );
-
             nextVersionString = Integer.toString( Integer.parseInt( nextVersionString ) + 1 );
-
-            System.out.println( "nextVersionString = " + nextVersionString );
 
             projectVersion = projectVersion.substring( 0, projectVersion.lastIndexOf( "-" ) + 1 ) + nextVersionString + SNAPSHOT;
         }
@@ -476,6 +472,8 @@ public class PrepareReleaseMojo
 
                 scm.setTag( tag );
             }
+
+            getLog().info( "Tagging release with the label " + tag + "." );        
 
             scm.tag();
         }
