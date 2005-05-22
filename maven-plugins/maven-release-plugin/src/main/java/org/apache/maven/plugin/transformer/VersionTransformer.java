@@ -61,27 +61,38 @@ public class VersionTransformer
             Element project = (Element) node;
 
             Node version = node.selectSingleNode( "version" );
+
             if ( version != null )
             {
+                System.out.println( ">> We have a version element and we are changing it to " + getUpdatedModel().getVersion() );
+
                 version.setText( getUpdatedModel().getVersion() );
             }
             else
             {
+                System.out.println( ">> We are adding a version element and we are setting it to " + getUpdatedModel().getVersion() );
+
                 project.addElement( "version" ).addText( getUpdatedModel().getVersion() );
             }
         }
         else if ( selectDependenciesNodesXPathExpression().equals( node.getPath() ) )
         {
             Element dependency = (Element) node;
+
             Node groupId = node.selectSingleNode( "groupId" );
+
             Node artifactId = node.selectSingleNode( "artifactId" );
+
             Node type = node.selectSingleNode( "type" );
+
             String typeText = "jar";
+
             if ( type != null )
             {
                 typeText = type.getText();
             }
             Node version = node.selectSingleNode( "version" );
+
             if ( version != null )
             {
                 version.setText( getDependency( groupId.getText(), artifactId.getText(), typeText ).getVersion() );
@@ -95,15 +106,22 @@ public class VersionTransformer
         else
         {
             Element plugin = (Element) node;
+
             Node groupId = node.selectSingleNode( "groupId" );
+
             String groupIdText = "org.apache.maven.plugins";
+
             if ( groupId != null )
             {
                 groupIdText = groupId.getText();
             }
+
             Node artifactId = node.selectSingleNode( "artifactId" );
+
             Node version = node.selectSingleNode( "version" );
+
             Plugin p = getPlugin( groupIdText, artifactId.getText() );
+
             if ( groupId != null )
             {
                 groupId.setText( p.getGroupId() );
@@ -128,6 +146,7 @@ public class VersionTransformer
         for ( Iterator i = getUpdatedModel().getDependencies().iterator(); i.hasNext(); )
         {
             Dependency dependency = (Dependency) i.next();
+
             if ( dependency.getGroupId().equals( groupId ) && dependency.getArtifactId().equals( artifactId )
                 && dependency.getType().equals( type ) )
             {
@@ -143,6 +162,7 @@ public class VersionTransformer
         for ( Iterator i = getUpdatedModel().getBuild().getPlugins().iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
+
             if ( plugin.getGroupId().equals( groupId ) && plugin.getArtifactId().equals( artifactId ) )
             {
                 return plugin;
