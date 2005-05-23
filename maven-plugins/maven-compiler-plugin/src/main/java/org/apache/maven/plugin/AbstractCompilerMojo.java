@@ -38,16 +38,13 @@ public abstract class AbstractCompilerMojo
 
     private Compiler compiler = new JavacCompiler();
     
-    // TODO: use boolean when supported
     /**
      * Whether to include debugging information in the compiled class files.
-     * <br/>
-     * <br/>
      * The default value is true.
      * 
      * @parameter expression="${maven.compiler.debug}"
      */
-    private String debug = Boolean.TRUE.toString();
+    private boolean debug = true;
     
     /**
      * The -source argument for the Java compiler
@@ -63,14 +60,13 @@ public abstract class AbstractCompilerMojo
      */
     private String target;
     
-    // TODO: Use long when supported
     /**
      * The granularity in milliseconds of the last modification
      * date for testing whether a source needs recompilation
      * 
      * @parameter alias="${lastModGranularityMs}"
      */
-    private String staleMillis = "0";
+    private int staleMillis = 0;
     
     protected abstract List getClasspathElements();
 
@@ -121,10 +117,7 @@ public abstract class AbstractCompilerMojo
             compilerConfiguration.addCompilerOption( "-target", target );
         }
 
-        if ( debug != null && Boolean.valueOf( debug ).booleanValue() )
-        {
-            compilerConfiguration.setDebug( true );
-        }
+        compilerConfiguration.setDebug( debug );
 
         List messages = null;
         try
@@ -158,24 +151,9 @@ public abstract class AbstractCompilerMojo
     private Set computeStaleSources()
         throws MojoExecutionException
     {
-        long staleTime = 0;
-
-        if ( staleMillis != null && staleMillis.length() > 0 )
-        {
-            try
-            {
-                staleTime = Long.parseLong( staleMillis );
-            }
-            catch ( NumberFormatException e )
-            {
-                throw new MojoExecutionException( "Invalid staleMillis plugin parameter value: \'" + staleMillis
-                    + "\'", e );
-            }
-
-        }
         SuffixMapping mapping = new SuffixMapping( ".java", ".class" );
 
-        SourceInclusionScanner scanner = new StaleSourceScanner( staleTime );
+        SourceInclusionScanner scanner = new StaleSourceScanner( staleMillis );
 
         scanner.addSourceMapping( mapping );
 
