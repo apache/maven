@@ -30,7 +30,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.wagon.util.IoUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -130,7 +130,7 @@ public class MavenMetadataSource
             }
             finally
             {
-                IoUtils.close( reader );
+                IOUtil.close( reader );
             }
         }
         return createArtifacts( dependencies, artifact.getScope() );
