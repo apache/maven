@@ -27,7 +27,7 @@ import java.io.File;
  * A Maven2 plugin which integrates the use of Maven2 with Eclipse.
  *
  * @goal eclipse
- * @requiresDependencyResolution
+ * @requiresDependencyResolution test
  * @executePhase generate-sources
  *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
