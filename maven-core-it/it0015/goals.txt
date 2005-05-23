@@ -1,3 +1,2 @@
--DupdateReleaseInfo=true
 install
 it0015:it0015

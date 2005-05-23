@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 /**
@@ -120,6 +121,28 @@ public class Verifier
                 throw new VerificationException( "Error in execution." );
             }
         }
+    }
+
+    private static Properties loadProperties( File propertiesFile )
+        throws VerificationException
+    {
+        Properties properties = new Properties();
+
+        FileInputStream fis = null;
+        try
+        {
+            if ( propertiesFile.exists() )
+            {
+                fis = new FileInputStream( propertiesFile );
+                properties.load( fis );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new VerificationException( "Error reading properties file", e );
+        }
+
+        return properties;
     }
 
     private static List loadFile( String basedir, String filename )
@@ -399,7 +422,7 @@ public class Verifier
     //
     // ----------------------------------------------------------------------
 
-    public void executeGoals( String filename )
+    public void executeGoals( Properties properties, String filename )
         throws VerificationException
     {
         String mavenHome = System.getProperty( "maven.home" );
@@ -439,6 +462,12 @@ public class Verifier
             
             cli.createArgument().setValue( "-e" );
 
+            for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
+            {
+                String key = (String) i.next();
+                cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
+            }
+
             for ( Iterator i = allGoals.iterator(); i.hasNext(); )
             {
                 cli.createArgument().setValue( (String) i.next() );
@@ -450,7 +479,7 @@ public class Verifier
 
             StreamConsumer err = new WriterStreamConsumer( logWriter );
 
-            System.out.println( Commandline.toString( cli.getCommandline() ) );
+            System.out.println( "Command: " + Commandline.toString( cli.getCommandline() ) );
 
             ret = CommandLineUtils.executeCommandLine( cli, out, err );
 
@@ -533,7 +562,9 @@ public class Verifier
             {
                 verifier.executeHook( "prebuild-hook.txt" );
 
-                verifier.executeGoals( "goals.txt" );
+                Properties properties = verifier.loadProperties( new File( basedir, "system.properties" ) );
+
+                verifier.executeGoals( properties, "goals.txt" );
 
                 verifier.executeHook( "postbuild-hook.txt" );
 
