@@ -16,17 +16,12 @@ package org.apache.maven.script.beanshell;
  * limitations under the License.
  */
 
+import bsh.EvalError;
+import bsh.Interpreter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.factory.bsh.BshComponent;
-import bsh.Interpreter;
-import bsh.This;
-import bsh.UtilEvalError;
-import bsh.EvalError;
-
-import java.io.PrintStream;
 
 /**
  * Mojo adapter for a Beanshell Mojo.
