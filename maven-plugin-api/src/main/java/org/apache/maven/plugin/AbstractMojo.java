@@ -34,21 +34,11 @@ public abstract class AbstractMojo
 
     public Log getLog()
     {
-        synchronized ( this )
+        if ( log == null )
         {
-            if ( log == null )
-            {
-                log = new SystemStreamLog();
-            }
+            log = new SystemStreamLog();
         }
 
         return log;
     }
-
-    public void execute()
-        throws MojoExecutionException
-    {
-        throw new MojoExecutionException( "You must override execute() if you implement the new paradigm" );
-    }
-
 }

@@ -31,4 +31,6 @@ public interface Mojo
 
     // TODO: not sure about this here, and may want a getLog on here as well/instead
     void setLog( Log log );
+
+    Log getLog();
 }

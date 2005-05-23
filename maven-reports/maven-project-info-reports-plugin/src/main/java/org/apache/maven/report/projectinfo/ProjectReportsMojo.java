@@ -34,8 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * A Maven2 plugin which generates the set of project reports.
  * @goal generate
- * @description A Maven2 plugin which generates the set of project reports
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id: ProjectReportsMojo.java,v 1.3 2005/02/23 00:08:03 brett Exp $
@@ -43,12 +43,6 @@ import java.util.Map;
 public class ProjectReportsMojo
     extends AbstractMojo
 {
-    /**
-     * @parameter expression="${basedir}"
-     * @required
-     */
-    private String basedir;
-
     /**
      * @parameter expression="${basedir}/src/site"
      * @required
@@ -134,6 +128,7 @@ public class ProjectReportsMojo
         return buffer.toString();
     }
 
+    /** @noinspection IOResourceOpenedButNotSafelyClosed*/
     private InputStream getSiteDescriptor()
         throws MojoExecutionException
     {
@@ -144,7 +139,7 @@ public class ProjectReportsMojo
             throw new MojoExecutionException( "The site descriptor is not present!" );
         }
 
-        String siteDescriptorContent = "";
+        String siteDescriptorContent;
 
         try
         {
@@ -155,7 +150,7 @@ public class ProjectReportsMojo
             throw new MojoExecutionException( "The site descriptor cannot be read!", e );
         }
 
-        Map props = new HashMap();
+        Map props = new HashMap( 1 );
 
         props.put( "reports", getReportsMenu() );
 
