@@ -450,6 +450,8 @@ public class Verifier
 
             StreamConsumer err = new WriterStreamConsumer( logWriter );
 
+            System.out.println( Commandline.toString( cli.getCommandline() ) );
+
             ret = CommandLineUtils.executeCommandLine( cli, out, err );
 
             logWriter.close();
