@@ -179,7 +179,7 @@ public class JavadocReport
         // TODO: this could probably be improved/configured
         // TODO: doesn't work with spaces in java.home
         String fileSeparator = System.getProperty( "file.separator" );
-        File f = new File( System.getProperty( "java.home" ), "bin/javadoc" );
+        File f = new File( System.getProperty( "java.home" ), "../bin/javadoc" );
         return f.getAbsolutePath();
     }
 }
