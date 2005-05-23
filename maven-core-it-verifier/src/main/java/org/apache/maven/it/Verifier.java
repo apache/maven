@@ -133,7 +133,7 @@ public class Verifier
         {
             if ( propertiesFile.exists() )
             {
-                System.out.println( "Load properties file : " + file.getPath() );
+                System.out.println( "Load properties file : " + propertiesFile.getPath() );
                 fis = new FileInputStream( propertiesFile );
                 properties.load( fis );
             }
