@@ -114,7 +114,7 @@ public class PrepareReleaseMojo
         {
             ScmFile f = (ScmFile) i.next();
             if ( f.getPath().equals( "pom.xml.backup" ) ||
-                 f.getPath().equals( "release.properties" ) )
+                 f.getPath().equals( RELEASE_PROPS ) )
             {
                 i.remove();
             }
