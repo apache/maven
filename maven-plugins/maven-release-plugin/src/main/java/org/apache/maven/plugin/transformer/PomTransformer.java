@@ -17,15 +17,13 @@ package org.apache.maven.plugin.transformer;
  * ====================================================================
  */
 
-import java.io.File;
-
 import org.apache.maven.model.Model;
-
 import org.dom4j.Node;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@zenplex.com">Jason van Zyl</a>
- *
  * @version $Id: PomTransformer.java 114783 2004-03-02 15:37:56Z evenisse $
  */
 public interface PomTransformer
@@ -37,11 +35,10 @@ public interface PomTransformer
     void transformNodes()
         throws Exception;
 
-    void transformNode( Node node )
-    throws Exception;
+    void transformNode( Node node );
 
     Node getTransformedNode( Node node )
-    throws Exception;
+        throws Exception;
 
     void write()
         throws Exception;

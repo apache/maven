@@ -228,10 +228,8 @@ public abstract class AbstractPomTransformer
     /**
      *
      * @param node
-     * @throws Exception
      */
-    public abstract void transformNode( Node node )
-        throws Exception;
+    public abstract void transformNode( Node node );
 
     /**
      * Update the snapshot version identifiers with actual timestamp versions

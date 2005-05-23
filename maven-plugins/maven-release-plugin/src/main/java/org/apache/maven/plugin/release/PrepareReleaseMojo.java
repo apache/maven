@@ -406,7 +406,7 @@ public class PrepareReleaseMojo
     private void checkInSnapshotVersionPom()
         throws MojoExecutionException
     {
-        checkInPom( "[maven-release-plugin] prepare release " + projectVersion );
+        checkInPom( "[maven-release-plugin] prepare for development " + projectVersion );
     }
 
     private void checkInPom( String message )

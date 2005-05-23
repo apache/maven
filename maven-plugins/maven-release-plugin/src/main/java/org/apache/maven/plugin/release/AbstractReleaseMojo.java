@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.File;
 
 /**
+ * 
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id: DoxiaMojo.java 169372 2005-05-09 22:47:34Z evenisse $
  */
