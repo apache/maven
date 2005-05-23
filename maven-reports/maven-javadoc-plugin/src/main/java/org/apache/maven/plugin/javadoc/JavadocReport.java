@@ -130,9 +130,14 @@ public class JavadocReport
             cl.createArgument().setValue( "-classpath" );
             cl.createArgument().setValue( classpath.toString() );
             cl.createArgument().setValue( "@files" );
+            System.out.println( getJavadocPath() );
             System.out.println( Commandline.toString( cl.getCommandline() ) );
             System.out.println( cl.getWorkingDirectory() );
-            CommandLineUtils.executeCommandLine( cl, new DefaultConsumer(), new DefaultConsumer() );
+            int exitCode = CommandLineUtils.executeCommandLine( cl, new DefaultConsumer(), new DefaultConsumer() );
+            if ( exitCode != 0 )
+            {
+                throw new MavenReportException( "exit code: " + exitCode );
+            }
         }
         catch ( Exception e )
         {
@@ -171,18 +176,10 @@ public class JavadocReport
      */
     private String getJavadocPath()
     {
-        String osName = System.getProperty( "os.name" );
-        String jdkPath;
-        if ( osName.startsWith( "Windows" ) )
-        {
-            jdkPath = "%JAVA_HOME%";
-        }
-        else
-        {
-            jdkPath = "$JAVA_HOME";
-        }
-
+        // TODO: this could probably be improved/configured
+        // TODO: doesn't work with spaces in java.home
         String fileSeparator = System.getProperty( "file.separator" );
-        return jdkPath + fileSeparator + "bin" + fileSeparator + "javadoc";
+        File f = new File( System.getProperty( "java.home" ), "bin/javadoc" );
+        return f.getAbsolutePath();
     }
 }
