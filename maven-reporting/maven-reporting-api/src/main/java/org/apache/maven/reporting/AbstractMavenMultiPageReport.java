@@ -1,16 +1,7 @@
 package org.apache.maven.reporting;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.maven.reporting.sink.MultiPageSink;
-import org.apache.maven.reporting.sink.SinkFactory;
-import org.codehaus.doxia.sink.Sink;
-
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +15,15 @@ import org.codehaus.doxia.sink.Sink;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.maven.reporting.sink.MultiPageSink;
+import org.apache.maven.reporting.sink.SinkFactory;
+import org.codehaus.doxia.sink.Sink;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
