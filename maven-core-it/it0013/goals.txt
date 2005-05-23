@@ -1,3 +1,3 @@
-clean:clean
+-DupdateReleaseInfo=true
 install
 it0013:it0013

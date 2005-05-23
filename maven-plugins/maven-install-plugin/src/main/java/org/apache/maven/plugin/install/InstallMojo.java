@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
@@ -82,6 +83,11 @@ public class InstallMojo
      */
     private String finalName;
 
+    /**
+     * @parameter expression="${updateReleaseInfo}"
+     */
+    private boolean updateReleaseInfo = false;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -95,16 +101,23 @@ public class InstallMojo
             artifact.addMetadata( metadata );
         }
 
+        if ( updateReleaseInfo )
+        {
+            ReleaseArtifactMetadata metadata = new ReleaseArtifactMetadata( artifact );
+            metadata.setVersion( artifact.getVersion() );
+            artifact.addMetadata( metadata );
+        }
+
         try
         {
-            if ( !isPomArtifact )
+            if ( isPomArtifact )
             {
-                // TODO: would be something nice to get back from the project to get the full filename (the OGNL feedback thing)
-                installer.install( buildDirectory, finalName, artifact, localRepository );
+                installer.install( pom, artifact, localRepository );
             }
             else
             {
-                installer.install( pom, artifact, localRepository );
+                // TODO: would be something nice to get back from the project to get the full filename (the OGNL feedback thing)
+                installer.install( buildDirectory, finalName, artifact, localRepository );
             }
         }
         catch ( ArtifactInstallationException e )

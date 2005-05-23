@@ -66,7 +66,8 @@ public class PerformReleaseMojo
         throws MojoExecutionException
     {
         // TODO: we need to get a reference to the maven component and use that so this
-        // will work purely in an embedded mode.
+        // will work purely in an embedded mode. Not sure how to pass the release setting to the plugin in that
+        // instance though - still via -D, or is there a better way?
 
         Commandline cl = new Commandline();
 
@@ -75,6 +76,8 @@ public class PerformReleaseMojo
         cl.setWorkingDirectory( workingDirectory );
 
         cl.createArgument().setLine( goals );
+
+        cl.createArgument().setLine( "-DupdateReleaseInfo=true" );
 
         StreamConsumer consumer = new DefaultConsumer();
 

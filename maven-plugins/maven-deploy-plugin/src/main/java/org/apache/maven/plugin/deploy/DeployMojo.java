@@ -21,6 +21,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,11 +30,11 @@ import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import java.io.File;
 
 /**
+ * Deploys an artifact to remote repository.
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:jdcasey@apache.org">John Casey (refactoring only)</a>
  * @version $Id$
  * @goal deploy
- * @description deploys an artifact to remote repository
  */
 public class DeployMojo
     extends AbstractMojo
@@ -108,6 +109,11 @@ public class DeployMojo
      */
     private ArtifactRepository localRepository;
 
+    /**
+     * @parameter expression="${updateReleaseInfo}"
+     */
+    private boolean updateReleaseInfo = false;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -128,15 +134,22 @@ public class DeployMojo
             artifact.addMetadata( metadata );
         }
 
+        if ( updateReleaseInfo )
+        {
+            ReleaseArtifactMetadata metadata = new ReleaseArtifactMetadata( artifact );
+            metadata.setVersion( artifact.getVersion() );
+            artifact.addMetadata( metadata );
+        }
+
         try
         {
-            if ( !isPomArtifact )
+            if ( isPomArtifact )
             {
-                deployer.deploy( buildDirectory, finalName, artifact, deploymentRepository, localRepository );
+                deployer.deploy( pom, artifact, deploymentRepository, localRepository );
             }
             else
             {
-                deployer.deploy( pom, artifact, deploymentRepository, localRepository );
+                deployer.deploy( buildDirectory, finalName, artifact, deploymentRepository, localRepository );
             }
         }
         catch ( ArtifactDeploymentException e )

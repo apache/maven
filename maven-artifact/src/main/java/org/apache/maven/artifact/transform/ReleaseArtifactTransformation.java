@@ -61,23 +61,13 @@ public class ReleaseArtifactTransformation
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        // TODO: this is implemented like a SNAPSHOT - it should be at release time only when we have that concept
-        ReleaseArtifactMetadata metadata = new ReleaseArtifactMetadata( artifact );
-
-        metadata.setVersion( artifact.getVersion() );
-
-        artifact.addMetadata( metadata );
+        // metadata is added at install time
     }
 
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
-        // TODO: this is implemented like a SNAPSHOT - it should be at release time only when we have that concept
-        ReleaseArtifactMetadata metadata = new ReleaseArtifactMetadata( artifact );
-
-        metadata.setVersion( artifact.getVersion() );
-
-        artifact.addMetadata( metadata );
+        // metadata is added at deploy time
     }
 
     protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
