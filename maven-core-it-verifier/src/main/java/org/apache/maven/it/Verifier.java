@@ -123,7 +123,7 @@ public class Verifier
         }
     }
 
-    private static Properties loadProperties( File propertiesFile )
+    private Properties loadProperties( String filename )
         throws VerificationException
     {
         Properties properties = new Properties();
@@ -131,9 +131,9 @@ public class Verifier
         FileInputStream fis = null;
         try
         {
+              File propertiesFile = new File( basedir, filename );
             if ( propertiesFile.exists() )
             {
-                System.out.println( "Load properties file : " + propertiesFile.getPath() );
                 fis = new FileInputStream( propertiesFile );
                 properties.load( fis );
             }
@@ -563,7 +563,7 @@ public class Verifier
             {
                 verifier.executeHook( "prebuild-hook.txt" );
 
-                Properties properties = verifier.loadProperties( new File( basedir, "system.properties" ) );
+                Properties properties = verifier.loadProperties( "system.properties" );
 
                 verifier.executeGoals( properties, "goals.txt" );
 
