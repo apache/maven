@@ -110,6 +110,16 @@ public class PrepareReleaseMojo
             throw new MojoExecutionException( "An error is occurred in the status process.", e );
         }
 
+        for ( Iterator i = changedFiles.iterator(); i.hasNext(); )
+        {
+            ScmFile f = (ScmFile) i.next();
+            if ( f.getPath().equals( "pom.xml.backup" ) ||
+                 f.getPath().equals( "release.properties" ) )
+            {
+                i.remove();
+            }
+        }
+
         if ( !changedFiles.isEmpty() )
         {
             StringBuffer message = new StringBuffer();
