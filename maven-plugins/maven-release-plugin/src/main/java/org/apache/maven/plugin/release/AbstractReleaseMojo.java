@@ -142,6 +142,11 @@ public abstract class AbstractReleaseMojo
         {
             initScmManager();
 
+            if ( username == null )
+            {
+                username = System.getProperty( "user.name" );
+            }
+
             // ----------------------------------------------------------------------
             // The release properties file has been created by the prepare phase and
             // wants to be shared with the perform.

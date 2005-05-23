@@ -258,7 +258,6 @@ public class PrepareReleaseMojo
 
             releaseProperties.setProperty( "version", projectVersion );
 
-            // TODO: fix
             releaseProperties.setProperty( USERNAME, username );
 
             releaseProperties.setProperty( TAG, getTagLabel() );
