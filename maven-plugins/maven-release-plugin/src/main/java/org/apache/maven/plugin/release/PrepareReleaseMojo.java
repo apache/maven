@@ -65,6 +65,8 @@ public class PrepareReleaseMojo
 
     private Model model;
 
+    private String userTag;
+
     protected void executeTask()
         throws MojoExecutionException
     {
@@ -435,7 +437,7 @@ public class PrepareReleaseMojo
         }
     }
 
-    private String getTagLabel()
+    private String getDefaultTagLabel()
     {
         String tag = project.getArtifactId().toUpperCase() + "_" + projectVersion.toUpperCase();
 
@@ -444,6 +446,44 @@ public class PrepareReleaseMojo
         tag = tag.replace( '.', '_' );
 
         return tag;
+    }
+
+    private String getTagLabel()
+        throws MojoExecutionException
+    {
+        if ( userTag == null )
+        {
+            userTag = getDefaultTagLabel();
+
+            try
+            {
+                ScmBean scm = getScm();
+
+                if ( scm.getTag() == null )
+                {
+                    getLog().info( "What tag name should be used? [ " + tag + " ]" );
+
+                    InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
+
+                    String inputTag = handler.readLine();
+
+                    if ( !StringUtils.isEmpty( inputTag ) )
+                    {
+                        userTag = inputTag;
+                    }
+                }
+                else
+                {
+                    userTag = scm.getTag();
+                }
+            }
+            catch ( Exception e )
+            {
+                throw new MojoExecutionException( "An error is occurred in the tag process.", e );
+            }
+        }
+
+        return userTag;
     }
 
     /**
@@ -466,23 +506,7 @@ public class PrepareReleaseMojo
         {
             ScmBean scm = getScm();
 
-            scm.setWorkingDirectory( basedir );
-
-            if ( scm.getTag() == null )
-            {
-                getLog().info( "What tag name should be used? [ " + tag + " ]" );
-
-                InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
-
-                String inputTag = handler.readLine();
-
-                if ( !StringUtils.isEmpty( inputTag ) )
-                {
-                    tag = inputTag;
-                }
-
-                scm.setTag( tag );
-            }
+            scm.setTag( tag );
 
             getLog().info( "Tagging release with the label " + tag + "." );
 
