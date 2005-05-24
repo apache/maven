@@ -52,10 +52,16 @@ public class VersionTransformer
         return "/project/build/plugins/plugin";
     }
 
+    public String selectScmTagNodesXPathExpression()
+    {
+        return "/project/scm/tag";
+    }
+
     public void transformNode( Node node )
     {
         if ( selectProjectNodeXPathExpression().equals( node.getPath() ) )
         {
+            // Modify project version
             Element project = (Element) node;
 
             Node version = node.selectSingleNode( "version" );
@@ -71,6 +77,7 @@ public class VersionTransformer
         }
         else if ( selectDependenciesNodesXPathExpression().equals( node.getPath() ) )
         {
+            // Modify dependency version
             Element dependency = (Element) node;
 
             Node groupId = node.selectSingleNode( "groupId" );
@@ -97,8 +104,9 @@ public class VersionTransformer
                                                                            type.getText() ).getVersion() );
             }
         }
-        else
+        else if ( selectPluginsNodesXPathExpression().equals( node.getPath() ) )
         {
+            // Modify plugin version
             Element plugin = (Element) node;
 
             Node groupId = node.selectSingleNode( "groupId" );
@@ -131,6 +139,25 @@ public class VersionTransformer
             else
             {
                 plugin.addElement( "version" ).addText( p.getVersion() );
+            }
+        }
+        else
+        {
+            // Modify scm tag
+            Element scm = (Element) node;
+
+            Node tag = node.selectSingleNode( "tag" );
+
+            if ( tag == null )
+            {
+                if ( !"HEAD".equals( getUpdatedModel().getScm().getTag() ) )
+                {
+                    scm.addElement( "tag" ).addText( getUpdatedModel().getScm().getTag() );
+                }
+            }
+            else
+            {
+                tag.setText( getUpdatedModel().getScm().getTag() );
             }
         }
     }

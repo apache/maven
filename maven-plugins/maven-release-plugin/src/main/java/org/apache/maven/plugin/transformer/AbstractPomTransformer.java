@@ -207,28 +207,14 @@ public abstract class AbstractPomTransformer
     // Implementation
     // ----------------------------------------------------------------------
 
-    /**
-     *
-     * @return
-     */
     public abstract String selectProjectNodeXPathExpression();
 
-    /**
-     *
-     * @return
-     */
     public abstract String selectDependenciesNodesXPathExpression();
 
-    /**
-     *
-     * @return
-     */
     public abstract String selectPluginsNodesXPathExpression();
 
-    /**
-     *
-     * @param node
-     */
+    public abstract String selectScmTagNodesXPathExpression();
+
     public abstract void transformNode( Node node );
 
     /**
@@ -255,6 +241,8 @@ public abstract class AbstractPomTransformer
 
         XPath pluginsXpath = new Dom4jXPath( selectPluginsNodesXPathExpression() );
 
+        XPath scmXpath = new Dom4jXPath( selectScmTagNodesXPathExpression() );
+
         List nodes = new ArrayList();
 
         nodes.addAll( pomXpath.selectNodes( getDocument() ) );
@@ -262,6 +250,8 @@ public abstract class AbstractPomTransformer
         nodes.addAll( dependenciesXpath.selectNodes( getDocument() ) );
 
         nodes.addAll( pluginsXpath.selectNodes( getDocument() ) );
+
+        nodes.addAll( scmXpath.selectNodes( getDocument() ) );
 
         setSelectedNodes( nodes );
     }

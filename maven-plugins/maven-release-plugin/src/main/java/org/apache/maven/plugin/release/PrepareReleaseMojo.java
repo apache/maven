@@ -67,6 +67,8 @@ public class PrepareReleaseMojo
 
     private String userTag;
 
+    private String currentTag;
+
     protected void executeTask()
         throws MojoExecutionException
     {
@@ -254,6 +256,10 @@ public class PrepareReleaseMojo
 
         model.setVersion( projectVersion );
 
+        currentTag = model.getScm().getTag();
+
+        model.getScm().setTag( getTagLabel() );
+
         try
         {
             Properties releaseProperties = new Properties();
@@ -382,6 +388,8 @@ public class PrepareReleaseMojo
             }
 
             model.setVersion( projectVersion );
+
+            model.getScm().setTag( currentTag );
 
             PomTransformer transformer = new VersionTransformer();
 
