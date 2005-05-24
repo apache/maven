@@ -483,7 +483,7 @@ public class MavenCli
         public CLIManager()
         {
             options = new Options();
-            options.addOption( OptionBuilder.withLongOpt( "define" ).hasArgs().withDescription(
+            options.addOption( OptionBuilder.withLongOpt( "define" ).hasArg().withDescription(
                 "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
             options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create(
                 OFFLINE ) );
