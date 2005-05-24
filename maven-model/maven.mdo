@@ -1729,6 +1729,15 @@
           <type>String</type>
         </field>
         <field>
+          <name>tag</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            The tag of current code. By default, it's set to HEAD during development.
+          ]]></description>
+          <type>String</type>
+          <defaultValue>HEAD</defaultValue>
+        </field>
+        <field>
           <name>url</name>
           <version>4.0.0</version>
           <description><![CDATA[The URL to the project's browsable CVS repository.]]></description>
