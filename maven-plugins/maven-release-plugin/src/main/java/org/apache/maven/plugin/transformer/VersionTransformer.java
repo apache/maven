@@ -143,21 +143,45 @@ public class VersionTransformer
         }
         else
         {
-            // Modify scm tag
-            Element scm = (Element) node;
-
-            Node tag = node.selectSingleNode( "tag" );
-
-            if ( tag == null )
+            if ( getUpdatedModel().getScm() != null )
             {
-                if ( !"HEAD".equals( getUpdatedModel().getScm().getTag() ) )
+                // Modify scm tag
+                Element scm = (Element) node;
+                
+                Node tag = node.selectSingleNode( "tag" );
+                
+                if ( tag == null )
                 {
-                    scm.addElement( "tag" ).addText( getUpdatedModel().getScm().getTag() );
+                    if ( !"HEAD".equals( getUpdatedModel().getScm().getTag() ) )
+                    {
+                        scm.addElement( "tag" ).addText( getUpdatedModel().getScm().getTag() );
+                    }
                 }
-            }
-            else
-            {
-                tag.setText( getUpdatedModel().getScm().getTag() );
+                else
+                {
+                    tag.setText( getUpdatedModel().getScm().getTag() );
+                }
+                
+                // Modify scmConnections
+                Node connection = node.selectSingleNode( "connection" );
+                
+                if ( connection != null )
+                {
+                    if ( !connection.getText().equals( getUpdatedModel().getScm().getConnection() ) )
+                    {
+                        connection.setText( getUpdatedModel().getScm().getConnection() );
+                    }
+                }
+                
+                Node developerConnection = node.selectSingleNode( "developerConnection" );
+                
+                if ( developerConnection != null )
+                {
+                    if ( !developerConnection.getText().equals( getUpdatedModel().getScm().getDeveloperConnection() ) )
+                    {
+                        developerConnection.setText( getUpdatedModel().getScm().getDeveloperConnection() );
+                    }
+                }
             }
         }
     }

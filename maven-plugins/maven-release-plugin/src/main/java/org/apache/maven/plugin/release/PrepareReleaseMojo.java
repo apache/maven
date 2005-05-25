@@ -69,6 +69,10 @@ public class PrepareReleaseMojo
 
     private String currentTag;
 
+    private String currentScmConnection;
+
+    private String currentScmDeveloperConnection;
+
     protected void executeTask()
         throws MojoExecutionException
     {
@@ -258,7 +262,19 @@ public class PrepareReleaseMojo
 
         currentTag = model.getScm().getTag();
 
-        model.getScm().setTag( getTagLabel() );
+        currentScmConnection = model.getScm().getConnection();
+
+        currentScmDeveloperConnection = model.getScm().getDeveloperConnection();
+
+        if ( model.getScm() != null )
+        {
+            model.getScm().setTag( getTagLabel() );
+
+            model.getScm().setConnection( rewriteScmConnection( model.getScm().getConnection(), getTagLabel() ) );
+
+            model.getScm().setDeveloperConnection( rewriteScmConnection( model.getScm().getDeveloperConnection(),
+                                                                         getTagLabel() ) );
+        }
 
         try
         {
@@ -389,7 +405,14 @@ public class PrepareReleaseMojo
 
             model.setVersion( projectVersion );
 
-            model.getScm().setTag( currentTag );
+            if ( model.getScm() != null )
+            {
+                model.getScm().setTag( currentTag );
+
+                model.getScm().setConnection( currentScmConnection );
+
+                model.getScm().setDeveloperConnection( currentScmDeveloperConnection );
+            }
 
             PomTransformer transformer = new VersionTransformer();
 
@@ -524,5 +547,26 @@ public class PrepareReleaseMojo
         {
             throw new MojoExecutionException( "An error is occurred in the tag process.", e );
         }
+    }
+
+    private String rewriteScmConnection( String scmConnection, String tag )
+    {
+        if ( scmConnection != null )
+        {
+            if ( scmConnection.startsWith( "svn" ) )
+            {
+                if ( scmConnection.endsWith( "trunk/") )
+                {
+                    scmConnection = scmConnection.substring( 0, scmConnection.length() - "trunk/".length() );
+                }
+                if ( scmConnection.endsWith( "branches/") )
+                {
+                    scmConnection = scmConnection.substring( 0, scmConnection.length() - "branches/".length() );
+                }
+                scmConnection += "tags/" + tag;
+            }
+        }
+
+        return scmConnection;
     }
 }
