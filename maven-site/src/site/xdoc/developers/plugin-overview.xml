@@ -78,9 +78,19 @@
         <p>Also starting with Maven 2.0 is an effort to integrate multiproject 
           builds directly into the core architecture. In Maven 1.x, many large 
           projects were fragmented into smaller builds to sidestep issues such 
-          as conditional compilation of a subset of classes; separation 
-          of client-server code; or cyclical dependencies between 
-          distinct application libraries.</p>
+          as conditional compilation of a subset of classes; separation of 
+          client-server code; or cyclical dependencies between distinct 
+          application libraries. This in turn created extra complexity with 
+          running builds, since multiple builds had to be run in order to build 
+          the application as a whole - one or more per project. While the first 
+          version (1.x) did indeed address this new multiple projects issue, it 
+          did so as an afterthought. The Reactor was created to act as a sort 
+          of <i>apply-to-all-these</i> function, and the multiproject plugin 
+          was later added to provide Reactor settings for some common build 
+          types. However, this solution (it <i>is</i> really only one solution, 
+          plus some macros) really never integrated the idea of the 
+          multi-project build process into the maven core conceptual 
+          framework. </p>
       </subsection>
       <subsection name="Why Change the Plugin Architecture?">
       </subsection>
