@@ -19,7 +19,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-compiler-javac</artifactId>
-      <version>1.3</version>
+      <version>1.4-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </model>
