@@ -73,7 +73,7 @@ public class SinkFactory
             descriptor = new StringInputStream( "" );
         }
 
-        return siteRenderer.createSink( new File( siteDirectory ), siteDirectory, outputFileName, outputDirectory,
+        return siteRenderer.createSink( new File( siteDirectory ), outputFileName, outputDirectory,
                                         descriptor, flavour );
     }
 }
