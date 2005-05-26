@@ -25,25 +25,24 @@ import org.apache.maven.reporting.MavenReportConfiguration;
 import org.codehaus.doxia.module.xhtml.XhtmlSink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.IOUtil;
 
-import java.util.ArrayList;
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @goal site
- * @description Doxia plugin
- *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
+ * @goal site
+ * @description Doxia plugin
  */
 public class DoxiaMojo
     extends AbstractMojo
@@ -73,6 +72,12 @@ public class DoxiaMojo
     private String outputDirectory;
 
     /**
+     * @parameter expression="${basedir}/src/site/resources"
+     * @required
+     */
+    private File resourcesDirectory;
+
+    /**
      * @parameter alias="flavor"
      */
     private String flavour = "maven";
@@ -82,7 +87,7 @@ public class DoxiaMojo
      * @required
      * @readonly
      */
-    private  SiteRenderer siteRenderer;
+    private SiteRenderer siteRenderer;
 
     /**
      * @parameter expression="${project}"
@@ -113,6 +118,7 @@ public class DoxiaMojo
     private List remoteRepositories;
 
     private List projectInfos = new ArrayList();
+
     private List projectReports = new ArrayList();
 
     public void execute()
@@ -141,9 +147,9 @@ public class DoxiaMojo
 
                     report.setConfiguration( config );
 
-                    XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), siteDirectory,
-                                                              report.getOutputName() + ".html",
-                                                              outputDirectory, getSiteDescriptor(), flavour );
+                    XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ),
+                                                              report.getOutputName() + ".html", outputDirectory,
+                                                              getSiteDescriptor(), flavour );
 
                     report.generate( sink );
                 }
@@ -174,8 +180,22 @@ public class DoxiaMojo
                 }
             }
 
+            File cssDirectory = new File( siteDirectory, "css" );
+            File imagesDirectory = new File( siteDirectory, "images" );
+
+            // special case for backwards compatibility
+            if ( cssDirectory.exists() || imagesDirectory.exists() )
+            {
+                getLog().warn( "DEPRECATED: the css and images directories are deprecated, please use resources" );
+
+                FileUtils.copyDirectory( cssDirectory, new File( outputDirectory, "css" ) );
+
+                FileUtils.copyDirectory( imagesDirectory, new File( outputDirectory, "images" ) );
+            }
+
             //Generate static site
-            siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour, getSiteDescriptor() );
+            siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour, getSiteDescriptor(),
+                                 resourcesDirectory );
         }
         catch ( Exception e )
         {
@@ -211,7 +231,7 @@ public class DoxiaMojo
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"Project Documentation\">\n" );
-        buffer.append( "    <item name=\"About " + project.getName() + "\" href=\"/index.html\"/>\n");
+        buffer.append( "    <item name=\"About " + project.getName() + "\" href=\"/index.html\"/>\n" );
 
         if ( projectInfos.size() > 0 )
         {
@@ -221,8 +241,9 @@ public class DoxiaMojo
             for ( Iterator i = projectInfos.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append( "        <item name=\"" + report.getName() + "\" href=\"/" +
-                               report.getOutputName() + ".html\"/>\n" );
+                buffer.append(
+                    "        <item name=\"" + report.getName() + "\" href=\"/" + report.getOutputName() +
+                    ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -236,8 +257,9 @@ public class DoxiaMojo
             for ( Iterator i = projectReports.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append( "        <item name=\"" + report.getName() + "\" href=\"/" +
-                               report.getOutputName() + ".html\"/>\n" );
+                buffer.append(
+                    "        <item name=\"" + report.getName() + "\" href=\"/" + report.getOutputName() +
+                    ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -266,7 +288,7 @@ public class DoxiaMojo
                 siteDescriptorContent = IOUtil.toString( getClass().getResourceAsStream( "/default-site.xml" ) );
             }
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             throw new MojoExecutionException( "The site descriptor cannot be read!", e );
         }
@@ -306,9 +328,8 @@ public class DoxiaMojo
     private void generateProjectInfoPage( InputStream siteDescriptor )
         throws Exception
     {
-        XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), siteDirectory,
-                                                  "project-info.html",
-                                                  outputDirectory, siteDescriptor, flavour );
+        XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), "project-info.html", outputDirectory,
+                                                  siteDescriptor, flavour );
 
         String title = "General Project Information";
 
@@ -326,7 +347,7 @@ public class DoxiaMojo
 
         sink.paragraph();
         sink.text( "This document provides an overview of the various documents and links that are part " +
-                   "of this project's general information. All of this content is automatically generated by ");
+                   "of this project's general information. All of this content is automatically generated by " );
         sink.link( "http://maven.apache.org" );
         sink.text( "Maven" );
         sink.link_();
@@ -367,7 +388,7 @@ public class DoxiaMojo
         }
 
         sink.table_();
-        
+
         sink.section2_();
 
         sink.section1_();
@@ -379,12 +400,11 @@ public class DoxiaMojo
         sink.close();
     }
 
-    private void generateProjectReportsPage( InputStream siteDescriptor)
+    private void generateProjectReportsPage( InputStream siteDescriptor )
         throws Exception
     {
-        XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), siteDirectory,
-                                                  "maven-reports.html",
-                                                  outputDirectory, siteDescriptor, flavour );
+        XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), "maven-reports.html", outputDirectory,
+                                                  siteDescriptor, flavour );
 
         String title = "Maven Generated Reports";
 
@@ -442,7 +462,7 @@ public class DoxiaMojo
         }
 
         sink.table_();
-        
+
         sink.section2_();
 
         sink.section1_();
