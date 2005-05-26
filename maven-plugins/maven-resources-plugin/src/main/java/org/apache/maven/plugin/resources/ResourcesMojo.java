@@ -16,18 +16,14 @@ package org.apache.maven.plugin.resources;
  * limitations under the License.
  */
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.DirectoryScanner;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +41,7 @@ public class ResourcesMojo
 {
     /**
      * The output directory into which to copy the resources.
-     * 
+     *
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      */
@@ -53,11 +49,15 @@ public class ResourcesMojo
 
     /**
      * The list of resources we want to transfer.
-     * 
+     *
      * @parameter expression="${project.build.resources}"
      * @required
      */
     private List resources;
+
+    private static final String[] EMPTY_STRING_ARRAY = {};
+
+    private static final String[] DEFAULT_INCLUDES = {"**/**"};
 
     public void execute()
         throws MojoExecutionException
@@ -73,7 +73,7 @@ public class ResourcesMojo
             for ( Iterator i = getJarResources( resources ).entrySet().iterator(); i.hasNext(); )
             {
                 Map.Entry entry = (Map.Entry) i.next();
-                String source = (String) entry.getKey();
+                File source = (File) entry.getKey();
                 String destination = (String) entry.getValue();
 
                 File destinationFile = new File( outputDirectory, destination );
@@ -83,7 +83,7 @@ public class ResourcesMojo
                     destinationFile.getParentFile().mkdirs();
                 }
 
-                fileCopy( source, destinationFile.getPath() );
+                FileUtils.copyFile( source, destinationFile );
             }
         }
         catch ( Exception e )
@@ -111,34 +111,27 @@ public class ResourcesMojo
                 continue;
             }
 
-            // If we only have a directory then we want to include
-            // everything we can find within that path.
+            DirectoryScanner scanner = new DirectoryScanner();
+            scanner.addDefaultExcludes();
 
-            String includesAsString = "**/**";
-
-            java.util.List includes = resource.getIncludes();
-            if ( includes != null && includes.size() > 0 )
+            scanner.setBasedir( resource.getDirectory() );
+            if ( resource.getIncludes() != null && !resource.getIncludes().isEmpty() )
             {
-                includesAsString = StringUtils.join( includes.iterator(), "," );
-            }
-
-            List excludes = resource.getExcludes();
-
-            if ( excludes == null )
-            {
-                excludes = resource.getDefaultExcludes();
+                scanner.setIncludes( (String[]) resource.getIncludes().toArray( EMPTY_STRING_ARRAY ) );
             }
             else
             {
-                excludes = new ArrayList( excludes );
-                excludes.addAll( resource.getDefaultExcludes() );
+                scanner.setIncludes( DEFAULT_INCLUDES );
+            }
+            if ( resource.getExcludes() != null && !resource.getExcludes().isEmpty() )
+            {
+                scanner.setExcludes( (String[]) resource.getExcludes().toArray( EMPTY_STRING_ARRAY ) );
             }
 
-            String excludesAsString = StringUtils.join( excludes.iterator(), "," );
+            scanner.scan();
 
-            List files = FileUtils.getFileNames( resourceDirectory, includesAsString, excludesAsString, false );
-
-            for ( Iterator j = files.iterator(); j.hasNext(); )
+            List includedFiles = Arrays.asList( scanner.getIncludedFiles() );
+            for ( Iterator j = includedFiles.iterator(); j.hasNext(); )
             {
                 String name = (String) j.next();
 
@@ -149,50 +142,11 @@ public class ResourcesMojo
                     entryName = targetPath + "/" + name;
                 }
 
-                String resourcePath = new File( resource.getDirectory(), name ).getPath();
-
-                resourceEntries.put( resourcePath, entryName );
+                resourceEntries.put( new File( resource.getDirectory(), name ), entryName );
             }
         }
 
         return resourceEntries;
-    }
-
-    public static byte[] fileRead( String fileName )
-        throws IOException
-    {
-        FileInputStream in = new FileInputStream( fileName );
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-        int count;
-        byte[] b = new byte[512];
-        while ( ( count = in.read( b ) ) > 0 ) // blocking read
-        {
-            buffer.write( b, 0, count );
-        }
-
-        in.close();
-
-        byte[] content = buffer.toByteArray();
-
-        buffer.close();
-
-        return content;
-    }
-
-    public static void fileWrite( String fileName, byte[] data )
-        throws Exception
-    {
-        FileOutputStream out = new FileOutputStream( fileName );
-        out.write( data );
-        out.close();
-    }
-
-    public static void fileCopy( String inFileName, String outFileName )
-        throws Exception
-    {
-        byte[] content = fileRead( inFileName );
-        fileWrite( outFileName, content );
     }
 
 }
