@@ -52,12 +52,17 @@ public class DefaultModelInheritanceAssembler
             child.setGroupId( parent.getGroupId() );
         }
 
-        // currentVersion
+        // version
+        // TODO: I think according to the latest design docs, we don't want to inherit version at all
         if ( child.getVersion() == null )
         {
             // The parent version may have resolved to something different, so we take what we asked for...
             // instead of - child.setVersion( parent.getVersion() );
-            child.setVersion( child.getParent().getVersion() );
+            
+            if ( child.getParent() != null )
+            {
+                child.setVersion( child.getParent().getVersion() );
+            }
         }
 
         // inceptionYear
