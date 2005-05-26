@@ -1,0 +1,387 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://maven.apache.org/POM/4.0.0" xmlns="http://maven.apache.org/POM/4.0.0">
+  <xs:element name="project">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="parent" minOccurs="0"/>
+        <xs:element name="modelVersion" type="xs:string" minOccurs="0"/>
+        <xs:element name="groupId" type="xs:string" minOccurs="0"/>
+        <xs:element name="artifactId" type="xs:string" minOccurs="0"/>
+        <xs:element name="packaging" type="xs:string" default="jar" minOccurs="0"/>
+        <xs:element name="modules" minOccurs="0"/>
+        <xs:element name="name" type="xs:string" minOccurs="0"/>
+        <xs:element name="version" type="xs:string" minOccurs="0"/>
+        <xs:element name="description" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+        <xs:element name="issueManagement" minOccurs="0"/>
+        <xs:element name="ciManagement" minOccurs="0"/>
+        <xs:element name="inceptionYear" type="xs:string" minOccurs="0"/>
+        <xs:element name="repositories" minOccurs="0"/>
+        <xs:element name="pluginRepositories" minOccurs="0"/>
+        <xs:element name="mailingLists" minOccurs="0"/>
+        <xs:element name="developers" minOccurs="0"/>
+        <xs:element name="contributors" minOccurs="0"/>
+        <xs:element name="dependencies" minOccurs="0"/>
+        <xs:element name="licenses" minOccurs="0"/>
+        <xs:element name="reports" minOccurs="0"/>
+        <xs:element name="scm" minOccurs="0"/>
+        <xs:element name="build" minOccurs="0"/>
+        <xs:element name="organization" minOccurs="0"/>
+        <xs:element name="distributionManagement" minOccurs="0"/>
+        <xs:element name="dependencyManagement" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parent">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="artifactId" type="xs:string" minOccurs="0"/>
+        <xs:element name="groupId" type="xs:string" minOccurs="0"/>
+        <xs:element name="version" type="xs:string" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="modules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="module" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="issueManagement">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="system" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ciManagement">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="system" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+        <xs:element name="notifiers" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="notifier">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="type" type="xs:string" default="mail" minOccurs="0"/>
+        <xs:element name="address" type="xs:string" minOccurs="0"/>
+        <xs:element name="configuration" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="configuration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="notifiers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="notifier" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="repository">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="id" type="xs:string" minOccurs="0"/>
+        <xs:element name="name" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+        <xs:element name="snapshotPolicy" type="xs:string" default="daily" minOccurs="0"/>
+        <xs:element name="layout" type="xs:string" default="default" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="repositories">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="repository" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pluginRepositories">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="pluginRepository" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="mailingList">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="name" type="xs:string" minOccurs="0"/>
+        <xs:element name="subscribe" type="xs:string" minOccurs="0"/>
+        <xs:element name="unsubscribe" type="xs:string" minOccurs="0"/>
+        <xs:element name="post" type="xs:string" minOccurs="0"/>
+        <xs:element name="archive" type="xs:string" minOccurs="0"/>
+        <xs:element name="otherArchives" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="otherArchives">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="otherArchive" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="mailingLists">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="mailingList" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="developer">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="id" type="xs:string" minOccurs="0"/>
+        <xs:element name="name" type="xs:string" minOccurs="0"/>
+        <xs:element name="email" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+        <xs:element name="organization" type="xs:string" minOccurs="0"/>
+        <xs:element name="organizationUrl" type="xs:string" minOccurs="0"/>
+        <xs:element name="roles" minOccurs="0"/>
+        <xs:element name="timezone" type="xs:string" minOccurs="0"/>
+        <xs:element name="properties" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="roles">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="role" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="properties">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="developers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="developer" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="contributor">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="name" type="xs:string" minOccurs="0"/>
+        <xs:element name="email" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+        <xs:element name="organization" type="xs:string" minOccurs="0"/>
+        <xs:element name="organizationUrl" type="xs:string" minOccurs="0"/>
+        <xs:element name="roles" minOccurs="0"/>
+        <xs:element name="timezone" type="xs:string" minOccurs="0"/>
+        <xs:element name="properties" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="contributors">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="contributor" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dependency">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="groupId" type="xs:string" minOccurs="0"/>
+        <xs:element name="artifactId" type="xs:string" minOccurs="0"/>
+        <xs:element name="version" type="xs:string" minOccurs="0"/>
+        <xs:element name="type" type="xs:string" default="jar" minOccurs="0"/>
+        <xs:element name="scope" type="xs:string" default="compile" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dependencies">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="dependency" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="license">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="name" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+        <xs:element name="distribution" type="xs:string" minOccurs="0"/>
+        <xs:element name="comments" type="xs:string" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="licenses">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="license" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="reports">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="outputDirectory" type="xs:string" minOccurs="0"/>
+        <xs:element name="plugins" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plugin">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="groupId" type="xs:string" default="org.apache.maven.plugins" minOccurs="0"/>
+        <xs:element name="artifactId" type="xs:string" minOccurs="0"/>
+        <xs:element name="version" type="xs:string" minOccurs="0"/>
+        <xs:element name="configuration" minOccurs="0"/>
+        <xs:element name="goals" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="configuration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="goal">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="id" type="xs:string" minOccurs="0"/>
+        <xs:element name="configuration" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="goals">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="goal" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="plugins">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="plugin" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="scm">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="connection" type="xs:string" minOccurs="0"/>
+        <xs:element name="developerConnection" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="build">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="defaultGoal" type="xs:string" minOccurs="0"/>
+        <xs:element name="sourceDirectory" type="xs:string" minOccurs="0"/>
+        <xs:element name="scriptSourceDirectory" type="xs:string" minOccurs="0"/>
+        <xs:element name="testSourceDirectory" type="xs:string" minOccurs="0"/>
+        <xs:element name="resources" minOccurs="0"/>
+        <xs:element name="testResources" minOccurs="0"/>
+        <xs:element name="directory" type="xs:string" minOccurs="0"/>
+        <xs:element name="outputDirectory" type="xs:string" minOccurs="0"/>
+        <xs:element name="finalName" type="xs:string" minOccurs="0"/>
+        <xs:element name="testOutputDirectory" type="xs:string" minOccurs="0"/>
+        <xs:element name="pluginManagement" minOccurs="0"/>
+        <xs:element name="plugins" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="resource">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="targetPath" type="xs:string" minOccurs="0"/>
+        <xs:element name="directory" type="xs:string" minOccurs="0"/>
+        <xs:element name="includes" minOccurs="0"/>
+        <xs:element name="excludes" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="includes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="include" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="excludes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="exclude" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="resources">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="resource" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="testResources">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="testResource" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pluginManagement">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="plugins" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="organization">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="name" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="distributionManagement">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="repository" minOccurs="0"/>
+        <xs:element name="site" minOccurs="0"/>
+        <xs:element name="downloadUrl" type="xs:string" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="site">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="id" type="xs:string" minOccurs="0"/>
+        <xs:element name="name" type="xs:string" minOccurs="0"/>
+        <xs:element name="url" type="xs:string" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dependencyManagement">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="dependencies" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
