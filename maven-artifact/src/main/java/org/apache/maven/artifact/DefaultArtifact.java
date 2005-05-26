@@ -71,10 +71,27 @@ public class DefaultArtifact
             throw new NullPointerException( "Artifact type cannot be null." );
         }
 
+        if( groupId == null )
+        {
+            throw new NullPointerException( "Artifact groupId cannot be null." );
+        }
+        
         this.groupId = groupId;
+        
 
+        if( artifactId == null )
+        {
+            throw new NullPointerException( "Artifact artifactId cannot be null." );
+        }
+        
         this.artifactId = artifactId;
+        
 
+        if( version == null )
+        {
+            throw new NullPointerException( "Artifact version cannot be null." );
+        }
+        
         this.version = version;
 
         this.type = type;
