@@ -75,6 +75,8 @@ public class JavaMojoDescriptorExtractor
     public static final String GOAL_REQUIRES_PROJECT = "requiresProject";
 
     public static final String GOAL_REQUIRES_ONLINE = "requiresOnline";
+    
+    public static final String GOAL_INHERIT_BY_DEFAULT = "inheritByDefault";
 
     public static final String GOAL_MULTI_EXECUTION_STRATEGY = "attainAlways";
 
@@ -210,6 +212,17 @@ public class JavaMojoDescriptorExtractor
         if ( requiresOnline != null )
         {
             mojoDescriptor.setOnlineRequired( true );
+        }
+
+        // ----------------------------------------------------------------------
+        // inheritByDefault flag
+        // ----------------------------------------------------------------------
+
+        DocletTag inheritByDefault = findInClassHierarchy( javaClass, GOAL_INHERIT_BY_DEFAULT );
+
+        if ( inheritByDefault != null )
+        {
+            mojoDescriptor.setInheritedByDefault( Boolean.valueOf( inheritByDefault.getValue() ).booleanValue() );
         }
 
         extractParameters( mojoDescriptor, javaClass );

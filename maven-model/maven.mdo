@@ -2022,6 +2022,12 @@
           <type>String</type>
         </field>
         <field>
+          <name>inherited</name>
+          <version>4.0.0</version>
+          <description><![CDATA[Whether this plugin configuration should be propagated to child POMs.]]></description>
+          <type>String</type>
+        </field>
+        <field>
           <name>configuration</name>
           <type>DOM</type>
         </field>
@@ -2077,6 +2083,12 @@
         <field>
           <name>id</name>
           <version>4.0.0</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>inherited</name>
+          <version>4.0.0</version>
+          <description><![CDATA[Whether this goal configuration should be propagated to child POMs.]]></description>
           <type>String</type>
         </field>
         <field>

@@ -60,7 +60,7 @@ public class MojoDescriptor
     private String executePhase;
 
     private String deprecated;
-
+    
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -74,6 +74,8 @@ public class MojoDescriptor
     private PlexusConfiguration mojoConfiguration;
 
     private PluginDescriptor pluginDescriptor;
+
+    private boolean inheritedByDefault = false;
 
     public MojoDescriptor()
     {
@@ -299,5 +301,15 @@ public class MojoDescriptor
     public void setPluginDescriptor( PluginDescriptor pluginDescriptor )
     {
         this.pluginDescriptor = pluginDescriptor;
+    }
+
+    public boolean isInheritedByDefault()
+    {
+        return inheritedByDefault;
+    }
+
+    public void setInheritedByDefault( boolean inheritedByDefault )
+    {
+        this.inheritedByDefault = inheritedByDefault;
     }
 }

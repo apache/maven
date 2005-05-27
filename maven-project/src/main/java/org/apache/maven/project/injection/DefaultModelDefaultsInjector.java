@@ -22,6 +22,7 @@ import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.Iterator;
@@ -72,41 +73,7 @@ public class DefaultModelDefaultsInjector
 
     public void mergePluginWithDefaults( Plugin plugin, Plugin def )
     {
-        if ( plugin.getVersion() == null && def.getVersion() != null )
-        {
-            plugin.setVersion( def.getVersion() );
-        }
-
-        Map defaultGoals = def.getGoalsAsMap();
-
-        List pluginGoals = plugin.getGoals();
-
-        if ( pluginGoals != null )
-        {
-            for ( Iterator it = pluginGoals.iterator(); it.hasNext(); )
-            {
-                Goal pluginGoal = (Goal) it.next();
-
-                Goal defaultGoal = (Goal) defaultGoals.get( pluginGoal.getId() );
-
-                if ( defaultGoal != null )
-                {
-                    Xpp3Dom pluginGoalConfig = (Xpp3Dom) pluginGoal.getConfiguration();
-                    Xpp3Dom defaultGoalConfig = (Xpp3Dom) defaultGoal.getConfiguration();
-
-                    pluginGoalConfig = Xpp3Dom.mergeXpp3Dom( pluginGoalConfig, defaultGoalConfig );
-
-                    pluginGoal.setConfiguration( pluginGoalConfig );
-                }
-            }
-        }
-
-        Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
-        Xpp3Dom defaultConfiguration = (Xpp3Dom) def.getConfiguration();
-
-        pluginConfiguration = Xpp3Dom.mergeXpp3Dom( pluginConfiguration, defaultConfiguration );
-
-        plugin.setConfiguration( pluginConfiguration );
+        ModelUtils.mergeSupplementalPluginDefinition( plugin, def );
     }
 
     private void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )

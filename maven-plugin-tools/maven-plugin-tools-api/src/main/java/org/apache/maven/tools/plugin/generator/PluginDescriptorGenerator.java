@@ -131,6 +131,12 @@ public class PluginDescriptorGenerator
         //
         // ----------------------------------------------------------------------
 
+        element( w, "inheritedByDefault", "" + mojoDescriptor.isInheritedByDefault() );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
         if ( mojoDescriptor.getPhase() != null )
         {
             element( w, "phase", mojoDescriptor.getPhase() );

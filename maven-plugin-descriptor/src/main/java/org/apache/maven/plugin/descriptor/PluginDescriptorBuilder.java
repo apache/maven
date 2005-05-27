@@ -153,6 +153,13 @@ public class PluginDescriptorBuilder
             mojo.setOnlineRequired( Boolean.valueOf( requiresOnline ).booleanValue() );
         }
 
+        String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
+
+        if ( inheritedByDefault != null )
+        {
+            mojo.setInheritedByDefault( Boolean.valueOf( inheritedByDefault ).booleanValue() );
+        }
+
         // ----------------------------------------------------------------------
         // Parameters
         // ----------------------------------------------------------------------
