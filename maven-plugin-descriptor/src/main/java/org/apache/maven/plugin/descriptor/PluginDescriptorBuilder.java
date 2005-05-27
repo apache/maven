@@ -38,6 +38,13 @@ public class PluginDescriptorBuilder
         pluginDescriptor.setVersion( c.getChild( "version" ).getValue() );
         pluginDescriptor.setGoalPrefix( c.getChild( "goalPrefix" ).getValue() );
 
+        String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
+
+        if ( inheritedByDefault != null )
+        {
+            pluginDescriptor.setInheritedByDefault( Boolean.valueOf( inheritedByDefault ).booleanValue() );
+        }
+
         // ----------------------------------------------------------------------
         // Components
         // ----------------------------------------------------------------------

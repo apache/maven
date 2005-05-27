@@ -41,6 +41,8 @@ public class PluginDescriptor
 
     private String source;
 
+    private boolean inheritedByDefault = true;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -177,5 +179,15 @@ public class PluginDescriptor
     public String getSource()
     {
         return source;
+    }
+
+    public boolean isInheritedByDefault()
+    {
+        return inheritedByDefault;
+    }
+
+    public void setInheritedByDefault( boolean inheritedByDefault )
+    {
+        this.inheritedByDefault = inheritedByDefault;
     }
 }

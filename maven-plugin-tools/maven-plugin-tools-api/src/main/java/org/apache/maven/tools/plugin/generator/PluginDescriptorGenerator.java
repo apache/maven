@@ -70,7 +70,9 @@ public class PluginDescriptorGenerator
 
             element( w, "goalPrefix", pluginDescriptor.getGoalPrefix() );
 
-             w.startElement( "mojos" );
+            element( w, "inheritedByDefault", "" + pluginDescriptor.isInheritedByDefault() );
+            
+            w.startElement( "mojos" );
 
             for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
             {

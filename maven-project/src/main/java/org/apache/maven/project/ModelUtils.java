@@ -68,9 +68,9 @@ public final class ModelUtils
                         ModelUtils.mergePluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
                     }
 
-                    if ( handleAsInheritance )
+                    if ( handleAsInheritance && parentInherited == null )
                     {
-                        assembledPlugin.setInheritanceApplied();
+                        assembledPlugin.unsetInheritanceApplied();
                     }
 
                     assembledPlugins.put( assembledPlugin.getKey(), assembledPlugin );
@@ -142,9 +142,9 @@ public final class ModelUtils
                             assembledGoal = childGoal;
                         }
 
-                        if ( handleAsInheritance )
+                        if ( handleAsInheritance && parentInherited == null )
                         {
-                            assembledGoal.setInheritanceApplied();
+                            assembledGoal.unsetInheritanceApplied();
                         }
 
                         assembledGoals.put( assembledGoal.getId(), assembledGoal );
@@ -165,6 +165,7 @@ public final class ModelUtils
                 }
 
                 child.setGoals( new ArrayList( assembledGoals.values() ) );
+
                 child.flushGoalMap();
             }
         }

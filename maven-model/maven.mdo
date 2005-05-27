@@ -2050,9 +2050,9 @@
           <version>4.0.0</version>
           <code><![CDATA[
     private Map goalMap = null;
-    private boolean inheritanceApplied = false;
+    private boolean inheritanceApplied = true;
     
-    public void setInheritanceApplied()
+    public void unsetInheritanceApplied()
     {
         this.inheritanceApplied = true;
     }
@@ -2120,9 +2120,9 @@
       <codeSegments>
         <codeSegment>
           <code><![CDATA[
-    private boolean inheritanceApplied = false;
+    private boolean inheritanceApplied = true;
     
-    public void setInheritanceApplied()
+    public void unsetInheritanceApplied()
     {
         this.inheritanceApplied = true;
     }

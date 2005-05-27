@@ -22,6 +22,7 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundExceptio
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -239,27 +240,42 @@ public class DefaultLifecycleExecutor
         {
             throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
         }
-
-        // ----------------------------------------------------------------------
-        // Look to see if the plugin configuration specifies particular mojos
-        // within the plugin. If this is the case then simply configure the
-        // mojos the user has specified and ignore the rest.
-        // ----------------------------------------------------------------------
-
-        for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
+        
+        if( plugin.isInheritanceApplied() || pluginDescriptor.isInheritedByDefault() )
         {
-            MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+            // ----------------------------------------------------------------------
+            // Look to see if the plugin configuration specifies particular mojos
+            // within the plugin. If this is the case then simply configure the
+            // mojos the user has specified and ignore the rest.
+            // ----------------------------------------------------------------------
 
-            // TODO: remove later
-            if ( mojoDescriptor.getGoal() == null )
+            Map goalMap = plugin.getGoalsAsMap();
+            
+            for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
             {
-                throw new LifecycleExecutionException(
-                    "The plugin " + artifactId + " was built with an older version of Maven" );
-            }
+                MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
 
-            if ( plugin.getGoals().isEmpty() || plugin.getGoalsAsMap().containsKey( mojoDescriptor.getGoal() ) )
-            {
-                configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
+                // TODO: remove later
+                if ( mojoDescriptor.getGoal() == null )
+                {
+                    throw new LifecycleExecutionException(
+                        "The plugin " + artifactId + " was built with an older version of Maven" );
+                }
+                
+                Goal goal = (Goal) goalMap.get( mojoDescriptor.getGoal() );
+
+                if( goalMap.isEmpty() )
+                {
+                    configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
+                }
+                else if ( goal != null )
+                {
+                    // We have to check to see that the inheritance rules have been applied before binding this mojo.
+                    if( goal.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
+                    {
+                        configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
+                    }
+                }
             }
         }
     }

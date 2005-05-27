@@ -75,7 +75,7 @@ public class MojoDescriptor
 
     private PluginDescriptor pluginDescriptor;
 
-    private boolean inheritedByDefault = false;
+    private boolean inheritedByDefault = true;
 
     public MojoDescriptor()
     {
