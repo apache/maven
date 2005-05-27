@@ -1,0 +1,64 @@
+marching orders:
+===========================
+
+[X] 1. Add concept of inherit=(true|false) for plugins at plugin/goal levels
+
+[X] 2. Add is|setInheritedByDefault methods to MojoDescriptor to support setting
+   the default inheritance behavior per mojo.
+
+[X] 3. Add annotation for @inheritedByDefault (true|false).
+
+[ ] 4. Change plugin inheritance to be enabled, cumulatively
+
+       -> Not sure how best to do this. 
+
+          It cannot happen in the MavenProjectBuilder, since no plugins have 
+          been resolved at this point, and we cannot know what the default 
+          inheritance semantics are for a particular plugin.
+
+          If this happens at the DefaultLifecycleExecutor, we've dragged the
+          Profiles assembly and injection out of the assembly code and into the
+          build-execution code (that is, out of maven-project and into 
+          maven-core). This has implications for people using maven-project
+          outside of m2 itself.
+
+       -> Possibly we need to move plugin verification outside of the lifecycle
+          executor to a post-MavenProjectBuilder phase, which would also
+          take place before injection of Profile values. This is complicated, as
+          it would leave maven-project in an incomplete state (plugin 
+          inheritance wouldn't be part of the basic MavenProjectBuilder, since 
+          the plugin manager is part of maven-core). Since Profiles must be 
+          applied after inheritance is finished, it also means that Profiles 
+          cannot be applied as part of the maven-project API as accessed 
+          through the MavenProjectBuilder
+
+       -> Alternately, we could inherit all plugins, but only APPLY/EXECUTE the
+          ones where inherit=true...that would keep the phases of the build
+          process essentially unchanged, but could result in quite a bit of 
+          useless overhead as we calculate/inject plugin configurations which 
+          will not be inherited/used. The problem here is knowing which ones 
+          actually were inherited and should have the inherit=true test 
+          applied, and which ones are supplying inherit=true|false but were 
+          specified at this level.
+
+[ ] 5. Add profiles, defined in POM, ${basedir}/profiles.xml, and settings.xml
+
+       -> Different validation rules for allowed elements in each, to maintain 
+          portability.
+    
+       -> Info in profiles will be applied AFTER all assembly, but BEFORE cli 
+          values (what cli values are we using??)
+    
+       -> Profiles can be ordered
+    
+           * settings.xml: 
+               <activeProfiles><profileId/><profileId/></activeProfiles>
+
+           * profiles.xml: 
+               <profiles><profile><id/>..</profile><profile/></profiles>
+
+           * pom.xml: {see profiles.xml}
+
+[ ] 6. Add --show-profiles execution mode for maven, storage of 
+       profiles-in-effect in MavenSession for later access?
+
