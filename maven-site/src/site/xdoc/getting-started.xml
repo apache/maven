@@ -61,7 +61,7 @@
           <code>src/test/java</code> directory containing a trivial unit test.
         </p>
         <p>
-          Let's try a few things...
+          Let's now change into the project's directory and try a few things...
         </p>
       </subsection>
       <subsection name="Building a Project">
@@ -132,20 +132,77 @@
           been done.
         </p>
       </subsection>
+      <subsection name="Configuring Plugins">
+        <p>
+          What if you would like to customise whether a plugins is enabled, or how a plugin operates? 
+          In Maven 1.0, you would have added some <code>preGoal</code> to <code>maven.xml</code> and some
+          entries to <code>project.properties</code>. Here, it is a little different.
+        </p>
+        <p>
+          For this example, we will configure the Java compiler to allow JDK 5.0 sources. This is as simple as
+          adding this to your POM:
+        </p>
+        <source><![CDATA[.
+.
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <configuration>
+        <source>1.5</source>
+        <target>1.5</target>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+.
+.]]></source>
+        <p>
+          You'll notice that all plugins in Maven 2.0 look much like a dependency - and in some ways they are.
+          This plugin will be automatically downloaded and used - including a specific version if you request it
+          (the default is to use the latest available).
+        </p>
+        <p>
+          The <code>configuration</code> element applies the given parameters to every goal from the compiler plugin.
+          It is possible to change a parameter just for an individual goal as well - for example, to change the
+          debug flag for test sources:
+        </p>
+        <source><![CDATA[.
+.
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <goals>
+        <goal>
+          <id>testCompile</id>
+          <configuration>
+            <debug>true</debug>
+          </configuration>
+        </goal>
+      </goals>
+    </plugin>
+.
+.]]></source>
+        <p>
+          To find out what configuration is available for a plugin, you can see the <a href="plugins/">Plugins List</a>
+          and navigate to the plugin and goal you are using.
+        </p>
+      </subsection>
       <subsection name="Other Project Types">
         <p>
-          Note that the lifecycle applies to any project type. For example, we can create a simple web application:
+          Note that the lifecycle applies to any project type. For example, back in the base direcotry we can create a simple web application:
         </p>
         <source>
-m2 archetype:create
-   -DgroupId=com.mycompany.app -DartifactId=my-webapp
+m2 archetype:create \
+   -DgroupId=com.mycompany.app -DartifactId=my-webapp \
    -DarchetypeArtifactId=maven-archetype-webapp</source>
         <p>
           Note that these must all be on a single line. This will create a directory
           <code>my-webapp</code> and the following
           project descriptor:
         </p>
-        <source><![CDATA[<model>
+        <source><![CDATA[<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mycompany.app</groupId>
   <artifactId>my-webapp</artifactId>
@@ -160,40 +217,17 @@ m2 archetype:create
     </dependency>
   </dependencies>
   <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>1.0-alpha-1</version>
-        <configuration>
-          <warName>my-webapp</warName>
-        </configuration>
-      </plugin>
-    </plugins>
+    <finalName>my-webapp</finalName>
   </build>
-</model>]]></source>
+</project>]]></source>
         <p>
           Note the
-          <code>&lt;packaging&gt;</code> element - this tells Maven to build as a WAR. Again, try:
+          <code>&lt;packaging&gt;</code> element - this tells Maven to build as a WAR. Change into the webapp project's directory and try:
         </p>
         <source>m2 clean:clean package</source>
         <p>
           You'll see
           <code>target/my-webapp.war</code> is built, and that all the normal steps were executed.
-        </p>
-        <p>
-          What is the
-          <code>plugins</code> section all about? Well, this is how plugins are configured in Maven 2.0.
-          It is analogous to the
-          <code>project.properties</code> file in Maven 1.0. You may note that it looks more
-          verbose - but you'll see over time that it should be required much less, and is capable of much more powerful
-          configuration than it's Maven 1.0 counterpart. In addition, we hope the burden of editing the POM will be
-          eased by the availability of tools in the near future.
-        </p>
-        <p>
-          Note that this section is not required to build a WAR - if you omit it, the project will still build a WAR,
-          but the default output name of
-          <code>my-webapp-1.0-SNAPSHOT.war</code> will be used instead. In fact... go ahead
-          and try that now!
         </p>
       </subsection>
       <subsection name="Multiple Modules">
@@ -215,7 +249,7 @@ m2 archetype:create
         <p>
           The POM file you'll create should contain the following:
         </p>
-        <source><![CDATA[<model>
+        <source><![CDATA[<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mycompany.app</groupId>
   <version>1.0-SNAPSHOT</version>
@@ -225,7 +259,7 @@ m2 archetype:create
     <module>my-app</module>
     <module>my-webapp</module>
   </modules>
-</model>]]></source>
+</project>]]></source>
         <p>
           We'll need a dependency on the JAR from the webapp, so add this to
           <code>my-webapp/pom.xml</code>:
@@ -245,11 +279,11 @@ m2 archetype:create
     .]]></source>
         <p>
           Finally, add the following
-          <code>&lt;parent&lt;</code> element to both of the other
+          <code>&lt;parent&gt;</code> element to both of the other
           <code>pom.xml</code> files
           in the subdirectories:
         </p>
-        <source><![CDATA[<model>
+        <source><![CDATA[<project>
   <parent>
     <groupId>com.mycompany.app</groupId>
     <artifactId>app</artifactId>
@@ -313,7 +347,7 @@ m2 archetype:create
         </p>
         <p>
           Like Maven 1.0, as of the current Maven release (
-          <code>2.0-alpha-1</code>), it is required that you run
+          <code>2.0-alpha-2</code>), it is required that you run
           <code>install</code> to successfully perform these steps. If you run
           <code>package</code>, the JAR will not be
           copied to the local repository and Maven will not be able to find it. This will be improved in future versions.
