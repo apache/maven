@@ -20,15 +20,13 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
+import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.Iterator;
 import java.util.List;
@@ -202,70 +200,8 @@ public class DefaultModelInheritanceAssembler
         }
 
         assembleDependencyManagementInheritance( child, parent );
-
     }
-
-    private void assemblePluginManagementInheritance( Build childBuild, Build parentBuild )
-    {
-        PluginManagement parentPluginMgmt = parentBuild.getPluginManagement();
-
-        PluginManagement childPluginMgmt = childBuild.getPluginManagement();
-
-        if ( parentPluginMgmt != null )
-        {
-            if ( childPluginMgmt == null )
-            {
-                childBuild.setPluginManagement( parentPluginMgmt );
-            }
-            else
-            {
-                Map mappedChildPlugins = childPluginMgmt.getPluginsAsMap();
-
-                for ( Iterator it = parentPluginMgmt.getPlugins().iterator(); it.hasNext(); )
-                {
-                    Plugin plugin = (Plugin) it.next();
-
-                    if ( !mappedChildPlugins.containsKey( plugin.getKey() ) )
-                    {
-                        childPluginMgmt.addPlugin( plugin );
-                    }
-                    else
-                    {
-                        Plugin childPlugin = (Plugin) mappedChildPlugins.get( plugin.getKey() );
-
-                        if ( childPlugin.getVersion() == null )
-                        {
-                            childPlugin.setVersion( childPlugin.getVersion() );
-                        }
-
-                        Map mappedChildGoals = childPlugin.getGoalsAsMap();
-
-                        for ( Iterator itGoals = plugin.getGoals().iterator(); itGoals.hasNext(); )
-                        {
-                            Goal parentGoal = (Goal) itGoals.next();
-                            Goal childGoal = (Goal) mappedChildGoals.get( parentGoal.getId() );
-
-                            if ( childGoal == null )
-                            {
-                                childPlugin.addGoal( parentGoal );
-                            }
-                            else
-                            {
-                                Xpp3Dom childDom = (Xpp3Dom) childGoal.getConfiguration();
-                                Xpp3Dom parentDom = (Xpp3Dom) parentGoal.getConfiguration();
-                                childGoal.setConfiguration( Xpp3Dom.mergeXpp3Dom( childDom, parentDom ) );
-                            }
-                        }
-
-                        Xpp3Dom childConfig = (Xpp3Dom) childPlugin.getConfiguration();
-                        Xpp3Dom parentConfig = (Xpp3Dom) plugin.getConfiguration();
-                        childPlugin.setConfiguration( Xpp3Dom.mergeXpp3Dom( childConfig, parentConfig ) );
-                    }
-                }
-            }
-        }
-    }
-
+    
     private void assembleDependencyManagementInheritance( Model child, Model parent )
     {
         DependencyManagement parentDepMgmt = parent.getDependencyManagement();
@@ -369,9 +305,14 @@ public class DefaultModelInheritanceAssembler
                 childBuild.setTestResources( parentBuild.getTestResources() );
             }
 
-            // Plugins are not aggregated, but management is
-
-            assemblePluginManagementInheritance( childBuild, parentBuild );
+            // Plugins are aggregated if Plugin.inherit != false
+            ModelUtils.mergePluginLists( childBuild, parentBuild, true );
+            
+            // Plugin management :: aggregate
+            if( childBuild != null && parentBuild != null )
+            {
+                ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(), false );
+            }
         }
     }
 

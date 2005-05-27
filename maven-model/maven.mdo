@@ -680,6 +680,11 @@
           <version>4.0.0</version>
           <code><![CDATA[
     Map pluginMap;
+    
+    public void flushPluginMap()
+    {
+        this.pluginMap = null;
+    }
 
     public Map getPluginsAsMap()
     {
@@ -2045,6 +2050,22 @@
           <version>4.0.0</version>
           <code><![CDATA[
     private Map goalMap = null;
+    private boolean inheritanceApplied = false;
+    
+    public void setInheritanceApplied()
+    {
+        this.inheritanceApplied = true;
+    }
+    
+    public boolean isInheritanceApplied()
+    {
+        return inheritanceApplied;
+    }
+    
+    public void flushGoalMap()
+    {
+        this.goalMap = null;
+    }
 
     public Map getGoalsAsMap()
     {
@@ -2096,6 +2117,23 @@
           <type>DOM</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <code><![CDATA[
+    private boolean inheritanceApplied = false;
+    
+    public void setInheritanceApplied()
+    {
+        this.inheritanceApplied = true;
+    }
+    
+    public boolean isInheritanceApplied()
+    {
+        return inheritanceApplied;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>DependencyManagement</name>

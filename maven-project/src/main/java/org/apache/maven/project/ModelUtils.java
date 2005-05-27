@@ -2,11 +2,14 @@ package org.apache.maven.project;
 
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -26,44 +29,152 @@ import java.util.Map;
 
 public final class ModelUtils
 {
-    
-    public static void mergeSupplementalPluginDefinition( Plugin main, Plugin supplemental )
+
+    public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
+                                        boolean handleAsInheritance )
     {
-        if ( main.getVersion() == null && supplemental.getVersion() != null )
+        if( childContainer == null || parentContainer == null )
         {
-            main.setVersion( supplemental.getVersion() );
+            // nothing to do.
+            return;
+        }
+        
+        List parentPlugins = parentContainer.getPlugins();
+
+        if ( parentPlugins != null && !parentPlugins.isEmpty() )
+        {
+            Map assembledPlugins = new TreeMap();
+
+            Map childPlugins = childContainer.getPluginsAsMap();
+
+            for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+            {
+                Plugin parentPlugin = (Plugin) it.next();
+                
+                String parentInherited = parentPlugin.getInherited();
+
+                if ( !handleAsInheritance || parentInherited == null
+                    || Boolean.valueOf( parentInherited ).booleanValue() )
+                {
+                    
+                    Plugin assembledPlugin = parentPlugin;
+
+                    Plugin childPlugin = (Plugin) childPlugins.get( parentPlugin.getKey() );
+
+                    if ( childPlugin != null )
+                    {
+                        assembledPlugin = childPlugin;
+
+                        ModelUtils.mergePluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
+                    }
+
+                    if ( handleAsInheritance )
+                    {
+                        assembledPlugin.setInheritanceApplied();
+                    }
+
+                    assembledPlugins.put( assembledPlugin.getKey(), assembledPlugin );
+                }
+            }
+
+            for ( Iterator it = childPlugins.values().iterator(); it.hasNext(); )
+            {
+                Plugin childPlugin = (Plugin) it.next();
+
+                if ( !assembledPlugins.containsKey( childPlugin.getKey() ) )
+                {
+                    assembledPlugins.put( childPlugin.getKey(), childPlugin );
+                }
+            }
+
+            childContainer.setPlugins( new ArrayList( assembledPlugins.values() ) );
+            
+            childContainer.flushPluginMap();
+        }
+    }
+
+    public static void mergePluginDefinitions( Plugin child, Plugin parent, boolean handleAsInheritance )
+    {
+        if( child == null || parent == null )
+        {
+            // nothing to do.
+            return;
+        }
+        
+        if ( child.getVersion() == null && parent.getVersion() != null )
+        {
+            child.setVersion( parent.getVersion() );
         }
 
-        Map supplementalGoals = supplemental.getGoalsAsMap();
+        List parentGoals = parent.getGoals();
 
-        List pluginGoals = main.getGoals();
-
-        if ( pluginGoals != null )
+        // if the supplemental goals are non-existent, then nothing related to goals changes.
+        if ( parentGoals != null && !parentGoals.isEmpty() )
         {
-            for ( Iterator it = pluginGoals.iterator(); it.hasNext(); )
+            Map assembledGoals = new TreeMap();
+
+            Map childGoals = child.getGoalsAsMap();
+
+            if ( childGoals != null )
             {
-                Goal pluginGoal = (Goal) it.next();
-
-                Goal supplementalGoal = (Goal) supplementalGoals.get( pluginGoal.getId() );
-
-                if ( supplementalGoal != null )
+                for ( Iterator it = parentGoals.iterator(); it.hasNext(); )
                 {
-                    Xpp3Dom pluginGoalConfig = (Xpp3Dom) pluginGoal.getConfiguration();
-                    Xpp3Dom supplementalGoalConfig = (Xpp3Dom) supplementalGoal.getConfiguration();
+                    Goal parentGoal = (Goal) it.next();
 
-                    pluginGoalConfig = Xpp3Dom.mergeXpp3Dom( pluginGoalConfig, supplementalGoalConfig );
+                    String parentInherited = parentGoal.getInherited();
 
-                    pluginGoal.setConfiguration( pluginGoalConfig );
+                    if ( !handleAsInheritance || parentInherited == null
+                        || Boolean.valueOf( parentInherited ).booleanValue() )
+                    {
+                        Goal assembledGoal = parentGoal;
+
+                        Goal childGoal = (Goal) childGoals.get( parentGoal.getId() );
+
+                        if ( childGoal != null )
+                        {
+                            Xpp3Dom childGoalConfig = (Xpp3Dom) childGoal.getConfiguration();
+                            Xpp3Dom parentGoalConfig = (Xpp3Dom) parentGoal.getConfiguration();
+
+                            childGoalConfig = Xpp3Dom.mergeXpp3Dom( childGoalConfig, parentGoalConfig );
+
+                            childGoal.setConfiguration( childGoalConfig );
+
+                            assembledGoal = childGoal;
+                        }
+
+                        if ( handleAsInheritance )
+                        {
+                            assembledGoal.setInheritanceApplied();
+                        }
+
+                        assembledGoals.put( assembledGoal.getId(), assembledGoal );
+                    }
                 }
+
+                for ( Iterator it = childGoals.entrySet().iterator(); it.hasNext(); )
+                {
+                    Map.Entry entry = (Map.Entry) it.next();
+
+                    String key = (String) entry.getKey();
+                    Goal childGoal = (Goal) entry.getValue();
+
+                    if ( !assembledGoals.containsKey( key ) )
+                    {
+                        assembledGoals.put( key, childGoal );
+                    }
+                }
+
+                child.setGoals( new ArrayList( assembledGoals.values() ) );
+                child.flushGoalMap();
             }
         }
 
-        Xpp3Dom pluginConfiguration = (Xpp3Dom) main.getConfiguration();
-        Xpp3Dom supplementalConfiguration = (Xpp3Dom) supplemental.getConfiguration();
+        Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
+        Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
 
-        pluginConfiguration = Xpp3Dom.mergeXpp3Dom( pluginConfiguration, supplementalConfiguration );
+        childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
 
-        main.setConfiguration( pluginConfiguration );
+        child.setConfiguration( childConfiguration );
     }
 
 }

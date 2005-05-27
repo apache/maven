@@ -18,8 +18,10 @@ package org.apache.maven.project.inheritance;
 
 import junit.framework.TestCase;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
@@ -28,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jdcasey
@@ -265,6 +268,140 @@ public class DefaultModelInheritanceAssemblerTest
 
         // TODO: a lot easier if modello generated equals() :)
         assertRepositories( repos, child.getRepositories() );
+    }
+
+    public void testPluginInheritanceWhereParentPluginWithoutInheritFlagAndChildHasNoPlugins()
+    {
+        Model parent = makeBaseModel( "parent" );
+
+        Model child = makeBaseModel( "child" );
+
+        Plugin parentPlugin = new Plugin();
+        parentPlugin.setArtifactId( "maven-testInheritance-plugin" );
+        parentPlugin.setGroupId( "org.apache.maven.plugins" );
+        parentPlugin.setVersion( "1.0" );
+
+        List parentPlugins = Collections.singletonList( parentPlugin );
+
+        Build parentBuild = new Build();
+        parentBuild.setPlugins( parentPlugins );
+
+        parent.setBuild( parentBuild );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertPlugins( parentPlugins, child );
+    }
+
+    public void testPluginInheritanceWhereParentPluginWithTrueInheritFlagAndChildHasNoPlugins()
+    {
+        Model parent = makeBaseModel( "parent" );
+
+        Model child = makeBaseModel( "child" );
+
+        Plugin parentPlugin = new Plugin();
+        parentPlugin.setArtifactId( "maven-testInheritance2-plugin" );
+        parentPlugin.setGroupId( "org.apache.maven.plugins" );
+        parentPlugin.setVersion( "1.0" );
+        parentPlugin.setInherited( "true" );
+
+        List parentPlugins = Collections.singletonList( parentPlugin );
+
+        Build parentBuild = new Build();
+        parentBuild.setPlugins( parentPlugins );
+
+        parent.setBuild( parentBuild );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertPlugins( parentPlugins, child );
+    }
+
+    public void testPluginInheritanceWhereParentPluginWithFalseInheritFlagAndChildHasNoPlugins()
+    {
+        Model parent = makeBaseModel( "parent" );
+
+        Model child = makeBaseModel( "child" );
+        
+        Plugin parentPlugin = new Plugin();
+        parentPlugin.setArtifactId("maven-testInheritance3-plugin");
+        parentPlugin.setGroupId("org.apache.maven.plugins");
+        parentPlugin.setVersion("1.0");
+        parentPlugin.setInherited("false");
+        
+        List parentPlugins = Collections.singletonList(parentPlugin);
+        
+        Build parentBuild = new Build();
+        parentBuild.setPlugins(parentPlugins);
+        
+        parent.setBuild(parentBuild);
+
+        assembler.assembleModelInheritance( child, parent );
+    
+        assertPlugins( new ArrayList(), child );
+    }
+
+    private void assertPlugins( List expectedPlugins, Model child )
+    {
+        Build childBuild = child.getBuild();
+        
+        if( expectedPlugins != null && !expectedPlugins.isEmpty() )
+        {
+            assertNotNull( childBuild );
+            
+            Map childPluginsMap = childBuild.getPluginsAsMap();
+            
+            if( childPluginsMap != null )
+            {
+                assertEquals( expectedPlugins.size(), childPluginsMap.size() );
+                
+                for ( Iterator it = expectedPlugins.iterator(); it.hasNext(); )
+                {
+                    Plugin expectedPlugin = (Plugin) it.next();
+                    
+                    Plugin childPlugin = (Plugin) childPluginsMap.get( expectedPlugin.getKey() );
+                    
+                    assertPluginsEqual( expectedPlugin, childPlugin );
+                }
+            }
+            else
+            {
+                fail( "child plugins collection is null, but expectations map is not." );
+            }
+        }
+        else
+        {
+            assertTrue( childBuild == null || childBuild.getPlugins() == null || childBuild.getPlugins().isEmpty() );
+        }
+    }
+
+    private void assertPluginsEqual( Plugin reference, Plugin test )
+    {
+        assertEquals("Plugin keys don't match", reference.getKey(), test.getKey());
+        assertEquals("Plugin configurations don't match", reference.getConfiguration(), test.getConfiguration());
+        
+        List referenceGoals = reference.getGoals();
+        Map testGoalsMap = test.getGoalsAsMap();
+        
+        if( referenceGoals != null && !referenceGoals.isEmpty() )
+        {
+            assertTrue( "Missing goals specification", ( testGoalsMap != null && !testGoalsMap.isEmpty() ) );
+            
+            for ( Iterator it = referenceGoals.iterator(); it.hasNext(); )
+            {
+                Goal referenceGoal = (Goal) it.next();
+                Goal testGoal = (Goal) testGoalsMap.get( referenceGoal.getId() );
+                
+                assertNotNull( "Goal from reference not found in test", testGoal );
+                
+                assertEquals( "Goal IDs don't match", referenceGoal.getId(), testGoal.getId() );
+                assertEquals( "Goal configurations don't match", referenceGoal.getConfiguration(), testGoal.getConfiguration() );
+            }
+        }
+        else
+        {
+            assertTrue( "Unexpected goals specification", ( testGoalsMap == null || testGoalsMap.isEmpty() ) );
+        }
     }
 
     // ----------------------------------------------------------------------

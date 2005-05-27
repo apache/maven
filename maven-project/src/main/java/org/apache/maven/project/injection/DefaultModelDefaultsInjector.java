@@ -18,12 +18,9 @@ package org.apache.maven.project.injection;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginManagement;
 import org.apache.maven.project.ModelUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.Iterator;
 import java.util.List;
@@ -42,38 +39,13 @@ public class DefaultModelDefaultsInjector
         injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );
         if ( model.getBuild() != null )
         {
-            injectPluginDefaults( model.getBuild().getPluginsAsMap(), model.getBuild().getPluginManagement() );
-        }
-    }
-
-    private void injectPluginDefaults( Map pluginMap, PluginManagement pluginManagement )
-    {
-        if ( pluginManagement != null )
-        {
-            // a given project's plugins should be smaller than the
-            // group-defined defaults set...
-            // in other words, the project's plugins will probably be a subset
-            // of
-            // those specified in defaults.
-
-            List managedPlugins = pluginManagement.getPlugins();
-
-            for ( Iterator it = managedPlugins.iterator(); it.hasNext(); )
-            {
-                Plugin def = (Plugin) it.next();
-
-                Plugin plugin = (Plugin) pluginMap.get( def.getKey() );
-                if ( plugin != null )
-                {
-                    mergePluginWithDefaults( plugin, def );
-                }
-            }
+            ModelUtils.mergePluginLists( model.getBuild(), model.getBuild().getPluginManagement(), false );
         }
     }
 
     public void mergePluginWithDefaults( Plugin plugin, Plugin def )
     {
-        ModelUtils.mergeSupplementalPluginDefinition( plugin, def );
+        ModelUtils.mergePluginDefinitions( plugin, def, false );
     }
 
     private void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )
