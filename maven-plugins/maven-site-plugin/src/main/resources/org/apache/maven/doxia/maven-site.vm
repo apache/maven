@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>$title</title>
+    <style type="text/css" media="all">
+      @import url("$relativePath/css/maven-base.css");
+      @import url("$relativePath/css/maven-theme.css");
+      @import url("$relativePath/css/site.css");
+    </style>
+    <link rel="stylesheet" href="$relativePath/style/print.css" type="text/css" media="print" />
+    #foreach( $author in $authors )
+      <meta name="author" content="$author" />
+    #end
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  </head>
+  <body class="composite">
+    <div id="banner">
+      $bannerLeft
+      $bannerRight
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="breadcrumbs">
+      <div class="xleft">$navBarLeft</div>
+      <div class="xright">$links</div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="leftColumn"><div id="navcolumn">$mainMenu<a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+              <img alt="Built by Maven" src="$relativePath/images/logos/maven-feather.png"></img>
+            </a>
+    </div></div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        $bodyContent
+      </div>
+    </div>
+    <div class="clear">
+      <hr/>
+    </div>
+    <div id="footer">
+      <div class="xright">&#169; 2002-2005, Apache Software Foundation</div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+  </body>
+</html>

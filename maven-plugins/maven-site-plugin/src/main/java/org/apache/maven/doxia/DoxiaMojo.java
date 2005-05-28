@@ -22,16 +22,22 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
-import org.codehaus.doxia.module.xhtml.XhtmlSink;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
+import org.apache.maven.reporting.MavenReportException;
+import org.codehaus.plexus.siterenderer.Renderer;
+import org.codehaus.plexus.siterenderer.RendererException;
+import org.codehaus.plexus.siterenderer.sink.SiteRendererSink;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,19 +45,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id$
  * @goal site
  * @description Doxia plugin
+ * @requiresDependencyResolution test
+ *
+ * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @version $Id$
  */
 public class DoxiaMojo
     extends AbstractMojo
 {
-    /**
-     * @parameter expression="${basedir}"
-     * @required
-     */
-    private String basedir;
+    private static final String RESOURCE_DIR = "org/apache/maven/doxia";
+
+    private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
 
     /**
      * @parameter expression="${basedir}/src/site"
@@ -78,16 +84,21 @@ public class DoxiaMojo
     private File resourcesDirectory;
 
     /**
-     * @parameter alias="flavor"
+     * @parameterX expression="${template}
      */
-    private String flavour = "maven";
+    private String template = DEFAULT_TEMPLATE;
 
     /**
-     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
+     * @parameterX expression="${attributes}
+     */
+    private Map attributes;
+
+    /**
+     * @parameter expression="${component.org.codehaus.plexus.siterenderer.Renderer}"
      * @required
      * @readonly
      */
-    private SiteRenderer siteRenderer;
+    private Renderer siteRenderer;
 
     /**
      * @parameter expression="${project}"
@@ -147,11 +158,21 @@ public class DoxiaMojo
 
                     report.setConfiguration( config );
 
-                    XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ),
-                                                              report.getOutputName() + ".html", outputDirectory,
-                                                              getSiteDescriptor(), flavour );
+                    String outputFileName = report.getOutputName() + ".html";
+
+                    SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
+                                                                     getSiteDescriptor() );
 
                     report.generate( sink );
+
+                    File outputFile = new File( outputDirectory, outputFileName );
+
+                    if ( !outputFile.getParentFile().exists() )
+                    {
+                        outputFile.getParentFile().mkdirs();
+                    }
+
+                    siteRenderer.generateDocument( new FileWriter( outputFile ), template, attributes, sink );
                 }
             }
 
@@ -193,13 +214,30 @@ public class DoxiaMojo
                 FileUtils.copyDirectory( imagesDirectory, new File( outputDirectory, "images" ) );
             }
 
-            //Generate static site
-            siteRenderer.render( siteDirectory, generatedSiteDirectory, outputDirectory, flavour, getSiteDescriptor(),
-                                 resourcesDirectory );
+            // Generate static site
+            siteRenderer.render( new File( siteDirectory ), new File( outputDirectory ), getSiteDescriptor(), template,
+                                 attributes );
+            siteRenderer.render( new File( generatedSiteDirectory ), new File( outputDirectory ), getSiteDescriptor(),
+                                 template, attributes );
+
+            // Copy site resources
+            if ( resourcesDirectory != null )
+            {
+                FileUtils.copyDirectory( resourcesDirectory, new File( outputDirectory ) );
+            }
+            
+            copyResources( outputDirectory );
+        }
+        catch ( MavenReportException e )
+        {
+            throw new MojoExecutionException( "Error during report generation", e );
+        }
+        catch ( RendererException e )
+        {
+            throw new MojoExecutionException( "Error during page generation", e );
         }
         catch ( Exception e )
         {
-            // TODO: handle it better
             throw new MojoExecutionException( "Error during site generation", e );
         }
     }
@@ -220,8 +258,8 @@ public class DoxiaMojo
             }
             else
             {
-                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for " +
-                                                  report.getName() + " mojo isn't valid." );
+                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for "
+                                                  + report.getName() + " mojo isn't valid." );
             }
         }
     }
@@ -235,15 +273,14 @@ public class DoxiaMojo
 
         if ( projectInfos.size() > 0 )
         {
-            buffer.append( "    <item name=\"" + MavenReport.CATEGORY_PROJECT_INFORMATION +
-                           "\" href=\"/project-info.html\" collapse=\"true\">\n" );
+            buffer.append( "    <item name=\"" + MavenReport.CATEGORY_PROJECT_INFORMATION
+                           + "\" href=\"/project-info.html\" collapse=\"true\">\n" );
 
             for ( Iterator i = projectInfos.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append(
-                    "        <item name=\"" + report.getName() + "\" href=\"/" + report.getOutputName() +
-                    ".html\"/>\n" );
+                buffer.append( "        <item name=\"" + report.getName() + "\" href=\"/" + report.getOutputName()
+                               + ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -251,15 +288,14 @@ public class DoxiaMojo
 
         if ( projectReports.size() > 0 )
         {
-            buffer.append( "    <item name=\"" + MavenReport.CATEGORY_PROJECT_REPORTS +
-                           "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
+            buffer.append( "    <item name=\"" + MavenReport.CATEGORY_PROJECT_REPORTS
+                           + "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
 
             for ( Iterator i = projectReports.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append(
-                    "        <item name=\"" + report.getName() + "\" href=\"/" + report.getOutputName() +
-                    ".html\"/>\n" );
+                buffer.append( "        <item name=\"" + report.getName() + "\" href=\"/" + report.getOutputName()
+                               + ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -328,8 +364,10 @@ public class DoxiaMojo
     private void generateProjectInfoPage( InputStream siteDescriptor )
         throws Exception
     {
-        XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), "project-info.html", outputDirectory,
-                                                  siteDescriptor, flavour );
+        String outputFileName = "project-info.html";
+
+        SiteRendererSink sink = siteRenderer
+            .createSink( new File( siteDirectory ), outputFileName, getSiteDescriptor() );
 
         String title = "General Project Information";
 
@@ -346,8 +384,8 @@ public class DoxiaMojo
         sink.sectionTitle1_();
 
         sink.paragraph();
-        sink.text( "This document provides an overview of the various documents and links that are part " +
-                   "of this project's general information. All of this content is automatically generated by " );
+        sink.text( "This document provides an overview of the various documents and links that are part "
+                   + "of this project's general information. All of this content is automatically generated by " );
         sink.link( "http://maven.apache.org" );
         sink.text( "Maven" );
         sink.link_();
@@ -398,13 +436,18 @@ public class DoxiaMojo
         sink.flush();
 
         sink.close();
+
+        siteRenderer.generateDocument( new FileWriter( new File( outputDirectory, outputFileName ) ), template,
+                                       attributes, sink );
     }
 
     private void generateProjectReportsPage( InputStream siteDescriptor )
         throws Exception
     {
-        XhtmlSink sink = siteRenderer.createSink( new File( siteDirectory ), "maven-reports.html", outputDirectory,
-                                                  siteDescriptor, flavour );
+        String outputFileName = "maven-reports.html";
+
+        SiteRendererSink sink = siteRenderer
+            .createSink( new File( siteDirectory ), outputFileName, getSiteDescriptor() );
 
         String title = "Maven Generated Reports";
 
@@ -468,5 +511,52 @@ public class DoxiaMojo
         sink.section1_();
 
         sink.body_();
+
+        siteRenderer.generateDocument( new FileWriter( new File( outputDirectory, outputFileName ) ), template,
+                                       attributes, sink );
+    }
+
+    private void copyResources( String outputDirectory )
+        throws Exception
+    {
+        InputStream resourceList = getStream( RESOURCE_DIR + "/resources.txt" );
+
+        if ( resourceList != null )
+        {
+            LineNumberReader reader = new LineNumberReader( new InputStreamReader( resourceList ) );
+
+            String line;
+
+            while ( ( line = reader.readLine() ) != null )
+            {
+                InputStream is = getStream( RESOURCE_DIR + "/" + line );
+
+                if ( is == null )
+                {
+                    throw new IOException( "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE + " template." );
+                }
+
+                File outputFile = new File( outputDirectory, line );
+
+                if ( !outputFile.getParentFile().exists() )
+                {
+                    outputFile.getParentFile().mkdirs();
+                }
+
+                FileOutputStream w = new FileOutputStream( outputFile );
+
+                IOUtil.copy( is, w );
+
+                IOUtil.close( is );
+
+                IOUtil.close( w );
+            }
+        }
+    }
+
+    private InputStream getStream( String name )
+        throws Exception
+    {
+        return DoxiaMojo.class.getClassLoader().getResourceAsStream( name );
     }
 }

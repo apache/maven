@@ -16,9 +16,9 @@
       <version>2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>doxia</groupId>
-      <artifactId>doxia-core</artifactId>
-      <version>1.0-alpha-3-SNAPSHOT</version>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-site-renderer</artifactId>
+      <version>1.0-alpha-1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
