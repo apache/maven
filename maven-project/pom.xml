@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven</groupId>
@@ -34,4 +34,4 @@
       <version>1.0-alpha-3</version>
     </dependency>
   </dependencies>
-</model>
+</project>
