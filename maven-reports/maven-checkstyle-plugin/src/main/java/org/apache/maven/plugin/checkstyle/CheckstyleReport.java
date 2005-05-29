@@ -16,8 +16,10 @@ package org.apache.maven.plugin.checkstyle;
  * limitations under the License.
  */
 
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -38,32 +40,37 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
+ * @goal checkstyle
+ *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id: DependenciesReport.java,v 1.2 2005/02/23 00:08:02 brett Exp $
  */
 public class CheckstyleReport
     extends AbstractMavenReport
 {
-    protected static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
-        "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
+    /**
+     * @parameter expression="${project.build.directory}/site"
+     * @required
+     */
+    private String outputDirectory;
 
-        // CVS
-        "**/CVS", "**/CVS/**", "**/.cvsignore",
+    /**
+     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
+     * @required
+     * @readonly
+     */
+    private SiteRenderer siteRenderer;
 
-        // SCCS
-        "**/SCCS", "**/SCCS/**",
-
-        // Visual SourceSafe
-        "**/vssver.scc",
-
-        // Subversion
-        "**/.svn", "**/.svn/**",
-
-        // Mac
-        "**/.DS_Store"};
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
 
     private URL configFile = getClass().getResource( "/config/sun_checks.xml" );
 
@@ -75,17 +82,50 @@ public class CheckstyleReport
 
     private boolean failedOnError = false;
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getName()
+     */
     public String getName()
     {
         return "Checkstyle";
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getDescription()
+     */
     public String getDescription()
     {
         return "Report on coding style conventions.";
     }
 
-    public void execute()
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getOutputDirectory()
+     */
+    protected String getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getProject()
+     */
+    protected MavenProject getProject()
+    {
+        return project;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getSiteRenderer()
+     */
+    protected SiteRenderer getSiteRenderer()
+    {
+        return siteRenderer;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
+     */
+    public void executeReport( Locale locale )
         throws MavenReportException
     {
         // ----------------------------------------------------------------------
@@ -204,6 +244,9 @@ public class CheckstyleReport
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.maven.reporting.MavenReport#getOutputName()
+     */
     public String getOutputName()
     {
         return "checkstyle";

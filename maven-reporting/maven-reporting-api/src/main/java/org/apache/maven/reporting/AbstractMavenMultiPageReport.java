@@ -16,14 +16,14 @@ package org.apache.maven.reporting;
  * limitations under the License.
  */
 
+import org.apache.maven.reporting.sink.MultiPageSink;
+import org.apache.maven.reporting.sink.SinkFactory;
+import org.codehaus.doxia.sink.Sink;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.maven.reporting.sink.MultiPageSink;
-import org.apache.maven.reporting.sink.SinkFactory;
-import org.codehaus.doxia.sink.Sink;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
@@ -110,7 +110,7 @@ public abstract class AbstractMavenMultiPageReport
                 currentSink.paragraph();
                 for ( Iterator j = sinks.iterator(); i.hasNext(); )
                 {
-                    if (counter>1)
+                    if ( counter > 1 )
                     {
                         currentSink.text( "&nbsp;" );
                     }
@@ -118,7 +118,7 @@ public abstract class AbstractMavenMultiPageReport
                     sink.link( sink.getOutputName() + ".html" );
                     sink.text( String.valueOf( counter++ ) );
                     sink.link_();
-                    
+
                 }
                 currentSink.paragraph_();
                 currentSink.closeSink();

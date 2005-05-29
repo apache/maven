@@ -16,9 +16,22 @@ package org.apache.maven.reporting;
  * limitations under the License.
  */
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.doxia.module.xhtml.XhtmlSink;
 import org.codehaus.doxia.sink.Sink;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringInputStream;
+import org.codehaus.plexus.util.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * The basis for a Maven report.
@@ -27,8 +40,28 @@ import java.io.IOException;
  * @version $Id: MavenReport.java 163376 2005-02-23 00:06:06Z brett $
  */
 public abstract class AbstractMavenReport
+    extends AbstractMojo
     implements MavenReport
 {
+    /** @todo share, use default excludes from plexus utils. */
+    protected static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
+        "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
+
+        // CVS
+        "**/CVS", "**/CVS/**", "**/.cvsignore",
+
+        // SCCS
+        "**/SCCS", "**/SCCS/**",
+
+        // Visual SourceSafe
+        "**/vssver.scc",
+
+        // Subversion
+        "**/.svn", "**/.svn/**",
+
+        // Mac
+        "**/.DS_Store"};
+
     private MavenReportConfiguration config;
 
     private Sink sink;
@@ -43,7 +76,44 @@ public abstract class AbstractMavenReport
         this.config = config;
     }
 
-    public void generate( Sink sink )
+    protected abstract SiteRenderer getSiteRenderer();
+
+    protected abstract String getOutputDirectory();
+
+    protected abstract MavenProject getProject();
+
+    /**
+     * @see org.apache.maven.plugin.Mojo#execute()
+     */
+    public void execute()
+        throws MojoExecutionException
+    {
+        config = new MavenReportConfiguration();
+
+        config.setProject( getProject() );
+
+        config.setReportOutputDirectory( new File( getOutputDirectory() ) );
+
+        try
+        {
+            String outputDirectory = getOutputDirectory();
+
+            XhtmlSink sink = getSiteRenderer().createSink( new File( outputDirectory ), outputDirectory,
+                                                      getOutputName() + ".html",
+                                                      getSiteDescriptor(), "maven" );
+
+            generate( sink, Locale.ENGLISH );
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "An error is occurred in " + getName() + " report generation." );
+        }
+    }
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
+     */
+    public void generate( Sink sink, Locale locale )
         throws MavenReportException
     {
         if ( config == null )
@@ -60,12 +130,12 @@ public abstract class AbstractMavenReport
             this.sink = sink;
         }
 
-        execute();
+        executeReport( locale );
 
         closeReport();
     }
 
-    protected abstract void execute()
+    protected abstract void executeReport( Locale locale )
         throws MavenReportException;
 
     protected void closeReport()
@@ -81,5 +151,61 @@ public abstract class AbstractMavenReport
     public String getCategoryName()
     {
         return CATEGORY_PROJECT_REPORTS;
+    }
+
+    private String getReportsMenu()
+        throws MojoExecutionException
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append( "<menu name=\"Project Documentation\">\n" );
+
+        buffer.append( "  <item name=\"" + getName() + "\" href=\"/" + getOutputName() + ".html\"/>\n" );
+
+        buffer.append( "</menu>\n" );
+
+        return buffer.toString();
+    }
+
+    private InputStream getSiteDescriptor()
+        throws MojoExecutionException
+    {
+        String siteDescriptorContent = "";
+
+        try
+        {
+            siteDescriptorContent = IOUtil.toString( getClass().getResourceAsStream( "/default-report.xml" ) );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "The site descriptor cannot be read!", e );
+        }
+
+        Map props = new HashMap();
+
+        props.put( "reports", getReportsMenu() );
+
+        // TODO: interpolate ${project.*} in general
+
+        if ( getProject().getName() != null )
+        {
+            props.put( "project.name", getProject().getName() );
+        }
+        else
+        {
+            props.put( "project.name", "NO_PROJECT_NAME_SET" );
+        }
+
+        if ( getProject().getUrl() != null )
+        {
+            props.put( "project.url", getProject().getUrl() );
+        }
+        else
+        {
+            props.put( "project.url", "NO_PROJECT_URL_SET" );
+        }
+
+        siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
+
+        return new StringInputStream( siteDescriptorContent );
     }
 }

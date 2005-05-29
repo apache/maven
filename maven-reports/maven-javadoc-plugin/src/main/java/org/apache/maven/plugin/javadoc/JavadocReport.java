@@ -19,27 +19,91 @@ package org.apache.maven.plugin.javadoc;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Locale;
 
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
 
 /**
+ * @goal javadoc
+ *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id: DependenciesReport.java,v 1.2 2005/02/23 00:08:02 brett Exp $
  */
 public class JavadocReport
     extends AbstractMavenReport
 {
+    /**
+     * @parameter expression="${project.build.directory}/site"
+     * @required
+     */
+    private String outputDirectory;
 
     /**
-     * @see org.apache.maven.reporting.AbstractMavenReport#generate(org.codehaus.doxia.sink.Sink)
+     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
+     * @required
+     * @readonly
      */
-    public void generate( Sink sink )
+    private SiteRenderer siteRenderer;
+
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getName()
+     */
+    public String getName()
+    {
+        return "JavaDocs";
+    }
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getDescription()
+     */
+    public String getDescription()
+    {
+        return "JavaDoc API documentation.";
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getOutputDirectory()
+     */
+    protected String getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getProject()
+     */
+    protected MavenProject getProject()
+    {
+        return project;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getSiteRenderer()
+     */
+    protected SiteRenderer getSiteRenderer()
+    {
+        return siteRenderer;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
+     */
+    public void generate( Sink sink, Locale locale )
         throws MavenReportException
     {
         if ( getConfiguration() == null )
@@ -47,13 +111,13 @@ public class JavadocReport
             throw new MavenReportException( "You must specify a report configuration." );
         }
 
-        execute();
+        executeReport( locale);
     }
 
     /**
-     * @see org.apache.maven.reporting.AbstractMavenReport#execute()
+     * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
      */
-    protected void execute()
+    protected void executeReport( Locale locale )
         throws MavenReportException
     {
         try
@@ -143,22 +207,6 @@ public class JavadocReport
         {
             throw new MavenReportException( "An error is occurred in javadoc report generation.", e );
         }
-    }
-
-    /**
-     * @see org.apache.maven.reporting.MavenReport#getDescription()
-     */
-    public String getDescription()
-    {
-        return "JavaDoc API documentation.";
-    }
-
-    /**
-     * @see org.apache.maven.reporting.MavenReport#getName()
-     */
-    public String getName()
-    {
-        return "JavaDocs";
     }
 
     /**

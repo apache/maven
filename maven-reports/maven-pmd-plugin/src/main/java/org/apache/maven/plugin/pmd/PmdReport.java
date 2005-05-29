@@ -22,9 +22,12 @@ import net.sourceforge.pmd.Report;
 import net.sourceforge.pmd.RuleContext;
 import net.sourceforge.pmd.RuleSet;
 import net.sourceforge.pmd.RuleSetFactory;
+
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -36,9 +39,12 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Implement the PMD report.
+ *
+ * @goal pmd
  *
  * @todo needs to support the multiple source roots
  * @author Brett Porter
@@ -47,36 +53,70 @@ import java.util.List;
 public class PmdReport
     extends AbstractMavenReport
 {
-    /** @todo share, use default excludes from plexus utils. */
-    protected static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
-        "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
+    /**
+     * @parameter expression="${project.build.directory}/site"
+     * @required
+     */
+    private String outputDirectory;
 
-        // CVS
-        "**/CVS", "**/CVS/**", "**/.cvsignore",
+    /**
+     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
+     * @required
+     * @readonly
+     */
+    private SiteRenderer siteRenderer;
 
-        // SCCS
-        "**/SCCS", "**/SCCS/**",
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
 
-        // Visual SourceSafe
-        "**/vssver.scc",
-
-        // Subversion
-        "**/.svn", "**/.svn/**",
-
-        // Mac
-        "**/.DS_Store"};
-
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getName()
+     */
     public String getName()
     {
         return "PMD report";
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getDescription()
+     */
     public String getDescription()
     {
         return "Verification of coding rules.";
     }
 
-    public void execute()
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getOutputDirectory()
+     */
+    protected String getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getProject()
+     */
+    protected MavenProject getProject()
+    {
+        return project;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getSiteRenderer()
+     */
+    protected SiteRenderer getSiteRenderer()
+    {
+        return siteRenderer;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
+     */
+    public void executeReport( Locale locale )
         throws MavenReportException
     {
         Sink sink = null;
@@ -158,6 +198,9 @@ public class PmdReport
         reportSink.endDocument();
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getOutputName()
+     */
     public String getOutputName()
     {
         return "pmd";

@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -163,7 +164,8 @@ public class DoxiaMojo
                     SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
                                                                      getSiteDescriptor() );
 
-                    report.generate( sink );
+                    //TODO: Use multiple locale with a loop
+                    report.generate( sink, Locale.ENGLISH );
 
                     File outputFile = new File( outputDirectory, outputFileName );
 

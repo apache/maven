@@ -18,37 +18,97 @@ package org.apache.maven.report.projectinfo;
 
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Locale;
 
 /**
+ * @goal mailing-list
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id: MailingListsReport.java,v 1.4 2005/02/23 00:08:03 brett Exp $
  */
 public class MailingListsReport
     extends AbstractMavenReport
 {
+    /**
+     * @parameter expression="${project.build.directory}/site"
+     * @required
+     */
+    private String outputDirectory;
+
+    /**
+     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
+     * @required
+     * @readonly
+     */
+    private SiteRenderer siteRenderer;
+
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getName()
+     */
     public String getName()
     {
         return "Mailing Lists";
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getCategoryName()
+     */
     public String getCategoryName()
     {
         return CATEGORY_PROJECT_INFORMATION;
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getDescription()
+     */
     public String getDescription()
     {
         return "This document provides subscription and archive information for this project's mailing lists.";
     }
 
-    public void execute()
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getOutputDirectory()
+     */
+    protected String getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getProject()
+     */
+    protected MavenProject getProject()
+    {
+        return project;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#getSiteRenderer()
+     */
+    protected SiteRenderer getSiteRenderer()
+    {
+        return siteRenderer;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
+     */
+    public void executeReport( Locale locale )
         throws MavenReportException
     {
         try
@@ -63,6 +123,9 @@ public class MailingListsReport
         }
     }
 
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getOutputName()
+     */
     public String getOutputName()
     {
         return "mail-lists";

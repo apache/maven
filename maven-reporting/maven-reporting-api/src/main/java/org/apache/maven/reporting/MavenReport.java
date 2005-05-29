@@ -19,6 +19,7 @@ package org.apache.maven.reporting;
 import org.codehaus.doxia.sink.Sink;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * The basis for a Maven report.
@@ -39,7 +40,7 @@ public interface MavenReport
 
     void setConfiguration( MavenReportConfiguration config );
 
-    void generate( Sink sink )
+    void generate( Sink sink, Locale locale )
         throws MavenReportException;
 
     String getOutputName();
