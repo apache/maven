@@ -432,11 +432,12 @@ public class MBoot
             {
                 FileUtils.copyFileToDirectory( source, boot );
             }
-            else if ( d.getArtifactId().equals( "plexus-container-default" ) )
+            else if ( d.getArtifactId().equals( "plexus-container-default" ) 
+                || d.getArtifactId().equals( "plexus-utils" ) )
             {
                 FileUtils.copyFileToDirectory( source, core );
             }
-            else if ( !d.getScope().equals( SCOPE_TEST ) && !d.getArtifactId().equals( "plexus-utils" ) )
+            else if ( !d.getScope().equals( SCOPE_TEST ) )
             {
                 // only compile and runtime
                 FileUtils.copyFileToDirectory( source, lib );
