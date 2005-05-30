@@ -798,7 +798,7 @@ public class DefaultPluginManager
                                                               "wagon-provider-api", "classworlds", "maven-plugin",
                                                               "plexus-marmalade-factory", "maven-script-marmalade",
                                                               "maven-script-beanshell", "plexus-bsh-factory", "bsh",
-                                                              "marmalade-core"} );
+                                                              "marmalade-core", "plexus-utils"} );
     }
 
     // ----------------------------------------------------------------------
