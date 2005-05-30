@@ -67,7 +67,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-i18n</artifactId>
-      <version>1.0-beta-5-SNAPSHOT</version>
+      <version>1.0-beta-4</version>
     </dependency>
     <!-- TODO: only here for classloader issues. It used to work when the script classes were inside the component factory... -->
     <dependency>
