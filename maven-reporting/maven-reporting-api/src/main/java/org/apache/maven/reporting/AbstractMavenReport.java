@@ -98,11 +98,13 @@ public abstract class AbstractMavenReport
         {
             String outputDirectory = getOutputDirectory();
 
-            XhtmlSink sink = getSiteRenderer().createSink( new File( outputDirectory ), outputDirectory,
-                                                      getOutputName() + ".html",
+            XhtmlSink sink = getSiteRenderer().createSink( new File( outputDirectory ), getOutputName() + ".html",
+                                                      outputDirectory,
                                                       getSiteDescriptor(), "maven" );
 
             generate( sink, Locale.ENGLISH );
+
+            getSiteRenderer().copyResources( outputDirectory, "maven" );
         }
         catch ( Exception e )
         {
