@@ -380,7 +380,32 @@ public class DefaultMaven
         getLogger().error( "BUILD ERROR" );
 
         line();
+        
+        Throwable error = r.getException();
 
+        String message = null;
+        if ( errorDiagnosers != null )
+        {
+            for ( Iterator it = errorDiagnosers.values().iterator(); it.hasNext(); )
+            {
+                ErrorDiagnoser diagnoser = (ErrorDiagnoser) it.next();
+
+                if ( diagnoser.canDiagnose( error ) )
+                {
+                    message = diagnoser.diagnose( error );
+                }
+            }
+        }
+
+        if ( message == null )
+        {
+            message = error.getMessage();
+        }
+
+        getLogger().info( "Diagnosis: " + message );
+        
+        line();
+        
         getLogger().error( "Cause: ", r.getException() );
 
         line();
@@ -390,7 +415,7 @@ public class DefaultMaven
         line();
     }
 
-    protected void logFailure( MavenExecutionResponse r, Throwable e, String longMessage )
+    protected void logFailure( MavenExecutionResponse r, Throwable error, String longMessage )
     {
         line();
 
@@ -405,16 +430,16 @@ public class DefaultMaven
             {
                 ErrorDiagnoser diagnoser = (ErrorDiagnoser) it.next();
 
-                if ( diagnoser.canDiagnose( e ) )
+                if ( diagnoser.canDiagnose( error ) )
                 {
-                    message = diagnoser.diagnose( e );
+                    message = diagnoser.diagnose( error );
                 }
             }
         }
 
         if ( message == null )
         {
-            message = "Reason: " + e.getMessage();
+            message = "Reason: " + error.getMessage();
         }
 
         getLogger().info( message );
@@ -431,7 +456,7 @@ public class DefaultMaven
         // TODO: needs to honour -e
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "Trace", e );
+            getLogger().debug( "Trace", error );
 
             line();
         }

@@ -26,23 +26,33 @@
     </component>
     <!--
      |
-     |
+     |PluginConfigurationDiagnoser
      |
      -->
     <component>
       <role>org.apache.maven.usability.ErrorDiagnoser</role>
-      <role-hint>plugin-configuration</role-hint>
+      <role-hint>PluginConfigurationDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.PluginConfigurationDiagnoser</implementation>
     </component>
     <!--
      |
-     |
+     |ArtifactResolverDiagnoser
      |
      -->
     <component>
       <role>org.apache.maven.usability.ErrorDiagnoser</role>
-      <role-hint>artifact-resolution</role-hint>
+      <role-hint>ArtifactResolverDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.ArtifactResolverDiagnoser</implementation>
+    </component>
+    <!--
+     |
+     |InvalidArtifactDiagnoser
+     |
+     -->
+    <component>
+      <role>org.apache.maven.usability.ErrorDiagnoser</role>
+      <role-hint>InvalidArtifactDiagnoser</role-hint>
+      <implementation>org.apache.maven.usability.InvalidArtifactDiagnoser</implementation>
     </component>
     <!--
      |

@@ -69,29 +69,6 @@ public class DefaultArtifact
                             String type,
                             String classifier )
     {
-        // These should help us catch coding errors until this code gets a whole lot clearer
-        if( groupId == null )
-        {
-            throw new NullPointerException( "Artifact groupId cannot be null." );
-        }
-
-        if( artifactId == null )
-        {
-            throw new NullPointerException( "Artifact artifactId cannot be null." );
-        }
-
-        // From here at least we can report the g:a
-
-        if ( type == null )
-        {
-            throw new NullPointerException( "Artifact type cannot be null for " + groupId + ":" + artifactId );
-        }
-
-        if( version == null )
-        {
-            throw new NullPointerException( "Artifact version cannot be null for " + groupId + ":" + artifactId );
-        }
-
         this.groupId = groupId;
 
         this.artifactId = artifactId;
@@ -103,6 +80,36 @@ public class DefaultArtifact
         this.scope = scope;
 
         this.classifier = classifier;
+        
+        validateIdentity();
+    }
+
+    private void validateIdentity()
+    {
+        if( empty( groupId ) )
+        {
+            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The groupId cannot be empty." );
+        }
+
+        if( artifactId == null )
+        {
+            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The artifactId cannot be empty." );
+        }
+
+        if ( type == null )
+        {
+            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The type cannot be empty." );
+        }
+
+        if( version == null )
+        {
+            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The version cannot be empty." );
+        }
+    }
+
+    private boolean empty( String value )
+    {
+        return value == null || value.trim().length() < 1;
     }
 
     public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type )
