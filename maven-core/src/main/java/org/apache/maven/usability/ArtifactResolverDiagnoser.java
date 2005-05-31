@@ -31,7 +31,7 @@ public class ArtifactResolverDiagnoser
 
     public String diagnose( Throwable error )
     {
-        Throwable root = traverseToRoot( error );
+        Throwable root = DiagnosisUtils.getRootCause( error );
 
         String message = null;
 
@@ -39,7 +39,7 @@ public class ArtifactResolverDiagnoser
         {
             StringBuffer messageBuffer = new StringBuffer();
 
-            if ( causalityChainContains( error, TransitiveArtifactResolutionException.class ) )
+            if ( DiagnosisUtils.containsInCausality( error, TransitiveArtifactResolutionException.class ) )
             {
                 messageBuffer.append(
                     "Error while transitively resolving artifacts (transitive path trace currently unavailable):\n\n" );
@@ -65,38 +65,6 @@ public class ArtifactResolverDiagnoser
         }
 
         return message;
-    }
-
-    private boolean causalityChainContains( Throwable error, Class errorClass )
-    {
-        Throwable cause = error;
-
-        boolean contains = false;
-
-        while ( cause != null )
-        {
-            if ( errorClass.isInstance( cause ) )
-            {
-                contains = true;
-                break;
-            }
-
-            cause = cause.getCause();
-        }
-
-        return contains;
-    }
-
-    private Throwable traverseToRoot( Throwable error )
-    {
-        Throwable potentialRoot = error;
-
-        while ( potentialRoot.getCause() != null )
-        {
-            potentialRoot = potentialRoot.getCause();
-        }
-
-        return potentialRoot;
     }
 
 }

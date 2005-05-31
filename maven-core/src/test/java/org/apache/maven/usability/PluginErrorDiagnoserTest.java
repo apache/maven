@@ -17,11 +17,14 @@ package org.apache.maven.usability;
  */
 
 import junit.framework.TestCase;
+
+import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.descriptor.DuplicateParameterException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +33,8 @@ import java.util.List;
 public class PluginErrorDiagnoserTest
     extends TestCase
 {
+    
+    private PluginConfigurationDiagnoser diagnoser = new PluginConfigurationDiagnoser();
 
     private PluginParameterException buildException( String prefix, String goal, List params )
         throws DuplicateParameterException
@@ -49,6 +54,22 @@ public class PluginErrorDiagnoserTest
 
         return new PluginParameterException( mojoDescriptor, params );
     }
+    
+    public void testShouldDiagnoseInvalidPluginConfiguration()
+    {
+        printMethodHeader();
+
+        ComponentConfigurationException cce = new ComponentConfigurationException( "Class \'org.apache.maven.plugin.jar.JarMojo\' does not contain a field named \'addClasspath\'" );
+        PluginConfigurationException pce = new PluginConfigurationException( "test", cce );
+        
+        assertTrue( diagnoser.canDiagnose( pce ) );
+        
+        String userMessage = diagnoser.diagnose( pce );
+
+        System.out.println( userMessage );
+
+        assertNotNull( userMessage );
+    }
 
     public void testShouldBeAbleToDiagnosePluginParameterExceptions()
         throws DuplicateParameterException
@@ -61,7 +82,7 @@ public class PluginErrorDiagnoserTest
 
         PluginParameterException error = buildException( "test", "test", Collections.singletonList( param ) );
 
-        assertTrue( new PluginConfigurationDiagnoser().canDiagnose( error ) );
+        assertTrue( diagnoser.canDiagnose( error ) );
     }
 
     public void testParamWithOneReportsExpressionAndOneProjectBasedExpression()
@@ -93,7 +114,7 @@ public class PluginErrorDiagnoserTest
 
         PluginParameterException error = buildException( "test", "test", params );
 
-        String userMessage = new PluginConfigurationDiagnoser().diagnose( error );
+        String userMessage = diagnoser.diagnose( error );
 
         System.out.println( userMessage );
 
@@ -113,7 +134,7 @@ public class PluginErrorDiagnoserTest
 
         PluginParameterException error = buildException( "test", "test", Collections.singletonList( param ) );
 
-        String userMessage = new PluginConfigurationDiagnoser().diagnose( error );
+        String userMessage = diagnoser.diagnose( error );
 
         System.out.println( userMessage );
 
@@ -132,7 +153,7 @@ public class PluginErrorDiagnoserTest
 
         PluginParameterException error = buildException( "test", "test", Collections.singletonList( param ) );
 
-        String userMessage = new PluginConfigurationDiagnoser().diagnose( error );
+        String userMessage = diagnoser.diagnose( error );
 
         System.out.println( userMessage );
 
@@ -152,7 +173,7 @@ public class PluginErrorDiagnoserTest
 
         PluginParameterException error = buildException( "test", "test", Collections.singletonList( param ) );
 
-        String userMessage = new PluginConfigurationDiagnoser().diagnose( error );
+        String userMessage = diagnoser.diagnose( error );
 
         System.out.println( userMessage );
 
@@ -172,7 +193,7 @@ public class PluginErrorDiagnoserTest
 
         PluginParameterException error = buildException( "test", "test", Collections.singletonList( param ) );
 
-        String userMessage = new PluginConfigurationDiagnoser().diagnose( error );
+        String userMessage = diagnoser.diagnose( error );
 
         System.out.println( userMessage );
 
@@ -192,7 +213,7 @@ public class PluginErrorDiagnoserTest
 
         PluginParameterException error = buildException( "test", "test", Collections.singletonList( param ) );
 
-        String userMessage = new PluginConfigurationDiagnoser().diagnose( error );
+        String userMessage = diagnoser.diagnose( error );
 
         System.out.println( userMessage );
 
@@ -212,7 +233,7 @@ public class PluginErrorDiagnoserTest
 
         PluginParameterException error = buildException( "test", "test", Collections.singletonList( param ) );
 
-        String userMessage = new PluginConfigurationDiagnoser().diagnose( error );
+        String userMessage = diagnoser.diagnose( error );
 
         System.out.println( userMessage );
 

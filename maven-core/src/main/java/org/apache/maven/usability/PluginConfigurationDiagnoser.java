@@ -20,6 +20,7 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
@@ -58,7 +59,12 @@ public class PluginConfigurationDiagnoser
         {
             PluginParameterException exception = (PluginParameterException) error;
 
-            return buildDiagnosticMessage( exception );
+            return buildParameterDiagnosticMessage( exception );
+        }
+        else if( DiagnosisUtils.containsInCausality(error, ComponentConfigurationException.class ) )
+        {
+            ComponentConfigurationException cce = (ComponentConfigurationException) DiagnosisUtils.getFromCausality( error, ComponentConfigurationException.class );
+            return buildInvalidPluginConfigurationDiagnosisMessage( cce );
         }
         else
         {
@@ -66,7 +72,18 @@ public class PluginConfigurationDiagnoser
         }
     }
 
-    private String buildDiagnosticMessage( PluginParameterException exception )
+    private String buildInvalidPluginConfigurationDiagnosisMessage( ComponentConfigurationException cce )
+    {
+        StringBuffer message = new StringBuffer();
+        
+        message.append( "Either your POM or one of its ancestors has declared an invalid plugin configuration.\n" )
+               .append( "The error message is:\n\n" )
+               .append( cce.getMessage() ).append( "\n" );
+        
+        return message.toString();
+    }
+
+    private String buildParameterDiagnosticMessage( PluginParameterException exception )
     {
         StringBuffer messageBuffer = new StringBuffer();
 
