@@ -8,7 +8,7 @@
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.model.profiles</value>
+      <value>org.apache.maven.profiles</value>
     </default>
   </defaults>
   <classes>

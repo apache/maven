@@ -1,4 +1,4 @@
-package org.apache.maven.model.settings;
+package org.apache.maven.settings;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,8 +16,8 @@ package org.apache.maven.model.settings;
  * limitations under the License.
  */
 
-import org.apache.maven.model.settings.Settings;
-import org.apache.maven.model.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;

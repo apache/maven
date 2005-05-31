@@ -1,4 +1,4 @@
-package org.apache.maven.model.settings;
+package org.apache.maven.settings;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,7 +16,7 @@ package org.apache.maven.model.settings;
  * limitations under the License.
  */
 
-import org.apache.maven.model.settings.Settings;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;

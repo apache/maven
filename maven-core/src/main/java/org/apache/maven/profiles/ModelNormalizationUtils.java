@@ -1,4 +1,4 @@
-package org.apache.maven.model.profiles;
+package org.apache.maven.profiles;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
@@ -29,7 +29,7 @@ public final class ModelNormalizationUtils
     {
     }
     
-    public static Profile convertFromSettingsProfile( org.apache.maven.model.settings.Profile settingsProfile )
+    public static Profile convertFromSettingsProfile( org.apache.maven.settings.Profile settingsProfile )
     {
         Profile profile = new Profile();
         profile.setConfiguration( settingsProfile.getConfiguration() );
@@ -39,7 +39,7 @@ public final class ModelNormalizationUtils
         {
             for ( Iterator it = repos.iterator(); it.hasNext(); )
             {
-                 profile.addRepository( convertFromSettingsRepository( (org.apache.maven.model.settings.Repository) it.next() ) );
+                 profile.addRepository( convertFromSettingsRepository( (org.apache.maven.settings.Repository) it.next() ) );
             }
         }
         
@@ -48,14 +48,14 @@ public final class ModelNormalizationUtils
         {
             for ( Iterator it = pluginRepos.iterator(); it.hasNext(); )
             {
-                 profile.addPluginRepository( convertFromSettingsRepository( (org.apache.maven.model.settings.Repository) it.next() ) );
+                 profile.addPluginRepository( convertFromSettingsRepository( (org.apache.maven.settings.Repository) it.next() ) );
             }
         }
         
         return profile;
     }
     
-    public static Profile convertFromProfileXmlProfile( org.apache.maven.model.profiles.Profile profileXmlProfile )
+    public static Profile convertFromProfileXmlProfile( org.apache.maven.profiles.Profile profileXmlProfile )
     {
         Profile profile = new Profile();
         profile.setConfiguration( profileXmlProfile.getConfiguration() );
@@ -65,7 +65,7 @@ public final class ModelNormalizationUtils
         {
             for ( Iterator it = repos.iterator(); it.hasNext(); )
             {
-                 profile.addRepository( convertFromSettingsRepository( (org.apache.maven.model.settings.Repository) it.next() ) );
+                 profile.addRepository( convertFromSettingsRepository( (org.apache.maven.settings.Repository) it.next() ) );
             }
         }
         
@@ -74,14 +74,14 @@ public final class ModelNormalizationUtils
         {
             for ( Iterator it = pluginRepos.iterator(); it.hasNext(); )
             {
-                 profile.addPluginRepository( convertFromSettingsRepository( (org.apache.maven.model.settings.Repository) it.next() ) );
+                 profile.addPluginRepository( convertFromSettingsRepository( (org.apache.maven.settings.Repository) it.next() ) );
             }
         }
         
         return profile;
     }
     
-    private static Repository convertFromSettingsRepository( org.apache.maven.model.settings.Repository settingsRepo )
+    private static Repository convertFromSettingsRepository( org.apache.maven.settings.Repository settingsRepo )
     {
         Repository repo = new Repository();
         
@@ -94,7 +94,7 @@ public final class ModelNormalizationUtils
         return repo;
     }
 
-    private static Repository convertFromProfileXmlRepository( org.apache.maven.model.profiles.Repository profileXmlRepo )
+    private static Repository convertFromProfileXmlRepository( org.apache.maven.profiles.Repository profileXmlRepo )
     {
         Repository repo = new Repository();
 

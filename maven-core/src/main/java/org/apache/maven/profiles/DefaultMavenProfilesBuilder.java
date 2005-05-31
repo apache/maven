@@ -1,6 +1,7 @@
-package org.apache.maven.model.profiles;
+package org.apache.maven.profiles;
 
-import org.apache.maven.model.profiles.io.xpp3.ProfilesXpp3Reader;
+import org.apache.maven.profiles.ProfilesRoot;
+import org.apache.maven.profiles.io.xpp3.ProfilesXpp3Reader;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

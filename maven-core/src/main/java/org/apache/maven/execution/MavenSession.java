@@ -17,9 +17,9 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.settings.Settings;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;

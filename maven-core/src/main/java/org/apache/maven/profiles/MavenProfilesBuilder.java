@@ -1,4 +1,4 @@
-package org.apache.maven.model.profiles;
+package org.apache.maven.profiles;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,6 +16,7 @@ package org.apache.maven.model.profiles;
  * limitations under the License.
  */
 
+import org.apache.maven.profiles.ProfilesRoot;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;

@@ -25,7 +25,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.settings.Settings;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
@@ -34,6 +33,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
