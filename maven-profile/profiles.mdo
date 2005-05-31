@@ -1,0 +1,201 @@
+<model>
+  <id>profiles</id>
+  <name>Profiles</name>
+  <description><![CDATA[
+    Project-local overrides to the build process based on detected or user-provided environmental parameters.
+    This is the model specification for ${basedir}/profiles.xml.
+  ]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.model.profiles</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="profilesXml">
+      <name>ProfilesRoot</name>
+      <version>1.0.0</version>
+      <description>Root element of the profiles.xml file.</description>
+      <fields>
+        <field>
+          <name>profiles</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            Configuration of build profiles for adjusting the build 
+            according to environmental parameters
+          ]]></description>
+          <association>
+            <type>Profile</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>activeProfiles</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            List of manually-activated build profiles, specified in the order in which
+            they should be applied.
+          ]]></description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Profile</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+        Modifications to the build process which is keyed on some 
+        sort of environmental parameter.
+      ]]></description>
+      <fields>
+        <field>
+          <name>id</name>
+          <required>true</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The ID of this build profile, for activation 
+            purposes.</description>
+        </field>
+        <field>
+          <name>activation</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The conditional logic which will automatically 
+            trigger the inclusion of this profile.]]></description>
+          <association>
+            <type>Activation</type>
+          </association>
+        </field>
+        <field>
+          <name>configuration</name>
+          <description>Extended configuration specific to this notifier goes 
+            here.</description>
+          <type>DOM</type>
+        </field>
+        <field>
+          <name>repositories</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The lists of the remote repositories]]>
+            </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>pluginRepositories</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+          The lists of the remote repositories for discovering plugins
+        ]]></description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <comment><![CDATA[ This may be removed or relocated in the near 
+            future. It is undecided whether plugins really need a remote 
+            repository set of their own. ]]></comment>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Activation</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+        The conditions within the build runtime environment which will trigger 
+        the automatic inclusion of the parent build profile.
+      ]]></description>
+      <fields>
+        <field>
+          <name>jdk</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description><![CDATA[
+            Specifies that this profile will be activated when a matching JDK is detected.
+          ]]></description>
+        </field>
+        <field>
+          <name>property</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description><![CDATA[
+            Specifies that this profile will be activated when this System property is specified.
+          ]]></description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Repository</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+         Repository contains the information needed
+         for establishing connections with remote repoistory
+      ]]></description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            A unique identifier for a repository.
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>name</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            Human readable name of the repository
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+             The url of the repository
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>snapshotPolicy</name>
+          <version>1.0.0</version>
+          <description> The policy for downloading snapshots - can be "always", 
+            "daily" (default), "interval:XXX" (in minutes) or "never". 
+            </description>
+          <type>String</type>
+          <defaultValue>daily</defaultValue>
+        </field>
+        <field>
+          <name>layout</name>
+          <version>1.0.0</version>
+          <description>The type of layout this repository uses for locating and 
+            storing artifacts - can be "legacy" or "default".</description>
+          <type>String</type>
+          <defaultValue>default</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+            public boolean equals( Object obj )
+            {
+                Repository other =  ( Repository ) obj;
+
+                boolean retValue = false;
+
+                if ( id != null )
+                {
+                    retValue = id.equals( other.id );
+                }
+
+                return retValue;
+            }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+  </classes>
+</model>

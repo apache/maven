@@ -8,7 +8,7 @@
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.settings</value>
+      <value>org.apache.maven.model.settings</value>
     </default>
   </defaults>
   <classes>
@@ -17,6 +17,30 @@
       <version>1.0.0</version>
       <description>Root element of the user configuration file.</description>
       <fields>
+        <field>
+          <name>localRepository</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <description><![CDATA[The local repository.]]></description>
+          <type>String</type>
+        </field>
+        <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
+        <!-- field>
+          <name>passwordStore</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <description><![CDATA[The keystore used to store passwords.]]></description>
+          <type>String</type>
+        </field -->
+        <field>
+          <name>offline</name>
+          <version>1.0.0</version>
+          <required>false</required>
+          <description><![CDATA[Indicate whether maven should operate in offline mode full-time.]]>
+            </description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
         <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
         <!-- field>
           <name>jdks</name>
@@ -64,9 +88,8 @@
         <field>
           <name>mirrors</name>
           <version>1.0.0</version>
-          <description>
-          	Configuration of download mirrors for repositories.
-          </description>
+          <description> Configuration of download mirrors for repositories. 
+            </description>
           <association>
             <type>Mirror</type>
             <multiplicity>*</multiplicity>
@@ -76,15 +99,23 @@
           <name>profiles</name>
           <version>1.0.0</version>
           <description><![CDATA[
-          	Configuration for different runtime profiles for maven itself. For
-            example, this will allow plugin developers to switch from a "work"
-            local repository to a "testing" local repository. It may also allow
-            configuration of such things as password keystore, etc. Once again, 
-            the active profile will be switchable via either the defaults section
-            or the command line (read: system properties).
+            Configuration of build profiles for adjusting the build 
+            according to environmental parameters
           ]]></description>
           <association>
             <type>Profile</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>activeProfiles</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            List of manually-activated build profiles, specified in the order in which
+            they should be applied.
+          ]]></description>
+          <association>
+            <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -93,52 +124,8 @@
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
-    private Profile activeProfile;
     private Proxy activeProxy;
     
-    public synchronized void initializeActiveProfile(String localRepository)
-    {
-        if(getActiveProfile() == null)
-        {
-          Profile profile = new Profile();
-          profile.setLocalRepository(localRepository);
-          profile.setActive(true);
-          
-          addProfile(profile);
-          activeProfile = profile;
-        }
-    }
-    
-    public synchronized Profile getActiveProfile()
-    {
-        if(activeProfile == null)
-        {
-            List profiles = getProfiles();
-            if ( profiles != null && !profiles.isEmpty() )
-            {
-                if ( profiles.size() > 1 )
-                {
-                    for ( Iterator it = profiles.iterator(); it.hasNext(); )
-                    {
-                        Profile profile = (Profile) it.next();
-                        if ( profile.isActive() )
-                        {
-                            activeProfile = profile;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    // If we only have one profile, use it as the active one.
-                    activeProfile = (Profile) profiles.get( 0 );
-                }
-            }
-        }
-        
-        return activeProfile;
-    }
-
     public synchronized Proxy getActiveProxy()
     {
         if(activeProxy == null)
@@ -233,7 +220,8 @@
           <version>1.0.0</version>
           <required>false</required>
           <defaultValue>false</defaultValue>
-          <description><![CDATA[Whether this proxy configuration is the active one.]]></description>
+          <description><![CDATA[Whether this proxy configuration is the active one.]]>
+            </description>
           <type>boolean</type>
         </field>
         <field>
@@ -295,7 +283,8 @@
         <field>
           <name>username</name>
           <version>1.0.0</version>
-          <description><![CDATA[The username used to authenticate.]]></description>
+          <description><![CDATA[The username used to authenticate.]]>
+            </description>
           <type>String</type>
         </field>
         <field>
@@ -309,7 +298,8 @@
         <field>
           <name>privateKey</name>
           <version>1.0.0</version>
-          <description><![CDATA[The private key location used to authenticate.]]></description>
+          <description><![CDATA[The private key location used to authenticate.]]>
+            </description>
           <type>String</type>
         </field>
         <field>
@@ -323,86 +313,42 @@
       </fields>
     </class>
     <class>
-      <name>Profile</name>
-      <version>1.0.0</version>
-      <fields>
-        <field>
-          <name>active</name>
-          <version>1.0.0</version>
-          <required>false</required>
-          <defaultValue>false</defaultValue>
-          <description><![CDATA[Whether this is the active maven profile.]]></description>
-          <type>boolean</type>
-        </field>
-        <field>
-          <name>localRepository</name>
-          <version>1.0.0</version>
-          <required>true</required>
-          <description><![CDATA[The local repository.]]></description>
-          <type>String</type>
-        </field>
-        <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
-        <!-- field>
-          <name>passwordStore</name>
-          <version>1.0.0</version>
-          <required>false</required>
-          <description><![CDATA[The keystore used to store passwords.]]></description>
-          <type>String</type>
-        </field -->
-        <field>
-          <name>offline</name>
-          <version>1.0.0</version>
-          <required>false</required>
-          <description><![CDATA[Indicate whether maven should operate in offline mode full-time.]]></description>
-          <type>boolean</type>
-          <defaultValue>false</defaultValue>
-        </field>
-      </fields>
-    </class>
-    <class>
       <name>Mirror</name>
       <version>1.0.0</version>
-      <description>
-        A download mirror for a given repository.
-      </description>
+      <description> A download mirror for a given repository. </description>
       <fields>
         <field>
           <name>id</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description>
-            The server ID of this mirror. This must -not- be the same as that of the repository you are mirroring.
-          </description>
+          <description> The server ID of this mirror. This must -not- be the 
+            same as that of the repository you are mirroring. </description>
         </field>
         <field>
           <name>mirrorOf</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description>
-            The server ID of the repository being mirrored, eg "central".
-          </description>
+          <description> The server ID of the repository being mirrored, eg 
+            "central". </description>
         </field>
         <field>
           <name>name</name>
           <required>false</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description>
-            The optional name that describes the mirror.
-          </description>
+          <description> The optional name that describes the mirror. 
+            </description>
         </field>
         <field>
           <name>url</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description>
-            The URL of the mirror repository.
-          </description>
+          <description> The URL of the mirror repository. </description>
         </field>
-<!--
+        <!--
         <field>
           <name>allowOriginal</name>
           <version>1.0.0</version>
@@ -415,5 +361,161 @@
 -->
       </fields>
     </class>
+    <!-- Profile support -->
+    <class>
+      <name>Profile</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+        Modifications to the build process which is keyed on some 
+        sort of environmental parameter.
+      ]]></description>
+      <fields>
+        <field>
+          <name>id</name>
+          <required>true</required>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The ID of this build profile, for activation 
+            purposes.</description>
+        </field>
+        <field>
+          <name>activation</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The conditional logic which will automatically 
+            trigger the inclusion of this profile.]]></description>
+          <association>
+            <type>Activation</type>
+          </association>
+        </field>
+        <field>
+          <name>configuration</name>
+          <description>Extended configuration specific to this notifier goes 
+            here.</description>
+          <type>DOM</type>
+        </field>
+        <field>
+          <name>repositories</name>
+          <version>1.0.0</version>
+          <description><![CDATA[The lists of the remote repositories]]>
+            </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>pluginRepositories</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+          The lists of the remote repositories for discovering plugins
+        ]]></description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <comment><![CDATA[ This may be removed or relocated in the near 
+            future. It is undecided whether plugins really need a remote 
+            repository set of their own. ]]></comment>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Activation</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+        The conditions within the build runtime environment which will trigger 
+        the automatic inclusion of the parent build profile.
+      ]]></description>
+      <fields>
+        <field>
+          <name>jdk</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description><![CDATA[
+            Specifies that this profile will be activated when a matching JDK is detected.
+          ]]></description>
+        </field>
+        <field>
+          <name>property</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description><![CDATA[
+            Specifies that this profile will be activated when this System property is specified.
+          ]]></description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Repository</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+         Repository contains the information needed
+         for establishing connections with remote repoistory
+      ]]></description>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            A unique identifier for a repository.
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>name</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+            Human readable name of the repository
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+             The url of the repository
+          ]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>snapshotPolicy</name>
+          <version>1.0.0</version>
+          <description> The policy for downloading snapshots - can be "always", 
+            "daily" (default), "interval:XXX" (in minutes) or "never". 
+            </description>
+          <type>String</type>
+          <defaultValue>daily</defaultValue>
+        </field>
+        <field>
+          <name>layout</name>
+          <version>1.0.0</version>
+          <description>The type of layout this repository uses for locating and 
+            storing artifacts - can be "legacy" or "default".</description>
+          <type>String</type>
+          <defaultValue>default</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+            public boolean equals( Object obj )
+            {
+                Repository other =  ( Repository ) obj;
+
+                boolean retValue = false;
+
+                if ( id != null )
+                {
+                    retValue = id.equals( other.id );
+                }
+
+                return retValue;
+            }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <!-- /BuildProfile support -->
   </classes>
 </model>

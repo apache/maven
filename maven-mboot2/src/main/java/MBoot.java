@@ -35,7 +35,7 @@ import java.util.TreeMap;
 
 public class MBoot
 {
-    String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin-api",
+    String[] builds = new String[]{"maven-model", "maven-settings", "maven-profile", "maven-monitor", "maven-plugin-api",
                                    "maven-plugin-descriptor", "maven-artifact", "maven-script/maven-script-marmalade",
                                    "maven-script/maven-script-beanshell", "maven-project",
                                    "maven-reporting/maven-reporting-api", "maven-core", "maven-archiver",
@@ -59,12 +59,14 @@ public class MBoot
         Map targetVersions = new TreeMap();
         targetVersions.put( "maven-model", "4.0.0" );
         targetVersions.put( "maven-settings", "1.0.0" );
+        targetVersions.put( "maven-profile", "1.0.0" );
 
         MODELLO_TARGET_VERSIONS = Collections.unmodifiableMap( targetVersions );
 
         Map modelFiles = new TreeMap();
         modelFiles.put( "maven-model", "maven.mdo" );
         modelFiles.put( "maven-settings", "settings.mdo" );
+        modelFiles.put( "maven-profile", "profiles.mdo" );
 
         MODELLO_MODEL_FILES = Collections.unmodifiableMap( modelFiles );
     }
@@ -152,12 +154,7 @@ public class MBoot
         {
             userModelReader.parse( settingsXml );
 
-            Profile activeProfile = userModelReader.getActiveProfile();
-
-            if ( mavenRepoLocal == null && activeProfile != null )
-            {
-                mavenRepoLocal = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
-            }
+            mavenRepoLocal = userModelReader.getLocalRepository();
         }
 
         if ( mavenRepoLocal == null )
@@ -177,12 +174,7 @@ public class MBoot
             System.out.println();
 
             System.out.println( "<settings>" );
-            System.out.println( "  <profiles>" );
-            System.out.println( "    <profile>" );
-            System.out.println( "      <active>true</active>" );
-            System.out.println( "      <localRepository>/path/to/your/repository</localRepository>" );
-            System.out.println( "    </profile>" );
-            System.out.println( "  </profiles>" );
+            System.out.println( "  <localRepository>/path/to/your/repository</localRepository>" );
             System.out.println( "</settings>" );
 
             System.out.println();
@@ -974,25 +966,21 @@ public class MBoot
     {
         private List mirrors = new ArrayList();
 
-        private List profiles = new ArrayList();
-
-        private Profile currentProfile = null;
-
         private List proxies = new ArrayList();
 
         private Proxy currentProxy = null;
 
         private StringBuffer currentBody = new StringBuffer();
 
-        private Profile activeProfile = null;
-
         private Proxy activeProxy = null;
 
         private Mirror currentMirror;
-
-        public Profile getActiveProfile()
+        
+        private String localRepository;
+        
+        public String getLocalRepository()
         {
-            return activeProfile;
+            return localRepository;
         }
 
         public Proxy getActiveProxy()
@@ -1009,32 +997,16 @@ public class MBoot
         public void endElement( String uri, String localName, String rawName )
             throws SAXException
         {
-            if ( "profile".equals( rawName ) )
+            if ( "localRepository".equals( rawName ) )
             {
-                if ( notEmpty( currentProfile.getLocalRepo() ) )
+                if ( notEmpty( currentBody.toString() ) )
                 {
-                    profiles.add( currentProfile );
-                    currentProfile = null;
+                    localRepository = currentBody.toString().trim();
                 }
                 else
                 {
                     throw new SAXException( "Invalid profile entry. Missing one or more " +
                                             "fields: {localRepository}." );
-                }
-            }
-            else if ( currentProfile != null )
-            {
-                if ( "active".equals( rawName ) )
-                {
-                    currentProfile.setActive( Boolean.valueOf( currentBody.toString().trim() ).booleanValue() );
-                }
-                else if ( "localRepository".equals( rawName ) )
-                {
-                    currentProfile.setLocalRepo( currentBody.toString().trim() );
-                }
-                else
-                {
-                    throw new SAXException( "Illegal element inside profile: \'" + rawName + "\'" );
                 }
             }
             else if ( "proxy".equals( rawName ) )
@@ -1119,21 +1091,6 @@ public class MBoot
             }
             else if ( "settings".equals( rawName ) )
             {
-                if ( profiles.size() == 1 )
-                {
-                    activeProfile = (Profile) profiles.get( 0 );
-                }
-                else
-                {
-                    for ( Iterator it = profiles.iterator(); it.hasNext(); )
-                    {
-                        Profile profile = (Profile) it.next();
-                        if ( profile.isActive() )
-                        {
-                            activeProfile = profile;
-                        }
-                    }
-                }
                 if ( proxies.size() != 0 )
                 {
                     for ( Iterator it = proxies.iterator(); it.hasNext(); )
@@ -1158,11 +1115,7 @@ public class MBoot
         public void startElement( String uri, String localName, String rawName, Attributes attributes )
             throws SAXException
         {
-            if ( "profile".equals( rawName ) )
-            {
-                currentProfile = new Profile();
-            }
-            else if ( "proxy".equals( rawName ) )
+            if ( "proxy".equals( rawName ) )
             {
                 currentProxy = new Proxy();
             }
@@ -1175,11 +1128,9 @@ public class MBoot
         public void reset()
         {
             this.currentBody = null;
-            this.activeProfile = null;
             this.activeProxy = null;
-            this.currentProfile = null;
             this.currentMirror = null;
-            this.profiles.clear();
+            this.localRepository = null;
             this.proxies.clear();
             this.mirrors.clear();
         }
@@ -1187,33 +1138,6 @@ public class MBoot
         public List getMirrors()
         {
             return mirrors;
-        }
-    }
-
-    public static class Profile
-    {
-        private String localRepo;
-
-        private boolean active = false;
-
-        public void setLocalRepo( String localRepo )
-        {
-            this.localRepo = localRepo;
-        }
-
-        public boolean isActive()
-        {
-            return active;
-        }
-
-        public void setActive( boolean active )
-        {
-            this.active = active;
-        }
-
-        public String getLocalRepo()
-        {
-            return localRepo;
         }
     }
 

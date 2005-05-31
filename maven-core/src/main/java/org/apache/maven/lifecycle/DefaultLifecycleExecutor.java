@@ -25,6 +25,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.settings.Settings;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
@@ -33,7 +34,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
@@ -290,7 +290,7 @@ public class DefaultLifecycleExecutor
     private void configureMojoPhaseBinding( MojoDescriptor mojoDescriptor, Map phaseMap, Settings settings )
         throws LifecycleExecutionException
     {
-        if ( settings.getActiveProfile().isOffline() && mojoDescriptor.isOnlineRequired() )
+        if ( settings.isOffline() && mojoDescriptor.isOnlineRequired() )
         {
             String goal = mojoDescriptor.getGoal();
             getLogger().warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );

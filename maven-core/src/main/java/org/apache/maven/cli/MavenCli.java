@@ -33,13 +33,13 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.settings.MavenSettingsBuilder;
+import org.apache.maven.model.settings.Settings;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.reactor.ReactorException;
-import org.apache.maven.settings.MavenSettingsBuilder;
-import org.apache.maven.settings.Settings;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -352,13 +352,13 @@ public class MavenCli
         ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory) embedder.lookup(
             ArtifactRepositoryFactory.ROLE );
 
-        String url = "file://" + settings.getActiveProfile().getLocalRepository();
+        String url = "file://" + settings.getLocalRepository();
         ArtifactRepository localRepository = new ArtifactRepository( "local", url, repositoryLayout );
 
         boolean snapshotPolicySet = false;
         if ( commandLine.hasOption( CLIManager.OFFLINE ) )
         {
-            settings.getActiveProfile().setOffline( true );
+            settings.setOffline( true );
 
             // TODO: this will still check to download if the artifact does not exist locally, instead of failing as it should in offline mode
             artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_NEVER );

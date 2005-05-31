@@ -3,7 +3,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.cli.CommandLineUtils;
 import org.apache.maven.it.cli.Commandline;
 import org.apache.maven.it.cli.StreamConsumer;
-import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -11,6 +10,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -347,10 +347,8 @@ public class Verifier
                 if ( userXml.exists() )
                 {
                     userModelReader.parse( userXml );
-
-                    Profile activeProfile = userModelReader.getActiveMavenProfile();
-
-                    repo = new File( activeProfile.getLocalRepo() ).getAbsolutePath();
+                    
+                    repo = new File( userModelReader.getLocalRepository() ).getAbsolutePath();
                 }
             }
             catch ( Exception e )
@@ -583,7 +581,9 @@ public class Verifier
 
                 verifier.displayStreamBuffers();
 
-                e.printStackTrace();
+                System.out.println(">>>>>> Error Stacktrace:");
+                e.printStackTrace(System.out);
+                System.out.println("<<<<<< Error Stacktrace");
 
                 verifier.displayLogFile();
 
@@ -599,14 +599,10 @@ public class Verifier
     {
 
         private SAXParserFactory saxFactory;
-
-        private List profiles = new ArrayList();
-
-        private Profile currentProfile = null;
+        
+        private String localRepository;
 
         private StringBuffer currentBody = new StringBuffer();
-
-        private Profile activeMavenProfile = null;
 
         public boolean parse( File file )
         {
@@ -651,9 +647,9 @@ public class Verifier
                                 spe.getMessage() );
         }
 
-        public Profile getActiveMavenProfile()
+        public String getLocalRepository()
         {
-            return activeMavenProfile;
+            return localRepository;
         }
 
         public void characters( char[] ch, int start, int length )
@@ -665,50 +661,16 @@ public class Verifier
         public void endElement( String uri, String localName, String rawName )
             throws SAXException
         {
-            if ( "profile".equals( rawName ) )
+            if ( "localRepository".equals( rawName ) )
             {
-                if ( notEmpty( currentProfile.getLocalRepo() ) )
+                if ( notEmpty( currentBody.toString() ) )
                 {
-                    profiles.add( currentProfile );
-                    currentProfile = null;
+                    localRepository = currentBody.toString().trim();
                 }
                 else
                 {
                     throw new SAXException( "Invalid mavenProfile entry. Missing one or more " +
                                             "fields: {localRepository}." );
-                }
-            }
-            else if ( currentProfile != null )
-            {
-                if ( "active".equals( rawName ) )
-                {
-                    currentProfile.setActive( Boolean.valueOf( currentBody.toString().trim() ).booleanValue() );
-                }
-                else if ( "localRepository".equals( rawName ) )
-                {
-                    currentProfile.setLocalRepo( currentBody.toString().trim() );
-                }
-                else
-                {
-                    throw new SAXException( "Illegal element inside profile: \'" + rawName + "\'" );
-                }
-            }
-            else if ( "settings".equals( rawName ) )
-            {
-                if ( profiles.size() == 1 )
-                {
-                    activeMavenProfile = (Profile) profiles.get( 0 );
-                }
-                else
-                {
-                    for ( Iterator it = profiles.iterator(); it.hasNext(); )
-                    {
-                        Profile profile = (Profile) it.next();
-                        if ( profile.isActive() )
-                        {
-                            activeMavenProfile = profile;
-                        }
-                    }
                 }
             }
 
@@ -720,51 +682,11 @@ public class Verifier
             return test != null && test.trim().length() > 0;
         }
 
-        public void startElement( String uri, String localName, String rawName, Attributes attributes )
-            throws SAXException
-        {
-            if ( "profile".equals( rawName ) )
-            {
-                currentProfile = new Profile();
-            }
-        }
-
         public void reset()
         {
             this.currentBody = null;
-            this.activeMavenProfile = null;
-            this.currentProfile = null;
-            this.profiles.clear();
+            this.localRepository = null;
         }
-    }
-
-    public static class Profile
-    {
-
-        private String localRepository;
-
-        private boolean active = false;
-
-        public void setLocalRepo( String localRepo )
-        {
-            this.localRepository = localRepo;
-        }
-
-        public String getLocalRepo()
-        {
-            return localRepository;
-        }
-
-        public void setActive( boolean active )
-        {
-            this.active = active;
-        }
-
-        public boolean isActive()
-        {
-            return active;
-        }
-
     }
 
 }

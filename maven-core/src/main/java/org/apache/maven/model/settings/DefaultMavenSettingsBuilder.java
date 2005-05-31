@@ -1,4 +1,4 @@
-package org.apache.maven.settings;
+package org.apache.maven.model.settings;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,7 +16,8 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.model.settings.Settings;
+import org.apache.maven.model.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
@@ -56,7 +57,7 @@ public class DefaultMavenSettingsBuilder
     }
 
     // ----------------------------------------------------------------------
-    // MavenSettingsBuilder Implementation
+    // MavenProfilesBuilder Implementation
     // ----------------------------------------------------------------------
 
     public Settings buildSettings()
@@ -92,8 +93,8 @@ public class DefaultMavenSettingsBuilder
 
             settings = new Settings();
         }
-
-        if ( settings.getActiveProfile() == null )
+        
+        if( settings.getLocalRepository() == null || settings.getLocalRepository().length() < 1 )
         {
             File mavenUserConfigurationDirectory = new File( userHome, ".m2" );
             if ( !mavenUserConfigurationDirectory.exists() )
@@ -105,8 +106,8 @@ public class DefaultMavenSettingsBuilder
             }
 
             String localRepository = new File( mavenUserConfigurationDirectory, "repository" ).getAbsolutePath();
-
-            settings.initializeActiveProfile( localRepository );
+            
+            settings.setLocalRepository( localRepository );
         }
 
         return settings;

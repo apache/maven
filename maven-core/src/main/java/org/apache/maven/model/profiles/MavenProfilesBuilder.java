@@ -1,4 +1,4 @@
-package org.apache.maven.settings;
+package org.apache.maven.model.profiles;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -18,16 +18,17 @@ package org.apache.maven.settings;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
  * @author jdcasey
- * @version $Id$
+ * @version $Id: MavenProfilesBuilder.java 168292 2005-05-05 07:16:07Z brett $
  */
-public interface MavenSettingsBuilder
+public interface MavenProfilesBuilder
 {
-    String ROLE = MavenSettingsBuilder.class.getName();
+    String ROLE = MavenProfilesBuilder.class.getName();
 
-    Settings buildSettings()
+    ProfilesRoot buildProfiles( File basedir )
         throws IOException, XmlPullParserException;
 }
