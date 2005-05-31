@@ -62,36 +62,40 @@ public class DefaultArtifact
      * !!! WARNING !!! Never put <classifier/> in the POM. It is for mojo use
      * only. Classifier is for specifying derived artifacts, like ejb-client.
      */
-    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
+    public DefaultArtifact( String groupId,
+                            String artifactId,
+                            String version,
+                            String scope,
+                            String type,
                             String classifier )
     {
         // These should help us catch coding errors until this code gets a whole lot clearer
-        if ( type == null )
-        {
-            throw new NullPointerException( "Artifact type cannot be null." );
-        }
-
         if( groupId == null )
         {
             throw new NullPointerException( "Artifact groupId cannot be null." );
         }
-        
-        this.groupId = groupId;
-        
 
         if( artifactId == null )
         {
             throw new NullPointerException( "Artifact artifactId cannot be null." );
         }
-        
-        this.artifactId = artifactId;
-        
+
+        // From here at least we can report the g:a
+
+        if ( type == null )
+        {
+            throw new NullPointerException( "Artifact type cannot be null for " + groupId + ":" + artifactId );
+        }
 
         if( version == null )
         {
-            throw new NullPointerException( "Artifact version cannot be null." );
+            throw new NullPointerException( "Artifact version cannot be null for " + groupId + ":" + artifactId );
         }
-        
+
+        this.groupId = groupId;
+
+        this.artifactId = artifactId;
+
         this.version = version;
 
         this.type = type;
