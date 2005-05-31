@@ -136,6 +136,8 @@ public class DoxiaMojo
     public void execute()
         throws MojoExecutionException
     {
+        siteRenderer.setTemplateClassLoader( DoxiaMojo.class.getClassLoader() );        
+        
         try
         {
             categorizeReports();

@@ -28,10 +28,14 @@
         <hr/>
       </div>
     </div>
-    <div id="leftColumn"><div id="navcolumn">$mainMenu<a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
-              <img alt="Built by Maven" src="$relativePath/images/logos/maven-feather.png"></img>
-            </a>
-    </div></div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+        $mainMenu
+        <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+          <img alt="Built by Maven" src="$relativePath/images/logos/maven-feather.png"></img>
+        </a>
+      </div>
+    </div>
     <div id="bodyColumn">
       <div id="contentBox">
         $bodyContent
