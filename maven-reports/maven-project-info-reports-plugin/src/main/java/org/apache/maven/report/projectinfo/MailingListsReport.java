@@ -19,20 +19,23 @@ package org.apache.maven.report.projectinfo;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.AbstractMavenReport;
+import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 /**
- * @goal mailing-list
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id: MailingListsReport.java,v 1.4 2005/02/23 00:08:03 brett Exp $
+ * @goal mailing-list
  */
 public class MailingListsReport
     extends AbstractMavenReport
@@ -117,7 +120,7 @@ public class MailingListsReport
 
             r.render();
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             throw new MavenReportException( "Can't write the report " + getOutputName(), e );
         }
@@ -165,20 +168,159 @@ public class MailingListsReport
 
                 startTable();
 
-                tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Archive"} );
+                // To beautify the display
+                boolean otherArchives = false;
+                for ( Iterator i = model.getMailingLists().iterator(); i.hasNext(); )
+                {
+                    MailingList m = (MailingList) i.next();
+                    if ( ( ( m.getOtherArchives() != null ) ) && ( m.getOtherArchives().size() > 0 ) )
+                    {
+                        otherArchives = true;
+                    }
+                }
+
+                if ( otherArchives )
+                {
+                    tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Archive", "Other Archives"} );
+                }
+                else
+                {
+                    tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Archive"} );
+                }
 
                 for ( Iterator i = model.getMailingLists().iterator(); i.hasNext(); )
                 {
                     MailingList m = (MailingList) i.next();
 
-                    // TODO: render otherArchives?
-                    tableRow( new String[]{m.getName(), m.getSubscribe(), m.getUnsubscribe(), m.getArchive()} );
+                    // Verify that subsribe and unsubsribe lists are valid?
+                    // Same for archive?
+                    if ( ( ( m.getOtherArchives() != null ) ) && ( m.getOtherArchives().size() > 0 ) )
+                    {
+                        List textRow = new ArrayList();
+                        List hrefRow = new ArrayList();
+
+                        textRow.add( m.getName() );
+                        hrefRow.add( null );
+
+                        textRow.add( "Subscribe" );
+                        hrefRow.add( m.getSubscribe() );
+
+                        textRow.add( "Unsubscribe" );
+                        hrefRow.add( m.getUnsubscribe() );
+
+                        textRow.add( getArchiveServer( m.getArchive() ) );
+                        hrefRow.add( m.getArchive() );
+                        
+                        // For the first line
+                        Iterator it = m.getOtherArchives().iterator();
+                        String otherArchive = (String) it.next();
+
+                        textRow.add( getArchiveServer( otherArchive ) );
+                        hrefRow.add( otherArchive );
+                        tableRowWithLink( (String[]) textRow.toArray( new String[0] ),
+                                          (String[]) hrefRow.toArray( new String[0] ) );
+
+                        // Other lines...
+                        while ( it.hasNext() )
+                        {
+                            otherArchive = (String) it.next();
+                            
+                            // Reinit the list to beautify the display
+                            textRow = new ArrayList();
+                            hrefRow = new ArrayList();
+
+                            textRow.add( "" );
+                            hrefRow.add( null );
+
+                            textRow.add( "" );
+                            hrefRow.add( null );
+
+                            textRow.add( "" );
+                            hrefRow.add( null );
+
+                            textRow.add( "" );
+                            hrefRow.add( null );
+
+                            textRow.add( getArchiveServer( otherArchive ) );
+                            hrefRow.add( otherArchive );
+
+                            tableRowWithLink( (String[]) textRow.toArray( new String[0] ),
+                                              (String[]) hrefRow.toArray( new String[0] ) );
+                        }
+                    }
+                    else
+                    {
+                        if ( otherArchives )
+                        {
+                            List textRow = new ArrayList();
+                            List hrefRow = new ArrayList();
+
+                            textRow.add( m.getName() );
+                            hrefRow.add( null );
+
+                            textRow.add( "Subscribe" );
+                            hrefRow.add( m.getSubscribe() );
+
+                            textRow.add( "Unsubscribe" );
+                            hrefRow.add( m.getUnsubscribe() );
+
+                            textRow.add( getArchiveServer( m.getArchive() ) );
+                            hrefRow.add( m.getArchive() );
+
+                            textRow.add( "" );
+                            hrefRow.add( null );
+
+                            tableRowWithLink( (String[]) textRow.toArray( new String[0] ),
+                                              (String[]) hrefRow.toArray( new String[0] ) );
+                        }
+                        else
+                        {
+                            List textRow = new ArrayList();
+                            List hrefRow = new ArrayList();
+
+                            textRow.add( m.getName() );
+                            hrefRow.add( null );
+
+                            textRow.add( "Subscribe" );
+                            hrefRow.add( m.getSubscribe() );
+
+                            textRow.add( "Unsubscribe" );
+                            hrefRow.add( m.getUnsubscribe() );
+
+                            textRow.add( getArchiveServer( m.getArchive() ) );
+                            hrefRow.add( m.getArchive() );
+
+                            tableRowWithLink( (String[]) textRow.toArray( new String[0] ),
+                                              (String[]) hrefRow.toArray( new String[0] ) );
+                        }
+                    }
                 }
 
                 endTable();
             }
             endSection();
         }
+    }
 
+    /**
+     * Convenience method to return the name of a web-based mailing list archive server.
+     * <br>
+     * For instance, if the archive uri is <code>http://www.mail-archive.com/dev@maven.apache.org</code>,
+     * this method return <code>www.mail-archive.com</code>
+     *
+     * @param uri
+     * @return the server name of a web-based mailing list archive server
+     */
+    private static String getArchiveServer( String uri )
+    {
+        if ( uri == null )
+        {
+            return "???UNKWOWN???";
+        }
+
+        int at = uri.indexOf( "//" );
+        int from = uri.indexOf( "/", at >= 0 ? ( uri.lastIndexOf( "/", at - 1 ) >= 0 ? 0 : at + 2 ) : 0 );
+
+        return uri.substring( at + 2, from );
     }
 }

@@ -10,4 +10,10 @@
   <packaging>maven-plugin</packaging>
   <name>Maven Project Info Reports Plugin</name>
   <inceptionYear>2005</inceptionYear>
+  <contributors>
+    <contributor>
+      <name>Vincent Siveton</name>
+      <email>vincent.siveton@gmail.com</email>
+    </contributor>
+  </contributors>
 </project>

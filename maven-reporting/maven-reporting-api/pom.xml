@@ -6,6 +6,12 @@
     <version>2.0-SNAPSHOT</version>
   </parent>
   <artifactId>maven-reporting-api</artifactId>
+  <contributors>
+    <contributor>
+      <name>Vincent Siveton</name>
+      <email>vincent.siveton@gmail.com</email>
+    </contributor>
+  </contributors>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -21,6 +27,16 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-validator</groupId>
+      <artifactId>commons-validator</artifactId>
+      <version>1.1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>oro</groupId>
+      <artifactId>oro</artifactId>
+      <version>2.0.7</version>
     </dependency>
   </dependencies>
 </project>

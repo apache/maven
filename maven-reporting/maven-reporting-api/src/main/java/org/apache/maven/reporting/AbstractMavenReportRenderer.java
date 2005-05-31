@@ -16,11 +16,14 @@ package org.apache.maven.reporting;
  * limitations under the License.
  */
 
+import org.apache.commons.validator.EmailValidator;
+import org.apache.commons.validator.UrlValidator;
 import org.codehaus.doxia.sink.Sink;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id: AbstractMavenReportRenderer.java 163373 2005-02-22 03:37:00Z brett $
  * @todo Later it may be appropriate to create something like a VelocityMavenReportRenderer that could take a velocity template and pipe that through Doxia rather than coding them up like this.
  */
@@ -185,6 +188,53 @@ public abstract class AbstractMavenReportRenderer
         sink.tableCell_();
     }
 
+    /**
+     * Create a cell with a potential link.
+     *
+     * @param text the text
+     * @param href the href
+     */
+    protected void tableCellWithLink( String text, String href )
+    {
+        sink.tableCell();
+
+        if ( text != null )
+        {
+            if ( href != null )
+            {
+                String[] schemes = {"http", "https"};
+                UrlValidator urlValidator = new UrlValidator( schemes );
+
+                if ( EmailValidator.getInstance().isValid( href ) )
+                {
+                    link( "mailto:" + href, text );
+                }
+                else if ( href.toLowerCase().startsWith( "mailto:" ) )
+                {
+                    link( href, text );
+                }
+                else if ( urlValidator.isValid( href ) )
+                {
+                    link( href, text );
+                }
+                else
+                {
+                    sink.text( text );
+                }
+            }
+            else
+            {
+                sink.text( text );
+            }
+        }
+        else
+        {
+            sink.nonBreakingSpace();
+        }
+
+        sink.tableCell_();
+    }
+
     protected void tableRow( String[] content )
     {
         sink.tableRow();
@@ -192,6 +242,31 @@ public abstract class AbstractMavenReportRenderer
         for ( int i = 0; i < content.length; i++ )
         {
             tableCell( content[i] );
+        }
+
+        sink.tableRow_();
+    }
+
+    /**
+     * Create a new row : each cell could have a link.
+     * <br>
+     * The arrays should have the same size.
+     *
+     * @param texts an array of text
+     * @param hrefs an array of href
+     */
+    protected void tableRowWithLink( String[] texts, String[] hrefs )
+    {
+        if ( hrefs.length != texts.length )
+        {
+            throw new IllegalArgumentException( "The arrays should have the same size" );
+        }
+
+        sink.tableRow();
+
+        for ( int i = 0; i < texts.length; i++ )
+        {
+            tableCellWithLink( texts[i], hrefs[i] );
         }
 
         sink.tableRow_();
@@ -209,10 +284,6 @@ public abstract class AbstractMavenReportRenderer
         sink.tableRow_();
     }
 
-    public abstract String getTitle();
-
-    protected abstract void renderBody();
-
     protected void tableCaption( String caption )
     {
         sink.tableCaption();
@@ -228,4 +299,17 @@ public abstract class AbstractMavenReportRenderer
 
         sink.paragraph_();
     }
+
+    protected void link( String href, String name )
+    {
+        sink.link( href );
+
+        sink.text( name );
+
+        sink.link_();
+    }
+
+    public abstract String getTitle();
+
+    protected abstract void renderBody();
 }
