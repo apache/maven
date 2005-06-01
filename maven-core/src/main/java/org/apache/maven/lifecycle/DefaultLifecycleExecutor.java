@@ -417,14 +417,24 @@ public class DefaultLifecycleExecutor
 
         MojoDescriptor mojoDescriptor = null;
 
-        // TODO: should be able to create a Map from this
-        for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
+        if ( pluginDescriptor.getMojos() != null )
         {
-            MojoDescriptor desc = (MojoDescriptor) i.next();
-            if ( desc.getGoal().equals( goal ) )
+            // TODO: should be able to create a Map from this
+            for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
             {
-                mojoDescriptor = desc;
+                MojoDescriptor desc = (MojoDescriptor) i.next();
+                if ( desc.getGoal().equals( goal ) )
+                {
+                    mojoDescriptor = desc;
+                }
             }
+        }
+        else
+        {
+            throw new LifecycleExecutionException( "The plugin " + pluginDescriptor.getGroupId() + ":" + 
+                                                   pluginDescriptor.getArtifactId() + ":" +
+                                                   pluginDescriptor.getVersion() +
+                                                   " doesn't contain any mojo. Check if it isn't corrupted." );
         }
 
         if ( mojoDescriptor == null )
