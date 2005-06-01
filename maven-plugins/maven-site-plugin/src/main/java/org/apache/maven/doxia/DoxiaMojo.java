@@ -26,6 +26,7 @@ import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.plexus.siterenderer.Renderer;
 import org.codehaus.plexus.siterenderer.RendererException;
 import org.codehaus.plexus.siterenderer.sink.SiteRendererSink;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
@@ -39,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -59,6 +61,24 @@ public class DoxiaMojo
     private static final String RESOURCE_DIR = "org/apache/maven/doxia";
 
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
+
+    private static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
+    "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
+
+    // CVS
+        "**/CVS", "**/CVS/**", "**/.cvsignore",
+
+        // SCCS
+        "**/SCCS", "**/SCCS/**",
+
+        // Visual SourceSafe
+        "**/vssver.scc",
+
+        // Subversion
+        "**/.svn", "**/.svn/**",
+
+        // Mac
+        "**/.DS_Store" };
 
     /**
      * @parameter expression="${basedir}/src/site"
@@ -136,8 +156,8 @@ public class DoxiaMojo
     public void execute()
         throws MojoExecutionException
     {
-        siteRenderer.setTemplateClassLoader( DoxiaMojo.class.getClassLoader() );        
-        
+        siteRenderer.setTemplateClassLoader( DoxiaMojo.class.getClassLoader() );
+
         try
         {
             categorizeReports();
@@ -213,9 +233,9 @@ public class DoxiaMojo
             {
                 getLog().warn( "DEPRECATED: the css and images directories are deprecated, please use resources" );
 
-                FileUtils.copyDirectory( cssDirectory, new File( outputDirectory, "css" ) );
+                copyDirectory( cssDirectory, new File( outputDirectory, "css" ) );
 
-                FileUtils.copyDirectory( imagesDirectory, new File( outputDirectory, "images" ) );
+                copyDirectory( imagesDirectory, new File( outputDirectory, "images" ) );
             }
 
             // Generate static site
@@ -227,9 +247,9 @@ public class DoxiaMojo
             // Copy site resources
             if ( resourcesDirectory != null )
             {
-                FileUtils.copyDirectory( resourcesDirectory, new File( outputDirectory ) );
+                copyDirectory( resourcesDirectory, new File( outputDirectory ) );
             }
-            
+
             copyResources( outputDirectory );
         }
         catch ( MavenReportException e )
@@ -537,7 +557,8 @@ public class DoxiaMojo
 
                 if ( is == null )
                 {
-                    throw new IOException( "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE + " template." );
+                    throw new IOException( "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE
+                                           + " template." );
                 }
 
                 File outputFile = new File( outputDirectory, line );
@@ -562,5 +583,34 @@ public class DoxiaMojo
         throws Exception
     {
         return DoxiaMojo.class.getClassLoader().getResourceAsStream( name );
+    }
+
+    private void copyDirectory( File source, File destination )
+        throws IOException
+    {
+        DirectoryScanner scanner = new DirectoryScanner();
+
+        String[] includedResources = { "**/**" };
+
+        scanner.setIncludes( includedResources );
+
+        scanner.addDefaultExcludes();
+
+        scanner.setBasedir( source );
+
+        scanner.scan();
+
+        List includedFiles = Arrays.asList( scanner.getIncludedFiles() );
+
+        for ( Iterator j = includedFiles.iterator(); j.hasNext(); )
+        {
+            String name = (String) j.next();
+
+            File sourceFile = new File( source, name );
+
+            File destinationFile = new File( destination, name );
+
+            FileUtils.copyFile( sourceFile, destinationFile );
+        }
     }
 }

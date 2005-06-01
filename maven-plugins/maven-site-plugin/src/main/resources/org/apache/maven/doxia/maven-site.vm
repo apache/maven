@@ -32,7 +32,7 @@
       <div id="navcolumn">
         $mainMenu
         <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
-          <img alt="Built by Maven" src="$relativePath/images/logos/maven-feather.png"></img>
+          <img alt="Built by Maven" src="$relativePath/images/logos/maven-feather.png" />
         </a>
       </div>
     </div>
@@ -42,12 +42,12 @@
       </div>
     </div>
     <div class="clear">
-      <hr/>
+      <hr />
     </div>
     <div id="footer">
       <div class="xright">&#169; 2002-2005, Apache Software Foundation</div>
       <div class="clear">
-        <hr/>
+        <hr />
       </div>
     </div>
   </body>
