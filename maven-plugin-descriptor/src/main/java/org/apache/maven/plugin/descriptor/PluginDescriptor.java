@@ -35,8 +35,6 @@ public class PluginDescriptor
 
     private List dependencies;
 
-    private boolean isolatedRealm;
-
     private String goalPrefix;
 
     private String source;
@@ -97,11 +95,6 @@ public class PluginDescriptor
     // ----------------------------------------------------------------------
     // Dependencies
     // ----------------------------------------------------------------------
-
-    public boolean isIsolatedRealm()
-    {
-        return isolatedRealm;
-    }
 
     public static String constructPluginKey( String groupId, String artifactId, String version )
     {
