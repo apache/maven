@@ -69,6 +69,8 @@ public class PluginDescriptorGenerator
             element( w, "version", pluginDescriptor.getVersion() );
 
             element( w, "goalPrefix", pluginDescriptor.getGoalPrefix() );
+            
+            element( w, "isolatedRealm", "" + pluginDescriptor.isIsolatedRealm() );
 
             element( w, "inheritedByDefault", "" + pluginDescriptor.isInheritedByDefault() );
             
