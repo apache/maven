@@ -39,6 +39,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,12 +90,17 @@ public class DoxiaMojo
     private File resourcesDirectory;
 
     /**
-     * @parameterX expression="${template}
+     * @parameter expression="${templateDirectory}
+     */
+    private String templateDirectory;
+
+    /**
+     * @parameter expression="${template}
      */
     private String template = DEFAULT_TEMPLATE;
 
     /**
-     * @parameterX expression="${attributes}
+     * @parameter expression="${attributes}
      */
     private Map attributes;
 
@@ -138,7 +146,27 @@ public class DoxiaMojo
     public void execute()
         throws MojoExecutionException
     {
-        siteRenderer.setTemplateClassLoader( DoxiaMojo.class.getClassLoader() );
+        if ( templateDirectory == null )
+        {
+            siteRenderer.setTemplateClassLoader( DoxiaMojo.class.getClassLoader() );
+        }
+        else
+        {
+            try
+            {
+                URL templateDirectoryUrl = new URL( templateDirectory );
+
+                URL[] urls = { templateDirectoryUrl };
+
+                URLClassLoader urlClassloader = new URLClassLoader( urls );
+
+                siteRenderer.setTemplateClassLoader( urlClassloader );
+            }
+            catch( MalformedURLException e )
+            {
+                throw new MojoExecutionException( templateDirectory + " isn't a valid URL." );
+            }
+        }
 
         try
         {
