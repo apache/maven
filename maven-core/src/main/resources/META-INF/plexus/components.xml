@@ -114,7 +114,7 @@
             <id>process-classes</id>
           </phase>
           <phase>
-            <id>generate-test-sources</id>
+            <id>generate-test-resources</id>
           </phase>
           <phase>
             <id>process-test-sources</id>
