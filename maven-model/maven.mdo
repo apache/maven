@@ -447,6 +447,15 @@
           ]]></description>
         </field>
         <field>
+          <name>build</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description><![CDATA[Information required to build the project.]]></description>
+          <association>
+            <type>Build</type>
+          </association>
+        </field>
+        <field>
           <name>profiles</name>
           <version>4.0.0</version>
           <description><![CDATA[
@@ -614,15 +623,6 @@
           </association>
         </field>
         <field>
-          <name>build</name>
-          <version>3.0.0+</version>
-          <required>true</required>
-          <description><![CDATA[Information required to build the project.]]></description>
-          <association>
-            <type>Build</type>
-          </association>
-        </field>
-        <field>
           <name>dependencyManagement</name>
           <version>4.0.0</version>
           <required>false</required>
@@ -747,7 +747,7 @@
       </fields>
     </class>
     <class>
-      <name>Build</name>
+      <name>BuildBase</name>
       <version>3.0.0+</version>
       <superClass>PluginConfiguration</superClass>
       <fields>
@@ -759,6 +759,53 @@
           ]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>resources</name>
+          <version>3.0.0+</version>
+          <description><![CDATA[
+            This element describes all of the resources associated with a 
+            project or unit tests. Each resource is described by a resource 
+            element, which is then described by additional elements (described 
+            <a href="#resource">below</a>). These resources are used to complete 
+            the jar file or to run unit test.
+          ]]></description>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>testResources</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            This element describes all of the resources associated with a 
+            project's unit tests. Each resource is described by a resource 
+            element, which is then described by additional elements (described
+            <a href="#resource">below</a>). These resources are used to complete 
+            the jar file or to run unit test.
+          ]]></description>
+          <association>
+            <type>Resource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>finalName</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            The filename (including an extension, but with no path information) that the produced artifact
+            will be called. The default value is artifactId-version.extension (where extension is derived from
+            type).
+          ]]></description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Build</name>
+      <version>3.0.0+</version>
+      <superClass>BuildBase</superClass>
+      <fields>
         <field>
           <name>nagEmailAddress</name>
           <version>3.0.0</version>
@@ -876,36 +923,6 @@
           </association>
         </field>
         <field>
-          <name>resources</name>
-          <version>3.0.0+</version>
-          <description><![CDATA[
-            This element describes all of the resources associated with a 
-            project or unit tests. Each resource is described by a resource 
-            element, which is then described by additional elements (described 
-            <a href="#resource">below</a>). These resources are used to complete 
-            the jar file or to run unit test.
-          ]]></description>
-          <association>
-            <type>Resource</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
-          <name>testResources</name>
-          <version>4.0.0</version>
-          <description><![CDATA[
-            This element describes all of the resources associated with a 
-            project's unit tests. Each resource is described by a resource 
-            element, which is then described by additional elements (described
-            <a href="#resource">below</a>). These resources are used to complete 
-            the jar file or to run unit test.
-          ]]></description>
-          <association>
-            <type>Resource</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
           <name>directory</name>
           <version>4.0.0</version>
           <description><![CDATA[
@@ -918,16 +935,6 @@
           <version>4.0.0</version>
           <description><![CDATA[
             The directory where compiled application classes are placed.
-          ]]></description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>finalName</name>
-          <version>4.0.0</version>
-          <description><![CDATA[
-            The filename (including an extension, but with no path information) that the produced artifact
-            will be called. The default value is artifactId-version.extension (where extension is derived from
-            type).
           ]]></description>
           <type>String</type>
         </field>
@@ -2237,6 +2244,15 @@
             trigger the inclusion of this profile.]]></description>
           <association>
             <type>Activation</type>
+          </association>
+        </field>
+        <field xml.tagName="build">
+          <name>build</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description><![CDATA[Information required to build the project.]]></description>
+          <association>
+            <type>BuildBase</type>
           </association>
         </field>
       </fields>
