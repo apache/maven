@@ -4,14 +4,14 @@
   <name>Maven Model</name>
   <groupId>maven</groupId>
   <artifactId>maven-model</artifactId>
-  <currentVersion>3.0.0-SNAPSHOT</currentVersion>
+  <currentVersion>3.0.0</currentVersion>
   <description>Maven Model</description>
   <shortDescription>Maven Model</shortDescription>
   <dependencies>
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-modello-plugin</artifactId>
-      <version>1.0-alpha-1-SNAPSHOT</version>
+      <version>1.0-alpha-1</version>
       <type>plugin</type>
     </dependency>
     <dependency>
