@@ -72,9 +72,9 @@ public class DefaultModelInheritanceAssembler
         // url
         if ( child.getUrl() == null )
         {
-            if ( parent.getUrl() != null && parent.getUrl().endsWith( "/" ) )
+            if ( parent.getUrl() != null )
             {
-                child.setUrl( parent.getUrl() + child.getArtifactId() + "/" );
+                child.setUrl( appendPath( parent.getUrl(), child.getArtifactId() ) );
             }
             else
             {
@@ -333,39 +333,18 @@ public class DefaultModelInheritanceAssembler
 
             if ( StringUtils.isEmpty( childScm.getConnection() ) && !StringUtils.isEmpty( parentScm.getConnection() ) )
             {
-                if ( parentScm.getConnection().endsWith( "/" ) )
-                {
-                    childScm.setConnection( parentScm.getConnection() + child.getArtifactId() + "/" );
-                }
-                else
-                {
-                    childScm.setConnection( parentScm.getConnection() );
-                }
+                childScm.setConnection( appendPath( parentScm.getConnection(), child.getArtifactId() ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
                 !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
-                if ( parentScm.getDeveloperConnection().endsWith( "/" ) )
-                {
-                    childScm.setDeveloperConnection( parentScm.getDeveloperConnection() + child.getArtifactId() + "/" );
-                }
-                else
-                {
-                    childScm.setDeveloperConnection( parentScm.getDeveloperConnection() );
-                }
+                childScm.setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId() ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getUrl() ) && !StringUtils.isEmpty( parentScm.getUrl() ) )
             {
-                if ( parentScm.getUrl().endsWith( "/" ) )
-                {
-                    childScm.setUrl( parentScm.getUrl() + child.getArtifactId() + "/" );
-                }
-                else
-                {
-                    childScm.setUrl( parentScm.getUrl() );
-                }
+                childScm.setUrl( appendPath( parentScm.getUrl(), child.getArtifactId() ) );
             }
         }
     }
@@ -399,9 +378,9 @@ public class DefaultModelInheritanceAssembler
 
                     site.setUrl( parentDistMgmt.getSite().getUrl() );
 
-                    if ( site.getUrl() != null && site.getUrl().endsWith( "/" ) )
+                    if ( site.getUrl() != null )
                     {
-                        site.setUrl( site.getUrl() + child.getArtifactId() + "/" );
+                        site.setUrl( appendPath( site.getUrl(), child.getArtifactId() ) );
                     }
                 }
             }
@@ -424,5 +403,15 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-
+    private static String appendPath( String url, String path )
+    {
+        if ( url.endsWith( "/" ) )
+        {
+            return url + path;
+        }
+        else
+        {
+            return url + "/" + path;
+        }
+    }
 }

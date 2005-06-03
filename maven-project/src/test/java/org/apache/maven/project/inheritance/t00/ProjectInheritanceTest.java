@@ -72,7 +72,7 @@ public class ProjectInheritanceTest
         // Value taken from p1
         // ----------------------------------------------------------------------
 
-        assertEquals( "scm-url", p4.getScm().getUrl() );
+        assertEquals( "scm-url/p2/p3/p4", p4.getScm().getUrl() );
 
         // ----------------------------------------------------------------------
         // Value taken from p4

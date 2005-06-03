@@ -127,14 +127,14 @@ public class DefaultModelInheritanceAssemblerTest
         throws Exception
     {
         // Make the models
-        Model root = makeScmModel( "root", "scm:foo:/scm-root/", "scm:foo:/scm-dev-root/", null );
+        Model root = makeScmModel( "root", "scm:foo:/scm-root", "scm:foo:/scm-dev-root", null );
 
         Model artifact1 = makeScmModel( "artifact1" );
 
         Model artifact1_1 = makeScmModel( "artifact1-1" );
 
-        Model artifact2 = makeScmModel( "artifact2", "scm:foo:/scm-root/yay-artifact2/",
-                                        "scm:foo:/scm-dev-root/yay-artifact2/", null );
+        Model artifact2 = makeScmModel( "artifact2", "scm:foo:/scm-root/yay-artifact2",
+                                        "scm:foo:/scm-dev-root/yay-artifact2", null );
 
         Model artifact2_1 = makeScmModel( "artifact2-1" );
 
@@ -149,70 +149,70 @@ public class DefaultModelInheritanceAssemblerTest
 
         // --- -- -
 
-        assertConnection( "scm:foo:/scm-root/artifact1/", "scm:foo:/scm-dev-root/artifact1/", artifact1 );
+        assertConnection( "scm:foo:/scm-root/artifact1", "scm:foo:/scm-dev-root/artifact1", artifact1 );
 
-        assertConnection( "scm:foo:/scm-root/artifact1/artifact1-1/", "scm:foo:/scm-dev-root/artifact1/artifact1-1/",
+        assertConnection( "scm:foo:/scm-root/artifact1/artifact1-1", "scm:foo:/scm-dev-root/artifact1/artifact1-1",
                           artifact1_1 );
 
-        assertConnection( "scm:foo:/scm-root/yay-artifact2/", "scm:foo:/scm-dev-root/yay-artifact2/", artifact2 );
+        assertConnection( "scm:foo:/scm-root/yay-artifact2", "scm:foo:/scm-dev-root/yay-artifact2", artifact2 );
 
-        assertConnection( "scm:foo:/scm-root/yay-artifact2/artifact2-1/",
-                          "scm:foo:/scm-dev-root/yay-artifact2/artifact2-1/", artifact2_1 );
+        assertConnection( "scm:foo:/scm-root/yay-artifact2/artifact2-1",
+                          "scm:foo:/scm-dev-root/yay-artifact2/artifact2-1", artifact2_1 );
     }
 
     public void testScmInheritanceWhereParentHasConnectionAndTheChildDoesnt()
     {
-        Model parent = makeScmModel( "parent", "scm:foo:bar:/scm-root/", null, null );
+        Model parent = makeScmModel( "parent", "scm:foo:bar:/scm-root", null, null );
 
         Model child = makeScmModel( "child" );
 
         assembler.assembleModelInheritance( child, parent );
 
-        assertScm( "scm:foo:bar:/scm-root/child/", null, null, child.getScm() );
+        assertScm( "scm:foo:bar:/scm-root/child", null, null, child.getScm() );
     }
 
     public void testScmInheritanceWhereParentHasConnectionAndTheChildDoes()
     {
-        Model parent = makeScmModel( "parent", "scm:foo:bar:/scm-root/", null, null );
+        Model parent = makeScmModel( "parent", "scm:foo:bar:/scm-root", null, null );
 
-        Model child = makeScmModel( "child", "scm:foo:bar:/another-root/", null, null );
+        Model child = makeScmModel( "child", "scm:foo:bar:/another-root", null, null );
 
         assembler.assembleModelInheritance( child, parent );
 
-        assertScm( "scm:foo:bar:/another-root/", null, null, child.getScm() );
+        assertScm( "scm:foo:bar:/another-root", null, null, child.getScm() );
     }
 
     public void testScmInheritanceWhereParentHasDeveloperConnectionAndTheChildDoesnt()
     {
-        Model parent = makeScmModel( "parent", null, "scm:foo:bar:/scm-dev-root/", null );
+        Model parent = makeScmModel( "parent", null, "scm:foo:bar:/scm-dev-root", null );
 
         Model child = makeScmModel( "child" );
 
         assembler.assembleModelInheritance( child, parent );
 
-        assertScm( null, "scm:foo:bar:/scm-dev-root/child/", null, child.getScm() );
+        assertScm( null, "scm:foo:bar:/scm-dev-root/child", null, child.getScm() );
     }
 
     public void testScmInheritanceWhereParentHasDeveloperConnectionAndTheChildDoes()
     {
-        Model parent = makeScmModel( "parent", null, "scm:foo:bar:/scm-dev-root/", null );
+        Model parent = makeScmModel( "parent", null, "scm:foo:bar:/scm-dev-root", null );
 
-        Model child = makeScmModel( "child", null, "scm:foo:bar:/another-dev-root/", null );
+        Model child = makeScmModel( "child", null, "scm:foo:bar:/another-dev-root", null );
 
         assembler.assembleModelInheritance( child, parent );
 
-        assertScm( null, "scm:foo:bar:/another-dev-root/", null, child.getScm() );
+        assertScm( null, "scm:foo:bar:/another-dev-root", null, child.getScm() );
     }
 
     public void testScmInheritanceWhereParentHasUrlAndTheChildDoesnt()
     {
-        Model parent = makeScmModel( "parent", null, null, "http://foo/bar/" );
+        Model parent = makeScmModel( "parent", null, null, "http://foo/bar" );
 
         Model child = makeScmModel( "child" );
 
         assembler.assembleModelInheritance( child, parent );
 
-        assertScm( null, null, "http://foo/bar/child/", child.getScm() );
+        assertScm( null, null, "http://foo/bar/child", child.getScm() );
     }
 
     public void testScmInheritanceWhereParentHasUrlAndTheChildDoes()
