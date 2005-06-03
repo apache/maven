@@ -1,3 +1,81 @@
+#macro ( banner $id )
+    #set ( $e = $siteDescriptor.getChild( $id ) )
+    #if( $e.getChild( "href" ) )
+        #set ( $link = $e.getChild( "href" ).getValue() )
+        <a href="$link" id="$id">
+    #else
+        <span id="$id">
+    #end
+
+    #if( $e.getChild( "src" ) )
+        #set ( $src = $e.getChild( "src" ).getValue() )
+        #if ( $e.getChild( "alt" ) )
+            #set ( $alt = $e.getChild( "alt" ).getValue() )
+        #else
+            #set ( $alt = "" )
+        #end
+        <img src="$src" alt="$alt" />
+    #else
+        $e.getChild( "name" ).getValue()
+    #end
+
+    #if( $e.getChild( "href" ) )
+        </a>
+    #else
+        </span>
+    #end
+    
+#end
+
+#macro ( links )
+  #set ( $counter = 0 )
+  #set ( $links = $siteDescriptor.getChild( "body" ).getChild( "links" ) )
+  #foreach( $item in $links.getChildren() )
+    #set ( $counter = $counter + 1 )
+    <a href="$item.getAttribute( "href" )">$item.getAttribute( "name" )</a>
+    #if ( $links.getChildCount() > $counter )
+      | 
+    #end
+  #end
+#end
+
+#macro ( menuItem $item )
+  #if ( $item.getChildCount() > 0 )
+    #set ( $collapse = "expanded" )
+  #else
+    #set ( $collapse = "none" )
+  #end
+  #set ( $currentItemHref = $PathTool.calculateLink( $item.getAttribute( "href" ), $relativePath ) )
+  <li class="$collapse">
+    #if ( $currentFileName == $currentItemHref )
+      <strong><a href="$currentItemHref">$item.getAttribute( "name" )</a></strong>
+    #else
+      <a href="$currentItemHref">$item.getAttribute( "name" )</a>
+    #end
+  </li>
+  #if ( $item.getChildren() )
+    #if ( $item.getChildCount() > 0 )
+      <ul>
+        #foreach( $subitem in $item.getChildren() )
+          #menuItem( $subitem )
+        #end
+      </ul>
+    #end
+  #end
+#end
+
+#macro ( mainMenu )
+  #set ( $menus = $siteDescriptor.getChild( "body" ).getChildren( "menu" ) )
+  #foreach( $menu in $menus )
+    <h5>$menu.getAttribute( "name" )</h5>
+    <ul>
+      #foreach( $item in $menu.getChildren() )
+        #menuItem( $item )
+      #end
+    </ul>
+  #end
+#end
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
   <head>
@@ -15,39 +93,37 @@
   </head>
   <body class="composite">
     <div id="banner">
-      $bannerLeft
-      $bannerRight
+      #set ( $banner = "bannerLeft" )
+      #banner( $banner )
+      #set ( $banner = "bannerRight" )
+      #banner( $banner )
       <div class="clear">
         <hr/>
       </div>
     </div>
     <div id="breadcrumbs">
-      <div class="xleft">$navBarLeft</div>
-      <div class="xright">$links</div>
+      <div class="xleft">Last Published: $currentDate</div>
+      <div class="xright">#links()</div>
       <div class="clear">
         <hr/>
       </div>
     </div>
-    <div id="leftColumn">
-      <div id="navcolumn">
-        $mainMenu
-        <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
-          <img alt="Built by Maven" src="$relativePath/images/logos/maven-feather.png" />
-        </a>
-      </div>
-    </div>
+    <div id="leftColumn"><div id="navcolumn">#mainMenu()<a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+              <img alt="Built by Maven" src="$relativePath/images/logos/maven-feather.png"></img>
+            </a>
+    </div></div>
     <div id="bodyColumn">
       <div id="contentBox">
         $bodyContent
       </div>
     </div>
     <div class="clear">
-      <hr />
+      <hr/>
     </div>
     <div id="footer">
       <div class="xright">&#169; 2002-2005, Apache Software Foundation</div>
       <div class="clear">
-        <hr />
+        <hr/>
       </div>
     </div>
   </body>

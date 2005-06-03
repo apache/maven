@@ -255,7 +255,7 @@ public class DoxiaMojo
                                  template, attributes );
 
             // Copy site resources
-            if ( resourcesDirectory != null )
+            if ( resourcesDirectory != null && resourcesDirectory.exists() )
             {
                 copyDirectory( resourcesDirectory, new File( outputDirectory ) );
             }
