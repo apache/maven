@@ -1,12 +1,11 @@
 <mojo xmlns="marmalade:mojo">
   <metadata>
-    <id>hello</id>
     <goal>hello</goal>
     <description>Say hello to the world.</description>
     <parameters>
       <parameter>
         <name>salutation</name>
-        <expression>#salutation</expression>
+        <expression>${salutation}</expression>
         <default>Hello</default>
         <description>The salutation to use when saying hello.</description>
       </parameter>
