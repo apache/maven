@@ -6,14 +6,26 @@ CMD=$1
 
 [ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit 1
 
-HOME_DIR=`pwd`
+FROM=jvanzyl@maven.org
+TO=dev@maven.apache.org
 DATE=`date`
+
+PID=$$
+RUNNING=`ps -ef | grep ci.sh | grep -v 'sh -c' | grep -v grep | grep -v $PID`
+if [ ! -z "$RUNNING" ]; then
+  echo "From: $FROM" > running_log
+  echo "To: $TO" >> running_log
+  echo "Subject: [maven2 build - FAILED - $CMD] $DATE" >>running_log
+  echo "" >> running_log
+  echo "ci.sh already running... exiting" >>running_log
+  echo "$RUNNING" >>running_log
+  /usr/sbin/sendmail -t < running_log
+  exit 1
+fi
+
+HOME_DIR=`pwd`
 DIR=m2-build
 REPO=maven-repo-local
-FROM=jvanzyl@maven.org
-#FROM=brett@apache.org
-#TO=maven2-user@lists.codehaus.org
-TO=dev@maven.apache.org
 SCM_LOG=scm.log
 TIMESTAMP=`date +%Y%m%d.%H%M%S`
 DEPLOY_DIR=$HOME_DIR/public_html/m2
