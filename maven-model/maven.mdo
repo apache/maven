@@ -1187,11 +1187,12 @@
         <field>
           <name>scope</name>
           <version>4.0.0</version>
-          <description>
+          <description><![CDATA[
             The scope of the dependency - compile, runtime, test. Used to
             calculate the various classpaths used for testing, etc. and for 
             determining which artifacts to include in a distribution of this
-            project. For more information, see <a href="http://maven.apache.org/maven2/dependencies.html">Dependency Mechanism</a>.
+            project. For more information, see 
+            <a href="http://maven.apache.org/maven2/dependencies.html">Dependency Mechanism</a>.]]>
           </description>
           <type>String</type>
           <defaultValue>compile</defaultValue>
