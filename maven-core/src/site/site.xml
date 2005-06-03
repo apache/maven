@@ -5,7 +5,7 @@
     <href>http://www.apache.org</href>
   </bannerLeft>
   <bannerRight>
-    <name>http://codehaus.org/codehaus-small.png</name>
+    <src>http://codehaus.org/codehaus-small.png</src>
     <href>http://www.codehaus.org</href>
   </bannerRight>
   <body>
