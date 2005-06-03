@@ -143,9 +143,9 @@ then
   echo "From: $FROM" > log
   echo "To: $TO" >> log
   if [ $ret != 0 ]; then
-    echo "Subject: [maven2 build - FAILED] $DATE" >> log
+    echo "Subject: [maven2 build - FAILED - $CMD] $DATE" >> log
   else
-    echo "Subject: [maven2 build - SUCCESS] $DATE" >> log
+    echo "Subject: [maven2 build - SUCCESS - $CMD] $DATE" >> log
     echo "" >> log
     echo "Distribution:" >> log
     echo "${DEPLOY_SITE}/${DIST}" >>log
