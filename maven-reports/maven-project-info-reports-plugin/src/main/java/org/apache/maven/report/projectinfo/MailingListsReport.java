@@ -146,12 +146,18 @@ public class MailingListsReport
             this.model = model;
         }
 
+        /**
+         * @see org.apache.maven.reporting.MavenReportRenderer#getTitle()
+         */
         // How to i18n these ...
         public String getTitle()
         {
             return "Project Mailing Lists";
         }
 
+        /**
+         * @see org.apache.maven.reporting.AbstractMavenReportRenderer#renderBody()
+         */
         public void renderBody()
         {
             startSection( getTitle() );
@@ -181,42 +187,86 @@ public class MailingListsReport
 
                 if ( otherArchives )
                 {
-                    tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Archive", "Other Archives"} );
+                    tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Post", "Archive", "Other Archives"} );
                 }
                 else
                 {
-                    tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Archive"} );
+                    tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Post", "Archive"} );
                 }
 
                 for ( Iterator i = model.getMailingLists().iterator(); i.hasNext(); )
                 {
                     MailingList m = (MailingList) i.next();
 
-                    // Verify that subsribe and unsubsribe lists are valid?
-                    // Same for archive?
-                    if ( ( ( m.getOtherArchives() != null ) ) && ( m.getOtherArchives().size() > 0 ) )
-                    {
-                        List textRow = new ArrayList();
-                        List hrefRow = new ArrayList();
+                    List textRow = new ArrayList();
+                    List hrefRow = new ArrayList();
 
+                    // Validate here subsribe/unsubsribe lists and archives?
+                    if ( m.getName() != null ) 
+                    {
                         textRow.add( m.getName() );
                         hrefRow.add( null );
+                    } 
+                    else 
+                    {
+                        // By default, a name should be set
+                        textRow.add( "???NOT_SET???" );
+                        hrefRow.add( null );
+                    }
 
+                    if ( m.getSubscribe() != null ) 
+                    {
                         textRow.add( "Subscribe" );
                         hrefRow.add( m.getSubscribe() );
+                    } 
+                    else 
+                    {
+                        textRow.add( null );
+                        hrefRow.add( null );
+                    }
 
+                    if ( m.getUnsubscribe() != null ) 
+                    {
                         textRow.add( "Unsubscribe" );
                         hrefRow.add( m.getUnsubscribe() );
+                    } 
+                    else 
+                    {
+                        textRow.add( null );
+                        hrefRow.add( null );
+                    }
 
+                    if ( m.getPost() != null ) 
+                    {
+                        textRow.add( "Post" );
+                        hrefRow.add( m.getPost() );
+                    } 
+                    else 
+                    {
+                        textRow.add( null );
+                        hrefRow.add( null );
+                    }
+
+                    if ( m.getArchive() != null ) 
+                    {
                         textRow.add( getArchiveServer( m.getArchive() ) );
                         hrefRow.add( m.getArchive() );
-                        
+                    } 
+                    else 
+                    {
+                        textRow.add( null );
+                        hrefRow.add( null );
+                    }
+                    
+                    if ( ( ( m.getOtherArchives() != null ) ) && ( m.getOtherArchives().size() > 0 ) )
+                    {   
                         // For the first line
                         Iterator it = m.getOtherArchives().iterator();
-                        String otherArchive = (String) it.next();
+                        String otherArchive = it.next().toString();
 
                         textRow.add( getArchiveServer( otherArchive ) );
                         hrefRow.add( otherArchive );
+
                         tableRowWithLink( (String[]) textRow.toArray( new String[0] ),
                                           (String[]) hrefRow.toArray( new String[0] ) );
 
@@ -229,18 +279,26 @@ public class MailingListsReport
                             textRow = new ArrayList();
                             hrefRow = new ArrayList();
 
-                            textRow.add( "" );
+                            // Name
+                            textRow.add( null );
                             hrefRow.add( null );
 
-                            textRow.add( "" );
+                            // Subscribe
+                            textRow.add( null );
                             hrefRow.add( null );
 
-                            textRow.add( "" );
+                            // UnSubscribe
+                            textRow.add( null );
                             hrefRow.add( null );
 
-                            textRow.add( "" );
+                            // Post
+                            textRow.add( null );
                             hrefRow.add( null );
 
+                            // Archive
+                            textRow.add( null );
+                            hrefRow.add( null );
+                            
                             textRow.add( getArchiveServer( otherArchive ) );
                             hrefRow.add( otherArchive );
 
@@ -252,47 +310,12 @@ public class MailingListsReport
                     {
                         if ( otherArchives )
                         {
-                            List textRow = new ArrayList();
-                            List hrefRow = new ArrayList();
-
-                            textRow.add( m.getName() );
+                            textRow.add( null );
                             hrefRow.add( null );
-
-                            textRow.add( "Subscribe" );
-                            hrefRow.add( m.getSubscribe() );
-
-                            textRow.add( "Unsubscribe" );
-                            hrefRow.add( m.getUnsubscribe() );
-
-                            textRow.add( getArchiveServer( m.getArchive() ) );
-                            hrefRow.add( m.getArchive() );
-
-                            textRow.add( "" );
-                            hrefRow.add( null );
-
-                            tableRowWithLink( (String[]) textRow.toArray( new String[0] ),
-                                              (String[]) hrefRow.toArray( new String[0] ) );
                         }
-                        else
-                        {
-                            List textRow = new ArrayList();
-                            List hrefRow = new ArrayList();
-
-                            textRow.add( m.getName() );
-                            hrefRow.add( null );
-
-                            textRow.add( "Subscribe" );
-                            hrefRow.add( m.getSubscribe() );
-
-                            textRow.add( "Unsubscribe" );
-                            hrefRow.add( m.getUnsubscribe() );
-
-                            textRow.add( getArchiveServer( m.getArchive() ) );
-                            hrefRow.add( m.getArchive() );
-
-                            tableRowWithLink( (String[]) textRow.toArray( new String[0] ),
-                                              (String[]) hrefRow.toArray( new String[0] ) );
-                        }
+                        
+                        tableRowWithLink( (String[]) textRow.toArray( new String[0] ),
+                                          (String[]) hrefRow.toArray( new String[0] ) );
                     }
                 }
 
@@ -311,7 +334,7 @@ public class MailingListsReport
      * @param uri
      * @return the server name of a web-based mailing list archive server
      */
-    private static String getArchiveServer( String uri )
+    private static String getArchiveServer( final String uri )
     {
         if ( uri == null )
         {
