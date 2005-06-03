@@ -48,12 +48,7 @@
 <settings>
   .
   .
-  <profiles>
-    <profile>
-      <active>true</active>
-      <localRepository>/path/to/local/repo</localRepository>
-    </profile>
-  </profiles>
+  <localRepository>/path/to/local/repo</localRepository>
   .
   .]]></source>
       <p>
