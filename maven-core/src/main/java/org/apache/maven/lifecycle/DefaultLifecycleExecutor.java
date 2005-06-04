@@ -251,29 +251,32 @@ public class DefaultLifecycleExecutor
 
             Map goalMap = plugin.getGoalsAsMap();
             
-            for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
+            if ( pluginDescriptor.getMojos() != null )
             {
-                MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
-
-                // TODO: remove later
-                if ( mojoDescriptor.getGoal() == null )
+                for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
                 {
-                    throw new LifecycleExecutionException(
-                        "The plugin " + artifactId + " was built with an older version of Maven" );
-                }
+                    MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
+
+                    // TODO: remove later
+                    if ( mojoDescriptor.getGoal() == null )
+                    {
+                        throw new LifecycleExecutionException(
+                            "The plugin " + artifactId + " was built with an older version of Maven" );
+                    }
                 
-                Goal goal = (Goal) goalMap.get( mojoDescriptor.getGoal() );
+                    Goal goal = (Goal) goalMap.get( mojoDescriptor.getGoal() );
 
-                if( goalMap.isEmpty() )
-                {
-                    configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
-                }
-                else if ( goal != null )
-                {
-                    // We have to check to see that the inheritance rules have been applied before binding this mojo.
-                    if( goal.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
+                    if( goalMap.isEmpty() )
                     {
                         configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
+                    }
+                    else if ( goal != null )
+                    {
+                        // We have to check to see that the inheritance rules have been applied before binding this mojo.
+                        if( goal.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
+                        {
+                            configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
+                        }
                     }
                 }
             }
