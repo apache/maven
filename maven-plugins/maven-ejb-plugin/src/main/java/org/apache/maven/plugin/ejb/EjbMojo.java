@@ -120,7 +120,7 @@ public class EjbMojo
                                                            DEFAULT_EXCLUDES );
 
                 // create archive
-                archiver.createArchive( project, archive );
+                clientArchiver.createArchive( project, archive );
             }
         }
         catch ( Exception e )
