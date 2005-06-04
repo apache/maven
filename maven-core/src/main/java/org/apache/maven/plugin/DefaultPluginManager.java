@@ -790,15 +790,32 @@ public class DefaultPluginManager
     {
         // TODO: configure this from bootstrap or scan lib
         // TODO: Note: maven-plugin just re-added until all plugins are switched over...
-        artifactFilter = new ExclusionSetFilter( new String[]{"maven-core", "maven-artifact", "maven-model",
-                                                              "maven-settings", "maven-monitor", "maven-plugin-api",
-                                                              "maven-plugin-descriptor", "plexus-container-default",
-                                                              "maven-project", "plexus-container-artifact",
-                                                              "maven-reporting-api", "doxia-core",
-                                                              "wagon-provider-api", "classworlds", "maven-plugin",
-                                                              "plexus-marmalade-factory", "maven-script-marmalade",
-                                                              "maven-script-beanshell", "plexus-bsh-factory", "bsh",
-                                                              "marmalade-core", "plexus-utils"} );
+        artifactFilter = new ExclusionSetFilter( new String[]
+        {
+            "bsh",
+            "classworlds",
+            "doxia-core",
+            "marmalade-core",
+            "maven-artifact",
+            "maven-core",
+            "maven-model",
+            "maven-monitor",
+            "maven-plugin",
+            "maven-plugin-api",
+            "maven-plugin-descriptor",
+            "maven-project",
+            "maven-reporting-api",
+            "maven-script-beanshell",
+            "maven-script-marmalade",
+            "maven-settings",
+            "plexus-bsh-factory",
+            "plexus-container-artifact",
+            "plexus-container-default",
+            "plexus-i18n",
+            "plexus-marmalade-factory",
+            "plexus-utils",
+            "wagon-provider-api"
+        } );
     }
 
     // ----------------------------------------------------------------------
