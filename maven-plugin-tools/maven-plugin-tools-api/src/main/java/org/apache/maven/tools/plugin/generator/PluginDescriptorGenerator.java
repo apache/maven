@@ -76,10 +76,13 @@ public class PluginDescriptorGenerator
             
             w.startElement( "mojos" );
 
-            for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
+            if ( pluginDescriptor.getMojos() != null )
             {
-                MojoDescriptor descriptor = (MojoDescriptor) it.next();
-                processMojoDescriptor( descriptor, w );
+                for ( Iterator it = pluginDescriptor.getMojos().iterator(); it.hasNext(); )
+                {
+                    MojoDescriptor descriptor = (MojoDescriptor) it.next();
+                    processMojoDescriptor( descriptor, w );
+                }
             }
 
             w.endElement();
