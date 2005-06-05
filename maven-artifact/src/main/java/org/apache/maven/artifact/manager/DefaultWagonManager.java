@@ -136,7 +136,8 @@ public class DefaultWagonManager
             wagon.addTransferListener( downloadMonitor );
         }
 
-        Map checksums = new HashMap();
+        Map checksums = new HashMap( 2 );
+        Map sums = new HashMap( 2 );
 
         // TODO: configure these on the repository
         try
@@ -161,16 +162,23 @@ public class DefaultWagonManager
 
             wagon.removeTransferListener( downloadMonitor );
 
-            // We do this in here so we can checksum the artifact metadata too, otherwise it could be metadata itself
+            // Pre-store the checksums as any future puts will overwrite them
             for ( Iterator i = checksums.keySet().iterator(); i.hasNext(); )
             {
                 String extension = (String) i.next();
                 ChecksumObserver observer = (ChecksumObserver) checksums.get( extension );
+                sums.put( extension, observer.getActualChecksum() );
+            }
+
+            // We do this in here so we can checksum the artifact metadata too, otherwise it could be metadata itself
+            for ( Iterator i = checksums.keySet().iterator(); i.hasNext(); )
+            {
+                String extension = (String) i.next();
 
                 // TODO: shouldn't need a file intermediatary - improve wagon to take a stream
                 File temp = File.createTempFile( "maven-artifact", null );
                 temp.deleteOnExit();
-                FileUtils.fileWrite( temp.getAbsolutePath(), observer.getActualChecksum() );
+                FileUtils.fileWrite( temp.getAbsolutePath(), (String) sums.get( extension ) );
 
                 wagon.put( temp, remotePath + "." + extension );
             }
