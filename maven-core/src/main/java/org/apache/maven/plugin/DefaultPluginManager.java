@@ -811,7 +811,6 @@ public class DefaultPluginManager
             "plexus-bsh-factory",
             "plexus-container-artifact",
             "plexus-container-default",
-            "plexus-i18n",
             "plexus-marmalade-factory",
             "plexus-utils",
             "wagon-provider-api"

@@ -42,7 +42,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -67,8 +66,6 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
-
-    private I18N i18n;
 
     protected MavenProjectBuilder projectBuilder;
 
@@ -302,7 +299,7 @@ public class DefaultMaven
         {
             if ( pom.length() == 0 )
             {
-                throw new ProjectBuildingException( i18n.format( "empty.descriptor.error", pom ) );
+                throw new ProjectBuildingException( "The file " + pom.getAbsolutePath() + " you specified has zero length." );
             }
         }
 

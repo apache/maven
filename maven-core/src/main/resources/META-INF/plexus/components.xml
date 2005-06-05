@@ -10,9 +10,6 @@
       <implementation>org.apache.maven.DefaultMaven</implementation>
       <requirements>
         <requirement>
-          <role>org.codehaus.plexus.i18n.I18N</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.project.MavenProjectBuilder</role>
         </requirement>
         <requirement>
@@ -53,18 +50,6 @@
       <role>org.apache.maven.usability.ErrorDiagnoser</role>
       <role-hint>InvalidArtifactDiagnoser</role-hint>
       <implementation>org.apache.maven.usability.InvalidArtifactDiagnoser</implementation>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.codehaus.plexus.i18n.I18N</role>
-      <implementation>org.codehaus.plexus.i18n.DefaultI18N</implementation>
-      <configuration>
-        <default-bundle-name>org.apache.maven.messages.messages</default-bundle-name>
-      </configuration>
     </component>
 
     <!--
