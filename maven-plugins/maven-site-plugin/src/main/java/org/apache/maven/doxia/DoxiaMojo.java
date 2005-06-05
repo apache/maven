@@ -23,6 +23,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
 import org.apache.maven.reporting.MavenReportException;
+import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.siterenderer.Renderer;
 import org.codehaus.plexus.siterenderer.RendererException;
 import org.codehaus.plexus.siterenderer.sink.SiteRendererSink;
@@ -49,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * @goal site
@@ -105,11 +107,23 @@ public class DoxiaMojo
     private Map attributes;
 
     /**
+     * @parameter expression="${locales}
+     */
+    private String locales;
+
+    /**
      * @parameter expression="${component.org.codehaus.plexus.siterenderer.Renderer}"
      * @required
      * @readonly
      */
     private Renderer siteRenderer;
+
+    /**
+     * @parameter expression="${component.org.codehaus.plexus.i18n.I18N}"
+     * @required
+     * @readonly
+     */
+    private I18N i18n;
 
     /**
      * @parameter expression="${project}"
@@ -143,6 +157,10 @@ public class DoxiaMojo
 
     private List projectReports = new ArrayList();
 
+    private Locale defaultLocale = Locale.ENGLISH;
+
+    private List localesList = new ArrayList();
+
     public void execute()
         throws MojoExecutionException
     {
@@ -162,7 +180,7 @@ public class DoxiaMojo
 
                 siteRenderer.setTemplateClassLoader( urlClassloader );
             }
-            catch( MalformedURLException e )
+            catch ( MalformedURLException e )
             {
                 throw new MojoExecutionException( templateDirectory + " isn't a valid URL." );
             }
@@ -172,95 +190,116 @@ public class DoxiaMojo
         {
             categorizeReports();
 
-            MavenReportConfiguration config = new MavenReportConfiguration();
-
-            config.setProject( project );
-
-            config.setReportOutputDirectory( new File( outputDirectory ) );
-
-            //Generate reports
-            if ( reports != null )
+            if ( locales == null )
             {
-                for ( Iterator i = reports.keySet().iterator(); i.hasNext(); )
+                localesList.add( defaultLocale );
+            }
+            else
+            {
+                StringTokenizer st = new StringTokenizer( locales, "," );
+
+                while ( st.hasMoreTokens() )
                 {
-                    String reportKey = (String) i.next();
+                    localesList.add( new Locale( st.nextToken().trim() ) );
+                }
+            }
 
-                    getLog().info( "Generate " + reportKey + " report." );
+            for ( Iterator i = localesList.iterator(); i.hasNext(); )
+            {
+                Locale locale = (Locale) i.next();
 
-                    MavenReport report = (MavenReport) reports.get( reportKey );
+                MavenReportConfiguration config = new MavenReportConfiguration();
 
-                    report.setConfiguration( config );
+                config.setProject( project );
 
-                    String outputFileName = report.getOutputName() + ".html";
+                File localeOutputDirectory = getOuputDirectory( locale );
 
-                    SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
-                                                                     getSiteDescriptor() );
+                config.setReportOutputDirectory( localeOutputDirectory );
 
-                    //TODO: Use multiple locale with a loop
-                    report.generate( sink, Locale.ENGLISH );
-
-                    File outputFile = new File( outputDirectory, outputFileName );
-
-                    if ( !outputFile.getParentFile().exists() )
+                //Generate reports
+                if ( reports != null )
+                {
+                    for ( Iterator j = reports.keySet().iterator(); j.hasNext(); )
                     {
-                        outputFile.getParentFile().mkdirs();
+                        String reportKey = (String) j.next();
+
+                        getLog().info( "Generate " + reportKey + " report." );
+
+                        MavenReport report = (MavenReport) reports.get( reportKey );
+
+                        report.setConfiguration( config );
+
+                        String outputFileName = report.getOutputName() + ".html";
+
+                        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
+                                                                         getSiteDescriptor( locale ) );
+
+                        report.generate( sink, locale );
+
+                        File outputFile = new File( localeOutputDirectory, outputFileName );
+
+                        if ( !outputFile.getParentFile().exists() )
+                        {
+                            outputFile.getParentFile().mkdirs();
+                        }
+
+                        siteRenderer
+                            .generateDocument( new FileWriter( outputFile ), template, attributes, sink, locale );
                     }
-
-                    siteRenderer.generateDocument( new FileWriter( outputFile ), template, attributes, sink, Locale.ENGLISH );
                 }
-            }
 
-            //Generate overview pages
-            if ( projectInfos.size() > 0 )
-            {
-                try
+                //Generate overview pages
+                if ( projectInfos.size() > 0 )
                 {
-                    generateProjectInfoPage( getSiteDescriptor() );
+                    try
+                    {
+                        generateProjectInfoPage( getSiteDescriptor( locale ), locale );
+                    }
+                    catch ( Exception e )
+                    {
+                        throw new MojoExecutionException( "An error is occurred in project info page generation.", e );
+                    }
                 }
-                catch ( Exception e )
+
+                if ( projectReports.size() > 0 )
                 {
-                    throw new MojoExecutionException( "An error is occurred in project info page generation.", e );
+                    try
+                    {
+                        generateProjectReportsPage( getSiteDescriptor( locale ), locale );
+                    }
+                    catch ( Exception e )
+                    {
+                        throw new MojoExecutionException( "An error is occurred in project reports page generation.", e );
+                    }
                 }
-            }
 
-            if ( projectReports.size() > 0 )
-            {
-                try
+                // Generate static site
+                siteRenderer.render( new File( siteDirectory ), localeOutputDirectory, getSiteDescriptor( locale ),
+                                     template, attributes );
+                siteRenderer.render( new File( generatedSiteDirectory ), localeOutputDirectory,
+                                     getSiteDescriptor( locale ), template, attributes );
+
+                File cssDirectory = new File( siteDirectory, "css" );
+                File imagesDirectory = new File( siteDirectory, "images" );
+
+                // special case for backwards compatibility
+                if ( cssDirectory.exists() || imagesDirectory.exists() )
                 {
-                    generateProjectReportsPage( getSiteDescriptor() );
+                    getLog().warn( "DEPRECATED: the css and images directories are deprecated, please use resources" );
+
+                    copyDirectory( cssDirectory, new File( localeOutputDirectory, "css" ) );
+
+                    copyDirectory( imagesDirectory, new File( localeOutputDirectory, "images" ) );
                 }
-                catch ( Exception e )
+
+                // Copy site resources
+                if ( resourcesDirectory != null && resourcesDirectory.exists() )
                 {
-                    throw new MojoExecutionException( "An error is occurred in project reports page generation.", e );
+                    copyDirectory( resourcesDirectory, localeOutputDirectory );
                 }
+
+                copyResources( localeOutputDirectory );
             }
-
-            File cssDirectory = new File( siteDirectory, "css" );
-            File imagesDirectory = new File( siteDirectory, "images" );
-
-            // special case for backwards compatibility
-            if ( cssDirectory.exists() || imagesDirectory.exists() )
-            {
-                getLog().warn( "DEPRECATED: the css and images directories are deprecated, please use resources" );
-
-                copyDirectory( cssDirectory, new File( outputDirectory, "css" ) );
-
-                copyDirectory( imagesDirectory, new File( outputDirectory, "images" ) );
-            }
-
-            // Generate static site
-            siteRenderer.render( new File( siteDirectory ), new File( outputDirectory ), getSiteDescriptor(), template,
-                                 attributes );
-            siteRenderer.render( new File( generatedSiteDirectory ), new File( outputDirectory ), getSiteDescriptor(),
-                                 template, attributes );
-
-            // Copy site resources
-            if ( resourcesDirectory != null && resourcesDirectory.exists() )
-            {
-                copyDirectory( resourcesDirectory, new File( outputDirectory ) );
-            }
-
-            copyResources( outputDirectory );
         }
         catch ( MavenReportException e )
         {
@@ -293,28 +332,28 @@ public class DoxiaMojo
             else
             {
                 throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for "
-                                                  + report.getName() + " mojo isn't valid." );
+                                                  + report.getName( defaultLocale ) + " mojo isn't valid." );
             }
         }
     }
 
-    private String getReportsMenu()
+    private String getReportsMenu( Locale locale )
         throws MojoExecutionException
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"Project Documentation\">\n" );
-        buffer.append( "    <item name=\"About " + project.getName() + "\" href=\"/index.html\"/>\n" );
+        buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.about") + " " + project.getName() + "\" href=\"/index.html\"/>\n" );
 
         if ( projectInfos.size() > 0 )
         {
-            buffer.append( "    <item name=\"" + MavenReport.CATEGORY_PROJECT_INFORMATION
+            buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectinformation")
                            + "\" href=\"/project-info.html\" collapse=\"true\">\n" );
 
             for ( Iterator i = projectInfos.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append( "        <item name=\"" + report.getName() + "\" href=\"/" + report.getOutputName()
-                               + ".html\"/>\n" );
+                buffer.append( "        <item name=\"" + report.getName( locale ) + "\" href=\"/"
+                               + report.getOutputName() + ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -322,14 +361,14 @@ public class DoxiaMojo
 
         if ( projectReports.size() > 0 )
         {
-            buffer.append( "    <item name=\"" + MavenReport.CATEGORY_PROJECT_REPORTS
+            buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectreports")
                            + "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
 
             for ( Iterator i = projectReports.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append( "        <item name=\"" + report.getName() + "\" href=\"/" + report.getOutputName()
-                               + ".html\"/>\n" );
+                buffer.append( "        <item name=\"" + report.getName( locale ) + "\" href=\"/"
+                               + report.getOutputName() + ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -340,7 +379,7 @@ public class DoxiaMojo
         return buffer.toString();
     }
 
-    private InputStream getSiteDescriptor()
+    private InputStream getSiteDescriptor( Locale locale )
         throws MojoExecutionException
     {
         File siteDescriptor = new File( siteDirectory, "site.xml" );
@@ -367,7 +406,7 @@ public class DoxiaMojo
 
         if ( reports != null )
         {
-            props.put( "reports", getReportsMenu() );
+            props.put( "reports", getReportsMenu( locale ) );
         }
 
         // TODO: interpolate ${project.*} in general
@@ -395,15 +434,15 @@ public class DoxiaMojo
         return new StringInputStream( siteDescriptorContent );
     }
 
-    private void generateProjectInfoPage( InputStream siteDescriptor )
+    private void generateProjectInfoPage( InputStream siteDescriptor, Locale locale )
         throws Exception
     {
         String outputFileName = "project-info.html";
 
-        SiteRendererSink sink = siteRenderer
-            .createSink( new File( siteDirectory ), outputFileName, getSiteDescriptor() );
+        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
+                                                         getSiteDescriptor( locale ) );
 
-        String title = "General Project Information";
+        String title = i18n.getString( "site-plugin", locale, "report.information.title");
 
         sink.head();
         sink.title();
@@ -418,28 +457,27 @@ public class DoxiaMojo
         sink.sectionTitle1_();
 
         sink.paragraph();
-        sink.text( "This document provides an overview of the various documents and links that are part "
-                   + "of this project's general information. All of this content is automatically generated by " );
+        sink.text( i18n.getString( "site-plugin", locale, "report.information.description1") + " " );
         sink.link( "http://maven.apache.org" );
         sink.text( "Maven" );
         sink.link_();
-        sink.text( " on behalf of the project." );
+        sink.text( " " + i18n.getString( "site-plugin", locale, "report.information.description2") );
         sink.paragraph_();
 
         sink.section2();
 
         sink.sectionTitle2();
-        sink.text( "Overview" );
+        sink.text( i18n.getString( "site-plugin", locale, "report.information.sectionTitle") );
         sink.sectionTitle2_();
 
         sink.table();
 
         sink.tableRow();
         sink.tableHeaderCell();
-        sink.text( "Document" );
+        sink.text( i18n.getString( "site-plugin", locale, "report.information.column.document") );
         sink.tableHeaderCell_();
         sink.tableHeaderCell();
-        sink.text( "Description" );
+        sink.text( i18n.getString( "site-plugin", locale, "report.information.column.description") );
         sink.tableHeaderCell_();
         sink.tableRow_();
 
@@ -450,11 +488,11 @@ public class DoxiaMojo
             sink.tableRow();
             sink.tableCell();
             sink.link( report.getOutputName() + ".html" );
-            sink.text( report.getName() );
+            sink.text( report.getName( locale ) );
             sink.link_();
             sink.tableCell_();
             sink.tableCell();
-            sink.text( report.getDescription() );
+            sink.text( report.getDescription( locale ) );
             sink.tableCell_();
             sink.tableRow_();
         }
@@ -471,19 +509,19 @@ public class DoxiaMojo
 
         sink.close();
 
-        siteRenderer.generateDocument( new FileWriter( new File( outputDirectory, outputFileName ) ), template,
-                                       attributes, sink, Locale.ENGLISH );
+        siteRenderer.generateDocument( new FileWriter( new File( getOuputDirectory( locale ), outputFileName ) ),
+                                       template, attributes, sink, locale );
     }
 
-    private void generateProjectReportsPage( InputStream siteDescriptor )
+    private void generateProjectReportsPage( InputStream siteDescriptor, Locale locale )
         throws Exception
     {
         String outputFileName = "maven-reports.html";
 
-        SiteRendererSink sink = siteRenderer
-            .createSink( new File( siteDirectory ), outputFileName, getSiteDescriptor() );
+        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
+                                                         getSiteDescriptor( locale ) );
 
-        String title = "Maven Generated Reports";
+        String title = i18n.getString( "site-plugin", locale, "report.project.title");
 
         sink.head();
         sink.title();
@@ -498,27 +536,27 @@ public class DoxiaMojo
         sink.sectionTitle1_();
 
         sink.paragraph();
-        sink.text( "This document provides an overview of the various reports that are automatically generated by " );
+        sink.text( i18n.getString( "site-plugin", locale, "report.project.description1") + " " );
         sink.link( "http://maven.apache.org" );
         sink.text( "Maven" );
         sink.link_();
-        sink.text( ". Each report is briefly described below." );
+        sink.text( ". " + i18n.getString( "site-plugin", locale, "report.project.description2") );
         sink.paragraph_();
 
         sink.section2();
 
         sink.sectionTitle2();
-        sink.text( "Overview" );
+        sink.text( i18n.getString( "site-plugin", locale, "report.project.sectionTitle") );
         sink.sectionTitle2_();
 
         sink.table();
 
         sink.tableRow();
         sink.tableHeaderCell();
-        sink.text( "Document" );
+        sink.text( i18n.getString( "site-plugin", locale, "report.project.column.document") );
         sink.tableHeaderCell_();
         sink.tableHeaderCell();
-        sink.text( "Description" );
+        sink.text( i18n.getString( "site-plugin", locale, "report.project.column.description") );
         sink.tableHeaderCell_();
         sink.tableRow_();
 
@@ -529,11 +567,11 @@ public class DoxiaMojo
             sink.tableRow();
             sink.tableCell();
             sink.link( report.getOutputName() + ".html" );
-            sink.text( report.getName() );
+            sink.text( report.getName( locale ) );
             sink.link_();
             sink.tableCell_();
             sink.tableCell();
-            sink.text( report.getDescription() );
+            sink.text( report.getDescription( locale ) );
             sink.tableCell_();
             sink.tableRow_();
         }
@@ -546,11 +584,11 @@ public class DoxiaMojo
 
         sink.body_();
 
-        siteRenderer.generateDocument( new FileWriter( new File( outputDirectory, outputFileName ) ), template,
-                                       attributes, sink, Locale.ENGLISH );
+        siteRenderer.generateDocument( new FileWriter( new File( getOuputDirectory( locale ), outputFileName ) ),
+                                       template, attributes, sink, locale );
     }
 
-    private void copyResources( String outputDirectory )
+    private void copyResources( File outputDirectory )
         throws Exception
     {
         InputStream resourceList = getStream( RESOURCE_DIR + "/resources.txt" );
@@ -621,6 +659,26 @@ public class DoxiaMojo
             File destinationFile = new File( destination, name );
 
             FileUtils.copyFile( sourceFile, destinationFile );
+        }
+    }
+
+    private File getOuputDirectory( Locale locale )
+    {
+        if ( localesList.size() == 1 )
+        {
+            return new File( outputDirectory );
+        }
+        else
+        {
+            Locale firstLocale = (Locale) localesList.get( 0 );
+            if ( locale.equals( firstLocale ) )
+            {
+                return new File( outputDirectory );
+            }
+            else
+            {
+                return new File( outputDirectory, locale.getLanguage() );
+            }
         }
     }
 }

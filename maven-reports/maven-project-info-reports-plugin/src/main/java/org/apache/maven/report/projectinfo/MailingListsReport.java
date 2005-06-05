@@ -61,9 +61,9 @@ public class MailingListsReport
     private MavenProject project;
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#getName()
+     * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
      */
-    public String getName()
+    public String getName( Locale locale )
     {
         return "Mailing Lists";
     }
@@ -77,9 +77,9 @@ public class MailingListsReport
     }
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#getDescription()
+     * @see org.apache.maven.reporting.MavenReport#getDescription(java.util.Locale)
      */
-    public String getDescription()
+    public String getDescription( Locale locale )
     {
         return "This document provides subscription and archive information for this project's mailing lists.";
     }

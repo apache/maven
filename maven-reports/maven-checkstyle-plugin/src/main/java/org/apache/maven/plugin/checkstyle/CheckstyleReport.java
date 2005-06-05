@@ -83,17 +83,17 @@ public class CheckstyleReport
     private boolean failedOnError = false;
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#getName()
+     * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
      */
-    public String getName()
+    public String getName( Locale locale )
     {
         return "Checkstyle";
     }
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#getDescription()
+     * @see org.apache.maven.reporting.MavenReport#getDescription(java.util.Locale)
      */
-    public String getDescription()
+    public String getDescription( Locale locale )
     {
         return "Report on coding style conventions.";
     }

@@ -60,9 +60,9 @@ public class DependenciesReport
     private MavenProject project;
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#getName()
+     * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
      */
-    public String getName()
+    public String getName( Locale locale )
     {
         return "Dependencies";
     }
@@ -76,9 +76,9 @@ public class DependenciesReport
     }
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#getDescription()
+     * @see org.apache.maven.reporting.MavenReport#getDescription(java.util.Locale)
      */
-    public String getDescription()
+    public String getDescription( Locale locale )
     {
         return "This document lists the projects dependencies and provides information on each dependency.";
     }

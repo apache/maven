@@ -74,17 +74,17 @@ public class PmdReport
     private MavenProject project;
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#getName()
+     * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
      */
-    public String getName()
+    public String getName( Locale locale )
     {
         return "PMD report";
     }
 
     /**
-     * @see org.apache.maven.reporting.MavenReport#getDescription()
+     * @see org.apache.maven.reporting.MavenReport#getDescription(java.util.Locale)
      */
-    public String getDescription()
+    public String getDescription( Locale locale )
     {
         return "Verification of coding rules.";
     }

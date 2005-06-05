@@ -66,6 +66,8 @@ public abstract class AbstractMavenReport
 
     private Sink sink;
 
+    private Locale locale = Locale.ENGLISH;
+
     public MavenReportConfiguration getConfiguration()
     {
         return config;
@@ -108,7 +110,7 @@ public abstract class AbstractMavenReport
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "An error is occurred in " + getName() + " report generation." );
+            throw new MojoExecutionException( "An error is occurred in " + getName( locale ) + " report generation." );
         }
     }
 
@@ -161,7 +163,7 @@ public abstract class AbstractMavenReport
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"Project Documentation\">\n" );
 
-        buffer.append( "  <item name=\"" + getName() + "\" href=\"/" + getOutputName() + ".html\"/>\n" );
+        buffer.append( "  <item name=\"" + getName( locale ) + "\" href=\"/" + getOutputName() + ".html\"/>\n" );
 
         buffer.append( "</menu>\n" );
 

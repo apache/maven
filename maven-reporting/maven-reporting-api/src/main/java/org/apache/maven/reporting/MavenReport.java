@@ -45,11 +45,11 @@ public interface MavenReport
 
     String getOutputName();
 
-    String getName();
+    String getName( Locale locale );
 
     String getCategoryName();
 
-    String getDescription();
+    String getDescription( Locale locale );
 
     Sink getSink()
         throws IOException;
