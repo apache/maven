@@ -126,7 +126,6 @@
  -->
 <mojo xmlns="marmalade:mojo">
   <metadata>
-    <id>pluginId</id>
     <goal>pluginGoalName</goal>
     <lifecyclePhase>compile</lifecyclePhase> <!-- Bind to the 'compile' phase of the standard build lifecycle. -->
     <description>A description of what the plugin accomplishes for the build process.</description>
