@@ -102,14 +102,14 @@
       </div>
     </div>
     <div id="breadcrumbs">
-      <div class="xleft">Last Published: $currentDate</div>
+      <div class="xleft">$i18n.getString( "site-plugin", $locale, "template.lastpublished" ): $currentDate</div>
       <div class="xright">#links()</div>
       <div class="clear">
         <hr/>
       </div>
     </div>
-    <div id="leftColumn"><div id="navcolumn">#mainMenu()<a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
-              <img alt="Built by Maven" src="$relativePath/images/logos/maven-feather.png"></img>
+    <div id="leftColumn"><div id="navcolumn">#mainMenu()<a href="http://maven.apache.org/" title="$i18n.getString( "site-plugin", $locale, "template.builtby" ) Maven" id="poweredBy">
+              <img alt="$i18n.getString( "site-plugin", $locale, "template.builtby" ) Maven" src="$relativePath/images/logos/maven-feather.png"></img>
             </a>
     </div></div>
     <div id="bodyColumn">

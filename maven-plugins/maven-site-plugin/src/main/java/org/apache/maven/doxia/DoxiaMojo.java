@@ -206,7 +206,7 @@ public class DoxiaMojo
                         outputFile.getParentFile().mkdirs();
                     }
 
-                    siteRenderer.generateDocument( new FileWriter( outputFile ), template, attributes, sink );
+                    siteRenderer.generateDocument( new FileWriter( outputFile ), template, attributes, sink, Locale.ENGLISH );
                 }
             }
 
@@ -472,7 +472,7 @@ public class DoxiaMojo
         sink.close();
 
         siteRenderer.generateDocument( new FileWriter( new File( outputDirectory, outputFileName ) ), template,
-                                       attributes, sink );
+                                       attributes, sink, Locale.ENGLISH );
     }
 
     private void generateProjectReportsPage( InputStream siteDescriptor )
@@ -547,7 +547,7 @@ public class DoxiaMojo
         sink.body_();
 
         siteRenderer.generateDocument( new FileWriter( new File( outputDirectory, outputFileName ) ), template,
-                                       attributes, sink );
+                                       attributes, sink, Locale.ENGLISH );
     }
 
     private void copyResources( String outputDirectory )
