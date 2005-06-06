@@ -55,10 +55,7 @@ public abstract class ArtifactTestCase
         if ( settingsFile.exists() )
         {
             Settings settings = new SettingsXpp3Reader().read( new FileReader( settingsFile ) );
-
-            // TODO: when settings has the code necessary, get the active profile.
-            Profile profile = (Profile) settings.getProfiles().get( 0 );
-            localRepo = profile.getLocalRepository();
+            localRepo = settings.getLocalRepository();
         }
         else
         {
