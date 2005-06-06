@@ -1,14 +1,5 @@
 package org.apache.maven.profiles;
 
-import org.apache.maven.profiles.ProfilesRoot;
-import org.apache.maven.profiles.io.xpp3.ProfilesXpp3Reader;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -24,6 +15,14 @@ import java.io.IOException;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.profiles.io.xpp3.ProfilesXpp3Reader;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class DefaultMavenProfilesBuilder
     implements MavenProfilesBuilder
