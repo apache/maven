@@ -63,22 +63,10 @@ public class SnapshotTransformation
         {
             artifact.setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
         }
-        try
+        else if ( isSnapshot( artifact ) )
         {
-            VersionArtifactMetadata metadata = readFromLocalRepository( artifact, localRepository );
-            if ( !metadata.exists() )
-            {
-                // doesn't exist - create to avoid an old snapshot download later
-                metadata.storeInLocalRepository( localRepository );
-            }
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Error getting existing metadata", e );
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Error getting existing metadata", e );
+            SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
+            metadata.storeInLocalRepository( localRepository );
         }
     }
 
