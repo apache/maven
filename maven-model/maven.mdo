@@ -21,7 +21,16 @@
 <model>
   <id>maven</id>
   <name>Maven</name>
-  <description><![CDATA[Maven's model for Java project.]]></description>
+  <description><![CDATA[
+    <p>This is a reference for the Maven project descriptor used in Maven.</p>
+    <p>An XSD is available at:</p>
+    <ul>
+      <li><a href="http://maven.apache.org/maven-v3_0_0.xsd">http://maven.apache.org/maven-v3_0_0.xsd</a> for Maven 1.1
+.</li>
+      <li><a href="http://maven.apache.org/maven-v4_0_0.xsd">http://maven.apache.org/maven-v4_0_0.xsd</a> for Maven 2.0
+.</li>
+    </ul>
+  ]]></description>
   <defaults>
     <default>
       <key>package</key>
@@ -389,7 +398,11 @@
           <name>reports</name>
           <version>3.0.0</version>
           <description><![CDATA[
-            
+            This element includes the specification of reports to be
+            included in a Maven-generated site.  These reports will be run
+            when a user executes <code>maven site</code>.  All of the
+            reports will be included in the navigation bar for browsing in
+            the order they are specified.
           ]]></description>
           <association>
             <type>String</type>
