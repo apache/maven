@@ -774,12 +774,11 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[]{"classworlds", /*"doxia-core",*/ "maven-artifact",
-                                                              "maven-core", "maven-model", "maven-monitor",
-                                                              "maven-plugin-api", "maven-plugin-descriptor",
-                                                              "maven-project", /*"maven-reporting-api",*/ "maven-settings",
-                                                              "plexus-container-default", "plexus-utils",
-                                                              "wagon-provider-api"} );
+        artifactFilter = new ExclusionSetFilter( new String[]{"classworlds", "maven-artifact", "maven-core",
+                                                              "maven-model", "maven-monitor", "maven-plugin-api",
+                                                              "maven-plugin-descriptor", "maven-project",
+                                                              "maven-settings", "plexus-container-default",
+                                                              "plexus-utils", "wagon-provider-api"} );
     }
 
     // ----------------------------------------------------------------------
