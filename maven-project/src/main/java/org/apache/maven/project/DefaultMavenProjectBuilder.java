@@ -41,6 +41,7 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -478,21 +479,8 @@ public class DefaultMavenProjectBuilder
 
     protected Set createArtifacts( List dependencies )
     {
-        Set projectArtifacts = new HashSet();
-
-        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-        {
-            Dependency d = (Dependency) i.next();
-
-            Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
-                                                                d.getScope(), d.getType(), null );
-            if ( artifact != null )
-            {
-                projectArtifacts.add( artifact );
-            }
-        }
-
-        return projectArtifacts;
+        // TODO: merge with MavenMetadataSource properly
+        return new MavenMetadataSource( artifactResolver, this ).createArtifacts( dependencies, null, null );
     }
 
     protected Set createPluginArtifacts( List plugins )

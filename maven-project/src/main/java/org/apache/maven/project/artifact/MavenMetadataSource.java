@@ -24,7 +24,11 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
@@ -37,6 +41,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -78,7 +83,7 @@ public class MavenMetadataSource
     {
         // TODO: only metadata is really needed - resolve as metadata
         Artifact pomArtifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                   artifact.getVersion(), artifact.getScope(), "pom" );
+                                                               artifact.getVersion(), artifact.getScope(), "pom" );
 
         List dependencies = null;
 
@@ -133,10 +138,10 @@ public class MavenMetadataSource
                 IOUtil.close( reader );
             }
         }
-        return createArtifacts( dependencies, artifact.getScope() );
+        return createArtifacts( dependencies, artifact.getScope(), artifact.getDependencyFilter() );
     }
 
-    protected Set createArtifacts( List dependencies, String inheritedScope )
+    public Set createArtifacts( List dependencies, String inheritedScope, ArtifactFilter dependencyFilter )
     {
         Set projectArtifacts = new HashSet();
 
@@ -146,9 +151,36 @@ public class MavenMetadataSource
 
             Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
                                                                 d.getScope(), d.getType(), inheritedScope );
-            if ( artifact != null )
+
+            if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
             {
-                projectArtifacts.add( artifact );
+                if ( d.getExclusions() != null && !d.getExclusions().isEmpty() )
+                {
+                    List exclusions = new ArrayList();
+                    for ( Iterator j = d.getExclusions().iterator(); j.hasNext(); )
+                    {
+                        Exclusion e = (Exclusion) j.next();
+                        exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
+                    }
+
+                    ArtifactFilter newFilter = new ExcludesArtifactFilter( exclusions );
+
+                    if ( dependencyFilter != null )
+                    {
+                        AndArtifactFilter filter = new AndArtifactFilter();
+                        filter.add( dependencyFilter );
+                        filter.add( newFilter );
+                        dependencyFilter = filter;
+                    }
+                    else
+                    {
+                        dependencyFilter = newFilter;
+                    }
+                }
+
+                artifact.setDependencyFilter( dependencyFilter );
+
+                    projectArtifacts.add( artifact );
             }
         }
 

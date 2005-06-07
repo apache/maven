@@ -20,6 +20,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -57,6 +58,8 @@ public class DefaultArtifact
     private ArtifactRepository repository;
 
     private String downloadUrl;
+
+    private ArtifactFilter dependencyFilter;
 
     /**
      * !!! WARNING !!! Never put <classifier/> in the POM. It is for mojo use
@@ -349,5 +352,15 @@ public class DefaultArtifact
     public void setDownloadUrl( String downloadUrl )
     {
         this.downloadUrl = downloadUrl;
+    }
+
+    public ArtifactFilter getDependencyFilter()
+    {
+        return dependencyFilter;
+    }
+
+    public void setDependencyFilter( ArtifactFilter artifactFilter )
+    {
+        this.dependencyFilter = artifactFilter;
     }
 }

@@ -17,6 +17,9 @@
  |
  | o use enums where appropriate (eg dependency scope)
  |
+ | o a number of elements have a grouId/artifactId and sometimes version. It would be good to have them all extend one
+ |   definition of these types
+ |
  -->
 <model>
   <id>maven</id>
@@ -1210,6 +1213,18 @@
           <type>String</type>
           <defaultValue>compile</defaultValue>
         </field>
+        <field>
+          <name>exclusions</name>
+          <version>4.0.0</version>
+          <description>
+            Lists a set of artifacts that should be excluded from this dependency's artifact list when it comes to
+            calculating transitive dependencies.
+          </description>
+          <association>
+            <type>Exclusion</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -1318,6 +1333,24 @@
           <name>id</name>
           <version>3.0.0+</version>
           <description><![CDATA[The username of the developer.]]></description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Exclusion</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <description><![CDATA[The artifact id of the project to exclude.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <description><![CDATA[The group id of the project to exclude.]]></description>
           <type>String</type>
         </field>
       </fields>

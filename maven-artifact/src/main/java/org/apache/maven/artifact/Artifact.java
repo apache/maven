@@ -19,6 +19,7 @@ package org.apache.maven.artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 import java.io.File;
 import java.util.List;
@@ -93,4 +94,8 @@ public interface Artifact
     String getDownloadUrl();
 
     void setDownloadUrl( String downloadUrl );
+
+    ArtifactFilter getDependencyFilter();
+
+    void setDependencyFilter( ArtifactFilter artifactFilter );
 }
