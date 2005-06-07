@@ -472,27 +472,16 @@ public class DefaultPluginManager
         {
             Parameter parameter = (Parameter) parameters.get( i );
 
-            // the key for the configuration map we're building.
-            String key = parameter.getName();
-
-            Object fieldValue = null;
-            String expression = null;
-            PlexusConfiguration value = configuration.getChild( key, false );
-            try
+            if ( parameter.isRequired() )
             {
-                if ( value != null )
-                {
-                    expression = value.getValue( null );
-                    fieldValue = expressionEvaluator.evaluate( expression );
-                    if ( fieldValue == null )
-                    {
-                        fieldValue = value.getAttribute( "default-value", null );
-                    }
-                }
+                // the key for the configuration map we're building.
+                String key = parameter.getName();
 
-                if ( fieldValue == null && StringUtils.isNotEmpty( parameter.getAlias() ) )
+                Object fieldValue = null;
+                String expression = null;
+                PlexusConfiguration value = configuration.getChild( key, false );
+                try
                 {
-                    value = configuration.getChild( parameter.getAlias(), false );
                     if ( value != null )
                     {
                         expression = value.getValue( null );
@@ -502,49 +491,63 @@ public class DefaultPluginManager
                             fieldValue = value.getAttribute( "default-value", null );
                         }
                     }
-                }
-            }
-            catch ( ExpressionEvaluationException e )
-            {
-                throw new PluginConfigurationException( "Bad expression", e );
-            }
 
-            if ( fieldValue == null && goal.getComponentConfigurator() == null )
-            {
-                try
-                {
-                    // TODO: remove in beta-1
-                    Field field = findPluginField( plugin.getClass(), parameter.getName() );
-                    boolean accessible = field.isAccessible();
-                    if ( !accessible )
+                    if ( fieldValue == null && StringUtils.isNotEmpty( parameter.getAlias() ) )
                     {
-                        field.setAccessible( true );
-                    }
-                    fieldValue = field.get( plugin );
-                    if ( !accessible )
-                    {
-                        field.setAccessible( false );
-                    }
-                    if ( fieldValue != null )
-                    {
-                        getLogger().warn( "DEPRECATED: using default-value to set the default value of field '" +
-                                          parameter.getName() + "'" );
+                        value = configuration.getChild( parameter.getAlias(), false );
+                        if ( value != null )
+                        {
+                            expression = value.getValue( null );
+                            fieldValue = expressionEvaluator.evaluate( expression );
+                            if ( fieldValue == null )
+                            {
+                                fieldValue = value.getAttribute( "default-value", null );
+                            }
+                        }
                     }
                 }
-                catch ( NoSuchFieldException e )
+                catch ( ExpressionEvaluationException e )
                 {
-                    throw new PluginConfigurationException( "Unable to find field to check default value", e );
+                    throw new PluginConfigurationException( "Bad expression", e );
                 }
-                catch ( IllegalAccessException e )
-                {
-                    throw new PluginConfigurationException( "Unable to read field to check default value", e );
-                }
-            }
 
-            if ( parameter.isRequired() && fieldValue == null )
-            {
-                parameter.setExpression( expression );
-                invalidParameters.add( parameter );
+                if ( fieldValue == null && goal.getComponentConfigurator() == null )
+                {
+                    try
+                    {
+                        // TODO: remove in beta-1
+                        Field field = findPluginField( plugin.getClass(), parameter.getName() );
+                        boolean accessible = field.isAccessible();
+                        if ( !accessible )
+                        {
+                            field.setAccessible( true );
+                        }
+                        fieldValue = field.get( plugin );
+                        if ( !accessible )
+                        {
+                            field.setAccessible( false );
+                        }
+                        if ( fieldValue != null )
+                        {
+                            getLogger().warn( "DEPRECATED: using default-value to set the default value of field '" +
+                                              parameter.getName() + "'" );
+                        }
+                    }
+                    catch ( NoSuchFieldException e )
+                    {
+                        throw new PluginConfigurationException( "Unable to find field to check default value", e );
+                    }
+                    catch ( IllegalAccessException e )
+                    {
+                        throw new PluginConfigurationException( "Unable to read field to check default value", e );
+                    }
+                }
+
+                if ( fieldValue == null )
+                {
+                    parameter.setExpression( expression );
+                    invalidParameters.add( parameter );
+                }
             }
         }
 
