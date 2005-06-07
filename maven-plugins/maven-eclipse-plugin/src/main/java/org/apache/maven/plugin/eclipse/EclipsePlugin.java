@@ -75,6 +75,12 @@ public class EclipsePlugin
         {
             throw new MojoExecutionException( "There must be a POM in the current working directory for the Eclipse plugin to work." );
         }
+        if ( "pom".equals( project.getPackaging() ) )
+        {
+            getLog().info( "Don't generate Eclipse project for pom project" );
+
+            return;
+        }
 
         try
         {
