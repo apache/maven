@@ -119,7 +119,7 @@ fi
     (
       cd $DIR/maven-components
   
-      sh m2-bootstrap-all.sh -Dmaven.repo.local="$HOME_DIR/$REPO" -Dmaven.home="$M2_HOME"
+      sh m2-bootstrap-all.sh -Dmaven.repo.local="$HOME_DIR/$REPO" -Dmaven.home="$M2_HOME" --update-snapshots
       ret=$?; if [ $ret != 0 ]; then exit $ret; fi
     )    
     ret=$?; if [ $ret != 0 ]; then exit $ret; fi
