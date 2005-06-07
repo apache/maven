@@ -38,10 +38,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
-import org.codehaus.plexus.ArtifactEnabledContainer;
-import org.codehaus.plexus.ArtifactEnabledContainerException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
@@ -62,8 +61,10 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -159,22 +160,21 @@ public class DefaultPluginManager
         return (PluginDescriptor) pluginDescriptorsByPrefix.get( prefix );
     }
 
-    private boolean isPluginInstalled( String groupId, String artifactId, String version )
+    private boolean isPluginInstalled( String pluginKey )
     {
 //        String key = PluginDescriptor.constructPluginKey( groupId, artifactId, version );
         // TODO: see comment in getPluginDescriptor
-        String key = groupId + ":" + artifactId;
-        return pluginDescriptors.containsKey( key );
+        return pluginDescriptors.containsKey( pluginKey );
     }
 
-    private boolean isPluginInstalled( String prefix )
+    private boolean isPluginInstalledForPrefix( String prefix )
     {
         return pluginDescriptorsByPrefix.containsKey( prefix );
     }
 
     public PluginDescriptor verifyPlugin( String prefix )
     {
-        if ( !isPluginInstalled( prefix ) )
+        if ( !isPluginInstalledForPrefix( prefix ) )
         {
             // TODO: lookup remotely
         }
@@ -184,6 +184,9 @@ public class DefaultPluginManager
     public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException
     {
+        
+        String pluginKey = groupId + ":" + artifactId;
+        
         // TODO: this should be possibly outside
         if ( version == null )
         {
@@ -232,17 +235,18 @@ public class DefaultPluginManager
         }
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
-        if ( !isPluginInstalled( groupId, artifactId, version ) )
+        if ( !isPluginInstalled( pluginKey ) )
         {
             try
             {
-                Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version, null,
+                Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME,
                                                                           MojoDescriptor.MAVEN_PLUGIN, null );
-                addPlugin( pluginArtifact, session );
+
+                addPlugin( pluginKey, pluginArtifact, session );
 
                 version = pluginArtifact.getBaseVersion();
             }
-            catch ( ArtifactEnabledContainerException e )
+            catch ( PlexusContainerException e )
             {
                 throw new PluginManagerException( "Error occurred in the artifact container attempting to download plugin " +
                                                   groupId + ":" + artifactId, e );
@@ -268,8 +272,8 @@ public class DefaultPluginManager
         return getPluginDescriptor( groupId, artifactId, version );
     }
 
-    protected void addPlugin( Artifact pluginArtifact, MavenSession session )
-        throws ArtifactEnabledContainerException, ArtifactResolutionException, ComponentLookupException
+    protected void addPlugin( String pluginKey, Artifact pluginArtifact, MavenSession session )
+        throws ArtifactResolutionException, ComponentLookupException, PlexusContainerException
     {
         ArtifactResolver artifactResolver = null;
         MavenProjectBuilder mavenProjectBuilder = null;
@@ -282,10 +286,21 @@ public class DefaultPluginManager
 
             MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
-            ( (ArtifactEnabledContainer) container ).addComponent( pluginArtifact, artifactResolver,
-                                                                   session.getPluginRepositories(),
-                                                                   session.getLocalRepository(), metadataSource,
-                                                                   artifactFilter );
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( pluginArtifact ), session.getRemoteRepositories(), session.getLocalRepository(), metadataSource, artifactFilter );
+            
+            Map resolved = result.getArtifacts();
+            
+            List files = new ArrayList();
+            
+            for ( Iterator it = resolved.values().iterator(); it.hasNext(); )
+            {
+                Artifact artifact = (Artifact) it.next();
+                File artifactFile = artifact.getFile();
+                
+                files.add( artifact.getFile() );
+            }
+            
+            container.createChildContainer( pluginKey, files, Collections.EMPTY_MAP, Collections.singletonList( this ) );
         }
         finally
         {
@@ -319,6 +334,8 @@ public class DefaultPluginManager
     public void executeMojo( MavenSession session, MojoDescriptor mojoDescriptor )
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
+        PlexusContainer pluginContainer = null;
+        
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
 
@@ -357,7 +374,16 @@ public class DefaultPluginManager
 
         try
         {
-            plugin = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
+            String pluginKey = mojoDescriptor.getPluginDescriptor().getPluginLookupKey();
+            
+            pluginContainer = container.getChildContainer( pluginKey );
+            
+            if( pluginContainer == null )
+            {
+                throw new PluginConfigurationException( "Cannot find PlexusContainer for plugin: " + pluginKey );
+            }
+            
+            plugin = (Mojo) pluginContainer.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
             plugin.setLog( mojoLogger );
 
             String goalId = mojoDescriptor.getGoal();
@@ -395,9 +421,9 @@ public class DefaultPluginManager
             try
             {
                 getPluginConfigurationFromExpressions( plugin, mojoDescriptor, mergedConfiguration,
-                                                       expressionEvaluator );
+                                                       pluginContainer, expressionEvaluator );
 
-                populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, expressionEvaluator );
+                populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, pluginContainer, expressionEvaluator );
             }
             catch ( ExpressionEvaluationException e )
             {
@@ -435,7 +461,17 @@ public class DefaultPluginManager
         }
         finally
         {
-            releaseComponent( plugin );
+            try
+            {
+                pluginContainer.release( plugin );
+            }
+            catch ( ComponentLifecycleException e )
+            {
+                if( getLogger().isErrorEnabled() )
+                {
+                    getLogger().error( "Error releasing plugin - ignoring.", e );
+                }
+            }
         }
     }
 
@@ -527,7 +563,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void populatePluginFields( Mojo plugin, MojoDescriptor mojoDescriptor, PlexusConfiguration configuration,
-                                       ExpressionEvaluator expressionEvaluator )
+                                       PlexusContainer pluginContainer, ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
         ComponentConfigurator configurator = null;
@@ -539,14 +575,14 @@ public class DefaultPluginManager
             // TODO: should this be known to the component factory instead? And if so, should configuration be part of lookup?
             if ( StringUtils.isNotEmpty( configuratorId ) )
             {
-                configurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE, configuratorId );
+                configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, configuratorId );
             }
             else
             {
-                configurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE );
+                configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE );
             }
 
-            configurator.configureComponent( plugin, configuration, expressionEvaluator );
+            configurator.configureComponent( plugin, configuration, expressionEvaluator, pluginContainer.getContainerRealm() );
 
         }
         catch ( ComponentConfigurationException e )
@@ -564,7 +600,7 @@ public class DefaultPluginManager
             {
                 try
                 {
-                    container.release( configurator );
+                    pluginContainer.release( configurator );
                 }
                 catch ( ComponentLifecycleException e )
                 {
@@ -599,7 +635,7 @@ public class DefaultPluginManager
      */
     private void getPluginConfigurationFromExpressions( Mojo plugin, MojoDescriptor goal,
                                                         PlexusConfiguration mergedConfiguration,
-                                                        ExpressionEvaluator expressionEvaluator )
+                                                        PlexusContainer pluginContainer, ExpressionEvaluator expressionEvaluator )
         throws ExpressionEvaluationException, PluginConfigurationException
     {
         List parameters = goal.getParameters();
@@ -795,7 +831,6 @@ public class DefaultPluginManager
             "bsh",
             "classworlds",
             "doxia-core",
-            "marmalade-core",
             "maven-artifact",
             "maven-core",
             "maven-model",
@@ -806,12 +841,9 @@ public class DefaultPluginManager
             "maven-project",
             "maven-reporting-api",
             "maven-script-beanshell",
-            "maven-script-marmalade",
             "maven-settings",
             "plexus-bsh-factory",
-            "plexus-container-artifact",
             "plexus-container-default",
-            "plexus-marmalade-factory",
             "plexus-utils",
             "wagon-provider-api"
         } );

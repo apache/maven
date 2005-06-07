@@ -44,7 +44,7 @@ import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.embed.ArtifactEnabledEmbedder;
+import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
@@ -148,7 +148,7 @@ public class MavenCli
         // bring the maven component to life for use.
         // ----------------------------------------------------------------------
 
-        ArtifactEnabledEmbedder embedder = new ArtifactEnabledEmbedder();
+        Embedder embedder = new Embedder();
 
         try
         {
@@ -276,7 +276,7 @@ public class MavenCli
         }
     }
 
-    private static MavenExecutionRequest createRequest( List files, ArtifactEnabledEmbedder embedder,
+    private static MavenExecutionRequest createRequest( List files, Embedder embedder,
                                                         CommandLine commandLine, Settings settings,
                                                         EventDispatcher eventDispatcher, LoggerManager manager )
         throws ComponentLookupException
@@ -330,7 +330,7 @@ public class MavenCli
         return files;
     }
 
-    private static Maven createMavenInstance( ArtifactEnabledEmbedder embedder )
+    private static Maven createMavenInstance( Embedder embedder )
         throws ComponentLookupException
     {
         // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place (likewise logger).
@@ -340,7 +340,7 @@ public class MavenCli
         return (Maven) embedder.lookup( Maven.ROLE );
     }
 
-    private static ArtifactRepository createLocalRepository( ArtifactEnabledEmbedder embedder, Settings settings,
+    private static ArtifactRepository createLocalRepository( Embedder embedder, Settings settings,
                                                              CommandLine commandLine )
         throws ComponentLookupException
     {

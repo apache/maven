@@ -100,7 +100,12 @@ public class PluginDescriptor
     {
         return groupId + ":" + artifactId + ":" + version;
     }
-
+    
+    public String getPluginLookupKey()
+    {
+        return groupId + ":" + artifactId;
+    }
+    
     public String getId()
     {
         String id = constructPluginKey( groupId, artifactId, version );

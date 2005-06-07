@@ -76,9 +76,8 @@
     </site>
   </distributionManagement>
   <modules>
-    <!-- Due to CL bug, assembly must be first -->
-    <module>maven-assembly-plugin</module>
     <module>maven-ant-plugin</module>
+    <module>maven-assembly-plugin</module>
     <module>maven-clean-plugin</module>
     <module>maven-compiler-plugin</module>
     <module>maven-deploy-plugin</module>
