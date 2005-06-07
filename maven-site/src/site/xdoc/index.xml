@@ -167,6 +167,11 @@
               <a href="docs-required.html">documentation is needed</a>?
             </i>
           </li>
+          <li>
+            <i>Draft <a href="http://docs.codehaus.org/display/MAVEN/Home">design documents</a> are in
+              Confluence, until they are implemented and added to the developers section.
+            </i>
+          </li>
         </ul>
       </subsection>
     </section>
