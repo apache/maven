@@ -100,12 +100,12 @@ public class DependenciesTask
             throw new BuildException( "Unable to resolve artifact", e );
         }
 
-        if ( getProject().getReference( pathId ) != null )
+        if ( pathId != null && getProject().getReference( pathId ) != null )
         {
             throw new BuildException( "Reference ID " + pathId + " already exists" );
         }
 
-        if ( getProject().getReference( filesetId ) != null )
+        if ( filesetId != null && getProject().getReference( filesetId ) != null )
         {
             throw new BuildException( "Reference ID " + filesetId + " already exists" );
         }
