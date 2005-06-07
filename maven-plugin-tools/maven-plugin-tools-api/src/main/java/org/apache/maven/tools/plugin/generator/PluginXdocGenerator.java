@@ -309,6 +309,12 @@ public class PluginXdocGenerator
 
         w.startElement( "th" );
 
+        w.writeText( "Default Value" );
+
+        w.endElement(); // th
+
+        w.startElement( "th" );
+
         w.writeText( "Description" );
 
         w.endElement(); // th
@@ -390,6 +396,27 @@ public class PluginXdocGenerator
                 !parameter.getExpression().startsWith( "${component." ) )
             {
                 w.writeText( parameter.getExpression() );
+            }
+            else
+            {
+                w.writeText( "-" );
+            }
+
+            w.endElement(); // code
+
+            w.endElement(); // td
+
+            // ----------------------------------------------------------------------
+            //
+            // ----------------------------------------------------------------------
+
+            w.startElement( "td" );
+
+            w.startElement( "code" );
+
+            if ( StringUtils.isNotEmpty( parameter.getDefaultValue() ) )
+            {
+                w.writeText( parameter.getDefaultValue() );
             }
             else
             {
