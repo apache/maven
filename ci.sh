@@ -15,7 +15,7 @@ RUNNING=`ps -ef | grep ci.sh | grep -v 'sh -c' | grep -v grep | grep -v $PID`
 if [ ! -z "$RUNNING" ]; then
   echo "From: $FROM" > running_log
   echo "To: $TO" >> running_log
-  echo "Subject: [maven2 build - FAILED - $CMD] $DATE" >>running_log
+  echo "Subject: [maven2 build - SKIPPED - $CMD] $DATE" >>running_log
   echo "" >> running_log
   echo "ci.sh already running... exiting" >>running_log
   echo "$RUNNING" >>running_log
