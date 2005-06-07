@@ -210,8 +210,6 @@ public class PluginDescriptorBuilder
 
             parameter.setDescription( d.getChild( "description" ).getValue() );
 
-            parameter.setExpression( d.getChild( "expression" ).getValue() );
-
             parameter.setDeprecated( d.getChild( "deprecated" ).getValue() );
 
             parameters.add( parameter );

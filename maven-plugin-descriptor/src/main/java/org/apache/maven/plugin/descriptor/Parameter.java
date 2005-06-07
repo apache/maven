@@ -38,6 +38,8 @@ public class Parameter
 
     private String deprecated;
 
+    private String defaultValue;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -132,8 +134,19 @@ public class Parameter
         this.editable = editable;
     }
 
+    public void setDefaultValue( String defaultValue )
+    {
+        this.defaultValue = defaultValue;
+    }
+
+    public String getDefaultValue()
+    {
+        return defaultValue;
+    }
+
     public String toString()
     {
         return "Mojo parameter [name: \'" + getName() + "\'; alias: \'" + getAlias() + "\']";
     }
+
 }

@@ -30,10 +30,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * @todo add example usage tag that can be shown in the doco
@@ -69,11 +69,11 @@ public class PluginDescriptorGenerator
             element( w, "version", pluginDescriptor.getVersion() );
 
             element( w, "goalPrefix", pluginDescriptor.getGoalPrefix() );
-            
+
             element( w, "isolatedRealm", "" + pluginDescriptor.isIsolatedRealm() );
 
             element( w, "inheritedByDefault", "" + pluginDescriptor.isInheritedByDefault() );
-            
+
             w.startElement( "mojos" );
 
             if ( pluginDescriptor.getMojos() != null )
@@ -233,10 +233,10 @@ public class PluginDescriptorGenerator
         w.startElement( "parameters" );
 
         Collection requirements = new ArrayList();
-        
-        Map configuration = new HashMap();
-        
-        if( parameters != null )
+
+        Set configuration = new HashSet();
+
+        if ( parameters != null )
         {
             for ( int j = 0; j < parameters.size(); j++ )
             {
@@ -276,9 +276,10 @@ public class PluginDescriptorGenerator
 
                     element( w, "description", parameter.getDescription() );
 
-                    if ( expression != null && expression.length() > 0 )
+                    if ( StringUtils.isNotEmpty( parameter.getDefaultValue() ) ||
+                        StringUtils.isNotEmpty( parameter.getExpression() ) )
                     {
-                        configuration.put( parameter, expression );
+                        configuration.add( parameter );
                     }
 
                     w.endElement();
@@ -297,7 +298,7 @@ public class PluginDescriptorGenerator
         {
             w.startElement( "configuration" );
 
-            for ( Iterator i = configuration.keySet().iterator(); i.hasNext(); )
+            for ( Iterator i = configuration.iterator(); i.hasNext(); )
             {
                 Parameter parameter = (Parameter) i.next();
 
@@ -309,7 +310,15 @@ public class PluginDescriptorGenerator
                     w.addAttribute( "implementation", type );
                 }
 
-                w.writeText( (String) configuration.get( parameter ) );
+                if ( parameter.getDefaultValue() != null )
+                {
+                    w.addAttribute( "default-value", parameter.getDefaultValue() );
+                }
+
+                if ( parameter.getExpression() != null )
+                {
+                    w.writeText( parameter.getExpression() );
+                }
 
                 w.endElement();
             }

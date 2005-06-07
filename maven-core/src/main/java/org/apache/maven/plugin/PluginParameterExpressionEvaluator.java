@@ -59,7 +59,6 @@ public class PluginParameterExpressionEvaluator
 
         if ( expr == null )
         {
-            // TODO: this should not have happened - previously there was a note about a fix to plexus Trygve was going to make - investigate
             return null;
         }
 

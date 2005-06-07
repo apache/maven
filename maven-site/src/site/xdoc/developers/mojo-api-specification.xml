@@ -477,14 +477,15 @@
               tool support for browsing, etc. and for clarity.</i></td>
           </tr>
           <tr>
-            <td>expression</td>
-            <td>@parameter expression="${someExpression}"</td>
+            <td>configuration</td>
+            <td>@parameter expression="${someExpression}" default-value="value"</td>
             <td>No</td>
             <td>Specifies the expression used to calculate the value to be 
               injected into this parameter of the Mojo at buildtime. This is 
               commonly used to refer to specific elements in the POM, such as 
               ${project.build.resources}, which refers to the List of resources 
               meant to accompany the classes in the resulting jar file. 
+              The default value is used when the expression evaluates to <code>null</code>.
               <i>NOTE: If not specified, an expression of ${&lt;name&gt;} is 
               assumed, which can only be satisfied from POM configuration or 
               System properties. The use of '${' and '}' is required to delimit 

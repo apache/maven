@@ -56,6 +56,8 @@ public class JavaMojoDescriptorExtractor
 
     public static final String PARAMETER_EXPRESSION = "expression";
 
+    public static final String PARAMETER_DEFAULT_VALUE = "default-value";
+
     public static final String REQUIRED = "required";
 
     public static final String DEPRECATED = "deprecated";
@@ -292,6 +294,8 @@ public class JavaMojoDescriptorExtractor
             }
 
             pd.setExpression( parameter.getNamedParameter( PARAMETER_EXPRESSION ) );
+
+            pd.setDefaultValue( parameter.getNamedParameter( PARAMETER_DEFAULT_VALUE ) );
 
             mojoDescriptor.addParameter( pd );
         }

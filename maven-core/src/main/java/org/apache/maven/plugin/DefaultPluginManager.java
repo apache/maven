@@ -61,7 +61,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -114,13 +113,6 @@ public class DefaultPluginManager
         if ( componentSetDescriptor instanceof PluginDescriptor )
         {
             PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
-
-            if ( pluginDescriptor.getVersion() == null )
-            {
-                // TODO: temporary - until we're done testing that version is always written
-                throw new NullPointerException( "Version was null - check your plugin '" + pluginDescriptor.getId() +
-                                                "' was built with Maven 2.0 Alpha 2" );
-            }
 
 //            String key = pluginDescriptor.getId();
             // TODO: see comment in getPluginDescriptor
@@ -184,7 +176,7 @@ public class DefaultPluginManager
     public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException
     {
-        
+
         String pluginKey = groupId + ":" + artifactId;
         
         // TODO: this should be possibly outside
@@ -239,7 +231,8 @@ public class DefaultPluginManager
         {
             try
             {
-                Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME,
+                Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version,
+                                                                          Artifact.SCOPE_RUNTIME,
                                                                           MojoDescriptor.MAVEN_PLUGIN, null );
 
                 addPlugin( pluginKey, pluginArtifact, session );
@@ -286,20 +279,21 @@ public class DefaultPluginManager
 
             MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( pluginArtifact ), session.getRemoteRepositories(), session.getLocalRepository(), metadataSource, artifactFilter );
-            
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively(
+                Collections.singleton( pluginArtifact ), session.getRemoteRepositories(), session.getLocalRepository(),
+                metadataSource, artifactFilter );
+
             Map resolved = result.getArtifacts();
-            
+
             List files = new ArrayList();
-            
+
             for ( Iterator it = resolved.values().iterator(); it.hasNext(); )
             {
                 Artifact artifact = (Artifact) it.next();
-                File artifactFile = artifact.getFile();
-                
+
                 files.add( artifact.getFile() );
             }
-            
+
             container.createChildContainer( pluginKey, files, Collections.EMPTY_MAP, Collections.singletonList( this ) );
         }
         finally
@@ -335,7 +329,7 @@ public class DefaultPluginManager
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
         PlexusContainer pluginContainer = null;
-        
+
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
 
@@ -375,20 +369,19 @@ public class DefaultPluginManager
         try
         {
             String pluginKey = mojoDescriptor.getPluginDescriptor().getPluginLookupKey();
-            
+
             pluginContainer = container.getChildContainer( pluginKey );
-            
-            if( pluginContainer == null )
+
+            if ( pluginContainer == null )
             {
                 throw new PluginConfigurationException( "Cannot find PlexusContainer for plugin: " + pluginKey );
             }
-            
+
             plugin = (Mojo) pluginContainer.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
             plugin.setLog( mojoLogger );
 
             String goalId = mojoDescriptor.getGoal();
 
-            // TODO: can probable refactor these a little when only the new plugin technique is in place
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
             Xpp3Dom dom = session.getProject().getGoalConfiguration( pluginDescriptor.getGroupId(),
                                                                      pluginDescriptor.getArtifactId(), goalId );
@@ -401,34 +394,24 @@ public class DefaultPluginManager
             else
             {
                 pomConfiguration = new XmlPlexusConfiguration( dom );
-
-                // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to 
-                // override in the POM.
-                // TODO: currently breaks it0014, as an expression is in pomConfiguration
-//                validatePomConfiguration( mojoDescriptor, pomConfiguration );
             }
 
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator,
-                                                                                              getLogger() );
+            // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to
+            // override in the POM.
+            validatePomConfiguration( mojoDescriptor, pomConfiguration );
 
             PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
                                                                           mojoDescriptor.getMojoConfiguration() );
 
-            // TODO: Go back to this when we get the container ready to configure mojos...
+            // TODO: plexus
 //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
 //                                                                          mojoDescriptor.getConfiguration() );
 
-            try
-            {
-                getPluginConfigurationFromExpressions( plugin, mojoDescriptor, mergedConfiguration,
-                                                       pluginContainer, expressionEvaluator );
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator,
+                                                                                              getLogger() );
+            checkRequiredParameters( mojoDescriptor, mergedConfiguration, expressionEvaluator, plugin );
 
-                populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, pluginContainer, expressionEvaluator );
-            }
-            catch ( ExpressionEvaluationException e )
-            {
-                throw new MojoExecutionException( "Unable to configure plugin", e );
-            }
+            populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, pluginContainer, expressionEvaluator );
 
             // !! This is ripe for refactoring to an aspect.
             // Event monitoring.
@@ -467,11 +450,107 @@ public class DefaultPluginManager
             }
             catch ( ComponentLifecycleException e )
             {
-                if( getLogger().isErrorEnabled() )
+                if ( getLogger().isErrorEnabled() )
                 {
                     getLogger().error( "Error releasing plugin - ignoring.", e );
                 }
             }
+        }
+    }
+
+    private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration,
+                                          ExpressionEvaluator expressionEvaluator, Mojo plugin )
+        throws PluginConfigurationException
+    {
+        // TODO: this should be built in to the configurator, as we presently double process the expressions
+
+        List parameters = goal.getParameters();
+
+        List invalidParameters = new ArrayList();
+
+        for ( int i = 0; i < parameters.size(); i++ )
+        {
+            Parameter parameter = (Parameter) parameters.get( i );
+
+            // the key for the configuration map we're building.
+            String key = parameter.getName();
+
+            Object fieldValue = null;
+            String expression = null;
+            PlexusConfiguration value = configuration.getChild( key, false );
+            try
+            {
+                if ( value != null )
+                {
+                    expression = value.getValue( null );
+                    fieldValue = expressionEvaluator.evaluate( expression );
+                    if ( fieldValue == null )
+                    {
+                        fieldValue = value.getAttribute( "default-value", null );
+                    }
+                }
+
+                if ( fieldValue == null && StringUtils.isNotEmpty( parameter.getAlias() ) )
+                {
+                    value = configuration.getChild( parameter.getAlias(), false );
+                    if ( value != null )
+                    {
+                        expression = value.getValue( null );
+                        fieldValue = expressionEvaluator.evaluate( expression );
+                        if ( fieldValue == null )
+                        {
+                            fieldValue = value.getAttribute( "default-value", null );
+                        }
+                    }
+                }
+            }
+            catch ( ExpressionEvaluationException e )
+            {
+                throw new PluginConfigurationException( "Bad expression", e );
+            }
+
+            if ( fieldValue == null && goal.getComponentConfigurator() == null )
+            {
+                try
+                {
+                    // TODO: remove in beta-1
+                    Field field = findPluginField( plugin.getClass(), parameter.getName() );
+                    boolean accessible = field.isAccessible();
+                    if ( !accessible )
+                    {
+                        field.setAccessible( true );
+                    }
+                    fieldValue = field.get( plugin );
+                    if ( !accessible )
+                    {
+                        field.setAccessible( false );
+                    }
+                    if ( fieldValue != null )
+                    {
+                        getLogger().warn( "DEPRECATED: using default-value to set the default value of field '" +
+                                          parameter.getName() + "'" );
+                    }
+                }
+                catch ( NoSuchFieldException e )
+                {
+                    throw new PluginConfigurationException( "Unable to find field to check default value", e );
+                }
+                catch ( IllegalAccessException e )
+                {
+                    throw new PluginConfigurationException( "Unable to read field to check default value", e );
+                }
+            }
+
+            if ( parameter.isRequired() && fieldValue == null )
+            {
+                parameter.setExpression( expression );
+                invalidParameters.add( parameter );
+            }
+        }
+
+        if ( !invalidParameters.isEmpty() )
+        {
+            throw new PluginParameterException( goal, invalidParameters );
         }
     }
 
@@ -484,31 +563,22 @@ public class DefaultPluginManager
         {
             Parameter parameter = (Parameter) parameters.get( i );
 
-            boolean editable = parameter.isEditable();
-
             // the key for the configuration map we're building.
             String key = parameter.getName();
 
-            // the key used to lookup the parameter in the config from the POM, etc.
-            String lookupKey = parameter.getAlias();
+            PlexusConfiguration value = pomConfiguration.getChild( key, false );
 
-            if ( StringUtils.isEmpty( lookupKey ) )
+            if ( value == null && StringUtils.isNotEmpty( parameter.getAlias() ) )
             {
-                lookupKey = key;
+                key = parameter.getAlias();
+                value = pomConfiguration.getChild( key, false );
             }
 
-            // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM 
-            if ( !editable && ( pomConfiguration.getChild( lookupKey, false ) != null ||
-                pomConfiguration.getChild( key, false ) != null ) )
+            // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM
+            if ( !parameter.isEditable() && value != null )
             {
-                StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " ).append(
-                    key );
-
-                if ( !lookupKey.equals( key ) )
-                {
-                    errorMessage.append( " (with alias: " ).append( lookupKey ).append( ")" );
-                }
-
+                StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " );
+                errorMessage.append( key );
                 errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
 
                 throw new PluginConfigurationException( errorMessage.toString() );
@@ -575,15 +645,16 @@ public class DefaultPluginManager
             // TODO: should this be known to the component factory instead? And if so, should configuration be part of lookup?
             if ( StringUtils.isNotEmpty( configuratorId ) )
             {
-                configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, configuratorId );
+                configurator =
+                    (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE, configuratorId );
             }
             else
             {
                 configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE );
             }
 
-            configurator.configureComponent( plugin, configuration, expressionEvaluator, pluginContainer.getContainerRealm() );
-
+            configurator.configureComponent( plugin, configuration, expressionEvaluator,
+                                             pluginContainer.getContainerRealm() );
         }
         catch ( ComponentConfigurationException e )
         {
@@ -627,144 +698,6 @@ public class DefaultPluginManager
             {
                 throw e;
             }
-        }
-    }
-
-    /**
-     * @deprecated [JC] in favor of what?
-     */
-    private void getPluginConfigurationFromExpressions( Mojo plugin, MojoDescriptor goal,
-                                                        PlexusConfiguration mergedConfiguration,
-                                                        PlexusContainer pluginContainer, ExpressionEvaluator expressionEvaluator )
-        throws ExpressionEvaluationException, PluginConfigurationException
-    {
-        List parameters = goal.getParameters();
-
-        List invalidParameters = new ArrayList();
-
-        if ( parameters == null || parameters.isEmpty() )
-        {
-            return;
-        }
-
-        for ( int i = 0; i < parameters.size(); i++ )
-        {
-            Parameter parameter = (Parameter) parameters.get( i );
-
-            boolean editable = parameter.isEditable();
-
-            // the key for the configuration map we're building.
-            String key = parameter.getName();
-
-            // the key used to lookup the parameter in the config from the POM, etc.
-            String lookupKey = parameter.getAlias();
-
-            if ( StringUtils.isEmpty( lookupKey ) )
-            {
-                lookupKey = key;
-            }
-
-            String expression;
-
-            boolean foundInConfiguration = false;
-
-            if ( mergedConfiguration.getChild( lookupKey, false ) != null )
-            {
-                expression = mergedConfiguration.getChild( lookupKey, false ).getValue( null );
-                foundInConfiguration = true;
-            }
-            else if ( mergedConfiguration.getChild( key, false ) != null )
-            {
-                expression = mergedConfiguration.getChild( key, false ).getValue( null );
-                foundInConfiguration = true;
-            }
-            else
-            {
-                expression = parameter.getExpression();
-            }
-
-            if ( foundInConfiguration && expression != null && parameter.getDeprecated() != null )
-            {
-                PlexusConfiguration goalConfiguration = goal.getMojoConfiguration();
-                
-                // TODO: Go back to this when we get the container ready to configure mojos...
-//                PlexusConfiguration goalConfiguration = goal.getConfiguration();
-
-                if ( !expression.equals( goalConfiguration.getChild( lookupKey, false ).getValue( null ) ) &&
-                    !expression.equals( goalConfiguration.getChild( key, false ).getValue( null ) ) )
-                {
-                    StringBuffer message = new StringBuffer().append( "DEPRECATED: " ).append( key );
-
-                    if ( !lookupKey.equals( key ) )
-                    {
-                        message.append( " (aliased to " ).append( lookupKey ).append( ")" );
-                    }
-
-                    message.append( " is deprecated.\n\t" ).append( parameter.getDeprecated() );
-
-                    getLogger().warn( message.toString() );
-                }
-            }
-
-            Object value = expressionEvaluator.evaluate( expression );
-
-            getLogger().debug( "Evaluated mojo parameter expression: \'" + expression + "\' to: " + value +
-                               " for parameter: \'" + key + "\'" );
-
-            // TODO: remove. If there is a default value, required should have been removed by the descriptor generator
-            if ( value == null && goal.getComponentConfigurator() == null )
-            {
-                Object defaultValue;
-                try
-                {
-                    Field pluginField = findPluginField( plugin.getClass(), parameter.getName() );
-                    boolean accessible = pluginField.isAccessible();
-                    if ( !accessible )
-                    {
-                        pluginField.setAccessible( true );
-                    }
-                    defaultValue = pluginField.get( plugin );
-                    if ( !accessible )
-                    {
-                        pluginField.setAccessible( false );
-                    }
-                }
-                catch ( IllegalAccessException e )
-                {
-                    String message = "Error finding field for parameter '" + parameter.getName() + "'";
-                    throw new PluginConfigurationException( message, e );
-                }
-                catch ( NoSuchFieldException e )
-                {
-                    String message = "Error finding field for parameter '" + parameter.getName() + "'";
-                    throw new PluginConfigurationException( message, e );
-                }
-                if ( defaultValue != null )
-                {
-                    // TODO: allow expressions?
-                    value = defaultValue;
-                }
-            }
-
-            // ----------------------------------------------------------------------
-            // We will perform a basic check here for parameters values that are
-            // required. Required parameters can't be null so we throw an
-            // Exception in the case where they are. We probably want some
-            // pluggable
-            // mechanism here but this will catch the most obvious of
-            // misconfigurations.
-            // ----------------------------------------------------------------------
-
-            if ( value == null && parameter.isRequired() )
-            {
-                invalidParameters.add( parameter );
-            }
-
-        }
-
-        if ( !invalidParameters.isEmpty() )
-        {
-            throw new PluginParameterException( goal, invalidParameters );
         }
     }
 
@@ -825,28 +758,13 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        // TODO: Note: maven-plugin just re-added until all plugins are switched over...
-        artifactFilter = new ExclusionSetFilter( new String[]
-        {
-            "bsh",
-            "classworlds",
-            "doxia-core",
-            "maven-artifact",
-            "maven-core",
-            "maven-model",
-            "maven-monitor",
-            "maven-plugin",
-            "maven-plugin-api",
-            "maven-plugin-descriptor",
-            "maven-project",
-            "maven-reporting-api",
-            "maven-script-beanshell",
-            "maven-settings",
-            "plexus-bsh-factory",
-            "plexus-container-default",
-            "plexus-utils",
-            "wagon-provider-api"
-        } );
+        artifactFilter = new ExclusionSetFilter( new String[]{"bsh", "classworlds", "doxia-core", "maven-artifact",
+                                                              "maven-core", "maven-model", "maven-monitor",
+                                                              "maven-plugin-api", "maven-plugin-descriptor",
+                                                              "maven-project", "maven-reporting-api",
+                                                              "maven-script-beanshell", "maven-settings",
+                                                              "plexus-bsh-factory", "plexus-container-default",
+                                                              "plexus-utils", "wagon-provider-api"} );
     }
 
     // ----------------------------------------------------------------------
@@ -899,7 +817,8 @@ public class DefaultPluginManager
         }
         context.getProject().setPluginArtifacts( pluginArtifacts );
 
-        artifactResolver.resolve( context.getProject().getParentArtifact(), context.getRemoteRepositories(), context.getLocalRepository() );
+        artifactResolver.resolve( context.getProject().getParentArtifact(), context.getRemoteRepositories(),
+                                  context.getLocalRepository() );
     }
 
 }
