@@ -94,6 +94,14 @@ public class SurefirePlugin
     private List excludes = new ArrayList( Collections.singletonList( "**/Abstract*Test.java" ) );
 
     /**
+     * The project whose project files to create.
+     *
+     * @parameter expression="${project}"
+     * @required
+     */
+    private MavenProject project;
+
+    /**
      * @parameter expression="${localRepository}"
      * @required
      * @readonly
@@ -110,6 +118,11 @@ public class SurefirePlugin
     public void execute()
         throws MojoExecutionException
     {
+        if ( "pom".equals( project.getPackaging() ) )
+        {
+            return;
+        }
+
         // ----------------------------------------------------------------------
         // Setup the surefire booter
         // ----------------------------------------------------------------------
