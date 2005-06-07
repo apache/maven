@@ -26,13 +26,14 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.Dependency;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.FileList;
-import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.Path;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +68,12 @@ public class DependenciesTask
 
         ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
 
-        Set artifacts = new HashSet();
+        ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
+        MavenMetadataSource metadataSource = new MavenMetadataSource( resolver, (MavenProjectBuilder) lookup(
+            MavenProjectBuilder.ROLE ) );
+
+        Set artifacts = metadataSource.createArtifacts( dependencies, null, null );
+/*
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency dependency = (Dependency) i.next();
@@ -76,10 +82,7 @@ public class DependenciesTask
                                                  null );
             artifacts.add( a );
         }
-
-        ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
-        MavenMetadataSource metadataSource = new MavenMetadataSource( resolver, (MavenProjectBuilder) lookup(
-            MavenProjectBuilder.ROLE ) );
+*/
 
         log( "Resolving dependencies..." );
 

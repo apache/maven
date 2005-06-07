@@ -13,7 +13,9 @@
     <artifact:pom file="pom.xml" id="maven.project"/>
 
     <artifact:dependencies pathId="dependency.classpath" filesetId="dependency.fileset">
-      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2"/>
+      <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2">
+        <exclusion groupId="junit" artifactId="junit" />
+      </dependency>
       <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
       <localRepository refid="local.repository"/>
     </artifact:dependencies>
