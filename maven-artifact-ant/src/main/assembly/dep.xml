@@ -18,16 +18,7 @@
       <unpack>true</unpack>
       <scope>runtime</scope>
       <excludes>
-        <exclude>junit:junit</exclude>
         <exclude>ant:ant</exclude>
-        <exclude>marmalade:marmalade-core</exclude>
-        <exclude>plexus:plexus-marmalade-factory</exclude>
-        <exclude>commons-cli:commons-cli</exclude>
-        <exclude>plexus:plexus-container-artifact</exclude>
-        <exclude>plexus:plexus-i18n</exclude>
-        <exclude>org.apache.maven:maven-script-marmalade</exclude>
-        <exclude>org.apache.maven:maven-plugin</exclude>
-        <exclude>org.apache.maven:maven-monitor</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
