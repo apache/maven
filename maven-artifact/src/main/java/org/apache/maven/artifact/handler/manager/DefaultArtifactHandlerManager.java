@@ -17,6 +17,7 @@ package org.apache.maven.artifact.handler.manager;
  */
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.GenericHandler;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 import java.util.Map;
@@ -39,6 +40,13 @@ public class DefaultArtifactHandlerManager
     {
         ArtifactHandler handler = (ArtifactHandler) artifactHandlers.get( type );
 
+        if ( handler == null )
+        {
+            handler = new GenericHandler( type );
+        }
+
+        // this should only happen if GenericHandler decides that the given type is unworthy to be handled
+        // TODO: can probably remove this
         if ( handler == null )
         {
             throw new ArtifactHandlerNotFoundException( "Artifact handler for type '" + type + "' cannot be found." );
