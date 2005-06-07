@@ -574,14 +574,24 @@ public class DefaultPluginManager
                 value = pomConfiguration.getChild( key, false );
             }
 
-            // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM
-            if ( !parameter.isEditable() && value != null )
+            if ( value != null )
             {
-                StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " );
-                errorMessage.append( key );
-                errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
+                // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM
+                if ( !parameter.isEditable() )
+                {
+                    StringBuffer errorMessage = new StringBuffer().append(
+                        "ERROR: Cannot override read-only parameter: " );
+                    errorMessage.append( key );
+                    errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
 
-                throw new PluginConfigurationException( errorMessage.toString() );
+                    throw new PluginConfigurationException( errorMessage.toString() );
+                }
+
+                String deprecated = parameter.getDeprecated();
+                if ( StringUtils.isNotEmpty( deprecated ) )
+                {
+                    getLogger().warn( "DEPRECATED [" + parameter.getName() + "]: " + deprecated );
+                }
             }
         }
     }
