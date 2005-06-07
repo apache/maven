@@ -42,9 +42,9 @@ public abstract class AbstractCompilerMojo
      * Whether to include debugging information in the compiled class files.
      * The default value is true.
      * 
-     * @parameter expression="${maven.compiler.debug}"
+     * @parameter expression="${maven.compiler.debug}" default-value="true"
      */
-    private boolean debug = true;
+    private boolean debug;
     
     /**
      * The -source argument for the Java compiler
@@ -64,9 +64,9 @@ public abstract class AbstractCompilerMojo
      * The granularity in milliseconds of the last modification
      * date for testing whether a source needs recompilation
      * 
-     * @parameter alias="${lastModGranularityMs}"
+     * @parameter expression="${lastModGranularityMs}" default-value="0"
      */
-    private int staleMillis = 0;
+    private int staleMillis;
     
     protected abstract List getClasspathElements();
 
