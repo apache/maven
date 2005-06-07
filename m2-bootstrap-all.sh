@@ -29,7 +29,7 @@ fi
   echo "-----------------------------------------------------------------------"  
 
   cd ./maven-mboot2
-  ./build $ARGS "$HOME_ARGS"
+  ./build
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -39,7 +39,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo " Building maven2 components ... "
   echo "-----------------------------------------------------------------------"  
 
-  "$JAVACMD" $ARGS "$HOME_ARGS" $MAVEN_OPTS -jar mboot.jar
+  "$JAVACMD" "$HOME_ARGS" $MAVEN_OPTS -jar mboot.jar $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi

@@ -23,5 +23,5 @@ if [ ! -z "$M2_HOME" ]; then
   jvm_m2_home="-Dmaven.home=$M2_HOME"
 fi
 
-java "$jvm_m2_home" $MAVEN_OPTS "$@" -cp "$cp" $verifier
+java "$jvm_m2_home" $MAVEN_OPTS -cp "$cp" $verifier $@
 
