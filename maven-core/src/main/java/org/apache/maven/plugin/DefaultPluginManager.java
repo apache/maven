@@ -771,12 +771,12 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[]{"bsh", "classworlds", "doxia-core", "maven-artifact",
+        artifactFilter = new ExclusionSetFilter( new String[]{/*"bsh",*/ "classworlds", "doxia-core", "maven-artifact",
                                                               "maven-core", "maven-model", "maven-monitor",
                                                               "maven-plugin-api", "maven-plugin-descriptor",
                                                               "maven-project", "maven-reporting-api",
-                                                              "maven-script-beanshell", "maven-settings",
-                                                              "plexus-bsh-factory", "plexus-container-default",
+                                                              /*"maven-script-beanshell", */"maven-settings",
+                                                              /*"plexus-bsh-factory", */"plexus-container-default",
                                                               "plexus-utils", "wagon-provider-api"} );
     }
 
