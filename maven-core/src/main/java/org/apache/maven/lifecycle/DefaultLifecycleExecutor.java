@@ -234,14 +234,15 @@ public class DefaultLifecycleExecutor
         PluginDescriptor pluginDescriptor;
         try
         {
-            pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session );
+            pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(),
+                                                           session.getLocalRepository() );
         }
         catch ( PluginManagerException e )
         {
             throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
         }
-        
-        if( plugin.isInheritanceApplied() || pluginDescriptor.isInheritedByDefault() )
+
+        if ( plugin.isInheritanceApplied() || pluginDescriptor.isInheritedByDefault() )
         {
             // ----------------------------------------------------------------------
             // Look to see if the plugin configuration specifies particular mojos
@@ -250,7 +251,7 @@ public class DefaultLifecycleExecutor
             // ----------------------------------------------------------------------
 
             Map goalMap = plugin.getGoalsAsMap();
-            
+
             if ( pluginDescriptor.getMojos() != null )
             {
                 for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
@@ -263,17 +264,17 @@ public class DefaultLifecycleExecutor
                         throw new LifecycleExecutionException(
                             "The plugin " + artifactId + " was built with an older version of Maven" );
                     }
-                
+
                     Goal goal = (Goal) goalMap.get( mojoDescriptor.getGoal() );
 
-                    if( goalMap.isEmpty() )
+                    if ( goalMap.isEmpty() )
                     {
                         configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
                     }
                     else if ( goal != null )
                     {
                         // We have to check to see that the inheritance rules have been applied before binding this mojo.
-                        if( goal.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
+                        if ( goal.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
                         {
                             configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
                         }
@@ -405,7 +406,9 @@ public class DefaultLifecycleExecutor
             {
                 injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
 
-                pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session );
+                pluginDescriptor =
+                    pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(),
+                                                session.getLocalRepository() );
             }
             catch ( PluginManagerException e )
             {
@@ -434,7 +437,7 @@ public class DefaultLifecycleExecutor
         }
         else
         {
-            throw new LifecycleExecutionException( "The plugin " + pluginDescriptor.getGroupId() + ":" + 
+            throw new LifecycleExecutionException( "The plugin " + pluginDescriptor.getGroupId() + ":" +
                                                    pluginDescriptor.getArtifactId() + ":" +
                                                    pluginDescriptor.getVersion() +
                                                    " doesn't contain any mojo. Check if it isn't corrupted." );

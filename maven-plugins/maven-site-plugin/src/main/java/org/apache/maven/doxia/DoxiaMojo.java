@@ -17,8 +17,11 @@ package org.apache.maven.doxia;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
@@ -32,6 +35,13 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,15 +63,16 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
- * @goal site
- * @description Doxia plugin
- * @requiresDependencyResolution test
+ * Generate the project site.
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
+ * @goal site
+ * @requiresDependencyResolution test
  */
 public class DoxiaMojo
     extends AbstractMojo
+    implements Contextualizable
 {
     private static final String RESOURCE_DIR = "org/apache/maven/doxia";
 
@@ -133,11 +144,11 @@ public class DoxiaMojo
     private MavenProject project;
 
     /**
-     * @parameter expression="${reports}"
+     * @parameter expression="${component.org.apache.maven.plugin.PluginManager}"
      * @required
      * @readonly
      */
-    private Map reports;
+    private PluginManager pluginManager;
 
     /**
      * @parameter expression="${localRepository}"
@@ -161,6 +172,8 @@ public class DoxiaMojo
 
     private List localesList = new ArrayList();
 
+    private PlexusContainer container;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -174,7 +187,7 @@ public class DoxiaMojo
             {
                 URL templateDirectoryUrl = new URL( templateDirectory );
 
-                URL[] urls = { templateDirectoryUrl };
+                URL[] urls = {templateDirectoryUrl};
 
                 URLClassLoader urlClassloader = new URLClassLoader( urls );
 
@@ -186,9 +199,11 @@ public class DoxiaMojo
             }
         }
 
+        Map reports = getReports();
+
         try
         {
-            categorizeReports();
+            categorizeReports( reports );
 
             if ( locales == null )
             {
@@ -232,7 +247,7 @@ public class DoxiaMojo
                         String outputFileName = report.getOutputName() + ".html";
 
                         SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
-                                                                         getSiteDescriptor( locale ) );
+                                                                         getSiteDescriptor( reports, locale ) );
 
                         report.generate( sink, locale );
 
@@ -243,8 +258,8 @@ public class DoxiaMojo
                             outputFile.getParentFile().mkdirs();
                         }
 
-                        siteRenderer
-                            .generateDocument( new FileWriter( outputFile ), template, attributes, sink, locale );
+                        siteRenderer.generateDocument( new FileWriter( outputFile ), template, attributes, sink,
+                                                       locale );
                     }
                 }
 
@@ -253,7 +268,7 @@ public class DoxiaMojo
                 {
                     try
                     {
-                        generateProjectInfoPage( getSiteDescriptor( locale ), locale );
+                        generateProjectInfoPage( getSiteDescriptor( reports, locale ), locale );
                     }
                     catch ( Exception e )
                     {
@@ -265,19 +280,20 @@ public class DoxiaMojo
                 {
                     try
                     {
-                        generateProjectReportsPage( getSiteDescriptor( locale ), locale );
+                        generateProjectReportsPage( getSiteDescriptor( reports, locale ), locale );
                     }
                     catch ( Exception e )
                     {
-                        throw new MojoExecutionException( "An error is occurred in project reports page generation.", e );
+                        throw new MojoExecutionException( "An error is occurred in project reports page generation.",
+                                                          e );
                     }
                 }
 
                 // Generate static site
-                siteRenderer.render( new File( siteDirectory ), localeOutputDirectory, getSiteDescriptor( locale ),
-                                     template, attributes );
+                siteRenderer.render( new File( siteDirectory ), localeOutputDirectory,
+                                     getSiteDescriptor( reports, locale ), template, attributes );
                 siteRenderer.render( new File( generatedSiteDirectory ), localeOutputDirectory,
-                                     getSiteDescriptor( locale ), template, attributes );
+                                     getSiteDescriptor( reports, locale ), template, attributes );
 
                 File cssDirectory = new File( siteDirectory, "css" );
                 File imagesDirectory = new File( siteDirectory, "images" );
@@ -315,7 +331,7 @@ public class DoxiaMojo
         }
     }
 
-    private void categorizeReports()
+    private void categorizeReports( Map reports )
         throws MojoExecutionException
     {
         for ( Iterator i = reports.values().iterator(); i.hasNext(); )
@@ -331,29 +347,30 @@ public class DoxiaMojo
             }
             else
             {
-                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for "
-                                                  + report.getName( defaultLocale ) + " mojo isn't valid." );
+                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for " +
+                                                  report.getName( defaultLocale ) + " mojo isn't valid." );
             }
         }
     }
 
     private String getReportsMenu( Locale locale )
-        throws MojoExecutionException
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"Project Documentation\">\n" );
-        buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.about") + " " + project.getName() + "\" href=\"/index.html\"/>\n" );
+        buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.about" ) + " " +
+                       project.getName() + "\" href=\"/index.html\"/>\n" );
 
         if ( projectInfos.size() > 0 )
         {
-            buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectinformation")
-                           + "\" href=\"/project-info.html\" collapse=\"true\">\n" );
+            buffer.append( "    <item name=\"" +
+                           i18n.getString( "site-plugin", locale, "report.menu.projectinformation" ) +
+                           "\" href=\"/project-info.html\" collapse=\"true\">\n" );
 
             for ( Iterator i = projectInfos.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append( "        <item name=\"" + report.getName( locale ) + "\" href=\"/"
-                               + report.getOutputName() + ".html\"/>\n" );
+                buffer.append( "        <item name=\"" + report.getName( locale ) + "\" href=\"/" +
+                               report.getOutputName() + ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -361,14 +378,14 @@ public class DoxiaMojo
 
         if ( projectReports.size() > 0 )
         {
-            buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectreports")
-                           + "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
+            buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectreports" ) +
+                           "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
 
             for ( Iterator i = projectReports.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append( "        <item name=\"" + report.getName( locale ) + "\" href=\"/"
-                               + report.getOutputName() + ".html\"/>\n" );
+                buffer.append( "        <item name=\"" + report.getName( locale ) + "\" href=\"/" +
+                               report.getOutputName() + ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -379,7 +396,10 @@ public class DoxiaMojo
         return buffer.toString();
     }
 
-    private InputStream getSiteDescriptor( Locale locale )
+    /**
+     * @todo should only be needed once
+     */
+    private InputStream getSiteDescriptor( Map reports, Locale locale )
         throws MojoExecutionException
     {
         File siteDescriptor = new File( siteDirectory, "site.xml" );
@@ -439,10 +459,9 @@ public class DoxiaMojo
     {
         String outputFileName = "project-info.html";
 
-        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
-                                                         getSiteDescriptor( locale ) );
+        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName, siteDescriptor );
 
-        String title = i18n.getString( "site-plugin", locale, "report.information.title");
+        String title = i18n.getString( "site-plugin", locale, "report.information.title" );
 
         sink.head();
         sink.title();
@@ -457,27 +476,27 @@ public class DoxiaMojo
         sink.sectionTitle1_();
 
         sink.paragraph();
-        sink.text( i18n.getString( "site-plugin", locale, "report.information.description1") + " " );
+        sink.text( i18n.getString( "site-plugin", locale, "report.information.description1" ) + " " );
         sink.link( "http://maven.apache.org" );
         sink.text( "Maven" );
         sink.link_();
-        sink.text( " " + i18n.getString( "site-plugin", locale, "report.information.description2") );
+        sink.text( " " + i18n.getString( "site-plugin", locale, "report.information.description2" ) );
         sink.paragraph_();
 
         sink.section2();
 
         sink.sectionTitle2();
-        sink.text( i18n.getString( "site-plugin", locale, "report.information.sectionTitle") );
+        sink.text( i18n.getString( "site-plugin", locale, "report.information.sectionTitle" ) );
         sink.sectionTitle2_();
 
         sink.table();
 
         sink.tableRow();
         sink.tableHeaderCell();
-        sink.text( i18n.getString( "site-plugin", locale, "report.information.column.document") );
+        sink.text( i18n.getString( "site-plugin", locale, "report.information.column.document" ) );
         sink.tableHeaderCell_();
         sink.tableHeaderCell();
-        sink.text( i18n.getString( "site-plugin", locale, "report.information.column.description") );
+        sink.text( i18n.getString( "site-plugin", locale, "report.information.column.description" ) );
         sink.tableHeaderCell_();
         sink.tableRow_();
 
@@ -518,10 +537,9 @@ public class DoxiaMojo
     {
         String outputFileName = "maven-reports.html";
 
-        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName,
-                                                         getSiteDescriptor( locale ) );
+        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName, siteDescriptor );
 
-        String title = i18n.getString( "site-plugin", locale, "report.project.title");
+        String title = i18n.getString( "site-plugin", locale, "report.project.title" );
 
         sink.head();
         sink.title();
@@ -536,27 +554,27 @@ public class DoxiaMojo
         sink.sectionTitle1_();
 
         sink.paragraph();
-        sink.text( i18n.getString( "site-plugin", locale, "report.project.description1") + " " );
+        sink.text( i18n.getString( "site-plugin", locale, "report.project.description1" ) + " " );
         sink.link( "http://maven.apache.org" );
         sink.text( "Maven" );
         sink.link_();
-        sink.text( ". " + i18n.getString( "site-plugin", locale, "report.project.description2") );
+        sink.text( ". " + i18n.getString( "site-plugin", locale, "report.project.description2" ) );
         sink.paragraph_();
 
         sink.section2();
 
         sink.sectionTitle2();
-        sink.text( i18n.getString( "site-plugin", locale, "report.project.sectionTitle") );
+        sink.text( i18n.getString( "site-plugin", locale, "report.project.sectionTitle" ) );
         sink.sectionTitle2_();
 
         sink.table();
 
         sink.tableRow();
         sink.tableHeaderCell();
-        sink.text( i18n.getString( "site-plugin", locale, "report.project.column.document") );
+        sink.text( i18n.getString( "site-plugin", locale, "report.project.column.document" ) );
         sink.tableHeaderCell_();
         sink.tableHeaderCell();
-        sink.text( i18n.getString( "site-plugin", locale, "report.project.column.description") );
+        sink.text( i18n.getString( "site-plugin", locale, "report.project.column.description" ) );
         sink.tableHeaderCell_();
         sink.tableRow_();
 
@@ -605,8 +623,8 @@ public class DoxiaMojo
 
                 if ( is == null )
                 {
-                    throw new IOException( "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE
-                                           + " template." );
+                    throw new IOException( "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE +
+                                           " template." );
                 }
 
                 File outputFile = new File( outputDirectory, line );
@@ -640,7 +658,7 @@ public class DoxiaMojo
         {
             DirectoryScanner scanner = new DirectoryScanner();
 
-            String[] includedResources = { "**/**" };
+            String[] includedResources = {"**/**"};
 
             scanner.setIncludes( includedResources );
 
@@ -657,9 +675,9 @@ public class DoxiaMojo
                 String name = (String) j.next();
 
                 File sourceFile = new File( source, name );
-    
+
                 File destinationFile = new File( destination, name );
-    
+
                 FileUtils.copyFile( sourceFile, destinationFile );
             }
         }
@@ -683,5 +701,53 @@ public class DoxiaMojo
                 return new File( outputDirectory, locale.getLanguage() );
             }
         }
+    }
+
+    private Map getReports()
+        throws MojoExecutionException
+    {
+        // TODO: not the best solution. Perhaps a mojo tag that causes the plugin manager to populate project reports instead?
+
+        List reportPlugins = project.getReportPlugins();
+        if ( reportPlugins != null )
+        {
+            for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
+            {
+                org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
+                try
+                {
+                    pluginManager.verifyPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
+                                                project, localRepository );
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    throw new MojoExecutionException( "Cannot find report plugin", e );
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new MojoExecutionException( "Cannot find report plugin", e );
+                }
+            }
+        }
+
+        // TODO: this is not good (using the container), also because it will import every report ever loaded
+        //   What we need is to be able to select individual reports and know what reports are inside a plugin
+        //   It may be better to push the report section in the pom back to "plugins", then just have a reports list
+        //   again which are role hints to look up
+
+        try
+        {
+            return container.lookupMap( MavenReport.ROLE );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new MojoExecutionException( "Unable to find reports", e );
+        }
+    }
+
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

@@ -16,20 +16,14 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -82,52 +76,7 @@ public class PluginParameterExpressionEvaluator
             return expression;
         }
 
-        if ( expression.equals( "reports" ) )
-        {
-            String role = PluginManager.ROLE;
-            try
-            {
-                PluginManager pluginManager = (PluginManager) context.lookup( role );
-                List reportPlugins = context.getProject().getReportPlugins();
-                if ( reportPlugins != null )
-                {
-                    for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
-                    {
-                        org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
-                        pluginManager.verifyPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
-                                                    context );
-                    }
-                }
-            }
-            catch ( ComponentLookupException cle )
-            {
-                throw new ExpressionEvaluationException( "Cannot lookup component: " + role + ".", cle );
-            }
-            catch ( ArtifactResolutionException are )
-            {
-                throw new ExpressionEvaluationException( "Cannot resolve component: " + role + ".", are );
-            }
-            catch ( PluginManagerException pme )
-            {
-                throw new ExpressionEvaluationException( "Cannot verify component: " + role + ".", pme );
-            }
-
-            role = MavenReport.ROLE;
-            try
-            {
-                value = context.lookupMap( role );
-                for ( Iterator i = ( (Map) value ).keySet().iterator(); i.hasNext(); )
-                {
-                    String key = (String) i.next();
-                    logger.debug( key + " report is found." );
-                }
-            }
-            catch ( ComponentLookupException cle )
-            {
-                throw new ExpressionEvaluationException( "Cannot lookup component: " + role + ".", cle );
-            }
-        }
-        else if ( expression.equals( "localRepository" ) )
+        if ( expression.equals( "localRepository" ) )
         {
             value = context.getLocalRepository();
         }

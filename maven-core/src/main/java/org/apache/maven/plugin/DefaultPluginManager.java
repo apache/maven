@@ -18,6 +18,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -26,6 +27,7 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -173,22 +175,22 @@ public class DefaultPluginManager
         return getPluginDescriptor( prefix );
     }
 
-    public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenSession session )
+    public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
+                                          ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException
     {
 
         String pluginKey = groupId + ":" + artifactId;
-        
+
         // TODO: this should be possibly outside
         if ( version == null )
         {
-            MavenProject project = session.getProject();
 
-            org.apache.maven.model.Plugin pluginConfig = null;
+            Plugin pluginConfig = null;
 
             for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
+                Plugin plugin = (Plugin) it.next();
 
                 if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
                 {
@@ -202,7 +204,7 @@ public class DefaultPluginManager
             {
                 for ( Iterator it = project.getReports().getPlugins().iterator(); it.hasNext(); )
                 {
-                    org.apache.maven.model.Plugin plugin = (org.apache.maven.model.Plugin) it.next();
+                    Plugin plugin = (Plugin) it.next();
 
                     if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
                     {
@@ -235,7 +237,7 @@ public class DefaultPluginManager
                                                                           Artifact.SCOPE_RUNTIME,
                                                                           MojoDescriptor.MAVEN_PLUGIN, null );
 
-                addPlugin( pluginKey, pluginArtifact, session );
+                addPlugin( pluginKey, pluginArtifact, project, localRepository );
 
                 version = pluginArtifact.getBaseVersion();
             }
@@ -265,7 +267,8 @@ public class DefaultPluginManager
         return getPluginDescriptor( groupId, artifactId, version );
     }
 
-    protected void addPlugin( String pluginKey, Artifact pluginArtifact, MavenSession session )
+    protected void addPlugin( String pluginKey, Artifact pluginArtifact, MavenProject project,
+                              ArtifactRepository localRepository )
         throws ArtifactResolutionException, ComponentLookupException, PlexusContainerException
     {
         ArtifactResolver artifactResolver = null;
@@ -280,7 +283,7 @@ public class DefaultPluginManager
             MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder );
 
             ArtifactResolutionResult result = artifactResolver.resolveTransitively(
-                Collections.singleton( pluginArtifact ), session.getRemoteRepositories(), session.getLocalRepository(),
+                Collections.singleton( pluginArtifact ), project.getRemoteArtifactRepositories(), localRepository,
                 metadataSource, artifactFilter );
 
             Map resolved = result.getArtifacts();
@@ -771,13 +774,12 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
-        artifactFilter = new ExclusionSetFilter( new String[]{/*"bsh",*/ "classworlds", "doxia-core", "maven-artifact",
+        artifactFilter = new ExclusionSetFilter( new String[]{"classworlds", /*"doxia-core",*/ "maven-artifact",
                                                               "maven-core", "maven-model", "maven-monitor",
                                                               "maven-plugin-api", "maven-plugin-descriptor",
-                                                              "maven-project", "maven-reporting-api",
-                                                              /*"maven-script-beanshell", */"maven-settings",
-                                                              /*"plexus-bsh-factory", */"plexus-container-default",
-                                                              "plexus-utils", "wagon-provider-api"} );
+                                                              "maven-project", /*"maven-reporting-api",*/ "maven-settings",
+                                                              "plexus-container-default", "plexus-utils",
+                                                              "wagon-provider-api"} );
     }
 
     // ----------------------------------------------------------------------

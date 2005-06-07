@@ -16,10 +16,12 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -34,6 +36,7 @@ public interface PluginManager
 
     PluginDescriptor verifyPlugin( String prefix );
 
-    PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenSession session )
+    PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
+                                   ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException;
 }
