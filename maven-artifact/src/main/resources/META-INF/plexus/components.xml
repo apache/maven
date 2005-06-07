@@ -153,6 +153,12 @@
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>plexus-application</role-hint>
+      <implementation>org.apache.maven.artifact.handler.PlexusApplicationHandler</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>plexus-service</role-hint>
       <implementation>org.apache.maven.artifact.handler.PlexusServiceHandler</implementation>
     </component>
