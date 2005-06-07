@@ -67,6 +67,9 @@ it0019: Test that a version is managed by pluginManagement in the super POM
 
 it0020: Test beanshell mojo support.
 
+it0021: Test pom-level profile inclusion (this one is activated by system
+        property).
+
 -------------------------------------------------------------------------------
 
 - generated sources

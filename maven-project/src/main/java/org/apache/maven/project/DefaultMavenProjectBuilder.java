@@ -27,13 +27,14 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.profile.activation.ProfileActivationCalculator;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -98,6 +99,8 @@ public class DefaultMavenProjectBuilder
     private ModelInterpolator modelInterpolator;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
+    
+    private ProfileActivationCalculator profileActivationCalculator;
 
     private final Map modelCache = new HashMap();
 
@@ -262,6 +265,15 @@ public class DefaultMavenProjectBuilder
         if ( cachedModel == null )
         {
             modelCache.put( key, model );
+        }
+        
+        // TODO: Add profiles support here?
+        List activePomProfiles = profileActivationCalculator.calculateActiveProfiles( model.getProfiles() );
+        for ( Iterator it = activePomProfiles.iterator(); it.hasNext(); )
+        {
+            Profile profile = (Profile) it.next();
+            
+            modelInheritanceAssembler.mergeProfileWithModel( cachedModel, profile );
         }
 
         model = modelInterpolator.interpolate( model );

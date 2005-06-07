@@ -1,4 +1,4 @@
-package org.apache.maven.project.inheritance;
+package org.apache.maven.profile.activation;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,18 +16,13 @@ package org.apache.maven.project.inheritance;
  * limitations under the License.
  */
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
-
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
- */
-public interface ModelInheritanceAssembler
+public final class ActivationConstants
 {
-    String ROLE = ModelInheritanceAssembler.class.getName();
 
-    void assembleModelInheritance( Model child, Model parent );
-    
-    void mergeProfileWithModel( Model model, Profile profile );
+    public static final String ACTIVE_PROFILE_IDS = "org.apache.maven.ActiveProfileIds";
+
+    private ActivationConstants()
+    {
+    }
+
 }

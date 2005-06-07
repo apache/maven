@@ -17,11 +17,14 @@ package org.apache.maven.project.inheritance;
  */
 
 import org.apache.maven.model.Build;
+import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
@@ -44,6 +47,12 @@ public class DefaultModelInheritanceAssembler
 {
     public void assembleModelInheritance( Model child, Model parent )
     {
+        // cannot inherit from null parent.
+        if ( parent == null )
+        {
+            return;
+        }
+        
         // Group id
         if ( child.getGroupId() == null )
         {
@@ -56,7 +65,7 @@ public class DefaultModelInheritanceAssembler
         {
             // The parent version may have resolved to something different, so we take what we asked for...
             // instead of - child.setVersion( parent.getVersion() );
-            
+
             if ( child.getParent() != null )
             {
                 child.setVersion( child.getParent().getVersion() );
@@ -134,8 +143,24 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Build
-        assembleBuildInheritance( child, parent );
+        assembleBuildInheritance( child, parent.getBuild() );
 
+        assembleModelBaseInheritance( child, parent );
+    }
+
+    public void mergeProfileWithModel( Model model, Profile profile )
+    {
+        assembleModelBaseInheritance( model, profile );
+
+        Build modelBuild = model.getBuild();
+
+        BuildBase profileBuild = profile.getBuild();
+
+        assembleBuildBaseInheritance( modelBuild, profileBuild );
+    }
+
+    private void assembleModelBaseInheritance( ModelBase child, ModelBase parent )
+    {
         // Dependencies :: aggregate
         List dependencies = parent.getDependencies();
 
@@ -175,7 +200,7 @@ public class DefaultModelInheritanceAssembler
                 child.addPluginRepository( repository );
             }
         }
-        
+
         // Reports :: aggregate
         if ( child.getReports() != null && parent.getReports() != null )
         {
@@ -201,8 +226,8 @@ public class DefaultModelInheritanceAssembler
 
         assembleDependencyManagementInheritance( child, parent );
     }
-    
-    private void assembleDependencyManagementInheritance( Model child, Model parent )
+
+    private void assembleDependencyManagementInheritance( ModelBase child, ModelBase parent )
     {
         DependencyManagement parentDepMgmt = parent.getDependencyManagement();
 
@@ -237,10 +262,15 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private void assembleBuildInheritance( Model child, Model parent )
+    private void assembleBuildInheritance( Model child, Build parentBuild )
     {
+        // cannot inherit from null parent...
+        if ( parentBuild == null )
+        {
+            return;
+        }
+        
         Build childBuild = child.getBuild();
-        Build parentBuild = parent.getBuild();
 
         if ( parentBuild != null )
         {
@@ -252,11 +282,6 @@ public class DefaultModelInheritanceAssembler
             // The build has been set but we want to step in here and fill in
             // values
             // that have not been set by the child.
-
-            if ( childBuild.getDefaultGoal() == null )
-            {
-                childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
-            }
 
             if ( childBuild.getDirectory() == null )
             {
@@ -288,31 +313,47 @@ public class DefaultModelInheritanceAssembler
                 childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
             }
 
-            if ( childBuild.getFinalName() == null )
-            {
-                childBuild.setFinalName( parentBuild.getFinalName() );
-            }
+            assembleBuildBaseInheritance( childBuild, parentBuild );
+        }
+    }
 
-            List resources = childBuild.getResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                childBuild.setResources( parentBuild.getResources() );
-            }
+    private void assembleBuildBaseInheritance( BuildBase childBuild, BuildBase parentBuild )
+    {
+        // if the parent build is null, obviously we cannot inherit from it...
+        if ( parentBuild == null )
+        {
+            return;
+        }
 
-            resources = childBuild.getTestResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                childBuild.setTestResources( parentBuild.getTestResources() );
-            }
+        if ( childBuild.getDefaultGoal() == null )
+        {
+            childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
+        }
 
-            // Plugins are aggregated if Plugin.inherit != false
-            ModelUtils.mergePluginLists( childBuild, parentBuild, true );
-            
-            // Plugin management :: aggregate
-            if( childBuild != null && parentBuild != null )
-            {
-                ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(), false );
-            }
+        if ( childBuild.getFinalName() == null )
+        {
+            childBuild.setFinalName( parentBuild.getFinalName() );
+        }
+
+        List resources = childBuild.getResources();
+        if ( resources == null || resources.isEmpty() )
+        {
+            childBuild.setResources( parentBuild.getResources() );
+        }
+
+        resources = childBuild.getTestResources();
+        if ( resources == null || resources.isEmpty() )
+        {
+            childBuild.setTestResources( parentBuild.getTestResources() );
+        }
+
+        // Plugins are aggregated if Plugin.inherit != false
+        ModelUtils.mergePluginLists( childBuild, parentBuild, true );
+
+        // Plugin management :: aggregate
+        if ( childBuild != null && parentBuild != null )
+        {
+            ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(), false );
         }
     }
 
@@ -336,10 +377,11 @@ public class DefaultModelInheritanceAssembler
                 childScm.setConnection( appendPath( parentScm.getConnection(), child.getArtifactId() ) );
             }
 
-            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
-                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
+            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() )
+                && !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
-                childScm.setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId() ) );
+                childScm
+                    .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId() ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getUrl() ) && !StringUtils.isEmpty( parentScm.getUrl() ) )

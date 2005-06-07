@@ -1,0 +1,28 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-it0021-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>1.0-SNAPSHOT</version>
+  
+  <profiles>
+    <profile>
+      <id>test-profile</id>
+      
+      <activation>
+        <property>
+          <name>includeProfile</name>
+        </property>
+      </activation>
+      
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-core-it-support</artifactId>
+          <version>1.0</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+  
+</model>
