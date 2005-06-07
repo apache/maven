@@ -636,29 +636,32 @@ public class DoxiaMojo
     private void copyDirectory( File source, File destination )
         throws IOException
     {
-        DirectoryScanner scanner = new DirectoryScanner();
-
-        String[] includedResources = { "**/**" };
-
-        scanner.setIncludes( includedResources );
-
-        scanner.addDefaultExcludes();
-
-        scanner.setBasedir( source );
-
-        scanner.scan();
-
-        List includedFiles = Arrays.asList( scanner.getIncludedFiles() );
-
-        for ( Iterator j = includedFiles.iterator(); j.hasNext(); )
+        if ( source.exists() )
         {
-            String name = (String) j.next();
+            DirectoryScanner scanner = new DirectoryScanner();
 
-            File sourceFile = new File( source, name );
+            String[] includedResources = { "**/**" };
 
-            File destinationFile = new File( destination, name );
+            scanner.setIncludes( includedResources );
 
-            FileUtils.copyFile( sourceFile, destinationFile );
+            scanner.addDefaultExcludes();
+
+            scanner.setBasedir( source );
+
+            scanner.scan();
+
+            List includedFiles = Arrays.asList( scanner.getIncludedFiles() );
+
+            for ( Iterator j = includedFiles.iterator(); j.hasNext(); )
+            {
+                String name = (String) j.next();
+
+                File sourceFile = new File( source, name );
+    
+                File destinationFile = new File( destination, name );
+    
+                FileUtils.copyFile( sourceFile, destinationFile );
+            }
         }
     }
 
