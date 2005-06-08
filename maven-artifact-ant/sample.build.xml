@@ -3,7 +3,6 @@
     <!--
     TODO...
     - read .m2/settings.xml
-    - get dependencies from a POM
     -->
 
     <artifact:localRepository id="local.repository" location="${basedir}/target/local-repo" layout="default"/>
@@ -22,6 +21,14 @@
 
     <copy todir="target/files">
       <fileset refid="dependency.fileset" />
+    </copy>
+
+    <artifact:dependencies filesetId="my.dependency.fileset">
+      <pom refid="maven.project" />
+    </artifact:dependencies>
+
+    <copy todir="target/my-dependencies">
+      <fileset refid="my.dependency.fileset" />
     </copy>
 
     <artifact:install file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">

@@ -17,17 +17,15 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.Dependency;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.FileList;
 import org.apache.tools.ant.types.FileSet;
@@ -57,6 +55,8 @@ public class DependenciesTask
 
     private String filesetId;
 
+    private Pom pom;
+
     public void execute()
     {
         if ( localRepository == null )
@@ -66,23 +66,25 @@ public class DependenciesTask
 
         ArtifactRepository localRepo = createArtifactRepository( localRepository );
 
-        ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-
         ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
-        MavenMetadataSource metadataSource = new MavenMetadataSource( resolver, (MavenProjectBuilder) lookup(
-            MavenProjectBuilder.ROLE ) );
+        MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+        MavenMetadataSource metadataSource = new MavenMetadataSource( resolver, projectBuilder );
+
+        List dependencies = this.dependencies;
+
+        if ( pom != null )
+        {
+            if ( !dependencies.isEmpty() )
+            {
+                throw new BuildException( "You cannot specify both dependencies and a pom in the dependencies task" );
+            }
+
+            pom.initialise( projectBuilder, localRepo );
+
+            dependencies = pom.getDependencies();
+        }
 
         Set artifacts = metadataSource.createArtifacts( dependencies, null, null );
-/*
-        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-        {
-            Dependency dependency = (Dependency) i.next();
-            Artifact a = factory.createArtifact( dependency.getGroupId(), dependency.getArtifactId(),
-                                                 dependency.getVersion(), dependency.getScope(), dependency.getType(),
-                                                 null );
-            artifacts.add( a );
-        }
-*/
 
         log( "Resolving dependencies..." );
 
@@ -92,8 +94,8 @@ public class DependenciesTask
         ArtifactResolutionResult result;
         try
         {
-            result =
-                resolver.resolveTransitively( artifacts, createRemoteArtifactRepositories(), localRepo, metadataSource );
+            List remoteArtifactRepositories = createRemoteArtifactRepositories();
+            result = resolver.resolveTransitively( artifacts, remoteArtifactRepositories, localRepo, metadataSource );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -214,5 +216,15 @@ public class DependenciesTask
     public void setFilesetId( String filesetId )
     {
         this.filesetId = filesetId;
+    }
+
+    public Pom getPom()
+    {
+        return pom;
+    }
+
+    public void addPom( Pom pom )
+    {
+        this.pom = pom;
     }
 }
