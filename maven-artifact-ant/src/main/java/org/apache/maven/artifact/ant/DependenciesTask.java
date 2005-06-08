@@ -47,24 +47,15 @@ public class DependenciesTask
 {
     private List dependencies = new ArrayList();
 
-    private LocalRepository localRepository;
-
     private List remoteRepositories = new ArrayList();
 
     private String pathId;
 
     private String filesetId;
 
-    private Pom pom;
-
     public void execute()
     {
-        if ( localRepository == null )
-        {
-            localRepository = getDefaultLocalRepository();
-        }
-
-        ArtifactRepository localRepo = createLocalArtifactRepository( localRepository );
+        ArtifactRepository localRepo = createLocalArtifactRepository();
 
         ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
         MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
@@ -72,14 +63,13 @@ public class DependenciesTask
 
         List dependencies = this.dependencies;
 
+        Pom pom = buildPom( projectBuilder, localRepo );
         if ( pom != null )
         {
             if ( !dependencies.isEmpty() )
             {
                 throw new BuildException( "You cannot specify both dependencies and a pom in the dependencies task" );
             }
-
-            pom.initialise( projectBuilder, localRepo );
 
             dependencies = pom.getDependencies();
 
@@ -120,7 +110,7 @@ public class DependenciesTask
         }
 
         FileList fileList = new FileList();
-        fileList.setDir( localRepository.getLocation() );
+        fileList.setDir( getLocalRepository().getLocation() );
 
         FileSet fileSet = new FileSet();
         fileSet.setDir( fileList.getDir( getProject() ) );
@@ -196,16 +186,6 @@ public class DependenciesTask
         dependencies.add( dependency );
     }
 
-    public LocalRepository getLocalRepository()
-    {
-        return localRepository;
-    }
-
-    public void addLocalRepository( LocalRepository localRepository )
-    {
-        this.localRepository = localRepository;
-    }
-
     public String getPathId()
     {
         return pathId;
@@ -224,15 +204,5 @@ public class DependenciesTask
     public void setFilesetId( String filesetId )
     {
         this.filesetId = filesetId;
-    }
-
-    public Pom getPom()
-    {
-        return pom;
-    }
-
-    public void addPom( Pom pom )
-    {
-        this.pom = pom;
     }
 }

@@ -1,10 +1,15 @@
 <project name="foo" xmlns:artifact="antlib:org.apache.maven.artifact.ant" default="foo">
-  <target name="foo">
-    <!--
-    TODO...
-    - read .m2/settings.xml
-    -->
+  <target name="test-pom">
+    <artifact:pom file="pom.xml" id="my.maven.project"/>
 
+    <artifact:setProperty property="my.artifactid" expression="project.artifactId" pomRefId="my.maven.project" />
+    <echo>Artifact ID = ${my.artifactid}</echo>
+
+    <artifact:setProperty property="my.parent.artifactid" expression="project.parent.artifactId" pomRefId="my.maven.project" />
+    <echo>Artifact ID = ${my.parent.artifactid}</echo>
+  </target>
+
+  <target name="foo">
     <artifact:localRepository id="local.repository" location="${basedir}/target/local-repo" layout="default"/>
 
     <artifact:remoteRepository id="deploy.repository" url="file://${basedir}/target/deployment-repo" layout="legacy"/>

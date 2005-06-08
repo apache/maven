@@ -37,28 +37,21 @@ import java.io.File;
 public class DeployTask
     extends AbstractArtifactTask
 {
-    private Pom pom;
-
-    private LocalRepository localRepository;
-
     private RemoteRepository remoteRepository;
 
     private File file;
 
     public void execute()
     {
-        if ( localRepository == null )
-        {
-            localRepository = getDefaultLocalRepository();
-        }
+        ArtifactRepository localRepo = createLocalArtifactRepository();
+        MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+
+        Pom pom = buildPom( builder, localRepo );
 
         if ( pom == null )
         {
             throw new BuildException( "A POM element is required to deploy to the repository" );
         }
-
-        ArtifactRepository localRepo = createLocalArtifactRepository( localRepository );
-        pom.initialise( (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE ), localRepo );
 
         if ( remoteRepository == null )
         {
@@ -100,26 +93,6 @@ public class DeployTask
             // TODO: deployment exception that does not give a trace
             throw new BuildException( "Error deploying artifact", e );
         }
-    }
-
-    public Pom getPom()
-    {
-        return pom;
-    }
-
-    public void addPom( Pom pom )
-    {
-        this.pom = pom;
-    }
-
-    public LocalRepository getLocalRepository()
-    {
-        return localRepository;
-    }
-
-    public void addLocalRepository( LocalRepository localRepository )
-    {
-        this.localRepository = localRepository;
     }
 
     public RemoteRepository getRemoteRepository()

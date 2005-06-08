@@ -102,7 +102,7 @@ public class Pom
         }
     }
 
-    private MavenProject getMavenProject()
+    protected MavenProject getMavenProject()
     {
         return getInstance().mavenProject;
     }
@@ -202,12 +202,10 @@ public class Pom
         return getMavenProject().getPackaging();
     } //-- String getPackaging()
 
-/* TODO: requires newer maven-core
     public java.util.List getPluginRepositories()
     {
-        return getModel().getPluginRepositories();
+        return getMavenProject().getPluginRepositories();
     } //-- java.util.List getPluginRepositories()
-*/
 
     public Reports getReports()
     {

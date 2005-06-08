@@ -38,21 +38,14 @@ import java.io.File;
 public class InstallTask
     extends AbstractArtifactTask
 {
-    private Pom pom;
-
-    private LocalRepository localRepository;
-
     private File file;
 
     public void execute()
     {
-        if ( localRepository == null )
-        {
-            localRepository = getDefaultLocalRepository();
-        }
+        ArtifactRepository localRepo = createLocalArtifactRepository();
 
-        ArtifactRepository localRepo = createLocalArtifactRepository( localRepository );
-        pom.initialise( (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE ), localRepo );
+        MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+        Pom pom = buildPom( builder, localRepo );
 
         Artifact artifact = new DefaultArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(),
                                                  pom.getPackaging() );
@@ -82,27 +75,7 @@ public class InstallTask
             throw new BuildException( "Error installing artifact", e );
         }
     }
-
-    public Pom getPom()
-    {
-        return pom;
-    }
-
-    public void addPom( Pom pom )
-    {
-        this.pom = pom;
-    }
-
-    public LocalRepository getLocalRepository()
-    {
-        return localRepository;
-    }
-
-    public void addLocalRepository( LocalRepository localRepository )
-    {
-        this.localRepository = localRepository;
-    }
-
+    
     public File getFile()
     {
         return file;

@@ -19,10 +19,11 @@ package org.apache.maven.artifact.ant;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -46,19 +47,30 @@ import java.io.IOException;
 public abstract class AbstractArtifactTask
     extends Task
 {
-    private Embedder embedder;
-
     private Settings settings;
 
-    protected ArtifactRepository createLocalArtifactRepository( LocalRepository repository )
+    private Embedder embedder;
+
+    private Pom pom;
+
+    private String pomRefId;
+
+    private LocalRepository localRepository;
+
+    protected ArtifactRepository createLocalArtifactRepository()
     {
+        if ( localRepository == null )
+        {
+            localRepository = getDefaultLocalRepository();
+        }
+
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                       repository.getLayout() );
+                                                                                       localRepository.getLayout() );
 
         CustomWagonManager manager = (CustomWagonManager) lookup( WagonManager.ROLE );
-        manager.setLocalRepository( repository.getLocation() );
+        manager.setLocalRepository( localRepository.getLocation() );
 
-        return new ArtifactRepository( "local", "file://" + repository.getLocation(), repositoryLayout );
+        return new ArtifactRepository( "local", "file://" + localRepository.getLocation(), repositoryLayout );
     }
 
     protected ArtifactRepository createRemoteArtifactRepository( RemoteRepository repository )
@@ -93,53 +105,6 @@ public abstract class AbstractArtifactTask
             artifactRepository = new ArtifactRepository( "remote", repository.getUrl(), repositoryLayout );
         }
         return artifactRepository;
-    }
-
-    protected Object lookup( String role )
-    {
-        try
-        {
-            return getEmbedder().lookup( role );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new BuildException( "Unable to find component: " + role, e );
-        }
-    }
-
-    private Object lookup( String role, String roleHint )
-    {
-        try
-        {
-            return getEmbedder().lookup( role, roleHint );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new BuildException( "Unable to find component: " + role + "[" + roleHint + "]", e );
-        }
-    }
-
-    private synchronized Embedder getEmbedder()
-    {
-        if ( embedder == null )
-        {
-            embedder = (Embedder) getProject().getReference( Embedder.class.getName() );
-
-            if ( embedder == null )
-            {
-                embedder = new Embedder();
-                try
-                {
-                    embedder.start();
-                }
-                catch ( PlexusContainerException e )
-                {
-                    throw new BuildException( "Unable to start embedder", e );
-                }
-                getProject().addReference( Embedder.class.getName(), embedder );
-            }
-        }
-        return embedder;
     }
 
     protected LocalRepository getDefaultLocalRepository()
@@ -225,5 +190,101 @@ public abstract class AbstractArtifactTask
         r.setUrl( mirror.getUrl() );
 
         return r;
+    }
+
+    protected Object lookup( String role )
+    {
+        try
+        {
+            return getEmbedder().lookup( role );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new BuildException( "Unable to find component: " + role, e );
+        }
+    }
+
+    protected Object lookup( String role, String roleHint )
+    {
+        try
+        {
+            return getEmbedder().lookup( role, roleHint );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new BuildException( "Unable to find component: " + role + "[" + roleHint + "]", e );
+        }
+    }
+
+    private synchronized Embedder getEmbedder()
+    {
+        if ( embedder == null )
+        {
+            embedder = (Embedder) getProject().getReference( Embedder.class.getName() );
+
+            if ( embedder == null )
+            {
+                embedder = new Embedder();
+                try
+                {
+                    embedder.start();
+                }
+                catch ( PlexusContainerException e )
+                {
+                    throw new BuildException( "Unable to start embedder", e );
+                }
+                getProject().addReference( Embedder.class.getName(), embedder );
+            }
+        }
+        return embedder;
+    }
+
+    public Pom buildPom( MavenProjectBuilder projectBuilder, ArtifactRepository localArtifactRepository )
+    {
+        if ( pomRefId != null && pom != null )
+        {
+            throw new BuildException( "You cannot specify both a POM element and a pomrefid element" );
+        }
+
+        Pom pom = this.pom;
+        if ( pomRefId != null )
+        {
+            pom = (Pom) getProject().getReference( pomRefId );
+            if ( pom == null )
+            {
+                throw new BuildException( "Reference '" + pomRefId + "' was not found." );
+            }
+        }
+
+        if ( pom != null )
+        {
+            pom.initialise( projectBuilder, localArtifactRepository );
+        }
+        return pom;
+    }
+
+    public void addPom( Pom pom )
+    {
+        this.pom = pom;
+    }
+
+    public String getPomRefId()
+    {
+        return pomRefId;
+    }
+
+    public void setPomRefId( String pomRefId )
+    {
+        this.pomRefId = pomRefId;
+    }
+
+    public LocalRepository getLocalRepository()
+    {
+        return localRepository;
+    }
+
+    public void addLocalRepository( LocalRepository localRepository )
+    {
+        this.localRepository = localRepository;
     }
 }

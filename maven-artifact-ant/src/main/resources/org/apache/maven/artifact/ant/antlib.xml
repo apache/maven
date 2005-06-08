@@ -4,6 +4,7 @@
   <typedef name="dependencies" classname="org.apache.maven.artifact.ant.DependenciesTask"/>
   <typedef name="install" classname="org.apache.maven.artifact.ant.InstallTask"/>
   <typedef name="deploy" classname="org.apache.maven.artifact.ant.DeployTask"/>
+  <typedef name="setProperty" classname="org.apache.maven.artifact.ant.SetPropertyTask"/>
 
   <!-- Types -->
   <typedef name="localRepository" classname="org.apache.maven.artifact.ant.LocalRepository"/>
