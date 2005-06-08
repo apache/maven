@@ -21,6 +21,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -199,6 +200,10 @@ public abstract class AbstractArtifactTask
 
     protected RemoteRepository createAntRemoteRepository( org.apache.maven.model.Repository pomRepository )
     {
+        // TODO: actually, we need to not funnel this through the ant repository - we should pump settings into wagon
+        // manager at the start like m2 does, and then match up by repository id
+        // As is, this could potentially cause a problem with 2 remote repositories with different authentication info  
+
         RemoteRepository r = new RemoteRepository();
         r.setUrl( pomRepository.getUrl() );
         r.setSnapshotPolicy( pomRepository.getSnapshotPolicy() );
@@ -215,6 +220,9 @@ public abstract class AbstractArtifactTask
         {
             r.addProxy( new Proxy( proxy ) );
         }
+
+        Mirror mirror = getSettings().getMirrorOf( pomRepository.getId() );
+        r.setUrl( mirror.getUrl() );
 
         return r;
     }
