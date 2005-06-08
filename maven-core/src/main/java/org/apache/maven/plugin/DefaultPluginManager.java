@@ -488,9 +488,9 @@ public class DefaultPluginManager
                     if ( value != null )
                     {
                         expression = value.getValue( null );
-                        
+
                         fieldValue = expressionEvaluator.evaluate( expression );
-                        
+
                         if ( fieldValue == null )
                         {
                             fieldValue = value.getAttribute( "default-value", null );
@@ -780,7 +780,8 @@ public class DefaultPluginManager
                                                               "maven-model", "maven-monitor", "maven-plugin-api",
                                                               "maven-plugin-descriptor", "maven-project",
                                                               "maven-settings", "plexus-container-default",
-                                                              "plexus-utils", "wagon-provider-api"} );
+                                                              "plexus-utils", "wagon-provider-api", "wagon-ssh",
+                                                              "wagon-http-lightweight", "wagon-file"} );
     }
 
     // ----------------------------------------------------------------------
