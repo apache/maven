@@ -152,11 +152,7 @@ public class DefaultModelInheritanceAssembler
     {
         assembleModelBaseInheritance( model, profile );
 
-        Build modelBuild = model.getBuild();
-
-        BuildBase profileBuild = profile.getBuild();
-
-        assembleBuildBaseInheritance( modelBuild, profileBuild );
+        assembleBuildBaseInheritance( model.getBuild(), profile.getBuild() );
     }
 
     private void assembleModelBaseInheritance( ModelBase child, ModelBase parent )
@@ -225,6 +221,9 @@ public class DefaultModelInheritanceAssembler
         }
 
         assembleDependencyManagementInheritance( child, parent );
+        
+        // Evaluation Properties :: aggregate
+        child.addEvalProperties( parent.getEvalProperties() );
     }
 
     private void assembleDependencyManagementInheritance( ModelBase child, ModelBase parent )

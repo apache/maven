@@ -32,7 +32,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.profile.AlwaysOnActivation;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfilesRoot;
-import org.apache.maven.project.ExternalProfileInjector;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -84,8 +83,6 @@ public class DefaultMaven
     
     protected MavenProfilesBuilder profilesBuilder;
     
-    protected ExternalProfileInjector externalProfileInjector;
-
     // ----------------------------------------------------------------------
     // Project execution
     // ----------------------------------------------------------------------
@@ -122,7 +119,9 @@ public class DefaultMaven
 
             if ( projects.isEmpty() )
             {
-                projects.add( projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() ) );
+                List externalProfiles = getActiveExternalProfiles( null, request.getSettings() );
+                
+                projects.add( projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(), externalProfiles ) );
             }
         }
         catch ( IOException e )
@@ -314,15 +313,22 @@ public class DefaultMaven
             }
         }
 
-        MavenProject project = projectBuilder.build( pom, localRepository );
+        List externalProfiles = getActiveExternalProfiles( pom, settings );
         
+        MavenProject project = projectBuilder.build( pom, localRepository, externalProfiles );
+        
+        return project;
+    }
+
+    private List getActiveExternalProfiles( File pom, Settings settings ) throws ProjectBuildingException
+    {
         // TODO: apply profiles.xml and settings.xml Profiles here.
+        List externalProfiles = new ArrayList();
+        
         List settingsProfiles = settings.getProfiles();
         
         if(settingsProfiles != null && !settingsProfiles.isEmpty())
         {
-            List profiles = new ArrayList();
-            
             List settingsActiveProfileIds = settings.getActiveProfiles();
             
             for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
@@ -336,40 +342,37 @@ public class DefaultMaven
                     profile.setActivation( new AlwaysOnActivation() );
                 }
                 
-                profiles.add( profile );
+                externalProfiles.add( profile );
             }
-            
-            externalProfileInjector.injectExternalProfiles( project, profiles );
         }
         
-        try
+        if( pom != null )
         {
-            ProfilesRoot root = profilesBuilder.buildProfiles( pom.getParentFile() );
-            
-            if( root != null )
+            try
             {
-                List profiles = new ArrayList();
+                ProfilesRoot root = profilesBuilder.buildProfiles( pom.getParentFile() );
                 
-                for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
+                if( root != null )
                 {
-                    org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
-                    
-                    profiles.add( ModelNormalizationUtils.convertFromProfileXmlProfile( rawProfile ) );
+                    for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
+                    {
+                        org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
+                        
+                        externalProfiles.add( ModelNormalizationUtils.convertFromProfileXmlProfile( rawProfile ) );
+                    }
                 }
-                
-                externalProfileInjector.injectExternalProfiles( project, profiles );
+            }
+            catch ( IOException e )
+            {
+                throw new ProjectBuildingException( "Cannot read profiles.xml resource for pom: " + pom, e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new ProjectBuildingException( "Cannot parse profiles.xml resource for pom: " + pom, e );
             }
         }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( "Cannot read profiles.xml resource for pom: " + pom, e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ProjectBuildingException( "Cannot parse profiles.xml resource for pom: " + pom, e );
-        }
         
-        return project;
+        return externalProfiles;
     }
 
     // ----------------------------------------------------------------------

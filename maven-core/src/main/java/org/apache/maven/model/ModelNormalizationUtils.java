@@ -59,7 +59,7 @@ public final class ModelNormalizationUtils
             }
         }
 
-        profile.setProperties( settingsProfile.getProperties() );
+        profile.addEvalProperties( settingsProfile.getProperties() );
 
         List repos = settingsProfile.getRepositories();
         if ( repos != null )
@@ -117,7 +117,7 @@ public final class ModelNormalizationUtils
             profile.setActivation( new AlwaysOnActivation() );
         }
         
-        profile.setProperties( profileXmlProfile.getProperties() );
+        profile.addEvalProperties( profileXmlProfile.getProperties() );
 
         List repos = profileXmlProfile.getRepositories();
         if ( repos != null )

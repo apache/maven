@@ -34,11 +34,11 @@ public interface MavenProjectBuilder
 
     static final String STANDALONE_SUPERPOM_VERSION = "2.0";
 
-    MavenProject build( File project, ArtifactRepository localRepository )
+    MavenProject build( File project, ArtifactRepository localRepository, List profiles )
         throws ProjectBuildingException, ArtifactResolutionException;
 
     MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
-                                        ArtifactMetadataSource artifactMetadataSource )
+                                        ArtifactMetadataSource artifactMetadataSource, List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException;
 
     /**
@@ -54,6 +54,6 @@ public interface MavenProjectBuilder
                                       ArtifactRepository localRepository )
         throws ProjectBuildingException, ArtifactResolutionException;
 
-    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
+    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, List externalProfiles )
         throws ProjectBuildingException;
 }

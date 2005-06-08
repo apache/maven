@@ -58,6 +58,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -112,10 +114,10 @@ public class DefaultMavenProjectBuilder
     // ----------------------------------------------------------------------
 
     public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
-                                               ArtifactMetadataSource artifactMetadataSource )
+                                               ArtifactMetadataSource artifactMetadataSource, List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-        MavenProject project = buildFromSourceFile( projectDescriptor, localRepository );
+        MavenProject project = buildFromSourceFile( projectDescriptor, localRepository, externalProfiles );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -138,13 +140,13 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository )
+    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-        return buildFromSourceFile( projectDescriptor, localRepository );
+        return buildFromSourceFile( projectDescriptor, localRepository, externalProfiles );
     }
 
-    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository )
+    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository, List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
         Model model = readModel( projectDescriptor );
@@ -152,7 +154,7 @@ public class DefaultMavenProjectBuilder
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
-        MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository );
+        MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository, externalProfiles );
 
         // Only translate the base directory for files in the source tree
         pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
@@ -174,7 +176,7 @@ public class DefaultMavenProjectBuilder
     {
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-        return build( "Artifact [" + artifact.getId() + "]", model, localRepository );
+        return build( "Artifact [" + artifact.getId() + "]", model, localRepository, Collections.EMPTY_LIST );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -212,7 +214,7 @@ public class DefaultMavenProjectBuilder
         return model;
     }
 
-    private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository )
+    private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository, List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
         Model superModel = getSuperModel();
@@ -236,7 +238,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, aggregatedRemoteWagonRepositories );
+            project = processProjectLogic( pomLocation, project, aggregatedRemoteWagonRepositories, externalProfiles );
         }
         catch ( ModelInterpolationException e )
         {
@@ -252,7 +254,7 @@ public class DefaultMavenProjectBuilder
      * the resolved source roots, etc for the parent - that occurs for the parent when it is constructed independently
      * and projects are not cached or reused
      */
-    private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories )
+    private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories, List externalProfiles )
         throws ProjectBuildingException, ModelInterpolationException
     {
         Model model = project.getModel();
@@ -264,8 +266,13 @@ public class DefaultMavenProjectBuilder
         }
         
         // TODO: Add profiles support here?
+        List activeProfiles = new ArrayList( externalProfiles );
+        
         List activePomProfiles = profileActivationCalculator.calculateActiveProfiles( model.getProfiles() );
-        for ( Iterator it = activePomProfiles.iterator(); it.hasNext(); )
+        
+        activeProfiles.addAll( activePomProfiles );
+        
+        for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
         {
             Profile profile = (Profile) it.next();
             
@@ -466,7 +473,7 @@ public class DefaultMavenProjectBuilder
         return pluginArtifacts;
     }
 
-    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
+    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, List externalProfiles )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -485,7 +492,7 @@ public class DefaultMavenProjectBuilder
 
             List remoteRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(), artifactRepositoryFactory, container );
 
-            project = processProjectLogic( "<Super-POM>", project, remoteRepositories );
+            project = processProjectLogic( "<Super-POM>", project, remoteRepositories, externalProfiles );
 
             return project;
         }

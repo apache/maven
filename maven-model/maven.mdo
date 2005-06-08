@@ -664,6 +664,24 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    private Properties evalProperties = new Properties();
+    
+    public void addEvalProperties( Properties properties )
+    {
+        this.evalProperties.putAll( properties );
+    }
+    
+    public Properties getEvalProperties()
+    {
+        return evalProperties;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
     <class>
@@ -2308,18 +2326,6 @@
           <version>4.0.0</version>
           <code><![CDATA[
     // We don't want this to be parseable...it's sort of 'hidden'
-    private Properties properties;
-    
-    public void setProperties( Properties properties )
-    {
-        this.properties = properties;
-    }
-    
-    public Properties getProperties()
-    {
-        return properties;
-    }
-    
     // default source for this profile is in the pom itself.
     private String source = "pom";
     

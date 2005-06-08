@@ -23,6 +23,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -93,13 +94,14 @@ public abstract class MavenProjectTestCase
         throws Exception
     {
         return projectBuilder.buildWithDependencies( pom, getLocalRepository(),
-                                                     new ProjectClasspathArtifactResolver.Source() );
+                                                     new ProjectClasspathArtifactResolver.Source(),
+                                                     Collections.EMPTY_LIST );
     }
 
     protected MavenProject getProject( File pom )
         throws Exception
     {
-        return projectBuilder.build( pom, getLocalRepository() );
+        return projectBuilder.build( pom, getLocalRepository(), Collections.EMPTY_LIST );
     }
 
 }
