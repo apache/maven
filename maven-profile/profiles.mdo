@@ -69,10 +69,14 @@
           </association>
         </field>
         <field>
-          <name>configuration</name>
-          <description>Extended configuration specific to this notifier goes 
+          <name>properties</name>
+          <description>Extended configuration specific to this profile goes 
             here.</description>
-          <type>DOM</type>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>repositories</name>

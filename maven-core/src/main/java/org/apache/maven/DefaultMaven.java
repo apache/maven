@@ -24,9 +24,15 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.model.ModelNormalizationUtils;
+import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.profile.AlwaysOnActivation;
+import org.apache.maven.profiles.MavenProfilesBuilder;
+import org.apache.maven.profiles.ProfilesRoot;
+import org.apache.maven.project.ExternalProfileInjector;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -45,6 +51,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +81,10 @@ public class DefaultMaven
     protected PlexusContainer container;
 
     protected Map errorDiagnosers;
+    
+    protected MavenProfilesBuilder profilesBuilder;
+    
+    protected ExternalProfileInjector externalProfileInjector;
 
     // ----------------------------------------------------------------------
     // Project execution
@@ -105,7 +116,7 @@ public class DefaultMaven
 
         try
         {
-            projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive() );
+            projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive(), request.getSettings() );
 
             projects = ProjectSorter.getSortedProjects( projects );
 
@@ -188,7 +199,7 @@ public class DefaultMaven
         }
     }
 
-    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive )
+    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings )
         throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException
     {
         List projects = new ArrayList( files.size() );
@@ -197,7 +208,7 @@ public class DefaultMaven
         {
             File file = (File) iterator.next();
 
-            MavenProject project = getProject( file, localRepository );
+            MavenProject project = getProject( file, localRepository, settings );
 
             if ( project.getModules() != null && !project.getModules().isEmpty() && recursive )
             {
@@ -214,7 +225,7 @@ public class DefaultMaven
                     moduleFiles.add( new File( basedir, name + "/pom.xml" ) );
                 }
 
-                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive );
+                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive, settings );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }
@@ -292,7 +303,7 @@ public class DefaultMaven
         return response;
     }
 
-    public MavenProject getProject( File pom, ArtifactRepository localRepository )
+    public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings )
         throws ProjectBuildingException, ArtifactResolutionException
     {
         if ( pom.exists() )
@@ -303,7 +314,62 @@ public class DefaultMaven
             }
         }
 
-        return projectBuilder.build( pom, localRepository );
+        MavenProject project = projectBuilder.build( pom, localRepository );
+        
+        // TODO: apply profiles.xml and settings.xml Profiles here.
+        List settingsProfiles = settings.getProfiles();
+        
+        if(settingsProfiles != null && !settingsProfiles.isEmpty())
+        {
+            List profiles = new ArrayList();
+            
+            List settingsActiveProfileIds = settings.getActiveProfiles();
+            
+            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
+            {
+                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
+                
+                Profile profile = ModelNormalizationUtils.convertFromSettingsProfile( rawProfile );
+                
+                if( settingsActiveProfileIds.contains( rawProfile.getId() ) )
+                {
+                    profile.setActivation( new AlwaysOnActivation() );
+                }
+                
+                profiles.add( profile );
+            }
+            
+            externalProfileInjector.injectExternalProfiles( project, profiles );
+        }
+        
+        try
+        {
+            ProfilesRoot root = profilesBuilder.buildProfiles( pom.getParentFile() );
+            
+            if( root != null )
+            {
+                List profiles = new ArrayList();
+                
+                for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
+                {
+                    org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
+                    
+                    profiles.add( ModelNormalizationUtils.convertFromProfileXmlProfile( rawProfile ) );
+                }
+                
+                externalProfileInjector.injectExternalProfiles( project, profiles );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( "Cannot read profiles.xml resource for pom: " + pom, e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new ProjectBuildingException( "Cannot parse profiles.xml resource for pom: " + pom, e );
+        }
+        
+        return project;
     }
 
     // ----------------------------------------------------------------------

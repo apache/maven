@@ -72,6 +72,16 @@
      -->
     <component>
       <role>org.apache.maven.profile.activation.ProfileActivator</role>
+      <role-hint>always-on</role-hint>
+      <implementation>org.apache.maven.profile.activation.AlwaysOnProfileActivator</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.profile.activation.ProfileActivator</role>
       <role-hint>jdk-prefix</role-hint>
       <implementation>org.apache.maven.profile.activation.JdkPrefixProfileActivator</implementation>
     </component>

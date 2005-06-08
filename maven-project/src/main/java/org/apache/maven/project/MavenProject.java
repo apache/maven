@@ -48,6 +48,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -78,6 +79,8 @@ public class MavenProject
     private Set pluginArtifacts;
 
     private List remoteArtifactRepositories;
+    
+    private Properties profileConfiguration;
 
     private List collectedProjects = Collections.EMPTY_LIST;
 
@@ -884,6 +887,16 @@ public class MavenProject
     public List getPluginRepositories()
     {
         return model.getPluginRepositories();
+    }
+
+    public Properties getProfileConfiguration()
+    {
+        return profileConfiguration;
+    }
+
+    public void addProfileConfiguration( Properties profileConfiguration )
+    {
+        this.profileConfiguration = profileConfiguration;
     }
 
 }

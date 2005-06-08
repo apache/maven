@@ -28,6 +28,8 @@ import java.io.IOException;
 public interface MavenSettingsBuilder
 {
     String ROLE = MavenSettingsBuilder.class.getName();
+    
+    String ALT_SETTINGS_XML_LOCATION = "org.apache.maven.SettingsXmlFile";
 
     Settings buildSettings()
         throws IOException, XmlPullParserException;

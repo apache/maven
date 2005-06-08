@@ -1,5 +1,7 @@
 package org.apache.maven.profile.activation;
 
+import org.apache.maven.model.Profile;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -16,13 +18,15 @@ package org.apache.maven.profile.activation;
  * limitations under the License.
  */
 
-public final class ActivationConstants
+public abstract class DetectedProfileActivator
+    implements ProfileActivator
 {
 
-    public static final String ACTIVE_PROFILE_IDS = "org.apache.maven.ActiveProfileIds";
-
-    private ActivationConstants()
+    public boolean canDetermineActivation( Profile profile )
     {
+        return !ProfileActivationUtils.profilesWereExplicitlyGiven() && canDetectActivation( profile );
     }
+    
+    protected abstract boolean canDetectActivation( Profile profile );
 
 }

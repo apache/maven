@@ -1,6 +1,7 @@
 package org.apache.maven.profile.activation;
 
 import org.apache.maven.model.Profile;
+import org.apache.maven.profile.AlwaysOnActivation;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -18,18 +19,18 @@ import org.apache.maven.model.Profile;
  * limitations under the License.
  */
 
-public class ExplicitListingProfileActivator
+public class AlwaysOnProfileActivator
     implements ProfileActivator
 {
 
     public boolean canDetermineActivation( Profile profile )
     {
-        return ProfileActivationUtils.profilesWereExplicitlyGiven();
+        return profile.getActivation() != null && profile.getActivation() instanceof AlwaysOnActivation;
     }
 
     public boolean isActive( Profile profile )
     {
-        return ProfileActivationUtils.getExplicitProfileList().contains( profile.getId() );
+        return true;
     }
 
 }

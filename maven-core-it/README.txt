@@ -70,6 +70,12 @@ it0020: Test beanshell mojo support.
 it0021: Test pom-level profile inclusion (this one is activated by system
         property).
 
+it0022: Test profile inclusion from profiles.xml (this one is activated by system
+        property).
+
+it0023: Test profile inclusion from settings.xml (this one is activated by an id
+        in the activeProfiles section).
+
 -------------------------------------------------------------------------------
 
 - generated sources

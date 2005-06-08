@@ -1,0 +1,21 @@
+<settings>
+  <activeProfiles>
+    <activeProfile>test-profile</activeProfile>
+  </activeProfiles>
+  
+  <profiles>
+    <profile>
+      <id>test-profile</id>
+      
+      <activation>
+        <property>
+          <name>includeProfile</name>
+        </property>
+      </activation>
+      
+      <properties>
+        <test>**/SomeAddTest*</test>
+      </properties>
+    </profile>
+  </profiles>
+</settings>

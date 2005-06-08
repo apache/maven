@@ -21,7 +21,7 @@ import org.codehaus.plexus.util.StringUtils;
  */
 
 public class JdkPrefixProfileActivator
-    implements ProfileActivator
+    extends DetectedProfileActivator
 {
 
     private static final String JDK_VERSION = System.getProperty( "java.version" );
@@ -36,7 +36,7 @@ public class JdkPrefixProfileActivator
         return JDK_VERSION.startsWith( jdk );
     }
 
-    public boolean canDetermineActivation( Profile profile )
+    protected boolean canDetectActivation( Profile profile )
     {
         return profile.getActivation() != null && StringUtils.isNotEmpty( profile.getActivation().getJdk() );
     }

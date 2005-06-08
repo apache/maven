@@ -19,6 +19,38 @@
           <role>org.apache.maven.usability.ErrorDiagnoser</role>
           <field-name>errorDiagnosers</field-name>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.ExternalProfileInjector</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
+      <implementation>org.apache.maven.profiles.DefaultMavenProfilesBuilder</implementation>
+    </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.project.ExternalProfileInjector</role>
+      <implementation>org.apache.maven.project.ExternalProfileInjector</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.profile.activation.ProfileActivationCalculator</role>
+        </requirement>
       </requirements>
     </component>
     <!--
@@ -152,7 +184,7 @@
       <role>org.apache.maven.settings.MavenSettingsBuilder</role>
       <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
       <configuration>
-        <settingsPath>${user.home}/.m2/settings.xml</settingsPath>
+        <settingsPath>.m2/settings.xml</settingsPath>
       </configuration>
     </component>
   </components>

@@ -2308,16 +2308,16 @@
           <version>4.0.0</version>
           <code><![CDATA[
     // We don't want this to be parseable...it's sort of 'hidden'
-    private Object configuration;
+    private Properties properties;
     
-    public void setConfiguration( Object configuration )
+    public void setProperties( Properties properties )
     {
-        this.configuration = configuration;
+        this.properties = properties;
     }
     
-    public Object getConfiguration()
+    public Properties getProperties()
     {
-        return configuration;
+        return properties;
     }
           ]]></code>
         </codeSegment>

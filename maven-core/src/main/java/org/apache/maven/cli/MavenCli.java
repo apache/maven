@@ -37,6 +37,7 @@ import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.Mojo;
+import org.apache.maven.profile.activation.ProfileActivationUtils;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
@@ -115,6 +116,11 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         initializeSystemProperties( commandLine );
+        
+        if( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+        {
+            System.setProperty(ProfileActivationUtils.ACTIVE_PROFILE_IDS, commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES ) );
+        }
 
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
 
@@ -479,6 +485,8 @@ public class MavenCli
         public static final char NON_RECURSIVE = 'N';
 
         public static final char UPDATE_SNAPSHOTS = 'U';
+        
+        public static final char ACTIVATE_PROFILES = 'P';
 
         public CLIManager()
         {
@@ -503,6 +511,8 @@ public class MavenCli
                 "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
             options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription(
                 "Update all snapshots regardless of repository policies" ).create( UPDATE_SNAPSHOTS ) );
+            options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription(
+                "Comma-delimited list of profiles to activate").hasArg().create( ACTIVATE_PROFILES ) );
         }
 
         public CommandLine parse( String[] args )

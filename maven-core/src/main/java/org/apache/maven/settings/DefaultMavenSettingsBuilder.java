@@ -21,6 +21,7 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -115,17 +116,19 @@ public class DefaultMavenSettingsBuilder
 
     private File getSettingsFile()
     {
-        String path = settingsPath;
+        String path = System.getProperty( MavenSettingsBuilder.ALT_SETTINGS_XML_LOCATION );
+        
+        if( StringUtils.isEmpty( path ) )
+        {
+            // TODO: This replacing shouldn't be necessary as user.home should be in the
+            // context of the container and thus the value would be interpolated by Plexus
+            String userHome = System.getProperty( "user.home" );
 
-        // TODO: This replacing shouldn't be necessary as user.home should be in the
-        // context of the container and thus the value would be interpolated by Plexus
-        String userHome = System.getProperty( "user.home" );
-        userHome = userHome.replaceAll( "\\\\", "/" );
-
-        path = path.replaceAll( "\\$\\{user.home\\}", userHome );
-        path = path.replaceAll( "\\\\", "/" );
-        path = path.replaceAll( "//", "/" );
-
-        return new File( path );
+            return new File( userHome, settingsPath ).getAbsoluteFile();
+        }
+        else
+        {
+            return new File( path ).getAbsoluteFile();
+        }
     }
 }

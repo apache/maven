@@ -21,7 +21,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -32,9 +31,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profile.activation.ProfileActivationCalculator;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -42,10 +41,8 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -61,7 +58,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -223,7 +219,7 @@ public class DefaultMavenProjectBuilder
 
         LinkedList lineage = new LinkedList();
 
-        List aggregatedRemoteWagonRepositories = buildArtifactRepositories( superModel.getRepositories() );
+        List aggregatedRemoteWagonRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(), artifactRepositoryFactory, container );
 
         MavenProject project = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository );
 
@@ -285,12 +281,12 @@ public class DefaultMavenProjectBuilder
 
         project = new MavenProject( model );
 
-        project.setPluginArtifactRepositories( buildArtifactRepositories( model.getPluginRepositories() ) );
+        project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(), artifactRepositoryFactory, container ) );
 
         DistributionManagement dm = model.getDistributionManagement();
         if ( dm != null )
         {
-            project.setDistributionManagementArtifactRepository( buildArtifactRepository( dm.getRepository() ) );
+            project.setDistributionManagementArtifactRepository( ProjectUtils.buildArtifactRepository( dm.getRepository(), artifactRepositoryFactory, container ) );
         }
 
         project.setParent( parentProject );
@@ -323,7 +319,7 @@ public class DefaultMavenProjectBuilder
                                           ArtifactRepository localRepository )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-        aggregatedRemoteWagonRepositories.addAll( buildArtifactRepositories( model.getRepositories() ) );
+        aggregatedRemoteWagonRepositories.addAll( ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container ) );
 
         MavenProject project = new MavenProject( model );
 
@@ -368,62 +364,6 @@ public class DefaultMavenProjectBuilder
         }
 
         return project;
-    }
-
-    private List buildArtifactRepositories( List repositories )
-        throws ProjectBuildingException
-    {
-
-        List repos = new ArrayList();
-
-        for ( Iterator i = repositories.iterator(); i.hasNext(); )
-        {
-            Repository mavenRepo = (Repository) i.next();
-
-            ArtifactRepository artifactRepo = buildArtifactRepository( mavenRepo );
-
-            if ( !repos.contains( artifactRepo ) )
-            {
-                repos.add( artifactRepo );
-            }
-        }
-        return repos;
-    }
-
-    private ArtifactRepositoryLayout getRepositoryLayout( Repository mavenRepo )
-        throws ProjectBuildingException
-    {
-        String layout = mavenRepo.getLayout();
-
-        ArtifactRepositoryLayout repositoryLayout = null;
-        try
-        {
-            repositoryLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout +
-                                                "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
-        }
-        return repositoryLayout;
-    }
-
-    private ArtifactRepository buildArtifactRepository( Repository repo )
-        throws ProjectBuildingException
-    {
-        if ( repo != null )
-        {
-            String id = repo.getId();
-            String url = repo.getUrl();
-            String snapshotPolicy = repo.getSnapshotPolicy();
-            // TODO: make this a map inside the factory instead, so no lookup needed
-            ArtifactRepositoryLayout layout = getRepositoryLayout( repo );
-            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshotPolicy );
-        }
-        else
-        {
-            return null;
-        }
     }
 
     private Model readModel( File file )
@@ -541,7 +481,7 @@ public class DefaultMavenProjectBuilder
         {
             project.setFile( new File( ".", "pom.xml" ) );
 
-            List remoteRepositories = buildArtifactRepositories( superModel.getRepositories() );
+            List remoteRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(), artifactRepositoryFactory, container );
 
             project = processProjectLogic( "<Super-POM>", project, remoteRepositories );
 

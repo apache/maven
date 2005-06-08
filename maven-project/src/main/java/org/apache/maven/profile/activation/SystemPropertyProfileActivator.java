@@ -22,10 +22,10 @@ import org.codehaus.plexus.util.StringUtils;
  */
 
 public class SystemPropertyProfileActivator
-    implements ProfileActivator
+    extends DetectedProfileActivator
 {
 
-    public boolean canDetermineActivation( Profile profile )
+    protected boolean canDetectActivation( Profile profile )
     {
         return profile.getActivation() != null && profile.getActivation().getProperty() != null;
     }

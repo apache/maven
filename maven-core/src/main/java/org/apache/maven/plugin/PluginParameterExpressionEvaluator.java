@@ -132,12 +132,23 @@ public class PluginParameterExpressionEvaluator
         }
         else
         {
-            // We will attempt to get nab a system property as a way to specify a
-            // parameter to a plugins. My particular case here is allowing the surefire
-            // plugin to run a single test so I want to specify that class on the cli
-            // as a parameter.
+            // Check properties that have been injected via profiles before we default over to 
+            // system properties.
+            
+            if( context.getProject().getProfileConfiguration() != null )
+            {
+                value = context.getProject().getProfileConfiguration().getProperty( expression );
+            }
+            
+            if( value == null )
+            {
+                // We will attempt to get nab a system property as a way to specify a
+                // parameter to a plugins. My particular case here is allowing the surefire
+                // plugin to run a single test so I want to specify that class on the cli
+                // as a parameter.
 
-            value = System.getProperty( expression );
+                value = System.getProperty( expression );
+            }
         }
 
         if ( value instanceof String )

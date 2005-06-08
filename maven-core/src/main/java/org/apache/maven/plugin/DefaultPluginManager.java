@@ -405,7 +405,7 @@ public class DefaultPluginManager
 
             PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
                                                                           mojoDescriptor.getMojoConfiguration() );
-
+            
             // TODO: plexus
 //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
 //                                                                          mojoDescriptor.getConfiguration() );
@@ -488,7 +488,9 @@ public class DefaultPluginManager
                     if ( value != null )
                     {
                         expression = value.getValue( null );
+                        
                         fieldValue = expressionEvaluator.evaluate( expression );
+                        
                         if ( fieldValue == null )
                         {
                             fieldValue = value.getAttribute( "default-value", null );
