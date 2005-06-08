@@ -31,6 +31,8 @@ public class RemoteRepository
 
     private String snapshotPolicy;
 
+    private Proxy proxy;
+
     public String getUrl()
     {
         return ( (RemoteRepository) getInstance() ).url;
@@ -59,5 +61,15 @@ public class RemoteRepository
     public String getSnapshotPolicy()
     {
         return snapshotPolicy;
+    }
+
+    public void addProxy( Proxy proxy )
+    {
+        this.proxy = proxy;
+    }
+
+    public Proxy getProxy()
+    {
+        return proxy;
     }
 }

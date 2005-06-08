@@ -65,12 +65,20 @@ public abstract class AbstractArtifactTask
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                        repository.getLayout() );
 
+        WagonManager manager = (WagonManager) lookup( WagonManager.ROLE );
+
         Authentication authentication = repository.getAuthentication();
         if ( authentication != null )
         {
-            WagonManager manager = (WagonManager) lookup( WagonManager.ROLE );
             manager.addAuthenticationInfo( "remote", authentication.getUserName(), authentication.getPassword(),
                                            authentication.getPrivateKey(), authentication.getPassphrase() );
+        }
+
+        Proxy proxy = repository.getProxy();
+        if ( proxy != null )
+        {
+            manager.addProxy( proxy.getType(), proxy.getHost(), proxy.getPort(), proxy.getUserName(),
+                              proxy.getPassword(), proxy.getNonProxyHosts() );
         }
 
         ArtifactRepository artifactRepository;
@@ -201,6 +209,13 @@ public abstract class AbstractArtifactTask
         {
             r.addAuthentication( new Authentication( server ) );
         }
+
+        org.apache.maven.settings.Proxy proxy = getSettings().getActiveProxy();
+        if ( proxy != null )
+        {
+            r.addProxy( new Proxy( proxy ) );
+        }
+
         return r;
     }
 }

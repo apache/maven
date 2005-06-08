@@ -9,5 +9,6 @@
   <typedef name="localRepository" classname="org.apache.maven.artifact.ant.LocalRepository"/>
   <typedef name="remoteRepository" classname="org.apache.maven.artifact.ant.RemoteRepository"/>
   <typedef name="authentication" classname="org.apache.maven.artifact.ant.Authentication"/>
+  <typedef name="proxy" classname="org.apache.maven.artifact.ant.Proxy"/>
   <typedef name="pom" classname="org.apache.maven.artifact.ant.Pom"/>
 </antlib>
