@@ -67,6 +67,8 @@ public class ExternalProfileInjector
                 project.addProfileConfiguration( props );
             }
         }
+        
+        project.addActiveProfiles( activeProfiles );
     }
 
     private void mergePluginRepositories( MavenProject project, Model model, Profile profile ) throws ProjectBuildingException

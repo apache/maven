@@ -175,6 +175,8 @@ public class MavenProject
 
     private ArtifactRepository distMgmtArtifactRepository;
 
+    private List activeProfiles = new ArrayList();
+
     public void addCompileSourceRoot( String path )
     {
         if ( path != null )
@@ -897,6 +899,16 @@ public class MavenProject
     public void addProfileConfiguration( Properties profileConfiguration )
     {
         this.profileConfiguration = profileConfiguration;
+    }
+
+    public void addActiveProfiles( List activeProfiles )
+    {
+        this.activeProfiles.addAll( activeProfiles );
+    }
+    
+    public List getActiveProfiles()
+    {
+        return activeProfiles;
     }
 
 }

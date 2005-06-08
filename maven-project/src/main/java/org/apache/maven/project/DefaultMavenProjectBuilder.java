@@ -280,6 +280,8 @@ public class DefaultMavenProjectBuilder
         MavenProject parentProject = project.getParent();
 
         project = new MavenProject( model );
+        
+        project.addActiveProfiles( activePomProfiles );
 
         project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(), artifactRepositoryFactory, container ) );
 

@@ -2319,6 +2319,19 @@
     {
         return properties;
     }
+    
+    // default source for this profile is in the pom itself.
+    private String source = "pom";
+    
+    public void setSource( String source )
+    {
+        this.source = source;
+    }
+    
+    public String getSource()
+    {
+        return source;
+    }
           ]]></code>
         </codeSegment>
       </codeSegments>

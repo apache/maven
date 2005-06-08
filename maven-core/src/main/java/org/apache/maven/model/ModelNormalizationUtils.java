@@ -35,6 +35,8 @@ public final class ModelNormalizationUtils
     public static Profile convertFromSettingsProfile( org.apache.maven.settings.Profile settingsProfile )
     {
         Profile profile = new Profile();
+        
+        profile.setSource( "settings.xml" );
 
         org.apache.maven.settings.Activation settingsActivation = settingsProfile.getActivation();
 
@@ -86,6 +88,8 @@ public final class ModelNormalizationUtils
     {
         Profile profile = new Profile();
         
+        profile.setSource( "profiles.xml" );
+
         org.apache.maven.profiles.Activation profileActivation = profileXmlProfile.getActivation();
 
         if ( profileActivation != null )
