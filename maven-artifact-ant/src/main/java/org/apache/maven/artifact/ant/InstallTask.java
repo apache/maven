@@ -51,7 +51,7 @@ public class InstallTask
             localRepository = getDefaultLocalRepository();
         }
 
-        ArtifactRepository localRepo = createArtifactRepository( localRepository );
+        ArtifactRepository localRepo = createLocalArtifactRepository( localRepository );
         pom.initialise( (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE ), localRepo );
 
         Artifact artifact = new DefaultArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(),

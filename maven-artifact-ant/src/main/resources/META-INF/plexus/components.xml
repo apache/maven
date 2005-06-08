@@ -51,6 +51,9 @@
           <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
           <field-name>artifactTransformations</field-name>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
       </requirements>
     </component>
 

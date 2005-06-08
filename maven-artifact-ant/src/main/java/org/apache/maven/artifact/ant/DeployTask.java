@@ -52,10 +52,10 @@ public class DeployTask
             localRepository = getDefaultLocalRepository();
         }
 
-        ArtifactRepository localRepo = createArtifactRepository( localRepository );
+        ArtifactRepository localRepo = createLocalArtifactRepository( localRepository );
         pom.initialise( (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE ), localRepo );
 
-        ArtifactRepository deploymentRepository = createArtifactRepository( remoteRepository );
+        ArtifactRepository deploymentRepository = createRemoteArtifactRepository( remoteRepository );
 
         // Deploy the POM
         Artifact artifact = new DefaultArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(),

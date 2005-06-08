@@ -64,7 +64,7 @@ public class DependenciesTask
             localRepository = getDefaultLocalRepository();
         }
 
-        ArtifactRepository localRepo = createArtifactRepository( localRepository );
+        ArtifactRepository localRepo = createLocalArtifactRepository( localRepository );
 
         ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
         MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
@@ -157,7 +157,7 @@ public class DependenciesTask
         List list = new ArrayList();
         for ( Iterator i = getRemoteRepositories().iterator(); i.hasNext(); )
         {
-            list.add( createArtifactRepository( (RemoteRepository) i.next() ) );
+            list.add( createRemoteArtifactRepository( (RemoteRepository) i.next() ) );
         }
         return list;
     }
