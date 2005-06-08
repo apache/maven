@@ -52,6 +52,8 @@ public class RepositoryCleanerConfiguration
     private boolean force;
 
     private String blacklistedPatterns;
+    
+    private boolean reportWarningEnabled = false;
 
     public void setSourceRepositoryPath( String sourceRepositoryPath )
     {
@@ -201,6 +203,16 @@ public class RepositoryCleanerConfiguration
     public void setErrorReportLink( String errorReportLink )
     {
         this.errorReportLink = errorReportLink;
+    }
+
+    public boolean isReportWarningEnabled()
+    {
+        return reportWarningEnabled;
+    }
+
+    public void setReportWarningEnabled( boolean reportWarningEnabled )
+    {
+        this.reportWarningEnabled = reportWarningEnabled;
     }
 
 }

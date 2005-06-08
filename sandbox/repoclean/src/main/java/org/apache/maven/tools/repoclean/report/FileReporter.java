@@ -50,8 +50,12 @@ public class FileReporter
 
     private Writer writer;
 
-    public FileReporter( File reportsBase, String reportPath )
+    private final boolean warningsEnabled;
+
+    public FileReporter( File reportsBase, String reportPath, boolean warningsEnabled )
     {
+        this.warningsEnabled = warningsEnabled;
+        
         this.reportsFile = new File( reportsBase, reportPath );
 
         File parentDir = reportsFile.getParentFile();
@@ -126,22 +130,37 @@ public class FileReporter
     public void warn( String message )
         throws ReportWriteException
     {
-        hasWarning = true;
-        write( new AppendingList( 2 ).append( WARN_LEVEL ).append( message ) );
+        if( warningsEnabled )
+        {
+            hasWarning = true;
+            String source = getSourceLine();
+            write( new AppendingList( 3 ).append( WARN_LEVEL ).append( source ).append( message ) );
+        }
     }
 
     public void error( String message, Throwable error )
         throws ReportWriteException
     {
         hasError = true;
-        write( new AppendingList( 3 ).append( ERROR_LEVEL ).append( message ).append( error ) );
+        String source = getSourceLine();
+        write( new AppendingList( 4 ).append( ERROR_LEVEL ).append( source ).append( message ).append( error ) );
     }
 
     public void error( String message )
         throws ReportWriteException
     {
         hasError = true;
-        write( new AppendingList( 2 ).append( ERROR_LEVEL ).append( message ) );
+        String source = getSourceLine();
+        write( new AppendingList( 3 ).append( ERROR_LEVEL ).append( source ).append( message ) );
+    }
+
+    private String getSourceLine()
+    {
+        NullPointerException npe = new NullPointerException();
+        
+        StackTraceElement element = npe.getStackTrace()[2];
+        
+        return " Reported from: (" + element.getClassName() + "." + element.getMethodName() + "(..):" + element.getLineNumber() + ")\n";
     }
 
     private CharSequence format( List messageParts )

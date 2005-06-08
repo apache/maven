@@ -79,7 +79,7 @@ public class RepositoryCleaner
             FileReporter repoReporter = null;
             try
             {
-                repoReporter = new FileReporter( reportsBase, "repository.report.txt" );
+                repoReporter = new FileReporter( reportsBase, "repository.report.txt", configuration.isReportWarningEnabled() );
 
                 List artifacts;
 

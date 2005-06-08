@@ -141,6 +141,7 @@ public class Main
         config.setReportsPath( props.getProperty( "reportsPath" ) );
         config.setBlacklistedPatterns( props.getProperty( "blacklistedPatterns" ) );
         config.setReportOnly( Boolean.valueOf( props.getProperty( "reportOnly" ) ).booleanValue() );
+        config.setReportWarningEnabled( Boolean.valueOf( props.getProperty( "reportWarnings", "false" ) ).booleanValue() );
 
         config.setMailErrorReport( Boolean.valueOf( props.getProperty( "errorReport.mailOnError", "false" ) )
             .booleanValue() );
@@ -150,7 +151,7 @@ public class Main
         config.setErrorReportToAddress( props.getProperty( "errorReport.toAddress" ) );
         config.setErrorReportToName( props.getProperty( "errorReport.toName" ) );
         config.setErrorReportLink( props.getProperty( "errorReport.link" ) );
-
+        
         return config;
     }
 
@@ -176,14 +177,15 @@ public class Main
             + "errorReport.toName=Developers List\n" + "\n" + "# [DEFAULT VALUE: legacy]\n"
             + "#sourceRepositoryLayout=[legacy|default]\n\n" + "# [DEFAULT VALUE: v3]\n"
             + "# [DEFAULT VALUE: default]\n" + "#targetRepositoryLayout=[legacy|default]\n"
-            + "# [DEFAULT VALUE: localhost]\n" + "#errorReport.smtpHost=<hostname>\n" + "\n" );
+            + "# [DEFAULT VALUE: localhost]\n" + "#errorReport.smtpHost=<hostname>\n"
+            + "# [DEFAULT VALUE: false]\n" + "#reportWarnings=[true|false]\n" + "\n" );
     }
 
     private static void printUsage()
     {
         System.out.println( "Required input is missing.\n\n" + "Usage:\n"
             + "--------------------------------------------------\n\n"
-            + "repoclean -h|-template|<configuration-properties-file>\n" );
+            + "repoclean [--force] -h|-template|<configuration-properties-file>\n" );
     }
 
 }

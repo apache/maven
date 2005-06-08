@@ -141,7 +141,7 @@ public class LegacyArtifactDiscoverer
                 + "([Tt][Ee][Ss][Tt][_.0-9]*)|" + "([Dd][Ee][Bb][Uu][Gg][_.0-9]*)|"
                 + "([Uu][Nn][Oo][Ff][Ff][Ii][Cc][Ii][Aa][Ll][_.0-9]*)|" + "([Cc][Uu][Rr][Rr][Ee][Nn][Tt])|"
                 + "([Ll][Aa][Tt][Ee][Ss][Tt])|" + "([Ff][Cc][Ss])|" + "([Rr][Ee][Ll][Ee][Aa][Ss][Ee][_.0-9]*)|"
-                + "([Nn][Ii][Gg][Hh][Tt][Ll][Yy])";
+                + "([Nn][Ii][Gg][Hh][Tt][Ll][Yy])|" + "([AaBb][_.0-9]*)";
 
             // let's discover the version, and whatever's leftover will be either
             // a classifier, or part of the artifactId, depending on position.

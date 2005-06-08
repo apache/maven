@@ -43,24 +43,10 @@ public class V3PomRewriter
 
         if( from != null )
         {
-            org.apache.maven.model.v3_0_0.Model v3Model = null;
-            try
-            {
-                MavenXpp3Reader v3Reader = new MavenXpp3Reader();
+            MavenXpp3Reader v3Reader = new MavenXpp3Reader();
 
-                v3Model = v3Reader.read( from );
-            }
-            catch ( Exception e )
-            {
-                reporter.error( "Invalid v3 POM at: \'" + from + "\'. Cannot read.", e );
-
-                throw e;
-            }
-            
-            if ( v3Model != null )
-            {
-                v4Model = translator.translate( v3Model, reporter );
-            }
+            org.apache.maven.model.v3_0_0.Model v3Model = v3Reader.read( from );
+            v4Model = translator.translate( v3Model, reporter );
         }
         else
         {

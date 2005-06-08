@@ -66,26 +66,26 @@ public class ProjectMetadata
 
     public boolean exists()
     {
-        return false;
+        return artifact.getFile() != null && artifact.getFile().exists();
     }
 
     public String getGroupId()
     {
-        return null;
+        return artifact.getGroupId();
     }
 
     public String getArtifactId()
     {
-        return null;
+        return artifact.getArtifactId();
     }
 
     public String getVersion()
     {
-        return null;
+        return artifact.getVersion();
     }
 
     public String getBaseVersion()
     {
-        return null;
+        return artifact.getBaseVersion();
     }
 }

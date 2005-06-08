@@ -10,7 +10,6 @@ import org.apache.maven.tools.repoclean.RepositoryCleanerConfiguration;
 import org.apache.maven.tools.repoclean.artifact.metadata.ProjectMetadata;
 import org.apache.maven.tools.repoclean.digest.DigestException;
 import org.apache.maven.tools.repoclean.digest.DigestVerifier;
-import org.apache.maven.tools.repoclean.report.FileReporter;
 import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.apache.maven.tools.repoclean.rewrite.ArtifactPomRewriter;
@@ -37,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,29 +70,46 @@ public class RewritePhase
 
     public List execute( List artifacts, ArtifactRepository sourceRepo, ArtifactRepository targetRepo,
                         RepositoryCleanerConfiguration configuration, File reportsBase, Reporter repoReporter )
-        throws Exception
+        throws ReportWriteException
     {
         Logger logger = getLogger();
 
         List rewritten = new ArrayList();
 
-        File sourceBase = new File( new URL( sourceRepo.getUrl() ).getPath() );
+        File sourceBase = null;
+        try
+        {
+            sourceBase = new File( new URL( sourceRepo.getUrl() ).getPath() );
+        }
+        catch ( MalformedURLException e )
+        {
+            repoReporter.error( "Cannot construct source repository base File for: " + sourceRepo, e );
 
-        File targetBase = new File( new URL( targetRepo.getUrl() ).getPath() );
+            return null;
+        }
+
+        File targetBase = null;
+        try
+        {
+            targetBase = new File( new URL( targetRepo.getUrl() ).getPath() );
+        }
+        catch ( MalformedURLException e )
+        {
+            repoReporter.error( "Cannot construct target repository base File for: " + targetRepo, e );
+
+            return null;
+        }
 
         for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-
+            
             RewriteTransaction transaction = new RewriteTransaction( artifact );
 
             String artifactReportPath = buildArtifactReportPath( artifact );
 
-            FileReporter artifactReporter = null;
             try
             {
-                artifactReporter = new FileReporter( reportsBase, artifactReportPath );
-
                 boolean errorOccurred = false;
 
                 File artifactSource = new File( sourceRepo.getBasedir(), sourceRepo.pathOf( artifact ) );
@@ -110,37 +127,27 @@ public class RewritePhase
                 {
                     transaction.addFile( artifactTarget );
 
-                    try
+                    if ( !configuration.reportOnly() )
                     {
-                        if ( !configuration.reportOnly() )
+                        if ( logger.isDebugEnabled() )
                         {
-                            if ( logger.isDebugEnabled() )
-                            {
-                                logger.debug( "sourceRepo basedir is: \'" + sourceRepo.getBasedir() + "\'" );
-                                logger.debug( "targetRepo basedir is: \'" + targetRepo.getBasedir() + "\'" );
-                            }
-
-                            File targetParent = artifactTarget.getParentFile();
-                            if ( !targetParent.exists() )
-                            {
-                                targetParent.mkdirs();
-                            }
-
-                            if ( logger.isDebugEnabled() )
-                            {
-                                logger.debug( "Copying artifact[" + artifact.getId() + "] from \'" + artifactSource
-                                    + "\' to \'" + artifactTarget + "\'." );
-                            }
-
-                            copyArtifact( artifact, artifactTarget, artifactReporter );
+                            logger.debug( "sourceRepo basedir is: \'" + sourceRepo.getBasedir() + "\'" );
+                            logger.debug( "targetRepo basedir is: \'" + targetRepo.getBasedir() + "\'" );
                         }
-                    }
-                    catch ( Exception e )
-                    {
-                        repoReporter.error( "Error transferring artifact[" + artifact.getId()
-                            + "] to the target repository.", e );
 
-                        throw e;
+                        File targetParent = artifactTarget.getParentFile();
+                        if ( !targetParent.exists() )
+                        {
+                            targetParent.mkdirs();
+                        }
+
+                        if ( logger.isDebugEnabled() )
+                        {
+                            logger.debug( "Copying artifact[" + artifact.getId() + "] from \'" + artifactSource
+                                + "\' to \'" + artifactTarget + "\'." );
+                        }
+
+                        copyArtifact( artifact, artifactTarget, repoReporter );
                     }
 
                     if ( logger.isDebugEnabled() )
@@ -149,46 +156,27 @@ public class RewritePhase
                             + artifact.getGroupId() + "\'" );
                     }
 
-                    try
-                    {
-                        digestVerifier.verifyDigest( artifactSource, artifactTarget, transaction, artifactReporter,
-                                                     configuration.reportOnly() );
-                    }
-                    catch ( Exception e )
-                    {
-                        repoReporter.error( "Error verifying digest for artifact[" + artifact.getId() + "]", e );
+                    digestVerifier.verifyDigest( artifactSource, artifactTarget, transaction, repoReporter,
+                                                 configuration.reportOnly() );
 
-                        throw e;
-                    }
-
-                    try
-                    {
-                        rewriteMetadata( artifact, transaction, sourceBase, sourceRepo, targetBase, targetRepo,
-                                         artifactReporter, configuration.reportOnly() );
-                    }
-                    catch ( Exception e )
-                    {
-                        repoReporter.error( "Error rewriting POM for artifact[" + artifact.getId()
-                            + "] into the target repository.\n Error message: " + e.getMessage() );
-
-                        throw e;
-                    }
-
+                    rewriteMetadata( artifact, transaction, sourceBase, sourceRepo, targetBase, targetRepo,
+                                     repoReporter, configuration.reportOnly() );
+                    
                     rewritten.add( artifact );
                 }
                 else if ( !targetMissingOrOlder )
                 {
-                    artifactReporter.warn( "Target file for artifact is present and not stale. (Artifact: \'"
+                    repoReporter.warn( "Target file for artifact is present and not stale. (Artifact: \'"
                         + artifact.getId() + "\' in path: \'" + artifactSource + "\' with target path: "
                         + artifactTarget + ")." );
                 }
                 else
                 {
-                    artifactReporter.error( "Cannot find source file for artifact: \'" + artifact.getId()
+                    repoReporter.error( "Cannot find source file for artifact: \'" + artifact.getId()
                         + "\' under path: \'" + artifactSource + "\'" );
                 }
 
-                if ( artifactReporter.hasError() )
+                if ( repoReporter.hasError() )
                 {
                     repoReporter.warn( "Error(s) occurred while rewriting artifact: \'" + artifact.getId()
                         + "\' or its POM." );
@@ -213,15 +201,8 @@ public class RewritePhase
                     repoReporter.warn( "NOT Rolling back conversion for: " + artifact + "; we are in --force mode." );
                 }
 
-                artifactReporter.error( "Error while rewriting file or POM for artifact: \'" + artifact.getId()
-                    + "\'. See report at: \'" + artifactReportPath + "\'.", e );
-            }
-            finally
-            {
-                if ( artifactReporter != null )
-                {
-                    artifactReporter.close();
-                }
+                repoReporter.error( "Error while rewriting file or POM for artifact: \'" + artifact.getId()
+                    + "\'.", e );
             }
         }
 
@@ -290,47 +271,39 @@ public class RewritePhase
 
                 transaction.addFile( bridgedTargetPom );
 
+                File targetPomParent = targetPom.getParentFile();
+                if ( !targetPomParent.exists() )
+                {
+                    targetPomParent.mkdirs();
+                }
+
+                FileWriter to = null;
                 try
                 {
-                    File targetPomParent = targetPom.getParentFile();
-                    if ( !targetPomParent.exists() )
+                    StringReader from = null;
+                    if ( pomContents != null )
                     {
-                        targetPomParent.mkdirs();
+                        from = new StringReader( pomContents );
                     }
 
-                    FileWriter to = null;
-                    try
-                    {
-                        StringReader from = null;
-                        if ( pomContents != null )
-                        {
-                            from = new StringReader( pomContents );
-                        }
+                    to = new FileWriter( targetPom );
 
-                        to = new FileWriter( targetPom );
-
-                        artifactPomRewriter.rewrite( artifact, from, to, artifactReporter, reportOnly );
-                    }
-                    finally
-                    {
-                        IOUtil.close( to );
-                    }
-
-                    boolean wroteBridge = bridgePomLocations( pom, targetPom, bridgedTargetPom, artifactReporter,
-                                                              transaction, reportOnly );
-
-                    digestVerifier.verifyDigest( sourcePom, targetPom, transaction, artifactReporter, reportOnly );
-
-                    if ( wroteBridge )
-                    {
-                        digestVerifier.verifyDigest( sourcePom, bridgedTargetPom, transaction, artifactReporter,
-                                                     reportOnly );
-                    }
-
+                    artifactPomRewriter.rewrite( artifact, from, to, artifactReporter, reportOnly );
                 }
-                catch ( Exception e )
+                finally
                 {
-                    throw e;
+                    IOUtil.close( to );
+                }
+
+                boolean wroteBridge = bridgePomLocations( pom, targetPom, bridgedTargetPom, artifactReporter,
+                                                          transaction, reportOnly );
+
+                digestVerifier.verifyDigest( sourcePom, targetPom, transaction, artifactReporter, reportOnly );
+
+                if ( wroteBridge )
+                {
+                    digestVerifier.verifyDigest( sourcePom, bridgedTargetPom, transaction, artifactReporter,
+                                                 reportOnly );
                 }
             }
             finally
@@ -421,7 +394,7 @@ public class RewritePhase
             + ( ( classifier != null ) ? ( classifier + "-" ) : ( "" ) ) + version + ".report.txt";
     }
 
-    private void copyArtifact( Artifact artifact, File artifactTarget, FileReporter reporter )
+    private void copyArtifact( Artifact artifact, File artifactTarget, Reporter reporter )
         throws IOException
     {
         File artifactSource = artifact.getFile();
