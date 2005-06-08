@@ -24,6 +24,7 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.profile.activation.ProfileActivationUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -286,5 +287,14 @@ public abstract class AbstractArtifactTask
     public void addLocalRepository( LocalRepository localRepository )
     {
         this.localRepository = localRepository;
+    }
+
+    public void setProfiles( String profiles )
+    {
+        if ( profiles != null )
+        {
+            // TODO: not sure this is the best way to do this...
+            System.setProperty( ProfileActivationUtils.ACTIVE_PROFILE_IDS, profiles );
+        }
     }
 }
