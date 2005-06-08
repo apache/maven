@@ -125,7 +125,7 @@
           <version>1.0.0</version>
           <code><![CDATA[
     private Proxy activeProxy;
-    
+
     public synchronized Proxy getActiveProxy()
     {
         if(activeProxy == null)
@@ -155,7 +155,7 @@
 
         return activeProxy;
     }
-    
+
     public Server getServer( String serverId )
     {
         Server match = null;
@@ -169,6 +169,27 @@
                 if ( serverId.equals( server.getId() ) )
                 {
                     match = server;
+                    break;
+                }
+            }
+        }
+
+        return match;
+    }
+    
+    public Mirror getMirrorOf( String repositoryId )
+    {
+        Mirror match = null;
+
+        List mirrors = getMirrors();
+        if ( mirrors != null && repositoryId != null )
+        {
+            for ( Iterator it = mirrors.iterator(); it.hasNext(); )
+            {
+                Mirror mirror = (Mirror) it.next();
+                if ( repositoryId.equals( mirror.getMirrorOf() ) )
+                {
+                    match = mirror;
                     break;
                 }
             }
