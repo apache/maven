@@ -24,7 +24,8 @@ import org.apache.tools.ant.ProjectComponent;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public abstract class Repository extends ProjectComponent
+public abstract class Repository
+    extends ProjectComponent
 {
     private String refid;
 

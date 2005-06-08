@@ -1,7 +1,5 @@
 package org.apache.maven.artifact.ant;
 
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -18,6 +16,9 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
  * limitations under the License.
  */
 
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.apache.maven.settings.Server;
+
 /**
  * Ant Wrapper for wagon authentication.
  *
@@ -27,4 +28,16 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
 public class Authentication
     extends AuthenticationInfo
 {
+    public Authentication()
+    {
+        super();
+    }
+
+    public Authentication( Server server )
+    {
+        setUserName( server.getUsername() );
+        setPassword( server.getPassword() );
+        setPassphrase( server.getPassphrase() );
+        setPrivateKey( server.getPrivateKey() );
+    }
 }

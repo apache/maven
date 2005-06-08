@@ -19,6 +19,7 @@ package org.apache.maven.artifact.ant;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.tools.ant.BuildException;
@@ -72,7 +73,17 @@ public abstract class AbstractArtifactTask
                                            authentication.getPrivateKey(), authentication.getPassphrase() );
         }
 
-        return new ArtifactRepository( "remote", repository.getUrl(), repositoryLayout );
+        ArtifactRepository artifactRepository;
+        if ( repository.getSnapshotPolicy() != null )
+        {
+            artifactRepository = new ArtifactRepository( "remote", repository.getUrl(), repositoryLayout,
+                                                         repository.getSnapshotPolicy() );
+        }
+        else
+        {
+            artifactRepository = new ArtifactRepository( "remote", repository.getUrl(), repositoryLayout );
+        }
+        return artifactRepository;
     }
 
     protected Object lookup( String role )
@@ -176,5 +187,20 @@ public abstract class AbstractArtifactTask
             }
         }
         return settings;
+    }
+
+    protected RemoteRepository createAntRemoteRepository( org.apache.maven.model.Repository pomRepository )
+    {
+        RemoteRepository r = new RemoteRepository();
+        r.setUrl( pomRepository.getUrl() );
+        r.setSnapshotPolicy( pomRepository.getSnapshotPolicy() );
+        r.setLayout( pomRepository.getLayout() );
+
+        Server server = getSettings().getServer( pomRepository.getId() );
+        if ( server != null )
+        {
+            r.addAuthentication( new Authentication( server ) );
+        }
+        return r;
     }
 }

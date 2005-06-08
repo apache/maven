@@ -32,18 +32,15 @@
     </copy>
 
     <artifact:install file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
-      <localRepository refid="local.repository"/>
       <pom refid="maven.project"/>
     </artifact:install>
 
     <artifact:deploy file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
-      <localRepository refid="local.repository"/>
       <remoteRepository refid="deploy.repository"/>
       <pom refid="maven.project"/>
     </artifact:deploy>
 
     <artifact:deploy file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
-      <localRepository refid="local.repository"/>
       <remoteRepository url="scp://localhost/tmp/deployment-repo">
         <authentication username="brett" privateKey="${user.home}/.ssh/id_dsa"/>
       </remoteRepository>

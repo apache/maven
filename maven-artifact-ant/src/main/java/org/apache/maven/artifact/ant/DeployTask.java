@@ -52,8 +52,23 @@ public class DeployTask
             localRepository = getDefaultLocalRepository();
         }
 
+        if ( pom == null )
+        {
+            throw new BuildException( "A POM element is required to deploy to the repository" );
+        }
+
         ArtifactRepository localRepo = createLocalArtifactRepository( localRepository );
         pom.initialise( (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE ), localRepo );
+
+        if ( remoteRepository == null )
+        {
+            if ( pom.getDistributionManagement() == null || pom.getDistributionManagement().getRepository() == null )
+            {
+                throw new BuildException( "A distributionManagement element is required in your POM to deploy" );
+            }
+
+            remoteRepository = createAntRemoteRepository( pom.getDistributionManagement().getRepository() );
+        }
 
         ArtifactRepository deploymentRepository = createRemoteArtifactRepository( remoteRepository );
 

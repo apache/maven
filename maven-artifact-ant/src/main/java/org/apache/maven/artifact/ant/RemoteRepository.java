@@ -29,6 +29,8 @@ public class RemoteRepository
 
     private Authentication authentication;
 
+    private String snapshotPolicy;
+
     public String getUrl()
     {
         return ( (RemoteRepository) getInstance() ).url;
@@ -47,5 +49,15 @@ public class RemoteRepository
     public void addAuthentication( Authentication authentication )
     {
         this.authentication = authentication;
+    }
+
+    public void setSnapshotPolicy( String snapshotPolicy )
+    {
+        this.snapshotPolicy = snapshotPolicy;
+    }
+
+    public String getSnapshotPolicy()
+    {
+        return snapshotPolicy;
     }
 }

@@ -82,6 +82,13 @@ public class DependenciesTask
             pom.initialise( projectBuilder, localRepo );
 
             dependencies = pom.getDependencies();
+
+            for ( Iterator i = pom.getRepositories().iterator(); i.hasNext(); )
+            {
+                org.apache.maven.model.Repository pomRepository = (org.apache.maven.model.Repository) i.next();
+
+                remoteRepositories.add( createAntRemoteRepository( pomRepository ) );
+            }
         }
 
         Set artifacts = metadataSource.createArtifacts( dependencies, null, null );
@@ -94,7 +101,7 @@ public class DependenciesTask
         ArtifactResolutionResult result;
         try
         {
-            List remoteArtifactRepositories = createRemoteArtifactRepositories();
+            List remoteArtifactRepositories = createRemoteArtifactRepositories( getRemoteRepositories() );
             result = resolver.resolveTransitively( artifacts, remoteArtifactRepositories, localRepo, metadataSource );
         }
         catch ( ArtifactResolutionException e )
@@ -152,10 +159,10 @@ public class DependenciesTask
         }
     }
 
-    private List createRemoteArtifactRepositories()
+    private List createRemoteArtifactRepositories( List remoteRepositories )
     {
         List list = new ArrayList();
-        for ( Iterator i = getRemoteRepositories().iterator(); i.hasNext(); )
+        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
             list.add( createRemoteArtifactRepository( (RemoteRepository) i.next() ) );
         }
@@ -166,6 +173,7 @@ public class DependenciesTask
     {
         if ( remoteRepositories.isEmpty() )
         {
+            // TODO: could we utilise the super POM for this?
             RemoteRepository remoteRepository = new RemoteRepository();
             remoteRepository.setUrl( "http://repo1.maven.org/maven2" );
             remoteRepositories.add( remoteRepository );
