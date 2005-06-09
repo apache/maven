@@ -1,1 +1,1 @@
-target/classes/org/apache/maven/it0022/test.txt
+target/test.txt

@@ -67,6 +67,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -283,22 +284,27 @@ public class DefaultMavenProjectBuilder
             modelCache.put( key, model );
         }
         
-        // TODO: Add profiles support here?
         List activeProfiles = new ArrayList( externalProfiles );
         
         List activePomProfiles = profileActivationCalculator.calculateActiveProfiles( model.getProfiles() );
         
         activeProfiles.addAll( activePomProfiles );
         
+        Properties profileProperties = new Properties();
+        
         for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
         {
             Profile profile = (Profile) it.next();
             
             modelInheritanceAssembler.mergeProfileWithModel( model, profile );
+            
+            profileProperties.putAll( profile.getProperties() );
         }
+        
+        // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
 
         model = modelInterpolator.interpolate( model );
-
+        
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
 
@@ -306,7 +312,9 @@ public class DefaultMavenProjectBuilder
 
         project = new MavenProject( model );
         
-        project.addActiveProfiles( activePomProfiles );
+        project.addProfileProperties( profileProperties );
+        
+        project.setActiveProfiles( activeProfiles );
 
         project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(), artifactRepositoryFactory, container ) );
 

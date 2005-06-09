@@ -151,7 +151,7 @@ public class DefaultModelInheritanceAssembler
     public void mergeProfileWithModel( Model model, Profile profile )
     {
         assembleModelBaseInheritance( model, profile );
-
+        
         assembleBuildBaseInheritance( model.getBuild(), profile.getBuild() );
     }
 
@@ -221,9 +221,6 @@ public class DefaultModelInheritanceAssembler
         }
 
         assembleDependencyManagementInheritance( child, parent );
-        
-        // Evaluation Properties :: aggregate
-        child.addEvalProperties( parent.getEvalProperties() );
     }
 
     private void assembleDependencyManagementInheritance( ModelBase child, ModelBase parent )

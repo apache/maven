@@ -135,11 +135,11 @@ public class PluginParameterExpressionEvaluator
             // Check properties that have been injected via profiles before we default over to 
             // system properties.
             
-            if( context.getProject().getProfileConfiguration() != null )
+            if( context.getProject().getProfileProperties() != null )
             {
-                value = context.getProject().getProfileConfiguration().getProperty( expression );
+                value = context.getProject().getProfileProperties().getProperty( expression );
             }
-            
+
             if( value == null )
             {
                 // We will attempt to get nab a system property as a way to specify a

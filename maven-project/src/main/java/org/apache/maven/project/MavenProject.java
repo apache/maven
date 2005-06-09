@@ -80,7 +80,7 @@ public class MavenProject
 
     private List remoteArtifactRepositories;
     
-    private Properties profileConfiguration;
+    private Properties profileProperties = new Properties();
 
     private List collectedProjects = Collections.EMPTY_LIST;
 
@@ -891,17 +891,17 @@ public class MavenProject
         return model.getPluginRepositories();
     }
 
-    public Properties getProfileConfiguration()
+    public Properties getProfileProperties()
     {
-        return profileConfiguration;
+        return profileProperties;
     }
 
-    public void addProfileConfiguration( Properties profileConfiguration )
+    public void addProfileProperties( Properties profileConfiguration )
     {
-        this.profileConfiguration = profileConfiguration;
+        this.profileProperties.putAll( profileConfiguration );
     }
 
-    public void addActiveProfiles( List activeProfiles )
+    public void setActiveProfiles( List activeProfiles )
     {
         this.activeProfiles.addAll( activeProfiles );
     }

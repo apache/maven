@@ -14,7 +14,7 @@
       </activation>
       
       <properties>
-        <test>**/SomeAddTest*</test>
+        <test>test.txt</test>
       </properties>
     </profile>
   </profiles>

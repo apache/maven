@@ -36,6 +36,8 @@ public final class ModelNormalizationUtils
     {
         Profile profile = new Profile();
         
+        profile.setId( settingsProfile.getId() );
+        
         profile.setSource( "settings.xml" );
 
         org.apache.maven.settings.Activation settingsActivation = settingsProfile.getActivation();
@@ -59,8 +61,8 @@ public final class ModelNormalizationUtils
             }
         }
 
-        profile.addEvalProperties( settingsProfile.getProperties() );
-
+        profile.setProperties( settingsProfile.getProperties() );
+        
         List repos = settingsProfile.getRepositories();
         if ( repos != null )
         {
@@ -87,6 +89,8 @@ public final class ModelNormalizationUtils
     public static Profile convertFromProfileXmlProfile( org.apache.maven.profiles.Profile profileXmlProfile )
     {
         Profile profile = new Profile();
+        
+        profile.setId( profileXmlProfile.getId() );
         
         profile.setSource( "profiles.xml" );
 
@@ -117,7 +121,7 @@ public final class ModelNormalizationUtils
             profile.setActivation( new AlwaysOnActivation() );
         }
         
-        profile.addEvalProperties( profileXmlProfile.getProperties() );
+        profile.setProperties( profileXmlProfile.getProperties() );
 
         List repos = profileXmlProfile.getRepositories();
         if ( repos != null )
