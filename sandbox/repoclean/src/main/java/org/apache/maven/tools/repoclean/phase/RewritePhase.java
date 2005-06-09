@@ -168,18 +168,12 @@ public class RewritePhase
                 {
                     repoReporter.warn( "Target file for artifact is present and not stale. (Artifact: \'"
                         + artifact.getId() + "\' in path: \'" + artifactSource + "\' with target path: "
-                        + artifactTarget + ")." );
+                        + artifactTarget + ")...SKIPPING" );
                 }
                 else
                 {
-                    repoReporter.error( "Cannot find source file for artifact: \'" + artifact.getId()
-                        + "\' under path: \'" + artifactSource + "\'" );
-                }
-
-                if ( repoReporter.hasError() )
-                {
-                    repoReporter.warn( "Error(s) occurred while rewriting artifact: \'" + artifact.getId()
-                        + "\' or its POM." );
+                    repoReporter.warn( "Cannot find source file for artifact: \'" + artifact.getId()
+                        + "\' under path: \'" + artifactSource + "\'...SKIPPING" );
                 }
             }
             catch ( Exception e )
@@ -193,7 +187,7 @@ public class RewritePhase
                     }
                     catch ( RollbackException re )
                     {
-                        repoReporter.error( "Error rolling back conversion transaction.", re );
+                        repoReporter.error( "Error rolling back conversion transaction (artifact: " + artifact.getId() + ").", re );
                     }
                 }
                 else
