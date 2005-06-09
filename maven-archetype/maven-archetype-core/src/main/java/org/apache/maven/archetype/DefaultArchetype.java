@@ -25,6 +25,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.velocity.VelocityComponent;
@@ -39,12 +40,14 @@ import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
 public class DefaultArchetype
+    extends AbstractLogEnabled
     implements Archetype
 {
     // ----------------------------------------------------------------------
@@ -65,23 +68,16 @@ public class DefaultArchetype
     // artifactId = maven-foo-archetype
     // version = latest
 
-    public void createArchetype( String archetypeGroupId,
-                                 String archetypeArtifactId,
-                                 String archetypeVersion,
-                                 ArtifactRepository localRepository,
-                                 List remoteRepositories,
-                                 Map parameters )
+    public void createArchetype( String archetypeGroupId, String archetypeArtifactId, String archetypeVersion,
+                                 ArtifactRepository localRepository, List remoteRepositories, Map parameters )
         throws ArchetypeNotFoundException, ArchetypeDescriptorException, ArchetypeTemplateProcessingException
     {
         // ----------------------------------------------------------------------
         // Download the archetype
         // ----------------------------------------------------------------------
 
-        Artifact archetypeArtifact = artifactFactory.createArtifact( archetypeGroupId,
-                                                                     archetypeArtifactId,
-                                                                     archetypeVersion,
-                                                                     Artifact.SCOPE_RUNTIME,
-                                                                     "jar" );
+        Artifact archetypeArtifact = artifactFactory.createArtifact( archetypeGroupId, archetypeArtifactId,
+                                                                     archetypeVersion, Artifact.SCOPE_RUNTIME, "jar" );
 
         try
         {
@@ -92,6 +88,47 @@ public class DefaultArchetype
             throw new ArchetypeNotFoundException( "Cannot download archetype.", e );
         }
 
+        // ---------------------------------------------------------------------
+        // Get Logger and display all parameters used 
+        // ---------------------------------------------------------------------
+        if ( getLogger().isInfoEnabled() )
+        {
+
+            if ( !parameters.isEmpty() )
+            {
+
+                getLogger().info( "----------------------------------------------------------------------------" );
+
+                getLogger().info( "Using following parameters for creating Archetype: " + archetypeArtifactId + ":" + archetypeVersion );
+
+                getLogger().info( "----------------------------------------------------------------------------" );
+
+                Set keys = parameters.keySet();
+
+                Iterator it = keys.iterator();
+
+                while ( it.hasNext() )
+                {
+
+                    String parameterName = (String) it.next();
+
+                    String parameterValue = (String) parameters.get( parameterName );
+
+                    getLogger().info( "Parameter: " + parameterName + ", Value: " + parameterValue );
+
+                }
+
+            }
+            else
+            {
+
+                getLogger().info( "No Parameters found for creating Archetype" );
+
+            }
+
+        }
+        
+        
         // ----------------------------------------------------------------------
         // Load the descriptor
         // ----------------------------------------------------------------------
@@ -118,8 +155,7 @@ public class DefaultArchetype
 
             if ( is == null )
             {
-                throw new ArchetypeDescriptorException( "The " + ARCHETYPE_DESCRIPTOR +
-                                                        " descriptor cannot be found." );
+                throw new ArchetypeDescriptorException( "The " + ARCHETYPE_DESCRIPTOR + " descriptor cannot be found." );
             }
 
             descriptor = (ArchetypeDescriptor) builder.build( new InputStreamReader( is ) );
@@ -212,6 +248,15 @@ public class DefaultArchetype
         {
             Thread.currentThread().setContextClassLoader( old );
         }
+        
+        // ----------------------------------------------------------------------
+        // Log message on Archetype creation
+        // ----------------------------------------------------------------------
+        if ( getLogger().isInfoEnabled() )
+        {
+            getLogger().info( "Archetype created in dir: " + outputDirectory );
+        }
+
     }
 
     // ----------------------------------------------------------------------
@@ -240,11 +285,8 @@ public class DefaultArchetype
         }
     }
 
-    protected void processTemplate( String outputDirectory,
-                                    Context context,
-                                    String template,
-                                    boolean packageInFileName,
-                                    String packageName )
+    protected void processTemplate( String outputDirectory, Context context, String template,
+                                    boolean packageInFileName, String packageName )
         throws Exception
     {
         File f;
