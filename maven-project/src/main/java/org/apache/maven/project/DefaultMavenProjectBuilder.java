@@ -294,7 +294,7 @@ public class DefaultMavenProjectBuilder
         {
             Profile profile = (Profile) it.next();
             
-            modelInheritanceAssembler.mergeProfileWithModel( cachedModel, profile );
+            modelInheritanceAssembler.mergeProfileWithModel( model, profile );
         }
 
         model = modelInterpolator.interpolate( model );
