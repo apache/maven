@@ -332,10 +332,13 @@
           </tr>
           <tr>
             <td>configurator</td>
-            <td>none (detected)</td>
+            <td>@configurator &lt;roleHint&gt;</td>
             <td>No</td>
             <td>The configurator type to use when injecting parameter values 
-              into this Mojo. <i>NOTE: This will only be used in very special 
+              into this Mojo. The value is normally deduced from the 
+              Mojo's implementation language, but can be specified to
+              allow a custom ComponentConfigurator implementation to be used.
+              <i>NOTE: This will only be used in very special 
               cases, using a highly controlled vocabulary of possible values. 
               (Elements like this are why it's a good idea to use the 
               descriptor tools.)</i></td>

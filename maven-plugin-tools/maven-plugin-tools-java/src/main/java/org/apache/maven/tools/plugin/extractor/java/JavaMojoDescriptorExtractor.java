@@ -51,6 +51,7 @@ public class JavaMojoDescriptorExtractor
     implements MojoDescriptorExtractor
 {
     public static final String MAVEN_PLUGIN_INSTANTIATION = "instantiationStrategy";
+    public static final String CONFIGURATOR = "configurator";
 
     public static final String PARAMETER = "parameter";
 
@@ -145,6 +146,18 @@ public class JavaMojoDescriptorExtractor
             mojoDescriptor.setExecutionStrategy( MojoDescriptor.SINGLE_PASS_EXEC_STRATEGY );
         }
 
+
+        // ----------------------------------------------------------------------
+        // Configurator hint
+        // ----------------------------------------------------------------------
+
+        DocletTag configurator = findInClassHierarchy( javaClass, CONFIGURATOR );
+
+        if ( configurator != null )
+        {
+            mojoDescriptor.setComponentConfigurator( configurator.getValue() );
+        }
+ 
         // ----------------------------------------------------------------------
         // Goal name
         // ----------------------------------------------------------------------
