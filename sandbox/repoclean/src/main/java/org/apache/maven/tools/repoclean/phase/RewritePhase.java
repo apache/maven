@@ -242,7 +242,7 @@ public class RewritePhase
 
         String pomContents = null;
 
-        boolean pomNeedsRewriting = true;
+        boolean shouldRewritePom = true;
 
         if ( sourcePom.exists() )
         {
@@ -250,13 +250,23 @@ public class RewritePhase
 
             if ( pomContents.indexOf( "modelVersion" ) > -1 )
             {
-                pomNeedsRewriting = false;
+                shouldRewritePom = false;
 
                 freshenSupplementalMetadata( pom, sourcePom, targetPom, transaction, artifactReporter, reportOnly );
             }
         }
+        else if( targetPom.exists() )
+        {
+            // we have a target pom for this artifact already, and we'll only be making up a new pom.
+            // let's leave the existing one alone.
+            shouldRewritePom = false;
+        }
 
-        if ( pomNeedsRewriting )
+        File bridgedTargetPom = null;
+        
+        boolean wroteBridge = false;
+        
+        if ( shouldRewritePom )
         {
             ArtifactPomRewriter artifactPomRewriter = null;
 
@@ -267,7 +277,7 @@ public class RewritePhase
 
                 transaction.addFile( targetPom );
 
-                File bridgedTargetPom = new File( targetBase, bridgingLayout.pathOfMetadata( pom ).replace( '+', '-' ) );
+                bridgedTargetPom = new File( targetBase, bridgingLayout.pathOfMetadata( pom ).replace( '+', '-' ) );
 
                 transaction.addFile( bridgedTargetPom );
 
@@ -295,16 +305,8 @@ public class RewritePhase
                     IOUtil.close( to );
                 }
 
-                boolean wroteBridge = bridgePomLocations( pom, targetPom, bridgedTargetPom, artifactReporter,
+                wroteBridge = bridgePomLocations( pom, targetPom, bridgedTargetPom, artifactReporter,
                                                           transaction, reportOnly );
-
-                digestVerifier.verifyDigest( sourcePom, targetPom, transaction, artifactReporter, reportOnly );
-
-                if ( wroteBridge )
-                {
-                    digestVerifier.verifyDigest( sourcePom, bridgedTargetPom, transaction, artifactReporter,
-                                                 reportOnly );
-                }
             }
             finally
             {
@@ -319,6 +321,14 @@ public class RewritePhase
                     }
                 }
             }
+        }
+        
+        digestVerifier.verifyDigest( sourcePom, targetPom, transaction, artifactReporter, reportOnly );
+
+        if ( wroteBridge )
+        {
+            digestVerifier.verifyDigest( sourcePom, bridgedTargetPom, transaction, artifactReporter,
+                                         reportOnly );
         }
     }
 

@@ -28,6 +28,11 @@ public class Digestor
     public void createArtifactDigest( File artifactFile, File digestFile, String algorithm )
         throws DigestException
     {
+        if ( artifactFile == null || !artifactFile.exists() )
+        {
+            throw new DigestException( "Cannot generate digest for missing file: " + artifactFile );
+        }
+
         byte[] digestData = generateArtifactDigest( artifactFile, algorithm );
 
         try
@@ -43,43 +48,40 @@ public class Digestor
     public boolean verifyArtifactDigest( File artifactFile, File digestFile, String algorithm )
         throws DigestException
     {
-        if ( artifactFile.exists() && digestFile.exists() )
-        {
-            byte[] generatedDigest = generateArtifactDigest( artifactFile, algorithm );
-
-            InputStream in = null;
-            try
-            {
-                in = new FileInputStream( artifactFile );
-
-                int digestLen = generatedDigest.length;
-                int currentIdx = 0;
-
-                boolean matched = true;
-
-                int read = -1;
-                while ( ( read = in.read() ) > -1 )
-                {
-                    if ( currentIdx >= digestLen || read != generatedDigest[currentIdx] )
-                    {
-                        return false;
-                    }
-                }
-            }
-            catch ( IOException e )
-            {
-                throw new DigestException( "Cannot verify digest for artifact file: \'" + artifactFile
-                    + "\' against digest file: \'" + digestFile + "\' using algorithm: \'" + algorithm + "\'", e );
-            }
-            finally
-            {
-                IOUtil.close( in );
-            }
-
-        }
-        else
+        if ( digestFile == null || !digestFile.exists() || artifactFile == null || !artifactFile.exists() )
         {
             return false;
+        }
+
+        byte[] generatedDigest = generateArtifactDigest( artifactFile, algorithm );
+
+        InputStream in = null;
+        try
+        {
+            in = new FileInputStream( artifactFile );
+
+            int digestLen = generatedDigest.length;
+            int currentIdx = 0;
+
+            boolean matched = true;
+
+            int read = -1;
+            while ( ( read = in.read() ) > -1 )
+            {
+                if ( currentIdx >= digestLen || read != generatedDigest[currentIdx] )
+                {
+                    return false;
+                }
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new DigestException( "Cannot verify digest for artifact file: \'" + artifactFile
+                + "\' against digest file: \'" + digestFile + "\' using algorithm: \'" + algorithm + "\'", e );
+        }
+        finally
+        {
+            IOUtil.close( in );
         }
 
         return true;
@@ -88,6 +90,11 @@ public class Digestor
     public byte[] generateArtifactDigest( File artifactFile, String algorithm )
         throws DigestException
     {
+        if ( artifactFile == null || !artifactFile.exists() )
+        {
+            throw new DigestException( "Cannot generate digest for missing file: " + artifactFile );
+        }
+
         MessageDigest digest = null;
         try
         {

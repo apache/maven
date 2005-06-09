@@ -54,17 +54,27 @@ public class DigestVerifier
         throws DigestException, ReportWriteException, IOException
     {
         // create the digest source file from which to copy/verify.
-        File digestSourceFile = new File( artifactSource + digestExt );
+        File digestSourceFile = null;
+
+        if ( artifactSource != null )
+        {
+            digestSourceFile = new File( artifactSource + digestExt );
+        }
 
         // create the digest target file from which to copy/create.
-        File digestTargetFile = new File( artifactTarget + digestExt );
+        File digestTargetFile = null;
 
-        transaction.addFile( digestTargetFile );
+        if ( artifactTarget != null )
+        {
+            digestTargetFile = new File( artifactTarget + digestExt );
+            
+            transaction.addFile( digestTargetFile );
+        }
 
         boolean verified = false;
 
         // if the digest source file exists, then verify it.
-        if ( digestSourceFile.exists() )
+        if ( digestSourceFile != null && digestSourceFile.exists() )
         {
             verified = artifactDigestor.verifyArtifactDigest( artifactTarget, digestTargetFile, digestAlgorithm );
 
