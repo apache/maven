@@ -346,7 +346,11 @@ public class DefaultMavenProjectBuilder
                                           ArtifactRepository localRepository )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-        aggregatedRemoteWagonRepositories.addAll( ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container ) );
+        if ( !model.getRepositories().isEmpty() )
+        {
+            List respositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container );
+            aggregatedRemoteWagonRepositories.addAll( respositories );
+        }
 
         MavenProject project = new MavenProject( model );
 
