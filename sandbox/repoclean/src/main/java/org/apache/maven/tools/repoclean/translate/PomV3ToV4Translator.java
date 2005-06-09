@@ -560,7 +560,7 @@ public class PomV3ToV4Translator
 
                     if ( !props.isEmpty() )
                     {
-                        for ( Iterator propertyIterator = props.keySet().iterator(); it.hasNext(); )
+                        for ( Iterator propertyIterator = props.keySet().iterator(); propertyIterator.hasNext(); )
                         {
                             String key = (String) propertyIterator.next();
                             String value = props.getProperty( key );
