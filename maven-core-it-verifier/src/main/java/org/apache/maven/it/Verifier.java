@@ -347,8 +347,12 @@ public class Verifier
                 if ( userXml.exists() )
                 {
                     userModelReader.parse( userXml );
-                    
-                    repo = new File( userModelReader.getLocalRepository() ).getAbsolutePath();
+
+                    String localRepository = userModelReader.getLocalRepository();
+                    if ( localRepository != null )
+                    {
+                        repo = new File( localRepository ).getAbsolutePath();
+                    }
                 }
             }
             catch ( Exception e )
