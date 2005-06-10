@@ -217,6 +217,19 @@ public class MBoot
 
         System.out.println( "Maven installation directory: " + dist );
 
+        if ( dist.exists() )
+        {
+            if ( !new File( dist, "bin/m2.conf" ).exists() )
+            {
+                System.err.println( "The directory given to install Maven in already exists, but does not contain a Maven installation" );
+                System.err.println();
+                System.err.println( "\t" + dist );
+                System.err.println();
+                System.err.println( "If you really mean to install Maven to this location, please delete the directory first" );
+                System.exit( 1 );
+            }
+        }
+
         Date fullStop;
 
         Date fullStart = new Date();
@@ -365,7 +378,6 @@ public class MBoot
         }
 
         // build the installation
-
         FileUtils.deleteDirectory( dist );
 
         // ----------------------------------------------------------------------
