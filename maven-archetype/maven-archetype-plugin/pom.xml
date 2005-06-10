@@ -9,6 +9,11 @@
   <packaging>maven-plugin</packaging>
   <name>Maven Archetype Plugin</name>
   <version>1.0-alpha-1</version>
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-archetype/maven-archetype-plugin/</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk/maven-archetype/maven-archetype-plugin/</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/components/maven-archetype/maven-archetype-plugin/</url>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
