@@ -2,11 +2,9 @@
   <target name="test-pom">
     <artifact:pom file="pom.xml" id="my.maven.project"/>
 
-    <artifact:setProperty property="my.artifactid" expression="project.artifactId" pomRefId="my.maven.project" />
-    <echo>Artifact ID = ${my.artifactid}</echo>
+    <echo>Artifact ID = ${my.maven.project:artifactId}</echo>
 
-    <artifact:setProperty property="my.parent.artifactid" expression="project.parent.artifactId" pomRefId="my.maven.project" />
-    <echo>Artifact ID = ${my.parent.artifactid}</echo>
+    <echo>Parent Artifact ID = ${my.maven.project:parent.artifactId}</echo>
   </target>
 
   <target name="foo">

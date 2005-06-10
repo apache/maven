@@ -18,6 +18,7 @@ package org.apache.maven.artifact.ant;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.DependencyManagement;
@@ -30,24 +31,43 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.ProjectComponent;
+import org.apache.tools.ant.PropertyHelper;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.Project;
+import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
+import java.util.Collections;
 
 /**
- * A POM.
+ * A POM typedef.
+ *
+ * Also an Ant Task that registers a handler called POMPropertyHelper
+ * that intercepts all calls to property value resolution and replies instead
+ * of Ant to properties that start with the id of the pom.
+ *
+ * Example:
+ * ${maven.project:artifactId}
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author <a href="mailto:nicolaken@apache.org">Nicola Ken Barozzi</a>
  * @version $Id$
  */
 public class Pom
-    extends ProjectComponent
+    extends AbstractArtifactTask
 {
     private String refid;
+
+    private String antId;
 
     private MavenProject mavenProject;
 
     private File file;
+
+    /**
+     * The property interceptor.
+     */
+    private final POMPropertyHelper helper = new POMPropertyHelper();
 
     public String getRefid()
     {
@@ -57,6 +77,11 @@ public class Pom
     public void setRefid( String refid )
     {
         this.refid = refid;
+    }
+
+    public void setId( String id )
+    {
+        this.antId = id;
     }
 
     protected Pom getInstance()
@@ -81,11 +106,13 @@ public class Pom
 
     void initialise( MavenProjectBuilder builder, ArtifactRepository localRepository )
     {
+        // TODO: should this be in execute() too? Would that work when it is used as a type?
         if ( file != null )
         {
             try
             {
-                mavenProject = builder.build( file, localRepository );
+                // TODO: should the profiles be constructed and passed in here? From Ant, or perhaps settings?
+                mavenProject = builder.build( file, localRepository, Collections.EMPTY_LIST );
             }
             catch ( ProjectBuildingException e )
             {
@@ -235,6 +262,78 @@ public class Pom
     public String getId()
     {
         return getMavenProject().getId();
+    }
+
+    /**
+     * Registers POMPropertyHelper as a property interceptor
+     */
+    public void execute()
+    {
+        ArtifactRepository localRepo = createLocalArtifactRepository();
+        MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+        initialise( projectBuilder, localRepo );
+
+        Project project = getProject();
+
+        // Add a reference to this task/type
+        project.addReference( antId, this );
+
+        // Register the property interceptor
+        PropertyHelper phelper = PropertyHelper.getPropertyHelper( project );
+        helper.setNext( phelper.getNext() );
+        helper.setProject( project );
+        phelper.setNext( helper );
+    }
+
+    /**
+     * The property interceptor that handles the calls for "pom." properties
+     */
+    private class POMPropertyHelper
+        extends PropertyHelper
+    {
+        /**
+         * The method that gets called by Ant with every request of property
+         */
+        public Object getPropertyHook( String ns, String name, boolean user )
+        {
+
+            String prefix = antId + ":";
+
+            if ( !name.startsWith( prefix ) )
+            {
+                // pass on to next interceptor
+                return super.getPropertyHook( ns, name, user );
+            }
+            try
+            {
+                // else handle the property resolution
+                String expression = name.substring( prefix.length() );
+                return getPOMValue( "project." + expression );
+
+            }
+            catch ( Exception ex )
+            {
+                ex.printStackTrace();
+                return null;
+            }
+        }
+
+        private Object getPOMValue( String expression )
+        {
+            Object value = null;
+
+            try
+            {
+                value = ReflectionValueExtractor.evaluate( expression, getMavenProject() );
+            }
+            catch ( Exception e )
+            {
+                throw new BuildException( "Error extracting expression from POM", e );
+            }
+
+            return value;
+        }
+
     }
 
 }
