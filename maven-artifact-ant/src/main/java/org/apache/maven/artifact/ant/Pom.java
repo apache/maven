@@ -297,7 +297,7 @@ public class Pom
         public Object getPropertyHook( String ns, String name, boolean user )
         {
 
-            String prefix = antId + ":";
+            String prefix = antId + ".";
 
             if ( !name.startsWith( prefix ) )
             {
