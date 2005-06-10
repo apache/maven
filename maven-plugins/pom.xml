@@ -11,6 +11,15 @@
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
+  <ciManagement>
+    <system>continuum</system>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <address>dev@maven.apache.org</address>
+      </notifier>
+    </notifiers>
+  </ciManagement>
   <developers>
     <developer>
       <id>jvanzyl</id>
