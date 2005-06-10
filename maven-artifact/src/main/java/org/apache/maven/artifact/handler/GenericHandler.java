@@ -39,9 +39,4 @@ public class GenericHandler
     {
         return type + "s";
     }
-
-    public String packageGoal()
-    {
-        return null;
-    }
 }

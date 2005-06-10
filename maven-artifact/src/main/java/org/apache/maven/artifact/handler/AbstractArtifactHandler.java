@@ -24,10 +24,6 @@ package org.apache.maven.artifact.handler;
 public abstract class AbstractArtifactHandler
     implements ArtifactHandler
 {
-    public String additionalPlugin()
-    {
-        return null;
-    }
 
     public String extension()
     {
@@ -39,8 +35,4 @@ public abstract class AbstractArtifactHandler
         return "jars";
     }
 
-    public String packageGoal()
-    {
-        return "jar:jar";
-    }
 }

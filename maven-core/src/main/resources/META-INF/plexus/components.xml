@@ -74,9 +74,6 @@
       <implementation>org.apache.maven.lifecycle.DefaultLifecycleExecutor</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.plugin.PluginManager</role>
         </requirement>
         <requirement>
@@ -86,77 +83,180 @@
       <configuration>
         <!-- START SNIPPET: lifecyle -->
         <phases>
-          <phase>
-            <id>generate-sources</id>
-          </phase>
-          <phase>
-            <id>process-sources</id>
-          </phase>
-          <phase>
-            <id>generate-resources</id>
-          </phase>
-          <phase>
-            <id>process-resources</id>
-            <goals>
-              <goal implementation="java.lang.String">resources:resources</goal>
-            </goals>
-          </phase>
-          <phase>
-            <id>compile</id>
-            <goals>
-              <goal implementation="java.lang.String">compiler:compile</goal>
-            </goals>
-          </phase>
-          <phase>
-            <id>process-classes</id>
-          </phase>
-          <phase>
-            <id>generate-test-resources</id>
-          </phase>
-          <phase>
-            <id>process-test-sources</id>
-          </phase>
-          <phase>
-            <id>generate-test-sources</id>
-          </phase>
-          <phase>
-            <id>process-test-resources</id>
-            <goals>
-              <goal implementation="java.lang.String">resources:testResources</goal>
-            </goals>
-          </phase>
-          <phase>
-            <id>test-compile</id>
-            <goals>
-              <goal implementation="java.lang.String">compiler:testCompile</goal>
-            </goals>
-          </phase>
-          <phase>
-            <id>test</id>
-            <goals>
-              <goal implementation="java.lang.String">surefire:test</goal>
-            </goals>
-          </phase>
-          <phase>
-            <id>package</id>
-          </phase>
-          <phase>
-            <id>integration-test</id>
-          </phase>
-          <phase>
-            <id>install</id>
-            <goals>
-              <goal implementation="java.lang.String">install:install</goal>
-            </goals>
-          </phase>
-          <phase>
-            <id>deploy</id>
-            <goals>
-              <goal implementation="java.lang.String">deploy:deploy</goal>
-            </goals>
-          </phase>
+          <phase implementation="java.lang.String">generate-sources</phase>
+          <phase implementation="java.lang.String">process-sources</phase>
+          <phase implementation="java.lang.String">generate-resources</phase>
+          <phase implementation="java.lang.String">process-resources</phase>
+          <phase implementation="java.lang.String">compile</phase>
+          <phase implementation="java.lang.String">process-classes</phase>
+          <phase implementation="java.lang.String">generate-test-resources</phase>
+          <phase implementation="java.lang.String">process-test-sources</phase>
+          <phase implementation="java.lang.String">generate-test-sources</phase>
+          <phase implementation="java.lang.String">process-test-resources</phase>
+          <phase implementation="java.lang.String">test-compile</phase>
+          <phase implementation="java.lang.String">test</phase>
+          <phase implementation="java.lang.String">package</phase>
+          <phase implementation="java.lang.String">install</phase>
+          <phase implementation="java.lang.String">integration-test</phase>
+          <phase implementation="java.lang.String">deploy</phase>
         </phases>
         <!-- END SNIPPET: lifecycle -->
+        <!-- START SNIPPET: default-lifecycle -->
+        <defaultPhases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>jar:jar</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </defaultPhases>
+        <!-- END SNIPPET: default-lifecycle -->
+      </configuration>
+    </component>
+
+    <!-- TODO: issues with the lifecycle:
+     - must manually configure plugins that are not in here for a given packaging, unless that packaging could be mapped to a plugin from the repo
+     - manually configured lifecycles will not pick up any later additions to the defaults where they are intended to extend defaults (have configuration <includeDefaults/> ?)
+     - should we be registering goals, or just plugins and letting them bind phases? Is it better to remove the plugin phase binding perhaps?
+     -->
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>pom</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: pom-lifecycle -->
+        <phases>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: pom-lifecycle -->
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>jar</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: jar-lifecycle -->
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>jar:jar</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: jar-lifecycle -->
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>maven-plugin</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: maven-plugin-lifecycle -->
+        <phases>
+          <generate-resources>plugin:descriptor</generate-resources>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>jar:jar</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: maven-plugin-lifecycle -->
+      </configuration>
+    </component>
+
+    <!-- TODO: move to the ejb plugin? -->
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>ejb</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: ejb-lifecycle -->
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>ejb:ejb</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: ejb-lifecycle -->
+      </configuration>
+    </component>
+
+    <!-- TODO: move to the war plugin? -->
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>war</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: war-lifecycle -->
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>war:war</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: war-lifecycle -->
+      </configuration>
+    </component>
+
+    <!-- TODO: move to the plexus plugin? -->
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>plexus-application</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: plexus-application-lifecycle -->
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>plexus:app</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: plexus-application-lifecycle -->
+      </configuration>
+    </component>
+
+    <!-- TODO: move to the plexus plugin? -->
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>plexus-service</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: plexus-service-lifecycle -->
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>plexus:service</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: plexus-service-lifecycle -->
       </configuration>
     </component>
 

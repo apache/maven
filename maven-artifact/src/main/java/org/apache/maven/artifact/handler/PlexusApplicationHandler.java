@@ -23,8 +23,4 @@ package org.apache.maven.artifact.handler;
 public class PlexusApplicationHandler
     extends JarHandler
 {
-    public String packageGoal()
-    {
-        return "plexus:app";
-    }
 }

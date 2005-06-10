@@ -27,8 +27,4 @@ public interface ArtifactHandler
     String extension();
 
     String directory();
-
-    String packageGoal();
-
-    String additionalPlugin();
 }

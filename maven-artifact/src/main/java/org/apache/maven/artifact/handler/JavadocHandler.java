@@ -33,9 +33,4 @@ public class JavadocHandler
     {
         return "javadocs";
     }
-
-    public String packageGoal()
-    {
-        return "apidocs:jar";
-    }
 }

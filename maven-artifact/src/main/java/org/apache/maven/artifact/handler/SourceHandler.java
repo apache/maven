@@ -33,9 +33,4 @@ public class SourceHandler
     {
         return "sources";
     }
-
-    public String packageGoal()
-    {
-        return "source:source";
-    }
 }

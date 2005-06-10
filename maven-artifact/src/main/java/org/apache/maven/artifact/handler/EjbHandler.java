@@ -27,9 +27,4 @@ public class EjbHandler
     {
         return "ejbs";
     }
-
-    public String packageGoal()
-    {
-        return "ejb:ejb";
-    }
 }

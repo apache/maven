@@ -16,12 +16,10 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
@@ -34,6 +32,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
@@ -64,9 +63,9 @@ public class DefaultLifecycleExecutor
 
     private PluginManager pluginManager;
 
-    private ArtifactHandlerManager artifactHandlerManager;
-
     private List phases;
+
+    private Map defaultPhases;
 
     // ----------------------------------------------------------------------
     //
@@ -94,10 +93,6 @@ public class DefaultLifecycleExecutor
         {
             response.setException( e );
         }
-        catch ( ArtifactHandlerNotFoundException e )
-        {
-            response.setException( e );
-        }
         catch ( ArtifactResolutionException e )
         {
             response.setException( e );
@@ -111,39 +106,42 @@ public class DefaultLifecycleExecutor
     }
 
     private void processGoals( MavenSession session, List tasks )
-        throws ArtifactHandlerNotFoundException, LifecycleExecutionException, PluginNotFoundException,
-        MojoExecutionException, ArtifactResolutionException
+        throws LifecycleExecutionException, PluginNotFoundException, MojoExecutionException,
+        ArtifactResolutionException
     {
         Map phaseMap = new HashMap();
 
         for ( Iterator i = phases.iterator(); i.hasNext(); )
         {
-            Phase p = (Phase) i.next();
+            String p = (String) i.next();
 
             // Make a copy of the phase as we will modify it
-            phaseMap.put( p.getId(), new Phase( p ) );
+            phaseMap.put( p, new ArrayList() );
         }
 
         MavenProject project = session.getProject();
 
-        ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( project.getPackaging() );
-
-        if ( artifactHandler != null )
+        Map mappings;
+        try
         {
-            if ( artifactHandler.packageGoal() != null )
+            LifecycleMapping m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, project.getPackaging() );
+            mappings = m.getPhases();
+        }
+        catch ( ComponentLookupException e )
+        {
+            getLogger().error( "No lifecycle mapping for type '" + project.getPackaging() + "': using defaults" );
+            mappings = defaultPhases;
+        }
+
+        for ( Iterator i = mappings.keySet().iterator(); i.hasNext(); )
+        {
+            String phase = (String) i.next();
+            String task = (String) mappings.get( phase );
+            MojoDescriptor mojoDescriptor = configureMojo( task, session, phaseMap );
+            List goals = (List) phaseMap.get( phase );
+            if ( !goals.contains( mojoDescriptor.getId() ) )
             {
-                // TODO: need to inject plugin configuration here
-                configureMojo( artifactHandler.packageGoal(), session, phaseMap );
-            }
-
-            if ( artifactHandler.additionalPlugin() != null )
-            {
-                String additionalPluginGroupId = PluginDescriptor.getDefaultPluginGroupId();
-
-                String additionalPluginArtifactId = PluginDescriptor.getDefaultPluginArtifactId(
-                    artifactHandler.additionalPlugin() );
-
-                injectHandlerPluginConfiguration( project, additionalPluginGroupId, additionalPluginArtifactId, null );
+                goals.add( mojoDescriptor.getId() );
             }
         }
 
@@ -303,14 +301,17 @@ public class DefaultLifecycleExecutor
         {
             if ( mojoDescriptor.getPhase() != null )
             {
-                Phase phase = (Phase) phaseMap.get( mojoDescriptor.getPhase() );
+                List goals = (List) phaseMap.get( mojoDescriptor.getPhase() );
 
-                if ( phase == null )
+                if ( goals == null )
                 {
                     String message = "Required phase '" + mojoDescriptor.getPhase() + "' not found";
                     throw new LifecycleExecutionException( message );
                 }
-                phase.getGoals().add( mojoDescriptor.getId() );
+                if ( !goals.contains( mojoDescriptor.getId() ) )
+                {
+                    goals.add( mojoDescriptor.getId() );
+                }
             }
         }
     }
@@ -323,18 +324,17 @@ public class DefaultLifecycleExecutor
         if ( phaseMap.containsKey( task ) )
         {
             // only execute up to the given phase
-            int index = phases.indexOf( phaseMap.get( task ) );
+            int index = phases.indexOf( task );
 
             for ( int j = 0; j <= index; j++ )
             {
-                // TODO: phases should just be strings...
-                Phase p = (Phase) phases.get( j );
+                String p = (String) phases.get( j );
 
-                p = (Phase) phaseMap.get( p.getId() );
+                List phaseGoals = (List) phaseMap.get( p );
 
-                if ( p.getGoals() != null )
+                if ( phaseGoals != null )
                 {
-                    for ( Iterator k = p.getGoals().iterator(); k.hasNext(); )
+                    for ( Iterator k = phaseGoals.iterator(); k.hasNext(); )
                     {
                         String goal = (String) k.next();
 
@@ -406,9 +406,8 @@ public class DefaultLifecycleExecutor
             {
                 injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
 
-                pluginDescriptor =
-                    pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(),
-                                                session.getLocalRepository() );
+                pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(),
+                                                               session.getLocalRepository() );
             }
             catch ( PluginManagerException e )
             {

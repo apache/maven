@@ -23,10 +23,6 @@ package org.apache.maven.artifact.handler;
 public class PluginHandler
     extends AbstractArtifactHandler
 {
-    public String additionalPlugin()
-    {
-        return "plugin";
-    }
 
     public String directory()
     {

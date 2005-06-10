@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.handler;
+package org.apache.maven.lifecycle.mapping;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,20 +16,22 @@ package org.apache.maven.artifact.handler;
  * limitations under the License.
  */
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
- * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
+ * Lifecycle mapping for a POM.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class WarHandler
-    extends AbstractArtifactHandler
+public class DefaultLifecycleMapping
+    implements LifecycleMapping
 {
-    public String extension()
-    {
-        return "war";
-    }
+    private Map phases = new HashMap();
 
-    public String directory()
+    public Map getPhases()
     {
-        return "wars";
+        return phases;
     }
 }

@@ -17,6 +17,7 @@ package org.apache.maven.lifecycle;
  */
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -29,6 +30,8 @@ public class LifecycleExecutorTest
         throws Exception
     {
         LifecycleExecutor le = (LifecycleExecutor) lookup( LifecycleExecutor.ROLE );
+
+        LifecycleMapping m = (LifecycleMapping) lookup( LifecycleMapping.ROLE, "pom" );
 
         assertEquals( 16, le.getPhases().size() );
 
