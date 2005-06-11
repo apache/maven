@@ -18,7 +18,6 @@ package org.apache.maven.artifact.ant;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.DependencyManagement;
@@ -31,9 +30,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.PropertyHelper;
-import org.apache.tools.ant.Task;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.PropertyHelper;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
@@ -47,7 +45,7 @@ import java.util.Collections;
  * of Ant to properties that start with the id of the pom.
  *
  * Example:
- * ${maven.project:artifactId}
+ * ${maven.project.artifactId}
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author <a href="mailto:nicolaken@apache.org">Nicola Ken Barozzi</a>
