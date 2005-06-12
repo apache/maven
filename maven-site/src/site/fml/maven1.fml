@@ -75,8 +75,8 @@
           version that is working for you until you need the new features and it covers all of your needs.
         </p>
         <p>
-          Importantly, a number of features of Maven 1.0 are not yet available in Maven 2.0 - most notably the site
-          generation and reporting. If you need these features, we recommend staying with Maven 1.0 at this point.
+          Importantly, a number of features of Maven 1.0 are not yet available in Maven 2.0.
+          If you need these features, we recommend staying with Maven 1.0 at this point.
         </p>
         <p>
           If you do use Maven 1.0, and would like to upgrade in the future, you should carefully consider following some
@@ -92,10 +92,6 @@
             <i>Error handling</i> - there are occasions where Maven 2.0 will drop out with a long stack trace
             when an error has occurred. If a specific trace is not providing enough information to find out what went
             wrong, please post the message to JIRA.
-          </li>
-          <li>
-            <i>No site generation</i> - The new site and documentation development tools are much more sophisticated than
-            the Maven 1.0 equivalents, but are not currently complete enough for a release.
           </li>
           <li>
             <i>Ant and scripting support</i> - while this is available, the Ant and scripting support has not undergone
