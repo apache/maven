@@ -1,0 +1,74 @@
+ ------
+ Building Maven 2.0
+ ------
+ Brett Porter
+ ------
+ 12 June 2005
+ ------
+
+Building Maven 2.0
+
+* Why would I want to build Maven 2.0?
+
+  Building Maven 2.0 yourself is for one of two reasons:
+
+    * to try out a bleeding edge feature or bugfix
+
+    * to fix a problem you are having and submit a patch to the developers team.
+
+  Note, that you don't need to bootstrap Maven for day to day use, or to develop plugins. While we encourage getting
+  involved and fixing bugs that you find, for day to day use we recommend using the latest release.
+
+* Checking out the sources
+
+  All of the source code for Maven 2.0 and its related libraries are in Subversion. You can
+  {{{http://svn.apache.org/viewcvs.cgi/maven/} browse the repository}}, or checkout specific modules directly.
+
+  To build Maven 2.0, you need the <<<components>>> module. To check that out, run the command:
+
+-------------------
+svn co http://svn.apache.org/repos/asf/maven/components/trunk maven-components
+-------------------
+
+  The <<<maven-components>>> directory will contain the source code. Note that this contains all of the plugins and
+  the Ant tasks.
+
+  Other modules you might be interested in related to Maven development are:
+
+    * <<<wagon/trunk>>> - Maven Wagon, used by the artifact code and others for providing the transport layer to
+      get and put artifacts in a repository.
+
+    * <<<scm/trunk>>> - Maven SCM, a generic API to communicate with various different SCM providers, used by
+      Continuum and the release and SCM plugins.
+
+    * {{{http://svn.plexus.codehaus.org/plexus/} Plexus}} - the IoC container used by Maven.
+
+* Building Maven
+
+  Once you have checked out the code, change into the <<<maven-components>>> directory that was created.
+  You may want to setup a different environment to install Maven to other than your normal installation of a
+  release, so set the <<<M2_HOME>>> environment variable accordingly, e.g.:
+
+----
+export M2_HOME=/usr/local/maven-2.0-SNAPSHOT
+PATH=$M2_HOME/bin:$PATH
+  or
+set M2_HOME=c:\maven-2.0-SNAPSHOT
+set PATH=%M2_HOME%\bin;$PATH
+----
+
+  From this, run the <<<m2-bootstrap-all>>> command for your system:
+
+----
+sh m2-bootstrap-all.sh
+  or
+m2-bootstrap-all.bat
+----
+
+  First, the code will be built, then using the new installation the plugins will be rebuilt and installed in the
+  local repository. Finally, a set of integration tests will run.
+
+  If you have any problems or get any failures during the run, please report them to the 
+  {{{/mail-lists.html} Maven Developers List}}.
+
+
