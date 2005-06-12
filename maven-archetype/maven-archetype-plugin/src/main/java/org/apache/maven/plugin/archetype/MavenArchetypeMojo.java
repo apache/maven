@@ -50,22 +50,22 @@ public class MavenArchetypeMojo
     private ArtifactRepository localRepository;
 
     /**
-     * @parameter expression="${archetypeGroupId}"
+     * @parameter expression="${archetypeGroupId}" default-value="org.apache.maven.archetypes"
      * @required
      */
-    private String archetypeGroupId = "org.apache.maven.archetypes";
+    private String archetypeGroupId;
 
     /**
-     * @parameter expression="${archetypeArtifactId}"
+     * @parameter expression="${archetypeArtifactId}" default-value="maven-archetype-quickstart"
      * @required
      */
-    private String archetypeArtifactId = "maven-archetype-quickstart";
+    private String archetypeArtifactId;
 
     /**
-     * @parameter expression="${archetypeVersion}"
+     * @parameter expression="${archetypeVersion}" default-value="RELEASE"
      * @required
      */
-    private String archetypeVersion = "RELEASE";
+    private String archetypeVersion;
 
     /**
      * @parameter expression="${groupId}"
@@ -80,16 +80,16 @@ public class MavenArchetypeMojo
     private String artifactId;
 
     /**
-     * @parameter expression="${version}"
+     * @parameter expression="${version}" default-value="1.0-SNAPSHOT"
      * @required
      */
-    private String version = "1.0-SNAPSHOT";
+    private String version;
 
     /**
-     * @parameter expression="${packageName}" alias="package"
+     * @parameter expression="${packageName}" alias="package" default-value="com.mycompany.app"
      * @required
      */
-    private String packageName = "com.mycompany.app";
+    private String packageName;
 
     /**
      * @parameter expression="${project.remoteArtifactRepositories}"
