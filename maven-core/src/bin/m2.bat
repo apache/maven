@@ -123,7 +123,6 @@ goto Win9xApp
 
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
-if "%MAVEN_OPTS%"=="" SET MAVEN_OPTS="-Xmx256m"
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
 @REM Start MAVEN2
