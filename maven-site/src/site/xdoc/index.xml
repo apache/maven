@@ -168,6 +168,11 @@
             </i>
           </li>
           <li>
+            <i>How do I
+              <a href="building.html">build Maven 2.0</a>?
+            </i>
+          </li>
+          <li>
             <i>Draft <a href="http://docs.codehaus.org/display/MAVEN/Home">design documents</a> are in
               Confluence, until they are implemented and added to the developers section.
             </i>

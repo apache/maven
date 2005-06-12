@@ -129,6 +129,9 @@
           join the project.
         </p>
         <p>
+          For instructions on checking out and building Maven 2.0, see <a href="building.html">Building Maven 2.0</a>.
+        </p>
+        <p>
           For more information, please see
           <a href="http://maven.apache.org/contributing/help.html">How to Help</a>.
         </p>
