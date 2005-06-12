@@ -369,7 +369,7 @@ m2 archetype:create \
         </p>
         <p>
           For more information on Maven 2.0, you can consult the
-          <a href="plugin-list.html">list of available plugins</a>,
+          <a href="plugins/index.html">list of available plugins</a>,
           or the other documentation on this site.
         </p>
       </subsection>
