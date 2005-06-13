@@ -24,6 +24,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
+import org.apache.maven.artifact.resolver.filter.InversionArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.execution.MavenSession;
@@ -303,7 +304,20 @@ public class DefaultPluginManager
             // around and set the artifacts.
             PluginDescriptor addedPlugin = (PluginDescriptor) pluginDescriptors.get( pluginKey );
 
-            addedPlugin.setArtifacts( new ArrayList( resolved.values() ) );
+            ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
+
+            ArtifactResolutionResult distroProvidedResult = artifactResolver.resolveTransitively( Collections
+                .singleton( pluginArtifact ), project.getRemoteArtifactRepositories(), localRepository, metadataSource,
+                                                                                                  distroProvidedFilter );
+
+            Map distroProvided = distroProvidedResult.getArtifacts();
+
+            List unfilteredArtifactList = new ArrayList( resolved.size() + distroProvided.size() );
+
+            unfilteredArtifactList.addAll( resolved.values() );
+            unfilteredArtifactList.addAll( distroProvided.values() );
+
+            addedPlugin.setArtifacts( unfilteredArtifactList );
         }
         finally
         {
