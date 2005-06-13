@@ -17,6 +17,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -39,9 +40,12 @@ public class PluginParameterExpressionEvaluator
 
     private final Logger logger;
 
-    public PluginParameterExpressionEvaluator( MavenSession context, PathTranslator pathTranslator, Logger logger )
+    private final PluginDescriptor pluginDescriptor;
+
+    public PluginParameterExpressionEvaluator( MavenSession context, PluginDescriptor pluginDescriptor, PathTranslator pathTranslator, Logger logger )
     {
         this.context = context;
+        this.pluginDescriptor = pluginDescriptor;
         this.pathTranslator = pathTranslator;
         this.logger = logger;
     }
@@ -99,6 +103,30 @@ public class PluginParameterExpressionEvaluator
                 else
                 {
                     value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), context.getProject() );
+                }
+            }
+            catch ( Exception e )
+            {
+                // TODO: don't catch exception
+                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
+                                                         e );
+            }
+        }
+        else if ( expression.startsWith( "plugin" ) )
+        {
+            try
+            {
+                int pathSeparator = expression.indexOf( "/" );
+
+                if ( pathSeparator > 0 )
+                {
+                    String pathExpression = expression.substring( 1, pathSeparator );
+                    value = ReflectionValueExtractor.evaluate( pathExpression, pluginDescriptor );
+                    value = value + expression.substring( pathSeparator );
+                }
+                else
+                {
+                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), pluginDescriptor );
                 }
             }
             catch ( Exception e )

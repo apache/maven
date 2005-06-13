@@ -185,7 +185,6 @@ public class DefaultPluginManager
         // TODO: this should be possibly outside
         if ( version == null )
         {
-
             Plugin pluginConfig = null;
 
             for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
@@ -299,6 +298,12 @@ public class DefaultPluginManager
             }
 
             container.createChildContainer( pluginKey, files, Collections.EMPTY_MAP, Collections.singletonList( this ) );
+            
+            // this plugin's descriptor should have been discovered by now, so we should be able to circle
+            // around and set the artifacts.
+            PluginDescriptor addedPlugin = (PluginDescriptor) pluginDescriptors.get( pluginKey );
+
+            addedPlugin.setArtifacts( new ArrayList( resolved.values() ) );
         }
         finally
         {
@@ -413,8 +418,11 @@ public class DefaultPluginManager
             //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
             //                                                                          mojoDescriptor.getConfiguration() );
 
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pathTranslator,
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session,
+                                                                                              pluginDescriptor,
+                                                                                              pathTranslator,
                                                                                               getLogger() );
+            
             checkRequiredParameters( mojoDescriptor, mergedConfiguration, expressionEvaluator, plugin );
 
             populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, pluginContainer, expressionEvaluator );

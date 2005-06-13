@@ -40,6 +40,8 @@ public class PluginDescriptor
     private String source;
 
     private boolean inheritedByDefault = true;
+    
+    private List artifacts;
 
     // ----------------------------------------------------------------------
     //
@@ -188,6 +190,16 @@ public class PluginDescriptor
     public void setInheritedByDefault( boolean inheritedByDefault )
     {
         this.inheritedByDefault = inheritedByDefault;
+    }
+    
+    public List getArtifacts()
+    {
+        return artifacts;
+    }
+
+    public void setArtifacts( List artifacts )
+    {
+        this.artifacts = artifacts;
     }
 
     public boolean equals( Object object )

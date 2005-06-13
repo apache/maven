@@ -22,6 +22,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.List;
 
 /**
  * @goal touch
@@ -38,6 +39,12 @@ public class CoreItMojo
      * @required
      */
     private String outputDirectory;
+
+    /** Test setting of plugin-artifacts on the PluginDescriptor instance.
+     * @parameter expression="${plugin.artifacts}"
+     * @required
+     */
+    private List pluginArtifacts;
 
     /**
      * @parameter expression="target/test-basedir-alignment"
