@@ -31,7 +31,7 @@ import java.io.IOException;
 
 /**
  * @author jdcasey
- * @version $Id$
+ * @version $Id: DefaultMavenSettingsBuilder.java 189510 2005-06-08 03:27:43Z jdcasey $
  */
 public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled

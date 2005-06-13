@@ -1,4 +1,4 @@
-package org.apache.maven.profile;
+package org.apache.maven.profiles;
 
 import org.apache.maven.model.Activation;
 

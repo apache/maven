@@ -33,7 +33,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.profile.activation.ProfileActivationCalculator;
+import org.apache.maven.profiles.activation.ProfileActivationCalculator;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;

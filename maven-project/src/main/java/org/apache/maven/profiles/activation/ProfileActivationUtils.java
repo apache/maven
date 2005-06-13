@@ -1,4 +1,4 @@
-package org.apache.maven.profile.activation;
+package org.apache.maven.profiles.activation;
 
 import org.codehaus.plexus.util.StringUtils;
 

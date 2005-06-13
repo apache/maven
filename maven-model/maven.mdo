@@ -2362,6 +2362,18 @@
             <type>BuildBase</type>
           </association>
         </field>
+        <field>
+          <name>properties</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+             Properties used to fill in plugin configuration when this profile is active
+          ]]></description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -2370,7 +2382,6 @@
     // We don't want this to be parseable...it's sort of 'hidden'
     // default source for this profile is in the pom itself.
     private String source = "pom";
-    private Properties properties = new Properties();
     
     public void setSource( String source )
     {
@@ -2385,16 +2396,6 @@
     public String toString()
     {
         return "Profile {id: " + getId() + ", source: " + getSource() + "}";
-    }
-    
-    public void setProperties( Properties properties )
-    {
-        this.properties = properties;
-    }
-    
-    public Properties getProperties()
-    {
-        return properties;
     }
           ]]></code>
         </codeSegment>

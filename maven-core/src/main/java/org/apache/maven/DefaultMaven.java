@@ -24,13 +24,13 @@ import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.model.ModelNormalizationUtils;
 import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.profile.AlwaysOnActivation;
+import org.apache.maven.profiles.AlwaysOnActivation;
 import org.apache.maven.profiles.MavenProfilesBuilder;
+import org.apache.maven.profiles.ProfilesConversionUtils;
 import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -41,6 +41,7 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsConversionUtils;
 import org.apache.maven.usability.ErrorDiagnoser;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -335,7 +336,7 @@ public class DefaultMaven
             {
                 org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
                 
-                Profile profile = ModelNormalizationUtils.convertFromSettingsProfile( rawProfile );
+                Profile profile = SettingsConversionUtils.convertFromSettingsProfile( rawProfile );
                 
                 if( settingsActiveProfileIds.contains( rawProfile.getId() ) )
                 {
@@ -358,7 +359,7 @@ public class DefaultMaven
                     {
                         org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
                         
-                        externalProfiles.add( ModelNormalizationUtils.convertFromProfileXmlProfile( rawProfile ) );
+                        externalProfiles.add( ProfilesConversionUtils.convertFromProfileXmlProfile( rawProfile ) );
                     }
                 }
             }

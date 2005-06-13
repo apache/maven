@@ -37,7 +37,7 @@ import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.Mojo;
-import org.apache.maven.profile.activation.ProfileActivationUtils;
+import org.apache.maven.profiles.activation.ProfileActivationUtils;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;

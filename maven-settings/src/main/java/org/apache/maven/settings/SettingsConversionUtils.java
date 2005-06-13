@@ -1,10 +1,9 @@
-package org.apache.maven.model;
+package org.apache.maven.settings;
 
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
-import org.apache.maven.profile.AlwaysOnActivation;
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
 
 import java.util.Iterator;
 import java.util.List;
@@ -25,12 +24,8 @@ import java.util.List;
  * limitations under the License.
  */
 
-public final class ModelNormalizationUtils
+public final class SettingsConversionUtils
 {
-
-    private ModelNormalizationUtils()
-    {
-    }
 
     public static Profile convertFromSettingsProfile( org.apache.maven.settings.Profile settingsProfile )
     {
@@ -86,66 +81,6 @@ public final class ModelNormalizationUtils
         return profile;
     }
 
-    public static Profile convertFromProfileXmlProfile( org.apache.maven.profiles.Profile profileXmlProfile )
-    {
-        Profile profile = new Profile();
-        
-        profile.setId( profileXmlProfile.getId() );
-        
-        profile.setSource( "profiles.xml" );
-
-        org.apache.maven.profiles.Activation profileActivation = profileXmlProfile.getActivation();
-
-        if ( profileActivation != null )
-        {
-            Activation activation = new Activation();
-
-            activation.setJdk( profileActivation.getJdk() );
-
-            org.apache.maven.profiles.ActivationProperty profileProp = profileActivation.getProperty();
-
-            if ( profileProp != null )
-            {
-                ActivationProperty prop = new ActivationProperty();
-
-                prop.setName( profileProp.getName() );
-                prop.setValue( profileProp.getValue() );
-
-                activation.setProperty( prop );
-            }
-            
-            profile.setActivation( activation );
-        }
-        else
-        {
-            profile.setActivation( new AlwaysOnActivation() );
-        }
-        
-        profile.setProperties( profileXmlProfile.getProperties() );
-
-        List repos = profileXmlProfile.getRepositories();
-        if ( repos != null )
-        {
-            for ( Iterator it = repos.iterator(); it.hasNext(); )
-            {
-                profile
-                    .addRepository( convertFromSettingsRepository( (org.apache.maven.settings.Repository) it.next() ) );
-            }
-        }
-
-        List pluginRepos = profileXmlProfile.getPluginRepositories();
-        if ( pluginRepos != null )
-        {
-            for ( Iterator it = pluginRepos.iterator(); it.hasNext(); )
-            {
-                profile.addPluginRepository( convertFromSettingsRepository( (org.apache.maven.settings.Repository) it
-                    .next() ) );
-            }
-        }
-
-        return profile;
-    }
-
     private static Repository convertFromSettingsRepository( org.apache.maven.settings.Repository settingsRepo )
     {
         Repository repo = new Repository();
@@ -155,19 +90,6 @@ public final class ModelNormalizationUtils
         repo.setName( settingsRepo.getName() );
         repo.setSnapshotPolicy( settingsRepo.getSnapshotPolicy() );
         repo.setUrl( settingsRepo.getUrl() );
-
-        return repo;
-    }
-
-    private static Repository convertFromProfileXmlRepository( org.apache.maven.profiles.Repository profileXmlRepo )
-    {
-        Repository repo = new Repository();
-
-        repo.setId( profileXmlRepo.getId() );
-        repo.setLayout( profileXmlRepo.getLayout() );
-        repo.setName( profileXmlRepo.getName() );
-        repo.setSnapshotPolicy( profileXmlRepo.getSnapshotPolicy() );
-        repo.setUrl( profileXmlRepo.getUrl() );
 
         return repo;
     }
