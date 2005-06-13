@@ -125,6 +125,11 @@
           <version>1.0.0</version>
           <code><![CDATA[
     private Proxy activeProxy;
+    
+    public void flushActiveProxy()
+    {
+        this.activeProxy = null;
+    }
 
     public synchronized Proxy getActiveProxy()
     {
@@ -154,6 +159,102 @@
         }
 
         return activeProxy;
+    }
+    
+    private Map mirrorMap;
+    
+    public void flushMirrorMap()
+    {
+        this.mirrorMap = null;
+    }
+    
+    public Map getMirrorsAsMap()
+    {
+        if ( mirrorMap == null )
+        {
+            mirrorMap = new HashMap();
+            
+            for ( Iterator it = getMirrors().iterator(); it.hasNext(); )
+            {
+                Mirror mirror = (Mirror) it.next();
+                
+                mirrorMap.put( mirror.getId(), mirror );
+            }
+        }
+        
+        return mirrorMap;
+    }
+
+    private Map serverMap;
+    
+    public void flushServerMap()
+    {
+        this.serverMap = null;
+    }
+    
+    public Map getServersAsMap()
+    {
+        if ( serverMap == null )
+        {
+            serverMap = new HashMap();
+            
+            for ( Iterator it = getServers().iterator(); it.hasNext(); )
+            {
+                Server server = (Server) it.next();
+                
+                serverMap.put( server.getId(), server );
+            }
+        }
+        
+        return serverMap;
+    }
+
+    private Map proxyMap;
+    
+    public void flushProxyMap()
+    {
+        this.proxyMap = null;
+    }
+    
+    public Map getProxiesAsMap()
+    {
+        if ( proxyMap == null )
+        {
+            proxyMap = new HashMap();
+            
+            for ( Iterator it = getProxies().iterator(); it.hasNext(); )
+            {
+                Proxy proxy = (Proxy) it.next();
+                
+                proxyMap.put( proxy.getId(), proxy );
+            }
+        }
+        
+        return proxyMap;
+    }
+
+    private Map profileMap;
+    
+    public void flushProfileMap()
+    {
+        this.profileMap = null;
+    }
+    
+    public Map getProfilesAsMap()
+    {
+        if ( profileMap == null )
+        {
+            profileMap = new HashMap();
+            
+            for ( Iterator it = getProfiles().iterator(); it.hasNext(); )
+            {
+                Profile profile = (Profile) it.next();
+                
+                profileMap.put( profile.getId(), profile );
+            }
+        }
+        
+        return profileMap;
     }
 
     public Server getServer( String serverId )
@@ -236,6 +337,12 @@
       <name>Proxy</name>
       <version>1.0.0</version>
       <fields>
+        <field>
+          <name>id</name>
+          <required>true</required>
+          <default>default</default>
+          <type>String</type>
+        </field>
         <field>
           <name>active</name>
           <version>1.0.0</version>

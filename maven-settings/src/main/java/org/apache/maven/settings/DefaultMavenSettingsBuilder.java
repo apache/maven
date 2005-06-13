@@ -16,7 +16,6 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
-import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -25,7 +24,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -42,9 +40,16 @@ public class DefaultMavenSettingsBuilder
     /**
      * @configuration
      */
-    private String settingsPath;
+    private String userSettingsPath;
 
-    private File settingsFile;
+    /**
+     * @configuration
+     */
+    private String globalSettingsPath;
+
+    private File userSettingsFile;
+
+    private File globalSettingsFile;
 
     // ----------------------------------------------------------------------
     // Component Lifecycle
@@ -52,16 +57,18 @@ public class DefaultMavenSettingsBuilder
 
     public void initialize()
     {
-        settingsFile = getSettingsFile();
+        userSettingsFile = getUserSettingsFile();
+        globalSettingsFile = getGlobalSettingsFile();
 
-        getLogger().debug( "Building Maven settings from: '" + settingsFile.getAbsolutePath() + "'" );
+        getLogger().debug( "Building Maven global-level settings from: '" + globalSettingsFile.getAbsolutePath() + "'" );
+        getLogger().debug( "Building Maven user-level settings from: '" + userSettingsFile.getAbsolutePath() + "'" );
     }
 
     // ----------------------------------------------------------------------
     // MavenProfilesBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public Settings buildSettings()
+    private Settings readSettings( File settingsFile )
         throws IOException, XmlPullParserException
     {
         Settings settings = null;
@@ -77,25 +84,29 @@ public class DefaultMavenSettingsBuilder
 
                 settings = modelReader.read( reader );
             }
-            catch ( FileNotFoundException e )
-            {
-                // Not possible - just ignore
-                getLogger().warn( "Settings file disappeared - ignoring", e );
-            }
             finally
             {
                 IOUtil.close( reader );
             }
         }
 
-        if ( settings == null )
-        {
-            getLogger().debug( "Settings model not found. Creating empty instance of MavenSettings." );
+        return settings;
+    }
 
-            settings = new Settings();
+    public Settings buildSettings()
+        throws IOException, XmlPullParserException
+    {
+        Settings globalSettings = readSettings( globalSettingsFile );
+        Settings userSettings = readSettings( userSettingsFile );
+
+        if ( userSettings == null )
+        {
+            userSettings = new Settings();
         }
-        
-        if( settings.getLocalRepository() == null || settings.getLocalRepository().length() < 1 )
+
+        SettingsUtils.merge( userSettings, globalSettings );
+
+        if ( userSettings.getLocalRepository() == null || userSettings.getLocalRepository().length() < 1 )
         {
             File mavenUserConfigurationDirectory = new File( userHome, ".m2" );
             if ( !mavenUserConfigurationDirectory.exists() )
@@ -107,24 +118,46 @@ public class DefaultMavenSettingsBuilder
             }
 
             String localRepository = new File( mavenUserConfigurationDirectory, "repository" ).getAbsolutePath();
-            
-            settings.setLocalRepository( localRepository );
+
+            userSettings.setLocalRepository( localRepository );
         }
 
-        return settings;
+        return userSettings;
     }
 
-    private File getSettingsFile()
+    private File getUserSettingsFile()
     {
-        String path = System.getProperty( MavenSettingsBuilder.ALT_SETTINGS_XML_LOCATION );
-        
-        if( StringUtils.isEmpty( path ) )
+        String path = System.getProperty( MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+
+        if ( StringUtils.isEmpty( path ) )
         {
             // TODO: This replacing shouldn't be necessary as user.home should be in the
             // context of the container and thus the value would be interpolated by Plexus
             String userHome = System.getProperty( "user.home" );
 
-            return new File( userHome, settingsPath ).getAbsoluteFile();
+            path = userSettingsPath.replaceAll( "\\$\\{user.home\\}", userHome );
+
+            return new File( path ).getAbsoluteFile();
+        }
+        else
+        {
+            return new File( path ).getAbsoluteFile();
+        }
+    }
+
+    private File getGlobalSettingsFile()
+    {
+        String path = System.getProperty( MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
+
+        if ( StringUtils.isEmpty( path ) )
+        {
+            // TODO: This replacing shouldn't be necessary as user.home should be in the
+            // context of the container and thus the value would be interpolated by Plexus
+            String mavenHome = System.getProperty( "maven.home" );
+
+            path = globalSettingsPath.replaceAll( "\\$\\{maven.home\\}", mavenHome );
+
+            return new File( path ).getAbsoluteFile();
         }
         else
         {

@@ -1,0 +1,14 @@
+<component-set>
+  <components>
+
+    <component>
+      <role>org.apache.maven.settings.MavenSettingsBuilder</role>
+      <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
+      <configuration>
+        <globalSettingsPath>${maven.home}/settings.xml</globalSettingsPath>
+        <userSettingsPath>${user.home}/.m2/settings.xml</userSettingsPath>
+      </configuration>
+    </component>
+    
+  </components>
+</component-set>

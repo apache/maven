@@ -41,7 +41,7 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsConversionUtils;
+import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.usability.ErrorDiagnoser;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -336,7 +336,7 @@ public class DefaultMaven
             {
                 org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
                 
-                Profile profile = SettingsConversionUtils.convertFromSettingsProfile( rawProfile );
+                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
                 
                 if( settingsActiveProfileIds.contains( rawProfile.getId() ) )
                 {

@@ -81,6 +81,8 @@ it0024: Test usage of <executions/> inside a plugin rather than <goals/>
 
 it0025: Test multiple goal executions with different execution-level configs.
 
+it0026: Test merging of global- and user-level settings.xml files.
+
 -------------------------------------------------------------------------------
 
 - generated sources

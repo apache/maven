@@ -29,7 +29,8 @@ public interface MavenSettingsBuilder
 {
     String ROLE = MavenSettingsBuilder.class.getName();
     
-    String ALT_SETTINGS_XML_LOCATION = "org.apache.maven.SettingsXmlFile";
+    String ALT_USER_SETTINGS_XML_LOCATION = "org.apache.maven.user-settings";
+    String ALT_GLOBAL_SETTINGS_XML_LOCATION = "org.apache.maven.global-settings";
 
     Settings buildSettings()
         throws IOException, XmlPullParserException;
