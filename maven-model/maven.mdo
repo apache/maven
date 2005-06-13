@@ -2081,32 +2081,13 @@
     -->
 
     <class>
-      <name>Plugin</name>
+      <name>GoalContainer</name>
       <version>4.0.0</version>
       <fields>
         <field>
-          <name>groupId</name>
-          <version>4.0.0</version>
-          <type>String</type>
-          <defaultValue>org.apache.maven.plugins</defaultValue>
-        </field>
-        <field>
-          <name>artifactId</name>
-          <version>4.0.0</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>version</name>
-          <version>4.0.0</version>
-          <required>true</required>
-          <description><![CDATA[The version of the plugin to be used.]]></description>
-          <type>String</type>
-        </field>
-        <field>
           <name>inherited</name>
           <version>4.0.0</version>
-          <description><![CDATA[Whether this plugin configuration should be propagated to child POMs.]]></description>
+          <description><![CDATA[Whether this container's configuration should be propagated to child POMs.]]></description>
           <type>String</type>
         </field>
         <field>
@@ -2131,7 +2112,7 @@
     
     public void unsetInheritanceApplied()
     {
-        this.inheritanceApplied = true;
+        this.inheritanceApplied = false;
     }
     
     public boolean isInheritanceApplied()
@@ -2160,7 +2141,73 @@
         }
         return goalMap;
     }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Plugin</name>
+      <version>4.0.0</version>
+      <superClass>GoalContainer</superClass>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <defaultValue>org.apache.maven.plugins</defaultValue>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description><![CDATA[The version of the plugin to be used.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>executions</name>
+          <version>4.0.0</version>
+          <description>Multiple specifications of a set of goals, each having (possibly) different configuration</description>
+          <association>
+            <type>PluginExecution</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    private Map executionMap = null;
+    
+    public void flushExecutionMap()
+    {
+        this.executionMap = null;
+    }
 
+    public Map getExecutionsAsMap()
+    {
+        if ( executionMap == null )
+        {
+            executionMap = new HashMap();
+            if ( getExecutions() != null )
+            {
+                for ( Iterator i = getExecutions().iterator(); i.hasNext(); )
+                {
+                    PluginExecution exec = (PluginExecution) i.next();
+                    executionMap.put( exec.getId(), exec );
+                }
+            }
+        }
+        
+        return executionMap;
+    }
+    
     public String getKey()
     {
         return constructKey( groupId, artifactId );
@@ -2173,6 +2220,19 @@
           ]]></code>
         </codeSegment>
       </codeSegments>
+    </class>
+    <class>
+      <name>PluginExecution</name>
+      <version>4.0.0</version>
+      <superClass>GoalContainer</superClass>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+      </fields>
     </class>
     <class>
       <name>Goal</name>
@@ -2201,7 +2261,7 @@
     
     public void unsetInheritanceApplied()
     {
-        this.inheritanceApplied = true;
+        this.inheritanceApplied = false;
     }
     
     public boolean isInheritanceApplied()

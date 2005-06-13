@@ -31,6 +31,7 @@ import java.io.File;
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
  * @goal install
+ * @phase install
  */
 public class InstallMojo
     extends AbstractInstallMojo

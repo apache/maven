@@ -37,6 +37,7 @@ import java.util.StringTokenizer;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  * @goal test
+ * @phase test
  * @description Run tests using surefire
  * @todo make version of junit and surefire configurable
  * @todo make report to be produced configurable

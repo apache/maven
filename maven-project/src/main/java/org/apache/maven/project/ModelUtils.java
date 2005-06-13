@@ -1,8 +1,10 @@
 package org.apache.maven.project;
 
 import org.apache.maven.model.Goal;
+import org.apache.maven.model.GoalContainer;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
+import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
@@ -33,12 +35,12 @@ public final class ModelUtils
     public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
                                         boolean handleAsInheritance )
     {
-        if( childContainer == null || parentContainer == null )
+        if ( childContainer == null || parentContainer == null )
         {
             // nothing to do.
             return;
         }
-        
+
         List parentPlugins = parentContainer.getPlugins();
 
         if ( parentPlugins != null && !parentPlugins.isEmpty() )
@@ -50,13 +52,13 @@ public final class ModelUtils
             for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
             {
                 Plugin parentPlugin = (Plugin) it.next();
-                
+
                 String parentInherited = parentPlugin.getInherited();
 
                 if ( !handleAsInheritance || parentInherited == null
                     || Boolean.valueOf( parentInherited ).booleanValue() )
                 {
-                    
+
                     Plugin assembledPlugin = parentPlugin;
 
                     Plugin childPlugin = (Plugin) childPlugins.get( parentPlugin.getKey() );
@@ -88,24 +90,87 @@ public final class ModelUtils
             }
 
             childContainer.setPlugins( new ArrayList( assembledPlugins.values() ) );
-            
+
             childContainer.flushPluginMap();
         }
     }
 
     public static void mergePluginDefinitions( Plugin child, Plugin parent, boolean handleAsInheritance )
     {
-        if( child == null || parent == null )
+        if ( child == null || parent == null )
         {
             // nothing to do.
             return;
         }
-        
+
         if ( child.getVersion() == null && parent.getVersion() != null )
         {
             child.setVersion( parent.getVersion() );
         }
 
+        // merge the lists of goals that are not attached to an <execution/>
+        ModelUtils.mergeGoalContainerDefinitions( child, parent, handleAsInheritance );
+
+        // from here to the end of the method is dealing with merging of the <executions/> section.
+        String parentInherited = parent.getInherited();
+
+        boolean parentIsInherited = parentInherited == null || Boolean.valueOf( parentInherited ).booleanValue();
+
+        List parentExecutions = parent.getExecutions();
+
+        if ( parentExecutions != null && !parentExecutions.isEmpty() )
+        {
+            Map assembledExecutions = new TreeMap();
+
+            Map childExecutions = child.getExecutionsAsMap();
+
+            for ( Iterator it = parentExecutions.iterator(); it.hasNext(); )
+            {
+                PluginExecution parentExecution = (PluginExecution) it.next();
+
+                if ( !handleAsInheritance || parentIsInherited )
+                {
+                    PluginExecution assembled = parentExecution;
+
+                    PluginExecution childExecution = (PluginExecution) childExecutions.get( parentExecution.getId() );
+
+                    if ( childExecution != null )
+                    {
+                        ModelUtils.mergeGoalContainerDefinitions( childExecution, parentExecution, handleAsInheritance );
+
+                        assembled = childExecution;
+                    }
+                    else if ( handleAsInheritance && parentInherited == null )
+                    {
+                        parentExecution.unsetInheritanceApplied();
+                    }
+
+                    assembledExecutions.put( assembled.getId(), assembled );
+                }
+            }
+
+            for ( Iterator it = childExecutions.entrySet().iterator(); it.hasNext(); )
+            {
+                Map.Entry entry = (Map.Entry) it.next();
+
+                String id = (String) entry.getKey();
+
+                if ( !assembledExecutions.containsKey( id ) )
+                {
+                    assembledExecutions.put( id, entry.getValue() );
+                }
+            }
+
+            child.setExecutions( new ArrayList( assembledExecutions.values() ) );
+
+            child.flushExecutionMap();
+        }
+
+    }
+
+    private static void mergeGoalContainerDefinitions( GoalContainer child, GoalContainer parent,
+                                                      boolean handleAsInheritance )
+    {
         List parentGoals = parent.getGoals();
 
         // if the supplemental goals are non-existent, then nothing related to goals changes.
@@ -141,8 +206,7 @@ public final class ModelUtils
 
                             assembledGoal = childGoal;
                         }
-
-                        if ( handleAsInheritance && parentInherited == null )
+                        else if ( handleAsInheritance && parentInherited == null )
                         {
                             assembledGoal.unsetInheritanceApplied();
                         }

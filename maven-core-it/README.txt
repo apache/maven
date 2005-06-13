@@ -76,6 +76,11 @@ it0022: Test profile inclusion from profiles.xml (this one is activated by syste
 it0023: Test profile inclusion from settings.xml (this one is activated by an id
         in the activeProfiles section).
 
+it0024: Test usage of <executions/> inside a plugin rather than <goals/>
+        that are directly inside th plugin.
+
+it0025: Test multiple goal executions with different execution-level configs.
+
 -------------------------------------------------------------------------------
 
 - generated sources

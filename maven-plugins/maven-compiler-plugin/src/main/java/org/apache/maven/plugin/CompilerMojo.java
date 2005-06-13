@@ -20,6 +20,7 @@ import java.util.List;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  * @goal compile
+ * @phase compile
  * @requiresDependencyResolution compile
  * @description Compiles application sources
  * @todo change debug parameter type to Boolean

@@ -64,7 +64,8 @@ public class PluginDescriptor
 
             MojoDescriptor existing = (MojoDescriptor) mojos.get( indexOf );
 
-            throw new DuplicateMojoDescriptorException( getGoalPrefix(), mojoDescriptor.getGoal(), existing.getImplementation(), mojoDescriptor.getImplementation() );
+            throw new DuplicateMojoDescriptorException( getGoalPrefix(), mojoDescriptor.getGoal(), existing
+                .getImplementation(), mojoDescriptor.getImplementation() );
         }
         else
         {
@@ -100,12 +101,12 @@ public class PluginDescriptor
     {
         return groupId + ":" + artifactId + ":" + version;
     }
-    
+
     public String getPluginLookupKey()
     {
         return groupId + ":" + artifactId;
     }
-    
+
     public String getId()
     {
         String id = constructPluginKey( groupId, artifactId, version );
@@ -187,5 +188,20 @@ public class PluginDescriptor
     public void setInheritedByDefault( boolean inheritedByDefault )
     {
         this.inheritedByDefault = inheritedByDefault;
+    }
+
+    public boolean equals( Object object )
+    {
+        if ( this == object )
+        {
+            return true;
+        }
+
+        return getId().equals( ( (PluginDescriptor) object ).getId() );
+    }
+
+    public int hashCode()
+    {
+        return 10 + getId().hashCode();
     }
 }

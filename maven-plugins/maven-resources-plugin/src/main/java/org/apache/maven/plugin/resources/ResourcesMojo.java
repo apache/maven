@@ -34,6 +34,7 @@ import java.util.TreeMap;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  * @goal resources
+ * @phase process-resources
  * @description copy application resources
  */
 public class ResourcesMojo

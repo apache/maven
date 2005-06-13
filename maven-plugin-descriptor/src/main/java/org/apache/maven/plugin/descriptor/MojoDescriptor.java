@@ -60,7 +60,7 @@ public class MojoDescriptor
     private String executePhase;
 
     private String deprecated;
-    
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -121,7 +121,7 @@ public class MojoDescriptor
             addParameter( parameter );
         }
     }
-    
+
     public void addParameter( Parameter parameter )
         throws DuplicateParameterException
     {
@@ -311,5 +311,68 @@ public class MojoDescriptor
     public void setInheritedByDefault( boolean inheritedByDefault )
     {
         this.inheritedByDefault = inheritedByDefault;
+    }
+
+    public boolean equals( Object object )
+    {
+        if ( this == object )
+        {
+            return true;
+        }
+
+        if ( object instanceof MojoDescriptor )
+        {
+            MojoDescriptor other = (MojoDescriptor) object;
+
+            if ( !compareObjects( getPluginDescriptor(), other.getPluginDescriptor() ) )
+            {
+                return false;
+            }
+
+            if ( !compareObjects( getGoal(), other.getGoal() ) )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean compareObjects( Object first, Object second )
+    {
+        if ( ( first == null && second != null ) || ( first != null && second == null ) )
+        {
+            return false;
+        }
+
+        if ( !first.equals( second ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public int hashCode()
+    {
+        int result = 1;
+
+        String goal = getGoal();
+
+        if ( goal != null )
+        {
+            result += goal.hashCode();
+        }
+
+        PluginDescriptor pd = getPluginDescriptor();
+
+        if ( pd != null )
+        {
+            result -= pd.hashCode();
+        }
+
+        return result;
     }
 }

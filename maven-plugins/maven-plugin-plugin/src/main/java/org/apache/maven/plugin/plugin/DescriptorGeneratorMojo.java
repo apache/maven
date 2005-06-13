@@ -29,6 +29,7 @@ import java.io.File;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  * @goal descriptor
+ * @phase generate-resources
  */
 public class DescriptorGeneratorMojo
     extends AbstractGeneratorMojo

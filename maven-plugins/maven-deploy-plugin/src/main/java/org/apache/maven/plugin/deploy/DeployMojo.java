@@ -35,6 +35,7 @@ import java.io.File;
  * @author <a href="mailto:jdcasey@apache.org">John Casey (refactoring only)</a>
  * @version $Id$
  * @goal deploy
+ * @phase deploy
  */
 public class DeployMojo
     extends AbstractMojo
