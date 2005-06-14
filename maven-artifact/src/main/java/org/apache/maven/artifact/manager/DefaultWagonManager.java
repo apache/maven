@@ -299,12 +299,6 @@ public class DefaultWagonManager
             wagon.addTransferListener( downloadMonitor );
         }
 
-        // TODO [BP]: do this handling in Wagon itself
-        if ( !destination.getParentFile().exists() )
-        {
-            destination.getParentFile().mkdirs();
-        }
-
         // TODO: configure on repository
         ChecksumObserver checksumObserver;
         try
@@ -330,6 +324,7 @@ public class DefaultWagonManager
 
             wagon.connect( repository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
+            // This should take care of creating destination directory now on
             wagon.get( remotePath, temp );
 
             try
@@ -348,8 +343,8 @@ public class DefaultWagonManager
 
                     // TODO: optionally retry?
                     /*                   throw new ChecksumFailedException( "Checksum failed on download: local = '" + actualChecksum +
-                                                                          "'; remote = '" + expectedChecksum + "'" );
-                    */
+                     "'; remote = '" + expectedChecksum + "'" );
+                     */
                 }
             }
             catch ( ResourceDoesNotExistException e )
@@ -448,13 +443,13 @@ public class DefaultWagonManager
     /**
      * Set the proxy used for a particular protocol.
      *
-     * @param protocol      the protocol (required)
-     * @param host          the proxy host name (required)
-     * @param port          the proxy port (required)
-     * @param username      the username for the proxy, or null if there is none
-     * @param password      the password for the proxy, or null if there is none
+     * @param protocol the protocol (required)
+     * @param host the proxy host name (required)
+     * @param port the proxy port (required)
+     * @param username the username for the proxy, or null if there is none
+     * @param password the password for the proxy, or null if there is none
      * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system
-     *                      property format: <code>*.foo.com|localhost</code>.
+     * property format: <code>*.foo.com|localhost</code>.
      * @todo [BP] would be nice to configure this via plexus in some way
      */
     public void addProxy( String protocol, String host, int port, String username, String password,
