@@ -259,13 +259,5 @@
         <!-- END SNIPPET: plexus-service-lifecycle -->
       </configuration>
     </component>
-
-    <component>
-      <role>org.apache.maven.settings.MavenSettingsBuilder</role>
-      <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
-      <configuration>
-        <settingsPath>.m2/settings.xml</settingsPath>
-      </configuration>
-    </component>
   </components>
 </component-set>
