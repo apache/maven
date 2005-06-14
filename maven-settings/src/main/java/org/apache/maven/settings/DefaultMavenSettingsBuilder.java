@@ -57,8 +57,9 @@ public class DefaultMavenSettingsBuilder
 
     public void initialize()
     {
-        userSettingsFile = getUserSettingsFile();
-        globalSettingsFile = getGlobalSettingsFile();
+        userSettingsFile = getFile( userSettingsPath, "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+        
+        globalSettingsFile = getFile( globalSettingsPath, "maven.home", MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
 
         getLogger().debug( "Building Maven global-level settings from: '" + globalSettingsFile.getAbsolutePath() + "'" );
         getLogger().debug( "Building Maven user-level settings from: '" + userSettingsFile.getAbsolutePath() + "'" );
@@ -124,18 +125,35 @@ public class DefaultMavenSettingsBuilder
 
         return userSettings;
     }
-
-    private File getUserSettingsFile()
+    
+    private File getFile( String pathPattern, String basedirSysProp, String altLocationSysProp )
     {
-        String path = System.getProperty( MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+        // -------------------------------------------------------------------------------------
+        // Alright, here's the justification for all the regexp wizardry below...
+        //
+        // Continuum and other server-like apps may need to locate the user-level and 
+        // global-level settings somewhere other than ${user.home} and ${maven.home},
+        // respectively. Using a simple replacement of these patterns will allow them
+        // to specify the absolute path to these files in a customized components.xml
+        // file. Ideally, we'd do full pattern-evaluation against the sysprops, but this
+        // is a first step. There are several replacements below, in order to normalize
+        // the path character before we operate on the string as a regex input, and 
+        // in order to avoid surprises with the File construction...
+        // -------------------------------------------------------------------------------------
+        
+        String path = System.getProperty( altLocationSysProp );
 
         if ( StringUtils.isEmpty( path ) )
         {
             // TODO: This replacing shouldn't be necessary as user.home should be in the
             // context of the container and thus the value would be interpolated by Plexus
-            String userHome = System.getProperty( "user.home" );
+            String basedir = System.getProperty( basedirSysProp );
 
-            path = userSettingsPath.replaceAll( "\\$\\{user.home\\}", userHome );
+            basedir = basedir.replaceAll( "\\\\", "/" );
+            
+            path = pathPattern.replaceAll( "\\$\\{" + basedirSysProp + "\\}", basedir );
+            path = path.replaceAll( "\\\\", "/" );
+            path = path.replaceAll( "//", "/" );
 
             return new File( path ).getAbsoluteFile();
         }
@@ -144,24 +162,5 @@ public class DefaultMavenSettingsBuilder
             return new File( path ).getAbsoluteFile();
         }
     }
-
-    private File getGlobalSettingsFile()
-    {
-        String path = System.getProperty( MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
-
-        if ( StringUtils.isEmpty( path ) )
-        {
-            // TODO: This replacing shouldn't be necessary as user.home should be in the
-            // context of the container and thus the value would be interpolated by Plexus
-            String mavenHome = System.getProperty( "maven.home" );
-
-            path = globalSettingsPath.replaceAll( "\\$\\{maven.home\\}", mavenHome );
-
-            return new File( path ).getAbsoluteFile();
-        }
-        else
-        {
-            return new File( path ).getAbsoluteFile();
-        }
-    }
+    
 }
