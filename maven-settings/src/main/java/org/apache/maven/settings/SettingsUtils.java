@@ -2,7 +2,7 @@ package org.apache.maven.settings;
 
 import org.codehaus.plexus.util.StringUtils;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +29,15 @@ public final class SettingsUtils
     private SettingsUtils()
     {
     }
-
-    public static void merge( Settings dominant, Settings recessive )
+    
+    public static void merge( Settings dominant, Settings recessive, String recessiveSourceLevel )
     {
         if ( dominant == null || recessive == null )
         {
             return;
         }
+        
+        recessive.setSourceLevel( recessiveSourceLevel );
 
         List dominantActiveProfiles = dominant.getActiveProfiles();
         List recessiveActiveProfiles = recessive.getActiveProfiles();
@@ -47,88 +49,76 @@ public final class SettingsUtils
             if ( !dominantActiveProfiles.contains( profileId ) )
             {
                 dominantActiveProfiles.add( profileId );
+                
+                dominant.setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
             }
         }
 
         if ( StringUtils.isEmpty( dominant.getLocalRepository() ) )
         {
             dominant.setLocalRepository( recessive.getLocalRepository() );
+            
+            dominant.setLocalRepositorySourceLevel( recessiveSourceLevel );
         }
 
-        List mergedMirrors = new ArrayList( dominant.getMirrors() );
+        shallowMergeById( dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel );
+        shallowMergeById( dominant.getServers(), recessive.getServers(), recessiveSourceLevel );
+        shallowMergeById( dominant.getProxies(), recessive.getProxies(), recessiveSourceLevel );
+        shallowMergeById( dominant.getProfiles(), recessive.getProfiles(), recessiveSourceLevel );
 
-        List recessiveMirrors = recessive.getMirrors();
-
-        Map dominantMirrors = dominant.getMirrorsAsMap();
-
-        for ( Iterator it = recessiveMirrors.iterator(); it.hasNext(); )
+        shallowMergePluginUpdates( dominant, recessive.getPluginUpdates(), recessiveSourceLevel );
+    }
+    
+    private static void shallowMergePluginUpdates( Settings dominant, List recessive, String recessiveSourceLevel )
+    {
+        Map dominantByKey = dominant.getPluginUpdatesByKey();
+        
+        List dominantPluginUpdates = dominant.getPluginUpdates();
+        
+        for ( Iterator it = recessive.iterator(); it.hasNext(); )
         {
-            Mirror recessiveMirror = (Mirror) it.next();
-
-            Mirror dominantMirror = (Mirror) dominantMirrors.get( recessiveMirror.getId() );
-
-            if ( dominantMirror == null )
+            PluginUpdate recessivePluginUpdate = (PluginUpdate) it.next();
+            
+            if( !dominantByKey.containsKey( recessivePluginUpdate.getKey() ) )
             {
-                mergedMirrors.add( recessiveMirror );
+                recessivePluginUpdate.setSourceLevel( recessiveSourceLevel );
+                
+                dominantPluginUpdates.add( recessivePluginUpdate );
             }
         }
+        
+        dominant.flushPluginUpdatesByKey();
+    }
 
-        dominant.setMirrors( mergedMirrors );
-
-        List mergedServers = new ArrayList( dominant.getServers() );
-
-        List recessiveServers = recessive.getServers();
-
-        Map dominantServers = dominant.getServersAsMap();
-
-        for ( Iterator it = recessiveServers.iterator(); it.hasNext(); )
+    private static void shallowMergeById( List dominant, List recessive, String recessiveSourceLevel )
+    {
+        Map dominantById = mapById( dominant );
+        
+        for ( Iterator it = recessive.iterator(); it.hasNext(); )
         {
-            Server recessiveServer = (Server) it.next();
-
-            if ( !dominantServers.containsKey( recessiveServer.getId() ) )
+            IdentifiableBase identifiable = (IdentifiableBase) it.next();
+            
+            if( !dominantById.containsKey(identifiable.getId()))
             {
-                mergedServers.add( recessiveServer );
+                identifiable.setSourceLevel( recessiveSourceLevel );
+                
+                dominant.add( identifiable );
             }
         }
-
-        dominant.setServers( mergedServers );
-
-        List mergedProxies = new ArrayList( dominant.getProxies() );
-
-        List recessiveProxies = recessive.getProxies();
-
-        Map dominantProxies = dominant.getProxiesAsMap();
-
-        for ( Iterator it = recessiveProxies.iterator(); it.hasNext(); )
+    }
+    
+    private static Map mapById( List identifiables )
+    {
+        Map byId = new HashMap();
+        
+        for ( Iterator it = identifiables.iterator(); it.hasNext(); )
         {
-            Proxy recessiveProxy = (Proxy) it.next();
-
-            if ( !dominantProxies.containsKey( recessiveProxy ) )
-            {
-                mergedProxies.add( recessiveProxy );
-            }
+            IdentifiableBase identifiable = (IdentifiableBase) it.next();
+            
+            byId.put( identifiable.getId(), identifiable );
         }
-
-        dominant.setProxies( mergedProxies );
-
-        List mergedProfiles = new ArrayList( dominant.getProfiles() );
-
-        List recessiveProfiles = recessive.getProfiles();
-
-        Map dominantProfiles = dominant.getProfilesAsMap();
-
-        for ( Iterator it = recessiveProfiles.iterator(); it.hasNext(); )
-        {
-            Profile recessiveProfile = (Profile) it.next();
-
-            if ( !dominantProfiles.containsKey( recessiveProfile.getId() ) )
-            {
-                mergedProfiles.add( recessiveProfile );
-            }
-        }
-
-        dominant.setProfiles( mergedProfiles );
-
+        
+        return byId;
     }
 
     public static org.apache.maven.model.Profile convertFromSettingsProfile( Profile settingsProfile )

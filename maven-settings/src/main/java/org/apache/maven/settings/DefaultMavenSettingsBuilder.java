@@ -105,7 +105,7 @@ public class DefaultMavenSettingsBuilder
             userSettings = new Settings();
         }
 
-        SettingsUtils.merge( userSettings, globalSettings );
+        SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
         if ( userSettings.getLocalRepository() == null || userSettings.getLocalRepository().length() < 1 )
         {

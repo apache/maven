@@ -12,9 +12,63 @@
     </default>
   </defaults>
   <classes>
+    <class>
+      <name>TrackableBase</name>
+      <version>1.0.0</version>
+      <description>common base class that contains code to track the source for this instance (USER|GLOBAL)</description>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public static final String USER_LEVEL = "user-level";
+    public static final String GLOBAL_LEVEL = "global-level";
+    
+    private String sourceLevel = USER_LEVEL;
+    private boolean sourceLevelSet = false;
+    
+    public void setSourceLevel( String sourceLevel )
+    {
+        if ( sourceLevelSet )
+        {
+            throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
+        }
+        else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
+        {
+            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
+        }
+        else
+        {
+            this.sourceLevel = sourceLevel;
+            this.sourceLevelSet = true;
+        }
+    }
+    
+    public String getSourceLevel()
+    {
+        return sourceLevel;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>IdentifiableBase</name>
+      <superClass>TrackableBase</superClass>
+      <version>1.0.0</version>
+      <fields>
+        <field>
+          <name>id</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <default>default</default>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
     <class rootElement="true" xml.tagName="settings">
       <name>Settings</name>
       <version>1.0.0</version>
+      <superClass>TrackableBase</superClass>
       <description>Root element of the user configuration file.</description>
       <fields>
         <field>
@@ -119,6 +173,15 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>pluginUpdates</name>
+          <version>1.0.0</version>
+          <description>Specified plugin update policy information.</description>
+          <association>
+            <type>PluginUpdate</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -161,102 +224,6 @@
         return activeProxy;
     }
     
-    private Map mirrorMap;
-    
-    public void flushMirrorMap()
-    {
-        this.mirrorMap = null;
-    }
-    
-    public Map getMirrorsAsMap()
-    {
-        if ( mirrorMap == null )
-        {
-            mirrorMap = new HashMap();
-            
-            for ( Iterator it = getMirrors().iterator(); it.hasNext(); )
-            {
-                Mirror mirror = (Mirror) it.next();
-                
-                mirrorMap.put( mirror.getId(), mirror );
-            }
-        }
-        
-        return mirrorMap;
-    }
-
-    private Map serverMap;
-    
-    public void flushServerMap()
-    {
-        this.serverMap = null;
-    }
-    
-    public Map getServersAsMap()
-    {
-        if ( serverMap == null )
-        {
-            serverMap = new HashMap();
-            
-            for ( Iterator it = getServers().iterator(); it.hasNext(); )
-            {
-                Server server = (Server) it.next();
-                
-                serverMap.put( server.getId(), server );
-            }
-        }
-        
-        return serverMap;
-    }
-
-    private Map proxyMap;
-    
-    public void flushProxyMap()
-    {
-        this.proxyMap = null;
-    }
-    
-    public Map getProxiesAsMap()
-    {
-        if ( proxyMap == null )
-        {
-            proxyMap = new HashMap();
-            
-            for ( Iterator it = getProxies().iterator(); it.hasNext(); )
-            {
-                Proxy proxy = (Proxy) it.next();
-                
-                proxyMap.put( proxy.getId(), proxy );
-            }
-        }
-        
-        return proxyMap;
-    }
-
-    private Map profileMap;
-    
-    public void flushProfileMap()
-    {
-        this.profileMap = null;
-    }
-    
-    public Map getProfilesAsMap()
-    {
-        if ( profileMap == null )
-        {
-            profileMap = new HashMap();
-            
-            for ( Iterator it = getProfiles().iterator(); it.hasNext(); )
-            {
-                Profile profile = (Profile) it.next();
-                
-                profileMap.put( profile.getId(), profile );
-            }
-        }
-        
-        return profileMap;
-    }
-
     public Server getServer( String serverId )
     {
         Server match = null;
@@ -298,6 +265,63 @@
 
         return match;
     }
+    
+    private Map activeProfileToSourceLevel = new HashMap();
+    
+    public void setActiveProfileSourceLevel( String activeProfile, String sourceLevel )
+    {
+        activeProfileToSourceLevel.put( activeProfile, sourceLevel );
+    }
+    
+    public String getSourceLevelForActiveProfile( String activeProfile )
+    {
+        String sourceLevel = (String) activeProfileToSourceLevel.get( activeProfile );
+        
+        if ( sourceLevel != null )
+        {
+            return sourceLevel;
+        }
+        else
+        {
+            return getSourceLevel();
+        }
+    }
+    
+    private String localRepositorySourceLevel = TrackableBase.USER_LEVEL;
+    
+    public void setLocalRepositorySourceLevel( String localRepoSourceLevel )
+    {
+        this.localRepositorySourceLevel = localRepoSourceLevel;
+    }
+    
+    public String getLocalRepositorySourceLevel()
+    {
+        return localRepositorySourceLevel;
+    }
+    
+    private Map pluginUpdatesByKey;
+    
+    public Map getPluginUpdatesByKey()
+    {
+        if ( pluginUpdatesByKey == null )
+        {
+            pluginUpdatesByKey = new HashMap();
+            
+            for ( Iterator it = getPluginUpdates().iterator(); it.hasNext(); )
+            {
+                PluginUpdate pluginUpdate = (PluginUpdate) it.next();
+            
+                pluginUpdatesByKey.put( pluginUpdate.getKey(), pluginUpdate );
+            }
+        }
+        
+        return pluginUpdatesByKey;
+    }
+    
+    public void flushPluginUpdatesByKey()
+    {
+        this.pluginUpdatesByKey = null;
+    }
         ]]></code>
         </codeSegment>
       </codeSegments>
@@ -307,6 +331,7 @@
     <!-- class>
       <name>Jdk</name>
       <version>1.0.0</version>
+      <superClass>TrackableBase</superClass>
       <description><![CDATA[Describes one Java environment]]></description>
       <fields>
         <field>
@@ -336,13 +361,8 @@
     <class>
       <name>Proxy</name>
       <version>1.0.0</version>
+      <superClass>IdentifiableBase</superClass>
       <fields>
-        <field>
-          <name>id</name>
-          <required>true</required>
-          <default>default</default>
-          <type>String</type>
-        </field>
         <field>
           <name>active</name>
           <version>1.0.0</version>
@@ -397,17 +417,8 @@
     <class>
       <name>Server</name>
       <version>1.0.0</version>
+      <superClass>IdentifiableBase</superClass>
       <fields>
-        <field>
-          <name>id</name>
-          <version>1.0.0</version>
-          <required>true</required>
-          <description><![CDATA[
-          	The ID of this configuration for indicating the default or "active" 
-            profile.
-          ]]></description>
-          <type>String</type>
-        </field>
         <field>
           <name>username</name>
           <version>1.0.0</version>
@@ -443,23 +454,16 @@
     <class>
       <name>Mirror</name>
       <version>1.0.0</version>
+      <superClass>IdentifiableBase</superClass>
       <description> A download mirror for a given repository. </description>
       <fields>
-        <field>
-          <name>id</name>
-          <required>true</required>
-          <version>1.0.0</version>
-          <type>String</type>
-          <description> The server ID of this mirror. This must -not- be the 
-            same as that of the repository you are mirroring. </description>
-        </field>
         <field>
           <name>mirrorOf</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
           <description> The server ID of the repository being mirrored, eg 
-            "central". </description>
+            "central". This MUST NOT match the mirror id. </description>
         </field>
         <field>
           <name>name</name>
@@ -493,19 +497,12 @@
     <class>
       <name>Profile</name>
       <version>1.0.0</version>
+      <superClass>IdentifiableBase</superClass>
       <description><![CDATA[
         Modifications to the build process which is keyed on some 
         sort of environmental parameter.
       ]]></description>
       <fields>
-        <field>
-          <name>id</name>
-          <required>true</required>
-          <version>1.0.0</version>
-          <type>String</type>
-          <description>The ID of this build profile, for activation 
-            purposes.</description>
-        </field>
         <field>
           <name>activation</name>
           <version>1.0.0</version>
@@ -675,5 +672,58 @@
       </fields>
     </class>
     <!-- /BuildProfile support -->
+    <class>
+      <name>PluginUpdate</name>
+      <version>1.0.0</version>
+      <superClass>TrackableBase</superClass>
+      <description>Policy for updating a single plugin.</description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>autoUpdate</name>
+          <version>1.0.0</version>
+          <type>boolean</type>
+          <default>false</default>
+          <description>Whether to automatically update this plugin - false means prompt the user.</description>
+        </field>
+        <field>
+          <name>useVersion</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The current version of this plugin, to be used until the appropriate update actions happen.</description>
+        </field>
+        <field>
+          <name>rejectedVersions</name>
+          <version>1.0.0</version>
+          <description>The list of versions for this plugin that the user declined to "install"</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public String getKey()
+    {
+        return getGroupId() + ":" + getArtifactId();
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
   </classes>
 </model>
