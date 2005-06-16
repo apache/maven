@@ -49,7 +49,7 @@ public class DefaultArtifactFactory
         {
             desiredScope = scope;
         }
-        else if ( Artifact.SCOPE_TEST.equals( scope ) )
+        else if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_PROVIDED.equals( scope ) )
         {
             return null;
         }
@@ -64,6 +64,11 @@ public class DefaultArtifactFactory
         if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
         {
             desiredScope = Artifact.SCOPE_TEST;
+        }
+
+        if ( Artifact.SCOPE_PROVIDED.equals( inheritedScope ) )
+        {
+            desiredScope = Artifact.SCOPE_PROVIDED;
         }
 
         DefaultArtifact artifact = new DefaultArtifact( groupId, artifactId, version, desiredScope, type, classifier );

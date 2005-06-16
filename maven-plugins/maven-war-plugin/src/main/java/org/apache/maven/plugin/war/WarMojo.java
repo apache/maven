@@ -170,7 +170,7 @@ public class WarMojo
 
             // TODO: scope handler
             // Include runtime and compile time libraries
-            if ( "jar".equals( artifact.getType() ) && !Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
+            if ( "jar".equals( artifact.getType() ) && !Artifact.SCOPE_TEST.equals( artifact.getScope() ) && !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
             {
                 FileUtils.copyFileToDirectory( artifact.getFile(), libDirectory );
             }

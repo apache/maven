@@ -34,28 +34,34 @@ public class ScopeArtifactFilter
 
     private final boolean testScope;
 
+    private final boolean providedScope;
+
     public ScopeArtifactFilter( String scope )
     {
         if ( DefaultArtifact.SCOPE_COMPILE.equals( scope ) )
         {
+            providedScope = true;
             compileScope = true;
             runtimeScope = false;
             testScope = false;
         }
         else if ( DefaultArtifact.SCOPE_RUNTIME.equals( scope ) )
         {
+            providedScope = false;
             compileScope = true;
             runtimeScope = true;
             testScope = false;
         }
         else if ( DefaultArtifact.SCOPE_TEST.equals( scope ) )
         {
+            providedScope = false;
             compileScope = true;
             runtimeScope = true;
             testScope = true;
         }
         else
         {
+            providedScope = false;
             compileScope = false;
             runtimeScope = false;
             testScope = false;
@@ -76,9 +82,13 @@ public class ScopeArtifactFilter
         {
             return testScope;
         }
+        else if ( DefaultArtifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+        {
+            return providedScope;
+        }
         else
         {
-            // TODO: should this be true?
+            // TODO: should this be true? Does it even happen?
             return false;
         }
     }

@@ -104,12 +104,6 @@ public class MBoot
 
     private boolean online = true;
 
-    private static final String SCOPE_TEST = "test";
-
-    private static final String SCOPE_COMPILE = "compile";
-
-    private static final String SCOPE_RUNTIME = "runtime";
-
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -444,7 +438,7 @@ public class MBoot
             {
                 FileUtils.copyFileToDirectory( source, core );
             }
-            else if ( !d.getScope().equals( SCOPE_TEST ) )
+            else if ( !d.getScope().equals( Dependency.SCOPE_TEST ) )
             {
                 // only compile and runtime
                 FileUtils.copyFileToDirectory( source, lib );
@@ -588,12 +582,12 @@ public class MBoot
 
         if ( new File( generatedSources ).exists() )
         {
-            compile( reader.getDependencies(), sources, classes, null, generatedSources, SCOPE_COMPILE,
+            compile( reader.getDependencies(), sources, classes, null, generatedSources, Dependency.SCOPE_COMPILE,
                      localRepository );
         }
         else
         {
-            compile( reader.getDependencies(), sources, classes, null, null, SCOPE_COMPILE, localRepository );
+            compile( reader.getDependencies(), sources, classes, null, null, Dependency.SCOPE_COMPILE, localRepository );
         }
 
         // ----------------------------------------------------------------------
@@ -624,7 +618,7 @@ public class MBoot
 
         Collection testDependencies = new ArrayList( reader.getDependencies() );
 
-        compile( testDependencies, testSources, testClasses, classes, null, SCOPE_TEST, localRepository );
+        compile( testDependencies, testSources, testClasses, classes, null, Dependency.SCOPE_TEST, localRepository );
 
         // ----------------------------------------------------------------------
         // Test resources
@@ -825,7 +819,7 @@ public class MBoot
         List depList = new ArrayList( reader.getDependencies() );
         depList.addAll( surefireDependencies );
 
-        List classpath = classpath( depList, null, SCOPE_TEST, localRepository );
+        List classpath = classpath( depList, null, Dependency.SCOPE_TEST, localRepository );
         classpath.add( classes );
         classpath.add( testClasses );
 
@@ -851,21 +845,21 @@ public class MBoot
 
             String element = localRepository.getArtifactFile( d ).getAbsolutePath();
 
-            if ( SCOPE_COMPILE.equals( scope ) )
+            if ( Dependency.SCOPE_COMPILE.equals( scope ) )
             {
-                if ( d.getScope().equals( SCOPE_COMPILE ) )
+                if ( d.getScope().equals( Dependency.SCOPE_COMPILE ) )
                 {
                     classpath.add( element );
                 }
             }
-            else if ( SCOPE_RUNTIME.equals( scope ) )
+            else if ( Dependency.SCOPE_RUNTIME.equals( scope ) )
             {
-                if ( d.getScope().equals( SCOPE_COMPILE ) || d.getScope().equals( SCOPE_RUNTIME ) )
+                if ( d.getScope().equals( Dependency.SCOPE_COMPILE ) || d.getScope().equals( Dependency.SCOPE_RUNTIME ) )
                 {
                     classpath.add( element );
                 }
             }
-            else if ( SCOPE_TEST.equals( scope ) )
+            else if ( Dependency.SCOPE_TEST.equals( scope ) )
             {
                 classpath.add( element );
             }

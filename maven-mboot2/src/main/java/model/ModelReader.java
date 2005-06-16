@@ -357,9 +357,9 @@ public class ModelReader
             Dependency d = (Dependency) i.next();
 
             // Do we care about runtime here?
-            if ( "test".equals( inheritedScope ) )
+            if ( Dependency.SCOPE_TEST.equals( inheritedScope ) )
             {
-                d.setScope( "test" );
+                d.setScope( Dependency.SCOPE_TEST );
             }
 
             if ( !hasDependency( d, target ) )
@@ -376,7 +376,7 @@ public class ModelReader
         {
             // We only care about pushing in compile scope dependencies I think
             // if not, we'll need to be able to get the original and pick the appropriate scope
-            if ( d.getScope().equals( "compile" ) )
+            if ( d.getScope().equals( Dependency.SCOPE_COMPILE ) )
             {
                 dependencies.remove( conflictId );
             }

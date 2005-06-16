@@ -4,6 +4,20 @@
   <artifactId>maven-core-it0016</artifactId>
   <packaging>war</packaging>
   <version>1.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>servletapi</groupId>
+      <artifactId>servletapi</artifactId>
+      <version>2.4-20040521</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.3</version>
+    </dependency>
+  </dependencies>
   
   <build>
     <plugins>

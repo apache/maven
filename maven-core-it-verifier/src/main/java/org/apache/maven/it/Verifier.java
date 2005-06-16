@@ -383,6 +383,13 @@ public class Verifier
     private void verifyExpectedResult( String line )
         throws VerificationException
     {
+        boolean wanted = true;
+        if ( line.startsWith( "!" ) )
+        {
+            line = line.substring( 1 );
+            wanted = false;
+        }
+
         if ( line.indexOf( "!/" ) > 0 )
         {
             String urlString = "jar:file:" + basedir + "/" + line;
@@ -395,14 +402,24 @@ public class Verifier
 
                 if ( is == null )
                 {
-                    throw new VerificationException( "Expected JAR resource was not found: " + line );
+                    if ( wanted )
+                    {
+                        throw new VerificationException( "Expected JAR resource was not found: " + line );
+                    }
+                }
+                else
+                {
+                    if ( !wanted )
+                    {
+                        throw new VerificationException( "Unwanted JAR resource was found: " + line );
+                    }
                 }
 
                 is.close();
             }
             catch ( Exception e )
             {
-                throw new VerificationException( "Expected JAR resource was not found: " + line );
+                throw new VerificationException( "Error looking for JAR resource", e );
             }
         }
         else
@@ -416,7 +433,17 @@ public class Verifier
 
             if ( !expectedFile.exists() )
             {
-                throw new VerificationException( "Expected file was not found: " + expectedFile.getPath() );
+                if ( wanted )
+                {
+                    throw new VerificationException( "Expected file was not found: " + expectedFile.getPath() );
+                }
+            }
+            else
+            {
+                if ( !wanted )
+                {
+                    throw new VerificationException( "Unwanted file was found: " + expectedFile.getPath() );
+                }
             }
         }
     }

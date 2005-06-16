@@ -37,9 +37,15 @@ public class Dependency
 
     private String type = "jar";
 
-    private String scope = "compile";
+    private String scope = SCOPE_COMPILE;
 
     private String resolvedVersion;
+
+    public static final String SCOPE_TEST = "test";
+
+    public static final String SCOPE_COMPILE = "compile";
+
+    public static final String SCOPE_RUNTIME = "runtime";
 
     public Dependency()
     {
