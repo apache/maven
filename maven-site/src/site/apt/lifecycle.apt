@@ -8,6 +8,8 @@
 
 Build Lifecycle
 
+  <<PLEASE NOTE:>> this documentation is current only as of alpha-3, and is not yet completely implemented, even in Subversion.
+
 * Build Lifecycle Basics
 
   Maven 2.0 is based around the central concept of a build lifecycle. What this means is that the process for building
@@ -117,7 +119,7 @@ m2 clean:clean install
          <modelVersion>4.0.0</modelVersion>
        </configuration>
        <goals>
-         <goal>modello:java</goal>
+         <goal>java</goal>
        </goals>
      </execution>
    </executions>
@@ -150,7 +152,7 @@ m2 clean:clean install
          <file>${project.output.directory}/timestamp.txt</file>
        </configuration>
        <goals>
-         <goal>touch:timestamp</goal>
+         <goal>timestamp</goal>
        </goals>
      </execution>
    </executions>
@@ -270,7 +272,98 @@ m2 clean:clean install
 
 ** Forking a Parallel Lifecycle
 
-  TODO
+  While lots of mojos will participate in the standard lifecycle, there are just as many that are used in other
+  scenarios. These are mojos that are executed standalone from the command line (such as <<<idea:idea>>>), or individual
+  reports in the site building process.
 
+  However, sometimes these goals require that a particular task has already been performed - for instance, the IDEA
+  plugin must ensure sources have been generated to properly construct its module files. If the goal were participating
+  in the lifecycle, it would easily do this by ensuring it occurred after the phase it depended on having run. Since
+  this isn't the case, it must have a way to first execute that task.
+
+  Additionally, even goals participating in the build lifecycle might need to perform a task with different parameters
+  to what was already used, and does not want the output to affect the current build (for example, running
+  <<<clover:check>>> to run tests with modified sources and fail if a certain coverage ratio is not achieved).
+
+  For these reasons, mojos are capable of forking a new lifecycle. The lifecycle will be a normal build lifecycle,
+  a clone of the one currently being used (including any additional bindings from the POM), executed up until the point
+  specified by the mojo.
+
+  For example, the <<<idea:idea>>> mojo specifies the following in the mojo level declarations to call the source
+  generation:
+
+----
+@execute phase="generate-sources"
+----
+
+  But what happens if <<<generate-sources>>> has already been run in this build? In the current version of Maven, there
+  is no way to tell if the previous execution used the same input and outputs as the current mojo requires, so the task
+  (and any preceding ones if from the lifecycle) must be run again.
+
+  For this reason, it is important that if your plugin does any intensive work, you should first check whether it is
+  necessary to perform the tasks again, perhaps by using timestamp checking or a similar technique. As an example,
+  the compiler plugin will only recompile changed source files so can very efficiently be run multiple times in a build
+  if necessary.
+
+  When the lifecycle is forked, the project object being used is also cloned. In this way, modifications made to the
+  project as part of the execution, such as the addition of a new source root, will not affect the original build.
+  When the lifecycle finishes executing and control is passed to the original mojo, it can access that project using
+  the expression <<<${executedProject}>>>. For example:
+
+----
+/**
+ * @parameter expression="${executedProject}"
+ */
+private MavenProject executedProject;
+----
+
+  This project instance can be used by the mojo to obtain results, and propogate any changes it sees fit into the
+  original build.
+
+  Finally, when forking the new lifecycle, it is possible to augment it on top of the changes already made by the
+  packaging and the plugins in the POM.
+
+  For example, consider the Clover plugin. If <<<clover:check>>> were to be run from the command line, the plugin
+  would need to fork the lifecycle, executing the <<<test>>> phase. But, it would also need to add some configuration
+  and bind the <<<clover:compiler>>> goal to the <<<generate-sources>>> phase.
+
+  This can be achieved by including the following file as <<<META-INF/maven/lifecycle.xml>>> in the plugin JAR:
+
+----
+<lifecycles>
+  <lifecycle>
+    <id>clover</id>
+    <phases>
+      <phase>
+        <id>generate-sources</id>
+        <executions>
+          <execution>
+            <configuration>
+              <debug>true</debug>
+              <goals>
+                <goal>clover:compiler</goal>
+              </goals>
+            </configuration>
+          </execution>
+        </executions>
+      </phase>
+    </phases>
+  </lifecycle>
+</lifecycles>
+----
+
+  Here, the <<<executions>>> element is present in a similar way to a plugin declaration in the POM. This can be used
+  to bind a goal one or more times to a particular phase, as well as specifying configuration. Note that configuration
+  already provided in the POM to that plugin that is not part of a specific execution will also be applied.
+
+  The lifecycle ID given here, <<<clover>>> can then be used in the mojo to specify what to overlay on the forked
+  lifecycle when executing it, using the following mojo level declaration:
+
+----
+@execute phase="test" lifecycle="clover"
+----
+
+  For more information about plugin development in general, see the
+  {{{developers/plugin-overview.html} Developer's Section}}.
 
 

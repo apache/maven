@@ -25,6 +25,7 @@
     </menu>
     <menu name="User's Guide">
       <item name="Getting Started" href="/getting-started.html"/>
+      <item name="Build Lifecycle" href="/lifecycle.html" />
       <item name="Configuration" href="/configuration.html"/>
       <item name="Dependency Mechanism" href="/dependencies.html"/>
       <item name="Developing Plugins" href="/developers/plugin-overview.html"/>
