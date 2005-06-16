@@ -99,6 +99,8 @@ m2 clean:clean install
   plugins contain information that says where to bind particular goals to. Note that adding the plugin on its own is not
   enough information - you must also specify the goals you want run as part of your build.
 
+  The goals that are configured will be added to the goals already bound to the lifecycle from the packaging selected.
+
   For example, the Modello plugin always binds <<<modello:java>>> to the <<<generate-sources>>> phase. So to use the
   Modello plugin and have it generate sources from a model and incorporate that into the build, you would add the
   following to your POM in the <<<plugins>>> section of <<<build>>>:
@@ -156,8 +158,6 @@ m2 clean:clean install
 ...
 ----
 
-   TODO
-
 * Build Lifecycle Phase Reference
 
   The following phases are all the ones available as of the Maven 2.0 alpha-3 release. They are executed in the order
@@ -203,6 +203,74 @@ m2 clean:clean install
 
 * How the Build Lifecycle Affects Plugin Developers
 
- TODO
+  The build lifecycle ensures that plugin developers only need to make their individual goal (a "mojo") perform a single
+  task with a simple set of inputs and outputs, and then have that goal bound to the appropriate stage of the build.
+
+  Information is passed between goals only through the project object - for example by adding new compile source roots,
+  changing the location of the classes directory after processing, and so on.
+
+  There are 3 ways that a plugin can interact with the build lifecycle: by binding a mojo to a particular phase, by
+  specifying an alternate packaging and appropriate lifecycle bindings, or by forking a parallel lifecycle.
+
+** Binding a Mojo to a Phase
+
+  If the mojo is participating in a part of the normal build, usually the plugin developer will bind that mojo to a
+  particular phase, using the following syntax in the mojo level declaration:
+
+----
+@phase generate-sources
+----
+
+  <<Note:>> <Some plugin languages such as Marmalade have different ways of specifying mojo level declarations.
+  Please refer to the specific plugin development documentation for more information.>
+
+  Once this is specified, it will automatically be registered when the goal is listed in the project POM, as described
+  previously.
+
+** Specifying a New Packaging
+
+  If your plugin is intended to provide a unique artifact type, then you will need to not only provide the goal to
+  package it with, but also a mapping of how the default lifecycle should behave.
+
+  This is currently achieved by adding a Plexus descriptor to your plugin (or modifying it if it already exists).
+  This file is <<<META-INF/plexus/components.xml>>> in the plugin JAR. The following is an example of configuring a
+  set of phases for the Plexus plugin itself to register the <<<plexus-application>>> type:
+
+----
+<components>
+  <component>
+    <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+    <role-hint>plexus-application</role-hint>
+    <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+    <configuration>
+      <phases>
+        <process-resources>resources:resources</process-resources>
+        <compile>compiler:compile</compile>
+        <process-test-resources>resources:testResources</process-test-resources>
+        <test-compile>compiler:testCompile</test-compile>
+        <test>surefire:test</test>
+        <package>plexus:app</package>
+        <install>install:install</install>
+        <deploy>deploy:deploy</deploy>
+      </phases>
+    </configuration>
+  </component>
+</components>
+----
+
+  In this example, the <<<role-hint>>> is used to specify the packaging, and the <<<role>>> of
+  <<<org.apache.maven.lifecycle.mapping.LifecycleMapping>>> indicates this is a lifecycle mapping for that packaging.
+  Implementation is required, and while you can provide your own, the default given above should suit and standard case.
+
+  The phases to bind are listed in the configuration element, and each that is given can have one goal associated with
+  that phase for that particular packaging.
+
+  Once this is included in the JAR and the plugin is added to the project, the packaging will also be available from
+  that project.
+
+** Forking a Parallel Lifecycle
+
+  TODO
+
 
 
