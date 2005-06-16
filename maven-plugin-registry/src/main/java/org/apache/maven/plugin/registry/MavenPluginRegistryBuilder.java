@@ -1,4 +1,8 @@
-package org.apache.maven.artifact.handler;
+package org.apache.maven.plugin.registry;
+
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.IOException;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,18 +20,16 @@ package org.apache.maven.artifact.handler;
  * limitations under the License.
  */
 
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
- */
-public class PluginHandler
-    extends AbstractArtifactHandler
+public interface MavenPluginRegistryBuilder
 {
+    String ROLE = MavenPluginRegistryBuilder.class.getName();
     
-    public static final String PLUGIN_TYPE = "maven-plugin";
+    String ALT_USER_PLUGIN_REG_LOCATION = "org.apache.maven.user-plugin-registry";
+    String ALT_GLOBAL_PLUGIN_REG_LOCATION = "org.apache.maven.global-plugin-registry";
 
-    public String directory()
-    {
-        return "maven-plugins";
-    }
+    PluginRegistry buildPluginRegistry()
+        throws IOException, XmlPullParserException;
+    
+    PluginRegistry createUserPluginRegistry();
+    
 }

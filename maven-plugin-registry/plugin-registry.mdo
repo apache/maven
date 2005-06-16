@@ -1,0 +1,168 @@
+<model>
+  <id>plugin-registry</id>
+  <name>PluginRegistry</name>
+  <description><![CDATA[
+    Contains plugin version information related to which version of a particular plugin to use,
+    when and how to update plugins, and which versions of a plugin have already been declined for
+    update.
+  ]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.plugin.registry</value>
+    </default>
+  </defaults>
+  <classes>
+    <class>
+      <name>TrackableBase</name>
+      <version>1.0.0</version>
+      <description>common base class that contains code to track the source for this instance (USER|GLOBAL)</description>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public static final String USER_LEVEL = "user-level";
+    public static final String GLOBAL_LEVEL = "global-level";
+    
+    private String sourceLevel = USER_LEVEL;
+    private boolean sourceLevelSet = false;
+    
+    public void setSourceLevel( String sourceLevel )
+    {
+        if ( sourceLevelSet )
+        {
+            throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
+        }
+        else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
+        {
+            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
+        }
+        else
+        {
+            this.sourceLevel = sourceLevel;
+            this.sourceLevelSet = true;
+        }
+    }
+    
+    public String getSourceLevel()
+    {
+        return sourceLevel;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class rootElement="true" xml.tagName="pluginRegistry">
+      <name>PluginRegistry</name>
+      <version>1.0.0</version>
+      <superClass>TrackableBase</superClass>
+      <description>Root element of the plugin registry file.</description>
+      <fields>
+        <field>
+          <name>plugins</name>
+          <version>1.0.0</version>
+          <description>Specified plugin update policy information.</description>
+          <association>
+            <type>Plugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    private Map pluginsByKey;
+    
+    public Map getPluginsByKey()
+    {
+        if ( pluginsByKey == null )
+        {
+            pluginsByKey = new HashMap();
+            
+            for ( Iterator it = getPlugins().iterator(); it.hasNext(); )
+            {
+                Plugin plugin = (Plugin) it.next();
+            
+                pluginsByKey.put( plugin.getKey(), plugin );
+            }
+        }
+        
+        return pluginsByKey;
+    }
+    
+    public void flushPluginsByKey()
+    {
+        this.pluginsByKey = null;
+    }
+    
+    private java.io.File file;
+    
+    public void setFile( java.io.File file )
+    {
+        this.file = file;
+    }
+    
+    public java.io.File getFile()
+    {
+        return file;
+    }
+        ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Plugin</name>
+      <version>1.0.0</version>
+      <superClass>TrackableBase</superClass>
+      <description>Policy for updating a single plugin.</description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>autoUpdate</name>
+          <version>1.0.0</version>
+          <type>boolean</type>
+          <default>false</default>
+          <description>Whether to automatically update this plugin - false means prompt the user.</description>
+        </field>
+        <field>
+          <name>useVersion</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The current version of this plugin, to be used until the appropriate update actions happen.</description>
+        </field>
+        <field>
+          <name>rejectedVersions</name>
+          <version>1.0.0</version>
+          <description>The list of versions for this plugin that the user declined to "install"</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public String getKey()
+    {
+        return getGroupId() + ":" + getArtifactId();
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+  </classes>
+</model>

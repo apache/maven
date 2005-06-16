@@ -78,6 +78,13 @@
           <description><![CDATA[The local repository.]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>interactiveMode</name>
+          <version>1.0.0</version>
+          <description><![CDATA[Whether Maven should attempt to interact with the user for input.]]></description>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
         <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
         <!-- field>
           <name>passwordStore</name>
@@ -170,15 +177,6 @@
           ]]></description>
           <association>
             <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
-          <name>pluginUpdates</name>
-          <version>1.0.0</version>
-          <description>Specified plugin update policy information.</description>
-          <association>
-            <type>PluginUpdate</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -299,28 +297,16 @@
         return localRepositorySourceLevel;
     }
     
-    private Map pluginUpdatesByKey;
+    private java.io.File file;
     
-    public Map getPluginUpdatesByKey()
+    public void setFile( java.io.File file )
     {
-        if ( pluginUpdatesByKey == null )
-        {
-            pluginUpdatesByKey = new HashMap();
-            
-            for ( Iterator it = getPluginUpdates().iterator(); it.hasNext(); )
-            {
-                PluginUpdate pluginUpdate = (PluginUpdate) it.next();
-            
-                pluginUpdatesByKey.put( pluginUpdate.getKey(), pluginUpdate );
-            }
-        }
-        
-        return pluginUpdatesByKey;
+        this.file = file;
     }
     
-    public void flushPluginUpdatesByKey()
+    public java.io.File getFile()
     {
-        this.pluginUpdatesByKey = null;
+        return file;
     }
         ]]></code>
         </codeSegment>
@@ -672,58 +658,5 @@
       </fields>
     </class>
     <!-- /BuildProfile support -->
-    <class>
-      <name>PluginUpdate</name>
-      <version>1.0.0</version>
-      <superClass>TrackableBase</superClass>
-      <description>Policy for updating a single plugin.</description>
-      <fields>
-        <field>
-          <name>groupId</name>
-          <version>1.0.0</version>
-          <required>true</required>
-          <type>String</type>
-        </field>
-        <field>
-          <name>artifactId</name>
-          <version>1.0.0</version>
-          <required>true</required>
-          <type>String</type>
-        </field>
-        <field>
-          <name>autoUpdate</name>
-          <version>1.0.0</version>
-          <type>boolean</type>
-          <default>false</default>
-          <description>Whether to automatically update this plugin - false means prompt the user.</description>
-        </field>
-        <field>
-          <name>useVersion</name>
-          <version>1.0.0</version>
-          <type>String</type>
-          <description>The current version of this plugin, to be used until the appropriate update actions happen.</description>
-        </field>
-        <field>
-          <name>rejectedVersions</name>
-          <version>1.0.0</version>
-          <description>The list of versions for this plugin that the user declined to "install"</description>
-          <association>
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-      </fields>
-      <codeSegments>
-        <codeSegment>
-          <version>1.0.0</version>
-          <code><![CDATA[
-    public String getKey()
-    {
-        return getGroupId() + ":" + getArtifactId();
-    }
-          ]]></code>
-        </codeSegment>
-      </codeSegments>
-    </class>
   </classes>
 </model>

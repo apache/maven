@@ -1,0 +1,14 @@
+<component-set>
+  <components>
+
+    <component>
+      <role>org.apache.maven.plugin.registry.MavenPluginRegistryBuilder</role>
+      <implementation>org.apache.maven.plugin.registry.DefaultPluginRegistryBuilder</implementation>
+      <configuration>
+        <globalRegistryPath>${maven.home}/conf/plugin-registry.xml</globalRegistryPath>
+        <userRegistryPath>${user.home}/.m2/plugin-registry.xml</userRegistryPath>
+      </configuration>
+    </component>
+    
+  </components>
+</component-set>

@@ -85,6 +85,17 @@ it0026: Test merging of global- and user-level settings.xml files.
 
 -------------------------------------------------------------------------------
 
+==============================
+NOTE: About it0023 and it0026
+==============================
+I am disabling these for now, because they depend on locally-supplied settings
+files, and need to know the location of the local repository where the plugin
+builds were deposited in order to work. This is why they will result in 
+ArtifactResolutionException's...they literally cannot find the plugins in the
+local repository, because they wind up using the default local repository.
+=============================
+
+
 - generated sources
 - generated resources from sources
 - generated resources from generated sources

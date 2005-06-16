@@ -58,6 +58,12 @@ public class PrepareReleaseMojo
      * @readonly
      */
     private String basedir;
+    
+    /**
+     * @parameter expression="${settings.interactiveMode}"
+     * @readonly
+     */
+    private boolean interactive = true;
 
     private static final String SNAPSHOT = "-SNAPSHOT";
 
@@ -490,7 +496,7 @@ public class PrepareReleaseMojo
             {
                 ScmBean scm = getScm();
 
-                if ( scm.getTag() == null )
+                if ( scm.getTag() == null && interactive )
                 {
                     getLog().info( "What tag name should be used? [ " + tag + " ]" );
 

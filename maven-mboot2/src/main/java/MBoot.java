@@ -38,7 +38,7 @@ public class MBoot
     String[] builds = new String[]{"maven-model", "maven-monitor", "maven-plugin-api",
                                    "maven-plugin-descriptor", "maven-artifact", "maven-script/maven-script-marmalade",
                                    "maven-script/maven-script-beanshell", "maven-project",
-                                   "maven-settings", "maven-profile",
+                                   "maven-settings", "maven-profile", "maven-plugin-registry",
                                    "maven-reporting/maven-reporting-api", "maven-core", "maven-archiver",
                                    "maven-plugin-tools/maven-plugin-tools-api",
                                    "maven-plugin-tools/maven-plugin-tools-java",
@@ -61,6 +61,7 @@ public class MBoot
         targetVersions.put( "maven-model", "4.0.0" );
         targetVersions.put( "maven-settings", "1.0.0" );
         targetVersions.put( "maven-profile", "1.0.0" );
+        targetVersions.put( "maven-plugin-registry", "1.0.0" );
 
         MODELLO_TARGET_VERSIONS = Collections.unmodifiableMap( targetVersions );
 
@@ -68,6 +69,7 @@ public class MBoot
         modelFiles.put( "maven-model", "maven.mdo" );
         modelFiles.put( "maven-settings", "settings.mdo" );
         modelFiles.put( "maven-profile", "profiles.mdo" );
+        modelFiles.put( "maven-plugin-registry", "plugin-registry.mdo" );
 
         MODELLO_MODEL_FILES = Collections.unmodifiableMap( modelFiles );
     }

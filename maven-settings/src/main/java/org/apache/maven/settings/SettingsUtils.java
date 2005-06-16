@@ -28,15 +28,16 @@ public final class SettingsUtils
 
     private SettingsUtils()
     {
+        // don't allow construction.
     }
-    
+
     public static void merge( Settings dominant, Settings recessive, String recessiveSourceLevel )
     {
         if ( dominant == null || recessive == null )
         {
             return;
         }
-        
+
         recessive.setSourceLevel( recessiveSourceLevel );
 
         List dominantActiveProfiles = dominant.getActiveProfiles();
@@ -49,7 +50,7 @@ public final class SettingsUtils
             if ( !dominantActiveProfiles.contains( profileId ) )
             {
                 dominantActiveProfiles.add( profileId );
-                
+
                 dominant.setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
             }
         }
@@ -57,7 +58,7 @@ public final class SettingsUtils
         if ( StringUtils.isEmpty( dominant.getLocalRepository() ) )
         {
             dominant.setLocalRepository( recessive.getLocalRepository() );
-            
+
             dominant.setLocalRepositorySourceLevel( recessiveSourceLevel );
         }
 
@@ -66,58 +67,36 @@ public final class SettingsUtils
         shallowMergeById( dominant.getProxies(), recessive.getProxies(), recessiveSourceLevel );
         shallowMergeById( dominant.getProfiles(), recessive.getProfiles(), recessiveSourceLevel );
 
-        shallowMergePluginUpdates( dominant, recessive.getPluginUpdates(), recessiveSourceLevel );
-    }
-    
-    private static void shallowMergePluginUpdates( Settings dominant, List recessive, String recessiveSourceLevel )
-    {
-        Map dominantByKey = dominant.getPluginUpdatesByKey();
-        
-        List dominantPluginUpdates = dominant.getPluginUpdates();
-        
-        for ( Iterator it = recessive.iterator(); it.hasNext(); )
-        {
-            PluginUpdate recessivePluginUpdate = (PluginUpdate) it.next();
-            
-            if( !dominantByKey.containsKey( recessivePluginUpdate.getKey() ) )
-            {
-                recessivePluginUpdate.setSourceLevel( recessiveSourceLevel );
-                
-                dominantPluginUpdates.add( recessivePluginUpdate );
-            }
-        }
-        
-        dominant.flushPluginUpdatesByKey();
     }
 
     private static void shallowMergeById( List dominant, List recessive, String recessiveSourceLevel )
     {
         Map dominantById = mapById( dominant );
-        
+
         for ( Iterator it = recessive.iterator(); it.hasNext(); )
         {
             IdentifiableBase identifiable = (IdentifiableBase) it.next();
-            
-            if( !dominantById.containsKey(identifiable.getId()))
+
+            if ( !dominantById.containsKey( identifiable.getId() ) )
             {
                 identifiable.setSourceLevel( recessiveSourceLevel );
-                
+
                 dominant.add( identifiable );
             }
         }
     }
-    
+
     private static Map mapById( List identifiables )
     {
         Map byId = new HashMap();
-        
+
         for ( Iterator it = identifiables.iterator(); it.hasNext(); )
         {
             IdentifiableBase identifiable = (IdentifiableBase) it.next();
-            
+
             byId.put( identifiable.getId(), identifiable );
         }
-        
+
         return byId;
     }
 

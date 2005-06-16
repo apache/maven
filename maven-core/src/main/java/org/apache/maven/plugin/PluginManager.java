@@ -20,6 +20,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -36,6 +37,6 @@ public interface PluginManager
     PluginDescriptor verifyPlugin( String prefix );
 
     PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
-                                   ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginManagerException;
+                                  ArtifactRepository localRepository, boolean interactiveMode )
+        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException;
 }

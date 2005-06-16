@@ -26,9 +26,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.InversionArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -37,6 +35,8 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.version.PluginVersionManager;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
@@ -177,54 +177,33 @@ public class DefaultPluginManager
     }
 
     public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
-                                         ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginManagerException
+                                         ArtifactRepository localRepository, boolean interactiveMode )
+        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
-
         String pluginKey = groupId + ":" + artifactId;
 
         // TODO: this should be possibly outside
+        // [HTTP-301] All version-resolution logic has been moved to DefaultPluginVersionManager. :)
         if ( version == null )
         {
-            Plugin pluginConfig = null;
+            PluginVersionManager pluginVersionManager = null;
 
-            for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
+            try
             {
-                Plugin plugin = (Plugin) it.next();
+                pluginVersionManager = (PluginVersionManager) container.lookup( PluginVersionManager.ROLE );
 
-                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-                {
-                    pluginConfig = plugin;
-
-                    break;
-                }
+                version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, localRepository,
+                                                                     interactiveMode );
             }
-
-            if ( project.getReports() != null )
+            catch ( ComponentLookupException e )
             {
-                for ( Iterator it = project.getReports().getPlugins().iterator(); it.hasNext(); )
-                {
-                    Plugin plugin = (Plugin) it.next();
-
-                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-                    {
-                        pluginConfig = plugin;
-
-                        break;
-                    }
-                }
+                throw new PluginVersionResolutionException( groupId, artifactId,
+                                                            "Cannot retrieve an instance of the PluginVersionManager",
+                                                            e );
             }
-
-            if ( pluginConfig != null )
+            finally
             {
-                if ( StringUtils.isEmpty( pluginConfig.getVersion() ) )
-                {
-                    version = ReleaseArtifactTransformation.RELEASE_VERSION;
-                }
-                else
-                {
-                    version = pluginConfig.getVersion();
-                }
+                releaseComponent( pluginVersionManager );
             }
         }
 
@@ -249,8 +228,9 @@ public class DefaultPluginManager
             }
             catch ( ArtifactResolutionException e )
             {
-                if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() )
-                    && version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
+                if ( ( groupId == null || artifactId == null || version == null || ( groupId.equals( e.getGroupId() )
+                    && artifactId.equals( e.getArtifactId() ) && version.equals( e.getVersion() ) ) )
+                    && "maven-plugin".equals( e.getType() ) )
                 {
                     throw new PluginNotFoundException( e );
                 }
@@ -299,7 +279,7 @@ public class DefaultPluginManager
             }
 
             container.createChildContainer( pluginKey, files, Collections.EMPTY_MAP, Collections.singletonList( this ) );
-            
+
             // this plugin's descriptor should have been discovered by now, so we should be able to circle
             // around and set the artifacts.
             PluginDescriptor addedPlugin = (PluginDescriptor) pluginDescriptors.get( pluginKey );
@@ -436,7 +416,7 @@ public class DefaultPluginManager
                                                                                               pluginDescriptor,
                                                                                               pathTranslator,
                                                                                               getLogger() );
-            
+
             checkRequiredParameters( mojoDescriptor, mergedConfiguration, expressionEvaluator, plugin );
 
             populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, pluginContainer, expressionEvaluator );
@@ -445,9 +425,9 @@ public class DefaultPluginManager
             // Event monitoring.
             String event = MavenEvents.MOJO_EXECUTION;
             EventDispatcher dispatcher = session.getEventDispatcher();
-            
+
             String goalExecId = goalName;
-            
+
             if ( goalInstance.getExecutionId() != null )
             {
                 goalExecId += " {execution: " + goalInstance.getExecutionId() + "}";
@@ -463,7 +443,7 @@ public class DefaultPluginManager
             catch ( MojoExecutionException e )
             {
                 session.getEventDispatcher().dispatchError( event, goalExecId, e );
-                
+
                 throw e;
             }
             // End event monitoring.
@@ -728,6 +708,7 @@ public class DefaultPluginManager
                 }
                 catch ( ComponentLifecycleException e )
                 {
+                    getLogger().debug( "Failed to release plugin container - ignoring." );
                 }
             }
         }

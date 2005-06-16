@@ -36,6 +36,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-registry</artifactId>
+      <version>2.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-profile</artifactId>
       <version>2.0-SNAPSHOT</version>
     </dependency>
@@ -80,6 +85,13 @@
       <artifactId>wagon-ssh</artifactId>
       <version>1.0-alpha-3</version>
       <scope>runtime</scope>
+    </dependency>
+    
+    <!-- used to prompt the user to add plugin versions to the plugin-registry. -->
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-input-handler</artifactId>
+      <version>1.0-alpha-2</version>
     </dependency>
   </dependencies>
   <reports>

@@ -51,7 +51,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
   cd maven-plugins
   # update the release info to ensure these versions get used in the integration tests
-  m2 -DupdateReleaseInfo=true -e $ARGS clean:clean install
+  m2 --batch-mode -DupdateReleaseInfo=true -e $ARGS clean:clean install
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -61,7 +61,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo
   echo "Running maven-core integration tests ..."
   echo 
-  ./maven-core-it.sh "$HOME_ARGS" $ARGS
+  ./maven-core-it.sh --batch-mode "$HOME_ARGS" $ARGS
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi

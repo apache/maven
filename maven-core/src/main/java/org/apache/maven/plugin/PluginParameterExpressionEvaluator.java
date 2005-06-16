@@ -140,6 +140,30 @@ public class PluginParameterExpressionEvaluator
         {
             value = context.getSettings();
         }
+        else if ( expression.startsWith( "settings" ) )
+        {
+            try
+            {
+                int pathSeparator = expression.indexOf( "/" );
+
+                if ( pathSeparator > 0 )
+                {
+                    String pathExpression = expression.substring( 1, pathSeparator );
+                    value = ReflectionValueExtractor.evaluate( pathExpression, context.getSettings() );
+                    value = value + expression.substring( pathSeparator );
+                }
+                else
+                {
+                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), context.getSettings() );
+                }
+            }
+            catch ( Exception e )
+            {
+                // TODO: don't catch exception
+                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
+                                                         e );
+            }
+        }
         else if ( expression.equals( "basedir" ) )
         {
             value = context.getProject().getBasedir().getAbsolutePath();

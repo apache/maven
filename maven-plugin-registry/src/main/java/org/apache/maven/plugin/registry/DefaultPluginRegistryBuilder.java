@@ -1,4 +1,16 @@
-package org.apache.maven.settings;
+package org.apache.maven.plugin.registry;
+
+import org.apache.maven.plugin.registry.io.xpp3.PluginRegistryXpp3Reader;
+import org.apache.maven.plugin.registry.TrackableBase;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,40 +28,26 @@ package org.apache.maven.settings;
  * limitations under the License.
  */
 
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
-/**
- * @author jdcasey
- * @version $Id: DefaultMavenSettingsBuilder.java 189510 2005-06-08 03:27:43Z jdcasey $
- */
-public class DefaultMavenSettingsBuilder
+public class DefaultPluginRegistryBuilder
     extends AbstractLogEnabled
-    implements MavenSettingsBuilder, Initializable
+    implements MavenPluginRegistryBuilder, Initializable
 {
+
     public static final String userHome = System.getProperty( "user.home" );
 
     /**
      * @configuration
      */
-    private String userSettingsPath;
+    private String userRegistryPath;
 
     /**
      * @configuration
      */
-    private String globalSettingsPath;
+    private String globalRegistryPath;
 
-    private File userSettingsFile;
+    private File userRegistryFile;
 
-    private File globalSettingsFile;
+    private File globalRegistryFile;
 
     // ----------------------------------------------------------------------
     // Component Lifecycle
@@ -57,36 +55,54 @@ public class DefaultMavenSettingsBuilder
 
     public void initialize()
     {
-        userSettingsFile = getFile( userSettingsPath, "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+        userRegistryFile = getFile( userRegistryPath, "user.home", MavenPluginRegistryBuilder.ALT_USER_PLUGIN_REG_LOCATION );
+        
+        globalRegistryFile = getFile( globalRegistryPath, "maven.home", MavenPluginRegistryBuilder.ALT_GLOBAL_PLUGIN_REG_LOCATION );
 
-        globalSettingsFile = getFile( globalSettingsPath, "maven.home",
-                                      MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
-
-        getLogger().debug( "Building Maven global-level settings from: '" + globalSettingsFile.getAbsolutePath() + "'" );
-        getLogger().debug( "Building Maven user-level settings from: '" + userSettingsFile.getAbsolutePath() + "'" );
+        getLogger().debug( "Building Maven global-level settings from: '" + globalRegistryFile.getAbsolutePath() + "'" );
+        getLogger().debug( "Building Maven user-level settings from: '" + userRegistryFile.getAbsolutePath() + "'" );
     }
-
-    // ----------------------------------------------------------------------
-    // MavenProfilesBuilder Implementation
-    // ----------------------------------------------------------------------
-
-    private Settings readSettings( File settingsFile )
+    
+    public PluginRegistry buildPluginRegistry()
         throws IOException, XmlPullParserException
     {
-        Settings settings = null;
+        PluginRegistry global = readPluginRegistry( globalRegistryFile );
+        
+        PluginRegistry user = readPluginRegistry( userRegistryFile );
 
-        if ( settingsFile.exists() && settingsFile.isFile() )
+        if ( user == null && global != null )
+        {
+            // we'll use the globals, but first we have to recursively mark them as global...
+            PluginRegistryUtils.recursivelySetSourceLevel( global, PluginRegistry.GLOBAL_LEVEL );
+            
+            user = global;
+        }
+        else
+        {
+            // merge non-colliding plugins into the user registry.
+            PluginRegistryUtils.merge( user, global, TrackableBase.GLOBAL_LEVEL );
+        }
+
+        return user;
+    }
+
+    private PluginRegistry readPluginRegistry( File registryFile )
+        throws IOException, XmlPullParserException
+    {
+        PluginRegistry registry = null;
+
+        if ( registryFile.exists() && registryFile.isFile() )
         {
             FileReader reader = null;
             try
             {
-                reader = new FileReader( settingsFile );
+                reader = new FileReader( registryFile );
 
-                SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
+                PluginRegistryXpp3Reader modelReader = new PluginRegistryXpp3Reader();
 
-                settings = modelReader.read( reader );
-
-                settings.setFile( settingsFile );
+                registry = modelReader.read( reader );
+                
+                registry.setFile( registryFile );
             }
             finally
             {
@@ -94,39 +110,7 @@ public class DefaultMavenSettingsBuilder
             }
         }
 
-        return settings;
-    }
-
-    public Settings buildSettings()
-        throws IOException, XmlPullParserException
-    {
-        Settings globalSettings = readSettings( globalSettingsFile );
-        Settings userSettings = readSettings( userSettingsFile );
-
-        if ( userSettings == null )
-        {
-            userSettings = new Settings();
-        }
-
-        SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
-
-        if ( userSettings.getLocalRepository() == null || userSettings.getLocalRepository().length() < 1 )
-        {
-            File mavenUserConfigurationDirectory = new File( userHome, ".m2" );
-            if ( !mavenUserConfigurationDirectory.exists() )
-            {
-                if ( !mavenUserConfigurationDirectory.mkdirs() )
-                {
-                    //throw a configuration exception
-                }
-            }
-
-            String localRepository = new File( mavenUserConfigurationDirectory, "repository" ).getAbsolutePath();
-
-            userSettings.setLocalRepository( localRepository );
-        }
-
-        return userSettings;
+        return registry;
     }
 
     private File getFile( String pathPattern, String basedirSysProp, String altLocationSysProp )
@@ -143,7 +127,7 @@ public class DefaultMavenSettingsBuilder
         // the path character before we operate on the string as a regex input, and 
         // in order to avoid surprises with the File construction...
         // -------------------------------------------------------------------------------------
-
+        
         String path = System.getProperty( altLocationSysProp );
 
         if ( StringUtils.isEmpty( path ) )
@@ -153,8 +137,8 @@ public class DefaultMavenSettingsBuilder
             String basedir = System.getProperty( basedirSysProp );
 
             basedir = basedir.replaceAll( "\\\\", "/" );
-            basedir = basedir.replaceAll( "\\$", "\\\\\\$" );
-
+            basedir = basedir.replaceAll("\\$", "\\\\\\$");
+            
             path = pathPattern.replaceAll( "\\$\\{" + basedirSysProp + "\\}", basedir );
             path = path.replaceAll( "\\\\", "/" );
             path = path.replaceAll( "//", "/" );
@@ -167,4 +151,13 @@ public class DefaultMavenSettingsBuilder
         }
     }
 
+    public PluginRegistry createUserPluginRegistry()
+    {
+        PluginRegistry registry = new PluginRegistry();
+        
+        registry.setFile( userRegistryFile );
+        
+        return registry;
+    }
+    
 }

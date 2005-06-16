@@ -188,6 +188,11 @@ public class MavenCli
             showFatalError( "Unable to read settings.xml", e, showErrors );
             return 1;
         }
+        
+        if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
+        {
+            settings.setInteractiveMode( false );
+        }
 
         List projectFiles = null;
         try
@@ -463,6 +468,8 @@ public class MavenCli
 
     static class CLIManager
     {
+        public static final char BATCH_MODE = 'B';
+
         public static final char SET_SYSTEM_PROPERTY = 'D';
 
         public static final char OFFLINE = 'o';
@@ -513,6 +520,7 @@ public class MavenCli
                 "Update all snapshots regardless of repository policies" ).create( UPDATE_SNAPSHOTS ) );
             options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription(
                 "Comma-delimited list of profiles to activate").hasArg().create( ACTIVATE_PROFILES ) );
+            options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription( "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
         }
 
         public CommandLine parse( String[] args )

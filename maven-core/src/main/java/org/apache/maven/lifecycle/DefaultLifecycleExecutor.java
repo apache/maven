@@ -31,6 +31,7 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.settings.Settings;
@@ -195,7 +196,7 @@ public class DefaultLifecycleExecutor
                     for ( Iterator instanceIterator = instances.iterator(); instanceIterator.hasNext(); )
                     {
                         GoalInstance instance = (GoalInstance) instanceIterator.next();
-                        
+
                         String executePhase = mojoDescriptor.getExecutePhase();
 
                         if ( executePhase != null )
@@ -241,7 +242,7 @@ public class DefaultLifecycleExecutor
         if ( idx > -1 )
         {
             GoalInstance cached = (GoalInstance) instances.get( idx );
-            
+
             cached.incorporate( goalInstance );
         }
         else
@@ -310,11 +311,15 @@ public class DefaultLifecycleExecutor
         try
         {
             pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(), session
-                .getLocalRepository() );
+                .getLocalRepository(), session.getSettings().isInteractiveMode() );
         }
         catch ( PluginManagerException e )
         {
             throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+        }
+        catch ( PluginVersionResolutionException e )
+        {
+            throw new LifecycleExecutionException( "Error resolving plugin version", e );
         }
 
         if ( plugin.isInheritanceApplied() || pluginDescriptor.isInheritedByDefault() )
@@ -574,11 +579,16 @@ public class DefaultLifecycleExecutor
                 injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
 
                 pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(),
-                                                               session.getLocalRepository() );
+                                                               session.getLocalRepository(), session.getSettings()
+                                                                   .isInteractiveMode() );
             }
             catch ( PluginManagerException e )
             {
                 throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+            }
+            catch ( PluginVersionResolutionException e )
+            {
+                throw new LifecycleExecutionException( "Error resolving plugin version", e );
             }
         }
         else

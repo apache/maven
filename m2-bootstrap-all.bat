@@ -115,7 +115,7 @@ cd ..
 
 echo Rebuilding maven2 plugins
 cd maven-plugins
-call m2 -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
+call m2 --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
 cd ..
 
 echo Running integration tests

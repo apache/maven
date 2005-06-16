@@ -1,4 +1,7 @@
-package org.apache.maven.artifact.handler;
+package org.apache.maven.plugin.version;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.project.MavenProject;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,18 +19,13 @@ package org.apache.maven.artifact.handler;
  * limitations under the License.
  */
 
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
- */
-public class PluginHandler
-    extends AbstractArtifactHandler
+public interface PluginVersionManager
 {
-    
-    public static final String PLUGIN_TYPE = "maven-plugin";
 
-    public String directory()
-    {
-        return "maven-plugins";
-    }
+    String ROLE = PluginVersionManager.class.getName();
+
+    String resolvePluginVersion( String groupId, String artifactId, MavenProject project,
+                                ArtifactRepository localRepository, boolean interactiveMode )
+        throws PluginVersionResolutionException;
+
 }

@@ -464,6 +464,8 @@ public class Verifier
             cli.setExecutable( executable );
             
             cli.createArgument().setValue( "-e" );
+            
+            cli.createArgument().setValue( "--batch-mode" );
 
             for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
             {

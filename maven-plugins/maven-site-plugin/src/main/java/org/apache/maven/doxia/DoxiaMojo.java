@@ -22,6 +22,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
@@ -77,6 +78,12 @@ public class DoxiaMojo
     private static final String RESOURCE_DIR = "org/apache/maven/doxia";
 
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
+    
+    /**
+     * @parameter expression="${settings.interactiveMode}"
+     * @readonly
+     */
+    private boolean interactive = true;
 
     /**
      * @parameter expression="${basedir}/src/site"
@@ -717,11 +724,15 @@ public class DoxiaMojo
                 try
                 {
                     pluginManager.verifyPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
-                                                project, localRepository );
+                                                project, localRepository, interactive );
                 }
                 catch ( ArtifactResolutionException e )
                 {
                     throw new MojoExecutionException( "Cannot find report plugin", e );
+                }
+                catch ( PluginVersionResolutionException e )
+                {
+                    throw new MojoExecutionException( "Cannot resolve version for report plugin", e );
                 }
                 catch ( PluginManagerException e )
                 {
