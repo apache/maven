@@ -188,7 +188,10 @@ public abstract class AbstractArtifactTask
         }
 
         Mirror mirror = getSettings().getMirrorOf( pomRepository.getId() );
-        r.setUrl( mirror.getUrl() );
+        if ( mirror != null )
+        {
+            r.setUrl( mirror.getUrl() );
+        }
 
         return r;
     }
