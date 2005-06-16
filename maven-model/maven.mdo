@@ -1008,12 +1008,13 @@
           <type>String</type>
           <description>The mechanism used to deliver notifications.</description>
         </field>
+        <!-- TODO: Remove it after continuum alpha-3 release -->
         <field>
           <name>address</name>
           <version>4.0.0</version>
           <type>String</type>
           <description>
-            Where to send the notification to - eg email address
+            Where to send the notification to - eg email address.
           </description>
         </field>
         <field>
