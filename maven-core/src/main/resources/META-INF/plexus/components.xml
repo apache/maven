@@ -83,21 +83,23 @@
       <configuration>
         <!-- START SNIPPET: lifecyle -->
         <phases>
+          <phase implementation="java.lang.String">validate</phase>
           <phase implementation="java.lang.String">generate-sources</phase>
           <phase implementation="java.lang.String">process-sources</phase>
           <phase implementation="java.lang.String">generate-resources</phase>
           <phase implementation="java.lang.String">process-resources</phase>
           <phase implementation="java.lang.String">compile</phase>
           <phase implementation="java.lang.String">process-classes</phase>
-          <phase implementation="java.lang.String">generate-test-resources</phase>
-          <phase implementation="java.lang.String">process-test-sources</phase>
           <phase implementation="java.lang.String">generate-test-sources</phase>
+          <phase implementation="java.lang.String">process-test-sources</phase>
+          <phase implementation="java.lang.String">generate-test-resources</phase>
           <phase implementation="java.lang.String">process-test-resources</phase>
           <phase implementation="java.lang.String">test-compile</phase>
           <phase implementation="java.lang.String">test</phase>
           <phase implementation="java.lang.String">package</phase>
-          <phase implementation="java.lang.String">install</phase>
           <phase implementation="java.lang.String">integration-test</phase>
+          <phase implementation="java.lang.String">verify</phase>
+          <phase implementation="java.lang.String">install</phase>
           <phase implementation="java.lang.String">deploy</phase>
         </phases>
         <!-- END SNIPPET: lifecycle -->

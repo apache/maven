@@ -33,7 +33,7 @@ public class LifecycleExecutorTest
 
         LifecycleMapping m = (LifecycleMapping) lookup( LifecycleMapping.ROLE, "pom" );
 
-        assertEquals( 16, le.getPhases().size() );
+        assertEquals( 18, le.getPhases().size() );
 
         //le.execute( "test", createGoalExecutionContext().getSession() );
     }
