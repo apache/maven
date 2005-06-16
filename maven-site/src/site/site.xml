@@ -38,6 +38,7 @@
       <item name="Available Plugins" href="/plugins/index.html"/>
       <item name="Mojo API" href="/developers/mojo-api-specification.html" />
       <item name="Ant Tasks" href="/ant-tasks.html"/>
+      <item name="APT Reference" href="/apt-format.html"/>      
     </menu>
     <menu name="Developers">
       <item name="Documentation Needed" href="/docs-required.html"/>
