@@ -1,0 +1,208 @@
+ ------
+ Build Lifecycle
+ ------
+ Brett Porter
+ ------
+ 16 June 2005
+ ------
+
+Build Lifecycle
+
+* Build Lifecycle Basics
+
+  Maven 2.0 is based around the central concept of a build lifecycle. What this means is that the process for building
+  and distributing a particular artifact is clearly defined.
+
+  For the person building a project, this means that it is only necessary to learn a small set of commands to build any
+  Maven project, and the POM will ensure they get the results they desired.
+
+   The most common lifecycle phases that would be executed on a project are the following:
+
+    * <<<validate>>> - validate the project is correct and all necessary information is available
+
+    * <<<compile>>> - compile the source code of the project
+
+    * <<<test>>> - test the compiled source code using a suitable unit testing framework. These tests should not
+      require the code be packaged or deployed
+
+    * <<<package>>> - take the compiled code and package it in its distributable format, such as a JAR.
+
+    * <<<integration-test>>> - process and deploy the package if necessary into an environment where integration tests
+      can be run
+
+    * <<<verify>>> - run any checks to verify the package is valid and meets quality criteria
+
+    * <<<install>>> - install the package into the local repository, for use as a dependency in other projects locally
+
+    * <<<deploy>>> - done in an integration or release environment, copies the final package to the remote repository
+      for sharing with other developers and projects.
+
+  Note that for each of these steps, all previous steps are always executed, so you only need to specify the last one
+  you desire on the command line. For example:
+
+-------
+m2 install
+-------
+
+  This command will compile, test, package, verify and install the package into the local repository when run.
+
+  There are more commands that are part of the lifecycle, which will be discussed in the following sections.
+
+  It should also be noted that the same command can be used in a multi-module scenario. For example;
+
+------
+m2 clean:clean install
+------
+
+  This command will traverse into all of the subprojects and run <<<clean:clean>>>, then <<<install>>> (including all of
+  the prior steps).
+
+* Setting up your Project to Use the Build Lifecycle
+
+ The build lifecycle is simple enough to use, but when you are constructing a Maven build for a project, how do you go
+ about assigning tasks to each of those build phases?
+
+** Packaging
+
+ The first, and most common way, is to set the <<<packaging>>> for your project. This defaults to <<<jar>>>, so whether
+ you have specifically done it or not, this has already happened. Each packaging contains a list of goals to bind to
+ a particular phase. For example, a JAR will add the following bindings to the lifecycle:
+
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<process-resources>>>      | <<<resources:resources>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<compile>>>                | <<<compiler:compile>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<process-test-resources>>> | <<<resources:testResources>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<test-compile>>>           | <<<compiler:testCompile>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<test>>>                   | <<<surefire:test>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<package>>>                | <<<jar:jar>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<install>>>                | <<<install:install>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+| <<<deploy>>>                 | <<<deploy:deploy>>>
+*------------------------------+---------------------------------------------------------------------------------------+
+
+  This is an almost standard set of bindings, however, some packages handle them differently. For example, a project
+  that is purely metadata (packaging <<<pom>>>) only binds the <<<install>>> and <<<deploy>>> phases.
+
+  Note that for some packaging tpyes to be available, you may also need to include a particular plugin in your
+  <<<build>>> section, similarly to the next section. One example of a plugin that requires this is the Plexus plugin,
+  which provides a <<<plexus-application>>> and <<<plexus-service>>> packaging.
+
+** Plugins
+
+  The second way to add goals to phases is to configure plugins in your project. As you will see in the later sections,
+  plugins contain information that says where to bind particular goals to. Note that adding the plugin on its own is not
+  enough information - you must also specify the goals you want run as part of your build.
+
+  For example, the Modello plugin always binds <<<modello:java>>> to the <<<generate-sources>>> phase. So to use the
+  Modello plugin and have it generate sources from a model and incorporate that into the build, you would add the
+  following to your POM in the <<<plugins>>> section of <<<build>>>:
+
+----
+...
+ <plugin>
+   <groupId>org.codehaus.modello</groupId>
+   <artifactId>modello-maven-plugin</artifactId>
+   <executions>
+     <execution>
+       <configuration>
+         <model>maven.mdo</model>
+         <modelVersion>4.0.0</modelVersion>
+       </configuration>
+       <goals>
+         <goal>modello:java</goal>
+       </goals>
+     </execution>
+   </executions>
+ </plugin>
+...
+----
+
+  You might be wondering why that executions element is there? That is so that you can run the same goal multiple times
+  with different configuration, if needed. Separate executions can also be given an ID so that during inheritence or the
+  application of profiles you can control whether goal configuration is merged or turned into an additional execution.
+
+  When multiple executions are given that match a particular phase, they are executed in the order specified in the POM,
+  with inherited executions running first.
+
+  Now, in the case of <<<modello:java>>>, it only makes sense in the <<<generate-sources>>> phase. But some goals can be
+  used in more than one phase, and there may not be a sensible default. For those, you can specify the phase yourself.
+  For example, let's say you have a goal <<<touch:timestamp>>> that echos the current time to file, and you want it to
+  run in the <<<process-test-resources>>> phase to indicate when the tests were started. This would be configured like
+  so:
+
+----
+...
+ <plugin>
+   <groupId>com.mycompany.example</groupId>
+   <artifactId>touch-maven-plugin</artifactId>
+   <executions>
+     <execution>
+       <phase>process-test-resources</phase>
+       <configuration>
+         <file>${project.output.directory}/timestamp.txt</file>
+       </configuration>
+       <goals>
+         <goal>touch:timestamp</goal>
+       </goals>
+     </execution>
+   </executions>
+ </plugin>
+...
+----
+
+   TODO
+
+* Build Lifecycle Phase Reference
+
+  The following phases are all the ones available as of the Maven 2.0 alpha-3 release. They are executed in the order
+  given, up to the point of the one specified.
+
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<validate>>>                | validate the project is correct and all necessary information is available.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-sources>>>        | generate any source code for inclusion in compilation.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-sources>>>         | process the source code, for example to filter any values.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-resources>>>      | generate resources for inclusion in the package.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-resources>>>       | copy and process the resources into the destination directory, ready for packaging.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<compile>>>                 | compile the source code of the project.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-classes>>>         | post-process the generated files from compilation, for example to do bytecode enhancement on Java classes.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-test-sources>>>   | generate any test source code for inclusion in compilation.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-test-sources>>>    | process the test source code, for example to filter any values.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-test-resources>>> | create resources for testing.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-test-resources>>>  | copy and process the resources into the test destination directory.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<test-compile>>>            | compile the test source code into the test destination directory
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<test>>>                    | run tests using a suitable unit testing framework. These tests should not require the code be packaged or deployed.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<package>>>                 | take the compiled code and package it in its distributable format, such as a JAR.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<integration-test>>>        | process and deploy the package if necessary into an environment where integration tests can be run.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<verify>>>                  | run any checks to verify the package is valid and meets quality criteria.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<install>>>                 | install the package into the local repository, for use as a dependency in other projects locally.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<deploy>>>                  | done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.
+*-------------------------------+--------------------------------------------------------------------------------------+
+
+* How the Build Lifecycle Affects Plugin Developers
+
+ TODO
+
+
