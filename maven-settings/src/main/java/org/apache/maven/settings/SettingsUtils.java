@@ -51,7 +51,7 @@ public final class SettingsUtils
             {
                 dominantActiveProfiles.add( profileId );
 
-                dominant.setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
+                dominant.getRuntimeInfo().setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
             }
         }
 
@@ -59,7 +59,7 @@ public final class SettingsUtils
         {
             dominant.setLocalRepository( recessive.getLocalRepository() );
 
-            dominant.setLocalRepositorySourceLevel( recessiveSourceLevel );
+            dominant.getRuntimeInfo().setLocalRepositorySourceLevel( recessiveSourceLevel );
         }
 
         shallowMergeById( dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel );

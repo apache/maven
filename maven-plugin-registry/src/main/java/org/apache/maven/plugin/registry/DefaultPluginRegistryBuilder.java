@@ -102,7 +102,11 @@ public class DefaultPluginRegistryBuilder
 
                 registry = modelReader.read( reader );
                 
-                registry.setFile( registryFile );
+                RuntimeInfo rtInfo = new RuntimeInfo( registry );
+                
+                registry.setRuntimeInfo( rtInfo );
+                
+                rtInfo.setFile( registryFile );
             }
             finally
             {
@@ -155,7 +159,11 @@ public class DefaultPluginRegistryBuilder
     {
         PluginRegistry registry = new PluginRegistry();
         
-        registry.setFile( userRegistryFile );
+        RuntimeInfo rtInfo = new RuntimeInfo( registry );
+        
+        registry.setRuntimeInfo( rtInfo );
+        
+        rtInfo.setFile( userRegistryFile );
         
         return registry;
     }

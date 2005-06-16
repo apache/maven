@@ -86,7 +86,11 @@ public class DefaultMavenSettingsBuilder
 
                 settings = modelReader.read( reader );
 
-                settings.setFile( settingsFile );
+                RuntimeInfo rtInfo = new RuntimeInfo( settings );
+                
+                rtInfo.setFile( settingsFile );
+                
+                settings.setRuntimeInfo( rtInfo );
             }
             finally
             {

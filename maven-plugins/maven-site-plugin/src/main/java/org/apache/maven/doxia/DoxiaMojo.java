@@ -27,6 +27,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportConfiguration;
 import org.apache.maven.reporting.MavenReportException;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.siterenderer.Renderer;
 import org.codehaus.plexus.siterenderer.RendererException;
@@ -80,10 +81,11 @@ public class DoxiaMojo
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
     
     /**
-     * @parameter expression="${settings.interactiveMode}"
+     * @parameter expression="${settings}"
+     * @required
      * @readonly
      */
-    private boolean interactive = true;
+    private Settings settings;
 
     /**
      * @parameter expression="${basedir}/src/site"
@@ -724,7 +726,7 @@ public class DoxiaMojo
                 try
                 {
                     pluginManager.verifyPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
-                                                project, localRepository, interactive );
+                                                project, settings, localRepository );
                 }
                 catch ( ArtifactResolutionException e )
                 {

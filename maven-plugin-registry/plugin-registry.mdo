@@ -59,6 +59,25 @@
       <description>Root element of the plugin registry file.</description>
       <fields>
         <field>
+          <name>updateInterval</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <defaultValue>never</defaultValue>
+          <description><![CDATA[
+            Specifies how often to check for plugin updates. Valid values are: never, always, interval:XXX.
+            For the interval specification, XXX denotes a terse interval specification, such as 4h.
+            Where h=hours, m=minutes, d=days, w=weeks. The interval period should be specified in descending
+            order of granularity, like this: '[n]w [n]d [n]h [n]m'. Any omitted level of granularity will be
+            assumed to be a zero value.
+          ]]></description>
+        </field>
+        <field>
+          <name>autoUpdate</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>Specifies whether the user should be prompted to update plugins.</description>
+        </field>
+        <field>
           <name>plugins</name>
           <version>1.0.0</version>
           <description>Specified plugin update policy information.</description>
@@ -96,16 +115,16 @@
         this.pluginsByKey = null;
     }
     
-    private java.io.File file;
+    private RuntimeInfo runtimeInfo;
     
-    public void setFile( java.io.File file )
+    public void setRuntimeInfo( RuntimeInfo runtimeInfo )
     {
-        this.file = file;
+        this.runtimeInfo = runtimeInfo;
     }
     
-    public java.io.File getFile()
+    public RuntimeInfo getRuntimeInfo()
     {
-        return file;
+        return runtimeInfo;
     }
         ]]></code>
         </codeSegment>
@@ -130,11 +149,10 @@
           <type>String</type>
         </field>
         <field>
-          <name>autoUpdate</name>
+          <name>lastChecked</name>
           <version>1.0.0</version>
-          <type>boolean</type>
-          <default>false</default>
-          <description>Whether to automatically update this plugin - false means prompt the user.</description>
+          <type>String</type>
+          <description>[format: yyyy-MM-dd.HH:mm:ss Z] Specifies the date/time at which this plugin was last checked.</description>
         </field>
         <field>
           <name>useVersion</name>
@@ -156,6 +174,8 @@
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[
+    public static final String LAST_CHECKED_DATE_FORMAT = "yyyy-MM-dd.HH:mm:ss Z";
+    
     public String getKey()
     {
         return getGroupId() + ":" + getArtifactId();

@@ -193,6 +193,11 @@ public class MavenCli
         {
             settings.setInteractiveMode( false );
         }
+        
+        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) )
+        {
+            settings.getRuntimeInfo().setPluginUpdateForced( true );
+        }
 
         List projectFiles = null;
         try
@@ -494,6 +499,8 @@ public class MavenCli
         public static final char UPDATE_SNAPSHOTS = 'U';
         
         public static final char ACTIVATE_PROFILES = 'P';
+        
+        public static final char FORCE_PLUGIN_UPDATES = 'F';
 
         public CLIManager()
         {
@@ -521,6 +528,7 @@ public class MavenCli
             options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription(
                 "Comma-delimited list of profiles to activate").hasArg().create( ACTIVATE_PROFILES ) );
             options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription( "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
+            options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Force upToDate check for any relevant registered plugins" ).create( FORCE_PLUGIN_UPDATES ) );
         }
 
         public CommandLine parse( String[] args )

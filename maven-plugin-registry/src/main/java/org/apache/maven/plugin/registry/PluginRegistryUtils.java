@@ -32,15 +32,43 @@ public final class PluginRegistryUtils
 
     public static void merge( PluginRegistry dominant, PluginRegistry recessive, String recessiveSourceLevel )
     {
-        // can't merge into something that doesn't exist...
-        if ( dominant == null )
+        // nothing to merge...
+        if ( dominant == null || recessive == null )
         {
             return;
         }
 
+        RuntimeInfo dominantRtInfo = dominant.getRuntimeInfo();
+
+        String dominantUpdateInterval = dominant.getUpdateInterval();
+
+        if ( dominantUpdateInterval == null )
+        {
+            String recessiveUpdateInterval = recessive.getUpdateInterval();
+
+            if ( recessiveUpdateInterval != null )
+            {
+                dominant.setUpdateInterval( recessiveUpdateInterval );
+                dominantRtInfo.setUpdateIntervalSourceLevel( recessiveSourceLevel );
+            }
+        }
+
+        String dominantAutoUpdate = dominant.getAutoUpdate();
+
+        if ( dominantAutoUpdate == null )
+        {
+            String recessiveAutoUpdate = recessive.getAutoUpdate();
+
+            if ( recessiveAutoUpdate != null )
+            {
+                dominant.setAutoUpdate( recessiveAutoUpdate );
+                dominantRtInfo.setAutoUpdateSourceLevel( recessiveSourceLevel );
+            }
+        }
+
         List recessivePlugins = null;
-        
-        if(recessive != null)
+
+        if ( recessive != null )
         {
             recessivePlugins = recessive.getPlugins();
         }
@@ -48,7 +76,7 @@ public final class PluginRegistryUtils
         {
             recessivePlugins = Collections.EMPTY_LIST;
         }
-        
+
         shallowMergePlugins( dominant, recessivePlugins, recessiveSourceLevel );
     }
 
@@ -99,6 +127,22 @@ public final class PluginRegistryUtils
         {
             userRegistry = new PluginRegistry();
 
+            RuntimeInfo rtInfo = new RuntimeInfo( userRegistry );
+
+            userRegistry.setRuntimeInfo( rtInfo );
+
+            RuntimeInfo oldRtInfo = pluginRegistry.getRuntimeInfo();
+
+            if ( TrackableBase.USER_LEVEL.equals( oldRtInfo.getAutoUpdateSourceLevel() ) )
+            {
+                userRegistry.setAutoUpdate( pluginRegistry.getAutoUpdate() );
+            }
+
+            if ( TrackableBase.USER_LEVEL.equals( oldRtInfo.getUpdateIntervalSourceLevel() ) )
+            {
+                userRegistry.setUpdateInterval( pluginRegistry.getUpdateInterval() );
+            }
+
             List plugins = new ArrayList();
 
             for ( Iterator it = pluginRegistry.getPlugins().iterator(); it.hasNext(); )
@@ -113,7 +157,7 @@ public final class PluginRegistryUtils
 
             userRegistry.setPlugins( plugins );
 
-            userRegistry.setFile( pluginRegistry.getFile() );
+            rtInfo.setFile( pluginRegistry.getRuntimeInfo().getFile() );
         }
 
         return userRegistry;

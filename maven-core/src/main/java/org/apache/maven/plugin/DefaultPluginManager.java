@@ -41,6 +41,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -177,7 +178,7 @@ public class DefaultPluginManager
     }
 
     public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
-                                         ArtifactRepository localRepository, boolean interactiveMode )
+                                         Settings settings, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
         String pluginKey = groupId + ":" + artifactId;
@@ -192,8 +193,7 @@ public class DefaultPluginManager
             {
                 pluginVersionManager = (PluginVersionManager) container.lookup( PluginVersionManager.ROLE );
 
-                version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, localRepository,
-                                                                     interactiveMode );
+                version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings, localRepository );
             }
             catch ( ComponentLookupException e )
             {

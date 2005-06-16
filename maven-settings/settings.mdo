@@ -264,49 +264,16 @@
         return match;
     }
     
-    private Map activeProfileToSourceLevel = new HashMap();
+    private RuntimeInfo runtimeInfo;
     
-    public void setActiveProfileSourceLevel( String activeProfile, String sourceLevel )
+    public void setRuntimeInfo( RuntimeInfo runtimeInfo )
     {
-        activeProfileToSourceLevel.put( activeProfile, sourceLevel );
+        this.runtimeInfo = runtimeInfo;
     }
     
-    public String getSourceLevelForActiveProfile( String activeProfile )
+    public RuntimeInfo getRuntimeInfo()
     {
-        String sourceLevel = (String) activeProfileToSourceLevel.get( activeProfile );
-        
-        if ( sourceLevel != null )
-        {
-            return sourceLevel;
-        }
-        else
-        {
-            return getSourceLevel();
-        }
-    }
-    
-    private String localRepositorySourceLevel = TrackableBase.USER_LEVEL;
-    
-    public void setLocalRepositorySourceLevel( String localRepoSourceLevel )
-    {
-        this.localRepositorySourceLevel = localRepoSourceLevel;
-    }
-    
-    public String getLocalRepositorySourceLevel()
-    {
-        return localRepositorySourceLevel;
-    }
-    
-    private java.io.File file;
-    
-    public void setFile( java.io.File file )
-    {
-        this.file = file;
-    }
-    
-    public java.io.File getFile()
-    {
-        return file;
+        return runtimeInfo;
     }
         ]]></code>
         </codeSegment>

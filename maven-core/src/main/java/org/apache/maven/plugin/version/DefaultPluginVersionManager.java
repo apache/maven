@@ -13,6 +13,7 @@ import org.apache.maven.plugin.registry.PluginRegistryUtils;
 import org.apache.maven.plugin.registry.TrackableBase;
 import org.apache.maven.plugin.registry.io.xpp3.PluginRegistryXpp3Writer;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.inputhandler.InputHandler;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
@@ -22,6 +23,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -56,17 +60,21 @@ public class DefaultPluginVersionManager
 
     private InputHandler inputHandler;
 
-    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project,
-                                       ArtifactRepository localRepository, boolean interactiveMode )
+    // calculated.
+    private PluginRegistry pluginRegistry;
+
+    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                       ArtifactRepository localRepository )
         throws PluginVersionResolutionException
     {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project );
 
-        // TODO: we're NEVER going to persist POM-derived plugin versions...dunno if this is 'right' or not.
+        // we're NEVER going to persist POM-derived plugin versions.
         String updatedVersion = null;
 
-        boolean promptToPersistUpdatedVersion = false;
+        // we're not going to prompt the user to accept a plugin update until we find one.
+        boolean promptToPersist = false;
 
         // second pass...if the plugin is listed in the settings.xml, use the version from <useVersion/>.
         if ( StringUtils.isEmpty( version ) )
@@ -76,21 +84,23 @@ public class DefaultPluginVersionManager
 
             if ( StringUtils.isNotEmpty( version ) )
             {
-                // TODO: 2. check for updates. Determine whether this is the right time to attempt to update the version.
-                boolean checkForUpdates = true;
+                boolean forceUpdate = settings.getRuntimeInfo().isPluginUpdateForced();
 
-                if ( checkForUpdates )
+                // 2. check for updates. Determine whether this is the right time to attempt to update the version.
+                if ( forceUpdate || shouldCheckForUpdates( groupId, artifactId ) )
                 {
                     updatedVersion = resolveReleaseVersion( groupId, artifactId, project
                         .getRemoteArtifactRepositories(), localRepository );
 
                     if ( StringUtils.isNotEmpty( updatedVersion ) && !updatedVersion.equals( version ) )
                     {
+                        // see if this version we've resolved is on our previously rejected list.
                         boolean isRejected = checkForRejectedStatus( groupId, artifactId, updatedVersion );
 
                         // we should only prompt to use this version if the user has not previously rejected it.
-                        promptToPersistUpdatedVersion = !isRejected;
+                        promptToPersist = !isRejected;
 
+                        // if we've rejected this version previously, forget about updating.
                         if ( isRejected )
                         {
                             updatedVersion = null;
@@ -101,22 +111,7 @@ public class DefaultPluginVersionManager
                                 .info( "Plugin {" + constructPluginKey( groupId, artifactId ) + "} has updates." );
                         }
                     }
-                    else
-                    {
-                        // let's be very careful about making this code resistant to change...
-                        promptToPersistUpdatedVersion = false;
-                    }
                 }
-                else
-                {
-                    // let's be very careful about making this code resistant to change...
-                    promptToPersistUpdatedVersion = false;
-                }
-            }
-            else
-            {
-                // let's be very careful about making this code resistant to change...
-                promptToPersistUpdatedVersion = false;
             }
         }
 
@@ -131,7 +126,8 @@ public class DefaultPluginVersionManager
             // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
             updatedVersion = version;
 
-            promptToPersistUpdatedVersion = true;
+            // 3. Tell the system to determine whether this update can/should be persisted.
+            promptToPersist = true;
         }
 
         // if we still haven't found a version, then fail early before we get into the update goop.
@@ -141,29 +137,102 @@ public class DefaultPluginVersionManager
                                                         "Failed to resolve a valid version for this plugin" );
         }
 
-        // if we're not in interactive mode, then the default is to update and NOT prompt.
-        // TODO: replace this with proper update policy-based determination related to batch mode.
-        boolean persistUpdatedVersion = promptToPersistUpdatedVersion && !interactiveMode;
+        // determine whether this build is running in interactive mode
+        // If it's not, then we'll defer to the autoUpdate setting from the registry 
+        // for a decision on updating the plugin in the registry...rather than prompting
+        // the user.
+        boolean inInteractiveMode = settings.isInteractiveMode();
+        
+        // determines what should be done if we're in non-interactive mode.
+        // if true, then just update the registry with the new versions.
+        boolean autoUpdate = Boolean.valueOf( pluginRegistry.getAutoUpdate() ).booleanValue();
 
+        // We should persist by default if:
+        // 1. we detected a change in the plugin version from what was in the registry, or
+        //      a. the plugin is not registered
+        // 2. we're in interactive mode, or
+        //      a. the registry is declared to be in autoUpdate mode
+        //
+        // NOTE: This is only the default value; it may be changed as the result of prompting the user.
+        boolean persistUpdate = promptToPersist && ( inInteractiveMode || autoUpdate );
+
+        Boolean applyToAll = settings.getRuntimeInfo().getApplyToAllPluginUpdates();
+        
+        // Incorporate interactive-mode and previous decisions on apply-to-all, if appropriate.
         // don't prompt if not in interactive mode.
-        if ( promptToPersistUpdatedVersion && interactiveMode )
-        {
-            persistUpdatedVersion = promptToPersistPluginUpdate( version, updatedVersion, groupId, artifactId );
-        }
+        // don't prompt if the user has selected ALL/NONE previously in this session
+        //
+        // NOTE: We're incorporating here, to make the usages of this check more consistent and 
+        // resistant to change.
+        promptToPersist = promptToPersist && applyToAll == null && inInteractiveMode;
 
+        if ( promptToPersist )
+        {
+            persistUpdate = promptToPersistPluginUpdate( version, updatedVersion, groupId, artifactId, settings );
+        }
+        
         // if it is determined that we should use this version, persist it as useVersion.
-        if ( persistUpdatedVersion )
+        // cases where this version will be persisted:
+        // 1. the user is prompted and answers yes or all
+        // 2. the user has previously answeres all in this session
+        // 3. the build is running in non-interactive mode, and the registry setting is for auto-update
+        if ( ( applyToAll == null || applyToAll.booleanValue() ) && persistUpdate )
         {
             updatePluginVersionInRegistry( groupId, artifactId, updatedVersion );
+            
+            // we're using the updated version of the plugin in this session as well.
+            version = updatedVersion;
         }
         // otherwise, if we prompted the user to update, we should treat this as a rejectedVersion, and
         // persist it iff the plugin pre-exists and is in the user-level registry.
-        else if ( promptToPersistUpdatedVersion && interactiveMode )
+        else if ( promptToPersist )
         {
             addNewVersionToRejectedListInExisting( groupId, artifactId, updatedVersion );
         }
 
         return version;
+    }
+
+    private boolean shouldCheckForUpdates( String groupId, String artifactId )
+        throws PluginVersionResolutionException
+    {
+        PluginRegistry pluginRegistry = getPluginRegistry( groupId, artifactId );
+
+        org.apache.maven.plugin.registry.Plugin plugin = getPlugin( groupId, artifactId, pluginRegistry );
+
+        if ( plugin == null )
+        {
+            return true;
+        }
+        else
+        {
+            String lastChecked = plugin.getLastChecked();
+
+            if ( StringUtils.isEmpty( lastChecked ) )
+            {
+                return true;
+            }
+            else
+            {
+                SimpleDateFormat format = new SimpleDateFormat(
+                                                                org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
+
+                try
+                {
+                    Date lastCheckedDate = format.parse( lastChecked );
+
+                    return IntervalUtils.isExpired( pluginRegistry.getUpdateInterval(), lastCheckedDate );
+                }
+                catch ( ParseException e )
+                {
+                    getLogger().warn(
+                                      "Last-checked date for plugin {" + constructPluginKey( groupId, artifactId )
+                                          + "} is invalid. Checking for updates." );
+
+                    return true;
+                }
+            }
+        }
     }
 
     private boolean checkForRejectedStatus( String groupId, String artifactId, String version )
@@ -177,7 +246,7 @@ public class DefaultPluginVersionManager
     }
 
     private boolean promptToPersistPluginUpdate( String version, String updatedVersion, String groupId,
-                                                String artifactId )
+                                                String artifactId, Settings settings )
         throws PluginVersionResolutionException
     {
         try
@@ -206,13 +275,35 @@ public class DefaultPluginVersionManager
 
             message.append( "Detected (NEW) Version: " ).append( updatedVersion ).append( "\n" );
             message.append( "\n" );
-            message.append( "Would you like to use this new version from now on? [Y/n] " );
+            message.append( "Would you like to use this new version from now on? ( [Y]es, [n]o, [a]ll, n[o]ne ) " );
 
             // TODO: check the GUI-friendliness of this approach to collecting input.
             // If we can't port this prompt into a GUI, IDE-integration will not work well.
             getLogger().info( message.toString() );
 
             String persistAnswer = inputHandler.readLine();
+
+            boolean shouldPersist = false;
+
+            if ( !StringUtils.isEmpty( persistAnswer ) )
+            {
+                persistAnswer = persistAnswer.toLowerCase();
+                
+                if ( persistAnswer.startsWith( "y" ) )
+                {
+                    shouldPersist = true;
+                }
+                else if ( persistAnswer.startsWith( "a" ) )
+                {
+                    shouldPersist = true;
+
+                    settings.getRuntimeInfo().setApplyToAllPluginUpdates( Boolean.TRUE );
+                }
+                else if ( persistAnswer.indexOf( "o" ) > -1 )
+                {
+                    settings.getRuntimeInfo().setApplyToAllPluginUpdates( Boolean.FALSE );
+                }
+            }
 
             return StringUtils.isEmpty( persistAnswer ) || "y".equalsIgnoreCase( persistAnswer );
 
@@ -352,6 +443,10 @@ public class DefaultPluginVersionManager
             else
             {
                 plugin.setUseVersion( version );
+                
+                SimpleDateFormat format = new SimpleDateFormat( org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
+                
+                plugin.setLastChecked(format.format( new Date() ) );
             }
         }
         else
@@ -361,7 +456,6 @@ public class DefaultPluginVersionManager
             plugin.setGroupId( groupId );
             plugin.setArtifactId( artifactId );
             plugin.setUseVersion( version );
-            plugin.setAutoUpdate( false );
 
             pluginRegistry.addPlugin( plugin );
         }
@@ -372,7 +466,7 @@ public class DefaultPluginVersionManager
     private void writeUserRegistry( String groupId, String artifactId, PluginRegistry pluginRegistry )
         throws PluginVersionResolutionException
     {
-        File pluginRegistryFile = pluginRegistry.getFile();
+        File pluginRegistryFile = pluginRegistry.getRuntimeInfo().getFile();
 
         PluginRegistry extractedUserRegistry = PluginRegistryUtils.extractUserPluginRegistry( pluginRegistry );
 
@@ -408,24 +502,25 @@ public class DefaultPluginVersionManager
     private PluginRegistry getPluginRegistry( String groupId, String artifactId )
         throws PluginVersionResolutionException
     {
-        PluginRegistry pluginRegistry = null;
-
-        try
-        {
-            pluginRegistry = mavenPluginRegistryBuilder.buildPluginRegistry();
-        }
-        catch ( IOException e )
-        {
-            throw new PluginVersionResolutionException( groupId, artifactId, "Cannot read plugin registry", e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new PluginVersionResolutionException( groupId, artifactId, "Cannot parse plugin registry", e );
-        }
-
         if ( pluginRegistry == null )
         {
-            pluginRegistry = mavenPluginRegistryBuilder.createUserPluginRegistry();
+            try
+            {
+                pluginRegistry = mavenPluginRegistryBuilder.buildPluginRegistry();
+            }
+            catch ( IOException e )
+            {
+                throw new PluginVersionResolutionException( groupId, artifactId, "Cannot read plugin registry", e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new PluginVersionResolutionException( groupId, artifactId, "Cannot parse plugin registry", e );
+            }
+
+            if ( pluginRegistry == null )
+            {
+                pluginRegistry = mavenPluginRegistryBuilder.createUserPluginRegistry();
+            }
         }
 
         return pluginRegistry;

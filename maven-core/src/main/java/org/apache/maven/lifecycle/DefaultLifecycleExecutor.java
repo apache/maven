@@ -311,7 +311,7 @@ public class DefaultLifecycleExecutor
         try
         {
             pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(), session
-                .getLocalRepository(), session.getSettings().isInteractiveMode() );
+                .getSettings(), session.getLocalRepository() );
         }
         catch ( PluginManagerException e )
         {
@@ -579,8 +579,7 @@ public class DefaultLifecycleExecutor
                 injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
 
                 pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(),
-                                                               session.getLocalRepository(), session.getSettings()
-                                                                   .isInteractiveMode() );
+                                                               session.getSettings(), session.getLocalRepository() );
             }
             catch ( PluginManagerException e )
             {
