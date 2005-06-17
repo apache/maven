@@ -102,6 +102,7 @@ public class JarSourceMojo
                                                                               project.getArtifactId(),
                                                                               project.getVersion(), null, "java-source",
                                                                               "sources" );
+            artifact.setFile( outputFile );
             project.addAttachedArtifact( artifact );
         }
         else
