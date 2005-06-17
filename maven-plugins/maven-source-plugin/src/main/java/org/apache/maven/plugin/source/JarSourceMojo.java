@@ -16,8 +16,11 @@ package org.apache.maven.plugin.source;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
@@ -35,11 +38,16 @@ public class JarSourceMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${project.version}"
+     * @parameter expression="${project}"
      * @readonly
      * @required
      */
-    private String version;
+    private MavenProject project;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}
+     */
+    private ArtifactFactory artifactFactory;
 
     /**
      * @parameter expression="${project.build.finalName}"
@@ -54,7 +62,7 @@ public class JarSourceMojo
     private List compileSourceRoots;
 
     /**
-     * @parameter expression="${project.build.outputDirectory}"
+     * @parameter expression="${project.build.directory}"
      * @required
      */
     private File outputDirectory;
@@ -63,7 +71,7 @@ public class JarSourceMojo
         throws MojoExecutionException
     {
         // TODO: this should be via a release profile instead
-        if ( version.indexOf( "SNAPSHOT" ) < 0 )
+        if ( project.getVersion().indexOf( "SNAPSHOT" ) < 0 )
         {
             // TODO: use a component lookup?
             JarArchiver archiver = new JarArchiver();
@@ -87,6 +95,14 @@ public class JarSourceMojo
             {
                 throw new MojoExecutionException( "Error building source JAR", e );
             }
+
+            // TODO: these introduced dependencies on the project are going to become problematic - can we export it
+            //  through metadata instead?
+            Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(),
+                                                                              project.getArtifactId(),
+                                                                              project.getVersion(), null, "java-source",
+                                                                              "sources" );
+            project.addAttachedArtifact( artifact );
         }
         else
         {

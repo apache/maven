@@ -1,8 +1,8 @@
 package org.apache.maven.plugin.source;
 
-import java.io.File;
-
 import org.codehaus.plexus.archiver.Archiver;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -10,14 +10,9 @@ import org.codehaus.plexus.archiver.Archiver;
  */
 public class SourceBundler
 {
-    private final static String[] DEFAULT_INCLUDES = new String[]{
-        "**/*",
-    };
+    private final static String[] DEFAULT_INCLUDES = new String[]{"**/*",};
 
-    private final static String[] DEFAULT_EXCLUDES = new String[]{
-        "**/CVS/**",
-        "**/.svn/**",
-    };
+    private final static String[] DEFAULT_EXCLUDES = new String[]{"**/CVS/**", "**/.svn/**",};
 
     public void makeSourceBundle( File outputFile, File[] sourceDirectories, Archiver archiver )
         throws Exception
@@ -28,7 +23,10 @@ public class SourceBundler
 
         for ( int i = 0; i < sourceDirectories.length; i++ )
         {
-            archiver.addDirectory( sourceDirectories[ i ], includes, excludes );
+            if ( sourceDirectories[i].exists() )
+            {
+                archiver.addDirectory( sourceDirectories[i], includes, excludes );
+            }
         }
 
         archiver.setDestFile( outputFile );
