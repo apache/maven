@@ -110,7 +110,7 @@
           <process-test-resources>resources:testResources</process-test-resources>
           <test-compile>compiler:testCompile</test-compile>
           <test>surefire:test</test>
-          <package>jar:jar</package>
+          <package>jar:jar,source:jar</package>
           <install>install:install</install>
           <deploy>deploy:deploy</deploy>
         </defaultPhases>
@@ -119,9 +119,7 @@
     </component>
 
     <!-- TODO: issues with the lifecycle:
-     - must manually configure plugins that are not in here for a given packaging, unless that packaging could be mapped to a plugin from the repo
      - manually configured lifecycles will not pick up any later additions to the defaults where they are intended to extend defaults (have configuration <includeDefaults/> ?)
-     - should we be registering goals, or just plugins and letting them bind phases? Is it better to remove the plugin phase binding perhaps?
      -->
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
@@ -149,7 +147,7 @@
           <process-test-resources>resources:testResources</process-test-resources>
           <test-compile>compiler:testCompile</test-compile>
           <test>surefire:test</test>
-          <package>jar:jar</package>
+          <package>jar:jar,source:jar</package>
           <install>install:install</install>
           <deploy>deploy:deploy</deploy>
         </phases>
@@ -178,7 +176,6 @@
       </configuration>
     </component>
 
-    <!-- TODO: move to the ejb plugin? -->
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>ejb</role-hint>
@@ -191,7 +188,7 @@
           <process-test-resources>resources:testResources</process-test-resources>
           <test-compile>compiler:testCompile</test-compile>
           <test>surefire:test</test>
-          <package>ejb:ejb</package>
+          <package>ejb:ejb,source:jar</package>
           <install>install:install</install>
           <deploy>deploy:deploy</deploy>
         </phases>
@@ -199,7 +196,6 @@
       </configuration>
     </component>
 
-    <!-- TODO: move to the war plugin? -->
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>war</role-hint>
@@ -220,7 +216,7 @@
       </configuration>
     </component>
 
-    <!-- TODO: move to the plexus plugin? -->
+    <!-- TODO: move to the plexus plugin -->
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>plexus-application</role-hint>
@@ -241,7 +237,7 @@
       </configuration>
     </component>
 
-    <!-- TODO: move to the plexus plugin? -->
+    <!-- TODO: move to the plexus plugin -->
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>plexus-service</role-hint>

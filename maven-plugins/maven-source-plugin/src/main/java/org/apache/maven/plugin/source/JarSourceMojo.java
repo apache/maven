@@ -35,6 +35,13 @@ public class JarSourceMojo
     extends AbstractMojo
 {
     /**
+     * @parameter expression="${project.version}"
+     * @readonly
+     * @required
+     */
+    private String version;
+
+    /**
      * @parameter expression="${project.build.finalName}"
      * @required
      */
@@ -47,7 +54,7 @@ public class JarSourceMojo
     private List compileSourceRoots;
 
     /**
-     * @parameter expression="${project.build.output}"
+     * @parameter expression="${project.build.outputDirectory}"
      * @required
      */
     private File outputDirectory;
@@ -55,27 +62,35 @@ public class JarSourceMojo
     public void execute()
         throws MojoExecutionException
     {
-        // TODO: use a component lookup?
-        JarArchiver archiver = new JarArchiver();
-
-        SourceBundler sourceBundler = new SourceBundler();
-
-        File outputFile = new File( outputDirectory, finalName + "-sources.jar" );
-
-        File[] sourceDirectories = new File[compileSourceRoots.size()];
-        int count = 0;
-        for ( Iterator i = compileSourceRoots.iterator(); i.hasNext(); count++ )
+        // TODO: this should be via a release profile instead
+        if ( version.indexOf( "SNAPSHOT" ) < 0 )
         {
-            sourceDirectories[count] = new File( (String) i.next() );
+            // TODO: use a component lookup?
+            JarArchiver archiver = new JarArchiver();
+
+            SourceBundler sourceBundler = new SourceBundler();
+
+            File outputFile = new File( outputDirectory, finalName + "-sources.jar" );
+
+            File[] sourceDirectories = new File[compileSourceRoots.size()];
+            int count = 0;
+            for ( Iterator i = compileSourceRoots.iterator(); i.hasNext(); count++ )
+            {
+                sourceDirectories[count] = new File( (String) i.next() );
+            }
+
+            try
+            {
+                sourceBundler.makeSourceBundle( outputFile, sourceDirectories, archiver );
+            }
+            catch ( Exception e )
+            {
+                throw new MojoExecutionException( "Error building source JAR", e );
+            }
         }
-
-        try
+        else
         {
-            sourceBundler.makeSourceBundle( outputFile, sourceDirectories, archiver );
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Error building source JAR", e );
+            getLog().info( "Not producing source bundle for a SNAPSHOT build" );
         }
     }
 }

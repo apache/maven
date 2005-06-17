@@ -115,45 +115,68 @@ public class DefaultLifecycleExecutor
         Map phaseMap = new HashMap();
         Map goalInstanceMap = new HashMap();
 
+        String maxPhase = null;
+
         for ( Iterator i = phases.iterator(); i.hasNext(); )
         {
             String p = (String) i.next();
 
             // Make a copy of the phase as we will modify it
             phaseMap.put( p, new ArrayList() );
+
+            if ( tasks.contains( p ) )
+            {
+                maxPhase = p;
+            }
         }
 
         MavenProject project = session.getProject();
 
-        Map mappings;
-        try
+        if ( maxPhase != null )
         {
-            LifecycleMapping m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, project.getPackaging() );
-            mappings = m.getPhases();
-        }
-        catch ( ComponentLookupException e )
-        {
-            getLogger().error( "No lifecycle mapping for type '" + project.getPackaging() + "': using defaults" );
-            mappings = defaultPhases;
-        }
-
-        for ( Iterator i = mappings.keySet().iterator(); i.hasNext(); )
-        {
-            String phase = (String) i.next();
-
-            String task = (String) mappings.get( phase );
-
-            MojoDescriptor mojoDescriptor = configureMojo( task, session, phaseMap );
-
-            addToPhaseMap( phaseMap, phase, mojoDescriptor );
-
-            List matchingGoalInstances = findMatchingGoalInstances( mojoDescriptor, project );
-
-            for ( Iterator instanceIterator = matchingGoalInstances.iterator(); instanceIterator.hasNext(); )
+            Map mappings;
+            try
             {
-                GoalInstance goalInstance = (GoalInstance) instanceIterator.next();
+                LifecycleMapping m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, project.getPackaging() );
+                mappings = m.getPhases();
+            }
+            catch ( ComponentLookupException e )
+            {
+                getLogger().error( "No lifecycle mapping for type '" + project.getPackaging() + "': using defaults" );
+                mappings = defaultPhases;
+            }
 
-                addToGoalInstanceMap( goalInstanceMap, goalInstance );
+            for ( Iterator i = phases.iterator(); i.hasNext(); )
+            {
+                String phase = (String) i.next();
+
+                String phaseTasks = (String) mappings.get( phase );
+
+                if ( phaseTasks != null )
+                {
+                    for ( StringTokenizer tok = new StringTokenizer( phaseTasks, "," ); tok.hasMoreTokens(); )
+                    {
+                        String task = tok.nextToken().trim();
+
+                        MojoDescriptor mojoDescriptor = configureMojo( task, session, phaseMap );
+
+                        addToPhaseMap( phaseMap, phase, mojoDescriptor );
+
+                        List matchingGoalInstances = findMatchingGoalInstances( mojoDescriptor, project );
+
+                        for ( Iterator instanceIterator = matchingGoalInstances.iterator(); instanceIterator.hasNext(); )
+                        {
+                            GoalInstance goalInstance = (GoalInstance) instanceIterator.next();
+
+                            addToGoalInstanceMap( goalInstanceMap, goalInstance );
+                        }
+                    }
+                }
+
+                if ( phase.equals( maxPhase ) )
+                {
+                    break;
+                }
             }
         }
 
