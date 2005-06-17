@@ -31,6 +31,7 @@ public interface MavenSettingsBuilder
     
     String ALT_USER_SETTINGS_XML_LOCATION = "org.apache.maven.user-settings";
     String ALT_GLOBAL_SETTINGS_XML_LOCATION = "org.apache.maven.global-settings";
+    String ALT_LOCAL_REPOSITORY_LOCATION = "maven.repo.local";
 
     Settings buildSettings()
         throws IOException, XmlPullParserException;

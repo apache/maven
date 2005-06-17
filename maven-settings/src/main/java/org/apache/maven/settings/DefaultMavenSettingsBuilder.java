@@ -115,7 +115,17 @@ public class DefaultMavenSettingsBuilder
 
         SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
-        if ( userSettings.getLocalRepository() == null || userSettings.getLocalRepository().length() < 1 )
+        // try using the local repository specified on the command line...
+        String localRepository = System.getProperty( MavenSettingsBuilder.ALT_LOCAL_REPOSITORY_LOCATION );
+        
+        // otherwise, use the one in settings.xml
+        if ( localRepository == null || localRepository.length() < 1 )
+        {
+            localRepository = userSettings.getLocalRepository();
+        }
+        
+        // if both are missing, default to ~/.m2/repository.
+        if ( localRepository == null || localRepository.length() < 1 )
         {
             File mavenUserConfigurationDirectory = new File( userHome, ".m2" );
             if ( !mavenUserConfigurationDirectory.exists() )
@@ -126,10 +136,10 @@ public class DefaultMavenSettingsBuilder
                 }
             }
 
-            String localRepository = new File( mavenUserConfigurationDirectory, "repository" ).getAbsolutePath();
-
-            userSettings.setLocalRepository( localRepository );
+            localRepository = new File( mavenUserConfigurationDirectory, "repository" ).getAbsolutePath();
         }
+
+        userSettings.setLocalRepository( localRepository );
 
         return userSettings;
     }

@@ -499,6 +499,8 @@ public class Verifier
                 String key = (String) i.next();
                 cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
             }
+            
+            cli.createArgument().setLine( "-Dmaven.repo.local=" + localRepo );
 
             for ( Iterator i = allGoals.iterator(); i.hasNext(); )
             {
