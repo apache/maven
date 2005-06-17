@@ -2,6 +2,7 @@
  Generating a Site
  ------
  Brett Porter
+ Jason van Zyl
  ------
  13 May 2005
  ------
@@ -124,18 +125,23 @@ m2 site:site site:deploy
 
 * Adding Additional Resources
 
-  You can also add images and CSS to your site, by creating the following directories in your site sources:
+ You can add any arbitrary resources to you site by including them in a
+ <<<resources>>> directory as shown below. Addition CSS will be picked up
+ when they are placed in the <<<css>>> directory within the <<<resources>>>
+ directory.
 
 -------------------
 +- src/
    +- site/
-      +- css/
-      |  +- site.css
-      |
-      +- images/
-      |  +- pic1.jpg
-      |
+      +- resources/
+         +- css/
+         |  +- site.css
+         |
+         +- images/
+            +- pic1.jpg
 --------------------
 
-  The file <<<site.css>>> will be added to the default XHTML output, so can be used to adjust the default Maven stylesheets if desired.
+ The file <<<site.css>>> will be added to the default XHTML output, so can be used to adjust the default Maven stylesheets if desired.
 
+ The file <<<pic1.jpg>>> will be available via a relative reference to the
+ <<<resources/images>>> directory from any page in your site.
