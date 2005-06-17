@@ -87,9 +87,9 @@ public class DefaultMavenSettingsBuilder
                 settings = modelReader.read( reader );
 
                 RuntimeInfo rtInfo = new RuntimeInfo( settings );
-                
+
                 rtInfo.setFile( settingsFile );
-                
+
                 settings.setRuntimeInfo( rtInfo );
             }
             finally
@@ -110,6 +110,7 @@ public class DefaultMavenSettingsBuilder
         if ( userSettings == null )
         {
             userSettings = new Settings();
+            userSettings.setRuntimeInfo( new RuntimeInfo( userSettings ) );
         }
 
         SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
