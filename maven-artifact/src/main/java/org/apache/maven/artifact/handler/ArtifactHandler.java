@@ -24,7 +24,11 @@ public interface ArtifactHandler
 {
     static String ROLE = ArtifactHandler.class.getName();
 
-    String extension();
+    String getExtension();
 
-    String directory();
+    String getDirectory();
+
+    String getClassifier();
+
+    String getPackaging();
 }

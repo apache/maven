@@ -52,7 +52,7 @@ public class DefaultArtifactDeployer
 
         try
         {
-            String extension = artifactHandlerManager.getArtifactHandler( artifact.getType() ).extension();
+            String extension = artifactHandlerManager.getArtifactHandler( artifact.getType() ).getExtension();
             source = new File( basedir, finalName + "." + extension );
         }
         catch ( ArtifactHandlerNotFoundException e )

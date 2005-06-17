@@ -2,7 +2,6 @@ package org.apache.maven.plugin.version;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.handler.PluginHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -531,7 +530,7 @@ public class DefaultPluginVersionManager
         throws PluginVersionResolutionException
     {
         Artifact releaseArtifact = artifactFactory.createArtifact( groupId, artifactId, "RELEASE",
-                                                                   Artifact.SCOPE_RUNTIME, PluginHandler.PLUGIN_TYPE );
+                                                                   Artifact.SCOPE_RUNTIME, "maven-plugin" );
 
         try
         {

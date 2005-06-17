@@ -139,43 +139,58 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ejb</role-hint>
-      <implementation>org.apache.maven.artifact.handler.EjbHandler</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>plexus-service</role-hint>
-      <implementation>org.apache.maven.artifact.handler.PlexusServiceHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>ejb</type>
+        <extension>jar</extension>
+      </configuration>
     </component>
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>jar</role-hint>
-      <implementation>org.apache.maven.artifact.handler.JarHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>jar</type>
+      </configuration>
     </component>
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>maven-plugin</role-hint>
-      <implementation>org.apache.maven.artifact.handler.PluginHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>maven-plugin</type>
+        <extension>jar</extension>
+      </configuration>
     </component>
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>pom</role-hint>
-      <implementation>org.apache.maven.artifact.handler.PomHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>pom</type>
+      </configuration>
     </component>
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>source</role-hint>
-      <implementation>org.apache.maven.artifact.handler.SourceHandler</implementation>
+      <role-hint>java-source</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>java-source</type>
+        <extension>jar</extension>
+      </configuration>
     </component>
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>war</role-hint>
-      <implementation>org.apache.maven.artifact.handler.WarHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>war</type>
+      </configuration>
     </component>
 
     <!--

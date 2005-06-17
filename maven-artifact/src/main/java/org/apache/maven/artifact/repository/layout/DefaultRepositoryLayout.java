@@ -62,9 +62,9 @@ public class DefaultRepositoryLayout
             path.append( '-' ).append( artifact.getClassifier() );
         }
 
-        if ( artifactHandler.extension() != null && artifactHandler.extension().length() > 0 )
+        if ( artifactHandler.getExtension() != null && artifactHandler.getExtension().length() > 0 )
         {
-            path.append( '.' ).append( artifactHandler.extension() );
+            path.append( '.' ).append( artifactHandler.getExtension() );
         }
 
         return path.toString();
