@@ -18,6 +18,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
@@ -34,12 +35,15 @@ public abstract class MavenProjectTestCase
 {
     protected MavenProjectBuilder projectBuilder;
 
+    private ArtifactFactory artifactFactory;
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
         projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+        artifactFactory = ( ArtifactFactory ) lookup( ArtifactFactory.ROLE );
     }
 
     // ----------------------------------------------------------------------
@@ -94,7 +98,7 @@ public abstract class MavenProjectTestCase
         throws Exception
     {
         return projectBuilder.buildWithDependencies( pom, getLocalRepository(),
-                                                     new ProjectClasspathArtifactResolver.Source(),
+                                                     new ProjectClasspathArtifactResolver.Source( artifactFactory ),
                                                      Collections.EMPTY_LIST );
     }
 

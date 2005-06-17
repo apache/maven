@@ -8,11 +8,6 @@
     <component>
       <role>org.apache.maven.artifact.manager.WagonManager</role>
       <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-      </requirements>
     </component>
 
     <!--
@@ -54,9 +49,6 @@
           <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
           <field-name>artifactTransformations</field-name>
         </requirement>
@@ -75,9 +67,6 @@
       <role>org.apache.maven.artifact.installer.ArtifactInstaller</role>
       <implementation>org.apache.maven.artifact.installer.DefaultArtifactInstaller</implementation>
       <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
         <requirement>
           <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
           <field-name>artifactTransformations</field-name>
@@ -98,9 +87,6 @@
           <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
           <field-name>artifactTransformations</field-name>
         </requirement>
@@ -111,22 +97,12 @@
       <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-      </requirements>
     </component>
 
     <component>
       <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
       <role-hint>legacy</role-hint>
       <implementation>org.apache.maven.artifact.repository.layout.LegacyRepositoryLayout</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-      </requirements>
     </component>
 
     <!--
@@ -203,8 +179,25 @@
     </component>
 
     <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>ejb-client</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>ejb-client</type>
+        <extension>jar</extension>
+        <packaging>ejb</packaging>
+        <classifier>client</classifier>
+      </configuration>
+    </component>
+
+    <component>
       <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
       <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
+      </requirements>
     </component>
     
     <component>

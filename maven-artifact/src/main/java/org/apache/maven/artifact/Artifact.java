@@ -20,6 +20,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 
 import java.io.File;
 import java.util.List;
@@ -80,7 +81,7 @@ public interface Artifact
 
     String getId();
 
-    String getConflictId();
+    String getDependencyConflictId();
 
     void addMetadata( ArtifactMetadata metadata );
 
@@ -90,8 +91,7 @@ public interface Artifact
 
     ArtifactRepository getRepository();
 
-    void updateVersion( String version, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException;
+    void updateVersion( String version, ArtifactRepository localRepository );
 
     String getDownloadUrl();
 
@@ -100,4 +100,6 @@ public interface Artifact
     ArtifactFilter getDependencyFilter();
 
     void setDependencyFilter( ArtifactFilter artifactFilter );
+
+    ArtifactHandler getArtifactHandler();
 }

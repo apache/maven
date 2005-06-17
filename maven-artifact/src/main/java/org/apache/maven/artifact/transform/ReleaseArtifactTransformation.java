@@ -22,7 +22,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
 import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 import java.io.IOException;
@@ -92,7 +91,7 @@ public class ReleaseArtifactTransformation
     }
 
     protected VersionArtifactMetadata readFromLocalRepository( Artifact artifact, ArtifactRepository localRepository )
-        throws IOException, ArtifactPathFormatException
+        throws IOException
     {
         AbstractVersionArtifactMetadata metadata = new ReleaseArtifactMetadata( artifact );
         metadata.readFromLocalRepository( localRepository );

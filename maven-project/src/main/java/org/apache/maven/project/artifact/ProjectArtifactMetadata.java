@@ -21,7 +21,6 @@ import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -64,15 +63,7 @@ public class ProjectArtifactMetadata
     public void storeInLocalRepository( ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        File destination;
-        try
-        {
-            destination = new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to install POM", e );
-        }
+        File destination = new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
 
         destination.getParentFile().mkdirs();
 

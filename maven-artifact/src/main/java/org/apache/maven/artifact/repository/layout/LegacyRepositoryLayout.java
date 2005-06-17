@@ -18,8 +18,6 @@ package org.apache.maven.artifact.repository.layout;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 
 /**
@@ -28,23 +26,9 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 public class LegacyRepositoryLayout
     implements ArtifactRepositoryLayout
 {
-
-    private ArtifactHandlerManager artifactHandlerManager;
-
     public String pathOf( Artifact artifact )
-        throws ArtifactPathFormatException
     {
-        ArtifactHandler artifactHandler = null;
-        try
-        {
-            // TODO: this is a poor excuse to have this method throwing an exception. Validate the artifact first, perhaps associate the handler with it
-            artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
-        }
-        catch ( ArtifactHandlerNotFoundException e )
-        {
-            throw new ArtifactPathFormatException( "Cannot find ArtifactHandler for artifact: \'" + artifact.getId() +
-                                                   "\'.", e );
-        }
+        ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
         StringBuffer path = new StringBuffer();
 
@@ -66,7 +50,6 @@ public class LegacyRepositoryLayout
     }
 
     public String pathOfMetadata( ArtifactMetadata metadata )
-        throws ArtifactPathFormatException
     {
         StringBuffer path = new StringBuffer();
 

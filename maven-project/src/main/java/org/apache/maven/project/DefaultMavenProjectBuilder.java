@@ -471,7 +471,7 @@ public class DefaultMavenProjectBuilder
     protected Set createArtifacts( List dependencies )
     {
         // TODO: merge with MavenMetadataSource properly
-        return new MavenMetadataSource( artifactResolver, this ).createArtifacts( dependencies, null, null );
+        return new MavenMetadataSource( artifactResolver, this, artifactFactory ).createArtifacts( dependencies, null, null );
     }
 
     protected Set createPluginArtifacts( List plugins )

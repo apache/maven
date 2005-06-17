@@ -27,6 +27,6 @@ public interface ArtifactFactory
 
     Artifact createArtifact( String groupId, String artifactId, String knownVersion, String scope, String type );
     
-    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope,
+    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope,
                                                   String type, String classifier );
 }

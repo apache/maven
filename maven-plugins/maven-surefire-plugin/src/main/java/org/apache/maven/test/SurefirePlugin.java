@@ -16,9 +16,8 @@ package org.apache.maven.test;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -117,6 +116,11 @@ public class SurefirePlugin
      */
     private Properties systemProperties;
 
+    /**
+     * @parameter expression="${plugin.artifacts}"
+     */
+    private List pluginArtifacts;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -194,19 +198,10 @@ public class SurefirePlugin
             }
         }
 
-        // TODO: we should really just trust the plugin classloader?
-        try
+        for ( Iterator i = pluginArtifacts.iterator(); i.hasNext(); )
         {
-            DefaultArtifact artifact = new DefaultArtifact( "junit", "junit", "3.8.1", "jar" );
-            File file = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-            surefireBooter.addClassPathUrl( file.getAbsolutePath() );
-            artifact = new DefaultArtifact( "surefire", "surefire", "1.2", "jar" );
-            file = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-            surefireBooter.addClassPathUrl( file.getAbsolutePath() );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new MojoExecutionException( "Error finding surefire JAR", e );
+            Artifact artifact = (Artifact) i.next();
+            surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
         }
 
         surefireBooter.addClassPathUrl( new File( classesDirectory ).getPath() );

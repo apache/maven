@@ -18,10 +18,15 @@ package org.apache.maven.artifact.factory;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 
 public class DefaultArtifactFactory
     implements ArtifactFactory
 {
+    // TODO: remove, it doesn't know the ones from the plugins
+    private ArtifactHandlerManager artifactHandlerManager;
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return createArtifact( groupId, artifactId, version, scope, type, null, null );
@@ -39,8 +44,8 @@ public class DefaultArtifactFactory
         return createArtifact( groupId, artifactId, version, scope, type, null, inheritedScope );
     }
 
-    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
-                                    String classifier, String inheritedScope )
+    private Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
+                                     String classifier, String inheritedScope )
     {
         // TODO: can refactor, use scope handler
 
@@ -71,7 +76,9 @@ public class DefaultArtifactFactory
             desiredScope = Artifact.SCOPE_PROVIDED;
         }
 
-        DefaultArtifact artifact = new DefaultArtifact( groupId, artifactId, version, desiredScope, type, classifier );
+        ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
+        DefaultArtifact artifact = new DefaultArtifact( groupId, artifactId, version, desiredScope, type, classifier,
+                                                        handler );
 
         return artifact;
     }

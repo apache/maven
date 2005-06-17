@@ -66,8 +66,8 @@ public class DeployTask
         ArtifactRepository deploymentRepository = createRemoteArtifactRepository( remoteRepository );
 
         // Deploy the POM
-        Artifact artifact = new DefaultArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(),
-                                                 pom.getPackaging() );
+        Artifact artifact = createArtifact( pom );
+
         boolean isPomArtifact = "pom".equals( pom.getPackaging() );
         if ( !isPomArtifact )
         {

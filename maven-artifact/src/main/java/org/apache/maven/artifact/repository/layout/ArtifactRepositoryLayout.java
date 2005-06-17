@@ -27,9 +27,7 @@ public interface ArtifactRepositoryLayout
 
     String ROLE = ArtifactRepositoryLayout.class.getName();
 
-    String pathOf( Artifact artifact )
-        throws ArtifactPathFormatException;
+    String pathOf( Artifact artifact );
 
-    String pathOfMetadata( ArtifactMetadata metadata )
-        throws ArtifactPathFormatException;
+    String pathOfMetadata( ArtifactMetadata metadata );
 }

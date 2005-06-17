@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.repository.layout;
+package org.apache.maven.artifact.handler.manager;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,16 +16,15 @@ package org.apache.maven.artifact.repository.layout;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.handler.ArtifactHandler;
+
 /**
- * @author jdcasey
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @version $Id$
  */
-public class ArtifactPathFormatException
-    extends Exception
+public interface ArtifactHandlerManager
 {
+    String ROLE = ArtifactHandlerManager.class.getName();
 
-    public ArtifactPathFormatException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
-
+    ArtifactHandler getArtifactHandler( String type );
 }

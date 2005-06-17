@@ -169,6 +169,7 @@ public class WarMojo
             Artifact artifact = (Artifact) iter.next();
 
             // TODO: scope handler
+            // TODO: use classpath instead
             // Include runtime and compile time libraries
             if ( "jar".equals( artifact.getType() ) && !Artifact.SCOPE_TEST.equals( artifact.getScope() ) && !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
             {

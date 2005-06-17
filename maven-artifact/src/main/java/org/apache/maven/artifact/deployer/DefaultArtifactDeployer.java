@@ -17,13 +17,10 @@ package org.apache.maven.artifact.deployer;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -40,8 +37,6 @@ public class DefaultArtifactDeployer
 {
     private WagonManager wagonManager;
 
-    private ArtifactHandlerManager artifactHandlerManager;
-
     private List artifactTransformations;
 
     public void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
@@ -50,16 +45,8 @@ public class DefaultArtifactDeployer
     {
         File source = null;
 
-        try
-        {
-            String extension = artifactHandlerManager.getArtifactHandler( artifact.getType() ).getExtension();
-            source = new File( basedir, finalName + "." + extension );
-        }
-        catch ( ArtifactHandlerNotFoundException e )
-        {
-            throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
-        }
-
+        String extension = artifact.getArtifactHandler().getExtension();
+        source = new File( basedir, finalName + "." + extension );
         deploy( source, artifact, deploymentRepository, localRepository );
     }
 
@@ -100,10 +87,6 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
         }
         catch ( ArtifactMetadataRetrievalException e )
-        {
-            throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
-        }
-        catch ( ArtifactPathFormatException e )
         {
             throw new ArtifactDeploymentException( "Error deploying artifact: ", e );
         }

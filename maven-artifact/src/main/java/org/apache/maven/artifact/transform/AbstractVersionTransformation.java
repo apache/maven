@@ -21,7 +21,6 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.IOException;
@@ -56,10 +55,6 @@ public abstract class AbstractVersionTransformation
         try
         {
             localMetadata = readFromLocalRepository( artifact, localRepository );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
         }
         catch ( IOException e )
         {
@@ -170,7 +165,7 @@ public abstract class AbstractVersionTransformation
 
     protected abstract VersionArtifactMetadata readFromLocalRepository( Artifact artifact,
                                                                         ArtifactRepository localRepository )
-        throws IOException, ArtifactPathFormatException;
+        throws IOException;
 
     private Date getMidnightBoundary()
     {

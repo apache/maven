@@ -18,6 +18,8 @@ package org.apache.maven.plugin.ejb;
 
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -37,12 +39,10 @@ public class EjbMojo
     // TODO: will null work instead?
     private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
 
-    private static final String[] DEFAULT_EXCLUDES = new String[]{"**/*Bean.class", "**/*CMP.class",
-                                                                  "**/*Session.class", "**/package.html"};
+    private static final String[] DEFAULT_EXCLUDES = new String[]{"**/*Bean.class", "**/*CMP.class", "**/*Session.class", "**/package.html"};
 
     /**
      * @todo File instead
-     * 
      * @parameter expression="${project.build.directory}"
      * @required
      * @readonly
@@ -63,7 +63,6 @@ public class EjbMojo
 
     /**
      * @todo boolean instead
-     * 
      * @parameter
      */
     private String generateClient = Boolean.FALSE.toString();
@@ -74,6 +73,13 @@ public class EjbMojo
      * @readonly
      */
     private MavenProject project;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+     * @required
+     * @readonly
+     */
+    private ArtifactFactory artifactFactory;
 
     /**
      * @parameter
@@ -121,6 +127,14 @@ public class EjbMojo
 
                 // create archive
                 clientArchiver.createArchive( project, archive );
+
+                Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(),
+                                                                                  project.getArtifactId(),
+                                                                                  project.getVersion(), null,
+                                                                                  "ejb-client", "client" );
+                artifact.setFile( clientJarFile );
+
+                project.addAttachedArtifact( artifact );
             }
         }
         catch ( Exception e )

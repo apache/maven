@@ -17,10 +17,9 @@ package org.apache.maven.artifact;
  */
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -61,16 +60,16 @@ public class DefaultArtifact
 
     private ArtifactFilter dependencyFilter;
 
-    /**
-     * !!! WARNING !!! Never put <classifier/> in the POM. It is for mojo use
-     * only. Classifier is for specifying derived artifacts, like ejb-client.
-     */
+    private final ArtifactHandler artifactHandler;
+
+    // TODO: direct all through the artifact factory
     public DefaultArtifact( String groupId,
                             String artifactId,
                             String version,
                             String scope,
                             String type,
-                            String classifier )
+                            String classifier,
+                            ArtifactHandler artifactHandler )
     {
         this.groupId = groupId;
 
@@ -78,12 +77,14 @@ public class DefaultArtifact
 
         this.version = version;
 
-        this.type = type;
+        this.artifactHandler = artifactHandler;
 
         this.scope = scope;
 
+        this.type = type;
+
         this.classifier = classifier;
-        
+
         validateIdentity();
     }
 
@@ -113,16 +114,6 @@ public class DefaultArtifact
     private boolean empty( String value )
     {
         return value == null || value.trim().length() < 1;
-    }
-
-    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type )
-    {
-        this( groupId, artifactId, version, scope, type, null );
-    }
-
-    public DefaultArtifact( String groupId, String artifactId, String version, String type )
-    {
-        this( groupId, artifactId, version, null, type, null );
     }
 
     public String getClassifier()
@@ -191,10 +182,10 @@ public class DefaultArtifact
 
     public String getId()
     {
-        return getConflictId() + ( hasClassifier() ? ( ":" + getClassifier() ) : "" ) + ":" + getBaseVersion();
+        return getDependencyConflictId() + ( hasClassifier() ? ( ":" + getClassifier() ) : "" ) + ":" + getBaseVersion();
     }
 
-    public String getConflictId()
+    public String getDependencyConflictId()
     {
         return getGroupId() + ":" + getArtifactId() + ":" + getType();
     }
@@ -331,17 +322,9 @@ public class DefaultArtifact
     }
 
     public void updateVersion( String version, ArtifactRepository localRepository )
-        throws ArtifactMetadataRetrievalException
     {
         setVersion( version );
-        try
-        {
-            setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Error reading local metadata", e );
-        }
+        setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );
     }
 
     public String getDownloadUrl()
@@ -362,5 +345,10 @@ public class DefaultArtifact
     public void setDependencyFilter( ArtifactFilter artifactFilter )
     {
         this.dependencyFilter = artifactFilter;
+    }
+
+    public ArtifactHandler getArtifactHandler()
+    {
+        return artifactHandler;
     }
 }

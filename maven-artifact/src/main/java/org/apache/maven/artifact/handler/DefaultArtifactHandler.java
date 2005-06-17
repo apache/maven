@@ -65,7 +65,7 @@ public class DefaultArtifactHandler
     {
         if ( directory == null )
         {
-            directory = type + "s";
+            directory = getPackaging() + "s";
         }
         return directory;
     }

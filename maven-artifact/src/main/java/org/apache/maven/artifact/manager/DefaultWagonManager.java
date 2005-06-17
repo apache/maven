@@ -18,10 +18,8 @@ package org.apache.maven.artifact.manager;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ChecksumFailedException;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -68,8 +66,6 @@ public class DefaultWagonManager
 
     private TransferListener downloadMonitor;
 
-    private ArtifactHandlerManager artifactHandlerManager;
-
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
     {
@@ -91,28 +87,14 @@ public class DefaultWagonManager
     public void putArtifact( File source, Artifact artifact, ArtifactRepository repository )
         throws TransferFailedException
     {
-        try
-        {
-            putRemoteFile( repository, source, repository.pathOf( artifact ), downloadMonitor );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new TransferFailedException( "Path of artifact could not be determined: ", e );
-        }
+        putRemoteFile( repository, source, repository.pathOf( artifact ), downloadMonitor );
     }
 
     public void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
         throws TransferFailedException
     {
-        try
-        {
-            getLogger().info( "Uploading " + artifactMetadata );
-            putRemoteFile( repository, source, repository.pathOfMetadata( artifactMetadata ), null );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new TransferFailedException( "Path of artifact could not be determined: ", e );
-        }
+        getLogger().info( "Uploading " + artifactMetadata );
+        putRemoteFile( repository, source, repository.pathOfMetadata( artifactMetadata ), null );
     }
 
     private void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
@@ -244,16 +226,7 @@ public class DefaultWagonManager
     public void getArtifact( Artifact artifact, ArtifactRepository repository, File destination )
         throws TransferFailedException, ResourceDoesNotExistException
     {
-        String remotePath = null;
-        try
-        {
-            remotePath = repository.pathOf( artifact );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            // TODO may be more appropriate to propogate the APFE
-            throw new TransferFailedException( "Failed to determine path for artifact", e );
-        }
+        String remotePath = repository.pathOf( artifact );
 
         getRemoteFile( repository, destination, remotePath, downloadMonitor );
     }
@@ -261,16 +234,7 @@ public class DefaultWagonManager
     public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination )
         throws TransferFailedException, ResourceDoesNotExistException
     {
-        String remotePath;
-        try
-        {
-            remotePath = remoteRepository.pathOfMetadata( metadata );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            // TODO may be more appropriate to propogate APFE
-            throw new TransferFailedException( "Failed to determine path for artifact", e );
-        }
+        String remotePath = remoteRepository.pathOfMetadata( metadata );
 
         getLogger().info( "Retrieving " + metadata );
         getRemoteFile( remoteRepository, destination, remotePath, null );

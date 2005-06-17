@@ -16,9 +16,9 @@
 
 package org.apache.maven.artifact;
 
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
@@ -36,16 +36,6 @@ import java.util.List;
 public abstract class ArtifactComponentTestCase
     extends PlexusTestCase
 {
-    protected ArtifactHandlerManager artifactHandlerManager;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        artifactHandlerManager = (ArtifactHandlerManager) lookup( ArtifactHandlerManager.ROLE );
-    }
-
     protected abstract String component();
 
     /**
@@ -252,12 +242,14 @@ public abstract class ArtifactComponentTestCase
 
     protected Artifact createArtifact( String artifactId, String version, String type )
     {
-        return new DefaultArtifact( "org.apache.maven", artifactId, version, type );
+        // TODO: fix handler instantiation
+        return new DefaultArtifact( "org.apache.maven", artifactId, version, null, type, null, new DefaultArtifactHandler( type ) );
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
     {
-        return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type );
+        // TODO: fix handler instantiation
+        return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type, null, new DefaultArtifactHandler( type ) );
     }
 
     protected void deleteLocalArtifact( Artifact artifact )

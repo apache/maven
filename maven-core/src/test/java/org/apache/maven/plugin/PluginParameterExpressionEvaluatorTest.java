@@ -102,7 +102,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         PluginDescriptor pd = new PluginDescriptor();
 
-        Artifact artifact = new DefaultArtifact( "testGroup", "testArtifact", "1.0", Artifact.SCOPE_COMPILE, "jar" );
+        Artifact artifact = new DefaultArtifact( "testGroup", "testArtifact", "1.0", Artifact.SCOPE_COMPILE, "jar", null, null );
 
         pd.setArtifacts( Collections.singletonList( artifact ) );
 

@@ -18,15 +18,14 @@ package org.apache.maven.project.artifact;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
@@ -58,24 +57,26 @@ public class MavenMetadataSource
 
     private ArtifactResolver artifactResolver;
 
-    // TODO: configure?
-    protected ArtifactFactory artifactFactory = new DefaultArtifactFactory();
+    private ArtifactFactory artifactFactory;
 
     /**
      * @todo remove.
      */
     private MavenXpp3Reader reader = new MavenXpp3Reader();
 
-    public MavenMetadataSource( ArtifactResolver artifactResolver )
+    public MavenMetadataSource( ArtifactResolver artifactResolver, ArtifactFactory artifactFactory )
     {
         this.artifactResolver = artifactResolver;
         this.mavenProjectBuilder = null;
+        this.artifactFactory = artifactFactory;
     }
 
-    public MavenMetadataSource( ArtifactResolver artifactResolver, MavenProjectBuilder projectBuilder )
+    public MavenMetadataSource( ArtifactResolver artifactResolver, MavenProjectBuilder projectBuilder,
+                                ArtifactFactory artifactFactory )
     {
         this.artifactResolver = artifactResolver;
         this.mavenProjectBuilder = projectBuilder;
+        this.artifactFactory = artifactFactory;
     }
 
     public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
@@ -180,7 +181,7 @@ public class MavenMetadataSource
 
                 artifact.setDependencyFilter( dependencyFilter );
 
-                    projectArtifacts.add( artifact );
+                projectArtifacts.add( artifact );
             }
         }
 

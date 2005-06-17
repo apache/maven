@@ -21,7 +21,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 import java.io.IOException;
@@ -115,7 +114,7 @@ public class SnapshotTransformation
     }
 
     protected VersionArtifactMetadata readFromLocalRepository( Artifact artifact, ArtifactRepository localRepository )
-        throws IOException, ArtifactPathFormatException
+        throws IOException
     {
         SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
         metadata.readFromLocalRepository( localRepository );

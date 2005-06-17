@@ -17,9 +17,9 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -59,7 +59,8 @@ public class DependenciesTask
 
         ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
         MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-        MavenMetadataSource metadataSource = new MavenMetadataSource( resolver, projectBuilder );
+        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        MavenMetadataSource metadataSource = new MavenMetadataSource( resolver, projectBuilder, artifactFactory );
 
         List dependencies = this.dependencies;
 
@@ -118,15 +119,7 @@ public class DependenciesTask
         for ( Iterator i = result.getArtifacts().values().iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
-            String filename = null;
-            try
-            {
-                filename = localRepo.pathOf( artifact );
-            }
-            catch ( ArtifactPathFormatException e )
-            {
-                throw new BuildException( "Unable to determine path to artifact: " + artifact, e );
-            }
+            String filename = localRepo.pathOf( artifact );
 
             FileList.FileName file = new FileList.FileName();
             file.setName( filename );

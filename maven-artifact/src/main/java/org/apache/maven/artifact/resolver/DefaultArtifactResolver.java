@@ -18,13 +18,11 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -54,11 +52,9 @@ public class DefaultArtifactResolver
 
     private WagonManager wagonManager;
 
-    private ArtifactHandlerManager artifactHandlerManager;
-
     private List artifactTransformations;
 
-    private ArtifactFactory artifactFactory;
+    protected ArtifactFactory artifactFactory;
 
     // ----------------------------------------------------------------------
     // Implementation
@@ -82,16 +78,7 @@ public class DefaultArtifactResolver
         logger.debug( "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository + "}\n" +
                       "{remoteRepositories: " + remoteRepositories + "}" );
 
-        String localPath;
-
-        try
-        {
-            localPath = localRepository.pathOf( artifact );
-        }
-        catch ( ArtifactPathFormatException e )
-        {
-            throw new ArtifactResolutionException( e.getMessage(), e );
-        }
+        String localPath = localRepository.pathOf( artifact );
 
         artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
 
@@ -209,7 +196,7 @@ public class DefaultArtifactResolver
             {
                 Artifact newArtifact = (Artifact) i.next();
 
-                String id = newArtifact.getConflictId();
+                String id = newArtifact.getDependencyConflictId();
 
                 if ( resolvedArtifacts.containsKey( id ) )
                 {
@@ -247,7 +234,7 @@ public class DefaultArtifactResolver
                                                                             knownArtifact.getArtifactId(),
                                                                             knownVersion, newArtifact.getScope(),
                                                                             knownArtifact.getType() );
-                        resolvedArtifacts.put( artifact.getConflictId(), artifact );
+                        resolvedArtifacts.put( artifact.getDependencyConflictId(), artifact );
                     }
                 }
                 else
@@ -304,7 +291,7 @@ public class DefaultArtifactResolver
     {
         List conflicts;
 
-        conflicts = (List) result.getConflicts().get( newArtifact.getConflictId() );
+        conflicts = (List) result.getConflicts().get( newArtifact.getDependencyConflictId() );
 
         if ( conflicts == null )
         {
@@ -312,7 +299,7 @@ public class DefaultArtifactResolver
 
             conflicts.add( knownArtifact );
 
-            result.getConflicts().put( newArtifact.getConflictId(), conflicts );
+            result.getConflicts().put( newArtifact.getDependencyConflictId(), conflicts );
         }
 
         conflicts.add( newArtifact );

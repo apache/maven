@@ -46,10 +46,11 @@ public class ProjectClasspathArtifactResolver
     public static class Source
         implements ArtifactMetadataSource
     {
-        private ArtifactFactory artifactFactory = new DefaultArtifactFactory();
+        private ArtifactFactory artifactFactory;
 
-        public Source()
+        public Source( ArtifactFactory artifactFactory )
         {
+            this.artifactFactory = artifactFactory;
         }
 
         public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
@@ -111,7 +112,7 @@ public class ProjectClasspathArtifactResolver
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source(), filter );
+        return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( artifactFactory ), filter );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
@@ -119,7 +120,7 @@ public class ProjectClasspathArtifactResolver
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source() );
+        return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( artifactFactory ) );
     }
 
     public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
@@ -127,6 +128,6 @@ public class ProjectClasspathArtifactResolver
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifact, remoteRepositories, localRepository, new Source() );
+        return super.resolveTransitively( artifact, remoteRepositories, localRepository, new Source( artifactFactory ) );
     }
 }

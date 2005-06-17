@@ -10,6 +10,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-ejb-plugin</artifactId>
+<configuration><generateClient>true</generateClient></configuration>
       </plugin>
     </plugins>
   </build>

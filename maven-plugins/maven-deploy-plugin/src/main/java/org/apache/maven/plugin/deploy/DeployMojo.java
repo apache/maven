@@ -18,6 +18,7 @@ package org.apache.maven.plugin.deploy;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -28,6 +29,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Deploys an artifact to remote repository.
@@ -111,6 +114,20 @@ public class DeployMojo
     private ArtifactRepository localRepository;
 
     /**
+     * @parameter expression="${project.attachedArtifacts}
+     * @required
+     * @readonly
+     */
+    private List attachedArtifacts;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+     * @required
+     * @readonly
+     */
+    private ArtifactFactory artifactFactory;
+
+    /**
      * @parameter expression="${updateReleaseInfo}"
      */
     private boolean updateReleaseInfo = false;
@@ -126,7 +143,9 @@ public class DeployMojo
         }
 
         // Deploy the POM
-        Artifact artifact = new DefaultArtifact( groupId, artifactId, version, packaging );
+        // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
+        Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, version, null, packaging );
+
         boolean isPomArtifact = "pom".equals( packaging );
         File pom = new File( parentDir, "pom.xml" );
         if ( !isPomArtifact )
@@ -152,7 +171,13 @@ public class DeployMojo
             {
                 deployer.deploy( buildDirectory, finalName, artifact, deploymentRepository, localRepository );
             }
-        }
+
+            for ( Iterator i = attachedArtifacts.iterator(); i.hasNext(); )
+            {
+                Artifact attached = (Artifact) i.next();
+                deployer.deploy( attached.getFile(), attached, deploymentRepository, localRepository );
+            }
+       }
         catch ( ArtifactDeploymentException e )
         {
             // TODO: deployment exception that does not give a trace

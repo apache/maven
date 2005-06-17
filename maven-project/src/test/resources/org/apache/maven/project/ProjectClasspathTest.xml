@@ -9,9 +9,6 @@
           <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
       </requirements>
@@ -23,9 +20,6 @@
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>

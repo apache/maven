@@ -18,6 +18,7 @@ package org.apache.maven.plugin.install;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
@@ -25,6 +26,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Installs project's main artifact in local repository.
@@ -89,10 +92,25 @@ public class InstallMojo
      */
     private boolean updateReleaseInfo = false;
 
+    /**
+     * @parameter expression="${project.attachedArtifacts}
+     * @required
+     * @readonly
+     */
+    private List attachedArtifacts;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+     * @required
+     * @readonly
+     */
+    private ArtifactFactory artifactFactory;
+
     public void execute()
         throws MojoExecutionException
     {
-        Artifact artifact = new DefaultArtifact( groupId, artifactId, version, packaging );
+        // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
+        Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, version, null, packaging );
 
         boolean isPomArtifact = "pom".equals( packaging );
         File pom = new File( basedir, "pom.xml" );
@@ -119,6 +137,12 @@ public class InstallMojo
             {
                 // TODO: would be something nice to get back from the project to get the full filename (the OGNL feedback thing)
                 installer.install( buildDirectory, finalName, artifact, localRepository );
+            }
+
+            for ( Iterator i = attachedArtifacts.iterator(); i.hasNext(); )
+            {
+                Artifact attached = (Artifact) i.next();
+                installer.install( attached.getFile(), attached, localRepository );
             }
         }
         catch ( ArtifactInstallationException e )

@@ -61,7 +61,7 @@ public class InvalidArtifactDiagnoserTest
 
         try
         {
-            new DefaultArtifact( groupId, artifactId, version, type );
+            new DefaultArtifact( groupId, artifactId, version, null, type, null, null );
 
             fail( "artifact creation did not fail; nothing to diagnose." );
         }

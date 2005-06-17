@@ -17,12 +17,9 @@ package org.apache.maven.artifact.installer;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerNotFoundException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
@@ -36,8 +33,6 @@ public class DefaultArtifactInstaller
     extends AbstractLogEnabled
     implements ArtifactInstaller
 {
-    private ArtifactHandlerManager artifactHandlerManager;
-
     private List artifactTransformations;
 
     public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
@@ -45,15 +40,8 @@ public class DefaultArtifactInstaller
     {
         File source = null;
 
-        try
-        {
-            String extension = artifactHandlerManager.getArtifactHandler( artifact.getType() ).getExtension();
-            source = new File( basedir, finalName + "." + extension );
-        }
-        catch ( ArtifactHandlerNotFoundException e )
-        {
-            throw new ArtifactInstallationException( "Error installing artifact: ", e );
-        }
+        String extension = artifact.getArtifactHandler().getExtension();
+        source = new File( basedir, finalName + "." + extension );
 
         install( source, artifact, localRepository );
     }
@@ -91,10 +79,6 @@ public class DefaultArtifactInstaller
             }
         }
         catch ( IOException e )
-        {
-            throw new ArtifactInstallationException( "Error installing artifact: ", e );
-        }
-        catch ( ArtifactPathFormatException e )
         {
             throw new ArtifactInstallationException( "Error installing artifact: ", e );
         }

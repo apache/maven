@@ -19,7 +19,6 @@ package org.apache.maven.artifact.metadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactPathFormatException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.util.FileUtils;
@@ -48,7 +47,6 @@ public abstract class AbstractVersionArtifactMetadata
     }
 
     protected File getLocalRepositoryLocation( ArtifactRepository localRepository )
-        throws ArtifactPathFormatException
     {
         return new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
     }
@@ -75,7 +73,7 @@ public abstract class AbstractVersionArtifactMetadata
     }
 
     public void readFromLocalRepository( ArtifactRepository localRepository )
-        throws ArtifactPathFormatException, IOException
+        throws IOException
     {
         File f = getLocalRepositoryLocation( localRepository );
         if ( f.exists() )
@@ -120,10 +118,6 @@ public abstract class AbstractVersionArtifactMetadata
             lastModified = file.lastModified();
         }
         catch ( IOException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
-        }
-        catch ( ArtifactPathFormatException e )
         {
             throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
         }

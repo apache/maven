@@ -17,7 +17,7 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -47,8 +47,7 @@ public class InstallTask
         MavenProjectBuilder builder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
         Pom pom = buildPom( builder, localRepo );
 
-        Artifact artifact = new DefaultArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(),
-                                                 pom.getPackaging() );
+        Artifact artifact = createArtifact( pom );
 
         boolean isPomArtifact = "pom".equals( pom.getPackaging() );
         if ( !isPomArtifact )
@@ -75,7 +74,7 @@ public class InstallTask
             throw new BuildException( "Error installing artifact", e );
         }
     }
-    
+
     public File getFile()
     {
         return file;
