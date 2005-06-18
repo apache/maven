@@ -132,7 +132,9 @@ public class PmdReport
         PMD pmd = new PMD();
         RuleContext ruleContext = new RuleContext();
         Report report = new Report();
-        PmdReportListener reportSink = new PmdReportListener( sink, getConfiguration().getSourceDirectory() );
+        // TODO: use source roots instead
+        String sourceDirectory = getProject().getBuild().getSourceDirectory();
+        PmdReportListener reportSink = new PmdReportListener( sink, sourceDirectory );
         report.addListener( reportSink );
         ruleContext.setReport( report );
 
@@ -149,7 +151,7 @@ public class PmdReport
         }
         catch ( IOException e )
         {
-            throw new MavenReportException( "Can't parse " + getConfiguration().getSourceDirectory(), e );
+            throw new MavenReportException( "Can't parse " + sourceDirectory, e );
         }
 
         for ( Iterator i = files.iterator(); i.hasNext(); )
@@ -209,7 +211,7 @@ public class PmdReport
     private List getFilesToProcess( String includes, String excludes )
         throws IOException
     {
-        File dir = new File( getConfiguration().getSourceDirectory() );
+        File dir = new File( getProject().getBuild().getSourceDirectory() );
         if ( !dir.exists() )
         {
             return Collections.EMPTY_LIST;

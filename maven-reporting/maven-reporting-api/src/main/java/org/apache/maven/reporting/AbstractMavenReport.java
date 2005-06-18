@@ -43,7 +43,9 @@ public abstract class AbstractMavenReport
     extends AbstractMojo
     implements MavenReport
 {
-    /** @todo share, use default excludes from plexus utils. */
+    /**
+     * @todo share, use default excludes from plexus utils.
+     */
     protected static final String[] DEFAULT_EXCLUDES = {// Miscellaneous typical temporary files
         "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
 
@@ -62,21 +64,9 @@ public abstract class AbstractMavenReport
         // Mac
         "**/.DS_Store"};
 
-    private MavenReportConfiguration config;
-
     private Sink sink;
 
     private Locale locale = Locale.ENGLISH;
-
-    public MavenReportConfiguration getConfiguration()
-    {
-        return config;
-    }
-
-    public void setConfiguration( MavenReportConfiguration config )
-    {
-        this.config = config;
-    }
 
     protected abstract SiteRenderer getSiteRenderer();
 
@@ -84,25 +74,20 @@ public abstract class AbstractMavenReport
 
     protected abstract MavenProject getProject();
 
+    private File reportOutputDirectory;
+
     /**
      * @see org.apache.maven.plugin.Mojo#execute()
      */
     public void execute()
         throws MojoExecutionException
     {
-        config = new MavenReportConfiguration();
-
-        config.setProject( getProject() );
-
-        config.setReportOutputDirectory( new File( getOutputDirectory() ) );
-
         try
         {
             String outputDirectory = getOutputDirectory();
 
             XhtmlSink sink = getSiteRenderer().createSink( new File( outputDirectory ), getOutputName() + ".html",
-                                                      outputDirectory,
-                                                      getSiteDescriptor(), "maven" );
+                                                           outputDirectory, getSiteDescriptor(), "maven" );
 
             generate( sink, Locale.ENGLISH );
 
@@ -120,14 +105,9 @@ public abstract class AbstractMavenReport
     public void generate( Sink sink, Locale locale )
         throws MavenReportException
     {
-        if ( config == null )
-        {
-            throw new MavenReportException( "You must specify a report configuration." );
-        }
-
         if ( sink == null )
         {
-            throw new MavenReportException( "You must specify a sink configuration." );
+            throw new MavenReportException( "You must specify a sink." );
         }
         else
         {
@@ -158,7 +138,6 @@ public abstract class AbstractMavenReport
     }
 
     private String getReportsMenu()
-        throws MojoExecutionException
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"Project Documentation\">\n" );
@@ -211,5 +190,19 @@ public abstract class AbstractMavenReport
         siteDescriptorContent = StringUtils.interpolate( siteDescriptorContent, props );
 
         return new StringInputStream( siteDescriptorContent );
+    }
+
+    public File getReportOutputDirectory()
+    {
+        if ( reportOutputDirectory == null )
+        {
+            reportOutputDirectory = new File( getOutputDirectory() );
+        }
+        return reportOutputDirectory;
+    }
+
+    public void setReportOutputDirectory( File reportOutputDirectory )
+    {
+        this.reportOutputDirectory = reportOutputDirectory;
     }
 }

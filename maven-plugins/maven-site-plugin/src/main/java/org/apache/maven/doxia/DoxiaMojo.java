@@ -28,7 +28,6 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
-import org.apache.maven.reporting.MavenReportConfiguration;
 import org.apache.maven.reporting.MavenReportException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.i18n.I18N;
@@ -225,13 +224,7 @@ public class DoxiaMojo
             {
                 Locale locale = (Locale) i.next();
 
-                MavenReportConfiguration config = new MavenReportConfiguration();
-
-                config.setProject( project );
-
                 File localeOutputDirectory = getOuputDirectory( locale );
-
-                config.setReportOutputDirectory( localeOutputDirectory );
 
                 //Generate reports
                 if ( reports != null )
@@ -242,7 +235,7 @@ public class DoxiaMojo
 
                         getLog().info( "Generate " + report.getName( locale ) + " report." );
 
-                        report.setConfiguration( config );
+                        report.setReportOutputDirectory( localeOutputDirectory );
 
                         String outputFileName = report.getOutputName() + ".html";
 

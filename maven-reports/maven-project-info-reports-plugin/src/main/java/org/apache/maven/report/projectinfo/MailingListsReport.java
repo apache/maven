@@ -116,7 +116,7 @@ public class MailingListsReport
     {
         try
         {
-            MailingListsRenderer r = new MailingListsRenderer( getSink(), getConfiguration().getModel() );
+            MailingListsRenderer r = new MailingListsRenderer( getSink(), getProject().getModel() );
 
             r.render();
         }

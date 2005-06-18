@@ -24,6 +24,7 @@ import java.util.Locale;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.apache.maven.model.Model;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.FileUtils;
@@ -106,11 +107,6 @@ public class JavadocReport
     public void generate( Sink sink, Locale locale )
         throws MavenReportException
     {
-        if ( getConfiguration() == null )
-        {
-            throw new MavenReportException( "You must specify a report configuration." );
-        }
-
         executeReport( locale);
     }
 
@@ -122,23 +118,24 @@ public class JavadocReport
     {
         try
         {
-            File outputDir = new File( getConfiguration().getReportOutputDirectory().getAbsolutePath() + "/apidocs" );
+            File outputDir = new File( getReportOutputDirectory().getAbsolutePath() + "/apidocs" );
             outputDir.mkdirs();
 
             int actualYear = Calendar.getInstance().get( Calendar.YEAR );
             String year;
-            if ( getConfiguration().getModel().getInceptionYear() != null
-                 && Integer.valueOf( getConfiguration().getModel().getInceptionYear() ).intValue() == actualYear )
+            Model model = getProject().getModel();
+            if ( model.getInceptionYear() != null
+                 && Integer.valueOf( model.getInceptionYear() ).intValue() == actualYear )
             {
-                year = getConfiguration().getModel().getInceptionYear();
+                year = model.getInceptionYear();
             }
             else
             {
-                year = getConfiguration().getModel().getInceptionYear() + "-" + String.valueOf( actualYear );
+                year = model.getInceptionYear() + "-" + String.valueOf( actualYear );
             }
 
             StringBuffer classpath = new StringBuffer();
-            for ( Iterator i = getConfiguration().getProject().getCompileClasspathElements().iterator(); i.hasNext(); )
+            for ( Iterator i = getProject().getCompileClasspathElements().iterator(); i.hasNext(); )
             {
                 classpath.append( (String) i.next() );
                 if ( i.hasNext() )
@@ -149,14 +146,14 @@ public class JavadocReport
 
             StringBuffer sourcePath = new StringBuffer();
             String[] fileList = new String[1];
-            for ( Iterator i = getConfiguration().getCompileSourceRoots().iterator(); i.hasNext(); )
+            for ( Iterator i = getProject().getCompileSourceRoots().iterator(); i.hasNext(); )
             {
                 String sourceDirectory = (String) i.next();
                 fileList = FileUtils.getFilesFromExtension( sourceDirectory, new String[] { "java" } );
                 sourcePath.append( sourceDirectory );
             }
 
-            File javadocDirectory = new File( getConfiguration().getProject().getBuild().getDirectory() + "/javadoc" );
+            File javadocDirectory = new File( getProject().getBuild().getDirectory() + "/javadoc" );
             if ( fileList != null && fileList.length != 0 )
             {
                 StringBuffer files = new StringBuffer();
@@ -181,11 +178,11 @@ public class JavadocReport
             cl.createArgument().setValue( "-author" );
             cl.createArgument().setValue( "-windowtitle" );
             cl.createArgument().setValue(
-                                          getConfiguration().getModel().getName() + " "
-                                              + getConfiguration().getModel().getVersion() );
+                                          model.getName() + " "
+                                              + model.getVersion() );
             cl.createArgument().setValue( "-bottom" );
             cl.createArgument().setValue( "Copyright &copy; " + year + " "
-                                          + getConfiguration().getModel().getOrganization().getName()
+                                          + model.getOrganization().getName()
                                           + ". All Rights Reserved." );
             cl.createArgument().setValue( "-sourcePath" );
             cl.createArgument().setValue( sourcePath.toString() );

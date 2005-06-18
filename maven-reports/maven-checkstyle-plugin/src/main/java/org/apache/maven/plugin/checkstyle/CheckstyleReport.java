@@ -141,7 +141,7 @@ public class CheckstyleReport
         {
             FileOutputStream out;
             // TODO: I removed outputDirectory, and shouldn't have. Put it back here.
-            File resultFile = new File( getConfiguration().getModel().getBuild().getDirectory() + "/site", resultFileName );
+            File resultFile = new File( getProject().getModel().getBuild().getDirectory() + "/site", resultFileName );
             try
             {
                 File parentFile = resultFile.getParentFile();
@@ -168,6 +168,7 @@ public class CheckstyleReport
         }
 
         File[] files;
+        String sourceDirectory = getProject().getBuild().getSourceDirectory();
         try
         {
             List filesList = getFilesToProcess( "**/*.java", null );
@@ -180,7 +181,7 @@ public class CheckstyleReport
         }
         catch( IOException e )
         {
-            throw new MavenReportException( "Can't parse " + getConfiguration().getSourceDirectory(), e );
+            throw new MavenReportException( "Can't parse " + sourceDirectory, e );
         }
 
         Configuration config;
@@ -220,7 +221,8 @@ public class CheckstyleReport
 
             checker.configure( config );
 
-            AuditListener sinkListener = new CheckstyleReportListener( getSink(), getConfiguration().getSourceDirectory() );
+            // TODO: use source roots
+            AuditListener sinkListener = new CheckstyleReportListener( getSink(), sourceDirectory );
 
             if ( listener != null )
             {
@@ -272,7 +274,7 @@ public class CheckstyleReport
             excludesStr.append( DEFAULT_EXCLUDES[i] );
         }
 
-        return FileUtils.getFiles( new File( getConfiguration().getSourceDirectory() ), includes, excludesStr.toString() );
+        return FileUtils.getFiles( new File( getProject().getBuild().getSourceDirectory() ), includes, excludesStr.toString() );
     }
 
     private Properties createOverridingProperties()
@@ -280,7 +282,7 @@ public class CheckstyleReport
         Properties props = new Properties();
         props.setProperty( "checkstyle.header.file", "LICENSE.txt" );
         // TODO: explicit output directory when it is back
-        props.setProperty( "checkstyle.cache.file", getConfiguration().getModel().getBuild().getDirectory() + "/checkstyle-cachefile" );
+        props.setProperty( "checkstyle.cache.file", getProject().getModel().getBuild().getDirectory() + "/checkstyle-cachefile" );
         return props;
     }
 }

@@ -115,7 +115,7 @@ public class DependenciesReport
     {
         try
         {
-            DependenciesRenderer r = new DependenciesRenderer( getSink(), getConfiguration().getModel() );
+            DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject().getModel() );
 
             r.render();
         }
