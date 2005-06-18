@@ -541,7 +541,7 @@ public class DefaultPluginVersionManager
                                                         "Cannot resolve RELEASE version of this plugin.", e );
         }
 
-        return releaseArtifact.getVersion();
+        return releaseArtifact.getBaseVersion();
     }
 
 }
