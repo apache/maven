@@ -6,7 +6,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Reporter;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.registry.MavenPluginRegistryBuilder;
 import org.apache.maven.plugin.registry.PluginRegistry;
 import org.apache.maven.plugin.registry.PluginRegistryUtils;
@@ -398,15 +398,15 @@ public class DefaultPluginVersionManager
 
         // won't this overwrite the above loop if it exists in both places (unlikely, I know)??
         // maybe that's the idea...?
-        if ( project.getReporters() != null )
+        if ( project.getReportPlugins() != null )
         {
-            for ( Iterator it = project.getReporters().iterator(); it.hasNext(); )
+            for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext(); )
             {
-                Reporter reporter = (Reporter) it.next();
+                ReportPlugin reportPlugin = (ReportPlugin) it.next();
 
-                if ( groupId.equals( reporter.getGroupId() ) && artifactId.equals( reporter.getArtifactId() ) )
+                if ( groupId.equals( reportPlugin.getGroupId() ) && artifactId.equals( reportPlugin.getArtifactId() ) )
                 {
-                    version = reporter.getVersion();
+                    version = reportPlugin.getVersion();
 
                     break;
                 }

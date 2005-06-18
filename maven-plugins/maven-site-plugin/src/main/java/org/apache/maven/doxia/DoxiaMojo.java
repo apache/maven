@@ -717,15 +717,16 @@ public class DoxiaMojo
     {
         // TODO: not the best solution. Perhaps a mojo tag that causes the plugin manager to populate project reports instead?
 
-        List reportPlugins = project.getReporters();
+        List reportPlugins = project.getReportPlugins();
+        
         if ( reportPlugins != null )
         {
             for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.Reporter reporter = (org.apache.maven.model.Reporter) it.next();
+                org.apache.maven.model.ReportPlugin reportPlugin = (org.apache.maven.model.ReportPlugin) it.next();
                 try
                 {
-                    pluginManager.verifyPlugin( reporter.getGroupId(), reporter.getArtifactId(), reporter.getVersion(),
+                    pluginManager.verifyPlugin( reportPlugin.getGroupId(), reportPlugin.getArtifactId(), reportPlugin.getVersion(),
                                                 project, settings, localRepository );
                 }
                 catch ( ArtifactResolutionException e )

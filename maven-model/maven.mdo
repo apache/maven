@@ -2316,12 +2316,11 @@
           <description>Where to store all of the generated reports</description>
         </field>
         <field>
-          <name>reporters</name>
+          <name>plugins</name>
           <version>4.0.0</version>
-          <description>The reporters (specialized plugins) to use and their configuration</description>
+          <description>The report plugins) to use and their configuration</description>
           <association>
-            <!-- TODO: goal stuff relevant or not? -->
-            <type>Reporter</type>
+            <type>ReportPlugin</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -2330,28 +2329,28 @@
         <codeSegment>
           <version>4.0.0</version>
           <code><![CDATA[
-    Map reporterMap;
+    Map reportPluginMap;
     
-    public void flushReporterMap()
+    public void flushReportPluginMap()
     {
-        this.reporterMap = null;
+        this.reportPluginMap = null;
     }
 
-    public Map getReportersAsMap()
+    public Map getReportPluginsAsMap()
     {
-        if ( reporterMap == null )
+        if ( reportPluginMap == null )
         {
-            reporterMap = new HashMap();
-            if ( getReporters() != null )
+            reportPluginMap = new HashMap();
+            if ( getPlugins() != null )
             {
-                for ( Iterator it = getReporters().iterator(); it.hasNext(); )
+                for ( Iterator it = getPlugins().iterator(); it.hasNext(); )
                 {
-                    Reporter reporter = (Reporter) it.next();
-                    reporterMap.put( reporter.getKey(), reporter );
+                    ReportPlugin reportPlugin = (ReportPlugin) it.next();
+                    reportPluginMap.put( reportPlugin.getKey(), reportPlugin );
                 }
             }
         }
-        return reporterMap;
+        return reportPluginMap;
     }
           ]]></code>
         </codeSegment>
@@ -2485,8 +2484,8 @@
       </fields>
     </class>
     <!-- /BuildProfile support -->
-    <class>
-      <name>Reporter</name>
+    <class xml.tagName="plugin">
+      <name>ReportPlugin</name>
       <version>4.0.0</version>
       <fields>
         <field>

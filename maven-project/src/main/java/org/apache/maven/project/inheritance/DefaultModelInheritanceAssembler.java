@@ -24,8 +24,8 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
-import org.apache.maven.model.Reporter;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
@@ -213,38 +213,38 @@ public class DefaultModelInheritanceAssembler
                 childReporting.setOutputDirectory( parentReporting.getOutputDirectory() );
             }
 
-            Map mergedReporters = new HashMap();
+            Map mergedReportPlugins = new HashMap();
 
-            Map childReportersByKey = childReporting.getReportersAsMap();
+            Map childReportersByKey = childReporting.getReportPluginsAsMap();
 
-            List parentReporters = parentReporting.getReporters();
+            List parentReportPlugins = parentReporting.getPlugins();
 
-            if ( parentReporters != null )
+            if ( parentReportPlugins != null )
             {
-                for ( Iterator it = parentReporters.iterator(); it.hasNext(); )
+                for ( Iterator it = parentReportPlugins.iterator(); it.hasNext(); )
                 {
-                    Reporter parentReporter = (Reporter) it.next();
+                    ReportPlugin parentReportPlugin = (ReportPlugin) it.next();
 
-                    String inherited = parentReporter.getInherited();
+                    String inherited = parentReportPlugin.getInherited();
 
                     if ( StringUtils.isEmpty( inherited ) || Boolean.valueOf( inherited ).booleanValue() )
                     {
-                        Reporter childReporter = (Reporter) childReportersByKey.get( parentReporter.getKey() );
+                        ReportPlugin childReportPlugin = (ReportPlugin) childReportersByKey.get( parentReportPlugin.getKey() );
 
-                        Reporter mergedReporter = parentReporter;
+                        ReportPlugin mergedReportPlugin = parentReportPlugin;
 
-                        if ( childReporter != null )
+                        if ( childReportPlugin != null )
                         {
-                            mergedReporter = childReporter;
+                            mergedReportPlugin = childReportPlugin;
 
-                            mergeReporters( childReporter, parentReporter );
+                            mergeReportPlugins( childReportPlugin, parentReportPlugin );
                         }
                         else if ( StringUtils.isEmpty( inherited ) )
                         {
-                            mergedReporter.unsetInheritanceApplied();
+                            mergedReportPlugin.unsetInheritanceApplied();
                         }
 
-                        mergedReporters.put( mergedReporter.getKey(), mergedReporter );
+                        mergedReportPlugins.put( mergedReportPlugin.getKey(), mergedReportPlugin );
                     }
                 }
             }
@@ -255,19 +255,21 @@ public class DefaultModelInheritanceAssembler
 
                 String key = (String) entry.getKey();
 
-                if ( !mergedReporters.containsKey( key ) )
+                if ( !mergedReportPlugins.containsKey( key ) )
                 {
-                    mergedReporters.put( key, entry.getValue() );
+                    mergedReportPlugins.put( key, entry.getValue() );
                 }
             }
 
-            childReporting.setReporters( new ArrayList( mergedReporters.values() ) );
+            childReporting.setPlugins( new ArrayList( mergedReportPlugins.values() ) );
+            
+            childReporting.flushReportPluginMap();
         }
         
         assembleDependencyManagementInheritance( child, parent );
     }
 
-    private void mergeReporters( Reporter dominant, Reporter recessive )
+    private void mergeReportPlugins( ReportPlugin dominant, ReportPlugin recessive )
     {
         if ( StringUtils.isEmpty( dominant.getVersion() ) )
         {
@@ -350,6 +352,8 @@ public class DefaultModelInheritanceAssembler
         }
 
         dominant.setReportSets( new ArrayList( mergedReportSets.values() ) );
+        
+        dominant.flushReportSetMap();
     }
 
     private void assembleDependencyManagementInheritance( ModelBase child, ModelBase parent )

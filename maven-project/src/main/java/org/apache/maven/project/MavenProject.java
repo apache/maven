@@ -706,13 +706,13 @@ public class MavenProject
     // Plugins
     // ----------------------------------------------------------------------
 
-    public List getReporters()
+    public List getReportPlugins()
     {
         if ( model.getReporting() == null )
         {
             return null;
         }
-        return model.getReporting().getReporters();
+        return model.getReporting().getPlugins();
 
     }
 
