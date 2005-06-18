@@ -248,6 +248,12 @@ public class DefaultWagonManager
 
         Wagon wagon;
 
+        Repository mirror = getMirror( repository.getId() );
+        if ( mirror != null )
+        {
+            repository = repository.createMirror( mirror );
+        }
+
         String protocol = repository.getProtocol();
         try
         {
@@ -280,12 +286,6 @@ public class DefaultWagonManager
 
         try
         {
-            Repository mirror = getMirror( repository.getId() );
-            if ( mirror != null )
-            {
-                repository = repository.createMirror( mirror );
-            }
-
             wagon.connect( repository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
             // This should take care of creating destination directory now on
