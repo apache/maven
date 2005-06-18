@@ -57,7 +57,7 @@ public class DefaultModelInheritanceAssembler
         {
             return;
         }
-        
+
         // Group id
         if ( child.getGroupId() == null )
         {
@@ -156,7 +156,7 @@ public class DefaultModelInheritanceAssembler
     public void mergeProfileWithModel( Model model, Profile profile )
     {
         assembleModelBaseInheritance( model, profile );
-        
+
         assembleBuildBaseInheritance( model.getBuild(), profile.getBuild() );
     }
 
@@ -262,10 +262,10 @@ public class DefaultModelInheritanceAssembler
             }
 
             childReporting.setPlugins( new ArrayList( mergedReportPlugins.values() ) );
-            
+
             childReporting.flushReportPluginMap();
         }
-        
+
         assembleDependencyManagementInheritance( child, parent );
     }
 
@@ -352,7 +352,7 @@ public class DefaultModelInheritanceAssembler
         }
 
         dominant.setReportSets( new ArrayList( mergedReportSets.values() ) );
-        
+
         dominant.flushReportSetMap();
     }
 
@@ -398,7 +398,7 @@ public class DefaultModelInheritanceAssembler
         {
             return;
         }
-        
+
         Build childBuild = child.getBuild();
 
         if ( parentBuild != null )
@@ -408,9 +408,9 @@ public class DefaultModelInheritanceAssembler
                 childBuild = new Build();
                 child.setBuild( childBuild );
             }
+            
             // The build has been set but we want to step in here and fill in
-            // values
-            // that have not been set by the child.
+            // values that have not been set by the child.
 
             if ( childBuild.getDirectory() == null )
             {

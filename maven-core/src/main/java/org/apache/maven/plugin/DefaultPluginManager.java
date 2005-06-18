@@ -346,12 +346,12 @@ public class DefaultPluginManager
     // Mojo execution
     // ----------------------------------------------------------------------
 
-    public void executeMojo( MavenSession session, GoalInstance goalInstance )
+    public void executeMojo( MojoExecution mojoExecution, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
         PlexusContainer pluginContainer = null;
 
-        MojoDescriptor mojoDescriptor = goalInstance.getMojoDescriptor();
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
@@ -409,11 +409,13 @@ public class DefaultPluginManager
             plugin = (Mojo) pluginContainer.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
             plugin.setLog( mojoLogger );
 
-            String goalId = goalInstance.getGoalId();
-
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-            Xpp3Dom dom = goalInstance.getCalculatedConfiguration();
+            String goalId = mojoDescriptor.getGoal();
+            String groupId = pluginDescriptor.getGroupId();
+            String artifactId = pluginDescriptor.getArtifactId();
+            String executionId = mojoExecution.getExecutionId();
+            Xpp3Dom dom = session.getProject().getGoalConfiguration( groupId, artifactId, executionId, goalId );
 
             PlexusConfiguration pomConfiguration;
             if ( dom == null )
@@ -451,9 +453,9 @@ public class DefaultPluginManager
 
             String goalExecId = goalName;
 
-            if ( goalInstance.getExecutionId() != null )
+            if ( mojoExecution.getExecutionId() != null )
             {
-                goalExecId += " {execution: " + goalInstance.getExecutionId() + "}";
+                goalExecId += " {execution: " + mojoExecution.getExecutionId() + "}";
             }
 
             dispatcher.dispatchStart( event, goalExecId );

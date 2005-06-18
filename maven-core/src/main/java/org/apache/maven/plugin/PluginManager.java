@@ -32,7 +32,7 @@ public interface PluginManager
 {
     String ROLE = PluginManager.class.getName();
 
-    void executeMojo( MavenSession session, GoalInstance buildStep )
+    void executeMojo( MojoExecution execution, MavenSession session )
         throws MojoExecutionException, PluginManagerException, ArtifactResolutionException;
 
     PluginDescriptor verifyPlugin( String prefix );

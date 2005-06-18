@@ -19,6 +19,7 @@ package org.apache.maven.plugin.descriptor;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -40,7 +41,7 @@ public class PluginDescriptor
     private String source;
 
     private boolean inheritedByDefault = true;
-    
+
     private List artifacts;
 
     // ----------------------------------------------------------------------
@@ -55,7 +56,8 @@ public class PluginDescriptor
     public void addMojo( MojoDescriptor mojoDescriptor )
         throws DuplicateMojoDescriptorException
     {
-        // this relies heavily on the equals() and hashCode() for ComponentDescriptor, 
+        MojoDescriptor existing = null;
+        // this relies heavily on the equals() and hashCode() for ComponentDescriptor,
         // which uses role:roleHint for identity...and roleHint == goalPrefix:goal.
         // role does not vary for Mojos.
         List mojos = getComponents();
@@ -64,8 +66,11 @@ public class PluginDescriptor
         {
             int indexOf = mojos.indexOf( mojoDescriptor );
 
-            MojoDescriptor existing = (MojoDescriptor) mojos.get( indexOf );
+            existing = (MojoDescriptor) mojos.get( indexOf );
+        }
 
+        if ( existing != null )
+        {
             throw new DuplicateMojoDescriptorException( getGoalPrefix(), mojoDescriptor.getGoal(), existing
                 .getImplementation(), mojoDescriptor.getImplementation() );
         }
@@ -191,7 +196,7 @@ public class PluginDescriptor
     {
         this.inheritedByDefault = inheritedByDefault;
     }
-    
+
     public List getArtifacts()
     {
         return artifacts;
@@ -215,5 +220,22 @@ public class PluginDescriptor
     public int hashCode()
     {
         return 10 + getId().hashCode();
+    }
+
+    public MojoDescriptor getMojo( String goal )
+    {
+        // TODO: could we use a map? Maybe if the parent did that for components too, as this is too vulnerable to
+        // changes above not being propogated to the map
+
+        MojoDescriptor mojoDescriptor = null;
+        for ( Iterator i = getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
+        {
+            MojoDescriptor desc = (MojoDescriptor) i.next();
+            if ( goal.equals( desc.getGoal() ) )
+            {
+                mojoDescriptor = desc;
+            }
+        }
+        return mojoDescriptor;
     }
 }

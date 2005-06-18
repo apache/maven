@@ -32,5 +32,4 @@ public interface LifecycleExecutor
     MavenExecutionResponse execute( List tasks, MavenSession session )
         throws LifecycleExecutionException;
 
-    List getPhases();
 }

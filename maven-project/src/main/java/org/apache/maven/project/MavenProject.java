@@ -27,6 +27,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Goal;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
@@ -36,6 +37,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Scm;
+import org.apache.maven.model.PluginExecution;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -877,5 +880,68 @@ public class MavenProject
             attachedArtifacts = new ArrayList();
         }
         return attachedArtifacts;
+    }
+
+    public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,
+                                         String goalId )
+    {
+        Xpp3Dom dom = null;
+
+        // ----------------------------------------------------------------------
+        // I would like to be able to lookup the Mojo object using a key but
+        // we have a limitation in modello that will be remedied shortly. So
+        // for now I have to iterate through and see what we have.
+        // ----------------------------------------------------------------------
+
+        if ( getBuildPlugins() != null )
+        {
+            for ( Iterator iterator = getBuildPlugins().iterator(); iterator.hasNext(); )
+            {
+                Plugin plugin = (Plugin) iterator.next();
+
+                if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
+                {
+                    dom = (Xpp3Dom) plugin.getConfiguration();
+
+                    // TODO: this part is deprecated
+                    if ( goalId != null )
+                    {
+                        Goal goal = (Goal) plugin.getGoalsAsMap().get( goalId );
+                        if ( goal != null )
+                        {
+                            Xpp3Dom goalConfiguration = (Xpp3Dom) goal.getConfiguration();
+                            if ( goalConfiguration != null )
+                            {
+                                Xpp3Dom newDom = new Xpp3Dom( goalConfiguration );
+                                dom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
+                            }
+                        }
+                    }
+
+                    if ( executionId != null )
+                    {
+                        PluginExecution execution = (PluginExecution) plugin.getExecutionsAsMap().get( executionId );
+                        if ( execution != null )
+                        {
+                            Xpp3Dom executionConfiguration = (Xpp3Dom) execution.getConfiguration();
+                            if ( executionConfiguration != null )
+                            {
+                                Xpp3Dom newDom = new Xpp3Dom( executionConfiguration );
+                                dom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if ( dom != null )
+        {
+            // make a copy so the original in the POM doesn't get messed with
+            dom = new Xpp3Dom( dom );
+        }
+
+        return dom;
     }
 }

@@ -1,7 +1,6 @@
 package org.apache.maven.project;
 
 import org.apache.maven.model.Goal;
-import org.apache.maven.model.GoalContainer;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
@@ -31,9 +30,8 @@ import java.util.TreeMap;
 
 public final class ModelUtils
 {
-
     public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
-                                        boolean handleAsInheritance )
+                                         boolean handleAsInheritance )
     {
         if ( childContainer == null || parentContainer == null )
         {
@@ -55,8 +53,8 @@ public final class ModelUtils
 
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || parentInherited == null
-                    || Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || parentInherited == null ||
+                    Boolean.valueOf( parentInherited ).booleanValue() )
                 {
 
                     Plugin assembledPlugin = parentPlugin;
@@ -109,7 +107,7 @@ public final class ModelUtils
         }
 
         // merge the lists of goals that are not attached to an <execution/>
-        ModelUtils.mergeGoalContainerDefinitions( child, parent, handleAsInheritance );
+        ModelUtils.mergeGoalContainerDefinitions( child, parent );
 
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
@@ -136,7 +134,7 @@ public final class ModelUtils
 
                     if ( childExecution != null )
                     {
-                        ModelUtils.mergeGoalContainerDefinitions( childExecution, parentExecution, handleAsInheritance );
+                        ModelUtils.mergePluginExecutionDefinitions( childExecution, parentExecution );
 
                         assembled = childExecution;
                     }
@@ -168,8 +166,12 @@ public final class ModelUtils
 
     }
 
-    private static void mergeGoalContainerDefinitions( GoalContainer child, GoalContainer parent,
-                                                      boolean handleAsInheritance )
+    /**
+     * @param child
+     * @param parent
+     * @deprecated
+     */
+    private static void mergeGoalContainerDefinitions( Plugin child, Plugin parent )
     {
         List parentGoals = parent.getGoals();
 
@@ -186,33 +188,23 @@ public final class ModelUtils
                 {
                     Goal parentGoal = (Goal) it.next();
 
-                    String parentInherited = parentGoal.getInherited();
+                    Goal assembledGoal = parentGoal;
 
-                    if ( !handleAsInheritance || parentInherited == null
-                        || Boolean.valueOf( parentInherited ).booleanValue() )
+                    Goal childGoal = (Goal) childGoals.get( parentGoal.getId() );
+
+                    if ( childGoal != null )
                     {
-                        Goal assembledGoal = parentGoal;
+                        Xpp3Dom childGoalConfig = (Xpp3Dom) childGoal.getConfiguration();
+                        Xpp3Dom parentGoalConfig = (Xpp3Dom) parentGoal.getConfiguration();
 
-                        Goal childGoal = (Goal) childGoals.get( parentGoal.getId() );
+                        childGoalConfig = Xpp3Dom.mergeXpp3Dom( childGoalConfig, parentGoalConfig );
 
-                        if ( childGoal != null )
-                        {
-                            Xpp3Dom childGoalConfig = (Xpp3Dom) childGoal.getConfiguration();
-                            Xpp3Dom parentGoalConfig = (Xpp3Dom) parentGoal.getConfiguration();
+                        childGoal.setConfiguration( childGoalConfig );
 
-                            childGoalConfig = Xpp3Dom.mergeXpp3Dom( childGoalConfig, parentGoalConfig );
-
-                            childGoal.setConfiguration( childGoalConfig );
-
-                            assembledGoal = childGoal;
-                        }
-                        else if ( handleAsInheritance && parentInherited == null )
-                        {
-                            assembledGoal.unsetInheritanceApplied();
-                        }
-
-                        assembledGoals.put( assembledGoal.getId(), assembledGoal );
+                        assembledGoal = childGoal;
                     }
+
+                    assembledGoals.put( assembledGoal.getId(), assembledGoal );
                 }
 
                 for ( Iterator it = childGoals.entrySet().iterator(); it.hasNext(); )
@@ -242,4 +234,27 @@ public final class ModelUtils
         child.setConfiguration( childConfiguration );
     }
 
+    private static void mergePluginExecutionDefinitions( PluginExecution child, PluginExecution parent )
+    {
+        List parentGoals = parent.getGoals();
+
+        // if the supplemental goals are non-existent, then nothing related to goals changes.
+        if ( parentGoals != null && !parentGoals.isEmpty() )
+        {
+            List goals = new ArrayList( parentGoals );
+            if ( child.getGoals() != null )
+            {
+                goals.addAll( child.getGoals() );
+            }
+
+            child.setGoals( goals );
+        }
+
+        Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
+        Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
+
+        childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
+
+        child.setConfiguration( childConfiguration );
+    }
 }

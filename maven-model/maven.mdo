@@ -625,6 +625,14 @@
           <comment>These should ultimately only be compile time dependencies when transitive dependencies come into play.</comment>
         </field>
         <field>
+          <name>reports</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+            NOT A VALID ELEMENT. LISTED TO ALLOW LEGACY REPOSITORY POMs TO PARSE.
+          ]]></description>
+          <type>DOM</type>
+        </field>
+        <field>
           <name>reporting</name>
           <version>4.0.0</version>
           <description><![CDATA[
@@ -2013,7 +2021,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <!--@todo find better solution for managment of site deployments -->
+    <!--@todo find better solution for management of site deployments -->
     <class>
       <name>Site</name>
       <version>4.0.0</version>
@@ -2049,40 +2057,8 @@
       </fields>
     </class>
 
-    <!--
-
-    A sketch of what a plugin configuration might look like where
-    we have plugin wide parameters that apply to all goals/mojos
-    and goal/mojo specific parameters that will override any
-    of the plugin wide definitions.
-
-    At first the configuration element will be a flat set of properties
-    but i would like the configuration to actually be an arbiitrary
-    data model or a simple DOM like structure so that mojos can
-    be arbitrarily configured in the same fashion plexus plugins
-    are configured.
-
-    <plugins>
-      <plugin>
-        <id>plexus</id>
-        <configuration>
-          <key>value</key>
-        </configuration>
-        <goals>
-          <goal>
-            <id></id>
-            <configuration>
-              <key>value</key>
-            </configuration>
-          </goal>
-        </goals>
-      </plugin>
-    </plugins>
-
-    -->
-
     <class>
-      <name>GoalContainer</name>
+      <name>ConfigurationContainer</name>
       <version>4.0.0</version>
       <fields>
         <field>
@@ -2095,20 +2071,11 @@
           <name>configuration</name>
           <type>DOM</type>
         </field>
-        <field>
-          <name>goals</name>
-          <version>4.0.0</version>
-          <association>
-            <type>Goal</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
       </fields>
       <codeSegments>
         <codeSegment>
           <version>4.0.0</version>
           <code><![CDATA[
-    private Map goalMap = null;
     private boolean inheritanceApplied = true;
     
     public void unsetInheritanceApplied()
@@ -2120,28 +2087,6 @@
     {
         return inheritanceApplied;
     }
-    
-    public void flushGoalMap()
-    {
-        this.goalMap = null;
-    }
-
-    public Map getGoalsAsMap()
-    {
-        if ( goalMap == null )
-        {
-            goalMap = new HashMap();
-            if ( goals != null )
-            {
-                for ( Iterator i = goals.iterator(); i.hasNext(); )
-                {
-                    Goal g = (Goal) i.next();
-                    goalMap.put( g.getId(), g );
-                }
-            }
-        }
-        return goalMap;
-    }
           ]]></code>
         </codeSegment>
       </codeSegments>
@@ -2149,7 +2094,7 @@
     <class>
       <name>Plugin</name>
       <version>4.0.0</version>
-      <superClass>GoalContainer</superClass>
+      <superClass>ConfigurationContainer</superClass>
       <fields>
         <field>
           <name>groupId</name>
@@ -2176,6 +2121,15 @@
           <description>Multiple specifications of a set of goals, each having (possibly) different configuration</description>
           <association>
             <type>PluginExecution</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <!-- TODO: this is deprecated -->
+        <field>
+          <name>goals</name>
+          <version>4.0.0</version>
+          <association>
+            <type>Goal</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -2218,6 +2172,32 @@
     {
         return groupId + ":" + artifactId;
     }
+
+    /** @deprecated */
+    private Map goalMap = null;
+    /** @deprecated */
+    public void flushGoalMap()
+    {
+        this.goalMap = null;
+    }
+
+    /** @deprecated */
+    public Map getGoalsAsMap()
+    {
+        if ( goalMap == null )
+        {
+            goalMap = new HashMap();
+            if ( goals != null )
+            {
+                for ( Iterator i = goals.iterator(); i.hasNext(); )
+                {
+                    Goal g = (Goal) i.next();
+                    goalMap.put( g.getId(), g );
+                }
+            }
+        }
+        return goalMap;
+    }
           ]]></code>
         </codeSegment>
       </codeSegments>
@@ -2225,7 +2205,7 @@
     <class>
       <name>PluginExecution</name>
       <version>4.0.0</version>
-      <superClass>GoalContainer</superClass>
+      <superClass>ConfigurationContainer</superClass>
       <fields>
         <field>
           <name>id</name>
@@ -2233,8 +2213,22 @@
           <required>true</required>
           <type>String</type>
         </field>
+        <field>
+          <name>phase</name>
+          <version>4.0.0</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>goals</name>
+          <version>4.0.0</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
     </class>
+    <!-- TODO: deprecated -->
     <class>
       <name>Goal</name>
       <version>4.0.0</version>
@@ -2245,33 +2239,10 @@
           <type>String</type>
         </field>
         <field>
-          <name>inherited</name>
-          <version>4.0.0</version>
-          <description><![CDATA[Whether this goal configuration should be propagated to child POMs.]]></description>
-          <type>String</type>
-        </field>
-        <field>
           <name>configuration</name>
           <type>DOM</type>
         </field>
       </fields>
-      <codeSegments>
-        <codeSegment>
-          <code><![CDATA[
-    private boolean inheritanceApplied = true;
-    
-    public void unsetInheritanceApplied()
-    {
-        this.inheritanceApplied = false;
-    }
-    
-    public boolean isInheritanceApplied()
-    {
-        return inheritanceApplied;
-    }
-          ]]></code>
-        </codeSegment>
-      </codeSegments>
     </class>
     <class>
       <name>DependencyManagement</name>

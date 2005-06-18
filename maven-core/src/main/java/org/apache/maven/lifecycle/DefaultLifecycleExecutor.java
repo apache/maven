@@ -16,6 +16,7 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
@@ -24,7 +25,7 @@ import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.plugin.GoalInstance;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
@@ -48,11 +49,10 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id: DefaultLifecycleExecutor.java,v 1.16 2005/03/04 09:04:25
  *          jdcasey Exp $
- * @todo this is structured somewhat confusingly. Attempt to "flatten out" to reduce the number of paths through by
- * compiling the list of plugins/tasks first.
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
@@ -75,7 +75,7 @@ public class DefaultLifecycleExecutor
     // ----------------------------------------------------------------------
 
     /**
-     * Execute a list of tasks. Each task may be a phase in the lifecycle or the
+     * Execute a task. Each task may be a phase in the lifecycle or the
      * execution of a mojo.
      *
      * @param tasks
@@ -90,7 +90,11 @@ public class DefaultLifecycleExecutor
 
         try
         {
-            processGoals( session, tasks );
+            for ( Iterator i = tasks.iterator(); i.hasNext(); )
+            {
+                String task = (String) i.next();
+                executeGoal( task, session );
+            }
         }
         catch ( MojoExecutionException e )
         {
@@ -108,14 +112,12 @@ public class DefaultLifecycleExecutor
         return response;
     }
 
-    private void processGoals( MavenSession session, List tasks )
-        throws LifecycleExecutionException, PluginNotFoundException, MojoExecutionException,
-        ArtifactResolutionException
+    private void executeGoal( String task, MavenSession session )
+        throws LifecycleExecutionException, PluginNotFoundException, MojoExecutionException, ArtifactResolutionException
     {
         Map phaseMap = new HashMap();
-        Map goalInstanceMap = new HashMap();
 
-        String maxPhase = null;
+        String selectedPhase = null;
 
         for ( Iterator i = phases.iterator(); i.hasNext(); )
         {
@@ -124,192 +126,111 @@ public class DefaultLifecycleExecutor
             // Make a copy of the phase as we will modify it
             phaseMap.put( p, new ArrayList() );
 
-            if ( tasks.contains( p ) )
+            if ( task.equals( p ) )
             {
-                maxPhase = p;
+                selectedPhase = p;
             }
         }
 
-        MavenProject project = session.getProject();
+        List goals;
 
-        if ( maxPhase != null )
-        {
-            Map mappings;
-            try
-            {
-                LifecycleMapping m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, project.getPackaging() );
-                mappings = m.getPhases();
-            }
-            catch ( ComponentLookupException e )
-            {
-                getLogger().error( "No lifecycle mapping for type '" + project.getPackaging() + "': using defaults" );
-                mappings = defaultPhases;
-            }
-
-            for ( Iterator i = phases.iterator(); i.hasNext(); )
-            {
-                String phase = (String) i.next();
-
-                String phaseTasks = (String) mappings.get( phase );
-
-                if ( phaseTasks != null )
-                {
-                    for ( StringTokenizer tok = new StringTokenizer( phaseTasks, "," ); tok.hasMoreTokens(); )
-                    {
-                        String task = tok.nextToken().trim();
-
-                        MojoDescriptor mojoDescriptor = configureMojo( task, session, phaseMap );
-
-                        addToPhaseMap( phaseMap, phase, mojoDescriptor );
-
-                        List matchingGoalInstances = findMatchingGoalInstances( mojoDescriptor, project );
-
-                        for ( Iterator instanceIterator = matchingGoalInstances.iterator(); instanceIterator.hasNext(); )
-                        {
-                            GoalInstance goalInstance = (GoalInstance) instanceIterator.next();
-
-                            addToGoalInstanceMap( goalInstanceMap, goalInstance );
-                        }
-                    }
-                }
-
-                if ( phase.equals( maxPhase ) )
-                {
-                    break;
-                }
-            }
-        }
-
-        processPluginConfiguration( project, session, phaseMap, goalInstanceMap );
-
-        for ( Iterator i = tasks.iterator(); i.hasNext(); )
-        {
-            String task = (String) i.next();
-
-            // verify that all loose-leaf goals have had GoalInstance(s) configured for them...
-            // we only need to do this if the current task is not a phase name.
-            if ( !phaseMap.containsKey( task ) )
-            {
-                MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
-
-                if ( mojoDescriptor != null && !goalInstanceMap.containsKey( mojoDescriptor ) )
-                {
-                    List matchingGoalInstances = findMatchingGoalInstances( mojoDescriptor, project );
-
-                    for ( Iterator instanceIterator = matchingGoalInstances.iterator(); instanceIterator.hasNext(); )
-                    {
-                        GoalInstance goalInstance = (GoalInstance) instanceIterator.next();
-
-                        addToGoalInstanceMap( goalInstanceMap, goalInstance );
-                    }
-                }
-            }
-
-            // now we can proceed to actually load up the list of goals we're interested in.
-            List goals = processGoalChain( task, session, phaseMap );
-
-            for ( Iterator j = goals.iterator(); j.hasNext(); )
-            {
-                MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
-
-                List instances = (List) goalInstanceMap.get( mojoDescriptor );
-
-                if ( instances != null )
-                {
-                    for ( Iterator instanceIterator = instances.iterator(); instanceIterator.hasNext(); )
-                    {
-                        GoalInstance instance = (GoalInstance) instanceIterator.next();
-
-                        String executePhase = mojoDescriptor.getExecutePhase();
-
-                        if ( executePhase != null )
-                        {
-                            // TODO: is this too broad to execute?
-                            execute( Collections.singletonList( executePhase ), session );
-                        }
-
-                        try
-                        {
-                            pluginManager.executeMojo( session, instance );
-                        }
-                        catch ( PluginManagerException e )
-                        {
-                            throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
-                        }
-                    }
-                }
-                else
-                {
-                    throw new LifecycleExecutionException( "This goal has not been configured: "
-                        + mojoDescriptor.getGoal() );
-                }
-            }
-        }
-    }
-
-    private void addToGoalInstanceMap( Map goalInstanceMap, GoalInstance goalInstance )
-    {
-        MojoDescriptor mojoDescriptor = goalInstance.getMojoDescriptor();
-
-        List instances = (List) goalInstanceMap.get( mojoDescriptor );
-
-        if ( instances == null )
-        {
-            instances = new ArrayList();
-
-            goalInstanceMap.put( mojoDescriptor, instances );
-        }
-
-        int idx = instances.indexOf( goalInstance );
-
-        if ( idx > -1 )
-        {
-            GoalInstance cached = (GoalInstance) instances.get( idx );
-
-            cached.incorporate( goalInstance );
-        }
-        else
-        {
-            instances.add( goalInstance );
-        }
-    }
-
-    private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId,
-                                                  String version )
-    {
-        String key = Plugin.constructKey( groupId, artifactId );
-        Plugin plugin = (Plugin) project.getBuild().getPluginsAsMap().get( key );
-
-        if ( plugin == null )
-        {
-            plugin = new Plugin();
-            plugin.setGroupId( groupId );
-            plugin.setArtifactId( artifactId );
-            plugin.setVersion( version );
-
-            PluginManagement pluginManagement = project.getPluginManagement();
-            if ( pluginManagement != null )
-            {
-                Plugin def = (Plugin) pluginManagement.getPluginsAsMap().get( key );
-                if ( def != null )
-                {
-                    modelDefaultsInjector.mergePluginWithDefaults( plugin, def );
-                }
-            }
-
-            project.addPlugin( plugin );
-        }
-    }
-
-    private void processPluginConfiguration( MavenProject project, MavenSession mavenSession, Map phaseMap,
-                                            Map goalInstanceMap )
-        throws LifecycleExecutionException, ArtifactResolutionException
-    {
-        for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
+        // Need to verify all the plugins up front, as standalone goals should use the version from the POM.
+        for ( Iterator i = session.getProject().getBuildPlugins().iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
 
-            processPluginPhases( plugin, mavenSession, phaseMap, goalInstanceMap );
+            verifyPlugin( plugin, session );
+        }
+
+        if ( selectedPhase != null )
+        {
+            // we have a lifecycle phase, so lets bind all the necessary goals
+            constructLifecyclePhaseMap( session, phaseMap, selectedPhase );
+
+            goals = processGoalChain( selectedPhase, phaseMap );
+        }
+        else
+        {
+            MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
+            goals = Collections.singletonList( new MojoExecution( mojoDescriptor ) );
+        }
+
+        for ( Iterator i = goals.iterator(); i.hasNext(); )
+        {
+            MojoExecution mojoExecution = (MojoExecution) i.next();
+
+            String executePhase = mojoExecution.getMojoDescriptor().getExecutePhase();
+
+            if ( executePhase != null )
+            {
+                // TODO: with introduction of cloned lifecyle, we want to avoid reconstructing some things - narrow
+                executeGoal( executePhase, session );
+            }
+
+            try
+            {
+                pluginManager.executeMojo( mojoExecution, session );
+            }
+            catch ( PluginManagerException e )
+            {
+                throw new LifecycleExecutionException( "Internal error in the plugin manager", e );
+            }
+        }
+    }
+
+    private void constructLifecyclePhaseMap( MavenSession session, Map phaseMap, String selectedPhase )
+        throws ArtifactResolutionException, LifecycleExecutionException
+    {
+        // first, bind those associated with the packaging
+        bindLifecycleForPackaging( session, phaseMap, selectedPhase );
+
+        // next, loop over plugins and for any that have a phase, bind it
+        for ( Iterator i = session.getProject().getBuildPlugins().iterator(); i.hasNext(); )
+        {
+            Plugin plugin = (Plugin) i.next();
+
+            bindPluginToLifecycle( plugin, session, phaseMap );
+        }
+    }
+
+    private void bindLifecycleForPackaging( MavenSession session, Map phaseMap, String selectedPhase )
+        throws ArtifactResolutionException, LifecycleExecutionException
+    {
+        Map mappings;
+        String packaging = session.getProject().getPackaging();
+        try
+        {
+            LifecycleMapping m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
+            mappings = m.getPhases();
+        }
+        catch ( ComponentLookupException e )
+        {
+            getLogger().error( "No lifecycle mapping for type '" + packaging + "': using defaults" );
+            mappings = defaultPhases;
+        }
+
+        boolean finished = false;
+        for ( Iterator i = phases.iterator(); i.hasNext() && !finished; )
+        {
+            String phase = (String) i.next();
+
+            String phaseTasks = (String) mappings.get( phase );
+
+            if ( phaseTasks != null )
+            {
+                for ( StringTokenizer tok = new StringTokenizer( phaseTasks, "," ); tok.hasMoreTokens(); )
+                {
+                    String goal = tok.nextToken().trim();
+
+                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session );
+                    addToPhaseMap( phaseMap, phase, new MojoExecution( mojoDescriptor ), session.getSettings() );
+                }
+            }
+
+            if ( phase.equals( selectedPhase ) )
+            {
+                finished = true;
+            }
         }
     }
 
@@ -319,10 +240,45 @@ public class DefaultLifecycleExecutor
      * to execute for that given phase.
      *
      * @param session
-     * @param goalInstanceMap 
      */
-    private void processPluginPhases( Plugin plugin, MavenSession session, Map phaseMap, Map goalInstanceMap )
+    private void bindPluginToLifecycle( Plugin plugin, MavenSession session, Map phaseMap )
         throws LifecycleExecutionException, ArtifactResolutionException
+    {
+        if ( plugin.getGoals() != null && !plugin.getGoals().isEmpty() )
+        {
+            getLogger().warn(
+                "DEPRECATED: goal definitions for plugin '" + plugin.getKey() + "' must be in an executions element" );
+        }
+
+        PluginDescriptor pluginDescriptor;
+        Settings settings = session.getSettings();
+
+        pluginDescriptor = verifyPlugin( plugin, session );
+
+        if ( pluginDescriptor.getMojos() != null && !pluginDescriptor.getMojos().isEmpty() )
+        {
+            // use the plugin if inherit was true in a base class, or it is in the current POM, otherwise use the default inheritence setting
+            if ( plugin.isInheritanceApplied() || pluginDescriptor.isInheritedByDefault() )
+            {
+                bindGoalMapToLifecycle( pluginDescriptor, plugin.getGoalsAsMap(), phaseMap, settings );
+
+                List executions = plugin.getExecutions();
+
+                if ( executions != null )
+                {
+                    for ( Iterator it = executions.iterator(); it.hasNext(); )
+                    {
+                        PluginExecution execution = (PluginExecution) it.next();
+
+                        bindExecutionToLifecycle( pluginDescriptor, phaseMap, execution, settings );
+                    }
+                }
+            }
+        }
+    }
+
+    private PluginDescriptor verifyPlugin( Plugin plugin, MavenSession session )
+        throws ArtifactResolutionException, LifecycleExecutionException
     {
         String groupId = plugin.getGroupId();
 
@@ -333,8 +289,10 @@ public class DefaultLifecycleExecutor
         PluginDescriptor pluginDescriptor;
         try
         {
-            pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(), session
-                .getSettings(), session.getLocalRepository() );
+            MavenProject project = session.getProject();
+            ArtifactRepository localRepository = session.getLocalRepository();
+            pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, project, session.getSettings(),
+                                                           localRepository );
         }
         catch ( PluginManagerException e )
         {
@@ -344,87 +302,80 @@ public class DefaultLifecycleExecutor
         {
             throw new LifecycleExecutionException( "Error resolving plugin version", e );
         }
-
-        if ( plugin.isInheritanceApplied() || pluginDescriptor.isInheritedByDefault() )
-        {
-            processGoalContainerPhases( plugin, null, pluginDescriptor, session, plugin.getGoalsAsMap(), phaseMap,
-                                        goalInstanceMap );
-
-            List executions = plugin.getExecutions();
-
-            if ( executions != null )
-            {
-                for ( Iterator it = executions.iterator(); it.hasNext(); )
-                {
-                    PluginExecution execution = (PluginExecution) it.next();
-
-                    if ( execution.isInheritanceApplied() )
-                    {
-                        processGoalContainerPhases( plugin, execution, pluginDescriptor, session, execution
-                            .getGoalsAsMap(), phaseMap, goalInstanceMap );
-                    }
-                }
-            }
-        }
-    }
-
-    private void processGoalContainerPhases( Plugin plugin, PluginExecution execution,
-                                            PluginDescriptor pluginDescriptor, MavenSession session, Map goalMap,
-                                            Map phaseMap, Map goalInstanceMap )
-        throws LifecycleExecutionException
-    {
-        // ----------------------------------------------------------------------
-        // Look to see if the plugin configuration specifies particular mojos
-        // within the plugin. If this is the case then simply configure the
-        // mojos the user has specified and ignore the rest.
-        // ----------------------------------------------------------------------
-
-        if ( pluginDescriptor.getMojos() != null )
-        {
-            for ( Iterator j = pluginDescriptor.getMojos().iterator(); j.hasNext(); )
-            {
-                MojoDescriptor mojoDescriptor = (MojoDescriptor) j.next();
-
-                // TODO: remove later
-                if ( mojoDescriptor.getGoal() == null )
-                {
-                    throw new LifecycleExecutionException( "The plugin " + pluginDescriptor.getId()
-                        + " was built with an older version of Maven" );
-                }
-
-                Goal goal = (Goal) goalMap.get( mojoDescriptor.getGoal() );
-
-                if ( goalMap.isEmpty() )
-                {
-                    configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
-
-                    addToGoalInstanceMap( goalInstanceMap, new GoalInstance( plugin, execution, goal, mojoDescriptor ) );
-                }
-                else if ( goal != null )
-                {
-                    // We have to check to see that the inheritance rules have been applied before binding this mojo.
-                    if ( goal.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
-                    {
-                        configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
-
-                        addToGoalInstanceMap( goalInstanceMap, new GoalInstance( plugin, execution, goal,
-                                                                                 mojoDescriptor ) );
-                    }
-                }
-            }
-        }
+        return pluginDescriptor;
     }
 
     /**
-     * Take a look at a mojo contained within a plugin, look to see whether it contributes to a
-     * phase in the lifecycle and if it does place it at the end of the list of goals
-     * to execute for the stated phase.
-     *
-     * @param mojoDescriptor
+     * @deprecated
      */
-    private void configureMojoPhaseBinding( MojoDescriptor mojoDescriptor, Map phaseMap, Settings settings )
+    private void bindGoalMapToLifecycle( PluginDescriptor pluginDescriptor, Map goalMap, Map phaseMap,
+                                         Settings settings )
         throws LifecycleExecutionException
     {
+        for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
+        {
+            MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
+
+            Goal goal = (Goal) goalMap.get( mojoDescriptor.getGoal() );
+
+            if ( goal != null )
+            {
+                // We have to check to see that the inheritance rules have been applied before binding this mojo.
+                if ( mojoDescriptor.isInheritedByDefault() )
+                {
+                    if ( mojoDescriptor.getPhase() != null )
+                    {
+                        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+                        addToPhaseMap( phaseMap, mojoDescriptor.getPhase(), mojoExecution, settings );
+                    }
+                }
+            }
+        }
+    }
+
+    private void bindExecutionToLifecycle( PluginDescriptor pluginDescriptor, Map phaseMap, PluginExecution execution,
+                                           Settings settings )
+        throws LifecycleExecutionException
+    {
+        for ( Iterator i = execution.getGoals().iterator(); i.hasNext(); )
+        {
+            String goal = (String) i.next();
+
+            MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
+            if ( mojoDescriptor == null )
+            {
+                throw new LifecycleExecutionException( "Goal from the POM '" + goal + "' was not found in the plugin" );
+            }
+
+            // We have to check to see that the inheritance rules have been applied before binding this mojo.
+            if ( execution.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
+            {
+                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
+                if ( execution.getPhase() != null )
+                {
+                    addToPhaseMap( phaseMap, execution.getPhase(), mojoExecution, settings );
+                }
+                else if ( mojoDescriptor.getPhase() != null )
+                {
+                    // if the phase was not in the configuration, use the phase in the descriptor
+                    addToPhaseMap( phaseMap, mojoDescriptor.getPhase(), mojoExecution, settings );
+                }
+            }
+        }
+    }
+
+    private void addToPhaseMap( Map phaseMap, String phase, MojoExecution mojoExecution, Settings settings )
+        throws LifecycleExecutionException
+    {
+        List goals = (List) phaseMap.get( phase );
+
+        if ( goals == null )
+        {
+            String message = "Required phase '" + phase + "' not found";
+            throw new LifecycleExecutionException( message );
+        }
+
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         if ( settings.isOffline() && mojoDescriptor.isOnlineRequired() )
         {
             String goal = mojoDescriptor.getGoal();
@@ -432,128 +383,29 @@ public class DefaultLifecycleExecutor
         }
         else
         {
-            if ( mojoDescriptor.getPhase() != null )
-            {
-                addToPhaseMap( phaseMap, mojoDescriptor.getPhase(), mojoDescriptor );
-            }
+            goals.add( mojoExecution );
         }
     }
 
-    private void addToPhaseMap( Map phaseMap, String phase, MojoDescriptor mojoDescriptor )
-        throws LifecycleExecutionException
-    {
-        if ( phase != null )
-        {
-            List goals = (List) phaseMap.get( phase );
-
-            if ( goals == null )
-            {
-                String message = "Required phase '" + phase + "' not found";
-                throw new LifecycleExecutionException( message );
-            }
-
-            if ( !goals.contains( mojoDescriptor ) )
-            {
-                goals.add( mojoDescriptor );
-            }
-        }
-    }
-
-    private List processGoalChain( String task, MavenSession session, Map phaseMap )
-        throws LifecycleExecutionException, ArtifactResolutionException
+    private List processGoalChain( String task, Map phaseMap )
     {
         List goals = new ArrayList();
 
-        if ( phaseMap.containsKey( task ) )
+        // only execute up to the given phase
+        int index = phases.indexOf( task );
+
+        for ( int i = 0; i <= index; i++ )
         {
-            // only execute up to the given phase
-            int index = phases.indexOf( task );
+            String p = (String) phases.get( i );
 
-            for ( int j = 0; j <= index; j++ )
+            List phaseGoals = (List) phaseMap.get( p );
+
+            if ( phaseGoals != null )
             {
-                String p = (String) phases.get( j );
-
-                List phaseGoals = (List) phaseMap.get( p );
-
-                if ( phaseGoals != null )
-                {
-                    goals.addAll( phaseGoals );
-                }
+                goals.addAll( phaseGoals );
             }
         }
-        else
-        {
-            MojoDescriptor mojoDescriptor = configureMojo( task, session, phaseMap );
-
-            goals.add( mojoDescriptor );
-        }
-
         return goals;
-    }
-
-    private MojoDescriptor configureMojo( String task, MavenSession session, Map phaseMap )
-        throws LifecycleExecutionException, ArtifactResolutionException
-    {
-        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
-
-        configureMojoPhaseBinding( mojoDescriptor, phaseMap, session.getSettings() );
-
-        return mojoDescriptor;
-    }
-
-    private List findMatchingGoalInstances( MojoDescriptor mojoDescriptor, MavenProject project )
-    {
-        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-
-        List plugins = project.getBuildPlugins();
-
-        List matchingSteps = new ArrayList();
-
-        Plugin plugin = null;
-
-        for ( Iterator it = plugins.iterator(); it.hasNext(); )
-        {
-            plugin = (Plugin) it.next();
-
-            if ( pluginDescriptor.getPluginLookupKey().equals( plugin.getKey() ) )
-            {
-                String mojoGoal = mojoDescriptor.getGoal();
-
-                Goal unattached = (Goal) plugin.getGoalsAsMap().get( mojoDescriptor.getGoal() );
-
-                if ( unattached != null )
-                {
-                    matchingSteps.add( new GoalInstance( plugin, unattached, mojoDescriptor ) );
-                }
-
-                List executions = plugin.getExecutions();
-
-                if ( executions != null )
-                {
-                    for ( Iterator executionIterator = executions.iterator(); executionIterator.hasNext(); )
-                    {
-                        PluginExecution execution = (PluginExecution) executionIterator.next();
-
-                        Goal attached = (Goal) execution.getGoalsAsMap().get( mojoDescriptor.getGoal() );
-
-                        if ( attached != null )
-                        {
-                            matchingSteps.add( new GoalInstance( plugin, execution, attached, mojoDescriptor ) );
-                        }
-                    }
-                }
-
-                break;
-            }
-        }
-
-        // if nothing is configured, then we need to add a "fully detached" step...
-        if ( matchingSteps.isEmpty() )
-        {
-            matchingSteps.add( new GoalInstance( mojoDescriptor ) );
-        }
-
-        return matchingSteps;
     }
 
     private MojoDescriptor getMojoDescriptor( String task, MavenSession session )
@@ -590,18 +442,17 @@ public class DefaultLifecycleExecutor
         }
         else
         {
-            String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or"
-                + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+            String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or" +
+                " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
             throw new LifecycleExecutionException( message );
         }
 
+        MavenProject project = session.getProject();
         if ( pluginDescriptor == null )
         {
             try
             {
-                injectHandlerPluginConfiguration( session.getProject(), groupId, artifactId, version );
-
-                pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, session.getProject(),
+                pluginDescriptor = pluginManager.verifyPlugin( groupId, artifactId, version, project,
                                                                session.getSettings(), session.getLocalRepository() );
             }
             catch ( PluginManagerException e )
@@ -613,33 +464,11 @@ public class DefaultLifecycleExecutor
                 throw new LifecycleExecutionException( "Error resolving plugin version", e );
             }
         }
-        else
-        {
-            injectHandlerPluginConfiguration( session.getProject(), pluginDescriptor.getGroupId(), pluginDescriptor
-                .getArtifactId(), pluginDescriptor.getVersion() );
-        }
 
-        MojoDescriptor mojoDescriptor = null;
+        injectHandlerPluginConfiguration( project, pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(),
+                                          pluginDescriptor.getVersion() );
 
-        if ( pluginDescriptor.getMojos() != null )
-        {
-            // TODO: should be able to create a Map from this
-            for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
-            {
-                MojoDescriptor desc = (MojoDescriptor) i.next();
-                if ( desc.getGoal().equals( goal ) )
-                {
-                    mojoDescriptor = desc;
-                }
-            }
-        }
-        else
-        {
-            throw new LifecycleExecutionException( "The plugin " + pluginDescriptor.getGroupId() + ":"
-                + pluginDescriptor.getArtifactId() + ":" + pluginDescriptor.getVersion()
-                + " doesn't contain any mojo. Check if it isn't corrupted." );
-        }
-
+        MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
         if ( mojoDescriptor == null )
         {
             throw new LifecycleExecutionException( "Required goal not found: " + task );
@@ -648,9 +477,30 @@ public class DefaultLifecycleExecutor
         return mojoDescriptor;
     }
 
-    public List getPhases()
+    private void injectHandlerPluginConfiguration( MavenProject project, String groupId, String artifactId,
+                                                   String version )
     {
-        return phases;
-    }
+        String key = Plugin.constructKey( groupId, artifactId );
+        Plugin plugin = (Plugin) project.getBuild().getPluginsAsMap().get( key );
 
+        if ( plugin == null )
+        {
+            plugin = new Plugin();
+            plugin.setGroupId( groupId );
+            plugin.setArtifactId( artifactId );
+            plugin.setVersion( version );
+
+            PluginManagement pluginManagement = project.getPluginManagement();
+            if ( pluginManagement != null )
+            {
+                Plugin def = (Plugin) pluginManagement.getPluginsAsMap().get( key );
+                if ( def != null )
+                {
+                    modelDefaultsInjector.mergePluginWithDefaults( plugin, def );
+                }
+            }
+
+            project.addPlugin( plugin );
+        }
+    }
 }

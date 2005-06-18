@@ -145,7 +145,12 @@ public class DefaultPluginVersionManager
         
         // determines what should be done if we're in non-interactive mode.
         // if true, then just update the registry with the new versions.
-        boolean autoUpdate = Boolean.valueOf( pluginRegistry.getAutoUpdate() ).booleanValue();
+        String s = getPluginRegistry( groupId, artifactId ).getAutoUpdate();
+        boolean autoUpdate = true;
+        if ( s != null )
+        {
+            autoUpdate = Boolean.valueOf( s ).booleanValue();
+        }
 
         // We should persist by default if:
         // 1. we detected a change in the plugin version from what was in the registry, or
