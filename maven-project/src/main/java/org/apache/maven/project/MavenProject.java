@@ -38,6 +38,8 @@ import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -924,6 +926,53 @@ public class MavenProject
                         if ( execution != null )
                         {
                             Xpp3Dom executionConfiguration = (Xpp3Dom) execution.getConfiguration();
+                            if ( executionConfiguration != null )
+                            {
+                                Xpp3Dom newDom = new Xpp3Dom( executionConfiguration );
+                                dom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if ( dom != null )
+        {
+            // make a copy so the original in the POM doesn't get messed with
+            dom = new Xpp3Dom( dom );
+        }
+
+        return dom;
+    }
+
+    public Xpp3Dom getReportConfiguration( String pluginGroupId, String pluginArtifactId, String reportSetId )
+    {
+        Xpp3Dom dom = null;
+
+        // ----------------------------------------------------------------------
+        // I would like to be able to lookup the Mojo object using a key but
+        // we have a limitation in modello that will be remedied shortly. So
+        // for now I have to iterate through and see what we have.
+        // ----------------------------------------------------------------------
+
+        if ( getReportPlugins() != null )
+        {
+            for ( Iterator iterator = getReportPlugins().iterator(); iterator.hasNext(); )
+            {
+                ReportPlugin plugin = (ReportPlugin) iterator.next();
+
+                if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
+                {
+                    dom = (Xpp3Dom) plugin.getConfiguration();
+
+                    if ( reportSetId != null )
+                    {
+                        ReportSet reportSet = (ReportSet) plugin.getReportSetsAsMap().get( reportSetId );
+                        if ( reportSet != null )
+                        {
+                            Xpp3Dom executionConfiguration = (Xpp3Dom) reportSet.getConfiguration();
                             if ( executionConfiguration != null )
                             {
                                 Xpp3Dom newDom = new Xpp3Dom( executionConfiguration );

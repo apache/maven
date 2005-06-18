@@ -27,6 +27,7 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.InversionArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.ReportSet;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -349,8 +350,6 @@ public class DefaultPluginManager
     public void executeMojo( MojoExecution mojoExecution, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
-        PlexusContainer pluginContainer = null;
-
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
@@ -391,88 +390,24 @@ public class DefaultPluginManager
             }
         }
 
-        Mojo plugin = null;
-
         String goalName = mojoDescriptor.getFullGoalName();
+
+        PlexusContainer pluginContainer = getPluginContainer( mojoDescriptor.getPluginDescriptor() );
+
+        Mojo plugin = null;
 
         try
         {
-            String pluginKey = mojoDescriptor.getPluginDescriptor().getPluginLookupKey();
-
-            pluginContainer = container.getChildContainer( pluginKey );
-
-            if ( pluginContainer == null )
-            {
-                throw new PluginConfigurationException( "Cannot find PlexusContainer for plugin: " + pluginKey );
-            }
-
-            plugin = (Mojo) pluginContainer.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
-            plugin.setLog( mojoLogger );
-
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-
             String goalId = mojoDescriptor.getGoal();
             String groupId = pluginDescriptor.getGroupId();
             String artifactId = pluginDescriptor.getArtifactId();
             String executionId = mojoExecution.getExecutionId();
             Xpp3Dom dom = session.getProject().getGoalConfiguration( groupId, artifactId, executionId, goalId );
+            Xpp3Dom reportDom = session.getProject().getReportConfiguration( groupId, artifactId, executionId );
+            dom = Xpp3Dom.mergeXpp3Dom( dom, reportDom );
 
-            PlexusConfiguration pomConfiguration;
-            if ( dom == null )
-            {
-                pomConfiguration = new XmlPlexusConfiguration( "configuration" );
-            }
-            else
-            {
-                pomConfiguration = new XmlPlexusConfiguration( dom );
-            }
-
-            // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to
-            // override in the POM.
-            validatePomConfiguration( mojoDescriptor, pomConfiguration );
-
-            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration, mojoDescriptor
-                .getMojoConfiguration() );
-
-            // TODO: plexus
-            //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
-            //                                                                          mojoDescriptor.getConfiguration() );
-
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pluginDescriptor,
-                                                                                              pathTranslator,
-                                                                                              getLogger() );
-
-            checkRequiredParameters( mojoDescriptor, mergedConfiguration, expressionEvaluator, plugin );
-
-            populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, pluginContainer, expressionEvaluator );
-
-            // !! This is ripe for refactoring to an aspect.
-            // Event monitoring.
-            String event = MavenEvents.MOJO_EXECUTION;
-            EventDispatcher dispatcher = session.getEventDispatcher();
-
-            String goalExecId = goalName;
-
-            if ( mojoExecution.getExecutionId() != null )
-            {
-                goalExecId += " {execution: " + mojoExecution.getExecutionId() + "}";
-            }
-
-            dispatcher.dispatchStart( event, goalExecId );
-            try
-            {
-                plugin.execute();
-
-                dispatcher.dispatchEnd( event, goalExecId );
-            }
-            catch ( MojoExecutionException e )
-            {
-                session.getEventDispatcher().dispatchError( event, goalExecId, e );
-
-                throw e;
-            }
-            // End event monitoring.
-
+            plugin = getConfiguredMojo( pluginContainer, mojoDescriptor, session, dom );
         }
         catch ( PluginConfigurationException e )
         {
@@ -482,6 +417,32 @@ public class DefaultPluginManager
         catch ( ComponentLookupException e )
         {
             throw new MojoExecutionException( "Error looking up plugin: ", e );
+        }
+
+        // !! This is ripe for refactoring to an aspect.
+        // Event monitoring.
+        String event = MavenEvents.MOJO_EXECUTION;
+        EventDispatcher dispatcher = session.getEventDispatcher();
+
+        String goalExecId = goalName;
+
+        if ( mojoExecution.getExecutionId() != null )
+        {
+            goalExecId += " {execution: " + mojoExecution.getExecutionId() + "}";
+        }
+
+        dispatcher.dispatchStart( event, goalExecId );
+        try
+        {
+            plugin.execute();
+
+            dispatcher.dispatchEnd( event, goalExecId );
+        }
+        catch ( MojoExecutionException e )
+        {
+            session.getEventDispatcher().dispatchError( event, goalExecId, e );
+
+            throw e;
         }
         finally
         {
@@ -497,6 +458,100 @@ public class DefaultPluginManager
                 }
             }
         }
+    }
+
+    public List getReports( String groupId, String artifactId, String version, ReportSet reportSet,
+                            MavenSession session )
+        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException
+    {
+        PluginDescriptor pluginDescriptor = getPluginDescriptor( groupId, artifactId, version );
+
+        PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
+
+        List reports = new ArrayList();
+        for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
+        {
+            MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
+
+            // TODO: check ID is correct for reports
+            // TODO: this returns mojos that aren't reports
+            // if the POM configured no reports, give all from plugin
+            if ( reportSet == null || reportSet.getReports().contains( mojoDescriptor.getGoal() ) )
+            {
+                try
+                {
+                    String id = null;
+                    if ( reportSet != null )
+                    {
+                        id = reportSet.getId();
+                    }
+                    MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, id );
+
+                    String executionId = mojoExecution.getExecutionId();
+                    Xpp3Dom dom = session.getProject().getReportConfiguration( groupId, artifactId, executionId );
+
+                    reports.add( getConfiguredMojo( pluginContainer, mojoDescriptor, session, dom ) );
+                }
+                catch ( ComponentLookupException e )
+                {
+                    throw new PluginManagerException( "Error looking up plugin: ", e );
+                }
+            }
+        }
+        return reports;
+    }
+
+    private PlexusContainer getPluginContainer( PluginDescriptor pluginDescriptor )
+        throws PluginManagerException
+    {
+        String pluginKey = pluginDescriptor.getPluginLookupKey();
+
+        PlexusContainer pluginContainer = container.getChildContainer( pluginKey );
+
+        if ( pluginContainer == null )
+        {
+            throw new PluginManagerException( "Cannot find PlexusContainer for plugin: " + pluginKey );
+        }
+        return pluginContainer;
+    }
+
+    private Mojo getConfiguredMojo( PlexusContainer pluginContainer, MojoDescriptor mojoDescriptor,
+                                    MavenSession session, Xpp3Dom dom )
+        throws ComponentLookupException, PluginConfigurationException
+    {
+        Mojo plugin = (Mojo) pluginContainer.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
+        plugin.setLog( mojoLogger );
+
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+
+        PlexusConfiguration pomConfiguration;
+        if ( dom == null )
+        {
+            pomConfiguration = new XmlPlexusConfiguration( "configuration" );
+        }
+        else
+        {
+            pomConfiguration = new XmlPlexusConfiguration( dom );
+        }
+
+        // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to
+        // override in the POM.
+        validatePomConfiguration( mojoDescriptor, pomConfiguration );
+
+        PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration, mojoDescriptor
+            .getMojoConfiguration() );
+
+        // TODO: plexus
+        //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
+        //                                                                          mojoDescriptor.getConfiguration() );
+
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pluginDescriptor,
+                                                                                          pathTranslator, getLogger() );
+
+        checkRequiredParameters( mojoDescriptor, mergedConfiguration, expressionEvaluator, plugin );
+
+        populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, pluginContainer, expressionEvaluator );
+        return plugin;
     }
 
     private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration,
@@ -816,8 +871,9 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
+        // TODO: remove doxia
         artifactFilter = new ExclusionSetFilter(
-            new String[]{"classworlds", "maven-artifact", "maven-core", "maven-model", "maven-monitor", "maven-plugin-api", "maven-plugin-descriptor", "maven-project", "maven-settings", "plexus-container-default", "plexus-utils", "wagon-provider-api", "wagon-ssh", "wagon-http-lightweight", "wagon-file"} );
+            new String[]{"classworlds", "maven-artifact", "maven-core", "maven-model", "maven-monitor", "maven-plugin-api", "maven-plugin-descriptor", "maven-project", "maven-settings", "plexus-container-default", "plexus-utils", "wagon-provider-api", "wagon-ssh", "wagon-http-lightweight", "wagon-file", "doxia-core", "maven-reporting-api"} );
     }
 
     // ----------------------------------------------------------------------

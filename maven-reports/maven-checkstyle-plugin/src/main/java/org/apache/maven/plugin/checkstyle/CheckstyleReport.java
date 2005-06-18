@@ -76,6 +76,9 @@ public class CheckstyleReport
 
     private String extraFormatter = "plain";
 
+    /**
+     * @parameter expression="${resultFileName}"
+     */
     private String resultFileName = "checkstyle-result.txt";
 
     private String packageNamesFile;

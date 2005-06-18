@@ -23,6 +23,10 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.model.ReportSet;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -38,6 +42,9 @@ public interface PluginManager
     PluginDescriptor verifyPlugin( String prefix );
 
     PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
-                                  Settings settings, ArtifactRepository localRepository )
+                                   Settings settings, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException;
+
+    List getReports( String groupId, String artifactId, String version, ReportSet reportSet, MavenSession session )
+        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException;
 }

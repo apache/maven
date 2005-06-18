@@ -18,8 +18,11 @@ package org.apache.maven.doxia;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.ReportSet;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -37,13 +40,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -74,12 +70,11 @@ import java.util.StringTokenizer;
  */
 public class DoxiaMojo
     extends AbstractMojo
-    implements Contextualizable
 {
     private static final String RESOURCE_DIR = "org/apache/maven/doxia";
 
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
-    
+
     /**
      * @parameter expression="${settings}"
      * @required
@@ -167,11 +162,11 @@ public class DoxiaMojo
     private ArtifactRepository localRepository;
 
     /**
-     * @parameter expression="${project.remoteArtifactRepositories}"
+     * @parameter expression="${session}"
      * @required
      * @readonly
      */
-    private List remoteRepositories;
+    private MavenSession session;
 
     private List projectInfos = new ArrayList();
 
@@ -180,8 +175,6 @@ public class DoxiaMojo
     private Locale defaultLocale = Locale.ENGLISH;
 
     private List localesList = new ArrayList();
-
-    private PlexusContainer container;
 
     public void execute()
         throws MojoExecutionException
@@ -208,7 +201,7 @@ public class DoxiaMojo
             }
         }
 
-        Map reports = getReports();
+        List reports = getReports();
 
         try
         {
@@ -243,13 +236,11 @@ public class DoxiaMojo
                 //Generate reports
                 if ( reports != null )
                 {
-                    for ( Iterator j = reports.keySet().iterator(); j.hasNext(); )
+                    for ( Iterator j = reports.iterator(); j.hasNext(); )
                     {
-                        String reportKey = (String) j.next();
+                        MavenReport report = (MavenReport) j.next();
 
-                        getLog().info( "Generate " + reportKey + " report." );
-
-                        MavenReport report = (MavenReport) reports.get( reportKey );
+                        getLog().info( "Generate " + report.getName( locale ) + " report." );
 
                         report.setConfiguration( config );
 
@@ -340,10 +331,10 @@ public class DoxiaMojo
         }
     }
 
-    private void categorizeReports( Map reports )
+    private void categorizeReports( List reports )
         throws MojoExecutionException
     {
-        for ( Iterator i = reports.values().iterator(); i.hasNext(); )
+        for ( Iterator i = reports.iterator(); i.hasNext(); )
         {
             MavenReport report = (MavenReport) i.next();
             if ( MavenReport.CATEGORY_PROJECT_INFORMATION.equals( report.getCategoryName() ) )
@@ -356,8 +347,9 @@ public class DoxiaMojo
             }
             else
             {
-                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for " +
-                                                  report.getName( defaultLocale ) + " mojo isn't valid." );
+                throw new MojoExecutionException(
+                    "'" + report.getCategoryName() + "' category define for " + report.getName( defaultLocale ) +
+                        " mojo isn't valid." );
             }
         }
     }
@@ -366,20 +358,22 @@ public class DoxiaMojo
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"Project Documentation\">\n" );
-        buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.about" ) + " " +
-                       project.getName() + "\" href=\"/index.html\"/>\n" );
+        buffer.append(
+            "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.about" ) + " " +
+                project.getName() + "\" href=\"/index.html\"/>\n" );
 
         if ( projectInfos.size() > 0 )
         {
-            buffer.append( "    <item name=\"" +
-                           i18n.getString( "site-plugin", locale, "report.menu.projectinformation" ) +
-                           "\" href=\"/project-info.html\" collapse=\"true\">\n" );
+            buffer.append(
+                "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectinformation" ) +
+                    "\" href=\"/project-info.html\" collapse=\"true\">\n" );
 
             for ( Iterator i = projectInfos.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append( "        <item name=\"" + report.getName( locale ) + "\" href=\"/" +
-                               report.getOutputName() + ".html\"/>\n" );
+                buffer.append(
+                    "        <item name=\"" + report.getName( locale ) + "\" href=\"/" + report.getOutputName() +
+                        ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -387,14 +381,16 @@ public class DoxiaMojo
 
         if ( projectReports.size() > 0 )
         {
-            buffer.append( "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectreports" ) +
-                           "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
+            buffer.append(
+                "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectreports" ) +
+                    "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
 
             for ( Iterator i = projectReports.iterator(); i.hasNext(); )
             {
                 MavenReport report = (MavenReport) i.next();
-                buffer.append( "        <item name=\"" + report.getName( locale ) + "\" href=\"/" +
-                               report.getOutputName() + ".html\"/>\n" );
+                buffer.append(
+                    "        <item name=\"" + report.getName( locale ) + "\" href=\"/" + report.getOutputName() +
+                        ".html\"/>\n" );
             }
 
             buffer.append( "    </item>\n" );
@@ -408,7 +404,7 @@ public class DoxiaMojo
     /**
      * @todo should only be needed once
      */
-    private InputStream getSiteDescriptor( Map reports, Locale locale )
+    private InputStream getSiteDescriptor( List reports, Locale locale )
         throws MojoExecutionException
     {
         File siteDescriptor = new File( siteDirectory, "site.xml" );
@@ -632,8 +628,8 @@ public class DoxiaMojo
 
                 if ( is == null )
                 {
-                    throw new IOException( "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE +
-                                           " template." );
+                    throw new IOException(
+                        "The resource " + line + " doesn't exists in " + DEFAULT_TEMPLATE + " template." );
                 }
 
                 File outputFile = new File( outputDirectory, line );
@@ -712,7 +708,7 @@ public class DoxiaMojo
         }
     }
 
-    private Map getReports()
+    private List getReports()
         throws MojoExecutionException
     {
         // TODO: not the best solution. Perhaps a mojo tag that causes the plugin manager to populate project reports instead?
@@ -721,18 +717,21 @@ public class DoxiaMojo
 
         if ( project.getModel().getReports() != null )
         {
-            getLog().error( "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead.");
+            getLog().error(
+                "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
         }
-        
+
+        List reports = new ArrayList();
         if ( reportPlugins != null )
         {
             for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
             {
                 org.apache.maven.model.ReportPlugin reportPlugin = (org.apache.maven.model.ReportPlugin) it.next();
+
                 try
                 {
-                    pluginManager.verifyPlugin( reportPlugin.getGroupId(), reportPlugin.getArtifactId(), reportPlugin.getVersion(),
-                                                project, settings, localRepository );
+                    pluginManager.verifyPlugin( reportPlugin.getGroupId(), reportPlugin.getArtifactId(),
+                                                reportPlugin.getVersion(), project, settings, localRepository );
                 }
                 catch ( ArtifactResolutionException e )
                 {
@@ -746,27 +745,43 @@ public class DoxiaMojo
                 {
                     throw new MojoExecutionException( "Cannot find report plugin", e );
                 }
+
+                try
+                {
+                    List reportSets = reportPlugin.getReportSets();
+                    if ( reportSets == null || reportSets.isEmpty() )
+                    {
+                        reports.addAll(
+                            pluginManager.getReports( reportPlugin.getGroupId(), reportPlugin.getArtifactId(),
+                                                      reportPlugin.getVersion(), null, session ) );
+
+                    }
+                    else
+                    {
+                        for ( Iterator j = reportSets.iterator(); j.hasNext(); )
+                        {
+                            ReportSet reportSet = (ReportSet) j.next();
+
+                            reports.addAll(
+                                pluginManager.getReports( reportPlugin.getGroupId(), reportPlugin.getArtifactId(),
+                                                          reportPlugin.getVersion(), reportSet, session ) );
+                        }
+                    }
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new MojoExecutionException( "Error getting reports", e );
+                }
+                catch ( PluginVersionResolutionException e )
+                {
+                    throw new MojoExecutionException( "Error getting reports", e );
+                }
+                catch ( PluginConfigurationException e )
+                {
+                    throw new MojoExecutionException( "Error getting reports", e );
+                }
             }
         }
-
-        // TODO: this is not good (using the container), also because it will import every report ever loaded
-        //   What we need is to be able to select individual reports and know what reports are inside a plugin
-        //   It may be better to push the report section in the pom back to "plugins", then just have a reports list
-        //   again which are role hints to look up
-
-        try
-        {
-            return container.lookupMap( MavenReport.ROLE );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new MojoExecutionException( "Unable to find reports", e );
-        }
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        return reports;
     }
 }

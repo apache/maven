@@ -84,6 +84,10 @@ public class PluginParameterExpressionEvaluator
         {
             value = context.getLocalRepository();
         }
+        else if ( expression.equals( "session" ) )
+        {
+            value = context;
+        }
         else if ( expression.equals( "project" ) )
         {
             value = context.getProject();
