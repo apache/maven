@@ -94,7 +94,7 @@
       <version>1.0-alpha-2</version>
     </dependency>
   </dependencies>
-  <reports>
+  <reporting>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -106,14 +106,10 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
     </plugins>
-  </reports>
+  </reporting>
   <distributionManagement>
     <site>
       <id>website</id>
