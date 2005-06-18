@@ -102,6 +102,9 @@ m2 clean:clean install
   enough information - you must also specify the goals you want run as part of your build.
 
   The goals that are configured will be added to the goals already bound to the lifecycle from the packaging selected.
+  If more than one goal is bound to a particular phase, the order used is that those from the packaging are executed
+  first, followed by those configured in the POM. Note that you can use the <<<executions>>> element to gain more
+  control over the order of particular goals.
 
   For example, the Modello plugin always binds <<<modello:java>>> to the <<<generate-sources>>> phase. So to use the
   Modello plugin and have it generate sources from a model and incorporate that into the build, you would add the
