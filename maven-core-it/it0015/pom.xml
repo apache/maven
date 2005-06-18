@@ -22,15 +22,10 @@
     </dependency>
   </dependencies>
   <build>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
-      </resource>
-      <resource>
-        <directory>src/main/scripts</directory>
-        <includes>
-          <include>**/*.mmld</include>
-        </includes>
       </resource>
     </resources>
   </build>

@@ -5,8 +5,12 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +33,76 @@ public abstract class AbstractScriptedMojoDescriptorExtractor
 
         List mojoDescriptors = extractMojoDescriptors( scriptFilesKeyedByBasedir, pluginDescriptor );
 
+        copyScriptsToOutputDirectory( scriptFilesKeyedByBasedir, project.getBuild().getOutputDirectory() );
+
         return mojoDescriptors;
+    }
+
+    private void copyScriptsToOutputDirectory( Map scriptFilesKeyedByBasedir, String outputDirectory )
+        throws ExtractionException
+    {
+        File outputDir = new File( outputDirectory );
+
+        if ( !outputDir.exists() )
+        {
+            outputDir.mkdirs();
+        }
+
+        for ( Iterator it = scriptFilesKeyedByBasedir.entrySet().iterator(); it.hasNext(); )
+        {
+            Map.Entry entry = (Map.Entry) it.next();
+
+            File sourceDir = new File( (String) entry.getKey() );
+
+            Set scripts = (Set) entry.getValue();
+
+            for ( Iterator scriptIterator = scripts.iterator(); scriptIterator.hasNext(); )
+            {
+                File scriptFile = (File) scriptIterator.next();
+
+                String relativePath = scriptFile.getPath().substring( sourceDir.getPath().length() );
+
+                if ( relativePath.charAt( 0 ) == File.separatorChar )
+                {
+                    relativePath = relativePath.substring( 1 );
+                }
+
+                File outputFile = new File( outputDir, relativePath ).getAbsoluteFile();
+
+                if ( !outputFile.getParentFile().exists() )
+                {
+                    outputFile.getParentFile().mkdirs();
+                }
+
+                FileInputStream in = null;
+                FileOutputStream out = null;
+
+                try
+                {
+                    in = new FileInputStream( scriptFile );
+                    out = new FileOutputStream( outputFile );
+
+                    byte[] buffer = new byte[16];
+                    int read = -1;
+
+                    while ( ( read = in.read( buffer ) ) > -1 )
+                    {
+                        out.write( buffer, 0, read );
+                    }
+
+                    out.flush();
+                }
+                catch ( IOException e )
+                {
+                    throw new ExtractionException( "Cannot copy script file: " + scriptFile + " to output: " + outputFile, e );
+                }
+                finally
+                {
+                    IOUtil.close( in );
+                    IOUtil.close( out );
+                }
+            }
+        }
     }
 
     protected abstract List extractMojoDescriptors( Map scriptFilesKeyedByBasedir, PluginDescriptor pluginDescriptor )

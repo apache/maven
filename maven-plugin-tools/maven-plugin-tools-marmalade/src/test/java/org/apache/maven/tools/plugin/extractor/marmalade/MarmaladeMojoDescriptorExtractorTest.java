@@ -16,6 +16,7 @@ package org.apache.maven.tools.plugin.extractor.marmalade;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -33,6 +34,19 @@ import java.util.List;
 public class MarmaladeMojoDescriptorExtractorTest
     extends PlexusTestCase
 {
+    
+    private String findThisBasedir()
+    {
+        String myClassFile = getClass().getName().replace('.', '/') + ".class";
+        
+        ClassLoader cloader = getClass().getClassLoader();
+        
+        URL myClassResource = cloader.getResource( myClassFile );
+        
+        String fullPath = myClassResource.getPath();
+        
+        return fullPath.substring( 0, fullPath.length() - myClassFile.length() );
+    }
 
     public void testShouldFindOneMojo()
         throws Exception
@@ -48,6 +62,12 @@ public class MarmaladeMojoDescriptorExtractorTest
 
         System.out.println( "Basedir: " + basedir );
         project.addScriptSourceRoot( basedir.getPath() );
+        
+        Build build = new Build();
+        
+        build.setOutputDirectory( findThisBasedir() );
+        
+        project.setBuild( build );
 
         MarmaladeMojoDescriptorExtractor extractor = (MarmaladeMojoDescriptorExtractor) lookup(
             MojoDescriptorExtractor.ROLE, "marmalade" );
