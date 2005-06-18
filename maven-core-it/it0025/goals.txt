@@ -1,1 +1,1 @@
-core-it:touch
+process-sources
