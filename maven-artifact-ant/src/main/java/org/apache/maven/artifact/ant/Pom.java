@@ -24,7 +24,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.Organization;
-import org.apache.maven.model.Reports;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -232,9 +232,9 @@ public class Pom
         return getMavenProject().getPluginRepositories();
     } //-- java.util.List getPluginRepositories()
 
-    public Reports getReports()
+    public Reporting getReporting()
     {
-        return getMavenProject().getReports();
+        return getMavenProject().getReporting();
     } //-- Reports getReports()
 
     public java.util.List getRepositories()

@@ -23,14 +23,19 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportSet;
+import org.apache.maven.model.Reporter;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -198,29 +203,153 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Reports :: aggregate
-        if ( child.getReports() != null && parent.getReports() != null )
+        Reporting childReporting = child.getReporting();
+        Reporting parentReporting = parent.getReporting();
+
+        if ( childReporting != null && parentReporting != null )
         {
-            if ( child.getReports().getOutputDirectory() == null )
+            if ( StringUtils.isEmpty( childReporting.getOutputDirectory() ) )
             {
-                child.getReports().setOutputDirectory( parent.getReports().getOutputDirectory() );
+                childReporting.setOutputDirectory( parentReporting.getOutputDirectory() );
             }
 
-            List parentReports = parent.getReports().getPlugins();
+            Map mergedReporters = new HashMap();
 
-            List childReports = child.getReports().getPlugins();
+            Map childReportersByKey = childReporting.getReportersAsMap();
 
-            for ( Iterator iterator = parentReports.iterator(); iterator.hasNext(); )
+            List parentReporters = parentReporting.getReporters();
+
+            if ( parentReporters != null )
             {
-                Plugin plugin = (Plugin) iterator.next();
-
-                if ( !childReports.contains( plugin ) )
+                for ( Iterator it = parentReporters.iterator(); it.hasNext(); )
                 {
-                    child.getReports().addPlugin( plugin );
+                    Reporter parentReporter = (Reporter) it.next();
+
+                    String inherited = parentReporter.getInherited();
+
+                    if ( StringUtils.isEmpty( inherited ) || Boolean.valueOf( inherited ).booleanValue() )
+                    {
+                        Reporter childReporter = (Reporter) childReportersByKey.get( parentReporter.getKey() );
+
+                        Reporter mergedReporter = parentReporter;
+
+                        if ( childReporter != null )
+                        {
+                            mergedReporter = childReporter;
+
+                            mergeReporters( childReporter, parentReporter );
+                        }
+                        else if ( StringUtils.isEmpty( inherited ) )
+                        {
+                            mergedReporter.unsetInheritanceApplied();
+                        }
+
+                        mergedReporters.put( mergedReporter.getKey(), mergedReporter );
+                    }
                 }
+            }
+
+            for ( Iterator it = childReportersByKey.entrySet().iterator(); it.hasNext(); )
+            {
+                Map.Entry entry = (Map.Entry) it.next();
+
+                String key = (String) entry.getKey();
+
+                if ( !mergedReporters.containsKey( key ) )
+                {
+                    mergedReporters.put( key, entry.getValue() );
+                }
+            }
+
+            childReporting.setReporters( new ArrayList( mergedReporters.values() ) );
+        }
+        
+        assembleDependencyManagementInheritance( child, parent );
+    }
+
+    private void mergeReporters( Reporter dominant, Reporter recessive )
+    {
+        if ( StringUtils.isEmpty( dominant.getVersion() ) )
+        {
+            dominant.setVersion( recessive.getVersion() );
+        }
+
+        Xpp3Dom dominantConfig = (Xpp3Dom) dominant.getConfiguration();
+        Xpp3Dom recessiveConfig = (Xpp3Dom) recessive.getConfiguration();
+
+        dominant.setConfiguration( Xpp3Dom.mergeXpp3Dom( dominantConfig, recessiveConfig ) );
+
+        Map mergedReportSets = new HashMap();
+
+        Map dominantReportSetsById = dominant.getReportSetsAsMap();
+
+        for ( Iterator it = recessive.getReportSets().iterator(); it.hasNext(); )
+        {
+            ReportSet recessiveReportSet = (ReportSet) it.next();
+
+            String inherited = recessiveReportSet.getInherited();
+
+            if ( StringUtils.isEmpty( inherited ) || Boolean.valueOf( inherited ).booleanValue() )
+            {
+                ReportSet dominantReportSet = (ReportSet) dominantReportSetsById.get( recessiveReportSet.getId() );
+
+                ReportSet merged = recessiveReportSet;
+
+                if ( dominantReportSet != null )
+                {
+                    merged = dominantReportSet;
+
+                    Xpp3Dom recessiveRSConfig = (Xpp3Dom) recessiveReportSet.getConfiguration();
+                    Xpp3Dom mergedRSConfig = (Xpp3Dom) merged.getConfiguration();
+
+                    merged.setConfiguration( Xpp3Dom.mergeXpp3Dom( mergedRSConfig, recessiveRSConfig ) );
+
+                    List mergedReports = merged.getReports();
+
+                    if ( mergedReports == null )
+                    {
+                        mergedReports = new ArrayList();
+
+                        merged.setReports( mergedReports );
+                    }
+
+                    List recessiveRSReports = recessiveReportSet.getReports();
+
+                    if ( recessiveRSReports != null )
+                    {
+                        for ( Iterator reportIterator = recessiveRSReports.iterator(); reportIterator.hasNext(); )
+                        {
+                            String report = (String) reportIterator.next();
+
+                            if ( !mergedReports.contains( report ) )
+                            {
+                                mergedReports.add( report );
+                            }
+                        }
+                    }
+                }
+                else if ( StringUtils.isEmpty( inherited ) )
+                {
+                    merged.unsetInheritanceApplied();
+                }
+
+                mergedReportSets.put( merged.getId(), merged );
             }
         }
 
-        assembleDependencyManagementInheritance( child, parent );
+        for ( Iterator rsIterator = dominantReportSetsById.entrySet().iterator(); rsIterator.hasNext(); )
+        {
+            Map.Entry entry = (Map.Entry) rsIterator.next();
+
+            String key = (String) entry.getKey();
+
+            if ( !mergedReportSets.containsKey( key ) )
+            {
+                mergedReportSets.put( key, entry.getValue() );
+            }
+        }
+
+        dominant.setReportSets( new ArrayList( mergedReportSets.values() ) );
     }
 
     private void assembleDependencyManagementInheritance( ModelBase child, ModelBase parent )

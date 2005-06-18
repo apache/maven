@@ -625,7 +625,7 @@
           <comment>These should ultimately only be compile time dependencies when transitive dependencies come into play.</comment>
         </field>
         <field>
-          <name>reports</name>
+          <name>reporting</name>
           <version>4.0.0</version>
           <description><![CDATA[
             This element includes the specification of reports to be
@@ -635,7 +635,7 @@
             the order they are specified.
           ]]></description>
           <association>
-            <type>Reports</type>
+            <type>Reporting</type>
           </association>
         </field>
         <field>
@@ -2305,7 +2305,7 @@
       </description>
     </class>
     <class>
-      <name>Reports</name>
+      <name>Reporting</name>
       <version>4.0.0</version>
       <description>Section for management of reports and configuration</description>
       <fields>
@@ -2316,16 +2316,46 @@
           <description>Where to store all of the generated reports</description>
         </field>
         <field>
-          <name>plugins</name>
+          <name>reporters</name>
           <version>4.0.0</version>
-          <description>The reporting plugins to use and their configuration</description>
+          <description>The reporters (specialized plugins) to use and their configuration</description>
           <association>
             <!-- TODO: goal stuff relevant or not? -->
-            <type>Plugin</type>
+            <type>Reporter</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    Map reporterMap;
+    
+    public void flushReporterMap()
+    {
+        this.reporterMap = null;
+    }
+
+    public Map getReportersAsMap()
+    {
+        if ( reporterMap == null )
+        {
+            reporterMap = new HashMap();
+            if ( getReporters() != null )
+            {
+                for ( Iterator it = getReporters().iterator(); it.hasNext(); )
+                {
+                    Reporter reporter = (Reporter) it.next();
+                    reporterMap.put( reporter.getKey(), reporter );
+                }
+            }
+        }
+        return reporterMap;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <!-- Profile support -->
     <class>
@@ -2455,6 +2485,156 @@
       </fields>
     </class>
     <!-- /BuildProfile support -->
+    <class>
+      <name>Reporter</name>
+      <version>4.0.0</version>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <defaultValue>org.apache.maven.plugins</defaultValue>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description><![CDATA[The version of the reporter to be used.]]></description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>inherited</name>
+          <version>4.0.0</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>configuration</name>
+          <version>4.0.0</version>
+          <type>DOM</type>
+        </field>
+        <field>
+          <name>reportSets</name>
+          <version>4.0.0</version>
+          <description>Multiple specifications of a set of reports, each having (possibly) different configuration</description>
+          <association>
+            <type>ReportSet</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    private Map reportSetMap = null;
+    
+    public void flushReportSetMap()
+    {
+        this.reportSetMap = null;
+    }
+
+    public Map getReportSetsAsMap()
+    {
+        if ( reportSetMap == null )
+        {
+            reportSetMap = new HashMap();
+            if ( getReportSets() != null )
+            {
+                for ( Iterator i = getReportSets().iterator(); i.hasNext(); )
+                {
+                    ReportSet reportSet = (ReportSet) i.next();
+                    reportSetMap.put( reportSet.getId(), reportSet );
+                }
+            }
+        }
+        
+        return reportSetMap;
+    }
+    
+    public String getKey()
+    {
+        return constructKey( groupId, artifactId );
+    }
+
+    public static String constructKey( String groupId, String artifactId )
+    {
+        return groupId + ":" + artifactId;
+    }
+    
+    private boolean inheritanceApplied = true;
+    
+    public void unsetInheritanceApplied()
+    {
+        this.inheritanceApplied = false;
+    }
+    
+    public boolean isInheritanceApplied()
+    {
+        return inheritanceApplied;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>ReportSet</name>
+      <version>4.0.0</version>
+      <description>Represents a set of reports and configuration to be used to generate them.</description>
+      <fields>
+        <field>
+          <name>id</name>
+          <type>String</type>
+          <required>true</required>
+          <description>The unique id for this report set, to be used during POM inheritance.</description>
+        </field>
+        <field>
+          <name>configuration</name>
+          <version>4.0.0</version>
+          <type>DOM</type>
+        </field>
+        <field>
+          <name>inherited</name>
+          <version>4.0.0</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>reports</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description><![CDATA[
+            The list of reports from this reporter/plugin which should be generated from this set 
+            (this configuration)
+          ]]></description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    private boolean inheritanceApplied = true;
+    
+    public void unsetInheritanceApplied()
+    {
+        this.inheritanceApplied = false;
+    }
+    
+    public boolean isInheritanceApplied()
+    {
+        return inheritanceApplied;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
   </classes>
 </model>
 

@@ -6,6 +6,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Reporter;
 import org.apache.maven.plugin.registry.MavenPluginRegistryBuilder;
 import org.apache.maven.plugin.registry.PluginRegistry;
 import org.apache.maven.plugin.registry.PluginRegistryUtils;
@@ -383,15 +384,13 @@ public class DefaultPluginVersionManager
     {
         String version = null;
 
-        Plugin pluginConfig = null;
-
         for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
         {
             Plugin plugin = (Plugin) it.next();
 
             if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
             {
-                pluginConfig = plugin;
+                version = plugin.getVersion();
 
                 break;
             }
@@ -399,24 +398,19 @@ public class DefaultPluginVersionManager
 
         // won't this overwrite the above loop if it exists in both places (unlikely, I know)??
         // maybe that's the idea...?
-        if ( project.getReports() != null )
+        if ( project.getReporters() != null )
         {
-            for ( Iterator it = project.getReports().getPlugins().iterator(); it.hasNext(); )
+            for ( Iterator it = project.getReporters().iterator(); it.hasNext(); )
             {
-                Plugin plugin = (Plugin) it.next();
+                Reporter reporter = (Reporter) it.next();
 
-                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                if ( groupId.equals( reporter.getGroupId() ) && artifactId.equals( reporter.getArtifactId() ) )
                 {
-                    pluginConfig = plugin;
+                    version = reporter.getVersion();
 
                     break;
                 }
             }
-        }
-
-        if ( pluginConfig != null )
-        {
-            version = pluginConfig.getVersion();
         }
 
         return version;
