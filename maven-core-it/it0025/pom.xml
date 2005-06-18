@@ -19,9 +19,7 @@
             </configuration>
             
             <goals>
-              <goal>
-                <id>touch</id>
-              </goal>
+              <goal>touch</goal>
             </goals>
           </execution>
           <execution>
@@ -30,11 +28,8 @@
             <configuration>
               <pluginItem>test2.txt</pluginItem>
             </configuration>
-            
             <goals>
-              <goal>
-                <id>touch</id>
-              </goal>
+              <goal>touch</goal>
             </goals>
           </execution>
         </executions>

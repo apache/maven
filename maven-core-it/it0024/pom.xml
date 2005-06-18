@@ -29,9 +29,7 @@
             </configuration>
 
             <goals>
-              <goal>
-                <id>compile</id>
-              </goal>
+              <goal>compile</goal>
             </goals>
           </execution>
         </executions>
