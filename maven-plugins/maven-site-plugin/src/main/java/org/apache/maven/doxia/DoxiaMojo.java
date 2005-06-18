@@ -718,6 +718,11 @@ public class DoxiaMojo
         // TODO: not the best solution. Perhaps a mojo tag that causes the plugin manager to populate project reports instead?
 
         List reportPlugins = project.getReportPlugins();
+
+        if ( project.getModel().getReports() != null )
+        {
+            getLog().error( "DEPRECATED: Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead.");
+        }
         
         if ( reportPlugins != null )
         {
