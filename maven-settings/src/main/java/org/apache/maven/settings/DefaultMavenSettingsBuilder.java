@@ -26,6 +26,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author jdcasey
@@ -115,16 +117,47 @@ public class DefaultMavenSettingsBuilder
 
         SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
+        setLocalRepository( userSettings );
+
+        return userSettings;
+    }
+
+    private void setLocalRepository( Settings userSettings )
+    {
         // try using the local repository specified on the command line...
         String localRepository = System.getProperty( MavenSettingsBuilder.ALT_LOCAL_REPOSITORY_LOCATION );
-        
+
         // otherwise, use the one in settings.xml
         if ( localRepository == null || localRepository.length() < 1 )
         {
             localRepository = userSettings.getLocalRepository();
         }
-        
-        // if both are missing, default to ~/.m2/repository.
+
+        // this is a backward compatibility feature...
+        if ( localRepository == null || localRepository.length() < 1 )
+        {
+            List profiles = userSettings.getProfiles();
+
+            for ( Iterator it = profiles.iterator(); it.hasNext(); )
+            {
+                Profile profile = (Profile) it.next();
+
+                localRepository = profile.getLocalRepository();
+
+                if ( localRepository != null && localRepository.length() > 0 )
+                {
+                    getLogger().warn(
+                                      "DEPRECATED: Please specify the local repository as:\n\n<settings>"
+                                          + "\n    <localRepository>" + localRepository + "</localRepository>"
+                                          + "\n    ...\n</settings>\n" );
+
+                    // we've found it! so stop looking through the profiles...
+                    break;
+                }
+            }
+        }
+
+        // if all of the above are missing, default to ~/.m2/repository.
         if ( localRepository == null || localRepository.length() < 1 )
         {
             File mavenUserConfigurationDirectory = new File( userHome, ".m2" );
@@ -140,8 +173,6 @@ public class DefaultMavenSettingsBuilder
         }
 
         userSettings.setLocalRepository( localRepository );
-
-        return userSettings;
     }
 
     private File getFile( String pathPattern, String basedirSysProp, String altLocationSysProp )

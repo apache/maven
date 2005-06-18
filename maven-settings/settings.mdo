@@ -264,6 +264,33 @@
         return match;
     }
     
+    private Map profileMap;
+    
+    public void flushProfileMap()
+    {
+        this.profileMap = null;
+    }
+    
+    public Map getProfilesAsMap()
+    {
+        if ( profileMap == null )
+        {
+            profileMap = new HashMap();
+            
+            if ( getProfiles() != null )
+            {
+                for ( Iterator it = getProfiles().iterator(); it.hasNext(); )
+                {
+                    Profile profile = (Profile) it.next();
+                    
+                    profileMap.put( profile.getId(), profile );
+                }
+            }
+        }
+        
+        return profileMap;
+    }
+    
     private RuntimeInfo runtimeInfo;
     
     public void setRuntimeInfo( RuntimeInfo runtimeInfo )
@@ -464,6 +491,13 @@
           <association>
             <type>Activation</type>
           </association>
+        </field>
+        <field>
+          <name>localRepository</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>backwards-compatible location for specifying the local repository for use in builds</description>
+          <comment>THIS IS DEPRECATED: use localRepository under the root element instead.</comment>
         </field>
         <field>
           <name>properties</name>
