@@ -22,6 +22,7 @@
         <executions>
           <execution>
             <id>test</id>
+            <phase>generate-sources</phase>
 
             <configuration>
               <source>1.4</source>
