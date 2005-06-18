@@ -242,7 +242,17 @@ public class PluginParameterExpressionEvaluator
 
     public File alignToBaseDirectory( File file )
     {
-        File basedir = context.getProject().getFile().getParentFile();
+        File basedir = null;
+        
+        if ( context != null && context.getProject() != null && context.getProject().getFile() != null )
+        {
+            basedir = context.getProject().getFile().getParentFile();
+        }
+        else
+        {
+            basedir = new File( "." ).getAbsoluteFile().getParentFile();
+        }
+        
         return new File( pathTranslator.alignToBaseDirectory( file.getPath(), basedir ) );
     }
 
