@@ -1,4 +1,4 @@
-<model>
+<project>
   <groupId>snapshot-test</groupId>
   <artifactId>maven-test-snapshot-resolving</artifactId>
   <packaging>jar</packaging>
@@ -46,4 +46,4 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-</model>
+</project>

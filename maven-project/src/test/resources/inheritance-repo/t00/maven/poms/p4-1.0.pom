@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>p3</artifactId>
     <groupId>maven</groupId>
@@ -10,4 +10,4 @@
   <packaging>jar</packaging>
   <name>p4</name>
   <version>1.0</version>
-</model>
+</project>

@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>p0</artifactId>
     <groupId>maven</groupId>
@@ -13,4 +13,4 @@
   <scm>
     <url>scm-url</url>
   </scm>
-</model>
+</project>

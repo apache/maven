@@ -1,7 +1,7 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>foo</groupId>
   <artifactId>bar</artifactId>
   <version>99.44</version>
   <packaging></packaging>
-</model>
+</project>

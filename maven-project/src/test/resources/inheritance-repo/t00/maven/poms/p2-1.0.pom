@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>p1</artifactId>
     <groupId>maven</groupId>
@@ -15,4 +15,4 @@
       <name>mailing-list</name>
     </mailingList>
   </mailingLists>
-</model>
+</project>

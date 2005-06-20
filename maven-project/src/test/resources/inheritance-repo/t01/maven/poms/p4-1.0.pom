@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>p3</artifactId>
     <groupId>maven</groupId>
@@ -13,4 +13,4 @@
   <organization>
     <name>p4-org</name>
   </organization>
-</model>
+</project>

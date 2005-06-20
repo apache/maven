@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven-test</groupId>
   <artifactId>maven-test-c</artifactId>
@@ -13,4 +13,4 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-</model>
+</project>

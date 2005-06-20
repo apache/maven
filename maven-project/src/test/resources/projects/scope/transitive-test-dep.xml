@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<model>
+<project>
   <groupId>maven-test</groupId>
   <artifactId>scope-test</artifactId>
   <version>1.0</version>
@@ -35,4 +35,4 @@
 
   </dependencies>
 
-</model>
+</project>

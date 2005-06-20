@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>project-which-needs-directory-alignment</artifactId>
@@ -9,7 +9,6 @@
   <inceptionYear>2001</inceptionYear>
   <description>Description</description>
   <url>http://maven.apache.org/</url>
-  <issueTrackingUrl>issueTrackingUrl</issueTrackingUrl>
 
   <organization>
     <name>Apache Software Foundation</name>
@@ -127,4 +126,4 @@
     </plugins>
   </reports>
 
-</model>
+</project>

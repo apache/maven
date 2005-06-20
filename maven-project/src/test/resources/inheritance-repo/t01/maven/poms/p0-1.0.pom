@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>p0</artifactId>
@@ -8,4 +8,4 @@
   <organization>
     <name>p0-org</name>
   </organization>
-</model>
+</project>

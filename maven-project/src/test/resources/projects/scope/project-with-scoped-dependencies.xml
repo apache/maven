@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>maven</groupId>
   <artifactId>maven-project-test</artifactId>
@@ -77,4 +77,4 @@
     </dependency>
   </dependencies>
 
-</model>
+</project>
