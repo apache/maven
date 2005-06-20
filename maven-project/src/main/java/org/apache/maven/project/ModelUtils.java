@@ -1,17 +1,5 @@
 package org.apache.maven.project;
 
-import org.apache.maven.model.Goal;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginContainer;
-import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -27,6 +15,21 @@ import java.util.TreeMap;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.model.Goal;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Model;
+import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
+import org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public final class ModelUtils
 {
@@ -256,5 +259,15 @@ public final class ModelUtils
         childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
 
         child.setConfiguration( childConfiguration );
+    }
+
+    static Model cloneModel( Model model )
+    {
+        // TODO: would be nice for the modello:java code to generate this as a copy constructor
+        Model newModel = new Model();
+        ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
+        assembler.assembleModelInheritance( newModel, model );
+        newModel.setVersion( model.getVersion() );
+        return newModel;
     }
 }

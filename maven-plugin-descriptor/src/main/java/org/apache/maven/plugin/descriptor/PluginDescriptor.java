@@ -17,9 +17,21 @@ package org.apache.maven.plugin.descriptor;
  */
 
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.classworlds.ClassRealm;
+import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
+import org.apache.maven.plugin.lifecycle.Lifecycle;
+import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
 
 import java.util.List;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileNotFoundException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -43,6 +55,10 @@ public class PluginDescriptor
     private boolean inheritedByDefault = true;
 
     private List artifacts;
+
+    private Map lifecycleMappings;
+
+    private ClassRealm classRealm;
 
     // ----------------------------------------------------------------------
     //
@@ -237,5 +253,47 @@ public class PluginDescriptor
             }
         }
         return mojoDescriptor;
+    }
+
+    public Lifecycle getLifecycleMapping( String lifecycle )
+        throws IOException, XmlPullParserException
+    {
+        if ( lifecycleMappings == null )
+        {
+            LifecycleMappingsXpp3Reader reader = new LifecycleMappingsXpp3Reader();
+            InputStreamReader r = null;
+            LifecycleConfiguration config;
+
+            try
+            {
+                InputStream resourceAsStream = classRealm.getResourceAsStream( "/META-INF/maven/lifecycle.xml" );
+                if ( resourceAsStream == null )
+                {
+                    throw new FileNotFoundException( "Unable to find /META-INF/maven/lifecycle.xml in the plugin" );
+                }
+                r = new InputStreamReader( resourceAsStream );
+                config = reader.read( r );
+            }
+            finally
+            {
+                IOUtil.close( r );
+            }
+
+            Map map = new HashMap();
+
+            for ( Iterator i = config.getLifecycles().iterator(); i.hasNext(); )
+            {
+                Lifecycle l = (Lifecycle) i.next();
+                map.put( l.getId(), l );
+            }
+
+            lifecycleMappings = map;
+        }
+        return (Lifecycle) lifecycleMappings.get( lifecycle );
+    }
+
+    public void setClassRealm( ClassRealm classRealm )
+    {
+        this.classRealm = classRealm;
     }
 }

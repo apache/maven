@@ -17,6 +17,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Describes a single mojo invocation.
@@ -30,16 +31,27 @@ public class MojoExecution
 
     private final MojoDescriptor mojoDescriptor;
 
+    private final Xpp3Dom configuration;
+
     public MojoExecution( MojoDescriptor mojoDescriptor )
     {
         this.mojoDescriptor = mojoDescriptor;
         this.executionId = null;
+        this.configuration = null;
     }
 
     public MojoExecution( MojoDescriptor mojoDescriptor, String executionId )
     {
         this.mojoDescriptor = mojoDescriptor;
         this.executionId = executionId;
+        this.configuration = null;
+    }
+
+    public MojoExecution( MojoDescriptor mojoDescriptor, Xpp3Dom configuration )
+    {
+        this.mojoDescriptor = mojoDescriptor;
+        this.configuration = configuration;
+        this.executionId = null;
     }
 
     public String getExecutionId()
@@ -50,5 +62,10 @@ public class MojoExecution
     public MojoDescriptor getMojoDescriptor()
     {
         return mojoDescriptor;
+    }
+
+    public Xpp3Dom getConfiguration()
+    {
+        return configuration;
     }
 }

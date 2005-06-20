@@ -288,12 +288,14 @@ public class DefaultPluginManager
                 files.add( artifact.getFile() );
             }
 
-            container.createChildContainer( pluginKey, files, Collections.EMPTY_MAP,
-                                            Collections.singletonList( this ) );
+            PlexusContainer child = container.createChildContainer( pluginKey, files, Collections.EMPTY_MAP,
+                                                                    Collections.singletonList( this ) );
 
-            // this plugin's descriptor should have been discovered by now, so we should be able to circle
-            // around and set the artifacts.
+            // this plugin's descriptor should have been discovered in the child creation, so we should be able to
+            // circle around and set the artifacts and class realm
             PluginDescriptor addedPlugin = (PluginDescriptor) pluginDescriptors.get( pluginKey );
+
+            addedPlugin.setClassRealm( child.getContainerRealm() );
 
             ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
 
@@ -402,6 +404,10 @@ public class DefaultPluginManager
             Xpp3Dom dom = project.getGoalConfiguration( groupId, artifactId, executionId, goalId );
             Xpp3Dom reportDom = project.getReportConfiguration( groupId, artifactId, executionId );
             dom = Xpp3Dom.mergeXpp3Dom( dom, reportDom );
+            if ( mojoExecution.getConfiguration() != null )
+            {
+                dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
+            }
 
             plugin = getConfiguredMojo( pluginContainer, mojoDescriptor, session, dom, project );
         }

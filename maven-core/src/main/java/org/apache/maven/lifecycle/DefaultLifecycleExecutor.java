@@ -32,13 +32,19 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.lifecycle.Execution;
+import org.apache.maven.plugin.lifecycle.Lifecycle;
+import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -152,11 +158,10 @@ public class DefaultLifecycleExecutor
             MojoExecution mojoExecution = (MojoExecution) i.next();
 
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-            String executePhase = mojoDescriptor.getExecutePhase();
 
-            if ( executePhase != null )
+            if ( mojoDescriptor.getExecutePhase() != null )
             {
-                forkLifecycle( executePhase, mojoDescriptor.getExecuteLifecycle(), session, project );
+                forkLifecycle( mojoDescriptor, session, project );
             }
 
             try
@@ -170,20 +175,57 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void forkLifecycle( String task, String executeLifecycle, MavenSession session,
-                                MavenProject project )
+    private void forkLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException
     {
+        String task = mojoDescriptor.getExecutePhase();
+
         // Create new lifecycle
         Map lifecycleMappings = constructLifecycleMappings( session, task, project );
 
+        String executeLifecycle = mojoDescriptor.getExecuteLifecycle();
         if ( executeLifecycle != null )
         {
-            // TODO: overlay new lifecycle
+            Lifecycle lifecycleOverlay;
+            try
+            {
+                lifecycleOverlay = mojoDescriptor.getPluginDescriptor().getLifecycleMapping( executeLifecycle );
+            }
+            catch ( IOException e )
+            {
+                throw new LifecycleExecutionException( "Unable to read lifecycle mapping file", e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new LifecycleExecutionException( "Unable to parse lifecycle mapping file", e );
+            }
+
+            if ( lifecycleOverlay == null )
+            {
+                throw new LifecycleExecutionException( "Lifecycle '" + executeLifecycle + "' not found in plugin" );
+            }
+
+            for ( Iterator i = lifecycleOverlay.getPhases().iterator(); i.hasNext(); )
+            {
+                Phase phase = (Phase) i.next();
+                for ( Iterator j = phase.getExecutions().iterator(); j.hasNext(); )
+                {
+                    Execution e = (Execution) j.next();
+
+                    for ( Iterator k = e.getGoals().iterator(); k.hasNext(); )
+                    {
+                        String goal = (String) k.next();
+                        MojoDescriptor desc = mojoDescriptor.getPluginDescriptor().getMojo( goal );
+                        MojoExecution mojoExecution = new MojoExecution( desc, (Xpp3Dom) e.getConfiguration() );
+                        addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution, session.getSettings() );
+                    }
+                }
+            }
         }
 
-        // TODO: clone project
-        executeGoalWithLifecycle( task, session, lifecycleMappings, project );
+        MavenProject executionProject = new MavenProject( project );
+        executeGoalWithLifecycle( task, session, lifecycleMappings, executionProject );
+        project.setExecutionProject( executionProject );
     }
 
     private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project )
@@ -325,7 +367,6 @@ public class DefaultLifecycleExecutor
      */
     private void bindGoalMapToLifecycle( PluginDescriptor pluginDescriptor, Map goalMap, Map phaseMap,
                                          Settings settings )
-        throws LifecycleExecutionException
     {
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
         {

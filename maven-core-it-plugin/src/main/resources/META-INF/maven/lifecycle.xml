@@ -1,0 +1,28 @@
+<lifecycles>
+  <lifecycle>
+    <id>foo</id>
+    <phases>
+      <phase>
+        <id>generate-sources</id>
+        <executions>
+          <execution>
+            <configuration>
+              <outputDirectory>${project.build.directory}/forked</outputDirectory>
+            </configuration>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+          </execution>
+          <execution>
+            <configuration>
+              <outputDirectory>${project.build.directory}/forked2</outputDirectory>
+            </configuration>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+          </execution>
+        </executions>
+      </phase>
+    </phases>
+  </lifecycle>
+</lifecycles>

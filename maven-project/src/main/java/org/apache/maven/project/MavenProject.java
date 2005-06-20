@@ -89,9 +89,51 @@ public class MavenProject
 
     private List attachedArtifacts;
 
+    private MavenProject executionProject;
+
+    private List compileSourceRoots = new ArrayList();
+
+    private List testCompileSourceRoots = new ArrayList();
+
+    private List scriptSourceRoots = new ArrayList();
+
+    private List pluginArtifactRepositories;
+
+    private ArtifactRepository distMgmtArtifactRepository;
+
+    private List activeProfiles = new ArrayList();
+
     public MavenProject( Model model )
     {
         this.model = model;
+    }
+
+    public MavenProject( MavenProject project )
+    {
+        // disown the parent
+
+        // copy fields
+        this.file = project.file;
+
+        // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be sure!
+        this.artifacts = Collections.unmodifiableSet( project.artifacts );
+        this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
+        this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
+        this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
+        this.attachedArtifacts = Collections.unmodifiableList( project.getAttachedArtifacts() );
+        this.collectedProjects = Collections.unmodifiableList( project.collectedProjects );
+        this.activeProfiles = Collections.unmodifiableList( project.activeProfiles );
+
+        // no need for execution project
+
+        // clone source roots
+        this.compileSourceRoots = new ArrayList( project.compileSourceRoots );
+        this.testCompileSourceRoots = new ArrayList( project.testCompileSourceRoots );
+        this.scriptSourceRoots = new ArrayList( project.scriptSourceRoots );
+
+        this.profileProperties = new Properties( project.profileProperties );
+
+        this.model = ModelUtils.cloneModel( project.model );
     }
 
     // ----------------------------------------------------------------------
@@ -169,18 +211,6 @@ public class MavenProject
     // ----------------------------------------------------------------------
     // Test and compile sourceroots.
     // ----------------------------------------------------------------------
-
-    private List compileSourceRoots = new ArrayList();
-
-    private List testCompileSourceRoots = new ArrayList();
-
-    private List scriptSourceRoots = new ArrayList();
-
-    private List pluginArtifactRepositories;
-
-    private ArtifactRepository distMgmtArtifactRepository;
-
-    private List activeProfiles = new ArrayList();
 
     public void addCompileSourceRoot( String path )
     {
@@ -992,5 +1022,15 @@ public class MavenProject
         }
 
         return dom;
+    }
+
+    public MavenProject getExecutionProject()
+    {
+        return executionProject;
+    }
+
+    public void setExecutionProject( MavenProject executionProject )
+    {
+        this.executionProject = executionProject;
     }
 }

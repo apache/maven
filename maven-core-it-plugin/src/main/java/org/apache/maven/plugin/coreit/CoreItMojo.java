@@ -18,6 +18,7 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
 import java.io.File;
@@ -34,6 +35,11 @@ import java.util.List;
 public class CoreItMojo
     extends AbstractMojo
 {
+    /**
+     * @parameter expression="${project}"
+     */
+    private MavenProject project;
+
     /**
      * @parameter expression="${project.build.directory}"
      * @required
@@ -86,6 +92,8 @@ public class CoreItMojo
         {
             touch( new File( outputDirectory ), goalItem );
         }
+
+        project.getBuild().setFinalName( "coreitified" );
     }
 
     private static void touch( File dir, String file )

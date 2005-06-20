@@ -345,7 +345,7 @@ private MavenProject executedProject;
               <debug>true</debug>
             </configuration>
               <goals>
-                <goal>clover:compiler</goal>
+                <goal>compiler</goal>
               </goals>
           </execution>
         </executions>

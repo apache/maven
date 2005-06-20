@@ -83,6 +83,7 @@ it0025: Test multiple goal executions with different execution-level configs.
 
 it0026: Test merging of global- and user-level settings.xml files.
 
+it0027: Test @execute with a custom lifecycle, including configuration
 -------------------------------------------------------------------------------
 
 - generated sources

@@ -46,7 +46,7 @@ public class EclipseWriter
         this.localRepository = localRepository;
     }
 
-    public void write( MavenProject project )
+    public void write( MavenProject project, MavenProject executedProject )
         throws EclipsePluginException
     {
         File basedir = project.getFile().getParentFile();
@@ -61,7 +61,7 @@ public class EclipseWriter
 
         writeEclipseProject( basedir, project, map );
 
-        writeEclipseClasspath( basedir, project, map );
+        writeEclipseClasspath( basedir, project, executedProject, map );
 
         System.out.println( "Wrote Eclipse project for " + project.getArtifactId() + " to " + basedir.getAbsolutePath() );
     }
@@ -155,7 +155,7 @@ public class EclipseWriter
     // .classpath
     // ----------------------------------------------------------------------
 
-    protected void writeEclipseClasspath( File basedir, MavenProject project, Map map )
+    protected void writeEclipseClasspath( File basedir, MavenProject project, MavenProject executedProject, Map map )
         throws EclipsePluginException
     {
         FileWriter w;
@@ -178,7 +178,7 @@ public class EclipseWriter
         // ----------------------------------------------------------------------
 
         addSourceRoots( writer, project.getBasedir(),
-                        project.getCompileSourceRoots(),
+                        executedProject.getCompileSourceRoots(),
                         null );
 
         addResources( writer, project.getBasedir(),
@@ -190,7 +190,7 @@ public class EclipseWriter
         // ----------------------------------------------------------------------
 
         addSourceRoots( writer, project.getBasedir(),
-                        project.getTestCompileSourceRoots(),
+                        executedProject.getTestCompileSourceRoots(),
                         project.getBuild().getTestOutputDirectory() );
 
         addResources( writer, project.getBasedir(),

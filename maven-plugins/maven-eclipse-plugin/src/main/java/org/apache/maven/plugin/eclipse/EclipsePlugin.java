@@ -28,7 +28,7 @@ import java.io.File;
  *
  * @goal eclipse
  * @requiresDependencyResolution test
- * @executePhase generate-sources
+ * @execute phase="generate-sources"
  *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
@@ -45,6 +45,14 @@ public class EclipsePlugin
      * @required
      */
     private MavenProject project;
+
+    /**
+     * The project whose project files to create.
+     *
+     * @parameter expression="${executedProject}"
+     * @required
+     */
+    private MavenProject executedProject;
 
     /**
      * @parameter expression="${localRepository}"
@@ -86,7 +94,7 @@ public class EclipsePlugin
         {
             eclipseWriter.setLocalRepositoryFile( new File ( localRepository.getBasedir() ) );
 
-            eclipseWriter.write( project );
+            eclipseWriter.write( project, executedProject );
         }
         catch ( EclipsePluginException e )
         {

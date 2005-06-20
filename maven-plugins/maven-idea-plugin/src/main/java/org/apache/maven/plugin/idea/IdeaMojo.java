@@ -37,10 +37,11 @@ import java.io.Reader;
 import java.util.Iterator;
 
 /**
+ * Goal for generating IDEA files from a POM.
+ *
  * @goal idea
- * @executePhase generate-sources
+ * @execute phase="generate-sources"
  * @requiresDependencyResolution test
- * @description Goal for generating IDEA files from a POM
  * @todo use dom4j or something. Xpp3Dom can't cope properly with entities and so on
  */
 public class IdeaMojo
@@ -52,6 +53,13 @@ public class IdeaMojo
      * @readonly
      */
     private MavenProject project;
+
+    /**
+     * @parameter expression="${executedProject}"
+     * @required
+     * @readonly
+     */
+    private MavenProject executedProject;
 
     public void execute()
         throws MojoExecutionException
@@ -203,12 +211,12 @@ public class IdeaMojo
 
             removeOldElements( content, "sourceFolder" );
 
-            for ( Iterator i = project.getCompileSourceRoots().iterator(); i.hasNext(); )
+            for ( Iterator i = executedProject.getCompileSourceRoots().iterator(); i.hasNext(); )
             {
                 String directory = (String) i.next();
                 addSourceFolder( content, directory, false );
             }
-            for ( Iterator i = project.getTestCompileSourceRoots().iterator(); i.hasNext(); )
+            for ( Iterator i = executedProject.getTestCompileSourceRoots().iterator(); i.hasNext(); )
             {
                 String directory = (String) i.next();
                 addSourceFolder( content, directory, true );
