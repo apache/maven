@@ -551,10 +551,39 @@ public class DefaultPluginManager
                                                                                           pathTranslator, getLogger(),
                                                                                           project );
 
-        checkRequiredParameters( mojoDescriptor, mergedConfiguration, expressionEvaluator, plugin );
+        PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration( mergedConfiguration, mojoDescriptor );
 
-        populatePluginFields( plugin, mojoDescriptor, mergedConfiguration, pluginContainer, expressionEvaluator );
+        checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator, plugin );
+        
+        populatePluginFields( plugin, mojoDescriptor, extractedMojoConfiguration, pluginContainer, expressionEvaluator );
         return plugin;
+    }
+
+    private PlexusConfiguration extractMojoConfiguration( PlexusConfiguration mergedConfiguration, MojoDescriptor mojoDescriptor )
+    {
+        Map parameterMap = mojoDescriptor.getParameterMap();
+        
+        PlexusConfiguration[] mergedChildren = mergedConfiguration.getChildren();
+        
+        XmlPlexusConfiguration extractedConfiguration = new XmlPlexusConfiguration( "configuration" );
+        
+        for ( int i = 0; i < mergedChildren.length; i++ )
+        {
+            PlexusConfiguration child = mergedChildren[i];
+            
+            if ( parameterMap.containsKey( child.getName() ) )
+            {
+                extractedConfiguration.addChild( DefaultPluginManager.copyConfiguration( child ) );
+            }
+            else
+            {
+                // TODO: I defy anyone to find these messages in the '-X' output! Do we need a new log level?
+                // ideally, this would be elevated above the true debug output, but below the default INFO level...
+                getLogger().debug( "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'" + mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***");
+            }
+        }
+        
+        return extractedConfiguration;
     }
 
     private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration,
@@ -758,6 +787,8 @@ public class DefaultPluginManager
             String configuratorId = mojoDescriptor.getComponentConfigurator();
 
             // TODO: should this be known to the component factory instead? And if so, should configuration be part of lookup?
+            // [jc]: I don't think we can be that strict with the configurator. It makes some measure of sense that
+            // people may want different configurators for their java mojos...
             if ( StringUtils.isNotEmpty( configuratorId ) )
             {
                 configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE,
