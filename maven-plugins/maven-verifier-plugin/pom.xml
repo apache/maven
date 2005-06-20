@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-plugin-parent</artifactId>
     <groupId>org.apache.maven.plugins</groupId>
@@ -58,4 +58,4 @@
       </plugin>
     </plugins>
   </build>
-</model>
+</project>

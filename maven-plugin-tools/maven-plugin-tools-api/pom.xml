@@ -1,4 +1,4 @@
-<model>
+<project>
   <parent>
     <artifactId>maven-plugin-tools</artifactId>
     <groupId>org.apache.maven</groupId>
@@ -29,4 +29,4 @@
       <version>1.0-alpha-3</version>
     </dependency>
   </dependencies>
-</model>
+</project>
