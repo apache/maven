@@ -40,9 +40,12 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1032,5 +1035,12 @@ public class MavenProject
     public void setExecutionProject( MavenProject executionProject )
     {
         this.executionProject = executionProject;
+    }
+    
+    public void writeModel( Writer writer ) throws IOException
+    {
+        MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+        
+        pomWriter.write( writer, getModel() );
     }
 }

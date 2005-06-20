@@ -18,13 +18,16 @@ package org.apache.maven.archiver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.archiver.jar.ManifestException;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
@@ -215,8 +218,11 @@ public class MavenArchiver
         String groupId = project.getGroupId();
 
         String artifactId = project.getArtifactId();
+        
+        
+        File exportReadyPom = writeExportReadyPom( project );
 
-        archiver.addFile( project.getFile(), "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
+        archiver.addFile( exportReadyPom, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
 
         // ----------------------------------------------------------------------
         // Create pom.properties file
@@ -268,5 +274,27 @@ public class MavenArchiver
         // Cleanup
 
         pomPropertiesFile.delete();
+    }
+
+    private File writeExportReadyPom( MavenProject project ) throws IOException
+    {
+        String buildDirectory = project.getBuild().getDirectory();
+        
+        File fullPom = new File( buildDirectory, "exported-pom.xml" );
+        
+        FileWriter fWriter = null;
+        
+        try
+        {
+            fWriter = new FileWriter( fullPom );
+            
+            project.writeModel( fWriter );
+        }
+        finally
+        {
+            IOUtil.close( fWriter );
+        }
+        
+        return fullPom;
     }
 }
