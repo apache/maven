@@ -138,7 +138,8 @@ public class PluginParameterExpressionEvaluatorTest
         MavenSession session = createSession( project, container, repo );
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pluginDescriptor,
-                                                                                          null, container.getLogger() );
+                                                                                          null, container.getLogger(),
+                                                                                          project );
         return expressionEvaluator;
     }
 }

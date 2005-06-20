@@ -36,15 +36,16 @@ public interface PluginManager
 {
     String ROLE = PluginManager.class.getName();
 
-    void executeMojo( MojoExecution execution, MavenSession session )
+    void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
         throws MojoExecutionException, PluginManagerException, ArtifactResolutionException;
 
-    PluginDescriptor verifyPlugin( String prefix );
+    String getPluginIdFromPrefix( String prefix );
 
     PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
                                    Settings settings, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException;
 
-    List getReports( String groupId, String artifactId, String version, ReportSet reportSet, MavenSession session )
+    List getReports( String groupId, String artifactId, String version, ReportSet reportSet, MavenSession session,
+                     MavenProject project )
         throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException;
 }

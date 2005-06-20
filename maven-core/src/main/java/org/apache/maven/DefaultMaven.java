@@ -253,7 +253,7 @@ public class DefaultMaven
         try
         {
             // Actual meat of the code.
-            response = lifecycleExecutor.execute( goals, session );
+            response = lifecycleExecutor.execute( goals, session, project );
 
             dispatcher.dispatchEnd( event, project.getId() );
         }

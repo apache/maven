@@ -746,7 +746,7 @@ public class DoxiaMojo
                     {
                         reports.addAll(
                             pluginManager.getReports( reportPlugin.getGroupId(), reportPlugin.getArtifactId(),
-                                                      reportPlugin.getVersion(), null, session ) );
+                                                      reportPlugin.getVersion(), null, session, project ) );
 
                     }
                     else
@@ -757,7 +757,7 @@ public class DoxiaMojo
 
                             reports.addAll(
                                 pluginManager.getReports( reportPlugin.getGroupId(), reportPlugin.getArtifactId(),
-                                                          reportPlugin.getVersion(), reportSet, session ) );
+                                                          reportPlugin.getVersion(), reportSet, session, project ) );
                         }
                     }
                 }

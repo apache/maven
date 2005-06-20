@@ -85,11 +85,6 @@ public class MavenSession
         return container;
     }
 
-    public MavenProject getProject()
-    {
-        return project;
-    }
-
     public ArtifactRepository getLocalRepository()
     {
         return localRepository;

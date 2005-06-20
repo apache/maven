@@ -18,6 +18,7 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.project.MavenProject;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public interface LifecycleExecutor
 {
     String ROLE = LifecycleExecutor.class.getName();
 
-    MavenExecutionResponse execute( List tasks, MavenSession session )
+    MavenExecutionResponse execute( List tasks, MavenSession session, MavenProject project )
         throws LifecycleExecutionException;
 
 }

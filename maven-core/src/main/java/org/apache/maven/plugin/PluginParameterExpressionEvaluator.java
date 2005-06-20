@@ -18,6 +18,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -42,12 +43,16 @@ public class PluginParameterExpressionEvaluator
 
     private final PluginDescriptor pluginDescriptor;
 
-    public PluginParameterExpressionEvaluator( MavenSession context, PluginDescriptor pluginDescriptor, PathTranslator pathTranslator, Logger logger )
+    private final MavenProject project;
+
+    public PluginParameterExpressionEvaluator( MavenSession context, PluginDescriptor pluginDescriptor,
+                                               PathTranslator pathTranslator, Logger logger, MavenProject project )
     {
         this.context = context;
         this.pluginDescriptor = pluginDescriptor;
         this.pathTranslator = pathTranslator;
         this.logger = logger;
+        this.project = project;
     }
 
     public Object evaluate( String expr )
@@ -90,7 +95,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( expression.equals( "project" ) )
         {
-            value = context.getProject();
+            value = project;
         }
         else if ( expression.startsWith( "project" ) )
         {
@@ -101,12 +106,12 @@ public class PluginParameterExpressionEvaluator
                 if ( pathSeparator > 0 )
                 {
                     String pathExpression = expression.substring( 1, pathSeparator );
-                    value = ReflectionValueExtractor.evaluate( pathExpression, context.getProject() );
+                    value = ReflectionValueExtractor.evaluate( pathExpression, project );
                     value = value + expression.substring( pathSeparator );
                 }
                 else
                 {
-                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), context.getProject() );
+                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), project );
                 }
             }
             catch ( Exception e )
@@ -170,7 +175,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( expression.equals( "basedir" ) )
         {
-            value = context.getProject().getBasedir().getAbsolutePath();
+            value = project.getBasedir().getAbsolutePath();
         }
         else if ( expression.startsWith( "basedir" ) )
         {
@@ -178,8 +183,7 @@ public class PluginParameterExpressionEvaluator
 
             if ( pathSeparator > 0 )
             {
-                value = context.getProject().getFile().getParentFile().getAbsolutePath() +
-                    expression.substring( pathSeparator );
+                value = project.getFile().getParentFile().getAbsolutePath() + expression.substring( pathSeparator );
             }
             else
             {
@@ -188,15 +192,15 @@ public class PluginParameterExpressionEvaluator
         }
         else
         {
-            // Check properties that have been injected via profiles before we default over to 
+            // Check properties that have been injected via profiles before we default over to
             // system properties.
-            
-            if( context.getProject().getProfileProperties() != null )
+
+            if ( project.getProfileProperties() != null )
             {
-                value = context.getProject().getProfileProperties().getProperty( expression );
+                value = project.getProfileProperties().getProperty( expression );
             }
 
-            if( value == null )
+            if ( value == null )
             {
                 // We will attempt to get nab a system property as a way to specify a
                 // parameter to a plugins. My particular case here is allowing the surefire
@@ -243,16 +247,16 @@ public class PluginParameterExpressionEvaluator
     public File alignToBaseDirectory( File file )
     {
         File basedir = null;
-        
-        if ( context != null && context.getProject() != null && context.getProject().getFile() != null )
+
+        if ( project != null && project.getFile() != null )
         {
-            basedir = context.getProject().getFile().getParentFile();
+            basedir = project.getFile().getParentFile();
         }
         else
         {
             basedir = new File( "." ).getAbsoluteFile().getParentFile();
         }
-        
+
         return new File( pathTranslator.alignToBaseDirectory( file.getPath(), basedir ) );
     }
 

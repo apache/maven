@@ -82,7 +82,7 @@ public class DefaultPluginManager
 {
     protected Map pluginDescriptors;
 
-    protected Map pluginDescriptorsByPrefix;
+    protected Map pluginIdsByPrefix;
 
     protected PlexusContainer container;
 
@@ -100,7 +100,7 @@ public class DefaultPluginManager
     {
         pluginDescriptors = new HashMap();
 
-        pluginDescriptorsByPrefix = new HashMap();
+        pluginIdsByPrefix = new HashMap();
 
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
     }
@@ -128,9 +128,10 @@ public class DefaultPluginManager
                 pluginDescriptors.put( key, pluginDescriptor );
 
                 // TODO: throw an (not runtime) exception if there is a prefix overlap - means doing so elsewhere
-                if ( !pluginDescriptorsByPrefix.containsKey( pluginDescriptor.getGoalPrefix() ) )
+                // we also need to deal with multiple versions somehow - currently, first wins
+                if ( !pluginIdsByPrefix.containsKey( pluginDescriptor.getGoalPrefix() ) )
                 {
-                    pluginDescriptorsByPrefix.put( pluginDescriptor.getGoalPrefix(), pluginDescriptor );
+                    pluginIdsByPrefix.put( pluginDescriptor.getGoalPrefix(), pluginDescriptor.getId() );
                 }
             }
         }
@@ -150,11 +151,6 @@ public class DefaultPluginManager
         return (PluginDescriptor) pluginDescriptors.get( key );
     }
 
-    private PluginDescriptor getPluginDescriptor( String prefix )
-    {
-        return (PluginDescriptor) pluginDescriptorsByPrefix.get( prefix );
-    }
-
     private boolean isPluginInstalled( String pluginKey )
     {
         //        String key = PluginDescriptor.constructPluginKey( groupId, artifactId, version );
@@ -164,16 +160,16 @@ public class DefaultPluginManager
 
     private boolean isPluginInstalledForPrefix( String prefix )
     {
-        return pluginDescriptorsByPrefix.containsKey( prefix );
+        return pluginIdsByPrefix.containsKey( prefix );
     }
 
-    public PluginDescriptor verifyPlugin( String prefix )
+    public String getPluginIdFromPrefix( String prefix )
     {
         if ( !isPluginInstalledForPrefix( prefix ) )
         {
             // TODO: lookup remotely
         }
-        return getPluginDescriptor( prefix );
+        return (String) pluginIdsByPrefix.get( prefix );
     }
 
     public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
@@ -347,7 +343,7 @@ public class DefaultPluginManager
     // Mojo execution
     // ----------------------------------------------------------------------
 
-    public void executeMojo( MojoExecution mojoExecution, MavenSession session )
+    public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws ArtifactResolutionException, PluginManagerException, MojoExecutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -366,8 +362,8 @@ public class DefaultPluginManager
                 artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
                 resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder, mojoDescriptor
-                    .isDependencyResolutionRequired(), artifactFactory );
-                downloadDependencies( session, artifactResolver );
+                    .isDependencyResolutionRequired(), artifactFactory, project );
+                downloadDependencies( project, session, artifactResolver );
             }
             catch ( ComponentLookupException e )
             {
@@ -403,11 +399,11 @@ public class DefaultPluginManager
             String groupId = pluginDescriptor.getGroupId();
             String artifactId = pluginDescriptor.getArtifactId();
             String executionId = mojoExecution.getExecutionId();
-            Xpp3Dom dom = session.getProject().getGoalConfiguration( groupId, artifactId, executionId, goalId );
-            Xpp3Dom reportDom = session.getProject().getReportConfiguration( groupId, artifactId, executionId );
+            Xpp3Dom dom = project.getGoalConfiguration( groupId, artifactId, executionId, goalId );
+            Xpp3Dom reportDom = project.getReportConfiguration( groupId, artifactId, executionId );
             dom = Xpp3Dom.mergeXpp3Dom( dom, reportDom );
 
-            plugin = getConfiguredMojo( pluginContainer, mojoDescriptor, session, dom );
+            plugin = getConfiguredMojo( pluginContainer, mojoDescriptor, session, dom, project );
         }
         catch ( PluginConfigurationException e )
         {
@@ -461,7 +457,7 @@ public class DefaultPluginManager
     }
 
     public List getReports( String groupId, String artifactId, String version, ReportSet reportSet,
-                            MavenSession session )
+                            MavenSession session, MavenProject project )
         throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException
     {
         PluginDescriptor pluginDescriptor = getPluginDescriptor( groupId, artifactId, version );
@@ -488,9 +484,9 @@ public class DefaultPluginManager
                     MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, id );
 
                     String executionId = mojoExecution.getExecutionId();
-                    Xpp3Dom dom = session.getProject().getReportConfiguration( groupId, artifactId, executionId );
+                    Xpp3Dom dom = project.getReportConfiguration( groupId, artifactId, executionId );
 
-                    reports.add( getConfiguredMojo( pluginContainer, mojoDescriptor, session, dom ) );
+                    reports.add( getConfiguredMojo( pluginContainer, mojoDescriptor, session, dom, project ) );
                 }
                 catch ( ComponentLookupException e )
                 {
@@ -516,7 +512,7 @@ public class DefaultPluginManager
     }
 
     private Mojo getConfiguredMojo( PlexusContainer pluginContainer, MojoDescriptor mojoDescriptor,
-                                    MavenSession session, Xpp3Dom dom )
+                                    MavenSession session, Xpp3Dom dom, MavenProject project )
         throws ComponentLookupException, PluginConfigurationException
     {
         Mojo plugin = (Mojo) pluginContainer.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
@@ -546,7 +542,8 @@ public class DefaultPluginManager
         //                                                                          mojoDescriptor.getConfiguration() );
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pluginDescriptor,
-                                                                                          pathTranslator, getLogger() );
+                                                                                          pathTranslator, getLogger(),
+                                                                                          project );
 
         checkRequiredParameters( mojoDescriptor, mergedConfiguration, expressionEvaluator, plugin );
 
@@ -882,11 +879,9 @@ public class DefaultPluginManager
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
                                                 MavenProjectBuilder mavenProjectBuilder, String scope,
-                                                ArtifactFactory artifactFactory )
+                                                ArtifactFactory artifactFactory, MavenProject project )
         throws ArtifactResolutionException
     {
-        MavenProject project = context.getProject();
-
         MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, mavenProjectBuilder,
                                                                     artifactFactory );
 
@@ -904,10 +899,10 @@ public class DefaultPluginManager
     // Artifact downloading
     // ----------------------------------------------------------------------
 
-    private void downloadDependencies( MavenSession context, ArtifactResolver artifactResolver )
+    private void downloadDependencies( MavenProject project, MavenSession context, ArtifactResolver artifactResolver )
         throws ArtifactResolutionException
     {
-        for ( Iterator it = context.getProject().getArtifacts().iterator(); it.hasNext(); )
+        for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
 
@@ -916,7 +911,7 @@ public class DefaultPluginManager
         }
 
         Set pluginArtifacts = new HashSet();
-        for ( Iterator it = context.getProject().getPluginArtifacts().iterator(); it.hasNext(); )
+        for ( Iterator it = project.getPluginArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
 
@@ -924,9 +919,9 @@ public class DefaultPluginManager
 
             pluginArtifacts.add( artifact );
         }
-        context.getProject().setPluginArtifacts( pluginArtifacts );
+        project.setPluginArtifacts( pluginArtifacts );
 
-        artifactResolver.resolve( context.getProject().getParentArtifact(), context.getRemoteRepositories(), context
+        artifactResolver.resolve( project.getParentArtifact(), context.getRemoteRepositories(), context
             .getLocalRepository() );
     }
 
