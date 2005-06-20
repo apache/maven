@@ -19,4 +19,26 @@
       <version>1.0-alpha-4-SNAPSHOT</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <version>1.0-alpha-3-SNAPSHOT</version>
+        <configuration>
+          <model>src/main/mdo/lifecycle.mdo</model>
+          <version>1.0.0</version>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

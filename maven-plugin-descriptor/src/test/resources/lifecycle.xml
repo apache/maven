@@ -1,0 +1,20 @@
+<lifecycles>
+  <lifecycle>
+    <id>clover</id>
+    <phases>
+      <phase>
+        <id>generate-sources</id>
+        <executions>
+          <execution>
+            <configuration>
+              <debug>true</debug>
+            </configuration>
+              <goals>
+                <goal>clover:compiler</goal>
+              </goals>
+          </execution>
+        </executions>
+      </phase>
+    </phases>
+  </lifecycle>
+</lifecycles>
