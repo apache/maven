@@ -612,6 +612,13 @@
           <type>String</type>
           <defaultValue>default</defaultValue>
         </field>
+        <field>
+          <name>checksumPolicy</name>
+          <version>1.0.0</version>
+          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are "fail" or "warn"</description>
+          <type>String</type>
+          <defaultValue>warn</defaultValue>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

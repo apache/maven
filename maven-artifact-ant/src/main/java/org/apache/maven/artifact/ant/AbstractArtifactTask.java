@@ -18,6 +18,7 @@ package org.apache.maven.artifact.ant;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -31,6 +32,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.IOUtil;
@@ -96,17 +98,34 @@ public abstract class AbstractArtifactTask
             manager.addProxy( proxy.getType(), proxy.getHost(), proxy.getPort(), proxy.getUserName(),
                               proxy.getPassword(), proxy.getNonProxyHosts() );
         }
-
+        
+        ArtifactRepositoryFactory repositoryFactory = null;
+        
         ArtifactRepository artifactRepository;
-        if ( repository.getSnapshotPolicy() != null )
+        
+        try
         {
-            artifactRepository = new ArtifactRepository( "remote", repository.getUrl(), repositoryLayout,
-                                                         repository.getSnapshotPolicy() );
+            repositoryFactory = (ArtifactRepositoryFactory) lookup( ArtifactRepositoryFactory.ROLE );
+            
+            String snapshotPolicy = repository.getSnapshotPolicy();
+            String checksumPolicy = repository.getChecksumPolicy();
+            
+            artifactRepository = repositoryFactory.createArtifactRepository( "remote", repository.getUrl(), 
+                                                                             repositoryLayout, snapshotPolicy, 
+                                                                             checksumPolicy );
         }
-        else
+        finally
         {
-            artifactRepository = new ArtifactRepository( "remote", repository.getUrl(), repositoryLayout );
+            try
+            {
+                getEmbedder().release( repositoryFactory );
+            }
+            catch ( ComponentLifecycleException e )
+            {
+                // TODO: Warn the user, or not?
+            }
         }
+
         return artifactRepository;
     }
 

@@ -90,7 +90,7 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository repository = new ArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
+        ArtifactRepository repository = new ArtifactRepository( "test", "file://" + f.getPath(), repoLayout, ArtifactRepository.SNAPSHOT_POLICY_NEVER, ArtifactRepository.CHECKSUM_POLICY_WARN );
 
         return repository;
     }

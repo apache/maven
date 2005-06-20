@@ -66,9 +66,12 @@ public final class ProjectUtils
             String id = repo.getId();
             String url = repo.getUrl();
             String snapshotPolicy = repo.getSnapshotPolicy();
+            String checksumPolicy = repo.getChecksumPolicy();
+            
             // TODO: make this a map inside the factory instead, so no lookup needed
             ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
-            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshotPolicy );
+            
+            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshotPolicy, checksumPolicy );
         }
         else
         {

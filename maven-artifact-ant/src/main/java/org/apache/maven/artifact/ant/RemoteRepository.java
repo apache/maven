@@ -30,7 +30,9 @@ public class RemoteRepository
     private Authentication authentication;
 
     private String snapshotPolicy;
-
+    
+    private String checksumPolicy;
+    
     private Proxy proxy;
 
     public String getUrl()
@@ -71,5 +73,15 @@ public class RemoteRepository
     public Proxy getProxy()
     {
         return proxy;
+    }
+
+    public String getChecksumPolicy()
+    {
+        return checksumPolicy;
+    }
+
+    public void setChecksumPolicy( String checksumPolicy )
+    {
+        this.checksumPolicy = checksumPolicy;
     }
 }

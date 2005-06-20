@@ -28,7 +28,9 @@ public interface ArtifactRepositoryFactory
 
     public ArtifactRepository createArtifactRepository( String id, String url,
                                                         ArtifactRepositoryLayout repositoryLayout,
-                                                        String snapshotPolicy );
+                                                        String snapshotPolicy, String checksumPolicy );
 
     void setGlobalSnapshotPolicy( String snapshotPolicy );
+    
+    void setGlobalChecksumPolicy( String checksumPolicy );
 }

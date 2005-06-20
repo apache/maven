@@ -392,6 +392,20 @@ public class MavenCli
         {
             artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS );
         }
+        
+        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
+        {
+            System.out.println( "+ Enabling strict checksum verification on all artifact downloads.");
+            
+            artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepository.CHECKSUM_POLICY_FAIL );
+        }
+        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
+        {
+            System.out.println( "+ Disabling strict checksum verification on all artifact downloads.");
+            
+            artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepository.CHECKSUM_POLICY_WARN );
+        }
+        
         return localRepository;
     }
 
@@ -508,6 +522,10 @@ public class MavenCli
         public static final char ACTIVATE_PROFILES = 'P';
         
         public static final char FORCE_PLUGIN_UPDATES = 'F';
+        
+        public static final char CHECKSUM_FAILURE_POLICY = 'C';
+        
+        public static final char CHECKSUM_WARNING_POLICY = 'c';
 
         public CLIManager()
         {
@@ -536,6 +554,8 @@ public class MavenCli
                 "Comma-delimited list of profiles to activate").hasArg().create( ACTIVATE_PROFILES ) );
             options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription( "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
             options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Force upToDate check for any relevant registered plugins" ).create( FORCE_PLUGIN_UPDATES ) );
+            options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription( "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
+            options.addOption( OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create( CHECKSUM_WARNING_POLICY ) );
         }
 
         public CommandLine parse( String[] args )

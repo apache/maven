@@ -32,6 +32,8 @@ public class ArtifactRepository
     extends Repository
 {
     private final String snapshotPolicy;
+    
+    private final String checksumPolicy;
 
     private final ArtifactRepositoryLayout layout;
 
@@ -42,19 +44,29 @@ public class ArtifactRepository
     public static final String SNAPSHOT_POLICY_DAILY = "daily";
 
     public static final String SNAPSHOT_POLICY_INTERVAL = "interval";
+    
+    public static final String CHECKSUM_POLICY_FAIL = "fail";
+    
+    public static final String CHECKSUM_POLICY_WARN = "warn";
+    
+    public static final String CHECKSUM_ALGORITHM_SHA1 = "SHA-1";
+    
+    public static final String CHECKSUM_ALGORITHM_MD5 = "MD5";
 
     public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
     {
-        this( id, url, layout, SNAPSHOT_POLICY_NEVER );
+        this( id, url, layout, SNAPSHOT_POLICY_NEVER, CHECKSUM_POLICY_WARN );
     }
 
-    public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, String snapshotPolicy )
+    public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, String snapshotPolicy, String checksumPolicy )
     {
         super( id, url );
 
         this.layout = layout;
 
         this.snapshotPolicy = snapshotPolicy;
+        
+        this.checksumPolicy = checksumPolicy;
     }
 
     public String pathOf( Artifact artifact )
@@ -71,9 +83,19 @@ public class ArtifactRepository
     {
         return snapshotPolicy;
     }
-
+    
+    public String getChecksumPolicy()
+    {
+        return checksumPolicy;
+    }
+    
+    public boolean failOnChecksumMismatch()
+    {
+        return CHECKSUM_POLICY_FAIL.equals( checksumPolicy );
+    }
+    
     public ArtifactRepository createMirror( Repository mirror )
     {
-        return new ArtifactRepository( mirror.getId(), mirror.getUrl(), layout, snapshotPolicy );
+        return new ArtifactRepository( mirror.getId(), mirror.getUrl(), layout, snapshotPolicy, checksumPolicy );
     }
 }

@@ -30,4 +30,9 @@ public class ChecksumFailedException extends TransferFailedException
     {
         super( s );
     }
+    
+    public ChecksumFailedException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }
