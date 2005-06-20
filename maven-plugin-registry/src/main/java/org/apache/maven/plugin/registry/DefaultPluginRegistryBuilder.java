@@ -1,7 +1,6 @@
 package org.apache.maven.plugin.registry;
 
 import org.apache.maven.plugin.registry.io.xpp3.PluginRegistryXpp3Reader;
-import org.apache.maven.plugin.registry.TrackableBase;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
