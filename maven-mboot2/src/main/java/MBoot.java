@@ -62,6 +62,7 @@ public class MBoot
         targetVersions.put( "maven-settings", "1.0.0" );
         targetVersions.put( "maven-profile", "1.0.0" );
         targetVersions.put( "maven-plugin-registry", "1.0.0" );
+        targetVersions.put( "maven-plugin-descriptor", "1.0.0" );
 
         MODELLO_TARGET_VERSIONS = Collections.unmodifiableMap( targetVersions );
 
@@ -70,6 +71,7 @@ public class MBoot
         modelFiles.put( "maven-settings", "settings.mdo" );
         modelFiles.put( "maven-profile", "profiles.mdo" );
         modelFiles.put( "maven-plugin-registry", "plugin-registry.mdo" );
+        modelFiles.put( "maven-plugin-descriptor", "src/main/mdo/lifecycle.mdo" );
 
         MODELLO_MODEL_FILES = Collections.unmodifiableMap( modelFiles );
     }
