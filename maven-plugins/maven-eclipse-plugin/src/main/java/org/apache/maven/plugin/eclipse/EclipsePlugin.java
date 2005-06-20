@@ -28,7 +28,7 @@ import java.io.File;
  *
  * @goal eclipse
  * @requiresDependencyResolution test
- * @execute phase="generate-sources"
+ * @executePhase="generate-sources"
  *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
@@ -47,10 +47,7 @@ public class EclipsePlugin
     private MavenProject project;
 
     /**
-     * The project whose project files to create.
-     *
      * @parameter expression="${executedProject}"
-     * @required
      */
     private MavenProject executedProject;
 
@@ -93,6 +90,12 @@ public class EclipsePlugin
         try
         {
             eclipseWriter.setLocalRepositoryFile( new File ( localRepository.getBasedir() ) );
+
+            if ( executedProject == null )
+            {
+                // backwards compat with alpha-2 only
+                executedProject = project;
+            }
 
             eclipseWriter.write( project, executedProject );
         }

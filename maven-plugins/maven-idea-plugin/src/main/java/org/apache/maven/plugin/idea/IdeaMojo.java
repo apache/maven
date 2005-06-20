@@ -40,7 +40,7 @@ import java.util.Iterator;
  * Goal for generating IDEA files from a POM.
  *
  * @goal idea
- * @execute phase="generate-sources"
+ * @executePhase "generate-sources"
  * @requiresDependencyResolution test
  * @todo use dom4j or something. Xpp3Dom can't cope properly with entities and so on
  */
@@ -56,14 +56,18 @@ public class IdeaMojo
 
     /**
      * @parameter expression="${executedProject}"
-     * @required
-     * @readonly
      */
     private MavenProject executedProject;
 
     public void execute()
         throws MojoExecutionException
     {
+        if ( executedProject == null )
+        {
+            // backwards compat with alpha-2 only
+            executedProject = project;
+        }
+
         rewriteModule();
 
         rewriteProject();
