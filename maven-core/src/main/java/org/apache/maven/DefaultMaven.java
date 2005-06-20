@@ -596,7 +596,7 @@ public class DefaultMaven
         {
             msg += "1 second";
         }
-        else
+        else if ( min > 0 )
         {
             msg += "< 1 second";
         }
