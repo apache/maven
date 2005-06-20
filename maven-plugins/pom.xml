@@ -90,7 +90,8 @@
     <module>maven-clean-plugin</module>
     <module>maven-compiler-plugin</module>
     <module>maven-deploy-plugin</module>
-    <module>maven-eclipse-plugin</module>
+    <!-- Broken reference to ${executedProject} -->
+    <!-- module>maven-eclipse-plugin</module -->
     <module>maven-ejb-plugin</module>
     <module>maven-idea-plugin</module>
     <module>maven-install-plugin</module>
