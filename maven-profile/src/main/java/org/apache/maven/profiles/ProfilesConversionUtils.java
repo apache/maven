@@ -100,6 +100,7 @@ public class ProfilesConversionUtils
         repo.setLayout( profileXmlRepo.getLayout() );
         repo.setName( profileXmlRepo.getName() );
         repo.setSnapshotPolicy( profileXmlRepo.getSnapshotPolicy() );
+        repo.setChecksumPolicy( profileXmlRepo.getChecksumPolicy() );
         repo.setUrl( profileXmlRepo.getUrl() );
 
         return repo;

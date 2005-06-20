@@ -160,6 +160,7 @@ public final class SettingsUtils
         repo.setLayout( settingsRepo.getLayout() );
         repo.setName( settingsRepo.getName() );
         repo.setSnapshotPolicy( settingsRepo.getSnapshotPolicy() );
+        repo.setChecksumPolicy( settingsRepo.getChecksumPolicy() );
         repo.setUrl( settingsRepo.getUrl() );
 
         return repo;
