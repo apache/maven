@@ -197,6 +197,10 @@ public class DefaultMavenSettingsBuilder
             // TODO: This replacing shouldn't be necessary as user.home should be in the
             // context of the container and thus the value would be interpolated by Plexus
             String basedir = System.getProperty( basedirSysProp );
+            if ( basedir == null )
+            {
+                basedir = System.getProperty( "user.dir" );
+            }
 
             basedir = basedir.replaceAll( "\\\\", "/" );
             basedir = basedir.replaceAll( "\\$", "\\\\\\$" );
