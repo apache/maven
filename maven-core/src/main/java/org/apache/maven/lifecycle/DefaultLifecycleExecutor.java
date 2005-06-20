@@ -116,41 +116,37 @@ public class DefaultLifecycleExecutor
     private void executeGoal( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, PluginNotFoundException, MojoExecutionException, ArtifactResolutionException
     {
-        Map phaseMap = new HashMap();
-
-        for ( Iterator i = phases.iterator(); i.hasNext(); )
-        {
-            String p = (String) i.next();
-
-            // Make a copy of the phase as we will modify it
-            phaseMap.put( p, new ArrayList() );
-        }
-
-        if ( phaseMap.containsKey( task ) )
+        if ( phases.contains( task ) )
         {
             // we have a lifecycle phase, so lets bind all the necessary goals
-            constructLifecyclePhaseMap( session, phaseMap, task, project );
+            Map lifecycleMappings = constructLifecycleMappings( session, task, project );
+            executeGoalWithLifecycle( task, session, lifecycleMappings, project );
         }
-
-        executeGoalWithLifecycle( task, session, phaseMap, project );
+        else
+        {
+            executeStandaloneGoal( task, session, project );
+        }
     }
 
     private void executeGoalWithLifecycle( String task, MavenSession session, Map lifecycleMappings,
                                            MavenProject project )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException
     {
-        List goals;
+        List goals = processGoalChain( task, lifecycleMappings );
 
-        if ( lifecycleMappings.containsKey( task ) )
-        {
-            goals = processGoalChain( task, lifecycleMappings );
-        }
-        else
-        {
-            MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project );
-            goals = Collections.singletonList( new MojoExecution( mojoDescriptor ) );
-        }
+        executeGoals( goals, session, project );
+    }
 
+    private void executeStandaloneGoal( String task, MavenSession session, MavenProject project )
+        throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException
+    {
+        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project );
+        executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), session, project );
+    }
+
+    private void executeGoals( List goals, MavenSession session, MavenProject project )
+        throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException
+    {
         for ( Iterator i = goals.iterator(); i.hasNext(); )
         {
             MojoExecution mojoExecution = (MojoExecution) i.next();
@@ -160,8 +156,7 @@ public class DefaultLifecycleExecutor
 
             if ( executePhase != null )
             {
-                forkLifecycle( executePhase, mojoDescriptor.getExecuteLifecycle(), session, lifecycleMappings,
-                               project );
+                forkLifecycle( executePhase, mojoDescriptor.getExecuteLifecycle(), session, project );
             }
 
             try
@@ -175,18 +170,12 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void forkLifecycle( String executePhase, String executeLifecycle, MavenSession session,
-                                Map lifecycleMappings, MavenProject project )
+    private void forkLifecycle( String task, String executeLifecycle, MavenSession session,
+                                MavenProject project )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException
     {
-        // Deep copy of the lifecycle
-        Map phaseMap = new HashMap();
-        for ( Iterator i = lifecycleMappings.keySet().iterator(); i.hasNext(); )
-        {
-            String phase = (String) i.next();
-            List mappings = (List) lifecycleMappings.get( phase );
-            phaseMap.put( phase, new ArrayList( mappings ) );
-        }
+        // Create new lifecycle
+        Map lifecycleMappings = constructLifecycleMappings( session, task, project );
 
         if ( executeLifecycle != null )
         {
@@ -194,27 +183,27 @@ public class DefaultLifecycleExecutor
         }
 
         // TODO: clone project
-        executeGoalWithLifecycle( executePhase, session, phaseMap, project );
+        executeGoalWithLifecycle( task, session, lifecycleMappings, project );
     }
 
-    private void constructLifecyclePhaseMap( MavenSession session, Map phaseMap, String selectedPhase,
-                                             MavenProject project )
+    private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project )
         throws ArtifactResolutionException, LifecycleExecutionException
     {
         // first, bind those associated with the packaging
-        bindLifecycleForPackaging( session, phaseMap, selectedPhase, project );
+        Map lifecycleMappings = bindLifecycleForPackaging( session, selectedPhase, project );
 
         // next, loop over plugins and for any that have a phase, bind it
         for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
 
-            bindPluginToLifecycle( plugin, session, phaseMap, project );
+            bindPluginToLifecycle( plugin, session, lifecycleMappings, project );
         }
+
+        return lifecycleMappings;
     }
 
-    private void bindLifecycleForPackaging( MavenSession session, Map phaseMap, String selectedPhase,
-                                            MavenProject project )
+    private Map bindLifecycleForPackaging( MavenSession session, String selectedPhase, MavenProject project )
         throws ArtifactResolutionException, LifecycleExecutionException
     {
         Map mappings;
@@ -230,6 +219,8 @@ public class DefaultLifecycleExecutor
             mappings = defaultPhases;
         }
 
+        Map lifecycleMappings = new HashMap();
+
         boolean finished = false;
         for ( Iterator i = phases.iterator(); i.hasNext() && !finished; )
         {
@@ -244,7 +235,8 @@ public class DefaultLifecycleExecutor
                     String goal = tok.nextToken().trim();
 
                     MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project );
-                    addToPhaseMap( phaseMap, phase, new MojoExecution( mojoDescriptor ), session.getSettings() );
+                    addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ),
+                                            session.getSettings() );
                 }
             }
 
@@ -253,6 +245,8 @@ public class DefaultLifecycleExecutor
                 finished = true;
             }
         }
+
+        return lifecycleMappings;
     }
 
     /**
@@ -347,7 +341,7 @@ public class DefaultLifecycleExecutor
                     if ( mojoDescriptor.getPhase() != null )
                     {
                         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-                        addToPhaseMap( phaseMap, mojoDescriptor.getPhase(), mojoExecution, settings );
+                        addToLifecycleMappings( phaseMap, mojoDescriptor.getPhase(), mojoExecution, settings );
                     }
                 }
             }
@@ -374,26 +368,26 @@ public class DefaultLifecycleExecutor
                 MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
                 if ( execution.getPhase() != null )
                 {
-                    addToPhaseMap( phaseMap, execution.getPhase(), mojoExecution, settings );
+                    addToLifecycleMappings( phaseMap, execution.getPhase(), mojoExecution, settings );
                 }
                 else if ( mojoDescriptor.getPhase() != null )
                 {
                     // if the phase was not in the configuration, use the phase in the descriptor
-                    addToPhaseMap( phaseMap, mojoDescriptor.getPhase(), mojoExecution, settings );
+                    addToLifecycleMappings( phaseMap, mojoDescriptor.getPhase(), mojoExecution, settings );
                 }
             }
         }
     }
 
-    private void addToPhaseMap( Map phaseMap, String phase, MojoExecution mojoExecution, Settings settings )
-        throws LifecycleExecutionException
+    private void addToLifecycleMappings( Map lifecycleMappings, String phase, MojoExecution mojoExecution,
+                                         Settings settings )
     {
-        List goals = (List) phaseMap.get( phase );
+        List goals = (List) lifecycleMappings.get( phase );
 
         if ( goals == null )
         {
-            String message = "Required phase '" + phase + "' not found";
-            throw new LifecycleExecutionException( message );
+            goals = new ArrayList();
+            lifecycleMappings.put( phase, goals );
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
