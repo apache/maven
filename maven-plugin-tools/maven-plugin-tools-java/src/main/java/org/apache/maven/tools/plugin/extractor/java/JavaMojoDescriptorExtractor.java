@@ -69,7 +69,7 @@ public class JavaMojoDescriptorExtractor
 
     public static final String PHASE = "phase";
 
-    public static final String EXECUTE_PHASE = "executePhase";
+    public static final String EXECUTE = "execute";
 
     public static final String GOAL_DESCRIPTION = "description";
 
@@ -184,11 +184,29 @@ public class JavaMojoDescriptorExtractor
         // Additional phase to execute first
         // ----------------------------------------------------------------------
 
-        DocletTag executePhase = findInClassHierarchy( javaClass, EXECUTE_PHASE );
-
-        if ( executePhase != null )
+        DocletTag oldExecutePhase = findInClassHierarchy( javaClass, "executePhase" );
+        if ( oldExecutePhase != null )
         {
-            mojoDescriptor.setExecutePhase( executePhase.getValue() );
+            getLogger().warn( "DEPRECATED: @executePhase is deprecated, please use @execute" );
+            mojoDescriptor.setExecutePhase( oldExecutePhase.getValue() );
+        }
+
+        DocletTag execute = findInClassHierarchy( javaClass, EXECUTE );
+
+        if ( execute != null )
+        {
+            String executePhase = execute.getNamedParameter( "phase" );
+            if ( executePhase == null )
+            {
+                throw new InvalidPluginDescriptorException( "@execute tag requires a 'phase' parameter" );
+            }
+            mojoDescriptor.setExecutePhase( executePhase );
+
+            String lifecycle = execute.getNamedParameter( "lifecycle" );
+            if ( lifecycle != null )
+            {
+                mojoDescriptor.setExecuteLifecycle( lifecycle );
+            }
         }
 
         // ----------------------------------------------------------------------
@@ -268,9 +286,7 @@ public class JavaMojoDescriptorExtractor
         // We're resolving class-level, ancestor-class-field, local-class-field order here.
         // ---------------------------------------------------------------------------------
 
-        Map rawParams = new TreeMap();
-
-        extractFieldParameterTags( javaClass, rawParams );
+        Map rawParams = extractFieldParameterTags( javaClass );
 
         for ( Iterator it = rawParams.entrySet().iterator(); it.hasNext(); )
         {
@@ -314,15 +330,21 @@ public class JavaMojoDescriptorExtractor
         }
     }
 
-    private void extractFieldParameterTags( JavaClass javaClass, Map rawParams )
+    private Map extractFieldParameterTags( JavaClass javaClass )
     {
+        Map rawParams;
+
         // we have to add the parent fields first, so that they will be overwritten by the local fields if
         // that actually happens...
         JavaClass superClass = javaClass.getSuperJavaClass();
 
         if ( superClass != null )
         {
-            extractFieldParameterTags( superClass, rawParams );
+            rawParams = extractFieldParameterTags( superClass );
+        }
+        else
+        {
+            rawParams = new TreeMap();
         }
 
         JavaField[] classFields = javaClass.getFields();
@@ -341,7 +363,7 @@ public class JavaMojoDescriptorExtractor
                 }
             }
         }
-
+        return rawParams;
     }
 
     private JavaClass getJavaClass( JavaSource javaSource )
@@ -353,8 +375,6 @@ public class JavaMojoDescriptorExtractor
         throws InvalidPluginDescriptorException
     {
         JavaDocBuilder builder = new JavaDocBuilder();
-
-        File basedir = project.getBasedir();
 
         for ( Iterator i = project.getCompileSourceRoots().iterator(); i.hasNext(); )
         {

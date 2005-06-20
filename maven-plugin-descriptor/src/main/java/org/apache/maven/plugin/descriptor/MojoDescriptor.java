@@ -36,7 +36,6 @@ public class MojoDescriptor
     extends ComponentDescriptor
     implements Cloneable
 {
-    // TODO: share with type handler
     public static String MAVEN_PLUGIN = "maven-plugin";
 
     public static final String SINGLE_PASS_EXEC_STRATEGY = "once-per-session";
@@ -58,6 +57,8 @@ public class MojoDescriptor
     private String phase;
 
     private String executePhase;
+
+    private String executeLifecycle;
 
     private String deprecated;
 
@@ -374,5 +375,15 @@ public class MojoDescriptor
         }
 
         return result;
+    }
+
+    public String getExecuteLifecycle()
+    {
+        return executeLifecycle;
+    }
+
+    public void setExecuteLifecycle( String executeLifecycle )
+    {
+        this.executeLifecycle = executeLifecycle;
     }
 }

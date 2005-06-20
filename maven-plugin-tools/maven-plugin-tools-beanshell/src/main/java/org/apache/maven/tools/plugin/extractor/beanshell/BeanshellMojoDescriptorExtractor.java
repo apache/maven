@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 /**
  * @todo share constants
  * @todo add example usage tag that can be shown in the doco

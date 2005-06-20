@@ -3,6 +3,7 @@ import java.util.regex.Pattern;
 import java.io.FileReader;
 import org.codehaus.plexus.util.StringUtils;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
 
 // only on start of line
 this.tag = "\\r?\\n\\s*\\*?\\s*@(\\w+)";
@@ -13,6 +14,8 @@ this.tagsPattern = Pattern.compile( "(?s)" + tag + "\\s*(.*?)" + tagOrEndComment
 this.descriptionPattern = Pattern.compile( "(?s)\\r?\\n\\s*\\*" );
 this.typePattern = Pattern.compile( "type\\s*=\\s*\"(.*?)\"" );
 this.expressionPattern = Pattern.compile( "expression\\s*=\\s*\"(.*?)\"" );
+this.phasePattern = Pattern.compile( "phase\\s*=\\s*\"(.*?)\"" );
+this.lifecyclePattern = Pattern.compile( "lifecycle\\s*=\\s*\"(.*?)\"" );
 
 setAccessibility( true );
 
@@ -135,7 +138,6 @@ extract( file, mojoDescriptor )
         this.tags = getTags( text );
         mojoDescriptor.setGoal( tags.get( "goal" ) );
         mojoDescriptor.setPhase( tags.get( "phase" ) );
-        mojoDescriptor.setExecutePhase( tags.get( "executePhase" ) );
         this.value = tags.get( "requiresDependencyResolution" );
         // TODO: share with java extractor
         if ( value == null || value.length() == 0 )
@@ -146,6 +148,26 @@ extract( file, mojoDescriptor )
 
         mojoDescriptor.setProjectRequired( tags.containsKey( "requiresProject" ) );
         mojoDescriptor.setOnlineRequired( tags.containsKey( "requiresOnline" ) );
+
+        this.value = tags.get( "execute" );
+        if ( value != null )
+        {
+            m = phasePattern.matcher( value );
+            if ( m.find() )
+            {
+                mojoDescriptor.setExecutePhase( m.group( 1 ) );
+            }
+            else
+            {
+                throw new InvalidPluginDescriptorException( "@execute must have a phase" );
+            }
+
+            m = lifecyclePattern.matcher( value );
+            if ( m.find() )
+            {
+                mojoDescriptor.setExecuteLifecycle( m.group( 1 ) );
+            }
+        }
     }
 }
 
