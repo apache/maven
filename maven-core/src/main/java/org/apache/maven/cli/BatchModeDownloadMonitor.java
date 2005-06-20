@@ -25,14 +25,12 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * Console download progress meter.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
+ * @version $Id: ConsoleDownloadMonitor.java 169548 2005-05-11 01:04:50Z brett $
  */
-public class ConsoleDownloadMonitor
+public class BatchModeDownloadMonitor
     extends AbstractLogEnabled
     implements TransferListener
 {
-    private long complete;
-
     public void transferInitiated( TransferEvent transferEvent )
     {
         String message = transferEvent.getRequestType() == TransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
@@ -41,8 +39,6 @@ public class ConsoleDownloadMonitor
 
         // TODO: can't use getLogger() because this isn't currently instantiated as a component
         System.out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
-
-        complete = 0;
     }
 
     public void transferStarted( TransferEvent transferEvent )
@@ -52,19 +48,7 @@ public class ConsoleDownloadMonitor
 
     public void transferProgress( TransferEvent transferEvent, byte[] buffer, int length )
     {
-        long total = transferEvent.getResource().getContentLength();
-        complete += length;
-        // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
-        if ( total >= 1024 )
-        {
-            System.out.print(
-                ( complete / 1024 ) + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K" ) +
-                    "\r" );
-        }
-        else
-        {
-            System.out.print( complete + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : total + "b" ) + "\r" );
-        }
+        // This space left intentionally blank
     }
 
     public void transferCompleted( TransferEvent transferEvent )

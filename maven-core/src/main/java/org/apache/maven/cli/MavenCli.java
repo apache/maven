@@ -224,7 +224,7 @@ public class MavenCli
 
             request = createRequest( projectFiles, embedder, commandLine, settings, eventDispatcher, manager );
 
-            maven = createMavenInstance( embedder );
+            maven = createMavenInstance( embedder, settings.isInteractiveMode() );
         }
         catch ( ComponentLookupException e )
         {
@@ -346,12 +346,19 @@ public class MavenCli
         return files;
     }
 
-    private static Maven createMavenInstance( Embedder embedder )
+    private static Maven createMavenInstance( Embedder embedder, boolean interactive )
         throws ComponentLookupException
     {
         // TODO [BP]: doing this here as it is CLI specific, though it doesn't feel like the right place (likewise logger).
         WagonManager wagonManager = (WagonManager) embedder.lookup( WagonManager.ROLE );
-        wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
+        if ( interactive )
+        {
+            wagonManager.setDownloadMonitor( new ConsoleDownloadMonitor() );
+        }
+        else
+        {
+            wagonManager.setDownloadMonitor( new BatchModeDownloadMonitor() );
+        }
 
         return (Maven) embedder.lookup( Maven.ROLE );
     }
