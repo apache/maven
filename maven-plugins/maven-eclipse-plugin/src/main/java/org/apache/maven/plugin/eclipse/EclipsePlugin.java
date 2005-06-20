@@ -28,7 +28,7 @@ import java.io.File;
  *
  * @goal eclipse
  * @requiresDependencyResolution test
- * @executePhase="generate-sources"
+ * @executePhase generate-sources
  *
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$

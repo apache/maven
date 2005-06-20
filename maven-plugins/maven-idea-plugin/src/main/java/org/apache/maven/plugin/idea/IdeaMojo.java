@@ -40,7 +40,7 @@ import java.util.Iterator;
  * Goal for generating IDEA files from a POM.
  *
  * @goal idea
- * @executePhase "generate-sources"
+ * @executePhase generate-sources
  * @requiresDependencyResolution test
  * @todo use dom4j or something. Xpp3Dom can't cope properly with entities and so on
  */
