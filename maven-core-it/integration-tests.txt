@@ -1,6 +1,5 @@
 it0028
-#Cannot find core-it:fork...
-#it0027
+it0027
 it0026
 it0025
 it0024
