@@ -558,8 +558,6 @@ public class DefaultPluginManager
 
                 Map resolved = result.getArtifacts();
 
-                List files = new ArrayList();
-
                 for ( Iterator it = resolved.values().iterator(); it.hasNext(); )
                 {
                     Artifact artifact = (Artifact) it.next();
@@ -572,6 +570,10 @@ public class DefaultPluginManager
 
                 pluginDescriptor.setClassRealm( pluginContainer.getContainerRealm() );
 
+                // TODO: this is probably overkill as it is rarely used - can we use a mojo tag to signal this will be
+                // used or check its configuration? Also, when it is used, perhaps it is more effecient to resolve
+                // everything at once and apply the exclusion filter when constructing the plugin container above.
+                // Check this out with yourkit
                 ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
 
                 ArtifactResolutionResult distroProvidedResult = artifactResolver
