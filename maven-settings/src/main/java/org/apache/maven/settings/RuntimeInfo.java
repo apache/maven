@@ -24,7 +24,8 @@ public class RuntimeInfo
 {
 
     private File file;
-    private boolean pluginUpdateForced = false;
+    
+    private Boolean pluginUpdateForced;
     
     // using Boolean for 3VL (null, true-to-all, false-to-all)
     private Boolean applyToAllPluginUpdates;
@@ -50,12 +51,12 @@ public class RuntimeInfo
         return file;
     }
     
-    public void setPluginUpdateForced( boolean pluginUpdateForced )
+    public void setPluginUpdateOverride( Boolean pluginUpdateForced )
     {
         this.pluginUpdateForced = pluginUpdateForced;
     }
     
-    public boolean isPluginUpdateForced()
+    public Boolean getPluginUpdateOverride()
     {
         return pluginUpdateForced;
     }
@@ -98,5 +99,5 @@ public class RuntimeInfo
     {
         return localRepositorySourceLevel;
     }
-    
+
 }

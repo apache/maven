@@ -492,6 +492,8 @@ public class Verifier
             
             cli.createArgument().setValue( "-e" );
             
+            cli.createArgument().setValue( "--no-plugin-updates" );
+            
             cli.createArgument().setValue( "--batch-mode" );
 
             for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )

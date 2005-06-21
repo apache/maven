@@ -76,18 +76,25 @@ public class DefaultPluginVersionManager
         // we're not going to prompt the user to accept a plugin update until we find one.
         boolean promptToPersist = false;
 
+        // determine the behavior WRT prompting the user and installing plugin updates.
+        Boolean pluginUpdateOverride = settings.getRuntimeInfo().getPluginUpdateOverride();
+
         // second pass...if the plugin is listed in the settings.xml, use the version from <useVersion/>.
         if ( StringUtils.isEmpty( version ) )
         {
-            // 1. resolve existing useVersion.
+            // resolve existing useVersion.
             version = resolveExistingFromPluginRegistry( groupId, artifactId );
 
             if ( StringUtils.isNotEmpty( version ) )
             {
-                boolean forceUpdate = settings.getRuntimeInfo().isPluginUpdateForced();
-
                 // 2. check for updates. Determine whether this is the right time to attempt to update the version.
-                if ( forceUpdate || shouldCheckForUpdates( groupId, artifactId ) )
+                // Only check for plugin updates if:
+                //
+                //  a. the CLI switch to force plugin updates is set, OR BOTH OF THE FOLLOWING:
+                //  b. the CLI switch to suppress plugin updates is NOT set, AND
+                //  c. the update interval for the plugin has triggered an update check.
+                if ( Boolean.TRUE.equals( pluginUpdateOverride )
+                    || ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
                 {
                     updatedVersion = resolveReleaseVersion( groupId, artifactId, project
                         .getRemoteArtifactRepositories(), localRepository );
@@ -142,7 +149,7 @@ public class DefaultPluginVersionManager
         // for a decision on updating the plugin in the registry...rather than prompting
         // the user.
         boolean inInteractiveMode = settings.isInteractiveMode();
-        
+
         // determines what should be done if we're in non-interactive mode.
         // if true, then just update the registry with the new versions.
         String s = getPluginRegistry( groupId, artifactId ).getAutoUpdate();
@@ -155,36 +162,40 @@ public class DefaultPluginVersionManager
         // We should persist by default if:
         // 1. we detected a change in the plugin version from what was in the registry, or
         //      a. the plugin is not registered
-        // 2. we're in interactive mode, or
+        // 2. the pluginUpdateOverride flag has NOT been set to Boolean.FALSE (suppression mode)
+        // 3. we're in interactive mode, or
         //      a. the registry is declared to be in autoUpdate mode
         //
         // NOTE: This is only the default value; it may be changed as the result of prompting the user.
-        boolean persistUpdate = promptToPersist && ( inInteractiveMode || autoUpdate );
+        boolean persistUpdate = promptToPersist && !Boolean.FALSE.equals( pluginUpdateOverride )
+            && ( inInteractiveMode || autoUpdate );
 
+        // retrieve the apply-to-all flag, if it's been set previously.
         Boolean applyToAll = settings.getRuntimeInfo().getApplyToAllPluginUpdates();
-        
-        // Incorporate interactive-mode and previous decisions on apply-to-all, if appropriate.
+
+        // Incorporate interactive-mode CLI overrides, and previous decisions on apply-to-all, if appropriate.
         // don't prompt if not in interactive mode.
+        // don't prompt if the CLI pluginUpdateOverride is set (either suppression or force mode will stop prompting)
         // don't prompt if the user has selected ALL/NONE previously in this session
         //
         // NOTE: We're incorporating here, to make the usages of this check more consistent and 
         // resistant to change.
-        promptToPersist = promptToPersist && applyToAll == null && inInteractiveMode;
+        promptToPersist = promptToPersist && pluginUpdateOverride == null && applyToAll == null && inInteractiveMode;
 
         if ( promptToPersist )
         {
             persistUpdate = promptToPersistPluginUpdate( version, updatedVersion, groupId, artifactId, settings );
         }
-        
+
         // if it is determined that we should use this version, persist it as useVersion.
         // cases where this version will be persisted:
         // 1. the user is prompted and answers yes or all
-        // 2. the user has previously answeres all in this session
+        // 2. the user has previously answered all in this session
         // 3. the build is running in non-interactive mode, and the registry setting is for auto-update
-        if ( ( applyToAll == null || applyToAll.booleanValue() ) && persistUpdate )
+        if ( !Boolean.FALSE.equals( applyToAll ) && persistUpdate )
         {
             updatePluginVersionInRegistry( groupId, artifactId, updatedVersion );
-            
+
             // we're using the updated version of the plugin in this session as well.
             version = updatedVersion;
         }
@@ -293,7 +304,7 @@ public class DefaultPluginVersionManager
             if ( !StringUtils.isEmpty( persistAnswer ) )
             {
                 persistAnswer = persistAnswer.toLowerCase();
-                
+
                 if ( persistAnswer.startsWith( "y" ) )
                 {
                     shouldPersist = true;
@@ -308,8 +319,17 @@ public class DefaultPluginVersionManager
                 {
                     settings.getRuntimeInfo().setApplyToAllPluginUpdates( Boolean.FALSE );
                 }
+                else if ( persistAnswer.startsWith( "n" ) )
+                {
+                    shouldPersist = false;
+                }
+                else
+                {
+                    // default to yes.
+                    shouldPersist = true;
+                }
             }
-            
+
             if ( shouldPersist )
             {
                 getLogger().info( "Updating plugin version to " + updatedVersion );
@@ -318,7 +338,7 @@ public class DefaultPluginVersionManager
             {
                 getLogger().info( "NOT updating plugin version to " + updatedVersion );
             }
-            
+
             return shouldPersist;
 
         }
@@ -450,10 +470,11 @@ public class DefaultPluginVersionManager
             else
             {
                 plugin.setUseVersion( version );
-                
-                SimpleDateFormat format = new SimpleDateFormat( org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
-                
-                plugin.setLastChecked(format.format( new Date() ) );
+
+                SimpleDateFormat format = new SimpleDateFormat(
+                                                                org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
+
+                plugin.setLastChecked( format.format( new Date() ) );
             }
         }
         else

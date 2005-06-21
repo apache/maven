@@ -197,7 +197,11 @@ public class MavenCli
         
         if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) )
         {
-            settings.getRuntimeInfo().setPluginUpdateForced( true );
+            settings.getRuntimeInfo().setPluginUpdateOverride( Boolean.TRUE );
+        }
+        else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_UPDATES ) )
+        {
+            settings.getRuntimeInfo().setPluginUpdateOverride( Boolean.FALSE );
         }
 
         List projectFiles = null;
@@ -522,7 +526,9 @@ public class MavenCli
         
         public static final char ACTIVATE_PROFILES = 'P';
         
-        public static final char FORCE_PLUGIN_UPDATES = 'F';
+        public static final String FORCE_PLUGIN_UPDATES = "update-plugins";
+        
+        public static final String SUPPRESS_PLUGIN_UPDATES = "no-plugin-updates";
         
         public static final char CHECKSUM_FAILURE_POLICY = 'C';
         
@@ -554,7 +560,8 @@ public class MavenCli
             options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription(
                 "Comma-delimited list of profiles to activate").hasArg().create( ACTIVATE_PROFILES ) );
             options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription( "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
-            options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Force upToDate check for any relevant registered plugins" ).create( FORCE_PLUGIN_UPDATES ) );
+            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_UPDATES ).withDescription( "Force upToDate check for any relevant registered plugins" ).create() );
+            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_UPDATES ).withDescription( "Suppress upToDate check for any relevant registered plugins" ).create() );
             options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription( "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
             options.addOption( OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create( CHECKSUM_WARNING_POLICY ) );
         }
