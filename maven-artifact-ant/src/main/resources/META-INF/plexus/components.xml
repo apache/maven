@@ -229,7 +229,7 @@
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.profiless.activation.ProfileActivationCalculator</role>
+          <role>org.apache.maven.profiles.activation.ProfileActivationCalculator</role>
         </requirement>
       </requirements>
     </component>
@@ -239,8 +239,8 @@
      |
      -->
     <component>
-      <role>org.apache.maven.profiless.activation.ProfileActivationCalculator</role>
-      <implementation>org.apache.maven.profiless.activation.ProfileActivationCalculator</implementation>
+      <role>org.apache.maven.profiles.activation.ProfileActivationCalculator</role>
+      <implementation>org.apache.maven.profiles.activation.ProfileActivationCalculator</implementation>
     </component>
     <!--
      |
@@ -248,9 +248,9 @@
      |
      -->
     <component>
-      <role>org.apache.maven.profiless.activation.ProfileActivator</role>
+      <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>always-on</role-hint>
-      <implementation>org.apache.maven.profiless.activation.AlwaysOnProfileActivator</implementation>
+      <implementation>org.apache.maven.profiles.activation.AlwaysOnProfileActivator</implementation>
     </component>
     <!--
      |
@@ -258,9 +258,9 @@
      |
      -->
     <component>
-      <role>org.apache.maven.profiless.activation.ProfileActivator</role>
+      <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>jdk-prefix</role-hint>
-      <implementation>org.apache.maven.profiless.activation.JdkPrefixProfileActivator</implementation>
+      <implementation>org.apache.maven.profiles.activation.JdkPrefixProfileActivator</implementation>
     </component>
     <!--
      |
@@ -268,9 +268,9 @@
      |
      -->
     <component>
-      <role>org.apache.maven.profiless.activation.ProfileActivator</role>
+      <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>system-property</role-hint>
-      <implementation>org.apache.maven.profiless.activation.SystemPropertyProfileActivator</implementation>
+      <implementation>org.apache.maven.profiles.activation.SystemPropertyProfileActivator</implementation>
     </component>
     <!--
      |
@@ -278,9 +278,9 @@
      |
      -->
     <component>
-      <role>org.apache.maven.profiless.activation.ProfileActivator</role>
+      <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>explicit-listing</role-hint>
-      <implementation>org.apache.maven.profiless.activation.ExplicitListingProfileActivator</implementation>
+      <implementation>org.apache.maven.profiles.activation.ExplicitListingProfileActivator</implementation>
     </component>
     <!--
      |

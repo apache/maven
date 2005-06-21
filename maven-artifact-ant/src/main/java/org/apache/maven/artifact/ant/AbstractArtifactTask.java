@@ -27,11 +27,16 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.model.Model;
 import org.apache.maven.profiles.activation.ProfileActivationUtils;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.codehaus.classworlds.ClassRealm;
+import org.codehaus.classworlds.ClassWorld;
+import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -251,14 +256,24 @@ public abstract class AbstractArtifactTask
             if ( embedder == null )
             {
                 embedder = new Embedder();
+
                 try
                 {
-                    embedder.start();
+                    ClassWorld classWorld = new ClassWorld();
+                    
+                    ClassRealm classRealm = classWorld.newRealm( "plexus.core", getClass().getClassLoader() );
+                    
+                    embedder.start( classWorld );
                 }
                 catch ( PlexusContainerException e )
                 {
                     throw new BuildException( "Unable to start embedder", e );
                 }
+                catch ( DuplicateRealmException e )
+                {
+                    throw new BuildException( "Unable to create embedder ClassRealm", e );
+                }
+                
                 getProject().addReference( Embedder.class.getName(), embedder );
             }
         }
@@ -286,6 +301,24 @@ public abstract class AbstractArtifactTask
         {
             pom.initialise( projectBuilder, localArtifactRepository );
         }
+        return pom;
+    }
+
+    protected Pom createDummyPom()
+    {
+        Model mavenModel = new Model();
+        
+        mavenModel.setGroupId( "unspecified" );
+        mavenModel.setArtifactId( "unspecified" );
+        mavenModel.setVersion( "0.0" );
+        mavenModel.setPackaging( "jar" );
+        
+        MavenProject mavenProject = new MavenProject( mavenModel );
+        
+        Pom pom = new Pom();
+        
+        pom.setMavenProject( mavenProject );
+        
         return pom;
     }
 

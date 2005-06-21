@@ -1,13 +1,46 @@
-<project name="foo" xmlns:artifact="antlib:org.apache.maven.artifact.ant" default="foo">
-  <target name="test-pom">
-    <artifact:pom file="pom.xml" id="my.maven.project"/>
+<project name="foo" default="foo" xmlns:artifact="urn:maven-artifact-ant">
+  <!--
+    You either need to run the the 'initTaskDefs' task below and
+    define the artifact namespace like above (choose anything you
+    like except strings that start with 'antlib:'),
+    and be sure to supply the path to the maven-artifact-ant jars
 
-    <echo>Artifact ID = ${my.maven.project:artifactId}</echo>
+    OR
 
-    <echo>Parent Artifact ID = ${my.maven.project:parent.artifactId}</echo>
+    just define the artifact namespace as follows:
+
+      xmlns:artifact="antlib:org.apache.maven.artifact.ant"
+
+    and be sure to add the maven-artifact-ant jars to the ant
+    classpath (either by setting the CLASSPATH environment variable
+    before calling ant, or place the jars in the $ANT_HOME/lib directory).
+
+  -->
+
+  <target name="initTaskDefs">
+    <!-- don't forget to set the value! -->
+    <property name="maven.artifact-ant.lib.dir" value="${user.home}/work/opensource/m2/maven-artifact-ant/target/"/>
+    <path id="maven.classpath">
+      <pathelement location="${maven.artifact-ant.lib.dir}/maven-artifact-ant-2.0-SNAPSHOT-dep.jar"/>
+      <pathelement location="${maven.artifact-ant.lib.dir}maven-artifact-ant-2.0-SNAPSHOT.jar"/>
+    </path>
+
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+      uri="urn:maven-artifact-ant"
+    >
+      <classpath refid="maven.classpath"/>
+    </typedef>
   </target>
 
-  <target name="foo">
+  <target name="test-pom" depends="initTaskDefs">
+    <artifact:pom file="pom.xml" id="my.maven.project"/>
+
+    <echo>Artifact ID = ${my.maven.project.artifactId}</echo>
+
+    <echo>Parent Artifact ID = ${my.maven.project.parent.artifactId}</echo>
+  </target>
+
+  <target name="foo" depends="initTaskDefs">
     <artifact:localRepository id="local.repository" location="${basedir}/target/local-repo" layout="default"/>
 
     <artifact:remoteRepository id="deploy.repository" url="file://${basedir}/target/deployment-repo" layout="legacy"/>
@@ -51,7 +84,7 @@
     </artifact:deploy>
   </target>
 
-  <target name="test-scm">
+  <target name="test-scm" depends="initTaskDefs">
     <mkdir dir="target" />
 
     <pathconvert targetos="unix" property="repo.path.unix">

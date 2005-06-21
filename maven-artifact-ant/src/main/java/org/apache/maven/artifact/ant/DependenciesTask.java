@@ -81,6 +81,12 @@ public class DependenciesTask
                 remoteRepositories.add( createAntRemoteRepository( pomRepository ) );
             }
         }
+        else
+        {
+            // we have to have some sort of Pom object in order to satisfy the requirements for building the
+            // originating Artifact below...
+            pom = createDummyPom();
+        }
 
         Set artifacts = metadataSource.createArtifacts( dependencies, null, null );
 

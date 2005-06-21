@@ -91,6 +91,11 @@ public class Pom
         }
         return instance;
     }
+    
+    public void setMavenProject( MavenProject mavenProject )
+    {
+        getInstance().mavenProject = mavenProject;
+    }
 
     public File getFile()
     {
