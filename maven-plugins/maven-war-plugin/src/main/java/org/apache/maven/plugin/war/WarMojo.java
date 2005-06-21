@@ -171,13 +171,22 @@ public class WarMojo
             // TODO: scope handler
             // TODO: use classpath instead
             // Include runtime and compile time libraries
-            if ( "jar".equals( artifact.getType() ) && !Artifact.SCOPE_TEST.equals( artifact.getScope() ) && !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
-            {
-                FileUtils.copyFileToDirectory( artifact.getFile(), libDirectory );
-            }
+            
+            // [jc, 21-June]: handle TLDs as a special-case.
             if ( "tld".equals( artifact.getType() ) )
             {
                 FileUtils.copyFileToDirectory( artifact.getFile(), tldDirectory );
+            }
+            // [jc, 21-June]: filter POMs out of the /lib copy process.
+            else if ( "pom".equals( artifact.getType() ) )
+            {
+                // don't mess with these...they'd only be here for inclusion of dependencies.
+            }
+            // [jc, 21-June]: I'm removing ( "jar".equals( artifact.getType() ) ) from consideration here
+            // we'll handle anything that's NOT a POM or a TLD as a binary library to go in /lib
+            else if ( !Artifact.SCOPE_TEST.equals( artifact.getScope() ) && !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+            {
+                FileUtils.copyFileToDirectory( artifact.getFile(), libDirectory );
             }
         }
     }
