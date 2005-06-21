@@ -309,8 +309,17 @@ public class DefaultPluginVersionManager
                     settings.getRuntimeInfo().setApplyToAllPluginUpdates( Boolean.FALSE );
                 }
             }
-
-            return StringUtils.isEmpty( persistAnswer ) || "y".equalsIgnoreCase( persistAnswer );
+            
+            if ( shouldPersist )
+            {
+                getLogger().info( "Updating plugin version to " + updatedVersion );
+            }
+            else
+            {
+                getLogger().info( "NOT updating plugin version to " + updatedVersion );
+            }
+            
+            return shouldPersist;
 
         }
         catch ( Exception e )
