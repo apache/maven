@@ -22,6 +22,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,12 +42,16 @@ public class ArtifactResolverTest
 {
     private ArtifactResolver artifactResolver;
 
+    private Artifact projectArtifact;
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
         artifactResolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
+
+        projectArtifact = createLocalArtifact( "project", "3.0" );
     }
 
     protected String component()
@@ -103,7 +108,8 @@ public class ArtifactResolverTest
             }
         };
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( g, remoteRepositories(),
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( g ),
+                                                                                projectArtifact, remoteRepositories(),
                                                                                 localRepository(), mds );
 
         assertEquals( 2, result.getArtifacts().size() );
@@ -141,7 +147,8 @@ public class ArtifactResolverTest
             }
         };
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( i, remoteRepositories(),
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( i ),
+                                                                                projectArtifact, remoteRepositories(),
                                                                                 localRepository(), mds );
 
         assertEquals( 2, result.getArtifacts().size() );

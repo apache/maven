@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO: describe
+ * Default implementation of the artifact collector.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
@@ -39,7 +39,8 @@ import java.util.Set;
 public class DefaultArtifactCollector
     implements ArtifactCollector
 {
-    public ArtifactResolutionResult collect( Set artifacts, ArtifactRepository localRepository, List remoteRepositories,
+    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact,
+                                             ArtifactRepository localRepository, List remoteRepositories,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
                                              ArtifactFactory artifactFactory )
         throws ArtifactResolutionException
@@ -91,12 +92,10 @@ public class DefaultArtifactCollector
 
                     if ( updateScope )
                     {
-                        // TODO: Artifact factory?
-                        // TODO: [jc] Is this a better way to centralize artifact construction here?
-
-                        Artifact artifact = artifactFactory.createArtifact(
-                            knownArtifact.getGroupId(), knownArtifact.getArtifactId(), knownVersion,
-                            newArtifact.getScope(), knownArtifact.getType() );
+                        Artifact artifact = artifactFactory.createArtifact( knownArtifact.getGroupId(),
+                                                                            knownArtifact.getArtifactId(), knownVersion,
+                                                                            newArtifact.getScope(),
+                                                                            knownArtifact.getType() );
                         resolvedArtifacts.put( artifact.getDependencyConflictId(), artifact );
                     }
                 }

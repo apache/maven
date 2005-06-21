@@ -18,7 +18,6 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
@@ -47,13 +46,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -106,6 +101,8 @@ public class MavenProject
 
     private List activeProfiles = new ArrayList();
 
+    private Set dependencyArtifacts;
+
     public MavenProject( Model model )
     {
         this.model = model;
@@ -119,7 +116,11 @@ public class MavenProject
         this.file = project.file;
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be sure!
-        this.artifacts = Collections.unmodifiableSet( project.artifacts );
+        this.dependencyArtifacts = Collections.unmodifiableSet( project.dependencyArtifacts );
+        if ( project.artifacts != null )
+        {
+            this.artifacts = Collections.unmodifiableSet( project.artifacts );
+        }
         this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
         this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
         this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
@@ -805,59 +806,6 @@ public class MavenProject
         this.collectedProjects = collectedProjects;
     }
 
-    public void addArtifacts( Collection newArtifacts, ArtifactFactory artifactFactory )
-    {
-        //        project.getArtifacts().addAll( result.getArtifacts().values() );
-        // We need to override the scope if one declared it higher
-        // TODO: could surely be more efficient, and use the scope handler, be part of maven-artifact...
-        Map artifacts = new HashMap();
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
-        {
-            Artifact a = (Artifact) i.next();
-            artifacts.put( a.getId(), a );
-        }
-        for ( Iterator i = newArtifacts.iterator(); i.hasNext(); )
-        {
-            Artifact a = (Artifact) i.next();
-            String id = a.getId();
-            if ( artifacts.containsKey( id ) )
-            {
-                Artifact existing = (Artifact) artifacts.get( id );
-                boolean updateScope = false;
-                if ( Artifact.SCOPE_RUNTIME.equals( a.getScope() ) &&
-                    Artifact.SCOPE_TEST.equals( existing.getScope() ) )
-                {
-                    updateScope = true;
-                }
-
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) &&
-                    !Artifact.SCOPE_COMPILE.equals( existing.getScope() ) )
-                {
-                    updateScope = true;
-                }
-
-                if ( updateScope )
-                {
-                    // TODO: Artifact factory?
-                    // TODO: [jc] Is this a better way to centralize artifact construction here?
-                    Artifact artifact = artifactFactory.createArtifact( existing.getGroupId(), existing.getArtifactId(),
-                                                                        existing.getVersion(), a.getScope(), existing
-                        .getType() );
-
-                    artifact.setFile( existing.getFile() );
-                    artifact.setBaseVersion( existing.getBaseVersion() );
-
-                    artifacts.put( id, artifact );
-                }
-            }
-            else
-            {
-                artifacts.put( id, a );
-            }
-        }
-        setArtifacts( new HashSet( artifacts.values() ) );
-    }
-
     public void setPluginArtifactRepositories( List pluginArtifactRepositories )
     {
         this.pluginArtifactRepositories = pluginArtifactRepositories;
@@ -1043,5 +991,15 @@ public class MavenProject
         MavenXpp3Writer pomWriter = new MavenXpp3Writer();
 
         pomWriter.write( writer, getModel() );
+    }
+
+    public Set getDependencyArtifacts()
+    {
+        return dependencyArtifacts;
+    }
+
+    public void setDependencyArtifacts( Set dependencyArtifacts )
+    {
+        this.dependencyArtifacts = dependencyArtifacts;
     }
 }

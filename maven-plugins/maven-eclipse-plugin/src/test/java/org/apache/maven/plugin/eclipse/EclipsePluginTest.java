@@ -17,11 +17,14 @@ package org.apache.maven.plugin.eclipse;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.BufferedReader;
@@ -72,7 +75,7 @@ public class EclipsePluginTest
         ArtifactRepository localRepository = new DefaultArtifactRepository( "local", "file://" + repo.getAbsolutePath(),
                                                                             localRepositoryLayout );
 
-        MavenProject project = builder.build( new File( basedir, "project.xml" ), localRepository, Collections.EMPTY_LIST );
+        MavenProject project = builder.buildWithDependencies( new File( basedir, "project.xml" ), localRepository, Collections.EMPTY_LIST );
 
         for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
         {

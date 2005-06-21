@@ -92,8 +92,12 @@ public class DependenciesTask
         ArtifactResolutionResult result;
         try
         {
+            Artifact pomArtifact = artifactFactory.createArtifact( pom.getGroupId(), pom.getArtifactId(),
+                                                                   pom.getVersion(), null, pom.getPackaging() );
+
             List remoteArtifactRepositories = createRemoteArtifactRepositories( getRemoteRepositories() );
-            result = resolver.resolveTransitively( artifacts, remoteArtifactRepositories, localRepo, metadataSource );
+            result = resolver.resolveTransitively( artifacts, pomArtifact, remoteArtifactRepositories, localRepo,
+                                                   metadataSource );
         }
         catch ( ArtifactResolutionException e )
         {

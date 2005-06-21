@@ -124,11 +124,6 @@ public class SurefirePlugin
     public void execute()
         throws MojoExecutionException
     {
-        if ( "pom".equals( project.getPackaging() ) )
-        {
-            return;
-        }
-
         // ----------------------------------------------------------------------
         // Setup the surefire booter
         // ----------------------------------------------------------------------

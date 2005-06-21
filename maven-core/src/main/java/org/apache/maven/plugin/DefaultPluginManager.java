@@ -173,7 +173,7 @@ public class DefaultPluginManager
     }
 
     public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
-                                         Settings settings, ArtifactRepository localRepository )
+                                          Settings settings, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
         String pluginKey = groupId + ":" + artifactId;
@@ -222,14 +222,15 @@ public class DefaultPluginManager
             catch ( PlexusContainerException e )
             {
                 throw new PluginManagerException(
-                                                  "Error occurred in the artifact container attempting to download plugin "
-                                                      + groupId + ":" + artifactId, e );
+                    "Error occurred in the artifact container attempting to download plugin " + groupId + ":" +
+                        artifactId, e );
             }
             catch ( ArtifactResolutionException e )
             {
-                if ( ( groupId == null || artifactId == null || version == null || ( groupId.equals( e.getGroupId() )
-                    && artifactId.equals( e.getArtifactId() ) && version.equals( e.getVersion() ) ) )
-                    && "maven-plugin".equals( e.getType() ) )
+                if (
+                    ( groupId == null || artifactId == null || version == null ||
+                        ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
+                            version.equals( e.getVersion() ) ) ) && "maven-plugin".equals( e.getType() ) )
                 {
                     throw new PluginNotFoundException( e );
                 }
@@ -240,8 +241,8 @@ public class DefaultPluginManager
             }
             catch ( ComponentLookupException e )
             {
-                throw new PluginManagerException( "Internal configuration error while retrieving " + groupId + ":"
-                    + artifactId, e );
+                throw new PluginManagerException(
+                    "Internal configuration error while retrieving " + groupId + ":" + artifactId, e );
             }
             finally
             {
@@ -256,7 +257,7 @@ public class DefaultPluginManager
     }
 
     protected void addPlugin( String pluginKey, Artifact pluginArtifact, MavenProject project,
-                             ArtifactRepository localRepository )
+                              ArtifactRepository localRepository )
         throws ArtifactResolutionException, ComponentLookupException, PlexusContainerException
     {
         ArtifactResolver artifactResolver = null;
@@ -277,7 +278,7 @@ public class DefaultPluginManager
             addedPlugin.setClassRealm( child.getContainerRealm() );
 
             // we're only setting the plugin's artifact itself as the artifact list, to allow it to be retrieved
-            // later when the plugin is first invoked. Retrieving this artifact will in turn allow us to 
+            // later when the plugin is first invoked. Retrieving this artifact will in turn allow us to
             // transitively resolve its dependencies, and add them to the plugin container...
             addedPlugin.setArtifacts( Collections.singletonList( pluginArtifact ) );
         }
@@ -425,7 +426,7 @@ public class DefaultPluginManager
     }
 
     public List getReports( String groupId, String artifactId, String version, ReportSet reportSet,
-                           MavenSession session, MavenProject project )
+                            MavenSession session, MavenProject project )
         throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException
     {
         PluginDescriptor pluginDescriptor = getPluginDescriptor( groupId, artifactId, version );
@@ -478,14 +479,14 @@ public class DefaultPluginManager
     }
 
     private Mojo getConfiguredMojo( MojoDescriptor mojoDescriptor, MavenSession session, Xpp3Dom dom,
-                                   MavenProject project )
+                                    MavenProject project )
         throws ComponentLookupException, PluginConfigurationException, PluginManagerException
     {
         PlexusContainer pluginContainer = getPluginContainer( mojoDescriptor.getPluginDescriptor() );
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-        // if this is the first time this plugin has been used, the plugin's container will only 
+        // if this is the first time this plugin has been used, the plugin's container will only
         // contain the plugin's artifact in isolation; we need to finish resolving the plugin's
         // dependencies, and add them to the container.
         ensurePluginContainerIsComplete( pluginDescriptor, pluginContainer, project, session );
@@ -519,11 +520,13 @@ public class DefaultPluginManager
                                                                                           pathTranslator, getLogger(),
                                                                                           project );
 
-        PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration( mergedConfiguration, mojoDescriptor );
+        PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration( mergedConfiguration,
+                                                                                   mojoDescriptor );
 
         checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator, plugin );
 
-        populatePluginFields( plugin, mojoDescriptor, extractedMojoConfiguration, pluginContainer, expressionEvaluator );
+        populatePluginFields( plugin, mojoDescriptor, extractedMojoConfiguration, pluginContainer,
+                              expressionEvaluator );
         return plugin;
     }
 
@@ -551,10 +554,12 @@ public class DefaultPluginManager
                 MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder,
                                                                               artifactFactory );
 
-                ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections
-                    .singleton( pluginArtifact ), project.getRemoteArtifactRepositories(),
+                List remoteArtifactRepositories = project.getRemoteArtifactRepositories();
+                ArtifactResolutionResult result = artifactResolver.resolveTransitively( pluginArtifact,
+                                                                                        remoteArtifactRepositories,
                                                                                         session.getLocalRepository(),
-                                                                                        metadataSource, artifactFilter );
+                                                                                        metadataSource,
+                                                                                        artifactFilter );
 
                 Map resolved = result.getArtifacts();
 
@@ -577,9 +582,8 @@ public class DefaultPluginManager
                 ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
 
                 ArtifactResolutionResult distroProvidedResult = artifactResolver
-                    .resolveTransitively( Collections.singleton( pluginArtifact ), project
-                        .getRemoteArtifactRepositories(), session.getLocalRepository(), metadataSource,
-                                          distroProvidedFilter );
+                    .resolveTransitively( pluginArtifact, remoteArtifactRepositories, session.getLocalRepository(),
+                                          metadataSource, distroProvidedFilter );
 
                 Map distroProvided = distroProvidedResult.getArtifacts();
 
@@ -617,7 +621,7 @@ public class DefaultPluginManager
     }
 
     private PlexusConfiguration extractMojoConfiguration( PlexusConfiguration mergedConfiguration,
-                                                         MojoDescriptor mojoDescriptor )
+                                                          MojoDescriptor mojoDescriptor )
     {
         Map parameterMap = mojoDescriptor.getParameterMap();
 
@@ -638,8 +642,8 @@ public class DefaultPluginManager
                 // TODO: I defy anyone to find these messages in the '-X' output! Do we need a new log level?
                 // ideally, this would be elevated above the true debug output, but below the default INFO level...
                 getLogger().debug(
-                                   "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'"
-                                       + mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
+                    "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'" +
+                        mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
             }
         }
 
@@ -647,7 +651,7 @@ public class DefaultPluginManager
     }
 
     private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration,
-                                         ExpressionEvaluator expressionEvaluator, Mojo plugin )
+                                          ExpressionEvaluator expressionEvaluator, Mojo plugin )
         throws PluginConfigurationException
     {
         // TODO: this should be built in to the configurator, as we presently double process the expressions
@@ -720,8 +724,8 @@ public class DefaultPluginManager
                         if ( fieldValue != null )
                         {
                             getLogger().warn(
-                                              "DEPRECATED: using default-value to set the default value of field '"
-                                                  + parameter.getName() + "'" );
+                                "DEPRECATED: using default-value to set the default value of field '" +
+                                    parameter.getName() + "'" );
                         }
                     }
                     catch ( NoSuchFieldException e )
@@ -837,7 +841,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void populatePluginFields( Mojo plugin, MojoDescriptor mojoDescriptor, PlexusConfiguration configuration,
-                                      PlexusContainer pluginContainer, ExpressionEvaluator expressionEvaluator )
+                                       PlexusContainer pluginContainer, ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
         ComponentConfigurator configurator = null;
@@ -869,8 +873,7 @@ public class DefaultPluginManager
         catch ( ComponentLookupException e )
         {
             throw new PluginConfigurationException(
-                                                    "Unable to retrieve component configurator for plugin configuration",
-                                                    e );
+                "Unable to retrieve component configurator for plugin configuration", e );
         }
         finally
         {
@@ -910,7 +913,7 @@ public class DefaultPluginManager
     }
 
     public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter,
-                                                              String expression )
+                                                               String expression )
     {
         StringBuffer message = new StringBuffer();
 
@@ -966,25 +969,27 @@ public class DefaultPluginManager
     public void initialize()
     {
         // TODO: configure this from bootstrap or scan lib
+        Set artifacts = new HashSet();
+        artifacts.add( "classworlds" );
+        artifacts.add( "maven-artifact" );
+        artifacts.add( "maven-artifact-manager" );
+        artifacts.add( "maven-core" );
+        artifacts.add( "maven-model" );
+        artifacts.add( "maven-monitor" );
+        artifacts.add( "maven-plugin-api" );
+        artifacts.add( "maven-plugin-descriptor" );
+        artifacts.add( "maven-project" );
+        artifacts.add( "maven-settings" );
+        artifacts.add( "plexus-container-default" );
+        artifacts.add( "plexus-utils" );
+        artifacts.add( "wagon-provider-api" );
+        artifacts.add( "wagon-ssh" );
+        artifacts.add( "wagon-http-lightweight" );
+        artifacts.add( "wagon-file" );
         // TODO: remove doxia
-        artifactFilter = new ExclusionSetFilter( new String[] {
-            "classworlds",
-            "maven-artifact",
-            "maven-core",
-            "maven-model",
-            "maven-monitor",
-            "maven-plugin-api",
-            "maven-plugin-descriptor",
-            "maven-project",
-            "maven-settings",
-            "plexus-container-default",
-            "plexus-utils",
-            "wagon-provider-api",
-            "wagon-ssh",
-            "wagon-http-lightweight",
-            "wagon-file",
-            "doxia-core",
-            "maven-reporting-api" } );
+        artifacts.add( "doxia-core" );
+        artifacts.add( "maven-reporting-api" );
+        artifactFilter = new ExclusionSetFilter( artifacts );
     }
 
     // ----------------------------------------------------------------------
@@ -992,8 +997,8 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
-                                               MavenProjectBuilder mavenProjectBuilder, String scope,
-                                               ArtifactFactory artifactFactory, MavenProject project )
+                                                MavenProjectBuilder mavenProjectBuilder, String scope,
+                                                ArtifactFactory artifactFactory, MavenProject project )
         throws ArtifactResolutionException
     {
         MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, mavenProjectBuilder,
@@ -1003,10 +1008,19 @@ public class DefaultPluginManager
 
         boolean systemOnline = !context.getSettings().isOffline();
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(), context
-            .getRemoteRepositories(), context.getLocalRepository(), sourceReader, filter );
+        // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
+        Artifact artifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),
+                                                            project.getVersion(), null, project.getPackaging() );
 
-        project.addArtifacts( result.getArtifacts().values(), artifactFactory );
+        // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
+        // check this with yourkit as a hot spot.
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
+                                                                                artifact,
+                                                                                project.getRemoteArtifactRepositories(),
+                                                                                context.getLocalRepository(),
+                                                                                sourceReader, filter );
+
+        project.setArtifacts( new HashSet( result.getArtifacts().values() ) );
     }
 
     // ----------------------------------------------------------------------
@@ -1016,27 +1030,26 @@ public class DefaultPluginManager
     private void downloadDependencies( MavenProject project, MavenSession context, ArtifactResolver artifactResolver )
         throws ArtifactResolutionException
     {
+        ArtifactRepository localRepository = context.getLocalRepository();
+        List remoteArtifactRepositories = project.getRemoteArtifactRepositories();
+
         for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
 
-            // TODO: should I get the modified artifacts back into the project?
-            artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
+            artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
         }
 
-        Set pluginArtifacts = new HashSet();
+        // TODO: is this really necessary?
         for ( Iterator it = project.getPluginArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
 
-            artifactResolver.resolve( artifact, context.getRemoteRepositories(), context.getLocalRepository() );
-
-            pluginArtifacts.add( artifact );
+            artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
         }
-        project.setPluginArtifacts( pluginArtifacts );
 
-        artifactResolver.resolve( project.getParentArtifact(), context.getRemoteRepositories(), context
-            .getLocalRepository() );
+        // TODO: is this really necessary?
+        artifactResolver.resolve( project.getParentArtifact(), remoteArtifactRepositories, localRepository );
     }
 
 }

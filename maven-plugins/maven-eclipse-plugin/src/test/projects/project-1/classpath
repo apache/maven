@@ -2,5 +2,5 @@
   <classpathentry kind="src" path="src/main/java"/>
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" rootpath="JRE_SRCROOT" path="JRE_LIB" sourcepath="JRE_SRC"/>
-  <classpathentry kind="var" path="M2_REPO/maven/jars/maven-core-2.0-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/maven/jars/maven-core-98.0.jar"/>
 </classpath>

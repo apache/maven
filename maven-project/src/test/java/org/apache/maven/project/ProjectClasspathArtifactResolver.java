@@ -106,30 +106,22 @@ public class ProjectClasspathArtifactResolver
         artifact.setFile( new File( "dummy" ) );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-                                                         ArtifactRepository localRepository,
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                         List remoteRepositories, ArtifactRepository localRepository,
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( artifactFactory ),
-                                          filter );
+        return super.resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository,
+                                          new Source( artifactFactory ), filter );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-                                                         ArtifactRepository localRepository,
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                         List remoteRepositories, ArtifactRepository localRepository,
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifacts, remoteRepositories, localRepository,
+        return super.resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository,
                                           new Source( artifactFactory ) );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
-        throws ArtifactResolutionException
-    {
-        return super.resolveTransitively( artifact, remoteRepositories, localRepository,
-                                          new Source( artifactFactory ) );
-    }
 }

@@ -130,19 +130,32 @@ public class DefaultArtifactResolver
         }
     }
 
-    // ----------------------------------------------------------------------
-    // Transitive modes
-    // ----------------------------------------------------------------------
-
-    public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
+    public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
                                                          ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source )
+        throws ArtifactResolutionException
+    {
+        return resolveTransitively( artifact, remoteRepositories, localRepository, source, null );
+    }
+
+    public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source, ArtifactFilter filter )
+        throws ArtifactResolutionException
+    {
+        return resolveTransitively( Collections.singleton( artifact ), null, remoteRepositories, localRepository,
+                                    source, filter );
+    }
+
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                         List remoteRepositories, ArtifactRepository localRepository,
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         ArtifactResolutionResult artifactResolutionResult;
 
-        artifactResolutionResult = artifactCollector.collect( artifacts, localRepository, remoteRepositories, source,
-                                                              filter, artifactFactory );
+        artifactResolutionResult = artifactCollector.collect( artifacts, originatingArtifact, localRepository,
+                                                              remoteRepositories, source, filter, artifactFactory );
 
         for ( Iterator i = artifactResolutionResult.getArtifacts().values().iterator(); i.hasNext(); )
         {
@@ -153,19 +166,12 @@ public class DefaultArtifactResolver
         return artifactResolutionResult;
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
-                                                         ArtifactRepository localRepository,
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                         List remoteRepositories, ArtifactRepository localRepository,
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
-        return resolveTransitively( artifacts, remoteRepositories, localRepository, source, null );
+        return resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository, source, null );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
-        throws ArtifactResolutionException
-    {
-        return resolveTransitively( Collections.singleton( artifact ), remoteRepositories, localRepository, source );
-    }
 }

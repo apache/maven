@@ -41,6 +41,9 @@ public interface MavenProjectBuilder
                                         ArtifactMetadataSource artifactMetadataSource, List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException;
 
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository, List externalProfiles )
+        throws ProjectBuildingException, ArtifactResolutionException;
+
     /**
      * Build the artifact from the local repository, resolving it if necessary.
      *

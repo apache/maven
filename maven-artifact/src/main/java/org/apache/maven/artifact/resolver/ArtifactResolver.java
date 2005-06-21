@@ -43,11 +43,16 @@ public interface ArtifactResolver
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source )
         throws ArtifactResolutionException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
+    ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
+                                                  ArtifactRepository localRepository, ArtifactMetadataSource source,
+                                                  ArtifactFilter filter )
+        throws ArtifactResolutionException;
+
+    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, List remoteRepositories,
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source )
         throws ArtifactResolutionException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
+    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, List remoteRepositories,
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source,
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException;

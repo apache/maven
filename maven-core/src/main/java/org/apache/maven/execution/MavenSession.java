@@ -90,11 +90,6 @@ public class MavenSession
         return localRepository;
     }
 
-    public List getRemoteRepositories()
-    {
-        return project.getRemoteArtifactRepositories();
-    }
-
     public List getGoals()
     {
         return goals;

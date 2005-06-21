@@ -115,6 +115,14 @@ public class DefaultMavenProjectBuilder
     // ----------------------------------------------------------------------
 
     public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
+                                               List externalProfiles )
+        throws ProjectBuildingException, ArtifactResolutionException
+    {
+        ArtifactMetadataSource source = new MavenMetadataSource( artifactResolver, this, artifactFactory );
+        return buildWithDependencies( projectDescriptor, localRepository, source, externalProfiles );
+    }
+
+    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
                                                ArtifactMetadataSource artifactMetadataSource, List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
@@ -132,12 +140,17 @@ public class DefaultMavenProjectBuilder
         // this snippet of code here.
         // ----------------------------------------------------------------------
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getArtifacts(),
+        // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
+        Artifact artifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),
+                                                            project.getVersion(), null, project.getPackaging() );
+
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
+                                                                                artifact,
                                                                                 project.getRemoteArtifactRepositories(),
                                                                                 localRepository,
                                                                                 artifactMetadataSource );
 
-        project.addArtifacts( result.getArtifacts().values(), artifactFactory );
+        project.setArtifacts( new HashSet( result.getArtifacts().values() ) );
         return project;
     }
 
@@ -248,10 +261,10 @@ public class DefaultMavenProjectBuilder
         }
 
         MavenProject project = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository );
-        
+
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         Model previous = superModel;
-        
+
         for ( Iterator i = lineage.iterator(); i.hasNext(); )
         {
             Model current = ( (MavenProject) i.next() ).getModel();
@@ -278,24 +291,24 @@ public class DefaultMavenProjectBuilder
     private void forcePluginExecutionIdCollision( Model model )
     {
         Build build = model.getBuild();
-        
+
         if ( build != null )
         {
             List plugins = build.getPlugins();
-            
+
             if ( plugins != null )
             {
                 for ( Iterator it = plugins.iterator(); it.hasNext(); )
                 {
                     Plugin plugin = (Plugin) it.next();
-                    
+
                     // this will force an IllegalStateException, even if we don't have to do inheritance assembly.
                     plugin.getExecutionsAsMap();
                 }
             }
         }
     }
-    
+
 
     /**
      * @todo can this take in a model instead of a project and still be successful?
@@ -370,7 +383,7 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setRemoteArtifactRepositories( remoteRepositories );
-        project.setArtifacts( createArtifacts( project.getDependencies() ) );
+        project.setDependencyArtifacts( createArtifacts( project.getDependencies() ) );
         project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
 
         ModelValidationResult validationResult = validator.validate( model );
@@ -586,7 +599,7 @@ public class DefaultMavenProjectBuilder
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
 
         Model superModel = readModel( url );
-        
+
         forcePluginExecutionIdCollision( superModel );
 
         return superModel;
