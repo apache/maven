@@ -312,7 +312,7 @@ public class DefaultMavenProjectBuilder
                     }
                     catch ( IllegalStateException collisionException )
                     {
-                        throw new ProjectBuildingException( "Detected illegal plugin-execution configuration in: " + pomLocation, collisionException ); 
+                        throw new ProjectBuildingException( "Detected illegal plugin-execution configuration in: " + pomLocation + " Error output: \n\n" + collisionException.getMessage(), collisionException ); 
                     }
                 }
             }
