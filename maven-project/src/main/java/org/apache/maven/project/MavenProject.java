@@ -302,6 +302,26 @@ public class MavenProject
         return list;
     }
 
+    public List getCompileArtifacts()
+    {
+        List list = new ArrayList( getArtifacts().size() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            if ( isAddedToClasspath( a ) )
+            {
+                // TODO: let the scope handler deal with this
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) )
+                {
+                    list.add( a );
+                }
+            }
+        }
+        return list;
+    }
+
     public List getCompileDependencies()
     {
         Set artifacts = getArtifacts();
@@ -348,8 +368,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
-                    Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
                     File file = a.getFile();
                     if ( file == null )
@@ -357,6 +377,27 @@ public class MavenProject
                         throw new DependencyResolutionRequiredException( a );
                     }
                     list.add( file.getPath() );
+                }
+            }
+        }
+        return list;
+    }
+
+    public List getTestArtifacts()
+    {
+        List list = new ArrayList( getArtifacts().size() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            if ( isAddedToClasspath( a ) )
+            {
+                // TODO: let the scope handler deal with this
+                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                {
+                    list.add( a );
                 }
             }
         }
@@ -379,8 +420,8 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: let the scope handler deal with this
-            if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
-                Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+            if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
+                || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
 
@@ -418,6 +459,26 @@ public class MavenProject
                         throw new DependencyResolutionRequiredException( a );
                     }
                     list.add( file.getPath() );
+                }
+            }
+        }
+        return list;
+    }
+
+    public List getRuntimeArtifacts()
+    {
+        List list = new ArrayList( getArtifacts().size() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            if ( isAddedToClasspath( a ) )
+            {
+                // TODO: let the scope handler deal with this
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                {
+                    list.add( a );
                 }
             }
         }
@@ -866,7 +927,7 @@ public class MavenProject
     }
 
     public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,
-                                         String goalId )
+                                        String goalId )
     {
         Xpp3Dom dom = null;
 

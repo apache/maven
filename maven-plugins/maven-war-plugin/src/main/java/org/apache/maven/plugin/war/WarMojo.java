@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Build a war/webapp.
@@ -143,6 +142,7 @@ public class WarMojo
     }
 
     /**
+     * @throws MojoExecutionException 
      *
      */
     public void buildWebapp( MavenProject project )
@@ -162,29 +162,22 @@ public class WarMojo
             FileUtils.copyDirectoryStructure( classesDirectory, webappClassesDirectory );
         }
 
-        Set artifacts = project.getArtifacts();
+        List runtimeArtifacts = project.getRuntimeArtifacts();
 
-        for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+        for ( Iterator iter = runtimeArtifacts.iterator(); iter.hasNext(); )
         {
             Artifact artifact = (Artifact) iter.next();
 
             // TODO: scope handler
-            // TODO: use classpath instead
             // Include runtime and compile time libraries
-            
             // [jc, 21-June]: handle TLDs as a special-case.
             if ( "tld".equals( artifact.getType() ) )
             {
                 FileUtils.copyFileToDirectory( artifact.getFile(), tldDirectory );
             }
-            // [jc, 21-June]: filter POMs out of the /lib copy process.
-            else if ( "pom".equals( artifact.getType() ) )
-            {
-                // don't mess with these...they'd only be here for inclusion of dependencies.
-            }
             // [jc, 21-June]: I'm removing ( "jar".equals( artifact.getType() ) ) from consideration here
-            // we'll handle anything that's NOT a POM or a TLD as a binary library to go in /lib
-            else if ( !Artifact.SCOPE_TEST.equals( artifact.getScope() ) && !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+            // we'll handle anything that's in the runtime classpath and NOT a SCOPE_PROVIDED artifact.
+            else if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
             {
                 FileUtils.copyFileToDirectory( artifact.getFile(), libDirectory );
             }
