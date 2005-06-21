@@ -216,11 +216,6 @@
         <!-- START SNIPPET: plexus-application-lifecycle -->
         <phases>
           <generate-resources>plexus:app</generate-resources>
-          <process-resources>resources:resources</process-resources>
-          <compile>compiler:compile</compile>
-          <process-test-resources>resources:testResources</process-test-resources>
-          <test-compile>compiler:testCompile</test-compile>
-          <test>surefire:test</test>
           <package>plexus:bundle-runtime</package>
           <install>install:install</install>
           <deploy>deploy:deploy</deploy>
