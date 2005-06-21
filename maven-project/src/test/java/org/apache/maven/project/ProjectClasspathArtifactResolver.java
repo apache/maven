@@ -18,7 +18,6 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -112,7 +111,8 @@ public class ProjectClasspathArtifactResolver
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( artifactFactory ), filter );
+        return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( artifactFactory ),
+                                          filter );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, List remoteRepositories,
@@ -120,7 +120,8 @@ public class ProjectClasspathArtifactResolver
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifacts, remoteRepositories, localRepository, new Source( artifactFactory ) );
+        return super.resolveTransitively( artifacts, remoteRepositories, localRepository,
+                                          new Source( artifactFactory ) );
     }
 
     public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
@@ -128,6 +129,7 @@ public class ProjectClasspathArtifactResolver
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifact, remoteRepositories, localRepository, new Source( artifactFactory ) );
+        return super.resolveTransitively( artifact, remoteRepositories, localRepository,
+                                          new Source( artifactFactory ) );
     }
 }

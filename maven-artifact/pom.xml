@@ -10,19 +10,8 @@
   <dependencies>
     <dependency>
       <groupId>plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-4-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-provider-api</artifactId>
-      <version>1.0-alpha-4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-file</artifactId>
-      <version>1.0-alpha-4</version>
-      <scope>test</scope>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.0-alpha-3</version>
     </dependency>
   </dependencies>
 </project>

@@ -16,6 +16,7 @@ package org.apache.maven.archetype;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
@@ -60,12 +61,12 @@ public class ArchetypeTest
                                                                                        "legacy" );
 
         String mavenRepoLocal = getTestFile( "target/local-repository" ).toURL().toString();
-        ArtifactRepository localRepository = new ArtifactRepository( "local", mavenRepoLocal, layout );
+        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", mavenRepoLocal, layout );
 
         List remoteRepositories = new ArrayList();
 
         String mavenRepoRemote = getTestFile( "src/test/repository" ).toURL().toString();
-        ArtifactRepository remoteRepository = new ArtifactRepository( "remote", mavenRepoRemote, layout );
+        ArtifactRepository remoteRepository = new DefaultArtifactRepository( "remote", mavenRepoRemote, layout );
 
         remoteRepositories.add( remoteRepository );
 

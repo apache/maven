@@ -17,9 +17,9 @@ package org.apache.maven.artifact.manager;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ChecksumFailedException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -78,8 +78,8 @@ public class DefaultWagonManager
         }
         catch ( ComponentLookupException e )
         {
-            throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: "
-                + protocol, e );
+            throw new UnsupportedProtocolException(
+                "Cannot find wagon which supports the requested protocol: " + protocol, e );
         }
 
         return wagon;
@@ -99,7 +99,7 @@ public class DefaultWagonManager
     }
 
     private void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
-                               TransferListener downloadMonitor )
+                                TransferListener downloadMonitor )
         throws TransferFailedException
     {
         String protocol = repository.getProtocol();
@@ -139,7 +139,8 @@ public class DefaultWagonManager
 
         try
         {
-            wagon.connect( repository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
+                           getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
             wagon.put( source, remotePath );
 
@@ -242,17 +243,17 @@ public class DefaultWagonManager
     }
 
     private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
-                               TransferListener downloadMonitor )
+                                TransferListener downloadMonitor )
         throws TransferFailedException, ResourceDoesNotExistException, ChecksumFailedException
     {
         // TODO: better excetpions - transfer failed is not enough?
 
         Wagon wagon;
 
-        Repository mirror = getMirror( repository.getId() );
+        ArtifactRepository mirror = getMirror( repository.getId() );
         if ( mirror != null )
         {
-            repository = repository.createMirror( mirror );
+            repository = mirror;
         }
 
         String protocol = repository.getProtocol();
@@ -291,22 +292,23 @@ public class DefaultWagonManager
 
         try
         {
-            wagon.connect( repository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
+                           getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
             boolean firstRun = true;
             boolean retry = false;
-            
+
             // this will run at most twice. The first time, the firstRun flag is turned off, and if the retry flag
             // is set on the first run, it will be turned off and not re-set on the second try. This is because the
             // only way the retry flag can be set is if ( firstRun == true ).
-            while( firstRun || retry )
+            while ( firstRun || retry )
             {
                 // reset the retry flag.
                 retry = false;
-                
+
                 // This should take care of creating destination directory now on
                 wagon.get( remotePath, temp );
-                
+
                 // keep the checksum files from showing up on the download monitor...
                 if ( downloadMonitor != null )
                 {
@@ -327,13 +329,14 @@ public class DefaultWagonManager
                     if ( sha1TryException instanceof ChecksumFailedException )
                     {
                         // if this is the second try, handle the problem...otherwise, let it try again.
-                        if( firstRun )
+                        if ( firstRun )
                         {
                             retry = true;
                         }
                         else
                         {
-                            handleChecksumFailure( repository, sha1TryException.getMessage(), sha1TryException.getCause() );
+                            handleChecksumFailure( repository, sha1TryException.getMessage(),
+                                                   sha1TryException.getCause() );
                         }
                     }
                     // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
@@ -348,22 +351,24 @@ public class DefaultWagonManager
                         {
                             // if we also fail to verify based on the MD5 checksum, and the checksum transfer/read
                             // succeeded, then we need to determine whether to retry or handle it as a failure.
-                            if( md5TryException instanceof ChecksumFailedException )
+                            if ( md5TryException instanceof ChecksumFailedException )
                             {
                                 // only retry once.
-                                if( firstRun )
+                                if ( firstRun )
                                 {
                                     retry = true;
                                 }
                                 else
                                 {
-                                    handleChecksumFailure( repository, md5TryException.getMessage(), md5TryException.getCause() );
+                                    handleChecksumFailure( repository, md5TryException.getMessage(),
+                                                           md5TryException.getCause() );
                                 }
                             }
                             // otherwise, this was a failed transfer, and we don't want to retry.
                             else
                             {
-                                handleChecksumFailure( repository, "Error retrieving checksum file for " + destination, md5TryException );
+                                handleChecksumFailure( repository, "Error retrieving checksum file for " + destination,
+                                                       md5TryException );
                             }
                         }
                     }
@@ -375,7 +380,7 @@ public class DefaultWagonManager
                     {
                         wagon.addTransferListener( downloadMonitor );
                     }
-                    
+
                     // unset the firstRun flag, so we don't get caught in an infinite loop...
                     firstRun = false;
                 }
@@ -429,7 +434,7 @@ public class DefaultWagonManager
     private void handleChecksumFailure( ArtifactRepository repository, String message, Throwable cause )
         throws ChecksumFailedException
     {
-        if( ArtifactRepository.CHECKSUM_POLICY_FAIL.equals( repository.getChecksumPolicy() ) )
+        if ( ArtifactRepository.CHECKSUM_POLICY_FAIL.equals( repository.getChecksumPolicy() ) )
         {
             throw new ChecksumFailedException( message, cause );
         }
@@ -440,7 +445,7 @@ public class DefaultWagonManager
     }
 
     private void verifyChecksum( ChecksumObserver checksumObserver, File destination, String remotePath,
-                                String checksumFileExtension, Wagon wagon )
+                                 String checksumFileExtension, Wagon wagon )
         throws WagonException
     {
         try
@@ -448,8 +453,8 @@ public class DefaultWagonManager
             // grab it first, because it's about to change...
             String actualChecksum = checksumObserver.getActualChecksum();
 
-            File checksumFile = new File( destination + ".sha1" );
-            wagon.get( remotePath + ".sha1", checksumFile );
+            File checksumFile = new File( destination + checksumFileExtension );
+            wagon.get( remotePath + checksumFileExtension, checksumFile );
 
             String expectedChecksum = FileUtils.fileRead( checksumFile );
             if ( !expectedChecksum.equals( actualChecksum ) )
@@ -457,13 +462,14 @@ public class DefaultWagonManager
                 //                getLogger().warn(
                 //                    "*** CHECKSUM MISMATCH - currently disabled fail due to bad repository checksums ***" );
 
-                throw new ChecksumFailedException( "Checksum failed on download: local = '" + actualChecksum
-                    + "'; remote = '" + expectedChecksum + "'" );
+                throw new ChecksumFailedException(
+                    "Checksum failed on download: local = '" + actualChecksum + "'; remote = '" + expectedChecksum +
+                        "'" );
             }
         }
         catch ( IOException e )
         {
-            throw new TransferFailedException( "Invalid SHA-1 checksum file", e );
+            throw new TransferFailedException( "Invalid checksum file", e );
         }
     }
 
@@ -501,9 +507,9 @@ public class DefaultWagonManager
         return (AuthenticationInfo) authenticationInfoMap.get( id );
     }
 
-    public Repository getMirror( String mirrorOf )
+    public ArtifactRepository getMirror( String mirrorOf )
     {
-        return (Repository) mirrors.get( mirrorOf );
+        return (ArtifactRepository) mirrors.get( mirrorOf );
     }
 
     /**
@@ -518,7 +524,8 @@ public class DefaultWagonManager
      * property format: <code>*.foo.com|localhost</code>.
      * @todo [BP] would be nice to configure this via plexus in some way
      */
-    public void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )
+    public void addProxy( String protocol, String host, int port, String username, String password,
+                          String nonProxyHosts )
     {
         ProxyInfo proxyInfo = new ProxyInfo();
         proxyInfo.setHost( host );
@@ -546,7 +553,7 @@ public class DefaultWagonManager
     }
 
     public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
-                                      String passphrase )
+                                       String passphrase )
     {
         AuthenticationInfo authInfo = new AuthenticationInfo();
 
@@ -563,7 +570,7 @@ public class DefaultWagonManager
 
     public void addMirror( String id, String mirrorOf, String url )
     {
-        Repository mirror = new Repository( id, url );
+        ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
         mirrors.put( mirrorOf, mirror );
     }

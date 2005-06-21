@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
  */
 public interface ModelInterpolator
 {
-
     String ROLE = ModelInterpolator.class.getName();
 
     Model interpolate( Model project )

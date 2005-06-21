@@ -19,7 +19,6 @@ package org.apache.maven.project.artifact;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -98,11 +97,6 @@ public class ProjectArtifactMetadata
             IOUtil.close( reader );
             IOUtil.close( writer );
         }
-    }
-
-    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager )
-    {
-        // not used - TODO: again indicates bad design?
     }
 
     public String toString()

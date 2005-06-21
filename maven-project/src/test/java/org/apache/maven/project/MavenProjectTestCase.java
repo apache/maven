@@ -16,9 +16,10 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
@@ -43,7 +44,7 @@ public abstract class MavenProjectTestCase
         super.setUp();
 
         projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-        artifactFactory = ( ArtifactFactory ) lookup( ArtifactFactory.ROLE );
+        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
 
     // ----------------------------------------------------------------------
@@ -84,8 +85,9 @@ public abstract class MavenProjectTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository r = new ArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath(),
-                                                       repoLayout );
+        ArtifactRepository r = new DefaultArtifactRepository( "local",
+                                                              "file://" + getLocalRepositoryPath().getAbsolutePath(),
+                                                              repoLayout );
 
         return r;
     }

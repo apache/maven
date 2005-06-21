@@ -21,7 +21,6 @@ import org.apache.maven.model.Profile;
 public class ExplicitListingProfileActivator
     implements ProfileActivator
 {
-
     public boolean canDetermineActivation( Profile profile )
     {
         return ProfileActivationUtils.profilesWereExplicitlyGiven();

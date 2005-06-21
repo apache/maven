@@ -36,7 +36,6 @@ public class ProfileActivationCalculator
     extends AbstractLogEnabled
     implements Contextualizable
 {
-
     public static final String ROLE = ProfileActivationCalculator.class.getName();
 
     private PlexusContainer container;
@@ -59,7 +58,8 @@ public class ProfileActivationCalculator
 
                 Activation activation = profile.getActivation();
 
-                activatorLoop: for ( Iterator activatorIterator = activators.iterator(); activatorIterator.hasNext(); )
+                activatorLoop:
+                for ( Iterator activatorIterator = activators.iterator(); activatorIterator.hasNext(); )
                 {
                     ProfileActivator activator = (ProfileActivator) activatorIterator.next();
 

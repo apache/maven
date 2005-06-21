@@ -34,12 +34,12 @@ import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Scm;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
+import org.apache.maven.model.Reporting;
+import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -1036,11 +1036,12 @@ public class MavenProject
     {
         this.executionProject = executionProject;
     }
-    
-    public void writeModel( Writer writer ) throws IOException
+
+    public void writeModel( Writer writer )
+        throws IOException
     {
         MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-        
+
         pomWriter.write( writer, getModel() );
     }
 }

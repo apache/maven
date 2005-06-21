@@ -17,13 +17,11 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
  * @author jdcasey
  */
 public class DefaultArtifactRepositoryFactory
-    extends AbstractLogEnabled
     implements ArtifactRepositoryFactory
 {
     // TODO: use settings?
@@ -61,7 +59,7 @@ public class DefaultArtifactRepositoryFactory
             csumPolicy = ArtifactRepository.CHECKSUM_POLICY_FAIL;
         }
         
-        repo = new ArtifactRepository( id, url, repositoryLayout, snapPolicy, csumPolicy );
+        repo = new DefaultArtifactRepository( id, url, repositoryLayout, snapPolicy, csumPolicy );
 
         return repo;
     }

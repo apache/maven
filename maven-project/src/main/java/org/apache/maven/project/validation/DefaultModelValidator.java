@@ -34,7 +34,7 @@ public class DefaultModelValidator
     public ModelValidationResult validate( Model model )
     {
         ModelValidationResult result = new ModelValidationResult();
-        
+
         validateStringNotEmpty( "modelVersion", result, model.getModelVersion() );
 
         validateStringNotEmpty( "groupId", result, model.getGroupId() );

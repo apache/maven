@@ -24,7 +24,6 @@ import org.codehaus.plexus.util.StringUtils;
 public class SystemPropertyProfileActivator
     extends DetectedProfileActivator
 {
-
     protected boolean canDetectActivation( Profile profile )
     {
         return profile.getActivation() != null && profile.getActivation().getProperty() != null;

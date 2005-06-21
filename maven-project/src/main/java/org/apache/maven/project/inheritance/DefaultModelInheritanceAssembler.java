@@ -229,7 +229,8 @@ public class DefaultModelInheritanceAssembler
 
                     if ( StringUtils.isEmpty( inherited ) || Boolean.valueOf( inherited ).booleanValue() )
                     {
-                        ReportPlugin childReportPlugin = (ReportPlugin) childReportersByKey.get( parentReportPlugin.getKey() );
+                        ReportPlugin childReportPlugin = (ReportPlugin) childReportersByKey.get(
+                            parentReportPlugin.getKey() );
 
                         ReportPlugin mergedReportPlugin = parentReportPlugin;
 
@@ -408,7 +409,7 @@ public class DefaultModelInheritanceAssembler
                 childBuild = new Build();
                 child.setBuild( childBuild );
             }
-            
+
             // The build has been set but we want to step in here and fill in
             // values that have not been set by the child.
 
@@ -506,8 +507,8 @@ public class DefaultModelInheritanceAssembler
                 childScm.setConnection( appendPath( parentScm.getConnection(), child.getArtifactId() ) );
             }
 
-            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() )
-                && !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
+            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
+                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
                 childScm
                     .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId() ) );

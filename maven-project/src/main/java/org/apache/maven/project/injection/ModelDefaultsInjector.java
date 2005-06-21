@@ -28,5 +28,5 @@ public interface ModelDefaultsInjector
 
     void injectDefaults( Model model );
 
-    void mergePluginWithDefaults( Plugin plugin, Plugin def );    
+    void mergePluginWithDefaults( Plugin plugin, Plugin def );
 }

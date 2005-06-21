@@ -24,7 +24,6 @@ package org.apache.maven.project.interpolation;
 public class ModelInterpolationException
     extends Exception
 {
-
     /**
      * Added: Feb 2, 2005 by jdcasey
      */

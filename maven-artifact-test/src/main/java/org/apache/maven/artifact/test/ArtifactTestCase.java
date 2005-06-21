@@ -17,8 +17,9 @@ package org.apache.maven.artifact.test;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
@@ -62,7 +63,7 @@ public abstract class ArtifactTestCase
         ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout) container.lookup(
             ArtifactRepositoryLayout.ROLE, "default" );
 
-        localRepository = new ArtifactRepository( "local", "file://" + localRepo, repositoryLayout );
+        localRepository = new DefaultArtifactRepository( "local", "file://" + localRepo, repositoryLayout );
     }
 
 }

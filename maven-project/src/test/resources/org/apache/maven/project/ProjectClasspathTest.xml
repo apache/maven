@@ -1,6 +1,6 @@
 <plexus>
   <components>
-    <!-- Due to PLX-108, have to work around it...
+<!-- Due to PLX-108, have to work around it...
     <component>
       <role>org.apache.maven.artifact.ArtifactResolver</role>
       <implementation>org.apache.maven.project.ProjectClasspathArtifactResolver</implementation>
@@ -23,6 +23,9 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
         </requirement>
       </requirements>
     </component>

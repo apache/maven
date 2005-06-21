@@ -1,4 +1,4 @@
-package org.apache.maven.artifact;
+package org.apache.maven.artifact.manager;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.

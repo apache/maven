@@ -10,7 +10,7 @@ rm -rf target
 
 echo Run with m2...
 
-time -p m2 jar:jar > /dev/null
+time -p m2 -B package > /dev/null
 
 rm -rf target
 

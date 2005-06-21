@@ -16,10 +16,10 @@ package org.apache.maven.artifact;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;

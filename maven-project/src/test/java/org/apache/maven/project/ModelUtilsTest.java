@@ -1,9 +1,8 @@
 package org.apache.maven.project;
 
+import junit.framework.TestCase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-
-import junit.framework.TestCase;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -24,7 +23,6 @@ import junit.framework.TestCase;
 public class ModelUtilsTest
     extends TestCase
 {
-
     public void testShouldInheritOnePluginWithExecution()
     {
         Plugin parent = new Plugin();

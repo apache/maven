@@ -29,7 +29,6 @@ import java.util.List;
 public class DefaultModelDefaultsInjectorTest
     extends TestCase
 {
-
     public void testShouldConstructWithNoParams()
     {
         new DefaultModelDefaultsInjector();

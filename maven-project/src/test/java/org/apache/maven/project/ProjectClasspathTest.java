@@ -28,7 +28,6 @@ import java.util.Iterator;
 public class ProjectClasspathTest
     extends MavenProjectTestCase
 {
-
     private String dir = "projects/scope/";
 
     public void testProjectClasspath()

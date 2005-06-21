@@ -1,6 +1,6 @@
 <component-set>
   <components>
-    <!--
+<!--
      |
      |
      |
@@ -9,7 +9,7 @@
       <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
       <implementation>org.apache.maven.project.interpolation.RegexBasedModelInterpolator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -18,7 +18,7 @@
       <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
       <implementation>org.apache.maven.project.injection.DefaultModelDefaultsInjector</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -56,7 +56,7 @@
         </requirement>
       </requirements>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -65,7 +65,7 @@
       <role>org.apache.maven.profiles.activation.ProfileActivationCalculator</role>
       <implementation>org.apache.maven.profiles.activation.ProfileActivationCalculator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -75,7 +75,7 @@
       <role-hint>always-on</role-hint>
       <implementation>org.apache.maven.profiles.activation.AlwaysOnProfileActivator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -85,7 +85,7 @@
       <role-hint>jdk-prefix</role-hint>
       <implementation>org.apache.maven.profiles.activation.JdkPrefixProfileActivator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -95,7 +95,7 @@
       <role-hint>system-property</role-hint>
       <implementation>org.apache.maven.profiles.activation.SystemPropertyProfileActivator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -105,7 +105,7 @@
       <role-hint>explicit-listing</role-hint>
       <implementation>org.apache.maven.profiles.activation.ExplicitListingProfileActivator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -114,7 +114,7 @@
       <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
       <implementation>org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -124,7 +124,7 @@
       <implementation>org.apache.maven.project.validation.DefaultModelValidator</implementation>
     </component>
 
-    <!-- ********************* FIXME *******************************************
+<!-- ********************* FIXME *******************************************
      | I realize this is duplicated but allows the project builder to work by itself
      -->
     <component>

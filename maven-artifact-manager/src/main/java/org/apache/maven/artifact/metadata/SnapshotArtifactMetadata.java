@@ -16,8 +16,8 @@ package org.apache.maven.artifact.metadata;
  * limitations under the License.
  */
 
-import org.codehaus.plexus.util.StringUtils;
 import org.apache.maven.artifact.Artifact;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.text.DateFormat;

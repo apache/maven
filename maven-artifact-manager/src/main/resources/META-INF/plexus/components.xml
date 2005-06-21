@@ -1,0 +1,104 @@
+<component-set>
+  <components>
+    <!--
+     |
+     | WagonManager
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.manager.WagonManager</role>
+      <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
+    </component>
+
+    <!--
+     |
+     | Transformations
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>snapshot</role-hint>
+      <implementation>org.apache.maven.artifact.transform.SnapshotTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>release</role-hint>
+      <implementation>org.apache.maven.artifact.transform.ReleaseArtifactTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!--
+     |
+     | Resolver
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+      <implementation>org.apache.maven.artifact.resolver.DefaultArtifactResolver</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | ArtifactInstaller
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.installer.ArtifactInstaller</role>
+      <implementation>org.apache.maven.artifact.installer.DefaultArtifactInstaller</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | ArtifactDeployer
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.deployer.ArtifactDeployer</role>
+      <implementation>org.apache.maven.artifact.deployer.DefaultArtifactDeployer</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+    </component>
+  </components>
+</component-set>

@@ -46,6 +46,7 @@ import org.apache.maven.usability.ErrorDiagnoser;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -101,6 +102,10 @@ public class DefaultMaven
             resolveParameters( request.getSettings() );
         }
         catch ( ComponentLookupException e )
+        {
+            throw new ReactorException( "Unable to configure Maven for execution", e );
+        }
+        catch ( ComponentLifecycleException e )
         {
             throw new ReactorException( "Unable to configure Maven for execution", e );
         }
@@ -398,31 +403,38 @@ public class DefaultMaven
      * the wagons, shouldn't we?
      */
     private void resolveParameters( Settings settings )
-        throws ComponentLookupException
+        throws ComponentLookupException, ComponentLifecycleException
     {
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
-        Proxy proxy = settings.getActiveProxy();
-
-        if ( proxy != null )
+        try
         {
-            wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
-                                   proxy.getPassword(), proxy.getNonProxyHosts() );
+            Proxy proxy = settings.getActiveProxy();
+
+            if ( proxy != null )
+            {
+                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+                                       proxy.getPassword(), proxy.getNonProxyHosts() );
+            }
+
+            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+            {
+                Server server = (Server) i.next();
+
+                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
+                                                    server.getPrivateKey(), server.getPassphrase() );
+            }
+
+            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
+            {
+                Mirror mirror = (Mirror) i.next();
+
+                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+            }
         }
-
-        for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+        finally
         {
-            Server server = (Server) i.next();
-
-            wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
-                                                server.getPrivateKey(), server.getPassphrase() );
-        }
-
-        for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
-        {
-            Mirror mirror = (Mirror) i.next();
-
-            wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+            container.release( wagonManager );
         }
     }
 
@@ -596,7 +608,7 @@ public class DefaultMaven
         {
             msg += "1 second";
         }
-        else if ( min > 0 )
+        else if ( min == 0 )
         {
             msg += "< 1 second";
         }

@@ -82,7 +82,8 @@ public class DefaultModelInheritanceAssemblerTest
 
         assembler.assembleModelInheritance( child, parent );
 
-        assertEquals( "source directory should be from parent", "src/main/java", child.getBuild().getSourceDirectory() );
+        assertEquals( "source directory should be from parent", "src/main/java",
+                      child.getBuild().getSourceDirectory() );
         assertEquals( "unit test source directory should be from parent", "src/test/java",
                       child.getBuild().getTestSourceDirectory() );
 
@@ -322,45 +323,45 @@ public class DefaultModelInheritanceAssemblerTest
         Model parent = makeBaseModel( "parent" );
 
         Model child = makeBaseModel( "child" );
-        
+
         Plugin parentPlugin = new Plugin();
-        parentPlugin.setArtifactId("maven-testInheritance3-plugin");
-        parentPlugin.setGroupId("org.apache.maven.plugins");
-        parentPlugin.setVersion("1.0");
-        parentPlugin.setInherited("false");
-        
-        List parentPlugins = Collections.singletonList(parentPlugin);
-        
+        parentPlugin.setArtifactId( "maven-testInheritance3-plugin" );
+        parentPlugin.setGroupId( "org.apache.maven.plugins" );
+        parentPlugin.setVersion( "1.0" );
+        parentPlugin.setInherited( "false" );
+
+        List parentPlugins = Collections.singletonList( parentPlugin );
+
         Build parentBuild = new Build();
-        parentBuild.setPlugins(parentPlugins);
-        
-        parent.setBuild(parentBuild);
+        parentBuild.setPlugins( parentPlugins );
+
+        parent.setBuild( parentBuild );
 
         assembler.assembleModelInheritance( child, parent );
-    
+
         assertPlugins( new ArrayList(), child );
     }
 
     private void assertPlugins( List expectedPlugins, Model child )
     {
         Build childBuild = child.getBuild();
-        
-        if( expectedPlugins != null && !expectedPlugins.isEmpty() )
+
+        if ( expectedPlugins != null && !expectedPlugins.isEmpty() )
         {
             assertNotNull( childBuild );
-            
+
             Map childPluginsMap = childBuild.getPluginsAsMap();
-            
-            if( childPluginsMap != null )
+
+            if ( childPluginsMap != null )
             {
                 assertEquals( expectedPlugins.size(), childPluginsMap.size() );
-                
+
                 for ( Iterator it = expectedPlugins.iterator(); it.hasNext(); )
                 {
                     Plugin expectedPlugin = (Plugin) it.next();
-                    
+
                     Plugin childPlugin = (Plugin) childPluginsMap.get( expectedPlugin.getKey() );
-                    
+
                     assertPluginsEqual( expectedPlugin, childPlugin );
                 }
             }
@@ -377,25 +378,26 @@ public class DefaultModelInheritanceAssemblerTest
 
     private void assertPluginsEqual( Plugin reference, Plugin test )
     {
-        assertEquals("Plugin keys don't match", reference.getKey(), test.getKey());
-        assertEquals("Plugin configurations don't match", reference.getConfiguration(), test.getConfiguration());
-        
+        assertEquals( "Plugin keys don't match", reference.getKey(), test.getKey() );
+        assertEquals( "Plugin configurations don't match", reference.getConfiguration(), test.getConfiguration() );
+
         List referenceGoals = reference.getGoals();
         Map testGoalsMap = test.getGoalsAsMap();
-        
-        if( referenceGoals != null && !referenceGoals.isEmpty() )
+
+        if ( referenceGoals != null && !referenceGoals.isEmpty() )
         {
             assertTrue( "Missing goals specification", ( testGoalsMap != null && !testGoalsMap.isEmpty() ) );
-            
+
             for ( Iterator it = referenceGoals.iterator(); it.hasNext(); )
             {
                 Goal referenceGoal = (Goal) it.next();
                 Goal testGoal = (Goal) testGoalsMap.get( referenceGoal.getId() );
-                
+
                 assertNotNull( "Goal from reference not found in test", testGoal );
-                
+
                 assertEquals( "Goal IDs don't match", referenceGoal.getId(), testGoal.getId() );
-                assertEquals( "Goal configurations don't match", referenceGoal.getConfiguration(), testGoal.getConfiguration() );
+                assertEquals( "Goal configurations don't match", referenceGoal.getConfiguration(),
+                              testGoal.getConfiguration() );
             }
         }
         else
@@ -500,7 +502,8 @@ public class DefaultModelInheritanceAssemblerTest
 
                 if ( actualRepository.getId().equals( expectedRepository.getId() ) )
                 {
-                    assertEquals( "Repository URLs don't match", expectedRepository.getUrl(), actualRepository.getUrl() );
+                    assertEquals( "Repository URLs don't match", expectedRepository.getUrl(),
+                                  actualRepository.getUrl() );
                     found = true;
                 }
             }

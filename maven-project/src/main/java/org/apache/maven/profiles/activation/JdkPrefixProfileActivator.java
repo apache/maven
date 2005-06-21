@@ -23,7 +23,6 @@ import org.codehaus.plexus.util.StringUtils;
 public class JdkPrefixProfileActivator
     extends DetectedProfileActivator
 {
-
     private static final String JDK_VERSION = System.getProperty( "java.version" );
 
     public boolean isActive( Profile profile )

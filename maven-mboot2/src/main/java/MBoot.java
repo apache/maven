@@ -1,4 +1,3 @@
-
 import compile.CompilerConfiguration;
 import compile.JavacCompiler;
 import download.ArtifactDownloader;
@@ -35,28 +34,23 @@ import java.util.TreeMap;
 
 public class MBoot
 {
-    String[] builds = new String[]{"maven-model", "maven-monitor", "maven-plugin-api",
-                                   "maven-plugin-descriptor", "maven-artifact", "maven-script/maven-script-marmalade",
-                                   "maven-script/maven-script-beanshell", "maven-project",
-                                   "maven-settings", "maven-profile", "maven-plugin-registry",
-                                   "maven-reporting/maven-reporting-api", "maven-core", "maven-archiver",
-                                   "maven-plugin-tools/maven-plugin-tools-api",
-                                   "maven-plugin-tools/maven-plugin-tools-java",
-                                   "maven-plugin-tools/maven-plugin-tools-beanshell",
-                                   "maven-plugin-tools/maven-plugin-tools-pluggy",
-                                   "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-verifier"};
+    String[] builds = new String[]{"maven-model", "maven-monitor", "maven-plugin-api", "maven-plugin-descriptor",
+        "maven-artifact", "maven-artifact-manager", "maven-artifact-test", "maven-script/maven-script-marmalade",
+        "maven-script/maven-script-beanshell", "maven-project", "maven-settings", "maven-profile",
+        "maven-plugin-registry", "maven-reporting/maven-reporting-api", "maven-core", "maven-archiver",
+        "maven-plugin-tools/maven-plugin-tools-api", "maven-plugin-tools/maven-plugin-tools-java",
+        "maven-plugin-tools/maven-plugin-tools-beanshell", "maven-plugin-tools/maven-plugin-tools-pluggy",
+        "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-verifier"};
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-clean-plugin", "maven-plugins/maven-compiler-plugin",
-                                         "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin",
-                                         "maven-plugins/maven-plugin-plugin", "maven-plugins/maven-resources-plugin",
-                                         "maven-plugins/maven-surefire-plugin"};
+        "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin", "maven-plugins/maven-plugin-plugin", 
+        "maven-plugins/maven-resources-plugin", "maven-plugins/maven-surefire-plugin"};
 
     private static final Map MODELLO_TARGET_VERSIONS;
 
     private static final Map MODELLO_MODEL_FILES;
 
-    static
-    {
+    static {
         Map targetVersions = new TreeMap();
         targetVersions.put( "maven-model", "4.0.0" );
         targetVersions.put( "maven-settings", "1.0.0" );
@@ -182,8 +176,9 @@ public class MBoot
 
             System.out.println();
 
-            System.out.println( "HOWEVER, since you did not specify a repository path, maven will use: " +
-                                repoDir.getAbsolutePath() + " to store artifacts locally." );
+            System.out.println(
+                "HOWEVER, since you did not specify a repository path, maven will use: " + repoDir.getAbsolutePath() +
+                    " to store artifacts locally." );
         }
 
         File repoLocalFile = new File( mavenRepoLocal );
@@ -220,11 +215,13 @@ public class MBoot
         {
             if ( !new File( dist, "bin/m2.conf" ).exists() )
             {
-                System.err.println( "The directory given to install Maven in already exists, but does not contain a Maven installation" );
+                System.err.println(
+                    "The directory given to install Maven in already exists, but does not contain a Maven installation" );
                 System.err.println();
                 System.err.println( "\t" + dist );
                 System.err.println();
-                System.err.println( "If you really mean to install Maven to this location, please delete the directory first" );
+                System.err.println(
+                    "If you really mean to install Maven to this location, please delete the directory first" );
                 System.exit( 1 );
             }
         }
@@ -435,8 +432,8 @@ public class MBoot
             {
                 FileUtils.copyFileToDirectory( source, boot );
             }
-            else if ( d.getArtifactId().equals( "plexus-container-default" ) 
-                || d.getArtifactId().equals( "plexus-utils" ) )
+            else if ( d.getArtifactId().equals( "plexus-container-default" ) ||
+                d.getArtifactId().equals( "plexus-utils" ) )
             {
                 FileUtils.copyFileToDirectory( source, core );
             }
@@ -589,7 +586,8 @@ public class MBoot
         }
         else
         {
-            compile( reader.getDependencies(), sources, classes, null, null, Dependency.SCOPE_COMPILE, localRepository );
+            compile( reader.getDependencies(), sources, classes, null, null, Dependency.SCOPE_COMPILE,
+                     localRepository );
         }
 
         // ----------------------------------------------------------------------
@@ -663,8 +661,8 @@ public class MBoot
         m.invoke( null, new Object[]{args} );
     }
 
-    private void generateSources( String model, String mode, String dir, String modelVersion,
-                                  String packageWithVersion, ClassLoader modelloClassLoader )
+    private void generateSources( String model, String mode, String dir, String modelVersion, String packageWithVersion,
+                                  ClassLoader modelloClassLoader )
         throws Exception
     {
         Class c = modelloClassLoader.loadClass( "org.codehaus.modello.ModelloCli" );
@@ -856,7 +854,8 @@ public class MBoot
             }
             else if ( Dependency.SCOPE_RUNTIME.equals( scope ) )
             {
-                if ( d.getScope().equals( Dependency.SCOPE_COMPILE ) || d.getScope().equals( Dependency.SCOPE_RUNTIME ) )
+                if ( d.getScope().equals( Dependency.SCOPE_COMPILE ) ||
+                    d.getScope().equals( Dependency.SCOPE_RUNTIME ) )
                 {
                     classpath.add( element );
                 }
@@ -986,9 +985,9 @@ public class MBoot
         private Proxy activeProxy = null;
 
         private Mirror currentMirror;
-        
+
         private String localRepository;
-        
+
         public String getLocalRepository()
         {
             return localRepository;
@@ -1016,8 +1015,8 @@ public class MBoot
                 }
                 else
                 {
-                    throw new SAXException( "Invalid profile entry. Missing one or more " +
-                                            "fields: {localRepository}." );
+                    throw new SAXException(
+                        "Invalid profile entry. Missing one or more " + "fields: {localRepository}." );
                 }
             }
             else if ( "proxy".equals( rawName ) )

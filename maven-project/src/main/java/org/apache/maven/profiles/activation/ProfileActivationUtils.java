@@ -24,44 +24,43 @@ import java.util.StringTokenizer;
 
 public final class ProfileActivationUtils
 {
-
     public static final String ACTIVE_PROFILE_IDS = "org.apache.maven.ActiveProfiles";
-    
+
     private static List profileList;
 
     private ProfileActivationUtils()
     {
     }
-    
+
     public static boolean profilesWereExplicitlyGiven()
     {
         return StringUtils.isNotEmpty( System.getProperty( ACTIVE_PROFILE_IDS ) );
     }
-    
+
     public static List getExplicitProfileList()
     {
-        if(!profilesWereExplicitlyGiven())
+        if ( !profilesWereExplicitlyGiven() )
         {
             return null;
         }
-        
-        if( profileList == null )
+
+        if ( profileList == null )
         {
             profileList = new ArrayList();
-            
+
             StringTokenizer profileTokens = new StringTokenizer( System.getProperty( ACTIVE_PROFILE_IDS ), "," );
-            
-            while( profileTokens.hasMoreTokens() )
+
+            while ( profileTokens.hasMoreTokens() )
             {
                 String token = profileTokens.nextToken().trim();
-                
-                if( StringUtils.isNotEmpty( token ) )
+
+                if ( StringUtils.isNotEmpty( token ) )
                 {
                     profileList.add( token );
                 }
             }
         }
-        
+
         return profileList;
     }
 

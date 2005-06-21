@@ -18,6 +18,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
@@ -77,7 +78,7 @@ public class PluginParameterExpressionEvaluatorTest
         ExpressionEvaluator expressionEvaluator = createExpressionEvaluator( createDefaultProject(), null );
         Object value = expressionEvaluator.evaluate( "${localRepository}" );
 
-        assertEquals( "local", ( (ArtifactRepository) value ).getId() );
+        assertEquals( "local", ( (DefaultArtifactRepository) value ).getId() );
     }
 
     public void testTwoExpressions()
@@ -132,7 +133,7 @@ public class PluginParameterExpressionEvaluatorTest
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository repo = new ArtifactRepository( "local", "target/repo", repoLayout );
+        ArtifactRepository repo = new DefaultArtifactRepository( "local", "target/repo", repoLayout );
 
         PlexusContainer container = getContainer();
         MavenSession session = createSession( project, container, repo );

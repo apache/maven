@@ -33,7 +33,6 @@ import java.util.TreeMap;
 public class DefaultModelDefaultsInjector
     implements ModelDefaultsInjector
 {
-
     public void injectDefaults( Model model )
     {
         injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );

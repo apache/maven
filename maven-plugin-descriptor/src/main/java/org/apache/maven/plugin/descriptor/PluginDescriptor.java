@@ -132,12 +132,7 @@ public class PluginDescriptor
 
     public String getId()
     {
-        String id = constructPluginKey( groupId, artifactId, version );
-        if ( groupId == null || artifactId == null || version == null )
-        {
-            throw new IllegalStateException( "Plugin descriptor ID incomplete: " + id + " in " + getSource() );
-        }
-        return id;
+        return constructPluginKey( groupId, artifactId, version );
     }
 
     /**

@@ -24,7 +24,6 @@ import java.io.File;
 public class ProjectBaseDirectoryAlignmentTest
     extends MavenProjectTestCase
 {
-
     private String dir = "src/test/resources/projects/base-directory-alignment/";
 
     public void testProjectDirectoryBaseDirectoryAlignment()

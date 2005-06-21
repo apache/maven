@@ -46,7 +46,7 @@ public class ModelValidationResult
     {
         return messages.get( i ).toString();
     }
-    
+
     public List getMessages()
     {
         return Collections.unmodifiableList( messages );
@@ -61,7 +61,7 @@ public class ModelValidationResult
     {
         return render( "" );
     }
-    
+
     public String render( String indentation )
     {
         if ( messages.size() == 0 )

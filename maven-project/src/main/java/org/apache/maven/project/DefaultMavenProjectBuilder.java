@@ -24,7 +24,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
@@ -99,7 +98,7 @@ public class DefaultMavenProjectBuilder
     private ModelInterpolator modelInterpolator;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
-    
+
     private ProfileActivationCalculator profileActivationCalculator;
 
     private final Map modelCache = new HashMap();
@@ -148,7 +147,8 @@ public class DefaultMavenProjectBuilder
         return buildFromSourceFile( projectDescriptor, localRepository, externalProfiles );
     }
 
-    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository, List externalProfiles )
+    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository,
+                                              List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
         Model model = readModel( projectDescriptor );
@@ -216,24 +216,29 @@ public class DefaultMavenProjectBuilder
         return model;
     }
 
-    private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository, List externalProfiles )
+    private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository,
+                                List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
         Model superModel = getSuperModel();
 
         LinkedList lineage = new LinkedList();
 
-        List aggregatedRemoteWagonRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(), artifactRepositoryFactory, container );
+        List aggregatedRemoteWagonRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
+                                                                                         artifactRepositoryFactory,
+                                                                                         container );
 
         for ( Iterator i = externalProfiles.iterator(); i.hasNext(); )
         {
             Profile externalProfile = (Profile) i.next();
-            
+
             for ( Iterator repoIterator = externalProfile.getRepositories().iterator(); repoIterator.hasNext(); )
             {
                 Repository mavenRepo = (Repository) repoIterator.next();
 
-                ArtifactRepository artifactRepo = ProjectUtils.buildArtifactRepository( mavenRepo, artifactRepositoryFactory, container );
+                ArtifactRepository artifactRepo = ProjectUtils.buildArtifactRepository( mavenRepo,
+                                                                                        artifactRepositoryFactory,
+                                                                                        container );
 
                 if ( !aggregatedRemoteWagonRepositories.contains( artifactRepo ) )
                 {
@@ -241,7 +246,7 @@ public class DefaultMavenProjectBuilder
                 }
             }
         }
-        
+
         MavenProject project = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository );
         
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
@@ -264,7 +269,8 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ModelInterpolationException e )
         {
-            throw new ProjectBuildingException( "Error building project from \'" + pomLocation + "\': " + model.getId(), e );
+            throw new ProjectBuildingException( "Error building project from \'" + pomLocation + "\': " + model.getId(),
+                                                e );
         }
         return project;
     }
@@ -298,7 +304,8 @@ public class DefaultMavenProjectBuilder
      * the resolved source roots, etc for the parent - that occurs for the parent when it is constructed independently
      * and projects are not cached or reused
      */
-    private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories, List externalProfiles )
+    private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories,
+                                              List externalProfiles )
         throws ProjectBuildingException, ModelInterpolationException
     {
         Model model = project.getModel();
@@ -308,45 +315,48 @@ public class DefaultMavenProjectBuilder
         {
             modelCache.put( key, model );
         }
-        
+
         List activeProfiles = new ArrayList( externalProfiles );
-        
+
         List activePomProfiles = profileActivationCalculator.calculateActiveProfiles( model.getProfiles() );
-        
+
         activeProfiles.addAll( activePomProfiles );
-        
+
         Properties profileProperties = new Properties();
-        
+
         for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
         {
             Profile profile = (Profile) it.next();
-            
+
             modelInheritanceAssembler.mergeProfileWithModel( model, profile );
-            
+
             profileProperties.putAll( profile.getProperties() );
         }
-        
+
         // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
 
         model = modelInterpolator.interpolate( model );
-        
+
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
 
         MavenProject parentProject = project.getParent();
 
         project = new MavenProject( model );
-        
+
         project.addProfileProperties( profileProperties );
-        
+
         project.setActiveProfiles( activeProfiles );
 
-        project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(), artifactRepositoryFactory, container ) );
+        project.setPluginArtifactRepositories(
+            ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(), artifactRepositoryFactory,
+                                                    container ) );
 
         DistributionManagement dm = model.getDistributionManagement();
         if ( dm != null )
         {
-            project.setDistributionManagementArtifactRepository( ProjectUtils.buildArtifactRepository( dm.getRepository(), artifactRepositoryFactory, container ) );
+            project.setDistributionManagementArtifactRepository(
+                ProjectUtils.buildArtifactRepository( dm.getRepository(), artifactRepositoryFactory, container ) );
         }
 
         project.setParent( parentProject );
@@ -355,9 +365,7 @@ public class DefaultMavenProjectBuilder
         {
             Artifact parentArtifact = artifactFactory.createArtifact( parentProject.getGroupId(),
                                                                       parentProject.getArtifactId(),
-                                                                      parentProject.getVersion(),
-                                                                      null,
-                                                                      "pom", null );
+                                                                      parentProject.getVersion(), null, "pom", null );
             project.setParentArtifact( parentArtifact );
         }
 
@@ -369,7 +377,9 @@ public class DefaultMavenProjectBuilder
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            throw new ProjectBuildingException( "Failed to validate POM for \'" + pomLocation + "\'.\n\n  Reason(s):\n" + validationResult.render( "  " ) );
+            throw new ProjectBuildingException(
+                "Failed to validate POM for \'" + pomLocation + "\'.\n\n  Reason(s):\n" +
+                    validationResult.render( "  " ) );
         }
 
         return project;
@@ -381,7 +391,8 @@ public class DefaultMavenProjectBuilder
     {
         if ( !model.getRepositories().isEmpty() )
         {
-            List respositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container );
+            List respositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(),
+                                                                         artifactRepositoryFactory, container );
             aggregatedRemoteWagonRepositories.addAll( respositories );
         }
 
@@ -447,12 +458,14 @@ public class DefaultMavenProjectBuilder
         catch ( IOException e )
         {
             throw new ProjectBuildingException(
-                "Failed to build model from file '" + file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
+                "Failed to build model from file '" + file.getAbsolutePath() + "'.\nError: \'" +
+                    e.getLocalizedMessage() + "\'", e );
         }
         catch ( XmlPullParserException e )
         {
             throw new ProjectBuildingException(
-                "Failed to parse model from file '" + file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
+                "Failed to parse model from file '" + file.getAbsolutePath() + "'.\nError: \'" +
+                    e.getLocalizedMessage() + "\'", e );
         }
         finally
         {
@@ -471,11 +484,15 @@ public class DefaultMavenProjectBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "Failed build model from URL \'" + url.toExternalForm() + "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
+            throw new ProjectBuildingException(
+                "Failed build model from URL \'" + url.toExternalForm() + "\'\nError: \'" + e.getLocalizedMessage() +
+                    "\'", e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException( "Failed to parse model from URL \'" + url.toExternalForm() + "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
+            throw new ProjectBuildingException(
+                "Failed to parse model from URL \'" + url.toExternalForm() + "\'\nError: \'" + e.getLocalizedMessage() +
+                    "\'", e );
         }
         finally
         {
@@ -496,7 +513,8 @@ public class DefaultMavenProjectBuilder
     protected Set createArtifacts( List dependencies )
     {
         // TODO: merge with MavenMetadataSource properly
-        return new MavenMetadataSource( artifactResolver, this, artifactFactory ).createArtifacts( dependencies, null, null );
+        return new MavenMetadataSource( artifactResolver, this, artifactFactory ).createArtifacts( dependencies, null,
+                                                                                                   null );
     }
 
     protected Set createPluginArtifacts( List plugins )
@@ -510,15 +528,15 @@ public class DefaultMavenProjectBuilder
             String version;
             if ( StringUtils.isEmpty( p.getVersion() ) )
             {
-                version = ReleaseArtifactTransformation.RELEASE_VERSION;
+                version = "RELEASE";
             }
             else
             {
                 version = p.getVersion();
             }
 
-            Artifact artifact = artifactFactory.createArtifact( p.getGroupId(), p.getArtifactId(), version,
-                                                                null, "maven-plugin", null );
+            Artifact artifact = artifactFactory.createArtifact( p.getGroupId(), p.getArtifactId(), version, null,
+                                                                "maven-plugin", null );
             if ( artifact != null )
             {
                 pluginArtifacts.add( artifact );
@@ -545,7 +563,8 @@ public class DefaultMavenProjectBuilder
         {
             project.setFile( new File( ".", "pom.xml" ) );
 
-            List remoteRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(), artifactRepositoryFactory, container );
+            List remoteRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
+                                                                              artifactRepositoryFactory, container );
 
             project = processProjectLogic( "<Super-POM>", project, remoteRepositories, externalProfiles );
 

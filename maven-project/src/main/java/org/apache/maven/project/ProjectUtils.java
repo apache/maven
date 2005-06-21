@@ -29,14 +29,13 @@ import java.util.List;
 
 public final class ProjectUtils
 {
-
     private ProjectUtils()
     {
     }
 
     public static List buildArtifactRepositories( List repositories,
-                                                 ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                 PlexusContainer container )
+                                                  ArtifactRepositoryFactory artifactRepositoryFactory,
+                                                  PlexusContainer container )
         throws ProjectBuildingException
     {
 
@@ -46,7 +45,8 @@ public final class ProjectUtils
         {
             Repository mavenRepo = (Repository) i.next();
 
-            ArtifactRepository artifactRepo = buildArtifactRepository( mavenRepo, artifactRepositoryFactory, container );
+            ArtifactRepository artifactRepo = buildArtifactRepository( mavenRepo, artifactRepositoryFactory,
+                                                                       container );
 
             if ( !repos.contains( artifactRepo ) )
             {
@@ -57,8 +57,8 @@ public final class ProjectUtils
     }
 
     public static ArtifactRepository buildArtifactRepository( Repository repo,
-                                                             ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                             PlexusContainer container )
+                                                              ArtifactRepositoryFactory artifactRepositoryFactory,
+                                                              PlexusContainer container )
         throws ProjectBuildingException
     {
         if ( repo != null )
@@ -67,11 +67,12 @@ public final class ProjectUtils
             String url = repo.getUrl();
             String snapshotPolicy = repo.getSnapshotPolicy();
             String checksumPolicy = repo.getChecksumPolicy();
-            
+
             // TODO: make this a map inside the factory instead, so no lookup needed
             ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
-            
-            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshotPolicy, checksumPolicy );
+
+            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshotPolicy,
+                                                                       checksumPolicy );
         }
         else
         {
@@ -91,8 +92,9 @@ public final class ProjectUtils
         }
         catch ( ComponentLookupException e )
         {
-            throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout
-                + "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
+            throw new ProjectBuildingException(
+                "Cannot find layout implementation corresponding to: \'" + layout +
+                    "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
         }
         return repositoryLayout;
     }

@@ -19,7 +19,6 @@ package org.apache.maven.artifact.repository.layout;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 
 /**
  * @author jdcasey
@@ -58,7 +57,7 @@ public class DefaultRepositoryLayout
 
         path.append( metadata.getGroupId().replace( '.', '/' ) ).append( '/' );
         path.append( metadata.getArtifactId() ).append( '/' );
-        if ( !metadata.getBaseVersion().equals( ReleaseArtifactTransformation.RELEASE_VERSION ) )
+        if ( !metadata.getBaseVersion().equals( "RELEASE" ) )
         {
             path.append( metadata.getBaseVersion() ).append( '/' );
         }

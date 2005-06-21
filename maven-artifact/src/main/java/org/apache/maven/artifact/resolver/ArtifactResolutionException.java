@@ -1,11 +1,5 @@
 package org.apache.maven.artifact.resolver;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
-import java.util.Iterator;
-import java.util.List;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -21,6 +15,12 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

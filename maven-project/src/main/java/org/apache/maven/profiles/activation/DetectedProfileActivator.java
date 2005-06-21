@@ -21,12 +21,11 @@ import org.apache.maven.model.Profile;
 public abstract class DetectedProfileActivator
     implements ProfileActivator
 {
-
     public boolean canDetermineActivation( Profile profile )
     {
         return !ProfileActivationUtils.profilesWereExplicitlyGiven() && canDetectActivation( profile );
     }
-    
+
     protected abstract boolean canDetectActivation( Profile profile );
 
 }

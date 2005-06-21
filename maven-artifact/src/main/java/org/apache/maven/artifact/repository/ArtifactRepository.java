@@ -18,84 +18,44 @@ package org.apache.maven.artifact.repository;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.wagon.repository.Repository;
 
 /**
- * This class is an abstraction of the location from/to resources can be
- * transfered.
+ * TODO: describe
  *
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class ArtifactRepository
-    extends Repository
+public interface ArtifactRepository
 {
-    private final String snapshotPolicy;
-    
-    private final String checksumPolicy;
+    String SNAPSHOT_POLICY_NEVER = "never";
 
-    private final ArtifactRepositoryLayout layout;
+    String SNAPSHOT_POLICY_ALWAYS = "always";
 
-    public static final String SNAPSHOT_POLICY_NEVER = "never";
+    String SNAPSHOT_POLICY_DAILY = "daily";
 
-    public static final String SNAPSHOT_POLICY_ALWAYS = "always";
+    String SNAPSHOT_POLICY_INTERVAL = "interval";
 
-    public static final String SNAPSHOT_POLICY_DAILY = "daily";
+    String CHECKSUM_POLICY_FAIL = "fail";
 
-    public static final String SNAPSHOT_POLICY_INTERVAL = "interval";
-    
-    public static final String CHECKSUM_POLICY_FAIL = "fail";
-    
-    public static final String CHECKSUM_POLICY_WARN = "warn";
-    
-    public static final String CHECKSUM_ALGORITHM_SHA1 = "SHA-1";
-    
-    public static final String CHECKSUM_ALGORITHM_MD5 = "MD5";
+    String CHECKSUM_POLICY_WARN = "warn";
 
-    public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
-    {
-        this( id, url, layout, SNAPSHOT_POLICY_NEVER, CHECKSUM_POLICY_WARN );
-    }
+    String CHECKSUM_ALGORITHM_SHA1 = "SHA-1";
 
-    public ArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, String snapshotPolicy, String checksumPolicy )
-    {
-        super( id, url );
+    String CHECKSUM_ALGORITHM_MD5 = "MD5";
 
-        this.layout = layout;
+    String pathOf( Artifact artifact );
 
-        this.snapshotPolicy = snapshotPolicy;
-        
-        this.checksumPolicy = checksumPolicy;
-    }
+    String pathOfMetadata( ArtifactMetadata artifactMetadata );
 
-    public String pathOf( Artifact artifact )
-    {
-        return layout.pathOf( artifact );
-    }
+    String getUrl();
 
-    public String pathOfMetadata( ArtifactMetadata artifactMetadata )
-    {
-        return layout.pathOfMetadata( artifactMetadata );
-    }
+    String getBasedir();
 
-    public String getSnapshotPolicy()
-    {
-        return snapshotPolicy;
-    }
-    
-    public String getChecksumPolicy()
-    {
-        return checksumPolicy;
-    }
-    
-    public boolean failOnChecksumMismatch()
-    {
-        return CHECKSUM_POLICY_FAIL.equals( checksumPolicy );
-    }
-    
-    public ArtifactRepository createMirror( Repository mirror )
-    {
-        return new ArtifactRepository( mirror.getId(), mirror.getUrl(), layout, snapshotPolicy, checksumPolicy );
-    }
+    String getSnapshotPolicy();
+
+    String getProtocol();
+
+    String getId();
+
+    String getChecksumPolicy();
 }

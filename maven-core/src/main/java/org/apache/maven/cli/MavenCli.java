@@ -25,8 +25,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -376,7 +377,7 @@ public class MavenCli
             ArtifactRepositoryFactory.ROLE );
 
         String url = "file://" + settings.getLocalRepository();
-        ArtifactRepository localRepository = new ArtifactRepository( "local", url, repositoryLayout );
+        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", url, repositoryLayout );
 
         boolean snapshotPolicySet = false;
         if ( commandLine.hasOption( CLIManager.OFFLINE ) )

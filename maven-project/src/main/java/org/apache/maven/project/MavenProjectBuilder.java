@@ -44,8 +44,8 @@ public interface MavenProjectBuilder
     /**
      * Build the artifact from the local repository, resolving it if necessary.
      *
-     * @param artifact                   the artifact description
-     * @param localRepository            the local repository
+     * @param artifact the artifact description
+     * @param localRepository the local repository
      * @param remoteArtifactRepositories the remote repository list
      * @return the built project
      * @throws ProjectBuildingException

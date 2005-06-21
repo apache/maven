@@ -16,9 +16,10 @@
 
 package org.apache.maven.artifact;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
@@ -55,7 +56,8 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository localRepository = new ArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
+        ArtifactRepository localRepository = new DefaultArtifactRepository( "test", "file://" + f.getPath(),
+                                                                            repoLayout );
 
         return localRepository;
     }
@@ -75,7 +77,8 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository localRepository = new ArtifactRepository( "local", "file://" + f.getPath(), repoLayout );
+        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", "file://" + f.getPath(),
+                                                                            repoLayout );
 
         return localRepository;
     }
@@ -90,7 +93,9 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository repository = new ArtifactRepository( "test", "file://" + f.getPath(), repoLayout, ArtifactRepository.SNAPSHOT_POLICY_NEVER, ArtifactRepository.CHECKSUM_POLICY_WARN );
+        ArtifactRepository repository = new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
+                                                                       ArtifactRepository.SNAPSHOT_POLICY_NEVER,
+                                                                       ArtifactRepository.CHECKSUM_POLICY_WARN );
 
         return repository;
     }
@@ -101,7 +106,8 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository repository = new ArtifactRepository( "test", "http://foo.bar/repository", repoLayout );
+        ArtifactRepository repository = new DefaultArtifactRepository( "test", "http://foo.bar/repository",
+                                                                       repoLayout );
 
         return repository;
     }
@@ -243,13 +249,15 @@ public abstract class ArtifactComponentTestCase
     protected Artifact createArtifact( String artifactId, String version, String type )
     {
         // TODO: fix handler instantiation
-        return new DefaultArtifact( "org.apache.maven", artifactId, version, null, type, null, new DefaultArtifactHandler( type ) );
+        return new DefaultArtifact( "org.apache.maven", artifactId, version, null, type, null,
+                                    new DefaultArtifactHandler( type ) );
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
     {
         // TODO: fix handler instantiation
-        return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type, null, new DefaultArtifactHandler( type ) );
+        return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type, null,
+                                    new DefaultArtifactHandler( type ) );
     }
 
     protected void deleteLocalArtifact( Artifact artifact )
