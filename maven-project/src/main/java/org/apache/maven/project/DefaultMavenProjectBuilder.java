@@ -243,12 +243,15 @@ public class DefaultMavenProjectBuilder
         }
         
         MavenProject project = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository );
-
+        
+        // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         Model previous = superModel;
-
+        
         for ( Iterator i = lineage.iterator(); i.hasNext(); )
         {
             Model current = ( (MavenProject) i.next() ).getModel();
+
+            forcePluginExecutionIdCollision( current );
 
             modelInheritanceAssembler.assembleModelInheritance( current, previous );
 
@@ -265,6 +268,28 @@ public class DefaultMavenProjectBuilder
         }
         return project;
     }
+
+    private void forcePluginExecutionIdCollision( Model model )
+    {
+        Build build = model.getBuild();
+        
+        if ( build != null )
+        {
+            List plugins = build.getPlugins();
+            
+            if ( plugins != null )
+            {
+                for ( Iterator it = plugins.iterator(); it.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) it.next();
+                    
+                    // this will force an IllegalStateException, even if we don't have to do inheritance assembly.
+                    plugin.getExecutionsAsMap();
+                }
+            }
+        }
+    }
+    
 
     /**
      * @todo can this take in a model instead of a project and still be successful?
@@ -541,7 +566,11 @@ public class DefaultMavenProjectBuilder
     {
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
 
-        return readModel( url );
+        Model superModel = readModel( url );
+        
+        forcePluginExecutionIdCollision( superModel );
+
+        return superModel;
     }
 
     public void contextualize( Context context )
