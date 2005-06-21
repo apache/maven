@@ -18,7 +18,6 @@ package org.apache.maven.archiver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
@@ -27,14 +26,14 @@ import org.codehaus.plexus.archiver.jar.ManifestException;
 import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.FileOutputStream;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
@@ -163,9 +162,8 @@ public class MavenArchiver
                 Artifact artifact = (Artifact) iter.next();
                 if ( "jar".equals( artifact.getType() ) )
                 {
-                    Manifest.Attribute archExtNameAttr = new Manifest.Attribute( artifact.getArtifactId() +
-                                                                                 "-Extension-Name",
-                                                                                 artifact.getArtifactId() );
+                    Manifest.Attribute archExtNameAttr = new Manifest.Attribute(
+                        artifact.getArtifactId() + "-Extension-Name", artifact.getArtifactId() );
                     m.addConfiguredAttribute( archExtNameAttr );
                     String name = artifact.getArtifactId() + "-Implementation-Version";
                     Manifest.Attribute archImplVersionAttr = new Manifest.Attribute( name, artifact.getVersion() );
@@ -218,8 +216,7 @@ public class MavenArchiver
         String groupId = project.getGroupId();
 
         String artifactId = project.getArtifactId();
-        
-        
+
         File exportReadyPom = writeExportReadyPom( project );
 
         archiver.addFile( exportReadyPom, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
@@ -276,25 +273,26 @@ public class MavenArchiver
         pomPropertiesFile.delete();
     }
 
-    private File writeExportReadyPom( MavenProject project ) throws IOException
+    private File writeExportReadyPom( MavenProject project )
+        throws IOException
     {
         String buildDirectory = project.getBuild().getDirectory();
-        
+
         File fullPom = new File( buildDirectory, "exported-pom.xml" );
-        
+
         FileWriter fWriter = null;
-        
+
         try
         {
             fWriter = new FileWriter( fullPom );
-            
+
             project.writeModel( fWriter );
         }
         finally
         {
             IOUtil.close( fWriter );
         }
-        
+
         return fullPom;
     }
 }
