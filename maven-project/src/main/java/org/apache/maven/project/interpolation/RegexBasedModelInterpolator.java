@@ -39,7 +39,7 @@ public class RegexBasedModelInterpolator
     extends AbstractLogEnabled
     implements ModelInterpolator
 {
-    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom|project\\.)?([^}]+)\\}" );
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom\\.|project\\.)?([^}]+)\\}" );
 
     /**
      * Added: Feb 3, 2005 by jdcasey
