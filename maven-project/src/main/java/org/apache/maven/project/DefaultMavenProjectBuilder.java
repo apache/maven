@@ -267,9 +267,11 @@ public class DefaultMavenProjectBuilder
 
         for ( Iterator i = lineage.iterator(); i.hasNext(); )
         {
-            Model current = ( (MavenProject) i.next() ).getModel();
+            MavenProject currentProject = (MavenProject) i.next();
+            
+            Model current = currentProject.getModel();
 
-            forcePluginExecutionIdCollision( current );
+            forcePluginExecutionIdCollision( pomLocation, current );
 
             modelInheritanceAssembler.assembleModelInheritance( current, previous );
 
@@ -288,7 +290,8 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private void forcePluginExecutionIdCollision( Model model )
+    private void forcePluginExecutionIdCollision( String pomLocation, Model model )
+        throws ProjectBuildingException
     {
         Build build = model.getBuild();
 
@@ -303,7 +306,14 @@ public class DefaultMavenProjectBuilder
                     Plugin plugin = (Plugin) it.next();
 
                     // this will force an IllegalStateException, even if we don't have to do inheritance assembly.
-                    plugin.getExecutionsAsMap();
+                    try
+                    {
+                        plugin.getExecutionsAsMap();
+                    }
+                    catch ( IllegalStateException collisionException )
+                    {
+                        throw new ProjectBuildingException( "Detected illegal plugin-execution configuration in: " + pomLocation, collisionException ); 
+                    }
                 }
             }
         }
@@ -600,7 +610,7 @@ public class DefaultMavenProjectBuilder
 
         Model superModel = readModel( url );
 
-        forcePluginExecutionIdCollision( superModel );
+        forcePluginExecutionIdCollision( "<super-POM>", superModel );
 
         return superModel;
     }
