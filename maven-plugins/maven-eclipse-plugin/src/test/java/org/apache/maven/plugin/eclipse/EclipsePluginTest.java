@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -73,11 +74,11 @@ public class EclipsePluginTest
         File repo = getTestFile( "src/test/repository" );
 
         ArtifactRepositoryLayout localRepositoryLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
-        
+
         ArtifactRepository localRepository = new ArtifactRepository("local", "file://" + repo.getAbsolutePath(), localRepositoryLayout);
 
-        MavenProject project = builder.build( new File( basedir, "project.xml" ), localRepository );
-        
+        MavenProject project = builder.build( new File( basedir, "project.xml" ), localRepository, Collections.EMPTY_LIST );
+
         for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
