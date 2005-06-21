@@ -1,14 +1,5 @@
 package org.apache.maven.profiles;
 
-import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationProperty;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.Repository;
-import org.apache.maven.profiles.AlwaysOnActivation;
-
-import java.util.Iterator;
-import java.util.List;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -25,9 +16,16 @@ import java.util.List;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Activation;
+import org.apache.maven.model.ActivationProperty;
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
+
+import java.util.Iterator;
+import java.util.List;
+
 public class ProfilesConversionUtils
 {
-    
     private ProfilesConversionUtils()
     {
     }
@@ -35,9 +33,9 @@ public class ProfilesConversionUtils
     public static Profile convertFromProfileXmlProfile( org.apache.maven.profiles.Profile profileXmlProfile )
     {
         Profile profile = new Profile();
-        
+
         profile.setId( profileXmlProfile.getId() );
-        
+
         profile.setSource( "profiles.xml" );
 
         org.apache.maven.profiles.Activation profileActivation = profileXmlProfile.getActivation();
@@ -59,14 +57,14 @@ public class ProfilesConversionUtils
 
                 activation.setProperty( prop );
             }
-            
+
             profile.setActivation( activation );
         }
         else
         {
             profile.setActivation( new AlwaysOnActivation() );
         }
-        
+
         profile.setProperties( profileXmlProfile.getProperties() );
 
         List repos = profileXmlProfile.getRepositories();
@@ -75,7 +73,8 @@ public class ProfilesConversionUtils
             for ( Iterator it = repos.iterator(); it.hasNext(); )
             {
                 profile
-                    .addRepository( convertFromProfileXmlRepository( (org.apache.maven.profiles.Repository) it.next() ) );
+                    .addRepository(
+                        convertFromProfileXmlRepository( (org.apache.maven.profiles.Repository) it.next() ) );
             }
         }
 

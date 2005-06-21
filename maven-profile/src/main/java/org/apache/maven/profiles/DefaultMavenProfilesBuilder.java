@@ -27,24 +27,23 @@ import java.io.IOException;
 public class DefaultMavenProfilesBuilder
     implements MavenProfilesBuilder
 {
-    
     private static final String PROFILES_XML_FILE = "profiles.xml";
 
     public ProfilesRoot buildProfiles( File basedir )
         throws IOException, XmlPullParserException
     {
         File profilesXml = new File( basedir, PROFILES_XML_FILE );
-        
+
         ProfilesRoot profilesRoot = null;
-        
-        if( profilesXml.exists() )
+
+        if ( profilesXml.exists() )
         {
             ProfilesXpp3Reader reader = new ProfilesXpp3Reader();
             FileReader fileReader = null;
             try
             {
                 fileReader = new FileReader( profilesXml );
-                
+
                 profilesRoot = reader.read( fileReader );
             }
             finally
@@ -52,7 +51,7 @@ public class DefaultMavenProfilesBuilder
                 IOUtil.close( fileReader );
             }
         }
-        
+
         return profilesRoot;
     }
 
