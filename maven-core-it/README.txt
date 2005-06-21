@@ -130,3 +130,7 @@ it1003: A build with a simple test failure.
 -------------------------------------------------------------------------------
 it1005: A build with two mojo java sources that declare the same goal.
 -------------------------------------------------------------------------------
+it1006: Tests collision on default execution id. Should throw an 
+        IllegalStateException, since the model is incorrect.
+-------------------------------------------------------------------------------
+

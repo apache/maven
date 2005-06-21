@@ -2162,6 +2162,12 @@
                 for ( Iterator i = getExecutions().iterator(); i.hasNext(); )
                 {
                     PluginExecution exec = (PluginExecution) i.next();
+                    
+                    if ( executionMap.containsKey( exec.getId() ) )
+                    {
+                        throw new IllegalStateException( "You cannot have two plugin executions with the same (or missing) <id/> elements.\nOffending execution\n\nId: \'" + exec.getId() + "\'\nPlugin:\'" + getKey() + "\'\n\n" );
+                    }
+                    
                     executionMap.put( exec.getId(), exec );
                 }
             }
@@ -2219,6 +2225,7 @@
           <version>4.0.0</version>
           <required>true</required>
           <type>String</type>
+          <defaultValue>default</defaultValue>
         </field>
         <field>
           <name>phase</name>
