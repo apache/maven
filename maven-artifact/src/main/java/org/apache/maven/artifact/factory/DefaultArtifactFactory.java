@@ -27,6 +27,15 @@ public class DefaultArtifactFactory
     // TODO: remove, it doesn't know the ones from the plugins
     private ArtifactHandlerManager artifactHandlerManager;
 
+    public DefaultArtifactFactory()
+    {
+    }
+
+    public DefaultArtifactFactory( ArtifactHandlerManager artifactHandlerManager )
+    {
+        this.artifactHandlerManager = artifactHandlerManager;
+    }
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return createArtifact( groupId, artifactId, version, scope, type, null, null );
