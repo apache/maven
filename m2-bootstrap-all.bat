@@ -116,19 +116,28 @@ cd ..
 @REM I Really Don't want to be rebuilding these (Especially the reports) every time, but
 @REM until we regularly push them to the repository and the integration tests rely on
 @REM some of these plugins, there is no choice
+echo
+echo -----------------------------------------------------------------------
 echo Rebuilding maven2 plugins
+echo -----------------------------------------------------------------------
 cd maven-plugins
 @REM update the release info to ensure these versions get used in the integration tests
 call m2 --no-plugin-updates --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
 cd ..
 
+echo
+echo -----------------------------------------------------------------------
 echo Rebuilding maven2 reports
+echo -----------------------------------------------------------------------
 cd maven-reports
 @REM update the release info to ensure these versions get used in the integration tests
 call m2 --no-plugin-updates --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
 cd ..
 
+echo
+echo -----------------------------------------------------------------------
 echo Running integration tests
+echo -----------------------------------------------------------------------
 cd maven-core-it
 call maven-core-it
 cd ..
