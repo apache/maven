@@ -44,12 +44,27 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
+# I Really Don't want to be rebuilding these (Especially the reports) every time, but
+# until we regularly push them to the repository and the integration tests rely on
+# some of these plugins, there is no choice
 (
   echo "-----------------------------------------------------------------------"
   echo " Rebuilding maven2 plugins ... "
   echo "-----------------------------------------------------------------------"  
 
   cd maven-plugins
+  # update the release info to ensure these versions get used in the integration tests
+  m2 --no-plugin-updates --batch-mode -DupdateReleaseInfo=true -e $ARGS clean:clean install
+  ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+)
+ret=$?; if [ $ret != 0 ]; then exit $ret; fi
+
+(
+  echo "-----------------------------------------------------------------------"
+  echo " Rebuilding maven2 reports ... "
+  echo "-----------------------------------------------------------------------"  
+
+  cd maven-reports
   # update the release info to ensure these versions get used in the integration tests
   m2 --no-plugin-updates --batch-mode -DupdateReleaseInfo=true -e $ARGS clean:clean install
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
