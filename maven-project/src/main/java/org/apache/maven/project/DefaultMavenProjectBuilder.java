@@ -159,15 +159,23 @@ public class DefaultMavenProjectBuilder
 
     private Map createManagedVersionMap( DependencyManagement dependencyManagement )
     {
-        Map map = new HashMap();
-        for ( Iterator i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
+        Map map;
+        if ( dependencyManagement != null && dependencyManagement.getDependencies() != null )
         {
-            Dependency d = (Dependency) i.next();
+            map = new HashMap();
+            for ( Iterator i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
+            {
+                Dependency d = (Dependency) i.next();
 
-            Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
-                                                                d.getScope(), d.getType(), null );
+                Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
+                                                                    d.getScope(), d.getType(), null );
 
-            map.put( d.getManagementKey(), artifact );
+                map.put( d.getManagementKey(), artifact );
+            }
+        }
+        else
+        {
+            map = Collections.EMPTY_MAP;
         }
         return map;
     }
