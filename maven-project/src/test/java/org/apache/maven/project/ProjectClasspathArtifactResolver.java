@@ -60,10 +60,19 @@ public class ProjectClasspathArtifactResolver
             try
             {
                 String scope = artifact.getArtifactId().substring( "scope-".length() );
-                String name = "/projects/scope/transitive-" + scope + "-dep.xml";
-                r = new InputStreamReader( getClass().getResourceAsStream( name ) );
-                MavenXpp3Reader reader = new MavenXpp3Reader();
-                model = reader.read( r );
+                if ( artifact.getGroupId().equals( "maven-test" ) )
+                {
+                    String name = "/projects/scope/transitive-" + scope + "-dep.xml";
+                    r = new InputStreamReader( getClass().getResourceAsStream( name ) );
+                    MavenXpp3Reader reader = new MavenXpp3Reader();
+                    model = reader.read( r );
+                }
+                else
+                {
+                    model = new Model();
+                }
+                model.setGroupId( artifact.getGroupId() );
+                model.setArtifactId( artifact.getArtifactId() );
             }
             catch ( IOException e )
             {
