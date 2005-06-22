@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver;
+package org.apache.maven.artifact.ant;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -17,24 +17,25 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.codehaus.plexus.logging.Logger;
+import org.apache.maven.artifact.resolver.ResolutionListener;
+import org.apache.tools.ant.Project;
 
 /**
- * Send resolution events to the debug log.
+ * Show resolution information in Ant.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class DebugResolutionListener
+public class AntResolutionListener
     implements ResolutionListener
 {
-    private Logger logger;
-
     private String indent = "";
 
-    public DebugResolutionListener( Logger logger )
+    private final Project project;
+
+    public AntResolutionListener( Project project )
     {
-        this.logger = logger;
+        this.project = project;
     }
 
     public void testArtifact( Artifact node )
@@ -53,22 +54,22 @@ public class DebugResolutionListener
 
     public void includeArtifact( Artifact artifact )
     {
-        logger.debug( indent + artifact.getId() + " (selected)" );
+        project.log( indent + artifact.getId() + " (selected)" );
     }
 
     public void omitForNearer( Artifact omitted, Artifact kept )
     {
-        logger.debug( indent + omitted.getId() + " (removed - nearer found: " + kept.getVersion() + ")" );
+        project.log( indent + omitted.getId() + " (removed - nearer found: " + kept.getVersion() + ")" );
     }
 
     public void omitForCycle( Artifact omitted )
     {
-        logger.debug( indent + omitted.getId() + " (removed - causes a cycle in the graph)" );
+        project.log( indent + omitted.getId() + " (removed - causes a cycle in the graph)" );
     }
 
     public void updateScope( Artifact artifact, String scope )
     {
-        logger.debug( indent + artifact.getId() + " (settings scope to: " + scope + ")" );
+        project.log( indent + artifact.getId() + " (settings scope to: " + scope + ")" );
     }
 
     public void manageArtifact( Artifact artifact, Artifact replacement )
@@ -84,6 +85,6 @@ public class DebugResolutionListener
             msg += "applying scope: " + replacement.getScope();
         }
         msg += ")";
-        logger.debug( msg );
+        project.log( msg );
     }
 }

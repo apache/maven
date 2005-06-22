@@ -32,6 +32,7 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +53,8 @@ public class DependenciesTask
     private String pathId;
 
     private String filesetId;
+
+    private boolean verbose;
 
     public void execute()
     {
@@ -101,10 +104,16 @@ public class DependenciesTask
             Artifact pomArtifact = artifactFactory.createArtifact( pom.getGroupId(), pom.getArtifactId(),
                                                                    pom.getVersion(), null, pom.getPackaging() );
 
+            List listeners = Collections.EMPTY_LIST;
+            if ( verbose )
+            {
+                listeners = Collections.singletonList( new AntResolutionListener( getProject() ) );
+            }
+
             List remoteArtifactRepositories = createRemoteArtifactRepositories( getRemoteRepositories() );
             // TODO: managed dependencies 
             result = resolver.resolveTransitively( artifacts, pomArtifact, remoteArtifactRepositories, localRepo,
-                                                   metadataSource );
+                                                   metadataSource, listeners );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -208,5 +217,10 @@ public class DependenciesTask
     public void setFilesetId( String filesetId )
     {
         this.filesetId = filesetId;
+    }
+
+    public void setVerbose( boolean verbose )
+    {
+        this.verbose = verbose;
     }
 }

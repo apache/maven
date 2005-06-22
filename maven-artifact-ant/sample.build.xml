@@ -55,7 +55,7 @@
       <fileset refid="dependency.fileset"/>
     </copy>
 
-    <artifact:dependencies filesetId="my.dependency.fileset">
+    <artifact:dependencies filesetId="my.dependency.fileset" verbose="true">
       <pom refid="maven.project"/>
     </artifact:dependencies>
 

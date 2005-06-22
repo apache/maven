@@ -151,8 +151,6 @@ public class DefaultArtifactResolver
                                                          ArtifactFilter filter )
         throws ArtifactResolutionException
     {
-        ArtifactResolutionResult artifactResolutionResult;
-
         // TODO: this is simplistic
         List listeners = new ArrayList();
         if ( getLogger().isDebugEnabled() )
@@ -160,6 +158,18 @@ public class DefaultArtifactResolver
             listeners.add( new DebugResolutionListener( getLogger() ) );
         }
 
+        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
+                                    remoteRepositories, source, filter, listeners );
+
+    }
+
+    private ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                          Map managedVersions, ArtifactRepository localRepository,
+                                                          List remoteRepositories, ArtifactMetadataSource source,
+                                                          ArtifactFilter filter, List listeners )
+        throws ArtifactResolutionException
+    {
+        ArtifactResolutionResult artifactResolutionResult;
         artifactResolutionResult = artifactCollector.collect( artifacts, originatingArtifact, managedVersions,
                                                               localRepository, remoteRepositories, source, filter,
                                                               artifactFactory, listeners );
@@ -179,6 +189,15 @@ public class DefaultArtifactResolver
         throws ArtifactResolutionException
     {
         return resolveTransitively( artifacts, originatingArtifact, localRepository, remoteRepositories, source, null );
+    }
+
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                         List remoteRepositories, ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source, List listeners )
+        throws ArtifactResolutionException
+    {
+        return resolveTransitively( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository,
+                                    remoteRepositories, source, null, listeners );
     }
 
 }
