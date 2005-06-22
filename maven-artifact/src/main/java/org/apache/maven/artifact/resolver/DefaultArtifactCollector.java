@@ -204,7 +204,7 @@ public class DefaultArtifactCollector
 
         private List children = null;
 
-        private final Set parents;
+        private final List parents;
 
         private final int depth;
 
@@ -213,7 +213,7 @@ public class DefaultArtifactCollector
             this.artifact = artifact;
             this.parent = null;
             this.depth = 0;
-            this.parents = Collections.EMPTY_SET;
+            this.parents = Collections.EMPTY_LIST;
         }
 
         public ResolutionNode( Artifact artifact, ResolutionNode parent )
@@ -221,9 +221,9 @@ public class DefaultArtifactCollector
             this.artifact = artifact;
             this.parent = parent;
             this.depth = parent.depth + 1;
-            this.parents = new HashSet();
-            this.parents.add( parent.getKey() );
+            this.parents = new ArrayList();
             this.parents.addAll( parent.parents );
+            this.parents.add( parent.getKey() );
         }
 
         public Artifact getArtifact()
@@ -249,7 +249,9 @@ public class DefaultArtifactCollector
                 {
                     if ( parents.contains( a.getDependencyConflictId() ) )
                     {
-                        throw new CyclicDependencyException( "The dependency is present in a cycle", a );
+                        List path = new ArrayList( parents );
+                        path.add( getKey() );
+                        throw new CyclicDependencyException( "The dependency is present in a cycle", a, path );
                     }
 
                     children.add( new ResolutionNode( a, this ) );

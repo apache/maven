@@ -42,9 +42,10 @@ public class ArtifactResolutionException
     private List remoteRepositories;
 
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
-                                        List remoteRepositories, String downloadUrl, Throwable t )
+                                        List remoteRepositories, String downloadUrl, List path, Throwable t )
     {
-        super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl ), t );
+        super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl, path ),
+               t );
 
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -55,9 +56,15 @@ public class ArtifactResolutionException
     }
 
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
-                                        List remoteRepositories, String downloadUrl )
+                                        List remoteRepositories, String downloadUrl, Throwable t )
     {
-        super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl ) );
+        this( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl, null, t );
+    }
+
+    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
+                                        List remoteRepositories, String downloadUrl, List path )
+    {
+        super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl, path ) );
 
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -70,7 +77,7 @@ public class ArtifactResolutionException
     private static final String LS = System.getProperty( "line.separator" );
 
     private static String constructMessage( String message, String groupId, String artifactId, String version,
-                                            String type, List remoteRepositories, String downloadUrl )
+                                            String type, List remoteRepositories, String downloadUrl, List path )
     {
         StringBuffer sb = new StringBuffer();
 
@@ -94,6 +101,23 @@ public class ArtifactResolutionException
                     sb.append( ", " );
                 }
             }
+        }
+
+        if ( path != null )
+        {
+            sb.append( LS );
+            sb.append( "Path to dependency: " );
+            sb.append( LS );
+            int num = 1;
+            for ( Iterator i = path.iterator(); i.hasNext(); )
+            {
+                sb.append( "\t" );
+                sb.append( num++ );
+                sb.append( ") " );
+                sb.append( i.next() );
+                sb.append( LS );
+            }
+            sb.append( LS );
         }
 
         if ( downloadUrl != null && !type.equals( "pom" ) )
@@ -120,16 +144,24 @@ public class ArtifactResolutionException
         return sb.toString();
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
+    public ArtifactResolutionException( String message, Artifact artifact, List path, List remoteRepositories,
+                                        Throwable t )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              remoteRepositories, artifact.getDownloadUrl(), t );
+              remoteRepositories, artifact.getDownloadUrl(), path, t );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact )
+    public ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
+    {
+        // TODO: path
+        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
+              remoteRepositories, artifact.getDownloadUrl(), null, t );
+    }
+
+    public ArtifactResolutionException( String message, Artifact artifact, List path )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,
-              artifact.getDownloadUrl() );
+              artifact.getDownloadUrl(), path );
     }
 
     public ArtifactResolutionException( String message, Throwable cause )
