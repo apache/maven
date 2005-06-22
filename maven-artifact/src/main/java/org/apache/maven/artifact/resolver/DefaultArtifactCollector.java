@@ -300,7 +300,7 @@ public class DefaultArtifactCollector
         public List getDependencyTrail()
         {
             List path = new ArrayList( parents );
-            path.add( getKey() );
+            path.add( artifact.getId() );
             return path;
         }
 
