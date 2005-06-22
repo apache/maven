@@ -21,12 +21,21 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.InterpolationFilterReader;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -56,6 +65,22 @@ public class ResourcesMojo
      */
     private List resources;
 
+    /**
+     * Wheter to apply filters during transfer.
+     *
+     * @parameter
+     */
+    private boolean filtering = false;
+
+    /**
+     * The name of the filter property file to use.
+     *
+     * @parameter expression="${basedir}/filter.properties"
+     */
+    private File filterPropertiesFile;
+
+    private Properties filterProperties;
+
     private static final String[] EMPTY_STRING_ARRAY = {};
 
     private static final String[] DEFAULT_INCLUDES = {"**/**"};
@@ -63,6 +88,7 @@ public class ResourcesMojo
     public void execute()
         throws MojoExecutionException
     {
+        initializeFiltering();
         copyResources( resources, outputDirectory );
     }
 
@@ -84,7 +110,7 @@ public class ResourcesMojo
                     destinationFile.getParentFile().mkdirs();
                 }
 
-                FileUtils.copyFile( source, destinationFile );
+                copyFile( source, destinationFile );
             }
         }
         catch ( Exception e )
@@ -95,7 +121,6 @@ public class ResourcesMojo
     }
 
     private Map getJarResources( List resources )
-        throws Exception
     {
         Map resourceEntries = new TreeMap();
 
@@ -150,4 +175,51 @@ public class ResourcesMojo
         return resourceEntries;
     }
 
+    private void initializeFiltering()
+        throws MojoExecutionException
+    {
+        if ( filtering )
+        {
+            try
+            {
+                filterProperties = PropertyUtils.loadPropertyFile( filterPropertiesFile, true, true );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Error loading property file '" + filterPropertiesFile + "'", e );
+            }
+        }
+    }
+
+    private void copyFile( File from, File to )
+        throws IOException
+    {
+        if ( !filtering )
+        {
+            FileUtils.copyFile( from, to );
+        }
+        else
+        {
+            // buffer so it isn't reading a byte at a time!
+            Reader fileReader = new BufferedReader( new FileReader( from ) );
+            Writer fileWriter = null;
+            try
+            {
+                // support ${token}
+                Reader reader = new InterpolationFilterReader( fileReader, filterProperties, "${", "}" );
+
+                // support @token@
+                reader = new InterpolationFilterReader( reader, filterProperties, "@", "@" );
+
+                fileWriter = new FileWriter( to );
+
+                IOUtil.copy( reader, fileWriter );
+            }
+            finally
+            {
+                IOUtil.close( fileReader );
+                IOUtil.close( fileWriter );
+            }
+        }
+    }
 }
