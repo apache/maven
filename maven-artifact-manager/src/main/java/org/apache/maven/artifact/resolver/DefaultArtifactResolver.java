@@ -31,8 +31,10 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DefaultArtifactResolver
@@ -130,14 +132,35 @@ public class DefaultArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
-                                                         List remoteRepositories, ArtifactRepository localRepository,
+                                                         ArtifactRepository localRepository, List remoteRepositories,
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
+        throws ArtifactResolutionException
+    {
+        return resolveTransitively( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository,
+                                    remoteRepositories, source, filter );
+
+    }
+
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         List remoteRepositories, ArtifactMetadataSource source )
+        throws ArtifactResolutionException
+    {
+        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
+                                    remoteRepositories, source, null );
+    }
+
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         List remoteRepositories, ArtifactMetadataSource source,
+                                                         ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         ArtifactResolutionResult artifactResolutionResult;
 
-        artifactResolutionResult = artifactCollector.collect( artifacts, originatingArtifact, localRepository,
-                                                              remoteRepositories, source, filter, artifactFactory );
+        artifactResolutionResult = artifactCollector.collect( artifacts, originatingArtifact, managedVersions,
+                                                              localRepository, remoteRepositories, source, filter,
+                                                              artifactFactory );
 
         for ( Iterator i = artifactResolutionResult.getArtifacts().iterator(); i.hasNext(); )
         {
@@ -153,7 +176,7 @@ public class DefaultArtifactResolver
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException
     {
-        return resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository, source, null );
+        return resolveTransitively( artifacts, originatingArtifact, localRepository, remoteRepositories, source, null );
     }
 
 }

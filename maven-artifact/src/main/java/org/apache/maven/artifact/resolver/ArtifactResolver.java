@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -43,8 +44,18 @@ public interface ArtifactResolver
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source )
         throws ArtifactResolutionException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, List remoteRepositories,
-                                                  ArtifactRepository localRepository, ArtifactMetadataSource source,
-                                                  ArtifactFilter filter )
+    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                  ArtifactRepository localRepository, List remoteRepositories,
+                                                  ArtifactMetadataSource source, ArtifactFilter filter )
+        throws ArtifactResolutionException;
+
+    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
+                                                  ArtifactRepository localRepository, List remoteRepositories,
+                                                  ArtifactMetadataSource source )
+        throws ArtifactResolutionException;
+
+    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
+                                                  ArtifactRepository localRepository, List remoteRepositories,
+                                                  ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException;
 }

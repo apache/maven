@@ -25,6 +25,8 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -141,17 +143,33 @@ public class DefaultMavenProjectBuilder
         // ----------------------------------------------------------------------
 
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
-        Artifact artifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),
-                                                            project.getVersion(), null, project.getPackaging() );
+        Artifact projectArtifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),
+                                                                   project.getVersion(), null, project.getPackaging() );
 
+        Map managedVersions = createManagedVersionMap( project.getDependencyManagement() );
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
-                                                                                artifact,
-                                                                                project.getRemoteArtifactRepositories(),
+                                                                                projectArtifact, managedVersions,
                                                                                 localRepository,
+                                                                                project.getRemoteArtifactRepositories(),
                                                                                 artifactMetadataSource );
 
         project.setArtifacts( result.getArtifacts() );
         return project;
+    }
+
+    private Map createManagedVersionMap( DependencyManagement dependencyManagement )
+    {
+        Map map = new HashMap();
+        for ( Iterator i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
+        {
+            Dependency d = (Dependency) i.next();
+
+            Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
+                                                                d.getScope(), d.getType(), null );
+
+            map.put( d.getManagementKey(), artifact );
+        }
+        return map;
     }
 
     public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, List externalProfiles )

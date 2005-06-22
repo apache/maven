@@ -561,8 +561,9 @@ public class DefaultPluginManager
                                                             remoteArtifactRepositories );
 
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
+                                                                                        localRepository,
                                                                                         remoteArtifactRepositories,
-                                                                                        localRepository, metadataSource,
+                                                                                        metadataSource,
                                                                                         artifactFilter );
 
                 Set resolved = result.getArtifacts();
@@ -586,7 +587,7 @@ public class DefaultPluginManager
                 ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
 
                 ArtifactResolutionResult distroProvidedResult = artifactResolver
-                    .resolveTransitively( dependencies, pluginArtifact, remoteArtifactRepositories, localRepository,
+                    .resolveTransitively( dependencies, pluginArtifact, localRepository, remoteArtifactRepositories,
                                           metadataSource, distroProvidedFilter );
 
                 Set distroProvided = distroProvidedResult.getArtifacts();
@@ -1023,9 +1024,8 @@ public class DefaultPluginManager
         // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
         // check this with yourkit as a hot spot.
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
-                                                                                artifact,
+                                                                                artifact, context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
-                                                                                context.getLocalRepository(),
                                                                                 sourceReader, filter );
 
         project.setArtifacts( result.getArtifacts() );

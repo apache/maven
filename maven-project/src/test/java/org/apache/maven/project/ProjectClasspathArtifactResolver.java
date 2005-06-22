@@ -107,11 +107,11 @@ public class ProjectClasspathArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
-                                                         List remoteRepositories, ArtifactRepository localRepository,
+                                                         ArtifactRepository localRepository, List remoteRepositories,
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
-        return super.resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository,
+        return super.resolveTransitively( artifacts, originatingArtifact, localRepository, remoteRepositories,
                                           new Source( artifactFactory ), filter );
     }
 

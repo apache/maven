@@ -102,6 +102,7 @@ public class DependenciesTask
                                                                    pom.getVersion(), null, pom.getPackaging() );
 
             List remoteArtifactRepositories = createRemoteArtifactRepositories( getRemoteRepositories() );
+            // TODO: managed dependencies 
             result = resolver.resolveTransitively( artifacts, pomArtifact, remoteArtifactRepositories, localRepo,
                                                    metadataSource );
         }

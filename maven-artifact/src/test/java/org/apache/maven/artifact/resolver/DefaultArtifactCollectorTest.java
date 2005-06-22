@@ -284,8 +284,7 @@ public class DefaultArtifactCollectorTest
     private ArtifactResolutionResult collect( ArtifactSpec a, Artifact managedVersion )
         throws ArtifactResolutionException
     {
-        Map managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(),
-                                                        managedVersion.getVersion() );
+        Map managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(), managedVersion );
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact,
                                           managedVersions, null, null, source, null, artifactFactory );
     }

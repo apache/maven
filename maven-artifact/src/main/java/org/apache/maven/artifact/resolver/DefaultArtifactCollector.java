@@ -92,7 +92,12 @@ public class DefaultArtifactCollector
         Object key = node.getKey();
         if ( managedVersions.containsKey( key ) )
         {
-            node.getArtifact().setVersion( (String) managedVersions.get( key ) );
+            Artifact artifact = (Artifact) managedVersions.get( key );
+            // TODO: apply scope. assign whole artifact, except that the missing bits must be filled in
+            if ( artifact.getVersion() != null )
+            {
+                node.getArtifact().setVersion( artifact.getVersion() );
+            }
         }
 
         ResolutionNode previous = (ResolutionNode) resolvedArtifacts.get( key );
