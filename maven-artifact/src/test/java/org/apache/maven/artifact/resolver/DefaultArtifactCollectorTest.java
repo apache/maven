@@ -114,7 +114,7 @@ public class DefaultArtifactCollectorTest
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
-        ArtifactSpec c = a.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
+        a.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
 
         b.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
 
@@ -131,7 +131,7 @@ public class DefaultArtifactCollectorTest
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
-        ArtifactSpec c = a.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
+        a.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
 
         b.addDependency( "c", "2.0", Artifact.SCOPE_RUNTIME );
 
@@ -148,7 +148,7 @@ public class DefaultArtifactCollectorTest
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
-        ArtifactSpec c = a.addDependency( "c", "3.0", Artifact.SCOPE_RUNTIME );
+        a.addDependency( "c", "3.0", Artifact.SCOPE_RUNTIME );
 
         b.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
 
