@@ -466,7 +466,14 @@ public class PrepareReleaseMojo
 
             scm.setWorkingDirectory( basedir );
 
+            String tag = scm.getTag();
+
+            // No tag here - we suppose user works on correct branch
+            scm.setTag( null );
+
             scm.checkin( message, "pom.xml", null );
+
+            scm.setTag( tag );
         }
         catch ( Exception e )
         {
