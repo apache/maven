@@ -998,6 +998,7 @@ public class DefaultPluginManager
         // TODO: remove doxia
         artifacts.add( "doxia-core" );
         artifacts.add( "maven-reporting-api" );
+        artifacts.add( "plexus-input-handler" );
         artifactFilter = new ExclusionSetFilter( artifacts );
     }
 
