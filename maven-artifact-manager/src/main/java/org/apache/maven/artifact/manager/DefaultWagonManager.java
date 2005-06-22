@@ -434,7 +434,7 @@ public class DefaultWagonManager
     private void handleChecksumFailure( ArtifactRepository repository, String message, Throwable cause )
         throws ChecksumFailedException
     {
-        if ( ArtifactRepository.CHECKSUM_POLICY_FAIL.equals( repository.getChecksumPolicy() ) )
+        if ( repository.failOnChecksumMismatch() )
         {
             throw new ChecksumFailedException( message, cause );
         }

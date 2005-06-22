@@ -61,6 +61,11 @@ public class DebugResolutionListener
         logger.debug( indent + omitted.getId() + " (removed - nearer found: " + kept.getVersion() + ")" );
     }
 
+    public void omitForCycle( Artifact omitted )
+    {
+        logger.debug( indent + omitted.getId() + " (removed - causes a cycle in the graph)" );
+    }
+
     public void updateScope( Artifact artifact, String scope )
     {
         logger.debug( indent + artifact.getId() + " (settings scope to: " + scope + ")" );

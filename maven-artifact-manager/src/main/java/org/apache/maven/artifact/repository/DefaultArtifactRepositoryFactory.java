@@ -26,7 +26,7 @@ public class DefaultArtifactRepositoryFactory
 {
     // TODO: use settings?
     private String globalSnapshotPolicy = null;
-    
+
     private String globalChecksumPolicy = null;
 
     public ArtifactRepository createArtifactRepository( String id, String url,
@@ -34,31 +34,31 @@ public class DefaultArtifactRepositoryFactory
                                                         String snapshotPolicy, String checksumPolicy )
     {
         ArtifactRepository repo = null;
-        
+
         String snapPolicy = snapshotPolicy;
 
         if ( globalSnapshotPolicy != null )
         {
             snapPolicy = globalSnapshotPolicy;
         }
-        
+
         if ( snapPolicy == null )
         {
             snapPolicy = ArtifactRepository.SNAPSHOT_POLICY_NEVER;
         }
-        
+
         String csumPolicy = checksumPolicy;
-        
+
         if ( globalChecksumPolicy != null )
         {
             csumPolicy = globalChecksumPolicy;
         }
-        
+
         if ( csumPolicy == null )
         {
-            csumPolicy = ArtifactRepository.CHECKSUM_POLICY_FAIL;
+            csumPolicy = ArtifactRepository.CHECKSUM_POLICY_WARN;
         }
-        
+
         repo = new DefaultArtifactRepository( id, url, repositoryLayout, snapPolicy, csumPolicy );
 
         return repo;
@@ -68,7 +68,7 @@ public class DefaultArtifactRepositoryFactory
     {
         this.globalSnapshotPolicy = snapshotPolicy;
     }
-    
+
     public void setGlobalChecksumPolicy( String checksumPolicy )
     {
         this.globalChecksumPolicy = checksumPolicy;

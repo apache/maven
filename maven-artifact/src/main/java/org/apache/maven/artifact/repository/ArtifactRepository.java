@@ -58,4 +58,6 @@ public interface ArtifactRepository
     String getId();
 
     String getChecksumPolicy();
+
+    boolean failOnChecksumMismatch();
 }

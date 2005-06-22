@@ -19,8 +19,6 @@
       <scope>runtime</scope>
       <excludes>
         <exclude>ant:ant</exclude>
-        <!-- Temporary until exclusion back in POM -->
-        <exclude>junit:junit</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

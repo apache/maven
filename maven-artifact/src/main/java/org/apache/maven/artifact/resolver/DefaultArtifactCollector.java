@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -150,6 +151,13 @@ public class DefaultArtifactCollector
                     Set artifacts = source.retrieve( child.getArtifact(), localRepository, remoteRepositories );
                     child.addDependencies( artifacts, filter );
                 }
+                catch ( CyclicDependencyException e )
+                {
+                    // would like to throw this, but we have crappy stuff in the repo
+                    // no logger to use here either just now
+                    fireEvent( ResolutionListener.OMIT_FOR_CYCLE, listeners,
+                               new ResolutionNode( e.getArtifact(), child ) );
+                }
                 catch ( ArtifactMetadataRetrievalException e )
                 {
                     child.getArtifact().setDependencyTrail( node.getDependencyTrail() );
@@ -226,6 +234,9 @@ public class DefaultArtifactCollector
                 case ResolutionListener.OMIT_FOR_NEARER:
                     listener.omitForNearer( node.getArtifact(), replacement );
                     break;
+                case ResolutionListener.OMIT_FOR_CYCLE:
+                    listener.omitForCycle( node.getArtifact() );
+                    break;
                 case ResolutionListener.UPDATE_SCOPE:
                     listener.updateScope( node.getArtifact(), replacement.getScope() );
                     break;
@@ -248,11 +259,14 @@ public class DefaultArtifactCollector
 
         private final int depth;
 
+        private final ResolutionNode parent;
+
         public ResolutionNode( Artifact artifact )
         {
             this.artifact = artifact;
             this.depth = 0;
             this.parents = Collections.EMPTY_LIST;
+            this.parent = null;
         }
 
         public ResolutionNode( Artifact artifact, ResolutionNode parent )
@@ -262,6 +276,7 @@ public class DefaultArtifactCollector
             this.parents = new ArrayList();
             this.parents.addAll( parent.parents );
             this.parents.add( parent.getKey() );
+            this.parent = parent;
         }
 
         public Artifact getArtifact()
@@ -289,7 +304,7 @@ public class DefaultArtifactCollector
                     {
                         a.setDependencyTrail( getDependencyTrail() );
 
-                        throw new CyclicDependencyException( "The dependency is present in a cycle", a );
+                        throw new CyclicDependencyException( "A dependency has introduced a cycle", a );
                     }
 
                     children.add( new ResolutionNode( a, this ) );
@@ -299,8 +314,13 @@ public class DefaultArtifactCollector
 
         public List getDependencyTrail()
         {
-            List path = new ArrayList( parents );
-            path.add( artifact.getId() );
+            List path = new LinkedList();
+            ResolutionNode node = this;
+            while ( node != null )
+            {
+                path.add( 0, node.getArtifact().getId() );
+                node = node.parent;
+            }
             return path;
         }
 

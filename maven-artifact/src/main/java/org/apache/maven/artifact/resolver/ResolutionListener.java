@@ -42,6 +42,8 @@ public interface ResolutionListener
 
     int MANAGE_ARTIFACT = 7;
 
+    int OMIT_FOR_CYCLE = 8;
+
     void testArtifact( Artifact node );
 
     void startProcessChildren( Artifact artifact );
@@ -55,4 +57,6 @@ public interface ResolutionListener
     void updateScope( Artifact artifact, String scope );
 
     void manageArtifact( Artifact artifact, Artifact replacement );
+
+    void omitForCycle( Artifact artifact );
 }

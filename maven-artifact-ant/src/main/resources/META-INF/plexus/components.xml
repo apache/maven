@@ -2,7 +2,7 @@
 
 <component-set>
   <components>
-    <!--
+<!--
      |
      | WagonManager
      |
@@ -12,7 +12,7 @@
       <implementation>org.apache.maven.artifact.ant.CustomWagonManager</implementation>
     </component>
 
-    <!--
+<!--
      |
      | Transformations
      |
@@ -27,7 +27,7 @@
       </requirements>
     </component>
 
-    <!--
+<!--
      |
      | Resolver
      |
@@ -46,10 +46,13 @@
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
+        </requirement>
       </requirements>
     </component>
 
-    <!--
+<!--
      |
      | ArtifactInstaller
      |
@@ -65,7 +68,7 @@
       </requirements>
     </component>
 
-    <!--
+<!--
      |
      | ArtifactDeployer
      |
@@ -96,7 +99,7 @@
       <implementation>org.apache.maven.artifact.repository.layout.LegacyRepositoryLayout</implementation>
     </component>
 
-    <!--
+<!--
      |
      | ArtifactHandlerManager
      |
@@ -181,7 +184,12 @@
       </configuration>
     </component>
 
-    <!--
+    <component>
+      <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
+      <implementation>org.apache.maven.artifact.resolver.DefaultArtifactCollector</implementation>
+    </component>
+
+<!--
      |
      |
      |
@@ -190,7 +198,7 @@
       <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
       <implementation>org.apache.maven.project.interpolation.RegexBasedModelInterpolator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -233,7 +241,7 @@
         </requirement>
       </requirements>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -242,7 +250,7 @@
       <role>org.apache.maven.profiles.activation.ProfileActivationCalculator</role>
       <implementation>org.apache.maven.profiles.activation.ProfileActivationCalculator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -252,7 +260,7 @@
       <role-hint>always-on</role-hint>
       <implementation>org.apache.maven.profiles.activation.AlwaysOnProfileActivator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -262,7 +270,7 @@
       <role-hint>jdk-prefix</role-hint>
       <implementation>org.apache.maven.profiles.activation.JdkPrefixProfileActivator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -272,7 +280,7 @@
       <role-hint>system-property</role-hint>
       <implementation>org.apache.maven.profiles.activation.SystemPropertyProfileActivator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -282,7 +290,7 @@
       <role-hint>explicit-listing</role-hint>
       <implementation>org.apache.maven.profiles.activation.ExplicitListingProfileActivator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -291,7 +299,7 @@
       <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
       <implementation>org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -300,7 +308,7 @@
       <role>org.apache.maven.project.validation.ModelValidator</role>
       <implementation>org.apache.maven.project.validation.DefaultModelValidator</implementation>
     </component>
-    <!--
+<!--
      |
      |
      |
@@ -345,7 +353,7 @@
       <implementation>org.apache.maven.wagon.providers.scm.ScmWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <requirements>
-        <requirement> 
+        <requirement>
           <role>org.apache.maven.scm.manager.ScmManager</role>
         </requirement>
       </requirements>
@@ -492,6 +500,5 @@
       <role-hint>update</role-hint>
       <implementation>org.apache.maven.scm.provider.svn.command.update.SvnUpdateCommand</implementation>
     </component>
-
   </components>
 </component-set>

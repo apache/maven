@@ -1,5 +1,5 @@
 <project name="foo" default="foo" xmlns:artifact="urn:maven-artifact-ant">
-  <!--
+<!--
     You either need to run the the 'initTaskDefs' task below and
     define the artifact namespace like above (choose anything you
     like except strings that start with 'antlib:'),
@@ -18,16 +18,12 @@
   -->
 
   <target name="initTaskDefs">
-    <!-- don't forget to set the value! -->
-    <property name="maven.artifact-ant.lib.dir" value="${user.home}/work/opensource/m2/maven-artifact-ant/target/"/>
     <path id="maven.classpath">
-      <pathelement location="${maven.artifact-ant.lib.dir}/maven-artifact-ant-2.0-SNAPSHOT-dep.jar"/>
-      <pathelement location="${maven.artifact-ant.lib.dir}maven-artifact-ant-2.0-SNAPSHOT.jar"/>
+      <!-- don't forget to set the value! -->
+      <pathelement location="target/maven-artifact-ant-2.0-SNAPSHOT-dep.jar"/>
     </path>
 
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-      uri="urn:maven-artifact-ant"
-    >
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
       <classpath refid="maven.classpath"/>
     </typedef>
   </target>
@@ -49,22 +45,22 @@
 
     <artifact:dependencies pathId="dependency.classpath" filesetId="dependency.fileset">
       <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test" version="1.0-alpha-2">
-        <exclusion groupId="junit" artifactId="junit" />
+        <exclusion groupId="junit" artifactId="junit"/>
       </dependency>
       <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
       <localRepository refid="local.repository"/>
     </artifact:dependencies>
 
     <copy todir="target/files">
-      <fileset refid="dependency.fileset" />
+      <fileset refid="dependency.fileset"/>
     </copy>
 
     <artifact:dependencies filesetId="my.dependency.fileset">
-      <pom refid="maven.project" />
+      <pom refid="maven.project"/>
     </artifact:dependencies>
 
     <copy todir="target/my-dependencies">
-      <fileset refid="my.dependency.fileset" />
+      <fileset refid="my.dependency.fileset"/>
     </copy>
 
     <artifact:install file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
@@ -85,21 +81,21 @@
   </target>
 
   <target name="test-scm" depends="initTaskDefs">
-    <mkdir dir="target" />
+    <mkdir dir="target"/>
 
     <pathconvert targetos="unix" property="repo.path.unix">
       <map from="c:" to=""/>
       <path>
-        <pathelement location="${basedir}/target/deployment-repo-scm" />
+        <pathelement location="${basedir}/target/deployment-repo-scm"/>
       </path>
     </pathconvert>
 
-    <property name="scm.url" value="file://${repo.path.unix}" />
+    <property name="scm.url" value="file://${repo.path.unix}"/>
 
-    <delete dir="${repo.path.unix}" />
+    <delete dir="${repo.path.unix}"/>
 
     <exec executable="svnadmin" failonerror="true">
-      <arg line="create ${repo.path.unix}" />
+      <arg line="create ${repo.path.unix}"/>
     </exec>
 
     <artifact:localRepository id="local.repository" location="${basedir}/target/local-repo" layout="default"/>
@@ -113,14 +109,14 @@
     </artifact:dependencies>
 
     <exec executable="svn" dir="${basedir}/target/local-repo" failonerror="true">
-      <arg line="import -m 'import' ${scm.url}" />
+      <arg line="import -m 'import' ${scm.url}"/>
     </exec>
 
-    <delete dir="${basedir}/target/local-repo-scm" />
+    <delete dir="${basedir}/target/local-repo-scm"/>
 
     <!-- Could the SCM provider initialise this? -->
     <exec executable="svn" dir="${basedir}/target" failonerror="true">
-      <arg line="co ${scm.url} -N local-repo-scm" />
+      <arg line="co ${scm.url} -N local-repo-scm"/>
     </exec>
 
     <artifact:localRepository id="local.repository.scm" location="${basedir}/target/local-repo-scm" layout="default"/>
@@ -134,7 +130,7 @@
 
     <artifact:deploy file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
       <localRepository refid="local.repository.scm"/>
-      <remoteRepository refid="deploy.repository" />
+      <remoteRepository refid="deploy.repository"/>
       <pom refid="maven.project"/>
     </artifact:deploy>
   </target>
