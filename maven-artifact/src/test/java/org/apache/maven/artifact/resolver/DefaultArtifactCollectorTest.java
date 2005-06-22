@@ -109,6 +109,57 @@ public class DefaultArtifactCollectorTest
                       res.getArtifacts() );
     }
 
+    public void testResolveCompileScopeOverTestScope()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec c = a.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
+
+        b.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
+
+        Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
+
+        ArtifactResolutionResult res = collect( a );
+        assertEquals( "Check artifact list",
+                      new HashSet( Arrays.asList( new Object[]{a.artifact, b.artifact, modifiedC} ) ),
+                      res.getArtifacts() );
+    }
+
+    public void testResolveRuntimeScopeOverTestScope()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec c = a.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
+
+        b.addDependency( "c", "2.0", Artifact.SCOPE_RUNTIME );
+
+        Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_RUNTIME ).artifact;
+
+        ArtifactResolutionResult res = collect( a );
+        assertEquals( "Check artifact list",
+                      new HashSet( Arrays.asList( new Object[]{a.artifact, b.artifact, modifiedC} ) ),
+                      res.getArtifacts() );
+    }
+
+    public void testResolveCompileScopeOverRuntimeScope()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec c = a.addDependency( "c", "3.0", Artifact.SCOPE_RUNTIME );
+
+        b.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
+
+        Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
+
+        ArtifactResolutionResult res = collect( a );
+        assertEquals( "Check artifact list",
+                      new HashSet( Arrays.asList( new Object[]{a.artifact, b.artifact, modifiedC} ) ),
+                      res.getArtifacts() );
+    }
+
     private ArtifactResolutionResult collect( ArtifactSpec a )
         throws ArtifactResolutionException
     {
@@ -118,8 +169,13 @@ public class DefaultArtifactCollectorTest
 
     private ArtifactSpec createArtifact( String id, String version )
     {
+        return createArtifact( id, version, null );
+    }
+
+    private ArtifactSpec createArtifact( String id, String version, String scope )
+    {
         ArtifactSpec spec = new ArtifactSpec();
-        spec.artifact = artifactFactory.createArtifact( "test", id, version, null, "jar" );
+        spec.artifact = artifactFactory.createArtifact( "test", id, version, scope, "jar" );
         source.artifacts.put( spec.artifact.getId(), spec );
         return spec;
     }
@@ -132,7 +188,12 @@ public class DefaultArtifactCollectorTest
 
         public ArtifactSpec addDependency( String id, String version )
         {
-            ArtifactSpec dep = createArtifact( id, version );
+            return addDependency( id, version, null );
+        }
+
+        public ArtifactSpec addDependency( String id, String version, String scope )
+        {
+            ArtifactSpec dep = createArtifact( id, version, scope );
             dependencies.add( dep.artifact );
             return dep;
         }
