@@ -65,7 +65,7 @@ public class DefaultArtifactCollectorTest
         this.projectArtifact = createArtifact( "project", "1.0", null );
     }
 
-    public void disabledtestCircularDependencyNotIncludingCurrentProject()
+    public void testCircularDependencyNotIncludingCurrentProject()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
@@ -82,7 +82,7 @@ public class DefaultArtifactCollectorTest
         }
     }
 
-    public void disabledtestCircularDependencyIncludingCurrentProject()
+    public void testCircularDependencyIncludingCurrentProject()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
@@ -132,7 +132,7 @@ public class DefaultArtifactCollectorTest
                       res.getArtifacts() );
     }
 
-    public void disabledtestResolveManagedVersion()
+    public void testResolveManagedVersion()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
@@ -284,9 +284,10 @@ public class DefaultArtifactCollectorTest
     private ArtifactResolutionResult collect( ArtifactSpec a, Artifact managedVersion )
         throws ArtifactResolutionException
     {
+        Map managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(),
+                                                        managedVersion.getVersion() );
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact,
-                                          Collections.singleton( managedVersion ), null, null, source, null,
-                                          artifactFactory );
+                                          managedVersions, null, null, source, null, artifactFactory );
     }
 
     private ArtifactSpec createArtifact( String id, String version )

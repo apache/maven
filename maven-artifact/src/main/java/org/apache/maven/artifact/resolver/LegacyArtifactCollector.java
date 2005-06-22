@@ -48,11 +48,11 @@ public class LegacyArtifactCollector
                                              ArtifactFactory artifactFactory )
         throws ArtifactResolutionException
     {
-        return collect( artifacts, originatingArtifact, Collections.EMPTY_SET, localRepository, remoteRepositories,
+        return collect( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository, remoteRepositories,
                         source, filter, artifactFactory );
     }
 
-    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Set managedVersions,
+    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                              ArtifactRepository localRepository, List remoteRepositories,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
                                              ArtifactFactory artifactFactory )

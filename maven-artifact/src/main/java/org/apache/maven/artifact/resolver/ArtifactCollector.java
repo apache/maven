@@ -24,6 +24,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 /**
  * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
@@ -39,7 +40,7 @@ public interface ArtifactCollector
                                       ArtifactFactory artifactFactory )
         throws ArtifactResolutionException;
 
-    ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Set managedVersions,
+    ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                       ArtifactRepository localRepository, List remoteRepositories,
                                       ArtifactMetadataSource source, ArtifactFilter filter,
                                       ArtifactFactory artifactFactory )

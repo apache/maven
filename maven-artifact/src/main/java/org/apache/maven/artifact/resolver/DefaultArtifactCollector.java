@@ -47,11 +47,11 @@ public class DefaultArtifactCollector
                                              ArtifactFactory artifactFactory )
         throws ArtifactResolutionException
     {
-        return collect( artifacts, originatingArtifact, Collections.EMPTY_SET, localRepository, remoteRepositories,
+        return collect( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository, remoteRepositories,
                         source, filter, artifactFactory );
     }
 
-    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Set managedVersions,
+    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                              ArtifactRepository localRepository, List remoteRepositories,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
                                              ArtifactFactory artifactFactory )
@@ -62,7 +62,8 @@ public class DefaultArtifactCollector
         ResolutionNode root = new ResolutionNode( originatingArtifact );
         root.addDependencies( artifacts, filter );
 
-        recurse( root, resolvedArtifacts, localRepository, remoteRepositories, source, filter, artifactFactory );
+        recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
+                 artifactFactory );
 
         Set set = new HashSet();
 
@@ -82,12 +83,19 @@ public class DefaultArtifactCollector
         return result;
     }
 
-    private void recurse( ResolutionNode node, Map resolvedArtifacts, ArtifactRepository localRepository,
-                          List remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter,
-                          ArtifactFactory artifactFactory )
+    private void recurse( ResolutionNode node, Map resolvedArtifacts, Map managedVersions,
+                          ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
+                          ArtifactFilter filter, ArtifactFactory artifactFactory )
         throws ArtifactResolutionException
     {
-        ResolutionNode previous = (ResolutionNode) resolvedArtifacts.get( node.getKey() );
+        // TODO: conflict resolvers, shouldn't be munging original artifact perhaps?
+        Object key = node.getKey();
+        if ( managedVersions.containsKey( key ) )
+        {
+            node.getArtifact().setVersion( (String) managedVersions.get( key ) );
+        }
+
+        ResolutionNode previous = (ResolutionNode) resolvedArtifacts.get( key );
         if ( previous != null )
         {
             // TODO: conflict resolvers
@@ -158,7 +166,7 @@ public class DefaultArtifactCollector
             }
         }
 
-        resolvedArtifacts.put( node.getKey(), node );
+        resolvedArtifacts.put( key, node );
 
         for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
         {
@@ -176,7 +184,7 @@ public class DefaultArtifactCollector
                                                                      remoteRepositories, e );
                 }
 
-                recurse( child, resolvedArtifacts, localRepository, remoteRepositories, source, filter,
+                recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
                          artifactFactory );
             }
         }
