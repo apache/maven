@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -65,7 +66,7 @@ public class MailingListsReport
      */
     public String getName( Locale locale )
     {
-        return "Mailing Lists";
+        return getBundle( locale ).getString( "report.mailing-lists.name" );
     }
 
     /**
@@ -81,7 +82,7 @@ public class MailingListsReport
      */
     public String getDescription( Locale locale )
     {
-        return "This document provides subscription and archive information for this project's mailing lists.";
+        return getBundle( locale ).getString( "report.mailing-lists.description" );
     }
 
     /**
@@ -116,7 +117,7 @@ public class MailingListsReport
     {
         try
         {
-            MailingListsRenderer r = new MailingListsRenderer( getSink(), getProject().getModel() );
+            MailingListsRenderer r = new MailingListsRenderer( getSink(), getProject().getModel(), locale );
 
             r.render();
         }
@@ -139,11 +140,15 @@ public class MailingListsReport
     {
         private Model model;
 
-        public MailingListsRenderer( Sink sink, Model model )
+        private Locale locale;
+
+        public MailingListsRenderer( Sink sink, Model model, Locale locale )
         {
             super( sink );
 
             this.model = model;
+
+            this.locale = locale;
         }
 
         /**
@@ -152,7 +157,7 @@ public class MailingListsReport
         // How to i18n these ...
         public String getTitle()
         {
-            return "Project Mailing Lists";
+            return getBundle( locale ).getString( "report.mailing-lists.title" );
         }
 
         /**
@@ -165,17 +170,17 @@ public class MailingListsReport
             if ( model.getMailingLists().isEmpty() )
             {
                 // TODO: should the report just be excluded?
-                paragraph( "There are no mailing lists currently associated with this project." );
+                paragraph( getBundle( locale ).getString( "report.mailing-lists.nolist" ) );
             }
             else
             {
-                paragraph( "These are the mailing lists that have been established for this project. For each list, " +
-                           "there is a subscribe, unsubscribe, and an archive link." );
+                paragraph( getBundle( locale ).getString( "report.mailing-lists.intro" ) );
 
                 startTable();
 
                 // To beautify the display
                 boolean otherArchives = false;
+
                 for ( Iterator i = model.getMailingLists().iterator(); i.hasNext(); )
                 {
                     MailingList m = (MailingList) i.next();
@@ -185,13 +190,25 @@ public class MailingListsReport
                     }
                 }
 
+                String name = getBundle( locale ).getString( "report.mailing-lists.column.name" );
+
+                String subscribe = getBundle( locale ).getString( "report.mailing-lists.column.subscribe" );
+
+                String unsubscribe = getBundle( locale ).getString( "report.mailing-lists.column.unsubscribe" );
+
+                String post = getBundle( locale ).getString( "report.mailing-lists.column.post" );
+
+                String archive = getBundle( locale ).getString( "report.mailing-lists.column.archive" );
+
+                String archivesOther = getBundle( locale ).getString( "report.mailing-lists.column.otherArchives" );
+
                 if ( otherArchives )
                 {
-                    tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Post", "Archive", "Other Archives"} );
+                    tableHeader( new String[]{name, subscribe, unsubscribe, post, archive, archivesOther} );
                 }
                 else
                 {
-                    tableHeader( new String[]{"Name", "Subscribe", "Unsubscribe", "Post", "Archive"} );
+                    tableHeader( new String[]{name, subscribe, unsubscribe, post, archive} );
                 }
 
                 for ( Iterator i = model.getMailingLists().iterator(); i.hasNext(); )
@@ -216,7 +233,7 @@ public class MailingListsReport
 
                     if ( m.getSubscribe() != null ) 
                     {
-                        textRow.add( "Subscribe" );
+                        textRow.add( subscribe );
                         hrefRow.add( m.getSubscribe() );
                     } 
                     else 
@@ -227,7 +244,7 @@ public class MailingListsReport
 
                     if ( m.getUnsubscribe() != null ) 
                     {
-                        textRow.add( "Unsubscribe" );
+                        textRow.add( unsubscribe );
                         hrefRow.add( m.getUnsubscribe() );
                     } 
                     else 
@@ -238,7 +255,7 @@ public class MailingListsReport
 
                     if ( m.getPost() != null ) 
                     {
-                        textRow.add( "Post" );
+                        textRow.add( post );
                         hrefRow.add( m.getPost() );
                     } 
                     else 
@@ -323,6 +340,11 @@ public class MailingListsReport
             }
             endSection();
         }
+    }
+    
+    private static ResourceBundle getBundle( Locale locale )
+    {
+        return ResourceBundle.getBundle("project-info-report", locale, MailingListsReport.class.getClassLoader() );
     }
 
     /**
