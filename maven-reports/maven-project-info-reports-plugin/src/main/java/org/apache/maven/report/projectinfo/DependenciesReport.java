@@ -28,6 +28,7 @@ import org.codehaus.doxia.site.renderer.SiteRenderer;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @goal dependencies
@@ -64,7 +65,7 @@ public class DependenciesReport
      */
     public String getName( Locale locale )
     {
-        return "Dependencies";
+        return getBundle( locale ).getString( "report.dependencies.name" );
     }
 
     /**
@@ -80,7 +81,7 @@ public class DependenciesReport
      */
     public String getDescription( Locale locale )
     {
-        return "This document lists the projects dependencies and provides information on each dependency.";
+        return getBundle( locale ).getString( "report.dependencies.description" );
     }
 
     /**
@@ -115,7 +116,7 @@ public class DependenciesReport
     {
         try
         {
-            DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject().getModel() );
+            DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject().getModel(), locale );
 
             r.render();
         }
@@ -138,17 +139,21 @@ public class DependenciesReport
     {
         private Model model;
 
-        public DependenciesRenderer( Sink sink, Model model )
+        private Locale locale;
+
+        public DependenciesRenderer( Sink sink, Model model, Locale locale )
         {
             super( sink );
 
             this.model = model;
+
+            this.locale = locale;
         }
 
         // How to i18n these ...
         public String getTitle()
         {
-            return "Project Dependencies";
+            return getBundle( locale ).getString( "report.dependencies.title" );
         }
 
         public void renderBody()
@@ -158,17 +163,21 @@ public class DependenciesReport
             if ( model.getDependencies().isEmpty() )
             {
                 // TODO: should the report just be excluded?
-                paragraph( "There are no dependencies for this project. It is a standalone " +
-                           "application that does not depend on any other project." );
+                paragraph( getBundle( locale ).getString( "report.dependencies.nolist" ) );
             }
             else
             {
                 startTable();
 
-                tableCaption( "The following is a list of dependencies for this project. These dependencies " +
-                              "are required to compile and run the application:" );
+                tableCaption( getBundle( locale ).getString( "report.dependencies.intro" ) );
 
-                tableHeader( new String[]{"GroupId", "ArtifactId", "Version"} );
+                String groupId = getBundle( locale ).getString( "report.dependencies.column.groupId" );
+
+                String artifactId = getBundle( locale ).getString( "report.dependencies.column.artifactId" );
+
+                String version = getBundle( locale ).getString( "report.dependencies.column.version" );
+
+                tableHeader( new String[]{groupId, artifactId, version} );
 
                 for ( Iterator i = model.getDependencies().iterator(); i.hasNext(); )
                 {
@@ -182,6 +191,10 @@ public class DependenciesReport
 
             endSection();
         }
+    }
 
+    private static ResourceBundle getBundle( Locale locale )
+    {
+        return ResourceBundle.getBundle("project-info-report", locale, DependenciesReport.class.getClassLoader() );
     }
 }
