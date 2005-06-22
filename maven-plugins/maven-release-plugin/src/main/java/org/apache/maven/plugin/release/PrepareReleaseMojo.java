@@ -550,6 +550,8 @@ public class PrepareReleaseMojo
         {
             ScmBean scm = getScm();
 
+            scm.setWorkingDirectory( basedir );
+
             scm.setTag( tag );
 
             getLog().info( "Tagging release with the label " + tag + "." );
