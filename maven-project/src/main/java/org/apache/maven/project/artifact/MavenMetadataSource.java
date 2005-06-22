@@ -21,25 +21,17 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -64,13 +56,6 @@ public class MavenMetadataSource
      */
     private MavenXpp3Reader reader = new MavenXpp3Reader();
 
-    public MavenMetadataSource( ArtifactResolver artifactResolver, ArtifactFactory artifactFactory )
-    {
-        this.artifactResolver = artifactResolver;
-        this.mavenProjectBuilder = null;
-        this.artifactFactory = artifactFactory;
-    }
-
     public MavenMetadataSource( ArtifactResolver artifactResolver, MavenProjectBuilder projectBuilder,
                                 ArtifactFactory artifactFactory )
     {
@@ -80,64 +65,27 @@ public class MavenMetadataSource
     }
 
     public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
-        throws ArtifactMetadataRetrievalException, ArtifactResolutionException
+        throws ArtifactMetadataRetrievalException
     {
         // TODO: only metadata is really needed - resolve as metadata
         Artifact pomArtifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
                                                                artifact.getVersion(), artifact.getScope(), "pom" );
 
+        // TODO: this a very thin wrapper around a project builder - is it needed?
         List dependencies = null;
 
         // Use the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
         // associated artifacts.
-        if ( mavenProjectBuilder != null )
+        try
         {
-            try
-            {
-                MavenProject p = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories,
-                                                                          localRepository );
-                dependencies = p.getDependencies();
-                artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
-            }
+            MavenProject p = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories,
+                                                                      localRepository );
+            dependencies = p.getDependencies();
+            artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
         }
-        else
+        catch ( ProjectBuildingException e )
         {
-            // there is code in plexus that uses this (though it shouldn't) so we
-            // need to be able to not have a project builder
-            // TODO: remove - which then makes this a very thin wrapper around a project builder - is it needed?
-
-            artifactResolver.resolve( pomArtifact, remoteRepositories, localRepository );
-
-            FileReader reader = null;
-            try
-            {
-//                String path = localRepository.pathOfMetadata( new ProjectArtifactMetadata( artifact, null ) );
-//                File file = new File( localRepository.getBasedir(), path );
-                File file = pomArtifact.getFile();
-                reader = new FileReader( file );
-                Model model = this.reader.read( reader );
-                dependencies = model.getDependencies();
-            }
-            catch ( FileNotFoundException e )
-            {
-                throw new ArtifactMetadataRetrievalException( "Unable to find the metadata file", e );
-            }
-            catch ( IOException e )
-            {
-                throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new ArtifactMetadataRetrievalException( "Unable to parse the metadata file", e );
-            }
-            finally
-            {
-                IOUtil.close( reader );
-            }
+            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
         }
         return createArtifacts( artifactFactory, dependencies, artifact.getScope(), artifact.getDependencyFilter() );
     }

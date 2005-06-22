@@ -181,14 +181,14 @@ public class DefaultMavenProjectBuilder
     }
 
     public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, List externalProfiles )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException
     {
         return buildFromSourceFile( projectDescriptor, localRepository, externalProfiles );
     }
 
     private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository,
                                               List externalProfiles )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
 
@@ -213,7 +213,7 @@ public class DefaultMavenProjectBuilder
 
     public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                              ArtifactRepository localRepository )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException
     {
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
@@ -222,13 +222,21 @@ public class DefaultMavenProjectBuilder
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                            ArtifactRepository localRepository )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException
     {
         Model model = getCachedModel( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
         if ( model == null )
         {
             // TODO: can't assume artifact is a POM
-            artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
+            try
+            {
+                artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                // TODO: a not found would be better vs other errors
+                throw new ProjectBuildingException( "Unable to find the POM in the repository", e );
+            }
 
 //                String path = localRepository.pathOfMetadata( new ProjectArtifactMetadata( artifact, null ) );
 //                File file = new File( localRepository.getBasedir(), path );
@@ -257,7 +265,7 @@ public class DefaultMavenProjectBuilder
 
     private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository,
                                 List externalProfiles )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
 
@@ -438,7 +446,7 @@ public class DefaultMavenProjectBuilder
 
     private MavenProject assembleLineage( Model model, LinkedList lineage, List aggregatedRemoteWagonRepositories,
                                           ArtifactRepository localRepository )
-        throws ProjectBuildingException, ArtifactResolutionException
+        throws ProjectBuildingException
     {
         if ( !model.getRepositories().isEmpty() )
         {

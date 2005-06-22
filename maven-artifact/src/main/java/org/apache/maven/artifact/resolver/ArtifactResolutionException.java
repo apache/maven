@@ -144,24 +144,16 @@ public class ArtifactResolutionException
         return sb.toString();
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, List path, List remoteRepositories,
-                                        Throwable t )
-    {
-        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              remoteRepositories, artifact.getDownloadUrl(), path, t );
-    }
-
     public ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
     {
-        // TODO: path
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              remoteRepositories, artifact.getDownloadUrl(), null, t );
+              remoteRepositories, artifact.getDownloadUrl(), artifact.getDependencyTrail(), t );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, List path )
+    public ArtifactResolutionException( String message, Artifact artifact )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,
-              artifact.getDownloadUrl(), path );
+              artifact.getDownloadUrl(), artifact.getDependencyTrail() );
     }
 
     public ArtifactResolutionException( String message, Throwable cause )

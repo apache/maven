@@ -337,7 +337,7 @@ public class DefaultArtifactCollectorTest
         Map artifacts = new HashMap();
 
         public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
-            throws ArtifactMetadataRetrievalException, ArtifactResolutionException
+            throws ArtifactMetadataRetrievalException
         {
             ArtifactSpec a = (ArtifactSpec) artifacts.get( artifact.getId() );
             return createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),

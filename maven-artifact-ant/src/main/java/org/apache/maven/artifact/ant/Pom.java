@@ -17,7 +17,6 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.DependencyManagement;
@@ -91,7 +90,7 @@ public class Pom
         }
         return instance;
     }
-    
+
     public void setMavenProject( MavenProject mavenProject )
     {
         getInstance().mavenProject = mavenProject;
@@ -118,10 +117,6 @@ public class Pom
                 mavenProject = builder.build( file, localRepository, Collections.EMPTY_LIST );
             }
             catch ( ProjectBuildingException e )
-            {
-                throw new BuildException( "Unable to build project: " + file, e );
-            }
-            catch ( ArtifactResolutionException e )
             {
                 throw new BuildException( "Unable to build project: " + file, e );
             }

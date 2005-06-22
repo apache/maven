@@ -18,8 +18,6 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 
-import java.util.List;
-
 /**
  * Indiciates a cycle in the dependency graph.
  *
@@ -29,8 +27,8 @@ import java.util.List;
 public class CyclicDependencyException
     extends ArtifactResolutionException
 {
-    public CyclicDependencyException( String message, Artifact artifact, List path )
+    public CyclicDependencyException( String message, Artifact artifact )
     {
-        super( message, artifact, path );
+        super( message, artifact );
     }
 }

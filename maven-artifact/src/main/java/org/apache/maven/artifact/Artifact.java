@@ -101,4 +101,8 @@ public interface Artifact
     void setDependencyFilter( ArtifactFilter artifactFilter );
 
     ArtifactHandler getArtifactHandler();
+
+    List getDependencyTrail();
+
+    void setDependencyTrail( List dependencyTrail );
 }

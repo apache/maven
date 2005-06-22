@@ -72,7 +72,11 @@ public class DefaultArtifactCollector
             ResolutionNode node = (ResolutionNode) i.next();
             if ( node != root )
             {
-                set.add( node.getArtifact() );
+                Artifact artifact = node.getArtifact();
+
+                artifact.setDependencyTrail( node.getDependencyTrail() );
+
+                set.add( artifact );
             }
         }
 
@@ -86,7 +90,7 @@ public class DefaultArtifactCollector
     private void recurse( ResolutionNode node, Map resolvedArtifacts, Map managedVersions,
                           ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
                           ArtifactFilter filter, ArtifactFactory artifactFactory )
-        throws ArtifactResolutionException
+        throws CyclicDependencyException, TransitiveArtifactResolutionException
     {
         // TODO: conflict resolvers, shouldn't be munging original artifact perhaps?
         Object key = node.getKey();
@@ -185,6 +189,7 @@ public class DefaultArtifactCollector
                 }
                 catch ( ArtifactMetadataRetrievalException e )
                 {
+                    child.getArtifact().setDependencyTrail( node.getDependencyTrail() );
                     throw new TransitiveArtifactResolutionException( e.getMessage(), child.getArtifact(),
                                                                      remoteRepositories, e );
                 }
@@ -195,12 +200,9 @@ public class DefaultArtifactCollector
         }
     }
 
-
     private static class ResolutionNode
     {
         private Artifact artifact;
-
-        private final ResolutionNode parent;
 
         private List children = null;
 
@@ -211,7 +213,6 @@ public class DefaultArtifactCollector
         public ResolutionNode( Artifact artifact )
         {
             this.artifact = artifact;
-            this.parent = null;
             this.depth = 0;
             this.parents = Collections.EMPTY_LIST;
         }
@@ -219,7 +220,6 @@ public class DefaultArtifactCollector
         public ResolutionNode( Artifact artifact, ResolutionNode parent )
         {
             this.artifact = artifact;
-            this.parent = parent;
             this.depth = parent.depth + 1;
             this.parents = new ArrayList();
             this.parents.addAll( parent.parents );
@@ -249,14 +249,21 @@ public class DefaultArtifactCollector
                 {
                     if ( parents.contains( a.getDependencyConflictId() ) )
                     {
-                        List path = new ArrayList( parents );
-                        path.add( getKey() );
-                        throw new CyclicDependencyException( "The dependency is present in a cycle", a, path );
+                        a.setDependencyTrail( getDependencyTrail() );
+
+                        throw new CyclicDependencyException( "The dependency is present in a cycle", a );
                     }
 
                     children.add( new ResolutionNode( a, this ) );
                 }
             }
+        }
+
+        public List getDependencyTrail()
+        {
+            List path = new ArrayList( parents );
+            path.add( getKey() );
+            return path;
         }
 
         public boolean isResolved()

@@ -62,14 +62,11 @@ public class DefaultArtifact
 
     private final ArtifactHandler artifactHandler;
 
+    private List dependencyTrail;
+
     // TODO: direct all through the artifact factory
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            String version,
-                            String scope,
-                            String type,
-                            String classifier,
-                            ArtifactHandler artifactHandler )
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
+                            String classifier, ArtifactHandler artifactHandler )
     {
         this.groupId = groupId;
 
@@ -90,14 +87,15 @@ public class DefaultArtifact
 
     private void validateIdentity()
     {
-        if( empty( groupId ) )
+        if ( empty( groupId ) )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The groupId cannot be empty." );
         }
 
-        if( artifactId == null )
+        if ( artifactId == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The artifactId cannot be empty." );
+            throw new InvalidArtifactRTException( groupId, artifactId, version, type,
+                                                  "The artifactId cannot be empty." );
         }
 
         if ( type == null )
@@ -105,7 +103,7 @@ public class DefaultArtifact
             throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The type cannot be empty." );
         }
 
-        if( version == null )
+        if ( version == null )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The version cannot be empty." );
         }
@@ -182,7 +180,8 @@ public class DefaultArtifact
 
     public String getId()
     {
-        return getDependencyConflictId() + ( hasClassifier() ? ( ":" + getClassifier() ) : "" ) + ":" + getBaseVersion();
+        return getDependencyConflictId() + ( hasClassifier() ? ( ":" + getClassifier() ) : "" ) + ":" +
+            getBaseVersion();
     }
 
     public String getDependencyConflictId()
@@ -350,5 +349,15 @@ public class DefaultArtifact
     public ArtifactHandler getArtifactHandler()
     {
         return artifactHandler;
+    }
+
+    public List getDependencyTrail()
+    {
+        return dependencyTrail;
+    }
+
+    public void setDependencyTrail( List dependencyTrail )
+    {
+        this.dependencyTrail = dependencyTrail;
     }
 }

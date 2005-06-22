@@ -27,7 +27,8 @@ import java.util.List;
 public class TransitiveArtifactResolutionException
     extends ArtifactResolutionException
 {
-    public TransitiveArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
+    public TransitiveArtifactResolutionException( String message, Artifact artifact, List remoteRepositories,
+                                                  Throwable t )
     {
         super( message, artifact, remoteRepositories, t );
     }
