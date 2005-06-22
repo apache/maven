@@ -34,7 +34,7 @@ import java.util.ResourceBundle;
  * @goal dependencies
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id: DependenciesReport.java,v 1.2 2005/02/23 00:08:02 brett Exp $
+ * @version $Id$
  * @plexus.component
  */
 public class DependenciesReport

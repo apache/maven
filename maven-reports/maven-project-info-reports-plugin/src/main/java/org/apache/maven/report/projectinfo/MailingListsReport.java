@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: MailingListsReport.java,v 1.4 2005/02/23 00:08:03 brett Exp $
+ * @version $Id$
  * @goal mailing-list
  */
 public class MailingListsReport
