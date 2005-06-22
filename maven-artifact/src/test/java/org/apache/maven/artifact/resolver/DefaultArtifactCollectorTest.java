@@ -65,12 +65,12 @@ public class DefaultArtifactCollectorTest
         this.projectArtifact = createArtifact( "project", "1.0", null );
     }
 
-    public void disabledtestCircularDependencyNotIncludingCurrentProject()
+    public void testCircularDependencyNotIncludingCurrentProject()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
         ArtifactSpec b = a.addDependency( "b", "1.0" );
-        b.addDependency( "a", "1.0" );
+        b.addDependency( a );
         try
         {
             collect( a );
@@ -82,7 +82,7 @@ public class DefaultArtifactCollectorTest
         }
     }
 
-    public void disabledtestCircularDependencyIncludingCurrentProject()
+    public void testCircularDependencyIncludingCurrentProject()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
@@ -321,8 +321,13 @@ public class DefaultArtifactCollectorTest
         public ArtifactSpec addDependency( String id, String version, String scope )
         {
             ArtifactSpec dep = createArtifact( id, version, scope );
-            dependencies.add( dep.artifact );
+            addDependency( dep );
             return dep;
+        }
+
+        public void addDependency( ArtifactSpec dep )
+        {
+            dependencies.add( dep.artifact );
         }
     }
 

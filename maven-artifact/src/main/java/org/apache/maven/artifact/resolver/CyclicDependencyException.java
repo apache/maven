@@ -18,30 +18,17 @@ package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 
-import java.util.List;
-
 /**
  * Indiciates a cycle in the dependency graph.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-                      public class CyclicDependencyException
+public class CyclicDependencyException
     extends ArtifactResolutionException
 {
-    public CyclicDependencyException( String message, String groupId, String artifactId, String version, String type,
-                                      List remoteRepositories, String downloadUrl, Throwable t )
+    public CyclicDependencyException( String message, Artifact artifact )
     {
-        super( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl, t );
-    }
-
-    public CyclicDependencyException( String message, Artifact artifact, List remoteRepositories, Throwable t )
-    {
-        super( message, artifact, remoteRepositories, t );
-    }
-
-    public CyclicDependencyException( String message, Throwable cause )
-    {
-        super( message, cause );
+        super( message, artifact );
     }
 }

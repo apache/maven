@@ -54,6 +54,19 @@ public class ArtifactResolutionException
         this.downloadUrl = downloadUrl;
     }
 
+    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
+                                        List remoteRepositories, String downloadUrl )
+    {
+        super( constructMessage( message, groupId, artifactId, version, type, remoteRepositories, downloadUrl ) );
+
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.type = type;
+        this.version = version;
+        this.remoteRepositories = remoteRepositories;
+        this.downloadUrl = downloadUrl;
+    }
+
     private static final String LS = System.getProperty( "line.separator" );
 
     private static String constructMessage( String message, String groupId, String artifactId, String version,
@@ -65,18 +78,21 @@ public class ArtifactResolutionException
         sb.append( LS );
         sb.append( "  " + groupId + ":" + artifactId + ":" + version + ":" + type );
         sb.append( LS );
-        sb.append( LS );
-        sb.append( "from the specified remote repositories:" );
-        sb.append( LS + "  " );
-
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+        if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
         {
-            ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
+            sb.append( LS );
+            sb.append( "from the specified remote repositories:" );
+            sb.append( LS + "  " );
 
-            sb.append( remoteRepository.getUrl() );
-            if ( i.hasNext() )
+            for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
             {
-                sb.append( ", " );
+                ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
+
+                sb.append( remoteRepository.getUrl() );
+                if ( i.hasNext() )
+                {
+                    sb.append( ", " );
+                }
             }
         }
 
@@ -108,6 +124,12 @@ public class ArtifactResolutionException
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
               remoteRepositories, artifact.getDownloadUrl(), t );
+    }
+
+    public ArtifactResolutionException( String message, Artifact artifact )
+    {
+        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,
+              artifact.getDownloadUrl() );
     }
 
     public ArtifactResolutionException( String message, Throwable cause )
