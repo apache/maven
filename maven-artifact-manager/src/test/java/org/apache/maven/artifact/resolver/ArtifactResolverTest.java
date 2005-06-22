@@ -114,9 +114,9 @@ public class ArtifactResolverTest
 
         assertEquals( 2, result.getArtifacts().size() );
 
-        assertTrue( result.getArtifacts().containsKey( g.getId() ) );
+        assertTrue( result.getArtifacts().contains( g ) );
 
-        assertTrue( result.getArtifacts().containsKey( h.getId() ) );
+        assertTrue( result.getArtifacts().contains( h ) );
 
         assertLocalArtifactPresent( g );
 
@@ -153,9 +153,9 @@ public class ArtifactResolverTest
 
         assertEquals( 2, result.getArtifacts().size() );
 
-        assertTrue( result.getArtifacts().containsKey( i.getId() ) );
+        assertTrue( result.getArtifacts().contains( i ) );
 
-        assertTrue( result.getArtifacts().containsKey( j.getId() ) );
+        assertTrue( result.getArtifacts().contains( j ) );
 
         assertLocalArtifactPresent( i );
 

@@ -18,6 +18,8 @@ package org.apache.maven.artifact.resolver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -25,18 +27,16 @@ import java.util.Map;
  */
 public class ArtifactResolutionResult
 {
-    private Map artifacts;
+    private Set artifacts = Collections.EMPTY_SET;
 
     private Map conflicts;
 
     public ArtifactResolutionResult()
     {
-        artifacts = new HashMap();
-
         conflicts = new HashMap();
     }
 
-    public Map getArtifacts()
+    public Set getArtifacts()
     {
         return artifacts;
     }
@@ -44,5 +44,10 @@ public class ArtifactResolutionResult
     public Map getConflicts()
     {
         return conflicts;
+    }
+
+    public void setArtifacts( Set artifacts )
+    {
+        this.artifacts = artifacts;
     }
 }

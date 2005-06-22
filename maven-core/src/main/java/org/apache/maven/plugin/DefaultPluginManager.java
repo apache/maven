@@ -561,9 +561,9 @@ public class DefaultPluginManager
                                                                                         metadataSource,
                                                                                         artifactFilter );
 
-                Map resolved = result.getArtifacts();
+                Set resolved = result.getArtifacts();
 
-                for ( Iterator it = resolved.values().iterator(); it.hasNext(); )
+                for ( Iterator it = resolved.iterator(); it.hasNext(); )
                 {
                     Artifact artifact = (Artifact) it.next();
 
@@ -585,12 +585,12 @@ public class DefaultPluginManager
                     .resolveTransitively( pluginArtifact, remoteArtifactRepositories, session.getLocalRepository(),
                                           metadataSource, distroProvidedFilter );
 
-                Map distroProvided = distroProvidedResult.getArtifacts();
+                Set distroProvided = distroProvidedResult.getArtifacts();
 
                 List unfilteredArtifactList = new ArrayList( resolved.size() + distroProvided.size() );
 
-                unfilteredArtifactList.addAll( resolved.values() );
-                unfilteredArtifactList.addAll( distroProvided.values() );
+                unfilteredArtifactList.addAll( resolved );
+                unfilteredArtifactList.addAll( distroProvided );
 
                 pluginDescriptor.setArtifacts( unfilteredArtifactList );
             }
@@ -1020,7 +1020,7 @@ public class DefaultPluginManager
                                                                                 context.getLocalRepository(),
                                                                                 sourceReader, filter );
 
-        project.setArtifacts( new HashSet( result.getArtifacts().values() ) );
+        project.setArtifacts( result.getArtifacts() );
     }
 
     // ----------------------------------------------------------------------

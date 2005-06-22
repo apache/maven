@@ -126,7 +126,7 @@ public class DependenciesTask
         FileSet fileSet = new FileSet();
         fileSet.setDir( fileList.getDir( getProject() ) );
 
-        for ( Iterator i = result.getArtifacts().values().iterator(); i.hasNext(); )
+        for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
             String filename = localRepo.pathOf( artifact );

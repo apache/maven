@@ -157,7 +157,7 @@ public class DefaultArtifactResolver
         artifactResolutionResult = artifactCollector.collect( artifacts, originatingArtifact, localRepository,
                                                               remoteRepositories, source, filter, artifactFactory );
 
-        for ( Iterator i = artifactResolutionResult.getArtifacts().values().iterator(); i.hasNext(); )
+        for ( Iterator i = artifactResolutionResult.getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
             resolve( artifact, remoteRepositories, localRepository );

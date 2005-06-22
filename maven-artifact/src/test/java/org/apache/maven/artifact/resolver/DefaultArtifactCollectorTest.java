@@ -23,6 +23,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.PlexusTestCase;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,11 +94,26 @@ public class DefaultArtifactCollectorTest
         }
     }
 
-    private void collect( ArtifactSpec a )
+    public void testResolveNearest()
         throws ArtifactResolutionException
     {
-        artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null, source,
-                                   null, artifactFactory );
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec c = a.addDependency( "c", "3.0" );
+
+        b.addDependency( "c", "2.0" );
+
+        ArtifactResolutionResult res = collect( a );
+        assertEquals( "Check artifact list",
+                      new HashSet( Arrays.asList( new Object[]{a.artifact, b.artifact, c.artifact} ) ),
+                      res.getArtifacts() );
+    }
+
+    private ArtifactResolutionResult collect( ArtifactSpec a )
+        throws ArtifactResolutionException
+    {
+        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
+                                          source, null, artifactFactory );
     }
 
     private ArtifactSpec createArtifact( String id, String version )

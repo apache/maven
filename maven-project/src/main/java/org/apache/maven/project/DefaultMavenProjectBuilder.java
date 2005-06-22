@@ -150,7 +150,7 @@ public class DefaultMavenProjectBuilder
                                                                                 localRepository,
                                                                                 artifactMetadataSource );
 
-        project.setArtifacts( new HashSet( result.getArtifacts().values() ) );
+        project.setArtifacts( result.getArtifacts() );
         return project;
     }
 

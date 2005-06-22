@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Default implementation of the artifact collector.
@@ -131,20 +132,7 @@ public class DefaultArtifactCollector
             }
         }
 
-        // ----------------------------------------------------------------------
-        // the dependencies list is keyed by groupId+artifactId+type
-        // so it must be 'rekeyed' to the complete id:
-        // groupId+artifactId+type+version
-        // ----------------------------------------------------------------------
-
-        Map artifactResult = result.getArtifacts();
-
-        for ( Iterator it = resolvedArtifacts.values().iterator(); it.hasNext(); )
-        {
-            Artifact artifact = (Artifact) it.next();
-
-            artifactResult.put( artifact.getId(), artifact );
-        }
+        result.setArtifacts( new HashSet( resolvedArtifacts.values() ) );
 
         return result;
     }
