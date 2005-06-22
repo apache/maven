@@ -113,8 +113,18 @@ cd ..
 
 %MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar mboot.jar %MAVEN_CMD_LINE_ARGS%
 
+@REM I Really Don't want to be rebuilding these (Especially the reports) every time, but
+@REM until we regularly push them to the repository and the integration tests rely on
+@REM some of these plugins, there is no choice
 echo Rebuilding maven2 plugins
 cd maven-plugins
+@REM update the release info to ensure these versions get used in the integration tests
+call m2 --no-plugin-updates --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
+cd ..
+
+echo Rebuilding maven2 reports
+cd maven-reports
+@REM update the release info to ensure these versions get used in the integration tests
 call m2 --no-plugin-updates --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
 cd ..
 
