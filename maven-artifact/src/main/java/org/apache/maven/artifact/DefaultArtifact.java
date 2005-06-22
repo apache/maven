@@ -48,7 +48,7 @@ public class DefaultArtifact
 
     private final String classifier;
 
-    private final String scope;
+    private String scope;
 
     private List metadataList;
 
@@ -359,5 +359,10 @@ public class DefaultArtifact
     public void setDependencyTrail( List dependencyTrail )
     {
         this.dependencyTrail = dependencyTrail;
+    }
+
+    public void setScope( String scope )
+    {
+        this.scope = scope;
     }
 }

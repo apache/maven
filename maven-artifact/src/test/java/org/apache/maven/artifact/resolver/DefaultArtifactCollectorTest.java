@@ -264,21 +264,21 @@ public class DefaultArtifactCollectorTest
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, source, null,
-                                          artifactFactory );
+                                          artifactFactory, Collections.EMPTY_LIST );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a )
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          source, null, artifactFactory );
+                                          source, null, artifactFactory, Collections.EMPTY_LIST );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          source, filter, artifactFactory );
+                                          source, filter, artifactFactory, Collections.EMPTY_LIST );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, Artifact managedVersion )
@@ -286,7 +286,8 @@ public class DefaultArtifactCollectorTest
     {
         Map managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(), managedVersion );
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact,
-                                          managedVersions, null, null, source, null, artifactFactory );
+                                          managedVersions, null, null, source, null, artifactFactory,
+                                          Collections.EMPTY_LIST );
     }
 
     private ArtifactSpec createArtifact( String id, String version )

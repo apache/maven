@@ -28,9 +28,9 @@ import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -70,11 +70,6 @@ public class DefaultArtifactResolver
         // ArtifactRepository. If it is present then simply return as the
         // request for resolution has been satisfied.
         // ----------------------------------------------------------------------
-
-        Logger logger = getLogger();
-        logger.debug(
-            "Resolving: " + artifact.getId() + " from:\n" + "{localRepository: " + localRepository + "}\n" +
-                "{remoteRepositories: " + remoteRepositories + "}" );
 
         String localPath = localRepository.pathOf( artifact );
 
@@ -158,9 +153,16 @@ public class DefaultArtifactResolver
     {
         ArtifactResolutionResult artifactResolutionResult;
 
+        // TODO: this is simplistic
+        List listeners = new ArrayList();
+        if ( getLogger().isDebugEnabled() )
+        {
+            listeners.add( new DebugResolutionListener( getLogger() ) );
+        }
+
         artifactResolutionResult = artifactCollector.collect( artifacts, originatingArtifact, managedVersions,
                                                               localRepository, remoteRepositories, source, filter,
-                                                              artifactFactory );
+                                                              artifactFactory, listeners );
 
         for ( Iterator i = artifactResolutionResult.getArtifacts().iterator(); i.hasNext(); )
         {

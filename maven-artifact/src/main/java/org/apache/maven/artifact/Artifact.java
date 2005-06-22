@@ -105,4 +105,6 @@ public interface Artifact
     List getDependencyTrail();
 
     void setDependencyTrail( List dependencyTrail );
+
+    void setScope( String scope );
 }

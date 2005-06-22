@@ -44,17 +44,17 @@ public class DefaultArtifactCollector
     public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact,
                                              ArtifactRepository localRepository, List remoteRepositories,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
-                                             ArtifactFactory artifactFactory )
+                                             ArtifactFactory artifactFactory, List listeners )
         throws ArtifactResolutionException
     {
         return collect( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository, remoteRepositories,
-                        source, filter, artifactFactory );
+                        source, filter, artifactFactory, listeners );
     }
 
     public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                              ArtifactRepository localRepository, List remoteRepositories,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
-                                             ArtifactFactory artifactFactory )
+                                             ArtifactFactory artifactFactory, List listeners )
         throws ArtifactResolutionException
     {
         Map resolvedArtifacts = new HashMap();
@@ -63,7 +63,7 @@ public class DefaultArtifactCollector
         root.addDependencies( artifacts, filter );
 
         recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
-                 artifactFactory );
+                 artifactFactory, listeners );
 
         Set set = new HashSet();
 
@@ -89,93 +89,56 @@ public class DefaultArtifactCollector
 
     private void recurse( ResolutionNode node, Map resolvedArtifacts, Map managedVersions,
                           ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
-                          ArtifactFilter filter, ArtifactFactory artifactFactory )
+                          ArtifactFilter filter, ArtifactFactory artifactFactory, List listeners )
         throws CyclicDependencyException, TransitiveArtifactResolutionException
     {
+        fireEvent( ResolutionListener.TEST_ARTIFACT, listeners, node );
+
         // TODO: conflict resolvers, shouldn't be munging original artifact perhaps?
         Object key = node.getKey();
         if ( managedVersions.containsKey( key ) )
         {
             Artifact artifact = (Artifact) managedVersions.get( key );
-            // TODO: apply scope. assign whole artifact, except that the missing bits must be filled in
+
+            fireEvent( ResolutionListener.MANAGE_ARTIFACT, listeners, node, artifact );
+
             if ( artifact.getVersion() != null )
             {
                 node.getArtifact().setVersion( artifact.getVersion() );
+            }
+            if ( artifact.getScope() != null )
+            {
+                node.getArtifact().setScope( artifact.getScope() );
             }
         }
 
         ResolutionNode previous = (ResolutionNode) resolvedArtifacts.get( key );
         if ( previous != null )
         {
-            // TODO: conflict resolvers
+            // TODO: use as conflict resolver(s), chain and introduce version mediation
 
             // previous one is more dominant
             if ( previous.getDepth() <= node.getDepth() )
             {
-                boolean updateScope = false;
-                Artifact newArtifact = node.getArtifact();
-                Artifact previousArtifact = previous.getArtifact();
-
-                if ( Artifact.SCOPE_RUNTIME.equals( newArtifact.getScope() ) &&
-                    ( Artifact.SCOPE_TEST.equals( previousArtifact.getScope() ) ||
-                        Artifact.SCOPE_PROVIDED.equals( previousArtifact.getScope() ) ) )
-                {
-                    updateScope = true;
-                }
-
-                if ( Artifact.SCOPE_COMPILE.equals( newArtifact.getScope() ) &&
-                    !Artifact.SCOPE_COMPILE.equals( previousArtifact.getScope() ) )
-                {
-                    updateScope = true;
-                }
-
-                if ( updateScope )
-                {
-                    Artifact artifact = artifactFactory.createArtifact( previousArtifact.getGroupId(),
-                                                                        previousArtifact.getArtifactId(),
-                                                                        previousArtifact.getVersion(),
-                                                                        newArtifact.getScope(),
-                                                                        previousArtifact.getType() );
-                    // TODO: can I just change the scope?
-                    previous.setArtifact( artifact );
-                }
-
-                return;
+                checkScopeUpdate( node, previous, artifactFactory, listeners );
             }
             else
             {
-                boolean updateScope = false;
-                Artifact previousArtifact = previous.getArtifact();
-                Artifact newArtifact = node.getArtifact();
+                checkScopeUpdate( previous, node, artifactFactory, listeners );
+            }
 
-                if ( Artifact.SCOPE_RUNTIME.equals( previousArtifact.getScope() ) &&
-                    ( Artifact.SCOPE_TEST.equals( newArtifact.getScope() ) ||
-                        Artifact.SCOPE_PROVIDED.equals( newArtifact.getScope() ) ) )
-                {
-                    updateScope = true;
-                }
-
-                if ( Artifact.SCOPE_COMPILE.equals( previousArtifact.getScope() ) &&
-                    !Artifact.SCOPE_COMPILE.equals( newArtifact.getScope() ) )
-                {
-                    updateScope = true;
-                }
-
-                if ( updateScope )
-                {
-                    Artifact artifact = artifactFactory.createArtifact( newArtifact.getGroupId(),
-                                                                        newArtifact.getArtifactId(),
-                                                                        newArtifact.getVersion(),
-                                                                        previousArtifact.getScope(),
-                                                                        newArtifact.getType() );
-                    // TODO: can I just change the scope?
-                    node.setArtifact( artifact );
-                }
-
+            if ( previous.getDepth() <= node.getDepth() )
+            {
+                fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, node, previous.getArtifact() );
+                return;
             }
         }
 
         resolvedArtifacts.put( key, node );
+
+        fireEvent( ResolutionListener.INCLUDE_ARTIFACT, listeners, node );
+
+        fireEvent( ResolutionListener.PROCESS_CHILDREN, listeners, node );
 
         for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
         {
@@ -195,7 +158,82 @@ public class DefaultArtifactCollector
                 }
 
                 recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
-                         artifactFactory );
+                         artifactFactory, listeners );
+            }
+        }
+
+        fireEvent( ResolutionListener.FINISH_PROCESSING_CHILDREN, listeners, node );
+    }
+
+    private void checkScopeUpdate( ResolutionNode node, ResolutionNode previous, ArtifactFactory artifactFactory,
+                                   List listeners )
+    {
+        boolean updateScope = false;
+        Artifact newArtifact = node.getArtifact();
+        Artifact previousArtifact = previous.getArtifact();
+
+        if ( Artifact.SCOPE_RUNTIME.equals( newArtifact.getScope() ) &&
+            ( Artifact.SCOPE_TEST.equals( previousArtifact.getScope() ) ||
+                Artifact.SCOPE_PROVIDED.equals( previousArtifact.getScope() ) ) )
+        {
+            updateScope = true;
+        }
+
+        if ( Artifact.SCOPE_COMPILE.equals( newArtifact.getScope() ) &&
+            !Artifact.SCOPE_COMPILE.equals( previousArtifact.getScope() ) )
+        {
+            updateScope = true;
+        }
+
+        if ( updateScope )
+        {
+            fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, previous, newArtifact );
+
+            Artifact artifact = artifactFactory.createArtifact( previousArtifact.getGroupId(),
+                                                                previousArtifact.getArtifactId(),
+                                                                previousArtifact.getVersion(), newArtifact.getScope(),
+                                                                previousArtifact.getType() );
+            // TODO: can I just change the scope?
+            previous.setArtifact( artifact );
+        }
+    }
+
+    private void fireEvent( int event, List listeners, ResolutionNode node )
+    {
+        fireEvent( event, listeners, node, null );
+    }
+
+    private void fireEvent( int event, List listeners, ResolutionNode node, Artifact replacement )
+    {
+        for ( Iterator i = listeners.iterator(); i.hasNext(); )
+        {
+            ResolutionListener listener = (ResolutionListener) i.next();
+
+            switch ( event )
+            {
+                case ResolutionListener.TEST_ARTIFACT:
+                    listener.testArtifact( node.getArtifact() );
+                    break;
+                case ResolutionListener.PROCESS_CHILDREN:
+                    listener.startProcessChildren( node.getArtifact() );
+                    break;
+                case ResolutionListener.FINISH_PROCESSING_CHILDREN:
+                    listener.endProcessChildren( node.getArtifact() );
+                    break;
+                case ResolutionListener.INCLUDE_ARTIFACT:
+                    listener.includeArtifact( node.getArtifact() );
+                    break;
+                case ResolutionListener.OMIT_FOR_NEARER:
+                    listener.omitForNearer( node.getArtifact(), replacement );
+                    break;
+                case ResolutionListener.UPDATE_SCOPE:
+                    listener.updateScope( node.getArtifact(), replacement.getScope() );
+                    break;
+                case ResolutionListener.MANAGE_ARTIFACT:
+                    listener.manageArtifact( node.getArtifact(), replacement );
+                    break;
+                default:
+                    throw new IllegalStateException( "Unknown event: " + event );
             }
         }
     }

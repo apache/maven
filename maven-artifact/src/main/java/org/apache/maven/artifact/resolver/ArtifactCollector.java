@@ -23,8 +23,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
@@ -37,12 +37,12 @@ public interface ArtifactCollector
 {
     ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, ArtifactRepository localRepository,
                                       List remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter,
-                                      ArtifactFactory artifactFactory )
+                                      ArtifactFactory artifactFactory, List listeners )
         throws ArtifactResolutionException;
 
     ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                       ArtifactRepository localRepository, List remoteRepositories,
                                       ArtifactMetadataSource source, ArtifactFilter filter,
-                                      ArtifactFactory artifactFactory )
+                                      ArtifactFactory artifactFactory, List listeners )
         throws ArtifactResolutionException;
 }
