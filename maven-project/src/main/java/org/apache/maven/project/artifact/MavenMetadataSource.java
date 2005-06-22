@@ -139,10 +139,11 @@ public class MavenMetadataSource
                 IOUtil.close( reader );
             }
         }
-        return createArtifacts( dependencies, artifact.getScope(), artifact.getDependencyFilter() );
+        return createArtifacts( artifactFactory, dependencies, artifact.getScope(), artifact.getDependencyFilter() );
     }
 
-    public Set createArtifacts( List dependencies, String inheritedScope, ArtifactFilter dependencyFilter )
+    public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
+                                       ArtifactFilter dependencyFilter )
     {
         Set projectArtifacts = new HashSet();
 

@@ -18,6 +18,7 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -213,7 +214,7 @@ public class DefaultPluginManager
 
                 Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version,
                                                                           Artifact.SCOPE_RUNTIME,
-                                                                          MojoDescriptor.MAVEN_PLUGIN, null );
+                                                                          MojoDescriptor.MAVEN_PLUGIN );
 
                 addPlugin( pluginKey, pluginArtifact, project, localRepository );
 
@@ -555,10 +556,13 @@ public class DefaultPluginManager
                                                                               artifactFactory );
 
                 List remoteArtifactRepositories = project.getRemoteArtifactRepositories();
-                ArtifactResolutionResult result = artifactResolver.resolveTransitively( pluginArtifact,
+                ArtifactRepository localRepository = session.getLocalRepository();
+                Set dependencies = metadataSource.retrieve( pluginArtifact, localRepository,
+                                                            remoteArtifactRepositories );
+
+                ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         remoteArtifactRepositories,
-                                                                                        session.getLocalRepository(),
-                                                                                        metadataSource,
+                                                                                        localRepository, metadataSource,
                                                                                         artifactFilter );
 
                 Set resolved = result.getArtifacts();
@@ -582,7 +586,7 @@ public class DefaultPluginManager
                 ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
 
                 ArtifactResolutionResult distroProvidedResult = artifactResolver
-                    .resolveTransitively( pluginArtifact, remoteArtifactRepositories, session.getLocalRepository(),
+                    .resolveTransitively( dependencies, pluginArtifact, remoteArtifactRepositories, localRepository,
                                           metadataSource, distroProvidedFilter );
 
                 Set distroProvided = distroProvidedResult.getArtifacts();
@@ -601,6 +605,10 @@ public class DefaultPluginManager
             catch ( PlexusContainerException e )
             {
                 throw new PluginConfigurationException( "Cannot start plugin container", e );
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                throw new PluginConfigurationException( "Cannot resolve plugin dependencies", e );
             }
             finally
             {

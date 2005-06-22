@@ -39,15 +39,6 @@ public interface ArtifactResolver
     void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException;
 
-    ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-                                                  ArtifactRepository localRepository, ArtifactMetadataSource source )
-        throws ArtifactResolutionException;
-
-    ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-                                                  ArtifactRepository localRepository, ArtifactMetadataSource source,
-                                                  ArtifactFilter filter )
-        throws ArtifactResolutionException;
-
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, List remoteRepositories,
                                                   ArtifactRepository localRepository, ArtifactMetadataSource source )
         throws ArtifactResolutionException;

@@ -56,7 +56,7 @@ public class DefaultArtifactFactory
     private Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                                      String classifier, String inheritedScope )
     {
-        // TODO: can refactor, use scope handler
+        // TODO: can refactor - inherited scope calculation belongs in the collector, use scope handler
 
         String desiredScope = Artifact.SCOPE_RUNTIME;
         if ( inheritedScope == null )

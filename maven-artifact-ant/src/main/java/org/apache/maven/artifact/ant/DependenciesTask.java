@@ -88,7 +88,7 @@ public class DependenciesTask
             pom = createDummyPom();
         }
 
-        Set artifacts = metadataSource.createArtifacts( dependencies, null, null );
+        Set artifacts = MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
 
         log( "Resolving dependencies..." );
 

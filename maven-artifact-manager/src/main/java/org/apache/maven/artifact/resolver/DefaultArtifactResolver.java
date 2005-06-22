@@ -31,7 +31,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -128,23 +127,6 @@ public class DefaultArtifactResolver
                 throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
             }
         }
-    }
-
-    public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
-        throws ArtifactResolutionException
-    {
-        return resolveTransitively( artifact, remoteRepositories, localRepository, source, null );
-    }
-
-    public ArtifactResolutionResult resolveTransitively( Artifact artifact, List remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source, ArtifactFilter filter )
-        throws ArtifactResolutionException
-    {
-        return resolveTransitively( Collections.singleton( artifact ), null, remoteRepositories, localRepository,
-                                    source, filter );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,

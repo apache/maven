@@ -268,7 +268,7 @@ public class DefaultMavenProjectBuilder
         for ( Iterator i = lineage.iterator(); i.hasNext(); )
         {
             MavenProject currentProject = (MavenProject) i.next();
-            
+
             Model current = currentProject.getModel();
 
             forcePluginExecutionIdCollision( pomLocation, current );
@@ -312,7 +312,9 @@ public class DefaultMavenProjectBuilder
                     }
                     catch ( IllegalStateException collisionException )
                     {
-                        throw new ProjectBuildingException( "Detected illegal plugin-execution configuration in: " + pomLocation + " Error output: \n\n" + collisionException.getMessage(), collisionException ); 
+                        throw new ProjectBuildingException(
+                            "Detected illegal plugin-execution configuration in: " + pomLocation +
+                                " Error output: \n\n" + collisionException.getMessage(), collisionException );
                     }
                 }
             }
@@ -388,7 +390,7 @@ public class DefaultMavenProjectBuilder
         {
             Artifact parentArtifact = artifactFactory.createArtifact( parentProject.getGroupId(),
                                                                       parentProject.getArtifactId(),
-                                                                      parentProject.getVersion(), null, "pom", null );
+                                                                      parentProject.getVersion(), null, "pom" );
             project.setParentArtifact( parentArtifact );
         }
 
@@ -450,7 +452,7 @@ public class DefaultMavenProjectBuilder
             // ----------------------------------------------------------------------
 
             Artifact artifact = artifactFactory.createArtifact( parentModel.getGroupId(), parentModel.getArtifactId(),
-                                                                parentModel.getVersion(), null, "pom", null );
+                                                                parentModel.getVersion(), null, "pom" );
 
             model = findModelFromRepository( artifact, aggregatedRemoteWagonRepositories, localRepository );
 
@@ -535,9 +537,7 @@ public class DefaultMavenProjectBuilder
 
     protected Set createArtifacts( List dependencies )
     {
-        // TODO: merge with MavenMetadataSource properly
-        return new MavenMetadataSource( artifactResolver, this, artifactFactory ).createArtifacts( dependencies, null,
-                                                                                                   null );
+        return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
     }
 
     protected Set createPluginArtifacts( List plugins )
@@ -559,7 +559,7 @@ public class DefaultMavenProjectBuilder
             }
 
             Artifact artifact = artifactFactory.createArtifact( p.getGroupId(), p.getArtifactId(), version, null,
-                                                                "maven-plugin", null );
+                                                                "maven-plugin" );
             if ( artifact != null )
             {
                 pluginArtifacts.add( artifact );

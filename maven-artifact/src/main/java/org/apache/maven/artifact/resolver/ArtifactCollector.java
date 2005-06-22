@@ -38,4 +38,10 @@ public interface ArtifactCollector
                                       List remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter,
                                       ArtifactFactory artifactFactory )
         throws ArtifactResolutionException;
+
+    ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Set managedVersions,
+                                      ArtifactRepository localRepository, List remoteRepositories,
+                                      ArtifactMetadataSource source, ArtifactFilter filter,
+                                      ArtifactFactory artifactFactory )
+        throws ArtifactResolutionException;
 }

@@ -21,12 +21,15 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +51,8 @@ public class DefaultArtifactCollectorTest
 
     private Source source;
 
+    private static final String GROUP_ID = "test";
+
     protected void setUp()
         throws Exception
     {
@@ -57,10 +62,10 @@ public class DefaultArtifactCollectorTest
         this.artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
         this.artifactCollector = new DefaultArtifactCollector();
 
-        this.projectArtifact = createArtifact( "project", "1.0" );
+        this.projectArtifact = createArtifact( "project", "1.0", null );
     }
 
-    public void testCircularDependencyNotIncludingCurrentProject()
+    public void disabledtestCircularDependencyNotIncludingCurrentProject()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
@@ -69,7 +74,7 @@ public class DefaultArtifactCollectorTest
         try
         {
             collect( a );
-//            fail( "Should have failed on cyclic dependency not involving project" );
+            fail( "Should have failed on cyclic dependency not involving project" );
         }
         catch ( CyclicDependencyException expected )
         {
@@ -77,7 +82,7 @@ public class DefaultArtifactCollectorTest
         }
     }
 
-    public void testCircularDependencyIncludingCurrentProject()
+    public void disabledtestCircularDependencyIncludingCurrentProject()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
@@ -86,12 +91,31 @@ public class DefaultArtifactCollectorTest
         try
         {
             collect( a );
-//            fail( "Should have failed on cyclic dependency involving project" );
+            fail( "Should have failed on cyclic dependency involving project" );
         }
         catch ( CyclicDependencyException expected )
         {
             assertTrue( true );
         }
+    }
+
+    public void testResolveWithFilter()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec c = a.addDependency( "c", "3.0" );
+
+        b.addDependency( "c", "2.0" );
+        ArtifactSpec d = b.addDependency( "d", "4.0" );
+
+        ArtifactResolutionResult res = collect( a );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact, d.artifact} ),
+                      res.getArtifacts() );
+
+        ArtifactFilter filter = new ExclusionSetFilter( new String[]{"b"} );
+        res = collect( a, filter );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, c.artifact} ), res.getArtifacts() );
     }
 
     public void testResolveNearest()
@@ -104,60 +128,143 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "2.0" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list",
-                      new HashSet( Arrays.asList( new Object[]{a.artifact, b.artifact, c.artifact} ) ),
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
                       res.getArtifacts() );
+    }
+
+    public void disabledtestResolveManagedVersion()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        a.addDependency( "b", "3.0", Artifact.SCOPE_RUNTIME );
+
+        Artifact managedVersion = createArtifact( "b", "5.0" ).artifact;
+        Artifact modifiedB = createArtifact( "b", "5.0", Artifact.SCOPE_RUNTIME ).artifact;
+
+        ArtifactResolutionResult res = collect( a, managedVersion );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedB} ), res.getArtifacts() );
     }
 
     public void testResolveCompileScopeOverTestScope()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
-        ArtifactSpec b = a.addDependency( "b", "1.0" );
-        a.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
+        ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_TEST );
 
-        b.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
+        a.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
 
         Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
-        ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list",
-                      new HashSet( Arrays.asList( new Object[]{a.artifact, b.artifact, modifiedC} ) ),
-                      res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        Artifact artifact = getArtifact( "c", res.getArtifacts() );
+        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
     }
 
     public void testResolveRuntimeScopeOverTestScope()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
-        ArtifactSpec b = a.addDependency( "b", "1.0" );
-        a.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
+        ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_TEST );
 
-        b.addDependency( "c", "2.0", Artifact.SCOPE_RUNTIME );
+        a.addDependency( "c", "2.0", Artifact.SCOPE_RUNTIME );
 
         Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_RUNTIME ).artifact;
 
-        ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list",
-                      new HashSet( Arrays.asList( new Object[]{a.artifact, b.artifact, modifiedC} ) ),
-                      res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        Artifact artifact = getArtifact( "c", res.getArtifacts() );
+        assertEquals( "Check scope", Artifact.SCOPE_RUNTIME, artifact.getScope() );
     }
 
     public void testResolveCompileScopeOverRuntimeScope()
         throws ArtifactResolutionException
     {
         ArtifactSpec a = createArtifact( "a", "1.0" );
-        ArtifactSpec b = a.addDependency( "b", "1.0" );
-        a.addDependency( "c", "3.0", Artifact.SCOPE_RUNTIME );
+        ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_RUNTIME );
 
-        b.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
+        a.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
 
         Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
-        ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list",
-                      new HashSet( Arrays.asList( new Object[]{a.artifact, b.artifact, modifiedC} ) ),
-                      res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        Artifact artifact = getArtifact( "c", res.getArtifacts() );
+        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
+    }
+
+    public void testResolveCompileScopeOverProvidedScope()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_PROVIDED );
+
+        a.addDependency( "c", "2.0", Artifact.SCOPE_COMPILE );
+
+        Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        Artifact artifact = getArtifact( "c", res.getArtifacts() );
+        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
+    }
+
+    public void testResolveRuntimeScopeOverProvidedScope()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec c = createArtifact( "c", "3.0", Artifact.SCOPE_PROVIDED );
+
+        a.addDependency( "c", "2.0", Artifact.SCOPE_RUNTIME );
+
+        Artifact modifiedC = createArtifact( "c", "3.0", Artifact.SCOPE_RUNTIME ).artifact;
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        Artifact artifact = getArtifact( "c", res.getArtifacts() );
+        assertEquals( "Check scope", Artifact.SCOPE_RUNTIME, artifact.getScope() );
+    }
+
+    public void testProvidedScopeNotTransitive()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0", Artifact.SCOPE_PROVIDED );
+        ArtifactSpec b = createArtifact( "b", "1.0" );
+        b.addDependency( "c", "3.0", Artifact.SCOPE_PROVIDED );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+    }
+
+    public void testTestScopeNotTransitive()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0", Artifact.SCOPE_TEST );
+        ArtifactSpec b = createArtifact( "b", "1.0" );
+        b.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
+
+        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+    }
+
+    private Artifact getArtifact( String id, Set artifacts )
+    {
+        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+            if ( a.getArtifactId().equals( id ) && a.getGroupId().equals( GROUP_ID ) )
+            {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    private ArtifactResolutionResult collect( Set artifacts )
+        throws ArtifactResolutionException
+    {
+        return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, source, null,
+                                          artifactFactory );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a )
@@ -167,17 +274,37 @@ public class DefaultArtifactCollectorTest
                                           source, null, artifactFactory );
     }
 
+    private ArtifactResolutionResult collect( ArtifactSpec a, ArtifactFilter filter )
+        throws ArtifactResolutionException
+    {
+        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
+                                          source, filter, artifactFactory );
+    }
+
+    private ArtifactResolutionResult collect( ArtifactSpec a, Artifact managedVersion )
+        throws ArtifactResolutionException
+    {
+        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact,
+                                          Collections.singleton( managedVersion ), null, null, source, null,
+                                          artifactFactory );
+    }
+
     private ArtifactSpec createArtifact( String id, String version )
     {
-        return createArtifact( id, version, null );
+        return createArtifact( id, version, Artifact.SCOPE_COMPILE );
     }
 
     private ArtifactSpec createArtifact( String id, String version, String scope )
     {
         ArtifactSpec spec = new ArtifactSpec();
-        spec.artifact = artifactFactory.createArtifact( "test", id, version, scope, "jar" );
+        spec.artifact = artifactFactory.createArtifact( GROUP_ID, id, version, scope, "jar" );
         source.artifacts.put( spec.artifact.getId(), spec );
         return spec;
+    }
+
+    private static Set createSet( Object[] x )
+    {
+        return new HashSet( Arrays.asList( x ) );
     }
 
     private class ArtifactSpec
@@ -199,7 +326,7 @@ public class DefaultArtifactCollectorTest
         }
     }
 
-    private static class Source
+    private class Source
         implements ArtifactMetadataSource
     {
         Map artifacts = new HashMap();
@@ -208,7 +335,31 @@ public class DefaultArtifactCollectorTest
             throws ArtifactMetadataRetrievalException, ArtifactResolutionException
         {
             ArtifactSpec a = (ArtifactSpec) artifacts.get( artifact.getId() );
-            return a.dependencies;
+            return createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
+                                    artifact.getDependencyFilter() );
+        }
+
+        private Set createArtifacts( ArtifactFactory artifactFactory, Set dependencies, String inheritedScope,
+                                     ArtifactFilter dependencyFilter )
+        {
+            Set projectArtifacts = new HashSet();
+
+            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+            {
+                Artifact d = (Artifact) i.next();
+
+                Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
+                                                                    d.getScope(), d.getType(), inheritedScope );
+
+                if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
+                {
+                    artifact.setDependencyFilter( dependencyFilter );
+
+                    projectArtifacts.add( artifact );
+                }
+            }
+
+            return projectArtifacts;
         }
     }
 }
