@@ -113,7 +113,7 @@
           <description><![CDATA[
             The short name of the project group. This value is used to group
             all jars for a project in one directory. For more info look at the
-            <a href="/user-guide.html#Naming%20Conventions">user guide</a>.
+            <a href="/reference/conventions.html">user guide</a>.
           ]]></description>
           <type>String</type>
         </field>
