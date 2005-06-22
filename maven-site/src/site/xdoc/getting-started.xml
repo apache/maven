@@ -95,6 +95,10 @@
         </p>
         <source>m2 install</source>
         <p>
+          <b>Note:</b> if you are using the project you generated in the first step, make sure you are running this
+          command from inside the directory it created, where <code>pom.xml</code> resides.
+        </p>
+        <p>
           This will do all of the steps - generating sources, compiling, copying resources, packaging and finally installing.
         </p>
         <p>
