@@ -267,7 +267,7 @@ public class DefaultPluginManager
         {
             artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
 
-            artifactResolver.resolve( pluginArtifact, project.getRemoteArtifactRepositories(), localRepository );
+            artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
             PlexusContainer child = container.createChildContainer( pluginKey, Collections
                 .singletonList( pluginArtifact.getFile() ), Collections.EMPTY_MAP, Collections.singletonList( this ) );
