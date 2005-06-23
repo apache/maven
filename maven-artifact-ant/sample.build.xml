@@ -20,7 +20,7 @@
   <target name="initTaskDefs">
     <path id="maven.classpath">
       <!-- don't forget to set the value! -->
-      <pathelement location="target/maven-artifact-ant-2.0-SNAPSHOT-dep.jar"/>
+      <pathelement location="target/maven-artifact-ant-2.0-alpha-3-dep.jar"/>
     </path>
 
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
@@ -63,16 +63,16 @@
       <fileset refid="my.dependency.fileset"/>
     </copy>
 
-    <artifact:install file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
+    <artifact:install file="target/maven-artifact-ant-2.0-alpha-3.jar">
       <pom refid="maven.project"/>
     </artifact:install>
 
-    <artifact:deploy file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
+    <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
       <remoteRepository refid="deploy.repository"/>
       <pom refid="maven.project"/>
     </artifact:deploy>
 
-    <artifact:deploy file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
+    <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
       <remoteRepository url="scp://localhost/tmp/deployment-repo">
         <authentication username="brett" privateKey="${user.home}/.ssh/id_dsa"/>
       </remoteRepository>
@@ -128,7 +128,7 @@
       <remoteRepository refid="deploy.repository"/>
     </artifact:dependencies>
 
-    <artifact:deploy file="target/maven-artifact-ant-2.0-SNAPSHOT.jar">
+    <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
       <localRepository refid="local.repository.scm"/>
       <remoteRepository refid="deploy.repository"/>
       <pom refid="maven.project"/>

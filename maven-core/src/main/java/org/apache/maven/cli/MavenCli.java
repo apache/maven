@@ -55,10 +55,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -117,7 +119,7 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         initializeSystemProperties( commandLine );
-        
+
         if( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
             System.setProperty(ProfileActivationUtils.ACTIVE_PROFILE_IDS, commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES ) );
@@ -189,12 +191,12 @@ public class MavenCli
             showFatalError( "Unable to read settings.xml", e, showErrors );
             return 1;
         }
-        
+
         if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
             settings.setInteractiveMode( false );
         }
-        
+
         if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) )
         {
             settings.getRuntimeInfo().setPluginUpdateOverride( Boolean.TRUE );
@@ -397,53 +399,38 @@ public class MavenCli
         {
             artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS );
         }
-        
+
         if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
         {
             System.out.println( "+ Enabling strict checksum verification on all artifact downloads.");
-            
+
             artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepository.CHECKSUM_POLICY_FAIL );
         }
         else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
         {
             System.out.println( "+ Disabling strict checksum verification on all artifact downloads.");
-            
+
             artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepository.CHECKSUM_POLICY_WARN );
         }
-        
+
         return localRepository;
     }
 
     private static void showVersion()
     {
-        // TODO: is there a beter way? Maybe read the manifest?
-
-        String version = "unknown";
-
+        InputStream resourceAsStream;
         try
         {
-            for ( Enumeration e = MavenCli.class.getClassLoader().getResources( "/META-INF/maven/pom.xml" );
-                  e.hasMoreElements(); )
-            {
-                URL resource = (URL) e.nextElement();
-                if ( resource.getPath().indexOf( "maven-core" ) >= 0 )
-                {
-                    MavenXpp3Reader reader = new MavenXpp3Reader();
-                    Model model = reader.read( new InputStreamReader( resource.openStream() ) );
-                    version = model.getVersion();
-                    break;
-                }
-            }
+            Properties properties = new Properties();
+            resourceAsStream = MavenCli.class.getClassLoader().getResourceAsStream(
+                "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+            properties.load( resourceAsStream );
 
-            System.out.println( "Maven version: " + version );
+            System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) );
         }
         catch ( IOException e )
         {
             System.err.println( "Unable determine version from JAR file: " + e.getMessage() );
-        }
-        catch ( XmlPullParserException e )
-        {
-            System.err.println( "Unable to parse POM in JAR file: " + e.getMessage() );
         }
     }
 
@@ -523,15 +510,15 @@ public class MavenCli
         public static final char NON_RECURSIVE = 'N';
 
         public static final char UPDATE_SNAPSHOTS = 'U';
-        
+
         public static final char ACTIVATE_PROFILES = 'P';
-        
+
         public static final String FORCE_PLUGIN_UPDATES = "update-plugins";
-        
+
         public static final String SUPPRESS_PLUGIN_UPDATES = "no-plugin-updates";
-        
+
         public static final char CHECKSUM_FAILURE_POLICY = 'C';
-        
+
         public static final char CHECKSUM_WARNING_POLICY = 'c';
 
         public CLIManager()

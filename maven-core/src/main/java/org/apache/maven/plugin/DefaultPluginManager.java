@@ -562,7 +562,7 @@ public class DefaultPluginManager
                 
                 ArtifactRepository localRepository = session.getLocalRepository();
                 Set dependencies = metadataSource.retrieve( pluginArtifact, localRepository,
-                                                            remoteRepositories );
+                                                            project.getPluginArtifactRepositories() );
 
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         localRepository,
@@ -1057,17 +1057,6 @@ public class DefaultPluginManager
 
             artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
         }
-
-        // TODO: is this really necessary?
-        for ( Iterator it = project.getPluginArtifacts().iterator(); it.hasNext(); )
-        {
-            Artifact artifact = (Artifact) it.next();
-
-            artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
-        }
-
-        // TODO: is this really necessary?
-        artifactResolver.resolve( project.getParentArtifact(), remoteArtifactRepositories, localRepository );
     }
 
 }

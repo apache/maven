@@ -28,6 +28,9 @@
       <includes>
         <include>maven-core-*.jar</include>
       </includes>
+      <excludes>
+        <exclude>maven-core-*-sources.jar</exclude>
+      </excludes>
     </fileSet>
   </fileSets>
   <dependencySets>
@@ -35,6 +38,7 @@
       <outputDirectory>core</outputDirectory>
       <includes>
         <include>plexus:plexus-container-default</include>
+        <include>plexus:plexus-utils</include>
       </includes>
     </dependencySet>
     <dependencySet>
@@ -48,7 +52,6 @@
       <excludes>
         <exclude>plexus:plexus-container-default</exclude>
         <exclude>classworlds:classworlds</exclude>
-        <!-- included in default container - not needed -->
         <exclude>plexus:plexus-utils</exclude>
         <!-- transitively picked up via default container - not needed -->
         <exclude>junit:junit</exclude>

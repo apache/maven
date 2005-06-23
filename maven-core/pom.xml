@@ -133,7 +133,7 @@
   <distributionManagement>
     <site>
       <id>website</id>
-      <url>scp://www.apache.org//www/maven.apache.org/m2</url>
+      <url>scp://minotaur.apache.org//www/maven.apache.org/m2</url>
     </site>
   </distributionManagement>
   <build>
