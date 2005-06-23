@@ -132,10 +132,4 @@ public class MavenSession
     {
         return settings;
     }
-
-    public List getPluginRepositories()
-    {
-        return project.getPluginArtifactRepositories();
-    }
-
 }
