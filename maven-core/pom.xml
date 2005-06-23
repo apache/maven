@@ -139,12 +139,10 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.0-alpha-2</version>
         <configuration>
           <descriptor>src/assemble/bin.xml</descriptor>
-          <finalName>maven-2.0-SNAPSHOT</finalName>
+          <finalName>maven-2.0-alpha-3</finalName>
         </configuration>
       </plugin>
     </plugins>
