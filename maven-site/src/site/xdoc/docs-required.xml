@@ -18,15 +18,21 @@
         </li>
         <li>deployment mechanism</li>
         <li>dependency management</li>
-        <li>plugin management - <i>in progress by J Matthew Pryor and John Casey</i></li>
+        <li>plugin management -
+          <i>in progress by J Matthew Pryor and John Casey</i>
+        </li>
         <li>plugin configuration</li>
-        <li>plugin downloading - <i>partial on Brett's blogs</i></li>
-        <li>site generation</li>
+        <li>plugin downloading -
+          <i>partial on Brett's blogs</i>
+        </li>
         <li>report generation</li>
         <li>project inheritence and company wide strategy</li>
+        <li>plugin documentation</li>
+        <li>archetypes - writing and using</li>
       </ul>
       <h4>Documentation for plugin authors</h4>
       <ul>
+        <li>Beanshell examples</li>
         <li>plugin writing guide</li>
         <li>report writing guide</li>
         <li>site customisation guide</li>

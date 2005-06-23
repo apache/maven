@@ -10,14 +10,14 @@
       </p>
       <ul>
         <li>
-          <i>Project</i> - most static configuration occurs in
+          <i>Project</i>- most static configuration occurs in
           <code>pom.xml</code>
         </li>
         <li>
-          <i>Installation</i> - this is configuration added once for a Maven installation (not supported in the initial Technology Preview)
+          <i>Installation</i>- this is configuration added once for a Maven installation
         </li>
         <li>
-          <i>User</i> - this is configuration specific to a particular user
+          <i>User</i>- this is configuration specific to a particular user
         </li>
       </ul>
       <p>
@@ -25,17 +25,18 @@
         building it, while the others both define settings for the current environment.
       </p>
       <p>
-        <b>Note: </b> the installation and user configuration can not be used to add shared project information -
+        <b>Note:</b>the installation and user configuration can not be used to add shared project information -
         for example setting
-        <code>&lt;organization&gt;</code> or
-        <code>&lt;distributionManagement&gt;</code> company-wide.
+        <code>&lt;organization&gt;</code>or
+        <code>&lt;distributionManagement&gt;</code>company-wide.
         For this, you should have your projects inherit from a company-wide parent
         <code>pom.xml</code>.
         <!-- TODO: versioning doc that discusses this -->
       </p>
       <p>
-        You can specify your user configuration in <code>${user.home}/.m2/settings.xml</code>. A
-        <a href="maven-settings/settings.html">full reference</a> to the
+        You can specify your user configuration in
+        <code>${user.home}/.m2/settings.xml</code>. A
+        <a href="maven-settings/settings.html">full reference</a>to the
         configuration file is available. This section will show how to make some common configurations.
         Note that the file is not required - defaults will be used if it is not found.
       </p>
@@ -58,13 +59,15 @@
       <p>
         You can configure a proxy to use for some or all of your HTTP requests in Maven 2.0. The username and
         password are only required if your proxy requires basic authentication (note that later alphas will support
-        storing your passwords in a secured keystore - in the mean time, please ensure your <code>settings.xml</code>
+        storing your passwords in a secured keystore - in the mean time, please ensure your
+        <code>settings.xml</code>
         file is secured with permissions appropriate for your operating system).
       </p>
       <p>
-        The <code>nonProxyHosts</code> setting accepts wild cards, and each host not to proxy is separated by the
-        <code>|</code> character. This matches the
-        <a href="http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html">JDK configuration</a> equivalent.
+        The
+        <code>nonProxyHosts</code>setting accepts wild cards, and each host not to proxy is separated by the
+        <code>|</code>character. This matches the
+        <a href="http://java.sun.com/j2se/1.4.2/docs/guide/net/properties.html">JDK configuration</a>equivalent.
       </p>
       <source><![CDATA[
 <settings>
@@ -85,14 +88,17 @@
   .]]></source>
       <h4>Security and Deployment Settings</h4>
       <p>
-        Repositories to deploy to are defined in a project in the <code>&lt;distributionManagement&gt;</code> section.
+        Repositories to deploy to are defined in a project in the
+        <code>&lt;distributionManagement&gt;</code>section.
         However, you cannot put your username, password, or other security settings in that project. For that reason,
-        you should add a server definition to your own settings with an <code>id</code> that matches that of the
+        you should add a server definition to your own settings with an
+        <code>id</code>that matches that of the
         deployment repository in the project.
       </p>
       <p>
         In addition, some repositories may require authorisation to download from, so the corresponding settings can
-        be specified in a <code>server</code> element in the same way.
+        be specified in a
+        <code>server</code>element in the same way.
       </p>
       <p>
         Which settings are required will depend on the type of repository you are deploying to. As of the first release,
@@ -133,8 +139,12 @@
       </ul>
       <p>
         To configure a mirror of a given repository, you provide it in your settings file, giving the new repository
-        it's own <code>id</code> and <code>url</code>, and specify the <code>mirrorOf</code> setting that is the ID of
-        the repository you are using a mirror of. For example, the ID of the main Maven repository included by default is
+        it's own
+        <code>id</code>and
+        <code>url</code>, and specify the
+        <code>mirrorOf</code>setting that is the ID of
+        the repository you are using a mirror of. For example, the ID of the main Maven repository included by default
+        is
         <code>central</code>, so to use an Australian mirror, you would configure the following:
       </p>
       <source><![CDATA[
@@ -152,7 +162,7 @@
   .
   .]]></source>
       <p>
-        <i>Please note:</i> this particular is not actually set up for Maven 2 yet, so this should be treated as an
+        <i>Please note:</i>this particular is not actually set up for Maven 2 yet, so this should be treated as an
         example only.
       </p>
     </section>
