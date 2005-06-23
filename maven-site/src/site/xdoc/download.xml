@@ -4,45 +4,46 @@
     <author email="brett@apache.org">Brett Porter</author>
   </properties>
   <body>
-    <section name="Download Maven 2.0 Alpha 2 Technology Preview">
+    <section name="Download Maven 2.0 Alpha 3 Technology Preview">
       <p>
         Maven is distributed in several formats for your convenience.
       </p>
       <p>
-        You will be prompted for a mirror - if the file is not found on yours, please be patient, as it may take 24 hours to reach all mirrors.
+        You will be prompted for a mirror - if the file is not found on yours, please be patient, as it may take 24
+        hours to reach all mirrors.
       </p>
       <ul>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-2-bin.tar.bz2">
-            <code>.tar.bz2</code> archive
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-3-bin.tar.bz2">
+            <code>.tar.bz2</code>archive
           </a>
           <span style="font-size: smaller">
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-2-bin.tar.bz2.md5">checksum</a>)
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-3-bin.tar.bz2.md5">checksum</a>)
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-2-bin.tar.bz2.asc">PGP</a>)
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-3-bin.tar.bz2.asc">PGP</a>)
           </span>
         </li>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-2-bin.tar.gz">
-            <code>.tar.gz</code> archive
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-3-bin.tar.gz">
+            <code>.tar.gz</code>archive
           </a>
           <span style="font-size: smaller">
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-2-bin.tar.gz.md5">checksum</a>)
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-3-bin.tar.gz.md5">checksum</a>)
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-2-bin.tar.gz.asc">PGP</a>)
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-3-bin.tar.gz.asc">PGP</a>)
           </span>
         </li>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-2-bin.zip">
-            <code>.zip</code> archive
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-2.0-alpha-3-bin.zip">
+            <code>.zip</code>archive
           </a>
           <span style="font-size: smaller">
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-2-bin.zip.md5">checksum</a>)
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-3-bin.zip.md5">checksum</a>)
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-2-bin.zip.asc">PGP</a>)
+            <a href="http://www.apache.org/dist/maven/binaries/maven-2.0-alpha-3-bin.zip.asc">PGP</a>)
           </span>
         </li>
       </ul>
@@ -50,18 +51,19 @@
       <p>
         Also available is a distribution suitable for use with Ant to use Maven 2.0's dependency
         management (including transitive dependencies), repository and artifact deployment support.
-        See <a href="ant-tasks.html">Ant Tasks</a> for more information and installation instructions.
+        See
+        <a href="ant-tasks.html">Ant Tasks</a>for more information and installation instructions.
       </p>
       <ul>
         <li>
-          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-alpha-2-dep.jar">
-            <code>.jar</code> archive
+          <a href="http://www.apache.org/dyn/closer.cgi/maven/binaries/maven-artifact-ant-2.0-alpha-3-dep.jar">
+            <code>.jar</code>archive
           </a>
           <span style="font-size: smaller">
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-alpha-2-dep.jar.md5">checksum</a>)
+            <a href="http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-alpha-3-dep.jar.md5">checksum</a>)
             (
-            <a href="http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-alpha-2-dep.jar.asc">PGP</a>)
+            <a href="http://www.apache.org/dist/maven/binaries/maven-artifact-ant-2.0-alpha-3-dep.jar.asc">PGP</a>)
           </span>
         </li>
       </ul>
@@ -108,27 +110,27 @@
         <ol>
           <li>
             Unzip
-            <code>maven-2.0-alpha-2-bin.zip</code> to the directory you wish to install Maven 2.0. These instructions
+            <code>maven-2.0-alpha-3-bin.zip</code>to the directory you wish to install Maven 2.0. These instructions
             assume you chose
-            <code>C:\Program Files\Apache Software Foundation\maven-2.0-alpha-2</code>
+            <code>C:\Program Files\Apache Software Foundation\maven-2.0-alpha-3</code>
           </li>
           <li>
             Add the
-            <code>bin</code> directory to your path, by opening up the system properties (WinKey + Pause),
+            <code>bin</code>directory to your path, by opening up the system properties (WinKey + Pause),
             selecting the "Advanced" tab, and the "Environment Variables" button, then editing the
             <code>PATH</code>
             variable in the user variables.
             eg.
-            <code>"C:\Program Files\Apache Software Foundation\maven-2.0-alpha-2\bin";%PATH%</code>
+            <code>"C:\Program Files\Apache Software Foundation\maven-2.0-alpha-3\bin";%PATH%</code>
           </li>
           <li>
             In the same dialog, make sure that
-            <code>JAVA_HOME</code> is set to the location of your JDK, eg.
+            <code>JAVA_HOME</code>is set to the location of your JDK, eg.
             <code>C:\Program Files\Java\jdk1.5.0_02</code>
           </li>
           <li>
             Run
-            <code>m2 --version</code> to verify that it is correctly installed.
+            <code>m2 --version</code>to verify that it is correctly installed.
           </li>
         </ol>
         <p style="font-weight: bold; font-size: larger">
@@ -138,23 +140,23 @@
           <li>
             Extract the distribution archive to the directory you wish to install Maven 2.0. These instructions
             assume you chose
-            <code>/usr/local/maven-2.0-alpha-2</code>. The directory
-            <code>maven-2.0-alpha-2</code>
+            <code>/usr/local/maven-2.0-alpha-3</code>. The directory
+            <code>maven-2.0-alpha-3</code>
             will be created from the archive.
           </li>
           <li>
             Add the
-            <code>bin</code> directory to your path, eg.
-            <code>export PATH=/usr/local/maven-2.0-alpha-2/bin:$PATH</code>
+            <code>bin</code>directory to your path, eg.
+            <code>export PATH=/usr/local/maven-2.0-alpha-3/bin:$PATH</code>
           </li>
           <li>
             Make sure that
-            <code>JAVA_HOME</code> is set to the location of your JDK, eg.
+            <code>JAVA_HOME</code>is set to the location of your JDK, eg.
             <code>export JAVA_HOME=/usr/java/jdk1.5.0_02</code>
           </li>
           <li>
             Run
-            <code>m2 --version</code> to verify that it is correctly installed.
+            <code>m2 --version</code>to verify that it is correctly installed.
           </li>
         </ol>
       </subsection>

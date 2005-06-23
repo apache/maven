@@ -10,35 +10,41 @@
   </bannerRight>
   <body>
     <links>
-      <item name="Apache" href="http://www.apache.org/" />
+      <item name="Apache" href="http://www.apache.org/"/>
       <item name="Maven 1.0" href="http://maven.apache.org/"/>
       <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
     </links>
 
-    <menu name="Maven 2.0">
-      <item name="Introduction" href="/index.html"/>
+    <menu name="Installing">
       <item name="Download" href="/download.html"/>
-      <item name="Release Notes" href="/release-notes.html" />
+      <item name="Install" href="/download.html#installation"/>
+      <item name="Configuration" href="/configuration.html"/>
+      <item name="Release Notes" href="/release-notes.html"/>
+    </menu>
+
+    <menu name="About Maven 2.0">
+      <item name="Introduction" href="/index.html"/>
       <item name="General Information" href="/about.html"/>
       <item name="For Maven 1.0 Users" href="/maven1.html"/>
-      <item name="Road Map" href="/roadmap.html" />
+      <item name="Road Map" href="/roadmap.html"/>
     </menu>
     <menu name="User's Guide">
       <item name="Getting Started" href="/getting-started.html"/>
-      <item name="Build Lifecycle" href="/lifecycle.html" />
-      <item name="Configuration" href="/configuration.html"/>
+      <item name="Build Lifecycle" href="/lifecycle.html"/>
       <item name="Dependency Mechanism" href="/dependencies.html"/>
+      <item name="Creating a Site" href="/site.html"/>
+    </menu>
+    <menu name="Plugin Developers">
       <item name="Developing Plugins" href="/developers/plugin-overview.html"/>
       <item name="Developing Plugins with Marmalade" href="/developers/developing-plugins-with-marmalade.html"/>
-      <item name="Creating a Site" href="/site.html"/>
     </menu>
     <menu name="Reference">
       <item name="Project Descriptor" href="/maven-model/maven.html"/>
       <item name="Settings Descriptor" href="/maven-settings/settings.html"/>
       <item name="Available Plugins" href="/plugins/index.html"/>
-      <item name="Mojo API" href="/developers/mojo-api-specification.html" />
+      <item name="Mojo API" href="/developers/mojo-api-specification.html"/>
       <item name="Ant Tasks" href="/ant-tasks.html"/>
-      <item name="APT Reference" href="/apt-format.html"/>      
+      <item name="APT Reference" href="/apt-format.html"/>
     </menu>
     ${reports}
     <menu name="Developers">
