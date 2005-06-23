@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 /**
  * @goal checkstyle
@@ -90,7 +91,7 @@ public class CheckstyleReport
      */
     public String getName( Locale locale )
     {
-        return "Checkstyle";
+        return getBundle( locale ).getString( "report.checkstyle.name" );
     }
 
     /**
@@ -98,7 +99,7 @@ public class CheckstyleReport
      */
     public String getDescription( Locale locale )
     {
-        return "Report on coding style conventions.";
+        return getBundle( locale ).getString( "report.checkstyle.description" );
     }
 
     /**
@@ -222,7 +223,7 @@ public class CheckstyleReport
             checker.configure( config );
 
             // TODO: use source roots
-            AuditListener sinkListener = new CheckstyleReportListener( getSink(), sourceDirectory );
+            AuditListener sinkListener = new CheckstyleReportListener( getSink(), sourceDirectory, getBundle( locale ) );
 
             if ( listener != null )
             {
@@ -284,5 +285,10 @@ public class CheckstyleReport
         // TODO: explicit output directory when it is back
         props.setProperty( "checkstyle.cache.file", getProject().getModel().getBuild().getDirectory() + "/checkstyle-cachefile" );
         return props;
+    }
+
+    private static ResourceBundle getBundle( Locale locale )
+    {
+        return ResourceBundle.getBundle("checkstyle-report", locale, CheckstyleReport.class.getClassLoader() );
     }
 }

@@ -19,6 +19,8 @@ package org.apache.maven.plugin.checkstyle;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.ResourceBundle;
+
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
@@ -32,8 +34,6 @@ public class CheckstyleReportListener
     extends AutomaticBean
     implements AuditListener
 {
-    private static final String TITLE = "Checkstyle Results";
-
     private Sink sink;
 
     private String sourceDirectory;
@@ -42,17 +42,25 @@ public class CheckstyleReportListener
 
     private boolean fileInitialized;
 
-    public CheckstyleReportListener( Sink sink, String sourceDirectory )
+    private ResourceBundle bundle;
+
+    public CheckstyleReportListener( Sink sink, String sourceDirectory, ResourceBundle bundle )
     {
         this.sink = sink;
         this.sourceDirectory = sourceDirectory;
+        this.bundle = bundle;
+    }
+
+    private String getTitle()
+    {
+        return bundle.getString( "report.checkstyle.title" );
     }
 
     public void auditStarted( AuditEvent event )
     {
         sink.head();
         sink.title();
-        sink.text( TITLE );
+        sink.text( getTitle() );
         sink.title_();
         sink.head_();
 
@@ -60,11 +68,11 @@ public class CheckstyleReportListener
 
         sink.section1();
         sink.sectionTitle1();
-        sink.text( TITLE );
+        sink.text( getTitle() );
         sink.sectionTitle1_();
 
         sink.paragraph();
-        sink.text( "The following document contains the results of " );
+        sink.text( bundle.getString( "report.checkstyle.checkstylelink" ) + " " );
         sink.link( "http://checkstyle.sourceforge.net/" );
         sink.text( "Checkstyle" );
         sink.link_();
@@ -74,7 +82,7 @@ public class CheckstyleReportListener
 
         sink.section1_();
         sink.sectionTitle1();
-        sink.text( "Files" );
+        sink.text( bundle.getString( "report.checkstyle.files" ) );
         sink.sectionTitle1_();
 
         // TODO files summary
@@ -118,10 +126,10 @@ public class CheckstyleReportListener
                 sink.table();
                 sink.tableRow();
                 sink.tableHeaderCell();
-                sink.text( "Violation" );
+                sink.text( bundle.getString( "report.checkstyle.column.violation" ) );
                 sink.tableHeaderCell_();
                 sink.tableHeaderCell();
-                sink.text( "Line" );
+                sink.text( bundle.getString( "report.checkstyle.column.line" ) );
                 sink.tableHeaderCell_();
                 sink.tableRow_();
 
