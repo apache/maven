@@ -193,15 +193,16 @@ public class SurefirePlugin
             }
         }
 
+
+        surefireBooter.addClassPathUrl( new File( classesDirectory ).getPath() );
+
+        surefireBooter.addClassPathUrl( new File( testClassesDirectory ).getPath() );
+
         for ( Iterator i = pluginArtifacts.iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
             surefireBooter.addClassPathUrl( artifact.getFile().getAbsolutePath() );
         }
-
-        surefireBooter.addClassPathUrl( new File( classesDirectory ).getPath() );
-
-        surefireBooter.addClassPathUrl( new File( testClassesDirectory ).getPath() );
 
         for ( Iterator i = classpathElements.iterator(); i.hasNext(); )
         {
