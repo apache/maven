@@ -8,7 +8,7 @@
   <groupId>org.apache.maven.archetypes</groupId>
   <artifactId>maven-archetypes</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-alpha-2-SNAPSHOT</version>
+  <version>1.0-alpha-2</version>
   <modules>
     <module>maven-archetype-marmalade-mojo</module>
     <module>maven-archetype-mojo</module>
