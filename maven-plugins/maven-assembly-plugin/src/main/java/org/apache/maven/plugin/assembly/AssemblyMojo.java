@@ -87,7 +87,6 @@ public class AssemblyMojo
     /**
      * @parameter expression="${project.build.finalName}"
      * @required
-     * @readonly
      */
     private String finalName;
 
