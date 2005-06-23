@@ -16,7 +16,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-bsh-factory</artifactId>
-      <version>1.0-alpha-6-SNAPSHOT</version>
+      <version>1.0-alpha-6</version>
     </dependency>
   </dependencies>
 </model>

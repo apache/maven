@@ -36,11 +36,11 @@ public class MBoot
 {
     String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin-api",
         "maven-plugin-descriptor", "maven-artifact", "maven-artifact-manager", "maven-artifact-test",
-        "maven-script/maven-script-marmalade", "maven-script/maven-script-beanshell", "maven-project", "maven-profile",
+        "maven-script/maven-script-beanshell", "maven-project", "maven-profile",
         "maven-plugin-registry", "maven-reporting/maven-reporting-api", "maven-core", "maven-archiver",
         "maven-plugin-tools/maven-plugin-tools-api", "maven-plugin-tools/maven-plugin-tools-java",
         "maven-plugin-tools/maven-plugin-tools-beanshell", "maven-plugin-tools/maven-plugin-tools-pluggy",
-        "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-verifier"};
+        "maven-core-it-verifier"};
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-clean-plugin", "maven-plugins/maven-compiler-plugin",
         "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin", "maven-plugins/maven-plugin-plugin", 
