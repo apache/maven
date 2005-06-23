@@ -23,6 +23,7 @@ import org.codehaus.doxia.sink.Sink;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
+import java.util.ResourceBundle;
 
 /**
  * Handle events from PMD, converting them into Doxia events.
@@ -33,8 +34,6 @@ import java.io.File;
 public class PmdReportListener
     implements ReportListener
 {
-    private static final String TITLE = "PMD Results";
-
     private Sink sink;
 
     private String sourceDirectory;
@@ -43,10 +42,18 @@ public class PmdReportListener
 
     private boolean fileInitialized;
 
-    public PmdReportListener( Sink sink, String sourceDirectory )
+    private ResourceBundle bundle;
+
+    public PmdReportListener( Sink sink, String sourceDirectory, ResourceBundle bundle )
     {
         this.sink = sink;
         this.sourceDirectory = sourceDirectory;
+        this.bundle = bundle;
+    }
+
+    private String getTitle()
+    {
+        return bundle.getString( "report.pmd.title" );
     }
 
     public void ruleViolationAdded( RuleViolation ruleViolation )
@@ -61,10 +68,10 @@ public class PmdReportListener
             sink.table();
             sink.tableRow();
             sink.tableHeaderCell();
-            sink.text( "Violation" );
+            sink.text( bundle.getString( "report.pmd.column.violation" ) );
             sink.tableHeaderCell_();
             sink.tableHeaderCell();
-            sink.text( "Line" );
+            sink.text( bundle.getString( "report.pmd.column.line" ) );
             sink.tableHeaderCell_();
             sink.tableRow_();
 
@@ -90,7 +97,7 @@ public class PmdReportListener
     {
         sink.head();
         sink.title();
-        sink.text( TITLE );
+        sink.text( getTitle() );
         sink.title_();
         sink.head_();
 
@@ -98,11 +105,11 @@ public class PmdReportListener
 
         sink.section1();
         sink.sectionTitle1();
-        sink.text( TITLE );
+        sink.text( getTitle() );
         sink.sectionTitle1_();
 
         sink.paragraph();
-        sink.text( "The following document contains the results of " );
+        sink.text( bundle.getString( "report.pmd.pmdlink" ) + " " );
         sink.link( "http://pmd.sourceforge.net/" );
         sink.text( "PMD" );
         sink.link_();
@@ -112,7 +119,7 @@ public class PmdReportListener
 
         sink.section1_();
         sink.sectionTitle1();
-        sink.text( "Files" );
+        sink.text( bundle.getString( "report.pmd.files" ) );
         sink.sectionTitle1_();
 
         // TODO files summary

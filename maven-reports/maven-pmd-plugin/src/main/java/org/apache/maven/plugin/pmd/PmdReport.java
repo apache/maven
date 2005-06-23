@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Implement the PMD report.
@@ -78,7 +79,7 @@ public class PmdReport
      */
     public String getName( Locale locale )
     {
-        return "PMD report";
+        return getBundle( locale ).getString( "report.pmd.name" );
     }
 
     /**
@@ -86,7 +87,7 @@ public class PmdReport
      */
     public String getDescription( Locale locale )
     {
-        return "Verification of coding rules.";
+        return getBundle( locale ).getString( "report.pmd.description" );
     }
 
     /**
@@ -134,7 +135,7 @@ public class PmdReport
         Report report = new Report();
         // TODO: use source roots instead
         String sourceDirectory = getProject().getBuild().getSourceDirectory();
-        PmdReportListener reportSink = new PmdReportListener( sink, sourceDirectory );
+        PmdReportListener reportSink = new PmdReportListener( sink, sourceDirectory, getBundle( locale ) );
         report.addListener( reportSink );
         ruleContext.setReport( report );
 
@@ -232,5 +233,10 @@ public class PmdReport
         }
 
         return FileUtils.getFiles( dir, includes, excludesStr.toString() );
+    }
+
+    private static ResourceBundle getBundle( Locale locale )
+    {
+        return ResourceBundle.getBundle("pmd-report", locale, PmdReport.class.getClassLoader() );
     }
 }
