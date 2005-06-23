@@ -34,7 +34,7 @@ Building a Site
   has been replaced by the site descriptor (see below).
 
   The APT format, "Almost Plain Text", is a wiki-like format that allows you to write simple, structured documents (like this)
-  very quickly. A full reference of the {{{http://www.xmlmind.com/_aptconvert/docs/userguide2.html#id.s2} APT Format}} is available.
+  very quickly. A full reference of the {{{apt-format.html} APT Format}} is available.
 
   The FML format is the FAQ format, also used in Maven 1.0.
 
@@ -116,6 +116,9 @@ m2 site:site site:deploy
       <item name="For Maven 1.0 Users" href="maven1.html"/>
       <item name="Road Map" href="roadmap.html" />
     </menu>
+
+    ${reports}
+
     ...
   </body>
 </project>
@@ -123,12 +126,15 @@ m2 site:site site:deploy
 
   ~~TODO: deserves more explanation.
 
-* Adding Additional Resources
+  Note the <<<${reports}>>> string in the navigation. When building the site, this is replaced by menus for any reports
+  that you have configured.
 
- You can add any arbitrary resources to you site by including them in a
- <<<resources>>> directory as shown below. Addition CSS will be picked up
- when they are placed in the <<<css>>> directory within the <<<resources>>>
- directory.
+* Adding Extra Resources
+
+  You can add any arbitrary resources to you site by including them in a
+  <<<resources>>> directory as shown below. Addition CSS will be picked up
+  when they are placed in the <<<css>>> directory within the <<<resources>>>
+  directory.
 
 -------------------
 +- src/
@@ -141,7 +147,77 @@ m2 site:site site:deploy
             +- pic1.jpg
 --------------------
 
- The file <<<site.css>>> will be added to the default XHTML output, so can be used to adjust the default Maven stylesheets if desired.
+  The file <<<site.css>>> will be added to the default XHTML output, so can be used to adjust the default Maven stylesheets if desired.
 
- The file <<<pic1.jpg>>> will be available via a relative reference to the
- <<<resources/images>>> directory from any page in your site.
+  The file <<<pic1.jpg>>> will be available via a relative reference to the
+  <<<resources/images>>> directory from any page in your site.
+
+* Configuring Reports
+
+  Maven has several reports that you can add to your web site to display the current state of the project.
+  These reports take the form of plugins, just like those used to build the project.
+
+  To add these reports to your site, you must add the plugins to a special <<<reporting>>> section in the POM. The
+  following example shows how to configure the standard project information reports that display information from the
+  POM in a friendly format:
+
+-------------------
+<project>
+  ...
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.reports</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+  ...
+-------------------
+
+  If you have included the appropriate <<<${reports}>>> tag in your <<<site.xml>>> descriptor, then when you regenerate
+  the site those items will appear on the menu.
+
+  ~~TODO: explain report sets
+
+* Internationalisation
+
+  Internationalisation in Maven is very simple, as long as the reports you are using have that particular locale
+  defined.
+
+  To enable multiple locales, add configuration similar to the following to your POM:
+
+-------------------
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <locales>en,fr</locales>
+        </configuration>
+      </plugin>
+    </plugins>
+  ...
+-------------------
+
+  This will generate both an English and a French version of the site. If <<<en>>> is your current locale, then it will
+  be generated at the root of the site, with a copy of the French translation of the site in the <<<fr/>>> subdirectory.
+
+  To add your own content for that translation instead of using the default, place a subdirectory with that locale
+  name in your individual content directories. For example:
+
+-------------------
++- src/
+   +- site/
+      +- apt/
+      |  +- fr/
+      |  |  +- index.apt  (French version)
+      |  +- index.apt     (Default version)
+      +- site.xml
+--------------------
+
+  ~~TODO: what about translating site.xml?
+
