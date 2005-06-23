@@ -97,7 +97,7 @@ public class DefaultPluginVersionManager
                     || ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
                 {
                     updatedVersion = resolveReleaseVersion( groupId, artifactId, project
-                        .getRemoteArtifactRepositories(), localRepository );
+                        .getPluginArtifactRepositories(), localRepository );
 
                     if ( StringUtils.isNotEmpty( updatedVersion ) && !updatedVersion.equals( version ) )
                     {
@@ -127,7 +127,7 @@ public class DefaultPluginVersionManager
         if ( StringUtils.isEmpty( version ) )
         {
             // 1. resolve the version to be used THIS TIME
-            version = resolveReleaseVersion( groupId, artifactId, project.getRemoteArtifactRepositories(),
+            version = resolveReleaseVersion( groupId, artifactId, project.getPluginArtifactRepositories(),
                                              localRepository );
 
             // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
