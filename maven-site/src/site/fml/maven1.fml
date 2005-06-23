@@ -75,10 +75,6 @@
           version that is working for you until you need the new features and it covers all of your needs.
         </p>
         <p>
-          Importantly, a number of features of Maven 1.0 are not yet available in Maven 2.0.
-          If you need these features, we recommend staying with Maven 1.0 at this point.
-        </p>
-        <p>
           If you do use Maven 1.0, and would like to upgrade in the future, you should carefully consider following some
           of the
           <a href="http://maven.apache.org/using/bestpractices.html">Best Practices</a> listed. These will make
