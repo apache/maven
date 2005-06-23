@@ -16,7 +16,8 @@
           document.
         </p>
         <p>
-          Maven has also grown into a project that is building other products to help in the software development lifecycle<!--,
+          Maven has also grown into a project that is building other products to help in the software development
+          lifecycle<!--,
           such as the <a href="http://maven.apache.org/continuum">Continuum</a> continuous integration server -->.
           <a href="http://maven.apache.org/project/index.html">More information about the Maven Project</a>.
         </p>
@@ -32,13 +33,16 @@
         <ul>
           <li>Simple project setup that follows best practices - get a new project or module started in seconds</li>
           <li>Consistent usage across all projects means no ramp up time for new developers coming onto a project</li>
-          <li>Superior dependency management including automatic updating, dependency closures (also known as transitive dependencies)</li>
+          <li>Superior dependency management including automatic updating, dependency closures (also known as transitive
+            dependencies)</li>
           <li>Able to easily work with multiple projects at a time</li>
           <li>A large and growing repository of libraries and metadata to use out of the box, and arrangements in place
-          with the largest Open Source projects for real-time availability of their latest releases</li>
+            with the largest Open Source projects for real-time availability of their latest releases</li>
           <li>Extensible, with the ability to easily write plugins in Java or other scripting languages</li>
           <li>Instant access to new features with little or no extra configuration</li>
-          <li><a href="ant-tasks.html">Ant tasks</a> for dependency management and deployment outside of Maven</li>
+          <li>
+            <a href="ant-tasks.html">Ant tasks</a>for dependency management and deployment outside of Maven
+          </li>
         </ul>
         <p>
           The following features are available in Maven 1.0 and will be available and much improved in Maven 2.0 through
@@ -57,7 +61,7 @@
       <answer>
         <p>
           You've seen
-          <a href="#what-is-maven">above</a> the goals that Maven aims to achieve, however there have also
+          <a href="#what-is-maven">above</a>the goals that Maven aims to achieve, however there have also
           been questions about why Maven 2.0 is rewritten from the successful Maven 1.0. In summary, the main goals of
           the new Maven 2.0 architecture are:
         </p>
@@ -112,7 +116,8 @@
           release schedule so that new features can be obtained as they are ready and tested.
         </p>
         <p>
-          For more information, consult the <a href="roadmap.html">Road Map</a>.
+          For more information, consult the
+          <a href="roadmap.html">Road Map</a>.
         </p>
       </answer>
     </faq>
@@ -129,11 +134,45 @@
           join the project.
         </p>
         <p>
-          For instructions on checking out and building Maven 2.0, see <a href="building.html">Building Maven 2.0</a>.
+          For instructions on checking out and building Maven 2.0, see
+          <a href="building.html">Building Maven 2.0</a>.
         </p>
         <p>
           For more information, please see
           <a href="http://maven.apache.org/contributing/help.html">How to Help</a>.
+        </p>
+      </answer>
+    </faq>
+
+    <faq id="scripting-languages">
+      <question>What plugin languages will Maven 2.0 support? What about [insert language here]?</question>
+      <answer>
+        <p>
+          As of the current alpha-3 release, Maven supports pure Java, Beanshell and Marmalade. Java is the preferred
+          language for it's familiarity and speed, while Marmalade is preferred for porting Maven 1.x plugins, and
+          writing
+          plugins based on Ant tasks.
+        </p>
+        <p>
+          We get asked a lot whether Maven 2.0 will support other languages, in particular Groovy.
+          We will allow the use of Groovy - and virtually any other scripting
+          language if there is demand, or someone can commit a small amount of time to implementing a
+          factory for it.
+        </p>
+        <p>
+          We would recommend waiting for Groovy to have a 1.0 release so the API
+          (and language!) is stable. What we will not be doing is actively
+          supporting it (in terms of answering questions about how to use it)
+          like we currently do for Jelly in Maven 1.x.
+        </p>
+        <p>
+          Beanshell is more mature, and we want a language that users will find
+          answers for when they look, and that when they find bugs, it is
+          clearly defined where they actually are.
+        </p>
+        <p>
+          We may consider emphasising a different language if there are compelling technical reasons
+          for doing so - if you have a suggestion, feel free to contact the development list.
         </p>
       </answer>
     </faq>
@@ -148,13 +187,13 @@
         </p>
         <p>
           You can also join us on IRC at
-          <code>irc.codehaus.org</code> on
+          <code>irc.codehaus.org</code>on
           <code>#maven2</code>. This is available both
           over
-          <a href="irc://irc.codehaus.org/#maven2">IRC</a> and
-          <a href="http://irc.codehaus.org/">HTTP</a> for those behind firewalls (enter
-          <code>#maven2</code> in the
-          <i>Channel</i> box).
+          <a href="irc://irc.codehaus.org/#maven2">IRC</a>and
+          <a href="http://irc.codehaus.org/">HTTP</a>for those behind firewalls (enter
+          <code>#maven2</code>in the
+          <i>Channel</i>box).
         </p>
         <p>
           Please remember that it is a preview release, so please be patient with features that are not yet implemented,

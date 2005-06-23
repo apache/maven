@@ -1,20 +1,20 @@
  ------
-Release Notes - Maven 2.0 Alpha 2
+Release Notes - Maven 2.0 Alpha 3
  ------
 Brett Porter
  ------
-13 May 2005
+23 June 2005
  ------
 
-  The Apache Maven team are proud to announce the second alpha release of Maven 2.0.
+  The Apache Maven team are proud to announce the third alpha release of Maven 2.0.
 
   Download it from {{http://maven.apache.org/maven2/download.html}}
 
   Maven is a software project management and comprehension tool. Based on the concept of a project object model
   (POM), Maven can manage a project's build, reporting and documentation from a central piece of information.
 
-  This release includes <<{{{http://jira.codehaus.org/secure/IssueNavigator.jspa?reset=true&pid=10500&fixfor=11020} 76 bug fixes and enhancements}}>> since the
-  first release on 8 April.
+  This release includes <<{{{http://jira.codehaus.org/secure/ReleaseNote.jspa?projectId=10500&styleName=Html&version=11021} 83 bug fixes and enhancements}}>>
+  since the previous release on 13 May.
 
   Maven 2.0 is a rewrite of the popular Maven application to achieve a number of goals, and to provide a stable
   basis to take it into the future.  While it can be considered quite stable, and future versions are now expected to
@@ -23,18 +23,23 @@ Brett Porter
 
   The main new features in this release are:
 
-    * Basic site generation
+    * Improved dependency management
 
-    * Improved error handling
+    * Build profiles for environment specific settings and dependencies
 
-    * Automatic plugin updates
+    * Finalised build lifecycle
 
-    * Published Mojo and Plugin API
+    * Proper handling of derived dependency type such as sources, javadocs and ejb clients
 
-    * Inclusion of Ant tasks for Maven 2.0
+    * Beanshell plugin support
 
-  This release is expected to be much more architecturally stable, making early adoption
-  a possiblity. At this point, there are still only the core plugins available.
+    * Improved reporting support, including internationalisation.
+
+    * Improvements to the Ant tasks
+
+    * Various plugin improvements
+
+  This release is very near to being feature complete, and the next release will be a feature complete beta-1.
 
   We hope you enjoy using Maven! If you have any questions, please consult:
 
