@@ -37,6 +37,8 @@ Brett Porter
 
     * Improvements to the Ant tasks
 
+    * Better plugin management, with the ability to select specific versions for use
+
     * Various plugin improvements
 
   This release is very near to being feature complete, and the next release will be a feature complete beta-1.

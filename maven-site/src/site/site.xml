@@ -40,6 +40,7 @@
       <item name="Ant Tasks" href="/ant-tasks.html"/>
       <item name="APT Reference" href="/apt-format.html"/>      
     </menu>
+    ${reports}
     <menu name="Developers">
       <item name="Documentation Needed" href="/docs-required.html"/>
       <item name="Building Maven 2.0" href="/building.html"/>

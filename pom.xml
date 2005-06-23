@@ -25,13 +25,15 @@
       <name>Maven User List</name>
       <subscribe>users-subscribe@maven.apache.org</subscribe>
       <unsubscribe>users-unsubscribe@maven.apache.org</unsubscribe>
-      <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listName=users@maven.apache.org</archive>
+      <post>users@maven.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/maven-users</archive>
     </mailingList>
     <mailingList>
       <name>Maven Developer List</name>
       <subscribe>dev-subscribe@maven.apache.org</subscribe>
       <unsubscribe>dev-unsubscribe@maven.apache.org</unsubscribe>
-      <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listName=dev@maven.apache.org</archive>
+      <post>dev@maven.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/maven-dev</archive>
     </mailingList>
   </mailingLists>
   <developers>
