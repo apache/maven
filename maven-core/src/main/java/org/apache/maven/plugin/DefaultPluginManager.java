@@ -555,14 +555,18 @@ public class DefaultPluginManager
                 MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder,
                                                                               artifactFactory );
 
-                List remoteArtifactRepositories = project.getRemoteArtifactRepositories();
+                List remoteRepositories = new ArrayList();
+                
+                remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
+                remoteRepositories.addAll( project.getPluginArtifactRepositories() );
+                
                 ArtifactRepository localRepository = session.getLocalRepository();
                 Set dependencies = metadataSource.retrieve( pluginArtifact, localRepository,
-                                                            remoteArtifactRepositories );
+                                                            remoteRepositories );
 
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         localRepository,
-                                                                                        remoteArtifactRepositories,
+                                                                                        remoteRepositories,
                                                                                         metadataSource,
                                                                                         artifactFilter );
 
@@ -587,7 +591,7 @@ public class DefaultPluginManager
                 ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
 
                 ArtifactResolutionResult distroProvidedResult = artifactResolver
-                    .resolveTransitively( dependencies, pluginArtifact, localRepository, remoteArtifactRepositories,
+                    .resolveTransitively( dependencies, pluginArtifact, localRepository, remoteRepositories,
                                           metadataSource, distroProvidedFilter );
 
                 Set distroProvided = distroProvidedResult.getArtifacts();
