@@ -980,6 +980,10 @@ public class DefaultPluginManager
         // TODO: configure this from bootstrap or scan lib
         Set artifacts = new HashSet();
         artifacts.add( "classworlds" );
+        artifacts.add( "commons-cli" );
+        artifacts.add( "commons-validator" );
+        artifacts.add( "jline" );
+        artifacts.add( "jsch" );
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
         artifacts.add( "maven-core" );
@@ -989,16 +993,17 @@ public class DefaultPluginManager
         artifacts.add( "maven-plugin-descriptor" );
         artifacts.add( "maven-project" );
         artifacts.add( "maven-settings" );
+        artifacts.add( "oro" );
         artifacts.add( "plexus-container-default" );
+        artifacts.add( "plexus-input-handler" );
         artifacts.add( "plexus-utils" );
         artifacts.add( "wagon-provider-api" );
-        artifacts.add( "wagon-ssh" );
-        artifacts.add( "wagon-http-lightweight" );
         artifacts.add( "wagon-file" );
+        artifacts.add( "wagon-http-lightweight" );
+        artifacts.add( "wagon-ssh" );
         // TODO: remove doxia
         artifacts.add( "doxia-core" );
         artifacts.add( "maven-reporting-api" );
-        artifacts.add( "plexus-input-handler" );
         artifactFilter = new ExclusionSetFilter( artifacts );
     }
 

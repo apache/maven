@@ -100,6 +100,12 @@
       <version>1.0-alpha-4</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-file</artifactId>
+      <version>1.0-alpha-4</version>
+      <scope>runtime</scope>
+    </dependency>
     
     <!-- used to prompt the user to add plugin versions to the plugin-registry. -->
     <dependency>
