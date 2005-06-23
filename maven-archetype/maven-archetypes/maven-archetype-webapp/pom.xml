@@ -2,7 +2,7 @@
   <parent>
     <artifactId>maven-archetypes</artifactId>
     <groupId>org.apache.maven.archetypes</groupId>
-    <version>1.0-alpha-2-SNAPSHOT</version>
+    <version>1.0-alpha-2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-archetype-webapp</artifactId>
