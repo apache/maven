@@ -44,7 +44,7 @@ public class MBoot
 
     String[] pluginBuilds = new String[]{"maven-plugins/maven-clean-plugin", "maven-plugins/maven-compiler-plugin",
         "maven-plugins/maven-install-plugin", "maven-plugins/maven-jar-plugin", "maven-plugins/maven-plugin-plugin", 
-        "maven-plugins/maven-resources-plugin", "maven-plugins/maven-surefire-plugin", "maven-core-it-plugin"};
+        "maven-plugins/maven-resources-plugin", "maven-plugins/maven-surefire-plugin"};
 
     private static final Map MODELLO_TARGET_VERSIONS;
 
