@@ -39,7 +39,7 @@ Building a Site
   The FML format is the FAQ format, also used in Maven 1.0.
 
   Other formats are available, but at this point these 3 are the best tested. There are also several possible output formats,
-  but as of alpha-2, only XHTML is available.
+  but as of alpha-3, only XHTML is available.
 
   Note that all of the above is optional - just one index file is required in one of the input trees. Each of the paths will be merged
   together to form the root directory of the site.

@@ -307,19 +307,22 @@ m2 archetype:create \
         </p>
         <p>
           The WAR has now been created in
-          <code>my-webapp/target/my-webapp-1.0-SNAPSHOT.war</code>, and the JAR is
+          <code>my-webapp/target/my-webapp.war</code>, and the JAR is
           included:
         </p>
         <source>$ jar tvf my-webapp/target/my-webapp-1.0-SNAPSHOT.war
-     0 Sat Apr 09 01:45:18 EST 2005 META-INF/
-   222 Sat Apr 09 01:45:16 EST 2005 META-INF/MANIFEST.MF
-     0 Sat Apr 09 01:45:18 EST 2005 META-INF/maven/
-   675 Sat Apr 09 01:42:54 EST 2005 META-INF/maven/pom.xml
-     0 Sat Apr 09 01:45:18 EST 2005 WEB-INF/
-   215 Sat Apr 09 01:45:18 EST 2005 WEB-INF/web.xml
-    52 Sat Apr 09 01:45:18 EST 2005 index.jsp
-     0 Sat Apr 09 01:45:18 EST 2005 WEB-INF/lib/
-  1586 Sat Apr 09 01:45:18 EST 2005 WEB-INF/lib/my-app-1.0-SNAPSHOT.jar</source>
+     0 Fri Jun 24 10:59:56 EST 2005 META-INF/
+   222 Fri Jun 24 10:59:54 EST 2005 META-INF/MANIFEST.MF
+     0 Fri Jun 24 10:59:56 EST 2005 META-INF/maven/
+     0 Fri Jun 24 10:59:56 EST 2005 META-INF/maven/com.mycompany.app/
+     0 Fri Jun 24 10:59:56 EST 2005 META-INF/maven/com.mycompany.app/my-webapp/
+  3239 Fri Jun 24 10:59:56 EST 2005 META-INF/maven/com.mycompany.app/my-webapp/pom.xml
+     0 Fri Jun 24 10:59:56 EST 2005 WEB-INF/
+   215 Fri Jun 24 10:59:56 EST 2005 WEB-INF/web.xml
+   123 Fri Jun 24 10:59:56 EST 2005 META-INF/maven/com.mycompany.app/my-webapp/pom.properties
+    52 Fri Jun 24 10:59:56 EST 2005 index.jsp
+     0 Fri Jun 24 10:59:56 EST 2005 WEB-INF/lib/
+  2713 Fri Jun 24 10:59:56 EST 2005 WEB-INF/lib/my-app-1.0-SNAPSHOT.jar</source>
         <p>
           How does this work? Firstly, the parent POM created (called
           <code>app</code>), has a packaging of
@@ -351,7 +354,7 @@ m2 archetype:create \
         </p>
         <p>
           Like Maven 1.0, as of the current Maven release (
-          <code>2.0-alpha-2</code>), it is required that you run
+          <code>2.0-alpha-3</code>), it is required that you run
           <code>install</code> to successfully perform these steps. If you run
           <code>package</code>, the JAR will not be
           copied to the local repository and Maven will not be able to find it. This will be improved in future versions.
