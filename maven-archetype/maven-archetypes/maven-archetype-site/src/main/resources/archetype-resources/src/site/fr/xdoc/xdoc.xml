@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<document>
+  <properties>
+    <title>Bienvenue</title>
+    <author email="dev@maven.apache.org">The Maven Team</author>
+  </properties>
+  <body>
+    <section name="Bienvenue dans un fichier XDOC!">
+      <p>
+        Ceci est du texte pour le fichier xdoc.
+      </p>
+    </section>
+  </body>
+</document>
+

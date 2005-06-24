@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<faqs id="FAQ Général">
+  <part id="General">
+    <faq id="where">
+      <question>D'où vient Maven</question>
+      <answer>
+        <p>
+          Maven was created by a group of software developers who were tired
+          of wasting their time fiddling around with builds and wanted to get
+          down to brass tacks and actually develop software!
+        </p>
+      </answer>
+    </faq>
+    <faq id="why">
+      <question>Pourquoi Maven est-il si populaire?</question>
+      <answer>
+        <p>
+          Maven saves you so much time in your software development efforts that
+          you will have time to learn a second language, relax ten hours a
+          day, and train for that marathon you've always wanted to run!
+        </p>
+      </answer>
+    </faq>
+  </part>
+</faqs>
