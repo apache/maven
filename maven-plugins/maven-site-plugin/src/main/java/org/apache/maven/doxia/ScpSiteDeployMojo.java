@@ -139,9 +139,11 @@ public class ScpSiteDeployMojo
 
             commandExecutor.put( zipFile, zipFile.getName() );
 
-            cmd = " cd " + basedir + ";" + unzipCommand + " " + zipFile.getName() + "; rm  " + basedir + "/" + zipFile.getName();
+            cmd = " cd " + basedir + ";" + unzipCommand + " " + zipFile.getName();
 
             commandExecutor.executeCommand( cmd );
+
+            commandExecutor.executeCommand( "rm -f " + basedir + "/" + zipFile.getName()  );
         }
         catch ( Exception e )
         {
