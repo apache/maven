@@ -233,7 +233,7 @@ public class DoxiaMojo
                     {
                         MavenReport report = (MavenReport) j.next();
 
-                        getLog().info( "Generate " + report.getName( locale ) + " report." );
+                        getLog().info( "Generate \"" + report.getName( locale ) + "\" report." );
 
                         report.setReportOutputDirectory( localeOutputDirectory );
 
@@ -283,10 +283,24 @@ public class DoxiaMojo
                 }
 
                 // Generate static site
-                siteRenderer.render( new File( siteDirectory ), localeOutputDirectory,
-                                     getSiteDescriptor( reports, locale ), template, attributes );
-                siteRenderer.render( new File( generatedSiteDirectory ), localeOutputDirectory,
-                                     getSiteDescriptor( reports, locale ), template, attributes );
+                File siteDirectoryFile;
+
+                Locale firstLocale = (Locale) localesList.get( 0 );
+
+                if ( locale.equals( firstLocale ) )
+                {
+                    siteDirectoryFile = new File( siteDirectory );
+                }
+                else
+                {
+                    siteDirectoryFile = new File( siteDirectory, locale.getLanguage() );
+                }
+
+                siteRenderer.render( siteDirectoryFile, localeOutputDirectory,
+                                     getSiteDescriptor( reports, locale ), template, attributes, locale );
+
+                siteRenderer.render( siteDirectoryFile, localeOutputDirectory,
+                                     getSiteDescriptor( reports, locale ), template, attributes, locale );
 
                 File cssDirectory = new File( siteDirectory, "css" );
                 File imagesDirectory = new File( siteDirectory, "images" );
@@ -400,7 +414,7 @@ public class DoxiaMojo
     private InputStream getSiteDescriptor( List reports, Locale locale )
         throws MojoExecutionException
     {
-        File siteDescriptor = new File( siteDirectory, "site.xml" );
+        File siteDescriptor = new File( siteDirectory, "site_" + locale.getLanguage() + ".xml" );
 
         String siteDescriptorContent = "";
 
@@ -412,7 +426,16 @@ public class DoxiaMojo
             }
             else
             {
-                siteDescriptorContent = IOUtil.toString( getClass().getResourceAsStream( "/default-site.xml" ) );
+                siteDescriptor = new File( siteDirectory, "site.xml" );
+                
+                if ( siteDescriptor.exists() )
+                {
+                    siteDescriptorContent = FileUtils.fileRead( siteDescriptor );
+                }
+                else
+                {
+                    siteDescriptorContent = IOUtil.toString( getClass().getResourceAsStream( "/default-site.xml" ) );
+                }
             }
         }
         catch ( IOException e )
