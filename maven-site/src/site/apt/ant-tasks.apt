@@ -1,0 +1,222 @@
+  --------
+  Antlib for Maven 2.0
+  --------
+  Brett Porter
+  --------
+  24 June 2005
+  --------
+
+Antlib for Maven 2.0
+
+  Maven 2.0 now comes with a set of Ant tasks that can be used to utilise Maven's artifact handling features
+  from within Ant. This includes:
+
+    * <Dependency management> - including transitive dependencies, scope recognition and SNAPSHOT handling
+
+    * <Artifact deployment> - file and SSH based deployment to a Maven repository
+
+    * <POM processing> - for reading a Maven 2.0 <<<pom.xml>>> file
+
+  The Ant tasks can be downloaded from {{{download.html#ant} Maven 2.0 download page}}.
+
+Installing the Ant Tasks
+
+  For convenience, the Ant task and all its dependencies are packaged together as a single JAR file.
+
+  There are two ways to use the tasks from your scripts.
+
+* Intalling in Ant's <<<lib>>> directory
+
+  This is the simplest installation method but requires changes on every machine using the build file.
+  You can place the JAR in your Ant <<<lib>>> directory, include it in the <<<CLASSPATH>>> environment variable,
+  or pass it in to Ant using the <<<-lib>>> command line parameter.
+
+  Using this method, to make the tasks available in your build file, add the following namespace to the start of
+  the file:
+
+-----
+<project ... xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+  ...
+-----
+
+* Declaring a <<<typedef>>>
+
+  Using a <<<typedef>>> declaration allows you to store the library anywhere you like (such as source control)
+  and put it's location in the build file. This can be used to bootstrap the tasks by using <<<get>>> to obtain
+  the library, and then reference it from the build script.
+
+  The following example shows how to set it up, assuming the library is in the <<<lib>>> subdirectory of your current
+  project.
+
+-----
+<project ... xmlns:artifact="urn:maven-artifact-ant">
+  ...
+  <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="maven-artifact-ant">
+    <classpath>
+      <pathelement location="lib/maven-artifact-ant-2.0-alpha-3.jar" />
+    </classpath>
+  </typedef>
+  ...
+-----
+
+Using the Antlib
+
+* Declaring Dependencies
+
+  The main purpose of the antlib is to utilise Maven's {{{dependencies.html} dependency management features}}.
+
+  This is achieved with the <<<dependencies>>> task. The simplest usage involves specifying your dependencies inline,
+  such as in the following example:
+
+-----
+<artifact:dependencies pathId="dependency.classpath">
+  <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-api"
+              version="1.0-alpha-2"/>
+  <dependency groupId="org.codehaus.modello" artifactId="modello-core" 
+              version="1.0-alpha-2-SNAPSHOT"/>
+  <dependency groupId="javax.servlet" artifactId="servlet-api" 
+              version="2.4" scope="provided" />
+</artifact:dependencies>
+-----
+
+  The above example will download those 3 dependencies, and their dependencies, and so on. They will be stored in
+  the default local repository location, <<<$\{user.home\}/.m2/repository>>>.
+
+  You can also use a Maven 2.0 POM to declare your dependencies, which is {{{#POM} explained below}}. This is a
+  recommended practice so that you can reuse the file to deploy your own artifacts. 
+
+  You may have noticed the <<<pathId>>> reference. This is optional, but if given will create a classpath reference
+  that includes the local files downloaded as dependencies. This is usually used to pass to <<<javac>>> or other tasks:
+
+-----
+<javac ...>
+  <classpath refid="dependency.classpath" />
+  ...
+</javac>
+-----
+
+  Another option you can use is <<<filesetId>>>, which will give you a fileset reference that can be used to copy
+  files into a particular location. For example, to populate <<<WEB-INF/lib>>> with your dependencies, and assuming
+  you passed <<<filesetId="dependeny.fileset">>> to the <<<dependencies>>> task, you could use the following:
+
+-----
+<copy todir="${webapp.output}/WEB-INF/lib">
+  <fileset refid="depdendency.fileset" />
+</copy>
+-----
+
+  You can also specify a <<<scope>>> parameter on each dependency. This changes the behaviour of
+  transitive dependencies and is useful for building different types of classpaths. To see how it affects
+  the behaviour of the dependencies, see the <a href="dependencies.html#Dependency_Scope">Dependency Mechanism</a>
+  documentation in the Maven 2.0 site.
+
+* Declaring Repositories
+
+  All of the tasks can optionally take one or more remote repositories to download from and upload to, and a
+  local repository to store downloaded and installed archives to.
+
+  These can be specified inline, or if you choose to reuse them, they can be declared with an <<<id>>>/<<<refid>>>
+  combination.
+
+  For example, you can specify the remote repository you want to use:
+
+-----
+<artifact:remoteRepository id="remote.repository" url="http://repository.mycompany.com/" />
+...
+<artifact:dependencies>
+  ...
+  <remoteRepository refid="remote.repository" />
+</artifact:dependencies>
+-----
+
+  If no remote repositories are specified, the default {{{http://repo1.maven.org/maven2} http://repo1.maven.org/maven2}}
+  is used.
+
+  <<Note:>> to work with transitive dependencies, you <must> use a Maven 2.0 repository.
+
+  If your repository requires authentication, you can provide this as a nested element. It accepts the
+  attributes <<<username>>>, <<<password>>>, and for SSH based repositories <<<privateKey>>>
+  and <<<passphrase>>>. For example:
+
+-----
+<authentication username="brett" privateKey="${user.home}/.ssh/id_dsa" />
+-----
+
+* Installing and Deploying Your Own Artifacts
+
+  If you want to share your built artifacts between projects, you can use two other tasks: <<<install>>> for
+  placing them in your local repository for access as dependencies in other scripts, and <<<deploy>>> for
+  deploying them to an remote location you have set up to serve as a repository in your organisation.
+
+-----
+...
+  <artifact:pom id="maven.project" file="pom.xml" />
+
+  <artifact:install file="target/maven-artifact-ant-2.0-alpha-3.jar">
+    <pom refid="maven.project"/>
+  </artifact:install>
+
+  <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
+    <remoteRepository url="scp://localhost/www/repository">
+      <authentication username="${repository.username}" privateKey="${user.home}/.ssh/id_dsa"/>
+    </remoteRepository>
+    <pom refid="maven.project"/>
+  </artifact:deploy>
+...
+-----
+
+  Note that the installation and deployment require that you have a Maven 2.0 POM file to deploy along with it.
+  These are required for the transitive dependency mechanism to work effectively, and can be quite simple to
+  create.
+
+* Using a Maven {POM} File
+
+  Maven 2.0 POM files are required for deploying your own artifacts to a repository for use in the dependencies
+  elements of other projects. 
+
+  They can also be reused for declaring your own dependencies, instead of specifying the inline version given earlier.
+
+  Here is the earlier example, expressed as a POM:
+
+-----
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany.project</groupId>
+  <artifactId>project-model</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-provider-api</artifactId>
+      <version>1.0-alpha-2</version>
+    </dependency>
+    ...
+  </dependencies>
+</project>
+-----
+
+~~explain ID
+
+Sample Ant Script
+
+  The file 
+  {{{http://svn.apache.org/repos/asf/maven/components/trunk/maven-artifact-ant/sample.build.xml} sample.build.xml}}
+  is a sample Ant script showing some of the functionality in action.
+
+Getting Help
+
+  If you have any questions specific to the Ant tasks, please contact the
+  {{{mail-lists.html} Maven Users Mailing List}}.
+
+  For more on the Maven functionality behind them, try the following links:
+
+    * {{{dependencies.html} Dependency Mechanism}}
+
+    * {{{maven-settings/settings.html} Settings Reference}}
+
+~~settings.xml
+~~reference
+~~exclusions
+
+
