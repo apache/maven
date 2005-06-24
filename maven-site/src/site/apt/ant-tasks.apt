@@ -70,7 +70,7 @@ Using the Antlib
 
 -----
 <artifact:dependencies pathId="dependency.classpath">
-  <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-api"
+  <dependency groupId="org.apache.maven.wagon" artifactId="wagon-provider-test"
               version="1.0-alpha-2"/>
   <dependency groupId="org.codehaus.modello" artifactId="modello-core" 
               version="1.0-alpha-2-SNAPSHOT"/>
@@ -107,7 +107,7 @@ Using the Antlib
 
   You can also specify a <<<scope>>> parameter on each dependency. This changes the behaviour of
   transitive dependencies and is useful for building different types of classpaths. To see how it affects
-  the behaviour of the dependencies, see the <a href="dependencies.html#Dependency_Scope">Dependency Mechanism</a>
+  the behaviour of the dependencies, see the {{{dependencies.html#Dependency_Scope} Dependency Mechanism}}
   documentation in the Maven 2.0 site.
 
 * Declaring Repositories
@@ -171,6 +171,8 @@ Using the Antlib
 
 * Using a Maven {POM} File
 
+  In Maven, the Project Object Model (POM) represents a unit of work - one exists for each artifact that is built.
+
   Maven 2.0 POM files are required for deploying your own artifacts to a repository for use in the dependencies
   elements of other projects. 
 
@@ -191,12 +193,93 @@ Using the Antlib
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-alpha-2</version>
     </dependency>
-    ...
+
+    <dependency>
+      <groupId>org.codehaus.modello</groupId>
+      <artifactId>modello-core</artifactId>
+      <version>1.0-alpha-2-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 </project>
 -----
 
-~~explain ID
+  These elements represent:
+
+    * <modelVersion> - this is the version of the POM layout in use, currently <<<4.0.0>>>
+
+    * <groupId> - the group ID represents your organisation and project name, much like a Java package name.
+      This must be universally unique. This becomes the base directory in the repository as well.
+
+    * <artifactId> - the artifact ID represents the current build unit. It usually equals the filename of the
+      resulting file, and must be unique within the group.
+
+    * <version> - the version of the artifact you are building.
+
+    * <dependencies> - the artifacts the project is dependant on.
+
+  This is all that is required for most projects. However, it is also possible to use other fields available in
+  Maven to describe your project, and reference them from your build script. 
+
+  To access a POM as Ant properties, you must define it as a reference. For example, to access the version from a POM,
+  you could use the following:
+
+-----
+  <artifact:pom id="maven.project" file="pom.xml" />
+
+  <echo>The version is ${maven.project.version}</echo>
+-----
+
+  You can also access nested parts of the POM. For example, you can read the default value of the <<<directory>>>
+  element within the <<<build>>> element using a <<<.>>> separator.
+
+-----
+  <artifact:pom id="project" file="pom.xml" />
+
+  <echo>The version is ${project.build.directory}</echo>
+-----
+
+  For more information on the elements available in the POM, see the {{{maven-model/maven.html} descriptor reference}}.
+
+The Settings File
+
+  The POM can be used to represent most of the information that the tasks have access to, including remote
+  repositories. For information that is user or environment specific, such as the <<<authentication>>> tag, are
+  specified in the <<<settings.xml>>> file in Maven, and can be accessed from the Ant tasks also.
+
+  The file is first looked for in <<<$\{user.home\}/.ant/settings.xml>>>, then in <<<$\{user.home\}/.m2/settings.xml>>>
+  so that the settings can be shared with Maven 2.0 itself.
+
+  For example, to specify your proxy settings, you would specify the following <<<settings.xml>>> file:
+
+-----
+<settings>
+  <proxies>
+    <proxy>
+      <protocol>http</protocol>
+      <host>proxy.host.net</host>
+      <port>8080</port>
+      <nonProxyHosts>localhost</nonProxyHosts>
+    </proxy>
+  </proxies>
+</settings>
+-----
+
+  For more information in configuring <<<settings.xml>>>, see:
+
+    * {{{configuration.html} Configuring Maven}}.
+
+    * {{{maven-settings/settings.html} Settings Descriptor Reference}}.
+
+    * There is a
+      {{{http://svn.apache.org/repos/asf/maven/components/trunk/maven-core/src/conf/settings.xml} sample settings file}}
+      in the Maven installation.
 
 Sample Ant Script
 
@@ -215,8 +298,120 @@ Getting Help
 
     * {{{maven-settings/settings.html} Settings Reference}}
 
-~~settings.xml
-~~reference
-~~exclusions
+    * {{{maven-model/maven.html} POM Reference}}
 
+Task Reference
+
+* <<<dependencies>>>
+
+  This task will check if any of the specified dependencies, and their dependencies are missing or updated, and
+  download them if necessary. The dependencies will be made available as a fileset or path reference.
+
+  The dependencies task accepts the following attributes:
+
+*-----------------+--------------------------------------------------------+
+| <<<verbose>>>   | If <<<true>>> this displays the results of each dependency resolution and their relationships. Default is <false>.
+*-----------------+--------------------------------------------------------+
+| <<<filesetId>>> | The reference ID to store a fileset under of the resolved dependencies.
+*-----------------+--------------------------------------------------------+
+| <<<pathId>>>    | The reference ID to store a path under of the resolved dependencies.
+*-----------------+--------------------------------------------------------+
+
+  The task can include the <<<dependency>>> nested type, in addition to the other shared types explained later.
+  You must include at least one <<<dependency>>> element, or a single <<<pom>>> element, but not both.
+
+** <<<dependency>>>
+
+*------------------+--------------------------------------------------------+
+| <<<groupId>>>    | The group ID for of the dependency. <Required>
+*------------------+--------------------------------------------------------+
+| <<<artifactId>>> | The artifact ID for of the dependency. <Required>
+*------------------+--------------------------------------------------------+
+| <<<version>>>    | The version of the dependency. <Required>
+*------------------+--------------------------------------------------------+
+| <<<type>>>       | The type of the dependency. The default is <<<jar>>>.
+*------------------+--------------------------------------------------------+
+| <<<scope>>>      | The scope of the usage of the dependency, which affects which of its dependencies are also retrieved. This can be <<<compile>>>, <<<runtime>>>, <<<test>>>, <<<provided>>>.
+*------------------+--------------------------------------------------------+
+
+  The dependency can also nest multiple <<<exclusion>>> elements.
+
+*** <<<exclusion>>>
+
+  An exclusion can be used to prevent the resolution of a particular artifact in the tree of the dependency.
+
+*------------------+--------------------------------------------------------+
+| <<<groupId>>>    | The group ID for of the dependency to exclude. <Required>
+*------------------+--------------------------------------------------------+
+| <<<artifactId>>> | The artifact ID for of the dependency to exclude. <Required>
+*------------------+--------------------------------------------------------+
+
+* <<<install>>>
+
+  This task will install the given file into the local repository. It is stored using the information in the supplied
+  POM.
+
+*------------------+--------------------------------------------------------+
+| <<<file>>>       | The file to install in the local repository. <Required>
+*------------------+--------------------------------------------------------+
+
+  The task must also take a nested <<<pom>>>, and can have an optional <<<localRepository>>> element.
+
+* <<<deploy>>>
+
+  This task will deploy the given file into the remote repository. It is stored using the information in the supplied
+  POM.
+
+*------------------+--------------------------------------------------------+
+| <<<file>>>       | The file to deploy in the remote repository. <Required>
+*------------------+--------------------------------------------------------+
+
+  The task must also take a nested <<<pom>>>, and can have an optional <<<remoteRepository>>> element. If no
+  <<<remoteRepository>>> element is given, the <<<distributionManagement>>> section of the POM is used.
+
+Type Reference
+
+* <<<localRepository>>>
+
+  Specifies the location of the local repository of artifacts.
+
+*------------------+--------------------------------------------------------+
+| <<<location>>>   | The directory of the local repository. <Required>
+*------------------+--------------------------------------------------------+
+| <<<layout>>>     | The layout of the local repository. The valid options are <<<legacy>>> (Maven 1), or <<<default>>> (Maven 2).
+*------------------+--------------------------------------------------------+
+
+* <<<remoteRepository>>>
+
+  Specifies the location of the remote repository.
+
+*----------------------+--------------------------------------------------------+
+| <<<url>>>            | The URL of the repository. <Required>
+*----------------------+--------------------------------------------------------+
+| <<<layout>>>         | The layout of the remote repository. The valid options are <<<legacy>>> (Maven 1), or <<<default>>> (Maven 2).
+*----------------------+--------------------------------------------------------+
+| <<<snapshotPolicy>>> | How often to check for updates on dependencies with a version that includes <<<SNAPSHOT>>>. Valid values are <<<never>>>, <<<interval:XXX>>>, <<<daily>>> (<default)>, <<<always>>>.
+*----------------------+--------------------------------------------------------+
+| <<<checksumPolicy>>> | How to treat missing or incorrect checksums for the dependencies that are downloaded. Valid values are <<<warn>>> (<default>) and <<<fail>>>.
+*----------------------+--------------------------------------------------------+
+
+  The remote repository can also nest the following elements: <<<authentication>>> and <<<proxy>>>.
+
+** <<<proxy>>>
+
+  The proxy element is typically used for HTTP repositories. The layout is the same as in the
+  {{{maven-settings/settings.html#Proxy} settings reference}}.
+
+** <<<authentication>>>
+
+  The authentication element is used for passing a username, password and other credentials to the repository either
+  on upload or download. The layout is the same as in the {{{maven-settings/settings.html#Server} settings reference}}.
+
+* <<<pom>>>
+
+  The POM element will load a POM file and make it available as a reference for the other tasks or as properties.
+
+*------------------+--------------------------------------------------------+
+| <<<file>>>       | The file of the POM to load. <Required>
+*------------------+--------------------------------------------------------+
 
