@@ -207,17 +207,19 @@ m2 site:site site:deploy
   be generated at the root of the site, with a copy of the French translation of the site in the <<<fr/>>> subdirectory.
 
   To add your own content for that translation instead of using the default, place a subdirectory with that locale
-  name in your individual content directories. For example:
+  name in your site directory and create a new site descriptor with the locale in the file name. For example:
 
 -------------------
 +- src/
    +- site/
       +- apt/
-      |  +- fr/
-      |  |  +- index.apt  (French version)
       |  +- index.apt     (Default version)
-      +- site.xml
+      +- fr/
+      |  +- apt/
+      |  |  +- index.apt  (French version)
+      +- site.xml         (Default site descriptor)
+      +- site_fr.xml      (French site descriptor)
 --------------------
 
-  ~~TODO: what about translating site.xml?
+  With one site descriptor by language, translated site can evolve independently.
 
