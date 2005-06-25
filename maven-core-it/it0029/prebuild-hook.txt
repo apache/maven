@@ -1,0 +1,2 @@
+rm ${artifact:org.apache.maven.it:maven-core-it0029:1.0-SNAPSHOT:jar}
+rm ${artifact:org.apache.maven.it:maven-core-it0029-child:1.0-SNAPSHOT:jar}

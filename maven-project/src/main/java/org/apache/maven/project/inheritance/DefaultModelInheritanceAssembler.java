@@ -23,6 +23,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
@@ -483,7 +484,17 @@ public class DefaultModelInheritanceAssembler
         // Plugin management :: aggregate
         if ( childBuild != null && parentBuild != null )
         {
-            ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(), false );
+            PluginManagement childPM = childBuild.getPluginManagement();
+            PluginManagement parentPM = parentBuild.getPluginManagement();
+            
+            if( childPM == null && parentPM !=null )
+            {
+                childBuild.setPluginManagement( parentPM );
+            }
+            else
+            {
+                ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(), false );
+            }
         }
     }
 

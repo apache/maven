@@ -88,6 +88,8 @@ it0027: Test @execute with a custom lifecycle, including configuration
 it0028: Test that unused configuration parameters from the POM don't cause the
         mojo to fail...they will show up as warnings in the -X output instead.
 
+it0029: Test for pluginManagement injection of plugin configuration.
+
 -------------------------------------------------------------------------------
 
 - generated sources
