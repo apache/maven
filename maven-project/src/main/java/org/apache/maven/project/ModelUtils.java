@@ -268,6 +268,7 @@ public final class ModelUtils
         ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
         assembler.assembleModelInheritance( newModel, model );
         newModel.setVersion( model.getVersion() );
+        newModel.setArtifactId( model.getArtifactId() );
         return newModel;
     }
 }
