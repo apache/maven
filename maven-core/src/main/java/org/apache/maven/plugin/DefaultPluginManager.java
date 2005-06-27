@@ -43,7 +43,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -455,11 +454,7 @@ public class DefaultPluginManager
                     String executionId = mojoExecution.getExecutionId();
                     Xpp3Dom dom = project.getReportConfiguration( groupId, artifactId, executionId );
 
-                    Mojo mojo = getConfiguredMojo( mojoDescriptor, session, dom, project );
-                    if ( mojo instanceof AbstractMavenReport)
-                    {
-                        reports.add( mojo );
-                    }
+                    reports.add( getConfiguredMojo( mojoDescriptor, session, dom, project ) );
                 }
                 catch ( ComponentLookupException e )
                 {
