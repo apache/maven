@@ -2,36 +2,36 @@
   <parent>
     <artifactId>maven-plugin-parent</artifactId>
     <groupId>org.apache.maven.plugins</groupId>
-    <version>2.0-alpha-3</version>
+    <version>2.0-beta-1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-plugin-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Maven PLUGIN Plugin</name>
-  <version>2.0-alpha-3</version>
+  <version>2.0-beta-1-SNAPSHOT</version>
   <inceptionYear>2001</inceptionYear>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-tools-api</artifactId>
-      <version>2.0-alpha-3</version>
+      <version>2.0-beta-1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-tools-beanshell</artifactId>
-      <version>2.0-alpha-3</version>
+      <version>2.0-beta-1-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-tools-java</artifactId>
-      <version>2.0-alpha-3</version>
+      <version>2.0-beta-1-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-tools-marmalade</artifactId>
-      <version>2.0-alpha-3</version>
+      <version>2.0-beta-1-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

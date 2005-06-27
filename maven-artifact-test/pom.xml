@@ -2,12 +2,12 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>2.0-alpha-3</version>
+    <version>2.0-beta-1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
   <artifactId>maven-artifact-test</artifactId>
-  <version>2.0-alpha-3</version>
+  <version>2.0-beta-1-SNAPSHOT</version>
   <name>Maven Artifact Test Helper Library</name>
   <dependencies>
     <dependency>
@@ -18,17 +18,17 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>2.0-alpha-3</version>
+      <version>2.0-beta-1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact-manager</artifactId>
-      <version>2.0-alpha-3</version>
+      <version>2.0-beta-1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-settings</artifactId>
-      <version>2.0-alpha-3</version>
+      <version>2.0-beta-1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
