@@ -32,8 +32,6 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -54,11 +52,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 

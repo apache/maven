@@ -25,7 +25,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.model.ReportSet;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
