@@ -765,11 +765,17 @@ public class DoxiaMojo
                 try
                 {
                     List reportSets = reportPlugin.getReportSets();
+
+                    List reportsList = new ArrayList();
+
                     if ( reportSets == null || reportSets.isEmpty() )
                     {
-                        reports.addAll(
-                            pluginManager.getReports( reportPlugin.getGroupId(), reportPlugin.getArtifactId(),
-                                                      reportPlugin.getVersion(), null, session, project ) );
+                        reportsList = pluginManager.getReports( reportPlugin.getGroupId(),
+                                                                reportPlugin.getArtifactId(),
+                                                                reportPlugin.getVersion(),
+                                                                null,
+                                                                session,
+                                                                project );
 
                     }
                     else
@@ -778,9 +784,23 @@ public class DoxiaMojo
                         {
                             ReportSet reportSet = (ReportSet) j.next();
 
-                            reports.addAll(
-                                pluginManager.getReports( reportPlugin.getGroupId(), reportPlugin.getArtifactId(),
-                                                          reportPlugin.getVersion(), reportSet, session, project ) );
+                            reportsList = pluginManager.getReports( reportPlugin.getGroupId(),
+                                                                    reportPlugin.getArtifactId(),
+                                                                    reportPlugin.getVersion(),
+                                                                    reportSet,
+                                                                    session,
+                                                                    project );
+                        }
+                    }
+
+                    for ( Iterator i = reportsList.iterator(); i.hasNext(); )
+                    {
+                        Object obj = i.next();
+
+                        //TODO: Remove this test when getReports will return only reports object
+                        if ( obj instanceof MavenReport )
+                        {
+                            reports.add( obj );
                         }
                     }
                 }
