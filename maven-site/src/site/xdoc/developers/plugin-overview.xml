@@ -97,8 +97,15 @@
     </section>
     <section name="Definitions">
       <subsection name="What is a Plugin?">
+        Maven is a framework for the execution of plugin goals.  Every action you 
+        take in Maven is really just calling out to an existing maven plugin. 
+        When you compile, clean, create a JAR, generate a site, or execute
+        unit tests, Maven is executing goals from the appropriate plugins. 
       </subsection>
       <subsection name="What is a Mojo (And Why the H--- is it Named 'Mojo')?">
+        MOJO is a play on POJO (Plain-old-Java-object), substituting "Maven" for
+        "Plain".  A Mojo is really just a goal in Maven 2, and plug-ins consist of 
+        any number of goals (Mojos). 
       </subsection>
       <subsection name="What is the Build Lifecycle?">
       </subsection>
@@ -131,8 +138,10 @@
     <section name="Resources">
       <ul>
         <li>
-          <a href="../plugin-management.html">Managing plugin configuration in 
-            large projects</a>
+          <a href="developing-plugins-with-marmalade.html">Developing Plugins with Marmalade</a>
+        </li>
+        <li>
+          <a href="mojo-api-specification.html">MOJO API Specification</a>
         </li>
       </ul>
     </section>
