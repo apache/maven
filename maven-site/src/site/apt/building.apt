@@ -12,7 +12,8 @@ Building Maven 2.0
 
   Building Maven 2.0 yourself is for one of two reasons:
 
-    * to try out a bleeding edge feature or bugfix
+    * to try out a bleeding edge feature or bugfix (issues can be found in
+      {{{http://jira.codehaus.org/browse/MNG} JIRA}}),
 
     * to fix a problem you are having and submit a patch to the developers team.
 
@@ -21,8 +22,8 @@ Building Maven 2.0
 
 * Checking out the sources
 
-  All of the source code for Maven 2.0 and its related libraries are in Subversion. You can
-  {{{http://svn.apache.org/viewcvs.cgi/maven/} browse the repository}}, or checkout specific modules directly.
+  All of the source code for Maven 2.0 and its related libraries are in {{{http://subversion.tigris.org/} Subversion}}.
+  You can {{{http://svn.apache.org/viewcvs.cgi/maven/} browse the repository}}, or checkout specific modules directly.
 
   To build Maven 2.0, you need the <<<components>>> module. To check that out, run the command:
 
@@ -54,7 +55,7 @@ export M2_HOME=/usr/local/maven-2.0-SNAPSHOT
 PATH=$M2_HOME/bin:$PATH
   or
 set M2_HOME=c:\maven-2.0-SNAPSHOT
-set PATH=%M2_HOME%\bin;$PATH
+set PATH=%M2_HOME%\bin;%PATH%
 ----
 
   From this, run the <<<m2-bootstrap-all>>> command for your system:
