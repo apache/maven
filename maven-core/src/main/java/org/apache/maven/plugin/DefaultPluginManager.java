@@ -770,6 +770,11 @@ public class DefaultPluginManager
     {
         List parameters = goal.getParameters();
 
+        if ( parameters == null )
+        {
+            return;
+        }
+
         for ( int i = 0; i < parameters.size(); i++ )
         {
             Parameter parameter = (Parameter) parameters.get( i );
