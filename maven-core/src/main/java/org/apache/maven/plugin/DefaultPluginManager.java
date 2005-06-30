@@ -671,6 +671,11 @@ public class DefaultPluginManager
 
         List parameters = goal.getParameters();
 
+        if ( parameters == null )
+        {
+            return;
+        }
+
         List invalidParameters = new ArrayList();
 
         for ( int i = 0; i < parameters.size(); i++ )
