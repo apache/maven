@@ -69,6 +69,14 @@ m2-bootstrap-all.bat
   First, the code will be built, then using the new installation the plugins will be rebuilt and installed in the
   local repository. Finally, a set of integration tests will run.
 
+  Note that it isn't necessary to have a previous version (alpha-X...) of maven 2 installed before bootstrap.
+
+  For bootstrap (exclusive possibility):
+
+    * M2_HOME is set to a directory that doesn't exist (if it exists, remove it)!
+
+    * M2_HOME directory contains a valid installation of m2 (ie $M2_HOME/bin/m2.conf or %M2_HOME%\bin\m2.conf exists).
+
   If you have any problems or get any failures during the run, please report them to the 
   {{{/mail-lists.html} Maven Developers List}}.
 
