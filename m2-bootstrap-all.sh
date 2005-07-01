@@ -18,9 +18,12 @@ if $cygwin ; then
   [ -n "$M2_HOME" ] && M2_HOME=`cygpath -w "$M2_HOME"`
 fi
 
-if [ ! -z "$M2_HOME" ]; then
-  HOME_ARGS="-Dmaven.home=$M2_HOME"
+if [ -z "$M2_HOME" ]; then
+  echo "M2_HOME must be set."
+  exit 1
 fi
+
+HOME_ARGS="-Dmaven.home=$M2_HOME"
 
 # Build and install mboot
 (
