@@ -149,7 +149,7 @@ public class MojoDescriptor
         {
             parameterMap = new HashMap();
 
-            if ( parameters == null )
+            if ( parameters != null )
             {
                 for ( Iterator iterator = parameters.iterator(); iterator.hasNext(); )
                 {
