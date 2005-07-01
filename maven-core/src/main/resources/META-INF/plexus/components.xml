@@ -216,7 +216,7 @@
         <!-- START SNIPPET: plexus-application-lifecycle -->
         <phases>
           <generate-resources>plexus:app</generate-resources>
-          <package>plexus:bundle-runtime</package>
+          <package>plexus:bundle-application</package>
           <install>install:install</install>
           <deploy>deploy:deploy</deploy>
         </phases>

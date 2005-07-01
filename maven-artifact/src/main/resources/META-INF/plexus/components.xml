@@ -98,6 +98,17 @@
 
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>plexus-application</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>plexus-application</type>
+        <extension>jar</extension>
+        <packaging>plexus-application</packaging>
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ejb-client</role-hint>
       <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
       <configuration>
