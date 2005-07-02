@@ -46,6 +46,7 @@
         <role>Architect</role>
         <role>Release Manager</role>
       </roles>
+      <timezone>-5</timezone>      
     </developer>
     <developer>
       <id>brett</id>
@@ -69,6 +70,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>jdcasey</id>
+      <name>John Casey</name>
+      <email>jdcasey@apache.org</email>
+      <organization>ASF</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>PMC Member</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>    
   </developers>
   <dependencies>
     <dependency>
