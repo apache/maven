@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The Ear Mojo.
+ * Builds J2EE Enteprise Archive (EAR) files.
  *
  * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
  * @version $Id $
@@ -77,7 +77,7 @@ public class EarMojo
      *
      * @parameter alias="earName" expression="${project.build.finalName}"
      * @required
-     * @readonly
+     * @readonly     
      */
     private String finalName;
 

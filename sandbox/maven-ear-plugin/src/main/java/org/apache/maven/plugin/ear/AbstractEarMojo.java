@@ -72,7 +72,8 @@ public abstract class AbstractEarMojo
             for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
             {
                 Artifact artifact = (Artifact) iter.next();
-                if ( !Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
+                if ( !Artifact.SCOPE_TEST.equals( artifact.getScope())  ||
+                    !Artifact.SCOPE_PROVIDED.equals( artifact.getScope()) )
                 {
                     EarModule module = EarModuleFactory.newEarModule( artifact );
                     modules.add( module );

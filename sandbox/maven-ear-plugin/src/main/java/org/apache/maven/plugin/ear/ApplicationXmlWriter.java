@@ -37,12 +37,21 @@ import java.util.List;
  */
 public final class ApplicationXmlWriter
 {
+    public static final String DOCTYPE_1_3 = "application PUBLIC\n" +
+        "\t\"-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN\"\n" +
+        "\t\"http://java.sun.com/dtd/application_1_3.dtd\"";
+
+    private static final String APPLICATION_ELEMENT = "application";
+
 
     private final String version;
 
-    public ApplicationXmlWriter( String version )
+    private final String encoding;
+
+    public ApplicationXmlWriter( String version, String encoding )
     {
         this.version = version;
+        this.encoding = encoding;
     }
 
     public void write( File destinationFile, List earModules, String displayName, String description )
@@ -59,10 +68,15 @@ public final class ApplicationXmlWriter
                                           ex );
         }
 
-        // @todo Add DTD or XSchema reference based on version attribute
-
-        XMLWriter writer = new PrettyPrintXMLWriter( w );
-        writer.startElement( "application" );
+        XMLWriter writer = null;
+        if ( GenerateApplicationXmlMojo.VERSION_1_3.equals( version ) )
+        {
+            writer = initializeRootElementOneDotThree( w );
+        }
+        else if ( GenerateApplicationXmlMojo.VERSION_1_4.equals( version ) )
+        {
+            writer = initializeRootElementOneDotFour( w );
+        }
 
         if ( displayName != null )
         {
@@ -104,5 +118,24 @@ public final class ApplicationXmlWriter
         {
             // TODO: warn
         }
+    }
+
+    private XMLWriter initializeRootElementOneDotThree( FileWriter w )
+    {
+        XMLWriter writer = new PrettyPrintXMLWriter( w, encoding, DOCTYPE_1_3 );
+        writer.startElement( APPLICATION_ELEMENT );
+        return writer;
+    }
+
+    private XMLWriter initializeRootElementOneDotFour( FileWriter w )
+    {
+        XMLWriter writer = new PrettyPrintXMLWriter( w, encoding, null );
+        writer.startElement( APPLICATION_ELEMENT );
+        writer.addAttribute( "xmlns", "http://java.sun.com/xml/ns/j2ee" );
+        writer.addAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
+        writer.addAttribute( "xsi:schemaLocation",
+                             "http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/application_1_4.xsd" );
+        writer.addAttribute( "version", "1.4" );
+        return writer;
     }
 }
