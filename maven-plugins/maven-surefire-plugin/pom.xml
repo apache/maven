@@ -18,13 +18,13 @@
     <dependency>
       <groupId>surefire</groupId>
       <artifactId>surefire-booter</artifactId>
-      <version>1.2</version>
+      <version>1.3-SNAPSHOT</version>
     </dependency>
     <!-- Specified for mboot -->
     <dependency>
       <groupId>surefire</groupId>
       <artifactId>surefire</artifactId>
-      <version>1.2</version>
+      <version>1.3-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
