@@ -39,6 +39,11 @@ public class ManifestConfiguration
      */
     private String addExtensions;
 
+    /**
+     * This gets prefixed to all classpath entries.
+     */
+    private String classpathPrefix = "";
+
     public String getMainClass()
     {
         return mainClass;
@@ -57,5 +62,17 @@ public class ManifestConfiguration
     public String getPackageName()
     {
         return packageName;
+    }
+
+    public String getClasspathPrefix()
+    {
+        String cpp = classpathPrefix.replaceAll( "\\\\", "/" );
+
+        if ( cpp.length() != 0 && !cpp.endsWith("/") )
+        {
+            cpp += "/";
+        }
+        
+        return cpp;
     }
 }

@@ -73,6 +73,7 @@ public class MavenArchiver
         {
             StringBuffer classpath = new StringBuffer();
             List artifacts = project.getRuntimeClasspathElements();
+            String classpathPrefix = config.getClasspathPrefix();
 
             for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
             {
@@ -84,6 +85,7 @@ public class MavenArchiver
                         classpath.append( " " );
                     }
 
+                    classpath.append( classpathPrefix );
                     classpath.append( f.getName() );
                 }
             }
