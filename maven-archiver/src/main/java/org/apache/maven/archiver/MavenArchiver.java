@@ -278,7 +278,11 @@ public class MavenArchiver
     {
         String buildDirectory = project.getBuild().getDirectory();
 
-        File fullPom = new File( buildDirectory, "exported-pom.xml" );
+        File buildDirectoryFile = new File( buildDirectory );
+
+        buildDirectoryFile.mkdirs();
+
+        File fullPom = new File( buildDirectoryFile, "exported-pom.xml" );
 
         FileWriter fWriter = null;
 
