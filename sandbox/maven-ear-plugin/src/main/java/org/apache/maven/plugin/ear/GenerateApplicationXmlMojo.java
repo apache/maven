@@ -90,7 +90,7 @@ public class GenerateApplicationXmlMojo
         getLog().debug( "encoding[" + encoding + "]" );
         getLog().debug( "generatedDescriptorLocation[" + generatedDescriptorLocation + "]" );
 
-        if ( !version.equals( VERSION_1_3 ) && version.equals( VERSION_1_4 ) )
+        if ( !version.equals( VERSION_1_3 ) && !version.equals( VERSION_1_4 ) )
         {
             throw new MojoExecutionException( "Invalid version[" + version + "]" );
         }
