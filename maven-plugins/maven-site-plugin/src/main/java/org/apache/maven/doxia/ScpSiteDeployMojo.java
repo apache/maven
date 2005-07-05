@@ -143,7 +143,12 @@ public class ScpSiteDeployMojo
 
             commandExecutor.executeCommand( cmd );
 
-            commandExecutor.executeCommand( "rm -f " + basedir + "/" + zipFile.getName()  );
+            if ( !basedir.endsWith( "/" ) )
+            {
+                basedir = basedir + "/";
+            }
+
+            commandExecutor.executeCommand( "rm -f " + basedir + zipFile.getName()  );
         }
         catch ( Exception e )
         {
