@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
@@ -41,6 +42,7 @@ import java.util.TreeMap;
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Andreas Hoheneder
  * @version $Id$
  * @goal resources
  * @phase process-resources
@@ -78,6 +80,13 @@ public class ResourcesMojo
      * @parameter expression="${basedir}/filter.properties"
      */
     private File filterPropertiesFile;
+
+    /**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
 
     private Properties filterProperties;
 
@@ -210,6 +219,8 @@ public class ResourcesMojo
 
                 // support @token@
                 reader = new InterpolationFilterReader( reader, filterProperties, "@", "@" );
+
+                reader = new InterpolationFilterReader( reader, new ReflectionProperties( project ), "${", "}" );
 
                 fileWriter = new FileWriter( to );
 
