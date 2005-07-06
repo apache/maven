@@ -90,6 +90,9 @@ it0028: Test that unused configuration parameters from the POM don't cause the
 
 it0029: Test for pluginManagement injection of plugin configuration.
 
+it0030: Test for injection of dependencyManagement through parents of 
+        dependency poms.
+
 -------------------------------------------------------------------------------
 
 - generated sources

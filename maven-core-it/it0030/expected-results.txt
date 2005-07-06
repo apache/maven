@@ -1,0 +1,1 @@
+child-hierarchy/project2/target/classes/org/apache/maven/it0001/Person.class

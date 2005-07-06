@@ -1,0 +1,4 @@
+rm ${artifact:org.apache.maven.it:maven-core-it0030:1.0-SNAPSHOT:jar}
+rm ${artifact:org.apache.maven.it:maven-core-it0030-child-hierarchy:1.0-SNAPSHOT:jar}
+rm ${artifact:org.apache.maven.it:maven-core-it0030-child-project1:1.0-SNAPSHOT:jar}
+rm ${artifact:org.apache.maven.it:maven-core-it0030-child-project2:1.0-SNAPSHOT:jar}

@@ -1,0 +1,26 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.it</groupId>
+    <artifactId>maven-core-it0030</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>maven-core-it0030-child-hierarchy</artifactId>
+  <packaging>pom</packaging>
+  
+  <version>1.0-SNAPSHOT</version>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <modules>
+    <module>project1</module>
+    <module>project2</module>
+  </modules>
+</model>
