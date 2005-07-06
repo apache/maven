@@ -27,7 +27,7 @@ public class AntlrPlugin
     private String grammars;
 
     /**
-     * @parameter expression="${basedir}/src/antlr"
+     * @parameter expression="${basedir}/src/main/antlr"
      * @required
      */
     private String sourceDirectory;
