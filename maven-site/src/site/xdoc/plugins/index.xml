@@ -7,7 +7,15 @@
     <section name="Available Plugins">
       <p>
         This page lists some of the available plugins for Maven 2.0. Please bear in mind that this is not a definitive
-        list, and that others can be made available immediately via the Maven repository.
+        list, and that others can be made available immediately via the Maven repository. 
+      </p>
+      <p>
+        To see the most up-to-date list of available plugins, browse the Maven 2 plugin repository
+        at <a href="http://www.ibiblio.org/maven2/plugins/">http://www.ibiblio.org/maven2/plugins/</a>.  
+        Plugins are organized according to a directory structure that resembles
+        the standard Java package naming convention.  To see a list of available
+        plugins from the Maven project, look in the <a href="http://www.ibiblio.org/maven2/plugins/org/apache/maven/plugins/">org/apache/maven subfolder</a>
+        of this directory.
       </p>
       <p>
         Full documentation on each of these plugins is still in the works - contributions are welcome!

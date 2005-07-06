@@ -2,8 +2,14 @@
 The APT format
 ~~~~~~~~~~~~~~
 
-  In the following section, boxes containing text in typewriter-like font are
-  examples of APT source.
+  <<APT stands for "Almost Plain Test">>. APT is a format thats takes the hassle out
+  of writing documentation by striving for simplicity.  APT syntax resembles 
+  plain-text more than it resembles markup languages such as HTML, and the 
+  following document contains some examples of available APT formatting.
+  The following sections contain formatted text that demonstrates the use 
+  of APT to create paragraphs, headers, sections, lists, code samples, 
+  figures, tables, rules, breaks, and text level elements such as font styles,
+  anchors, and special characters.
 
 * Document structure
 ~~~~~~~~~~~~~~~~~~~~
