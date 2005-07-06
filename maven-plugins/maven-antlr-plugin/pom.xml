@@ -1,0 +1,25 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>mojo</artifactId>
+    <groupId>org.apache.maven.plugins</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>maven-antlr-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+  <name>Maven ANTLR Plugin</name>
+  <inceptionYear>2001</inceptionYear>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.0-beta-1-SNAPSHOT</version>
+    </dependency>      
+    <dependency>
+      <groupId>antlr</groupId>
+      <artifactId>antlrall</artifactId>
+      <version>2.7.4</version>
+    </dependency>
+  </dependencies>
+</project>
