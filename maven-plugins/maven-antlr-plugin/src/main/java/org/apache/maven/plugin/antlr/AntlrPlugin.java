@@ -12,7 +12,7 @@ import java.security.Permission;
 import java.util.StringTokenizer;
 
 /**
- * @goal genrerate
+ * @goal generate
  * @phase generate-sources
  * @requiresDependencyResolution compile
  * @description Antlr plugin
