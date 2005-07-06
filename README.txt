@@ -16,3 +16,22 @@ e.g. to run in offline mode, set MAVEN_OPTS=-o
 Then run m2-bootstrap-all.bat (in Windows) or m2-bootstrap-all.sh (in Unix)
 
 NOTE: You must run these instructions from this directory!
+
+If you are behind a firewall, you will need to let the bootstrap process know.
+To do this, create a file at ~/.m2/settings.xml and paste in the XML below,
+substituting your settings for those provided. You can safely skip the
+username, password and nonProxyHost elements if they are not relevant to you.
+
+<settings>
+  <proxies>
+    <proxy>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>proxy.somewhere.com</host>
+      <port>8080</port>
+      <username>proxyuser</username>
+      <password>somepassword</password>
+      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+    </proxy>
+  </proxies>
+</settings>
