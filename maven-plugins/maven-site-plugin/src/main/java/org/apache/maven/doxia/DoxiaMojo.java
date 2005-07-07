@@ -315,13 +315,13 @@ public class DoxiaMojo
                     copyDirectory( imagesDirectory, new File( localeOutputDirectory, "images" ) );
                 }
 
+                copyResources( localeOutputDirectory );
+
                 // Copy site resources
                 if ( resourcesDirectory != null && resourcesDirectory.exists() )
                 {
                     copyDirectory( resourcesDirectory, localeOutputDirectory );
                 }
-
-                copyResources( localeOutputDirectory );
             }
         }
         catch ( MavenReportException e )
