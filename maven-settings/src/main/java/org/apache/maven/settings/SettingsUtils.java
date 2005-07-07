@@ -55,6 +55,21 @@ public final class SettingsUtils
             }
         }
 
+        List dominantPluginGroupIds = dominant.getPluginGroups();
+        List recessivePluginGroupIds = recessive.getPluginGroups();
+
+        for ( Iterator it = recessivePluginGroupIds.iterator(); it.hasNext(); )
+        {
+            String pluginGroupId = (String) it.next();
+
+            if ( !dominantPluginGroupIds.contains( pluginGroupId ) )
+            {
+                dominantPluginGroupIds.add( pluginGroupId );
+
+                dominant.getRuntimeInfo().setPluginGroupIdSourceLevel( pluginGroupId, recessiveSourceLevel );
+            }
+        }
+
         if ( StringUtils.isEmpty( dominant.getLocalRepository() ) )
         {
             dominant.setLocalRepository( recessive.getLocalRepository() );

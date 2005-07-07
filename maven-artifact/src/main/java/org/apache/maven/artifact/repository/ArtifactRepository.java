@@ -46,6 +46,8 @@ public interface ArtifactRepository
     String pathOf( Artifact artifact );
 
     String pathOfMetadata( ArtifactMetadata artifactMetadata );
+    
+    String formatDirectory( String directory );
 
     String getUrl();
 

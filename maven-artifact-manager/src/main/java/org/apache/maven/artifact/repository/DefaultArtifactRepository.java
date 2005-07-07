@@ -63,6 +63,11 @@ public class DefaultArtifactRepository
     {
         return layout.pathOfMetadata( artifactMetadata );
     }
+    
+    public String formatDirectory( String directory )
+    {
+        return layout.formatDirectory( directory );
+    }
 
     public String getSnapshotPolicy()
     {

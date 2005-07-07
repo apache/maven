@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
@@ -57,10 +58,17 @@ public interface WagonManager
     public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination )
         throws TransferFailedException, ResourceDoesNotExistException;
 
+    public void putRepositoryMetadata( File source, RepositoryMetadata metadata, ArtifactRepository repository )
+        throws TransferFailedException;
+
+    public void getRepositoryMetadata( RepositoryMetadata metadata, ArtifactRepository remoteRepository,
+                                      File destination )
+        throws TransferFailedException, ResourceDoesNotExistException;
+
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
 
     void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
-                                String passphrase );
+                               String passphrase );
 
     void addMirror( String id, String mirrorOf, String url );
 

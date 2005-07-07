@@ -1,0 +1,59 @@
+<model>
+  <id>plugin-map</id>
+  <name>PluginMapping</name>
+  <description>Mappings for searching for a plugin within a particular groupId.</description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.plugin.mapping</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="mapping">
+      <name>PluginMap</name>
+      <version>1.0.0</version>
+      <description>Root model class, containing various mappings for plugins in this group.</description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The groupId for plugins mapped in this file.</description>
+        </field>
+        <field>
+          <name>plugins</name>
+          <version>1.0.0</version>
+          <required>true</required>
+          <description>The set of plugin mappings</description>
+          <association>
+            <type>MappedPlugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class xml.tagName="plugin">
+      <name>MappedPlugin</name>
+      <version>1.0.0</version>
+      <description>Mapping information for a single plugin within this group</description>
+      <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm.</comment>
+      <fields>
+        <field>
+          <name>prefix</name>
+          <type>String</type>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>The plugin invocation prefix (i.e. eclipse for eclipse:eclipse)</description>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <type>String</type>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>The plugin artifactId</description>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>

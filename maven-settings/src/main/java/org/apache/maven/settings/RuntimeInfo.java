@@ -34,8 +34,10 @@ public class RuntimeInfo
     
     private String localRepositorySourceLevel = TrackableBase.USER_LEVEL;
     
-    private final Settings settings;
+    private Map pluginGroupIdSourceLevels = new HashMap();
     
+    private final Settings settings;
+
     public RuntimeInfo( Settings settings )
     {
         this.settings = settings;
@@ -79,6 +81,25 @@ public class RuntimeInfo
     public String getSourceLevelForActiveProfile( String activeProfile )
     {
         String sourceLevel = (String) activeProfileToSourceLevel.get( activeProfile );
+        
+        if ( sourceLevel != null )
+        {
+            return sourceLevel;
+        }
+        else
+        {
+            return settings.getSourceLevel();
+        }
+    }
+    
+    public void setPluginGroupIdSourceLevel( String pluginGroupId, String sourceLevel )
+    {
+        pluginGroupIdSourceLevels.put( pluginGroupId, sourceLevel );
+    }
+    
+    public String getSourceLevelForPluginGroupId( String pluginGroupId )
+    {
+        String sourceLevel = (String) pluginGroupIdSourceLevels.get( pluginGroupId );
         
         if ( sourceLevel != null )
         {

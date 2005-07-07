@@ -180,6 +180,15 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>pluginGroups</name>
+          <version>1.0.0</version>
+          <description>List of groupIds to search for a plugin when that plugin groupId is not explicitly provided.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

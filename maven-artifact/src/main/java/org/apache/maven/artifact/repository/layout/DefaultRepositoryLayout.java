@@ -33,7 +33,7 @@ public class DefaultRepositoryLayout
 
         StringBuffer path = new StringBuffer();
 
-        path.append( artifact.getGroupId().replace( '.', '/' ) ).append( '/' );
+        path.append( formatDirectory( artifact.getGroupId() ) ).append( '/' );
         path.append( artifact.getArtifactId() ).append( '/' );
         path.append( artifact.getBaseVersion() ).append( '/' );
         path.append( artifact.getArtifactId() ).append( '-' ).append( artifact.getVersion() );
@@ -55,7 +55,7 @@ public class DefaultRepositoryLayout
     {
         StringBuffer path = new StringBuffer();
 
-        path.append( metadata.getGroupId().replace( '.', '/' ) ).append( '/' );
+        path.append( formatDirectory( metadata.getGroupId() ) ).append( '/' );
         path.append( metadata.getArtifactId() ).append( '/' );
         if ( !metadata.getBaseVersion().equals( "RELEASE" ) )
         {
@@ -67,4 +67,8 @@ public class DefaultRepositoryLayout
         return path.toString();
     }
 
+    public String formatDirectory( String directory )
+    {
+        return directory.replace( '.', '/' );
+    }
 }

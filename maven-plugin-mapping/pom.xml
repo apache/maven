@@ -6,15 +6,30 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
-  <artifactId>maven-model</artifactId>
+  <artifactId>maven-plugin-mapping</artifactId>
   <version>2.0-beta-1-SNAPSHOT</version>
-  <name>Maven Model</name>
-  <description>Maven Model</description>
+  <name>Maven Plugin Mapping</name>
+  <description>Maven Plugin Mapping</description>
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0-beta-1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact-manager</artifactId>
+      <version>2.0-beta-1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>2.0-beta-1-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.0-alpha-3</version>
+      <version>1.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>
@@ -24,8 +39,8 @@
         <artifactId>modello-maven-plugin</artifactId>
         <version>1.0-alpha-3</version>
         <configuration>
-          <version>4.0.0</version>
-          <model>maven.mdo</model>
+          <version>1.0.0</version>
+          <model>src/main/mdo/plugins.mdo</model>
         </configuration>
         <executions>
           <execution>

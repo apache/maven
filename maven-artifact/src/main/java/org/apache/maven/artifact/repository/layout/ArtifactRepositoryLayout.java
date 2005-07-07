@@ -30,4 +30,6 @@ public interface ArtifactRepositoryLayout
     String pathOf( Artifact artifact );
 
     String pathOfMetadata( ArtifactMetadata metadata );
+
+    String formatDirectory( String directory );
 }

@@ -58,5 +58,10 @@ public class LegacyRepositoryLayout
 
         return path.toString();
     }
+    
+    public String formatDirectory( String directory )
+    {
+        return directory;
+    }
 
 }
