@@ -53,8 +53,8 @@ Developing Maven 2.0 Plugins
 
 * Resources
 
-    [[1]] {{{../plugin-management.html}Managing plugin configuration in large 
-          projects}}
-
-    [[2]] {{{../plugin-configuration.html}Configuring plugins}}
-
+    [[1]] {{{developers/developing-plugins-with-marmalade.html}Developing plugins
+          with Marmalade}}
+          
+    [[2]] {{{developers/mojo-api-specification.html}Mojo API specification}}
+          

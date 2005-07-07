@@ -109,7 +109,25 @@ Plugin Overview
 
 ** What is a Plugin?
 
+  Maven is a framework for the execution of plugin goals.  Every action you 
+  take in Maven is really just calling out to an existing maven plugin. 
+  When you compile, clean, create a JAR, generate a site, or execute
+  unit tests, Maven is executing goals from the appropriate plugins. 
+
 ** What is a Mojo (<And Why the H--- is it Named 'Mojo'>)?
 
+  MOJO is a play on POJO (Plain-old-Java-object), substituting "Maven" for
+  "Plain".  A Mojo is really just a goal in Maven 2, and plug-ins consist of 
+  any number of goals (Mojos).
+
 ** What is the Build Lifecycle? (Overview)
+
+* Resources
+
+    [[1]] {{{developers/plugin-development-guide.html}Plugin development guide}}
+
+    [[2]] {{{plugin-management.html}Managing plugin configuration in large 
+          projects}}
+
+    [[3]] {{{plugin-configuration.html}Configuring plugins}}
 
