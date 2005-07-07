@@ -1,6 +1,7 @@
 package org.apache.maven.plugin;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
@@ -9,6 +10,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,11 +18,11 @@ public class MavenPluginCollector
     extends AbstractLogEnabled
     implements ComponentDiscoveryListener
 {
-    
+
     private Set pluginsInProcess = new HashSet();
-    
+
     private Map pluginDescriptors = new HashMap();
-    
+
     private Map pluginIdsByPrefix = new HashMap();
 
     // ----------------------------------------------------------------------
@@ -33,10 +35,9 @@ public class MavenPluginCollector
         if ( componentSetDescriptor instanceof PluginDescriptor )
         {
             PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
-
-            //            String key = pluginDescriptor.getId();
+            
             // TODO: see comment in getPluginDescriptor
-            String key = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId();
+            String key = Plugin.constructKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
 
             if ( !pluginsInProcess.contains( key ) )
             {
@@ -48,33 +49,29 @@ public class MavenPluginCollector
                 // we also need to deal with multiple versions somehow - currently, first wins
                 if ( !pluginIdsByPrefix.containsKey( pluginDescriptor.getGoalPrefix() ) )
                 {
-                    pluginIdsByPrefix.put( pluginDescriptor.getGoalPrefix(), pluginDescriptor.getId() );
+                    pluginIdsByPrefix.put( pluginDescriptor.getGoalPrefix(), pluginDescriptor );
                 }
             }
         }
     }
-    
-    public PluginDescriptor getPluginDescriptor( String groupId, String artifactId, String version )
+
+    public PluginDescriptor getPluginDescriptor( Plugin plugin )
     {
         // TODO: include version, but can't do this in the plugin manager as it is not resolved to the right version
         // at that point. Instead, move the duplication check to the artifact container, or store it locally based on
         // the unresolved version?
-        return (PluginDescriptor) pluginDescriptors.get( Plugin.constructKey( groupId, artifactId ) );
-    }
-    
-    public boolean isPluginInstalled( String groupId, String artifactId )
-    {
-        //        String key = PluginDescriptor.constructPluginKey( groupId, artifactId, version );
-        // TODO: see comment in getPluginDescriptor
-        return pluginDescriptors.containsKey( Plugin.constructKey( groupId, artifactId ) );
+        return (PluginDescriptor) pluginDescriptors.get( plugin.getKey() );
     }
 
-    public String getPluginIdFromPrefix( String prefix )
+    public boolean isPluginInstalled( Plugin plugin )
     {
-        if ( !pluginIdsByPrefix.containsKey( prefix ) )
-        {
-            // TODO: lookup remotely
-        }
-        return (String) pluginIdsByPrefix.get( prefix );
+        // TODO: see comment in getPluginDescriptor
+        return pluginDescriptors.containsKey( plugin.getKey() );
     }
+
+    public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
+    {
+        return (PluginDescriptor) pluginIdsByPrefix.get( prefix );
+    }
+
 }

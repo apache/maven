@@ -23,6 +23,8 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 
 import java.util.List;
@@ -38,13 +40,14 @@ public interface PluginManager
     void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
         throws MojoExecutionException, PluginManagerException, ArtifactResolutionException;
 
-    String getPluginIdFromPrefix( String prefix );
+    PluginDescriptor getPluginDescriptorForPrefix( String prefix );
 
-    PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
-                                   Settings settings, ArtifactRepository localRepository )
+    PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
+                                  ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException;
 
-    List getReports( String groupId, String artifactId, String version, ReportSet reportSet, MavenSession session,
-                     MavenProject project )
-        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException;
+    List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session,
+                    ArtifactRepository localRepository )
+        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException,
+        ArtifactResolutionException;
 }

@@ -854,7 +854,10 @@ public class MavenProject
             model.setBuild( build );
         }
 
-        build.addPlugin( plugin );
+        if ( !build.getPluginsAsMap().containsKey( plugin.getKey() ) )
+        {
+            build.addPlugin( plugin );
+        }
     }
 
     public List getCollectedProjects()

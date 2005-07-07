@@ -2,6 +2,7 @@ package org.apache.maven.settings;
 
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,30 +44,48 @@ public final class SettingsUtils
         List dominantActiveProfiles = dominant.getActiveProfiles();
         List recessiveActiveProfiles = recessive.getActiveProfiles();
 
-        for ( Iterator it = recessiveActiveProfiles.iterator(); it.hasNext(); )
+        if ( recessiveActiveProfiles != null )
         {
-            String profileId = (String) it.next();
-
-            if ( !dominantActiveProfiles.contains( profileId ) )
+            if ( dominantActiveProfiles == null )
             {
-                dominantActiveProfiles.add( profileId );
+                dominantActiveProfiles = new ArrayList();
+                dominant.setActiveProfiles( dominantActiveProfiles );
+            }
+            
+            for ( Iterator it = recessiveActiveProfiles.iterator(); it.hasNext(); )
+            {
+                String profileId = (String) it.next();
 
-                dominant.getRuntimeInfo().setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
+                if ( !dominantActiveProfiles.contains( profileId ) )
+                {
+                    dominantActiveProfiles.add( profileId );
+
+                    dominant.getRuntimeInfo().setActiveProfileSourceLevel( profileId, recessiveSourceLevel );
+                }
             }
         }
 
         List dominantPluginGroupIds = dominant.getPluginGroups();
         List recessivePluginGroupIds = recessive.getPluginGroups();
 
-        for ( Iterator it = recessivePluginGroupIds.iterator(); it.hasNext(); )
+        if( recessivePluginGroupIds != null )
         {
-            String pluginGroupId = (String) it.next();
-
-            if ( !dominantPluginGroupIds.contains( pluginGroupId ) )
+            if( dominantPluginGroupIds == null )
             {
-                dominantPluginGroupIds.add( pluginGroupId );
+                dominantPluginGroupIds = new ArrayList();
+                dominant.setPluginGroups( dominantPluginGroupIds );
+            }
+            
+            for ( Iterator it = recessivePluginGroupIds.iterator(); it.hasNext(); )
+            {
+                String pluginGroupId = (String) it.next();
 
-                dominant.getRuntimeInfo().setPluginGroupIdSourceLevel( pluginGroupId, recessiveSourceLevel );
+                if ( !dominantPluginGroupIds.contains( pluginGroupId ) )
+                {
+                    dominantPluginGroupIds.add( pluginGroupId );
+
+                    dominant.getRuntimeInfo().setPluginGroupIdSourceLevel( pluginGroupId, recessiveSourceLevel );
+                }
             }
         }
 

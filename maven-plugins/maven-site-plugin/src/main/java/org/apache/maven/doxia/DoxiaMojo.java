@@ -744,23 +744,18 @@ public class DoxiaMojo
             {
                 org.apache.maven.model.ReportPlugin reportPlugin = (org.apache.maven.model.ReportPlugin) it.next();
 
-                try
-                {
-                    pluginManager.verifyPlugin( reportPlugin.getGroupId(), reportPlugin.getArtifactId(),
-                                                reportPlugin.getVersion(), project, settings, localRepository );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    throw new MojoExecutionException( "Cannot find report plugin", e );
-                }
-                catch ( PluginVersionResolutionException e )
-                {
-                    throw new MojoExecutionException( "Cannot resolve version for report plugin", e );
-                }
-                catch ( PluginManagerException e )
-                {
-                    throw new MojoExecutionException( "Cannot find report plugin", e );
-                }
+//                try
+//                {
+//                    pluginManager.verifyPlugin( reportPlugin, project, settings, localRepository );
+//                }
+//                catch ( PluginVersionResolutionException e )
+//                {
+//                    throw new MojoExecutionException( "Cannot resolve version for report plugin", e );
+//                }
+//                catch ( PluginManagerException e )
+//                {
+//                    throw new MojoExecutionException( "Cannot find report plugin", e );
+//                }
 
                 try
                 {
@@ -770,12 +765,11 @@ public class DoxiaMojo
 
                     if ( reportSets == null || reportSets.isEmpty() )
                     {
-                        reportsList = pluginManager.getReports( reportPlugin.getGroupId(),
-                                                                reportPlugin.getArtifactId(),
-                                                                reportPlugin.getVersion(),
+                        reportsList = pluginManager.getReports( reportPlugin,
                                                                 null,
+                                                                project,
                                                                 session,
-                                                                project );
+                                                                localRepository );
 
                     }
                     else
@@ -784,12 +778,11 @@ public class DoxiaMojo
                         {
                             ReportSet reportSet = (ReportSet) j.next();
 
-                            reportsList = pluginManager.getReports( reportPlugin.getGroupId(),
-                                                                    reportPlugin.getArtifactId(),
-                                                                    reportPlugin.getVersion(),
+                            reportsList = pluginManager.getReports( reportPlugin,
                                                                     reportSet,
+                                                                    project,
                                                                     session,
-                                                                    project );
+                                                                    localRepository );
                         }
                     }
 
@@ -815,6 +808,10 @@ public class DoxiaMojo
                 catch ( PluginConfigurationException e )
                 {
                     throw new MojoExecutionException( "Error getting reports", e );
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    throw new MojoExecutionException( "Cannot find report plugin", e );
                 }
             }
         }

@@ -29,6 +29,7 @@ import org.apache.maven.artifact.resolver.filter.InversionArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -109,44 +110,55 @@ public class DefaultPluginManager
     //
     // ----------------------------------------------------------------------
 
-    public String getPluginIdFromPrefix( String prefix )
+    public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
     {
-        return pluginCollector.getPluginIdFromPrefix( prefix );
+        return pluginCollector.getPluginDescriptorForPrefix( prefix );
     }
-
-    public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
-                                          Settings settings, ArtifactRepository localRepository )
+    
+    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings, 
+                                          ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
         // TODO: this should be possibly outside
         // [HTTP-301] All version-resolution logic has been moved to DefaultPluginVersionManager. :)
-        if ( version == null )
+        if ( plugin.getVersion() == null )
         {
-            version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings,
-                                                                 localRepository );
+            String groupId = plugin.getGroupId();
+            String artifactId = plugin.getArtifactId();
+            
+            plugin.setVersion( pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings,
+                                                                 localRepository ) );
         }
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
-        if ( !pluginCollector.isPluginInstalled( groupId, artifactId ) )
+        if ( !pluginCollector.isPluginInstalled( plugin ) )
         {
             try
             {
-                Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version,
+                Artifact pluginArtifact = artifactFactory.createArtifact( plugin.getGroupId(), 
+                                                                          plugin.getArtifactId(), 
+                                                                          plugin.getVersion(),
                                                                           Artifact.SCOPE_RUNTIME,
                                                                           MojoDescriptor.MAVEN_PLUGIN );
     
-                addPlugin( groupId, artifactId, version, pluginArtifact, project, localRepository );
-    
-                version = pluginArtifact.getBaseVersion();
+                // TODO: [jc; 2005-july-06] what's this for?
+                //plugin.setVersion( pluginArtifact.getBaseVersion() );
+                
+                addPlugin( plugin, pluginArtifact, project, localRepository );
+                
+                project.addPlugin( plugin );
             }
             catch ( PlexusContainerException e )
             {
                 throw new PluginManagerException(
-                    "Error occurred in the artifact container attempting to download plugin " + groupId + ":" +
-                        artifactId, e );
+                    "Error occurred in the artifact container attempting to download plugin " + plugin.getKey(), e );
             }
             catch ( ArtifactResolutionException e )
             {
+                String groupId = plugin.getGroupId();
+                String artifactId = plugin.getArtifactId();
+                String version = plugin.getVersion();
+                
                 if (
                     ( groupId == null || artifactId == null || version == null ||
                         ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
@@ -160,23 +172,22 @@ public class DefaultPluginManager
                 }
             }
         }
-        return pluginCollector.getPluginDescriptor( groupId, artifactId, version );
+        
+        return pluginCollector.getPluginDescriptor( plugin );
     }
 
-    protected void addPlugin( String groupId, String artifactId, String version, Artifact pluginArtifact, MavenProject project,
+    protected void addPlugin( Plugin plugin, Artifact pluginArtifact, MavenProject project,
                               ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException
     {
-        String pluginKey = Plugin.constructKey( groupId, artifactId );
-        
         artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
-        PlexusContainer child = container.createChildContainer( pluginKey, Collections
+        PlexusContainer child = container.createChildContainer( plugin.getKey(), Collections
             .singletonList( pluginArtifact.getFile() ), Collections.EMPTY_MAP, Collections.singletonList( pluginCollector ) );
 
         // this plugin's descriptor should have been discovered in the child creation, so we should be able to
         // circle around and set the artifacts and class realm
-        PluginDescriptor addedPlugin = pluginCollector.getPluginDescriptor( groupId, artifactId, version );
+        PluginDescriptor addedPlugin = pluginCollector.getPluginDescriptor( plugin );
 
         addedPlugin.setClassRealm( child.getContainerRealm() );
 
@@ -185,18 +196,6 @@ public class DefaultPluginManager
         // transitively resolve its dependencies, and add them to the plugin container...
         addedPlugin.setArtifacts( Collections.singletonList( pluginArtifact ) );
     }
-
-//    private void releaseComponent( Object component )
-//    {
-//        try
-//        {
-//            container.release( component );
-//        }
-//        catch ( ComponentLifecycleException e )
-//        {
-//            getLogger().error( "Error releasing component - ignoring", e );
-//        }
-//    }
 
     // ----------------------------------------------------------------------
     // Mojo execution
@@ -291,12 +290,18 @@ public class DefaultPluginManager
         }
     }
 
-    public List getReports( String groupId, String artifactId, String version, ReportSet reportSet,
-                            MavenSession session, MavenProject project )
-        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException
+    public List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project,
+                            MavenSession session, ArtifactRepository localRepository )
+        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException,
+        ArtifactResolutionException
     {
-        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( groupId, artifactId, version );
-
+        Plugin forLookup = new Plugin();
+        forLookup.setGroupId( reportPlugin.getGroupId() );
+        forLookup.setArtifactId( reportPlugin.getArtifactId() );
+        forLookup.setVersion( reportPlugin.getVersion() );
+        
+        PluginDescriptor pluginDescriptor = verifyPlugin( forLookup, project, session.getSettings(), localRepository );
+        
         List reports = new ArrayList();
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
         {
@@ -317,7 +322,7 @@ public class DefaultPluginManager
                     MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, id );
 
                     String executionId = mojoExecution.getExecutionId();
-                    Xpp3Dom dom = project.getReportConfiguration( groupId, artifactId, executionId );
+                    Xpp3Dom dom = project.getReportConfiguration( reportPlugin.getGroupId(), reportPlugin.getArtifactId(), executionId );
 
                     reports.add( getConfiguredMojo( mojoDescriptor, session, dom, project ) );
                 }

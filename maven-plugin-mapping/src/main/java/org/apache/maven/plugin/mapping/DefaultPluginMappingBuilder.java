@@ -28,15 +28,21 @@ public class DefaultPluginMappingBuilder
     {
         PluginMappingManager mappingManager = new PluginMappingManager();
 
-        for ( Iterator it = pluginGroupIds.iterator(); it.hasNext(); )
+        if ( pluginGroupIds != null )
         {
-            String groupId = (String) it.next();
+            for ( Iterator it = pluginGroupIds.iterator(); it.hasNext(); )
+            {
+                String groupId = (String) it.next();
 
-            File mappingFile = resolveMappingMetadata( groupId, pluginRepositories, localRepository );
+                File mappingFile = resolveMappingMetadata( groupId, pluginRepositories, localRepository );
 
-            PluginMap pluginMap = readPluginMap( mappingFile );
-            
-            mappingManager.addPluginMap( pluginMap );
+                PluginMap pluginMap = readPluginMap( mappingFile );
+                
+                if ( pluginMap != null )
+                {
+                    mappingManager.addPluginMap( pluginMap );
+                }
+            }
         }
 
         return mappingManager;
@@ -44,26 +50,33 @@ public class DefaultPluginMappingBuilder
 
     private PluginMap readPluginMap( File mappingFile ) throws PluginMappingManagementException
     {
-        Reader fileReader = null;
-        try
+        if( mappingFile.exists() )
         {
-            fileReader = new FileReader( mappingFile );
+            Reader fileReader = null;
+            try
+            {
+                fileReader = new FileReader( mappingFile );
 
-            PluginMappingXpp3Reader mappingReader = new PluginMappingXpp3Reader();
-            
-            return mappingReader.read(fileReader);
+                PluginMappingXpp3Reader mappingReader = new PluginMappingXpp3Reader();
+                
+                return mappingReader.read(fileReader);
+            }
+            catch ( IOException e )
+            {
+                throw new PluginMappingManagementException( "Cannot read plugin mappings from: " + mappingFile, e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new PluginMappingManagementException( "Cannot parse plugin mappings from: " + mappingFile, e );
+            }
+            finally
+            {
+                IOUtil.close( fileReader );
+            }
         }
-        catch ( IOException e )
+        else
         {
-            throw new PluginMappingManagementException( "Cannot read plugin mappings from: " + mappingFile, e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new PluginMappingManagementException( "Cannot parse plugin mappings from: " + mappingFile, e );
-        }
-        finally
-        {
-            IOUtil.close( fileReader );
+            return null;
         }
     }
 
