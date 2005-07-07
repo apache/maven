@@ -1,0 +1,115 @@
+ ------
+Maven 2.0 Plugin Development
+ ------
+John Casey
+ ------
+24 June 2005
+ ------
+
+~~ Copyright 2001-2004 The Apache Software Foundation.
+~~ 
+~~ Licensed under the Apache License, Version 2.0 (the "License");
+~~ you may not use this file except in compliance with the License.
+~~ You may obtain a copy of the License at
+~~ 
+~~      http://www.apache.org/licenses/LICENSE-2.0
+~~ 
+~~ Unless required by applicable law or agreed to in writing, software
+~~ distributed under the License is distributed on an "AS IS" BASIS,
+~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~~ See the License for the specific language governing permissions and
+~~ limitations under the License.
+
+Plugin Overview
+
+* Introduction
+
+  Maven consists of a core engine which provides basic project-processing
+  capabilities and build-process management, and a host of plugins which are
+  used to execute the actual build tasks.
+  
+~~ Additional intro material here.
+  
+** Similarities to Maven 1.x
+
+  Maven 2.0 is similar to its predecessor in that it has two main 
+  functions. First, it organizes project data into a coherent whole, 
+  and exposes this data for use within the build process. Second, Maven 
+  marshals a set of plugins to do the heavy lifting and execute the 
+  actual steps of the build.
+  
+  Many things in Maven 2 will have at least superficial familiarity 
+  to users of Maven 1, and the plugin system is no exception. Maven 2 
+  plugins appear to behave much as their 1.x counterparts do. Like 1.x 
+  plugins, they use both project information and custom-defined 
+  configurations to perform their work. Also, Maven 2 plugins are 
+  organized and executed in a coherent way by the build engine itself - 
+  that is to say, the engine is still responsible for organizing and 
+  fulfilling a plugin's requirements before executing the plugin 
+  itself.
+  
+  Operationally, Maven 2.0 should feel very much like a more 
+  performant big brother of Maven 1.x. While the POM has definitely 
+  changed, it has the same basic layout and features (with notable 
+  additions). However, this is where the similarity ends. Maven 2.0 is 
+  a complete redesign and reimplementation of the Maven build concept. 
+  As such, it has a much different and more evolved architecture - at least to 
+  our minds. <<;-)>>
+  
+** Differences from Maven 1.x
+
+  However similar the architectures may seem, Maven 2 offers a much 
+  richer environment for its plugins than Maven 1 ever did. The new 
+  architecture offers a managed lifecycle, multiple implementation 
+  languages, reusability outside of the build system, and many more 
+  advantages. Arguably the biggest advantage is the ability to write 
+  Maven plugins entirely in Java, which allows developers to tap into a 
+  rich landscape of development and testing tools to aid in their 
+  efforts.
+  
+  Prior to Maven 2.0, the build system organized relevant plugins 
+  into a loosely defined lifecycle, which was determined based on goal 
+  prerequisites and decoration via preGoals and postGoals. That 
+  experience was critical for the Maven community. It taught us that 
+  even though there may be a million different build scenarios out 
+  there, most of the activities in those builds fit into just a few 
+  broad categories. Moreover, the category to which a goal fits serves 
+  as an accurate predictor for where in the build process the goal 
+  should execute. Drawing on this experience, Maven 2.0 defines a 
+  lifecycle within which plugins are managed according to their 
+  relative position within this lifecycle.
+  
+  Starting with Maven 2.0, plugins implemented in different 
+  programming or scripting languages can coexist within the same build 
+  process. This removes the requirement that plugin developers learn a 
+  particular scripting language in order to interact with Maven. It 
+  also reduced the risk associated with the stability or richness of 
+  any particular scripting language.
+  
+  Also starting with Maven 2.0 is an effort to integrate multiproject 
+  builds directly into the core architecture. In Maven 1.x, many large 
+  projects were fragmented into smaller builds to sidestep issues such 
+  as conditional compilation of a subset of classes; separation of 
+  client-server code; or cyclical dependencies between distinct 
+  application libraries. This in turn created extra complexity with 
+  running builds, since multiple builds had to be run in order to build 
+  the application as a whole - one or more per project. While the first 
+  version (1.x) did indeed address this new multiple projects issue, it 
+  did so as an afterthought. The Reactor was created to act as a sort 
+  of <apply-to-all-these> function, and the multiproject plugin 
+  was later added to provide Reactor settings for some common build 
+  types. However, this solution (it <is> really only one solution, 
+  plus some macros) really never integrated the idea of the 
+  multi-project build process into the maven core conceptual 
+  framework.
+  
+** Why Change the Plugin Architecture?
+
+* Definitions
+
+** What is a Plugin?
+
+** What is a Mojo (<And Why the H--- is it Named 'Mojo'>)?
+
+** What is the Build Lifecycle? (Overview)
+
