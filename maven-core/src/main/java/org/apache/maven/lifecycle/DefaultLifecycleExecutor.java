@@ -35,6 +35,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.Phase;
+import org.apache.maven.plugin.mapping.MavenPluginMappingBuilder;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
@@ -69,6 +70,8 @@ public class DefaultLifecycleExecutor
     // ----------------------------------------------------------------------
 
     private ModelDefaultsInjector modelDefaultsInjector;
+    
+    private MavenPluginMappingBuilder pluginMappingBuilder;
 
     private PluginManager pluginManager;
 

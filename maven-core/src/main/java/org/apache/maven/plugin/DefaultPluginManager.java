@@ -28,6 +28,7 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.InversionArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -51,9 +52,6 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurationExceptio
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
-import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
-import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -70,7 +68,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -79,145 +76,67 @@ import java.util.Set;
 
 public class DefaultPluginManager
     extends AbstractLogEnabled
-    implements PluginManager, ComponentDiscoveryListener, Initializable, Contextualizable
+    implements PluginManager, Initializable, Contextualizable
 {
-    protected Map pluginDescriptors;
-
-    protected Map pluginIdsByPrefix;
-
     protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
     protected ArtifactFilter artifactFilter;
 
-    protected PathTranslator pathTranslator;
-
-    private Set pluginsInProcess = new HashSet();
-
     private Log mojoLogger;
+
+    // component requirements
+    protected PathTranslator pathTranslator;
+    
+    protected MavenPluginCollector pluginCollector;
+    
+    protected PluginVersionManager pluginVersionManager;
+    
+    protected ArtifactFactory artifactFactory;
+
+    protected ArtifactResolver artifactResolver;
+
+    protected MavenProjectBuilder mavenProjectBuilder;
+    // END component requirements
 
     public DefaultPluginManager()
     {
-        pluginDescriptors = new HashMap();
-
-        pluginIdsByPrefix = new HashMap();
-
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
-    }
-
-    // ----------------------------------------------------------------------
-    // Mojo discovery
-    // ----------------------------------------------------------------------
-
-    public void componentDiscovered( ComponentDiscoveryEvent event )
-    {
-        ComponentSetDescriptor componentSetDescriptor = event.getComponentSetDescriptor();
-
-        if ( componentSetDescriptor instanceof PluginDescriptor )
-        {
-            PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
-
-            //            String key = pluginDescriptor.getId();
-            // TODO: see comment in getPluginDescriptor
-            String key = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId();
-
-            if ( !pluginsInProcess.contains( key ) )
-            {
-                pluginsInProcess.add( key );
-
-                pluginDescriptors.put( key, pluginDescriptor );
-
-                // TODO: throw an (not runtime) exception if there is a prefix overlap - means doing so elsewhere
-                // we also need to deal with multiple versions somehow - currently, first wins
-                if ( !pluginIdsByPrefix.containsKey( pluginDescriptor.getGoalPrefix() ) )
-                {
-                    pluginIdsByPrefix.put( pluginDescriptor.getGoalPrefix(), pluginDescriptor.getId() );
-                }
-            }
-        }
     }
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    private PluginDescriptor getPluginDescriptor( String groupId, String artifactId, String version )
-    {
-        //        String key = PluginDescriptor.constructPluginKey( groupId, artifactId, version );
-        // TODO: include version, but can't do this in the plugin manager as it is not resolved to the right version
-        // at that point. Instead, move the duplication check to the artifact container, or store it locally based on
-        // the unresolved version?
-        String key = groupId + ":" + artifactId;
-        return (PluginDescriptor) pluginDescriptors.get( key );
-    }
-
-    private boolean isPluginInstalled( String pluginKey )
-    {
-        //        String key = PluginDescriptor.constructPluginKey( groupId, artifactId, version );
-        // TODO: see comment in getPluginDescriptor
-        return pluginDescriptors.containsKey( pluginKey );
-    }
-
-    private boolean isPluginInstalledForPrefix( String prefix )
-    {
-        return pluginIdsByPrefix.containsKey( prefix );
-    }
-
     public String getPluginIdFromPrefix( String prefix )
     {
-        if ( !isPluginInstalledForPrefix( prefix ) )
-        {
-            // TODO: lookup remotely
-        }
-        return (String) pluginIdsByPrefix.get( prefix );
+        return pluginCollector.getPluginIdFromPrefix( prefix );
     }
 
     public PluginDescriptor verifyPlugin( String groupId, String artifactId, String version, MavenProject project,
                                           Settings settings, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
-        String pluginKey = groupId + ":" + artifactId;
-
         // TODO: this should be possibly outside
         // [HTTP-301] All version-resolution logic has been moved to DefaultPluginVersionManager. :)
         if ( version == null )
         {
-            PluginVersionManager pluginVersionManager = null;
-
-            try
-            {
-                pluginVersionManager = (PluginVersionManager) container.lookup( PluginVersionManager.ROLE );
-
-                version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings,
-                                                                     localRepository );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new PluginVersionResolutionException( groupId, artifactId,
-                                                            "Cannot retrieve an instance of the PluginVersionManager",
-                                                            e );
-            }
-            finally
-            {
-                releaseComponent( pluginVersionManager );
-            }
+            version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings,
+                                                                 localRepository );
         }
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
-        if ( !isPluginInstalled( pluginKey ) )
+        if ( !pluginCollector.isPluginInstalled( groupId, artifactId ) )
         {
-            ArtifactFactory artifactFactory = null;
             try
             {
-                artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
-
                 Artifact pluginArtifact = artifactFactory.createArtifact( groupId, artifactId, version,
                                                                           Artifact.SCOPE_RUNTIME,
                                                                           MojoDescriptor.MAVEN_PLUGIN );
-
-                addPlugin( pluginKey, pluginArtifact, project, localRepository );
-
+    
+                addPlugin( groupId, artifactId, version, pluginArtifact, project, localRepository );
+    
                 version = pluginArtifact.getBaseVersion();
             }
             catch ( PlexusContainerException e )
@@ -240,69 +159,44 @@ public class DefaultPluginManager
                     throw e;
                 }
             }
-            catch ( ComponentLookupException e )
-            {
-                throw new PluginManagerException(
-                    "Internal configuration error while retrieving " + groupId + ":" + artifactId, e );
-            }
-            finally
-            {
-                if ( artifactFactory != null )
-                {
-                    releaseComponent( artifactFactory );
-                }
-
-            }
         }
-        return getPluginDescriptor( groupId, artifactId, version );
+        return pluginCollector.getPluginDescriptor( groupId, artifactId, version );
     }
 
-    protected void addPlugin( String pluginKey, Artifact pluginArtifact, MavenProject project,
+    protected void addPlugin( String groupId, String artifactId, String version, Artifact pluginArtifact, MavenProject project,
                               ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ComponentLookupException, PlexusContainerException
+        throws ArtifactResolutionException, PlexusContainerException
     {
-        ArtifactResolver artifactResolver = null;
+        String pluginKey = Plugin.constructKey( groupId, artifactId );
+        
+        artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
-        try
-        {
-            artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
+        PlexusContainer child = container.createChildContainer( pluginKey, Collections
+            .singletonList( pluginArtifact.getFile() ), Collections.EMPTY_MAP, Collections.singletonList( pluginCollector ) );
 
-            artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
+        // this plugin's descriptor should have been discovered in the child creation, so we should be able to
+        // circle around and set the artifacts and class realm
+        PluginDescriptor addedPlugin = pluginCollector.getPluginDescriptor( groupId, artifactId, version );
 
-            PlexusContainer child = container.createChildContainer( pluginKey, Collections
-                .singletonList( pluginArtifact.getFile() ), Collections.EMPTY_MAP, Collections.singletonList( this ) );
+        addedPlugin.setClassRealm( child.getContainerRealm() );
 
-            // this plugin's descriptor should have been discovered in the child creation, so we should be able to
-            // circle around and set the artifacts and class realm
-            PluginDescriptor addedPlugin = (PluginDescriptor) pluginDescriptors.get( pluginKey );
-
-            addedPlugin.setClassRealm( child.getContainerRealm() );
-
-            // we're only setting the plugin's artifact itself as the artifact list, to allow it to be retrieved
-            // later when the plugin is first invoked. Retrieving this artifact will in turn allow us to
-            // transitively resolve its dependencies, and add them to the plugin container...
-            addedPlugin.setArtifacts( Collections.singletonList( pluginArtifact ) );
-        }
-        finally
-        {
-            if ( artifactResolver != null )
-            {
-                releaseComponent( artifactResolver );
-            }
-        }
+        // we're only setting the plugin's artifact itself as the artifact list, to allow it to be retrieved
+        // later when the plugin is first invoked. Retrieving this artifact will in turn allow us to
+        // transitively resolve its dependencies, and add them to the plugin container...
+        addedPlugin.setArtifacts( Collections.singletonList( pluginArtifact ) );
     }
 
-    private void releaseComponent( Object component )
-    {
-        try
-        {
-            container.release( component );
-        }
-        catch ( ComponentLifecycleException e )
-        {
-            getLogger().error( "Error releasing component - ignoring", e );
-        }
-    }
+//    private void releaseComponent( Object component )
+//    {
+//        try
+//        {
+//            container.release( component );
+//        }
+//        catch ( ComponentLifecycleException e )
+//        {
+//            getLogger().error( "Error releasing component - ignoring", e );
+//        }
+//    }
 
     // ----------------------------------------------------------------------
     // Mojo execution
@@ -316,39 +210,10 @@ public class DefaultPluginManager
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
 
-            ArtifactResolver artifactResolver = null;
-            MavenProjectBuilder mavenProjectBuilder = null;
-            ArtifactFactory artifactFactory = null;
-
-            try
-            {
-                artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
-                mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
-                artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
-
-                resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder, mojoDescriptor
-                    .isDependencyResolutionRequired(), artifactFactory, project );
-                downloadDependencies( project, session, artifactResolver );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new PluginManagerException( "Internal configuration error in plugin manager", e );
-            }
-            finally
-            {
-                if ( artifactResolver != null )
-                {
-                    releaseComponent( artifactResolver );
-                }
-                if ( mavenProjectBuilder != null )
-                {
-                    releaseComponent( mavenProjectBuilder );
-                }
-                if ( artifactFactory != null )
-                {
-                    releaseComponent( artifactFactory );
-                }
-            }
+            resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder, mojoDescriptor
+                .isDependencyResolutionRequired(), artifactFactory, project );
+            
+            downloadDependencies( project, session, artifactResolver );
         }
 
         String goalName = mojoDescriptor.getFullGoalName();
@@ -430,7 +295,7 @@ public class DefaultPluginManager
                             MavenSession session, MavenProject project )
         throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException
     {
-        PluginDescriptor pluginDescriptor = getPluginDescriptor( groupId, artifactId, version );
+        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( groupId, artifactId, version );
 
         List reports = new ArrayList();
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
@@ -533,7 +398,7 @@ public class DefaultPluginManager
 
     private void ensurePluginContainerIsComplete( PluginDescriptor pluginDescriptor, PlexusContainer pluginContainer,
                                                   MavenProject project, MavenSession session )
-        throws PluginConfigurationException, ComponentLookupException
+        throws PluginConfigurationException
     {
         // if the plugin's already been used once, don't re-do this step...
         // otherwise, we have to finish resolving the plugin's classpath and start the container.
@@ -542,19 +407,11 @@ public class DefaultPluginManager
             // TODO: this is a little shady...
             Artifact pluginArtifact = (Artifact) pluginDescriptor.getArtifacts().get( 0 );
 
-            ArtifactResolver artifactResolver = null;
-            MavenProjectBuilder mavenProjectBuilder = null;
-            ArtifactFactory artifactFactory = null;
-
             try
             {
-                artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE );
-                mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
-                artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
-
                 MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder,
                                                                               artifactFactory );
-
+    
                 List remoteRepositories = new ArrayList();
                 
                 remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
@@ -563,44 +420,44 @@ public class DefaultPluginManager
                 ArtifactRepository localRepository = session.getLocalRepository();
                 Set dependencies = metadataSource.retrieve( pluginArtifact, localRepository,
                                                             project.getPluginArtifactRepositories() );
-
+    
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         localRepository,
                                                                                         remoteRepositories,
                                                                                         metadataSource,
                                                                                         artifactFilter );
-
+    
                 Set resolved = result.getArtifacts();
-
+    
                 for ( Iterator it = resolved.iterator(); it.hasNext(); )
                 {
                     Artifact artifact = (Artifact) it.next();
-
+    
                     if ( artifact != pluginArtifact )
                     {
                         pluginContainer.addJarResource( artifact.getFile() );
                     }
                 }
-
+    
                 pluginDescriptor.setClassRealm( pluginContainer.getContainerRealm() );
-
+    
                 // TODO: this is probably overkill as it is rarely used - can we use a mojo tag to signal this will be
                 // used or check its configuration? Also, when it is used, perhaps it is more effecient to resolve
                 // everything at once and apply the exclusion filter when constructing the plugin container above.
                 // Check this out with yourkit
                 ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
-
+    
                 ArtifactResolutionResult distroProvidedResult = artifactResolver
                     .resolveTransitively( dependencies, pluginArtifact, localRepository, remoteRepositories,
                                           metadataSource, distroProvidedFilter );
-
+    
                 Set distroProvided = distroProvidedResult.getArtifacts();
-
+    
                 List unfilteredArtifactList = new ArrayList( resolved.size() + distroProvided.size() );
-
+    
                 unfilteredArtifactList.addAll( resolved );
                 unfilteredArtifactList.addAll( distroProvided );
-
+    
                 pluginDescriptor.setArtifacts( unfilteredArtifactList );
             }
             catch ( ArtifactResolutionException e )
@@ -614,21 +471,6 @@ public class DefaultPluginManager
             catch ( ArtifactMetadataRetrievalException e )
             {
                 throw new PluginConfigurationException( "Cannot resolve plugin dependencies", e );
-            }
-            finally
-            {
-                if ( artifactFactory != null )
-                {
-                    releaseComponent( artifactFactory );
-                }
-                if ( artifactResolver != null )
-                {
-                    releaseComponent( artifactResolver );
-                }
-                if ( mavenProjectBuilder != null )
-                {
-                    releaseComponent( mavenProjectBuilder );
-                }
             }
         }
     }
@@ -1034,8 +876,6 @@ public class DefaultPluginManager
                                                                     artifactFactory );
 
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
-
-        boolean systemOnline = !context.getSettings().isOffline();
 
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
         Artifact artifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),

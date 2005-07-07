@@ -1,0 +1,16 @@
+<component-set>
+  <components>
+
+    <component>
+      <role>org.apache.maven.plugin.mapping.MavenPluginMappingBuilder</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.plugin.mapping.DefaultPluginMappingBuilder</implementation>
+      <requirements>
+        <requirement>
+		      <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
+      </requirements>
+    </component>
+    
+  </components>
+</component-set>

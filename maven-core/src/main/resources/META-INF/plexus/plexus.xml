@@ -2,7 +2,7 @@
   <component-discoverer-manager implementation="org.codehaus.plexus.component.discovery.DefaultComponentDiscovererManager">
     <listeners>
       <listener implementation="org.codehaus.plexus.component.discovery.DiscoveryListenerDescriptor">
-        <role>org.apache.maven.plugin.PluginManager</role>
+        <role>org.apache.maven.plugin.MavenPluginCollector</role>
       </listener>
     </listeners>
     <component-discoverers>
@@ -11,19 +11,8 @@
   </component-discoverer-manager>
   <components>
     <component>
-      <role>org.apache.maven.plugin.PluginManager</role>
-      <implementation>org.apache.maven.plugin.DefaultPluginManager</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.project.path.PathTranslator</role>
-        </requirement>
-      </requirements>
-    </component>
-
-    <!-- Duplicated from Maven core as it is used in the plugin manager -->
-    <component>
-      <role>org.apache.maven.project.path.PathTranslator</role>
-      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
+      <role>org.apache.maven.plugin.MavenPluginCollector</role>
+      <implementation>org.apache.maven.plugin.MavenPluginCollector</implementation>
     </component>
   </components>
 </plexus>
