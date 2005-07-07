@@ -290,23 +290,13 @@ Verbatim
   square brackets. The figure name is optionally followed by some text: the
   figure caption.
 
-  The figure name is the pathname of the file containing the figure but
-  without an extension. Example: if your figure is contained in
-  <<</home/joe/docs/mylogo.jpeg>>>, the figure name is
-  <<</home/joe/docs/mylogo>>>.
+  The figure name is the pathname of the file containing the figure with an
+  extension. Example: <<</images/mylogo.jpeg>>>.
 
   If the figure name comes from a relative pathname (recommended practice)
   rather than from an absolute pathname, this relative pathname is taken to be
   relative to the directory of the current APT document (a la HTML)
   rather than relative to the current working directory.
-
-  Why not leave the file extension in the figure name? This is better
-  explained by an example. You need to convert an APT document to PostScript
-  and your figure name is <<</home/joe/docs/mylogo>>>. A APT processor will
-  first try to load <<</home/joe/docs/mylogo.eps>>>. When the desired format
-  is not found, a APT processor tries to convert one of the existing
-  formats. In our example, the APT processor tries to convert
-  <<</home/joe/docs/mylogo.jpeg>>> to encapsulated PostScript.
 
 *** Table
 ~~~~~~~~~
