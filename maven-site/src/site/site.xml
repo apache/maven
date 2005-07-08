@@ -48,6 +48,7 @@
     </menu>
     ${reports}
     <menu name="Developers">
+      <item name="Developers Guide" href="/developers/development-guide.html"/>
       <item name="Documentation Needed" href="/docs-required.html"/>
       <item name="Building Maven 2.0" href="/building.html"/>
     </menu>
