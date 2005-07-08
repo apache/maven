@@ -25,4 +25,4 @@ Subversion configuration
     Before committing files in subversion repository, you need to read the
     {{{http://www.apache.org/dev/version-control.html#https-svn}Committer Subversion Access}}
     document and you must set your svn client
-    with these properties file : {{http://www.apache.org/dev/svn-eol-style.txt}}
+    with these properties file : {{svn-eol-style.txt}}
