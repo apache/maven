@@ -46,9 +46,15 @@ public class SurefirePlugin
 {
     /**
      *  Set this to 'true' to bypass unit tests entirely. Its use is NOT RECOMMENDED, but quite convenient on occasion.
-     * @parameter expression=${maven.test.skip}"
+     *
+     * @parameter expression="${maven.test.skip}"
      */
     private boolean skip;
+
+    /**
+     * @parameter expression="${maven.test.failure.ignore}"
+     */
+    private boolean testFailureIgnore = false;
 
     /**
      * @parameter expression="${basedir}"
@@ -238,7 +244,16 @@ public class SurefirePlugin
 
         if ( !success )
         {
-            throw new MojoExecutionException( "There are some test failures." );
+            String msg = "There are some test failure.";
+
+            if ( testFailureIgnore )
+            {
+                getLog().error( msg );
+            }
+            else
+            {
+                throw new MojoExecutionException( msg );
+            }
         }
     }
 

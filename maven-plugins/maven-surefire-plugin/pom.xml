@@ -34,4 +34,10 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+  <contributors>
+    <contributor>
+      <name>Joakim Erdfelt</name>
+      <email>joakim@erdfelt.com</email>
+    </contributor>
+  </contributors>
 </project>
