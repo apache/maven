@@ -44,6 +44,11 @@ import java.util.StringTokenizer;
 public class SurefirePlugin
     extends AbstractMojo
 {
+    /**
+     *  Set this to 'true' to bypass unit tests entirely. Its use is NOT RECOMMENDED, but quite convenient on occasion.
+     * @parameter expression=${maven.test.skip}"
+     */
+    private boolean skip;
 
     /**
      * @parameter expression="${basedir}"
@@ -124,6 +129,13 @@ public class SurefirePlugin
     public void execute()
         throws MojoExecutionException
     {
+        if ( skip )
+        {
+            getLog().info( "Tests are skipped." );
+
+            return;
+        }
+
         // ----------------------------------------------------------------------
         // Setup the surefire booter
         // ----------------------------------------------------------------------
