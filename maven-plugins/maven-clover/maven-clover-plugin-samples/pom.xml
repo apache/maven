@@ -1,0 +1,16 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-clover</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>maven-clover-plugin-samples</artifactId>
+  <packaging>pom</packaging>
+  <name>Maven Clover Plugin Samples</name>
+  <description>Maven Clover Plugin Samples</description>
+  <version>1.0-SNAPSHOT</version>
+  <modules>
+    <module>maven-clover-plugin-sample-simple</module>
+  </modules>
+</project>

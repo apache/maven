@@ -1,0 +1,21 @@
+<lifecycles>
+  <lifecycle>
+    <id>clover</id>
+    <phases>
+      <phase>
+        <id>generate-sources</id>
+        <executions>
+          <execution>
+            <configuration>
+              <cloverOutputDirectory>${project.build.directory}/clover</cloverOutputDirectory>
+              <cloverDatabase>${project.build.directory}/clover/clover.db</cloverDatabase>
+            </configuration>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+          </execution>
+        </executions>
+      </phase>
+    </phases>
+  </lifecycle>
+</lifecycles>

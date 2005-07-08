@@ -1,0 +1,55 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-clover-plugin-samples</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>maven-clover-plugin-sample-simple</artifactId>
+  <packaging>jar</packaging>
+  <name>Maven Clover Plugin Simple Sample</name>
+  <description>Maven Clover Plugin Simple Sample</description>
+  <version>1.0-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- to be removed -->
+    <dependency>
+      <groupId>clover</groupId>
+      <artifactId>clover</artifactId>
+      <version>1.3.8</version>
+    </dependency>
+  </dependencies>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </plugin>
+    </plugins>
+  </reporting>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <configuration>
+              <targetPercentage>50</targetPercentage>
+            </configuration>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
