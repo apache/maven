@@ -1,0 +1,145 @@
+ ------
+ Configuring Javadoc Report
+ ------
+ Vincent Siveton
+ ------
+ 10 July 2005
+ ------
+
+
+Javadoc Plugin Configuration
+
+ Add configuration similar to the following to your POM:
+
+-------------------
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <minmemory>128m</minmemory>
+          <maxmemory>512</maxmemory>
+          ...
+        </configuration>
+      </plugin>
+    </plugins>
+  ...
+  </build>
+  ...
+</project>
+-------------------
+
+Javadoc Plugin Settings
+
+  Refer to {{{http://java.sun.com/j2se/javadoc/}Javadoc Tool}} for more information.
+
+*-----------------------+-----------+----------------+-----------+
+| Setting               | Optional? | Description    | Reference |
+*-----------------------+-----------+----------------+-----------+
+| additionalparam       | Yes       | Specifies additional parameters added to the javadoc command line. | |
+*-----------------------+-----------+----------------+-----------+
+| author                | Yes       | Boolean value. Specifies whether or not the @author text is included in the generated Javadocs. The default value is 'true'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#author}author}} |
+*-----------------------+-----------+----------------+-----------+
+| bottom                | Yes       | Specifies the text to be placed at the bottom of each output file. The default value is 'Copyright $pom.inceptionY-currentYear $pom.organization.name. All Rights Reserved.'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#bottom}bottom}} |
+*-----------------------+-----------+----------------+-----------+
+| breakiterator         | Yes       | Boolean value. Uses the sentence break iterator to determine the end of the first sentence. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#breakiterator}breakiterator}} |
+*-----------------------+-----------+----------------+-----------+
+| charset               | Yes       | Specifies the HTML character set for this document. The default value is 'ISO-8859-1'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#charset}charset}} |
+*-----------------------+-----------+----------------+-----------+
+| destDir               | Yes       | Specifies the destination directory where javadoc saves the generated HTML files. The default value is '$target/apidocs'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#d}d}} |
+*-----------------------+-----------+----------------+-----------+
+| docencoding           | Yes       | Specifies the encoding of the generated HTML files. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#docencoding}docencoding}} |
+*-----------------------+-----------+----------------+-----------+
+| docfilessubdirs       | Yes       | Boolean value. Enables deep copying of "doc-files" directories. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#docfilessubdirs}docfilessubdirs}} |
+*-----------------------+-----------+----------------+-----------+
+| doclet                | Yes       | Specifies the class file that starts the doclet used in generating the documentation. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#doclet}doclet}} |
+*-----------------------+-----------+----------------+-----------+
+| docletPath            | Yes       | Specifies the path to the doclet starting class file (specified with the -doclet option) and any jar files it depends on. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#docletPath}docletPath}} |
+*-----------------------+-----------+----------------+-----------+
+| doctitle              | Yes       | Specifies the title to be placed near the top of the overview summary file. The default value is the value of windowtitle option. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#doctitle}doctitle}} |
+*-----------------------+-----------+----------------+-----------+
+| encoding              | Yes       | Specifies the encoding name of the source files. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#encoding}encoding}} |
+*-----------------------+-----------+----------------+-----------+
+| excludedocfilessubdir | Yes       | Excludes any "doc-files" subdirectories with the given names. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#excludedocfilessubdir}excludedocfilessubdir}} |
+*-----------------------+-----------+----------------+-----------+
+| excludePackageNames   | Yes       | Unconditionally excludes the specified packages and their subpackages from the list formed by -subpackages. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#exclude}exclude}} |
+*-----------------------+-----------+----------------+-----------+
+| extdirs               | Yes       | Specifies the directories where extension classes reside. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#extdirs}extdirs}} |
+*-----------------------+-----------+----------------+-----------+
+| footer                | Yes       | Specifies the footer text to be placed at the bottom of each output file. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#footer}footer}} |
+*-----------------------+-----------+----------------+-----------+
+| group                 | Yes       | Separates packages on the overview page into whatever groups you specify, one group per table. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#d}d}} |
+*-----------------------+-----------+----------------+-----------+
+| header                | Yes       | Specifies the header text to be placed at the top of each output file. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#header}header}} |
+*-----------------------+-----------+----------------+-----------+
+| helpfile              | Yes       | Specifies the path of an alternate help file path\filename that the HELP link in the top and bottom navigation bars link to. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#helpfile}helpfile}} |
+*-----------------------+-----------+----------------+-----------+
+| link                  | Yes       | Creates links to existing javadoc-generated documentation of external referenced classes. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#link}link}} |
+*-----------------------+-----------+----------------+-----------+
+| linkoffline           | Yes       | This option is a variation of -link; they both create links to javadoc-generated documentation for external referenced classes. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#linkoffline}linkoffline}} |
+*-----------------------+-----------+----------------+-----------+
+| linksource            | Yes       | Boolean value. Creates an HTML version of each source file (with line numbers) and adds links to them from the standard HTML documentation. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#linksource}linksource}} |
+*-----------------------+-----------+----------------+-----------+
+| locale                | Yes       | Specifies the locale that javadoc uses when generating documentation.| {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#locale}locale}} |
+*-----------------------+-----------+----------------+-----------+
+| maxmemory             | Yes       | Specifies the maximum Java heap size to be used when launching the javadoc executable. Some JVMs refer to this property as the -Xmx parameter. Example: '512' or '512m' | |
+*-----------------------+-----------+----------------+-----------+
+| minmemory             | Yes       | Specifies the minimum Java heap size to be used when launching the javadoc executable. Some JVMs refer to this property as the -Xms parameter. Example: '128' or '128m' | |
+*-----------------------+-----------+----------------+-----------+
+| nocomment             | Yes       | Boolean value. Suppress the entire comment body, including the main description and all tags, generating only declarations. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nocomment}nocomment}} |
+*-----------------------+-----------+----------------+-----------+
+| nodeprecated          | Yes       | Boolean value. Prevents the generation of any deprecated API at all in the documentation. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nodeprecated}nodeprecated}} |
+*-----------------------+-----------+----------------+-----------+
+| nodeprecatedlist      | Yes       | Boolean value. Prevents the generation of the file containing the list of deprecated APIs (deprecated-list.html) and the link in the navigation bar to that page. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nodeprecatedlist}nodeprecatedlist}} |
+*-----------------------+-----------+----------------+-----------+
+| nohelp                | Yes       | Boolean value. Omits the HELP link in the navigation bars at the top and bottom of each page of output. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nohelp}nohelp}} |
+*-----------------------+-----------+----------------+-----------+
+| noindex               | Yes       | Boolean value. Omits the index from the generated docs. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#noindex}noindex}} |
+*-----------------------+-----------+----------------+-----------+
+| nonavbar              | Yes       | Boolean value. Omits the index from the generated docs. The default value is 'false'. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nonavbar}nonavbar}} |
+*-----------------------+-----------+----------------+-----------+
+| noqualifier           | Yes       | Boolean value. Omits qualifying package name from ahead of class names in output. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#noqualifier}noqualifier}} |
+*-----------------------+-----------+----------------+-----------+
+| nosince               | Yes       | Boolean value. Omits from the generated docs the "Since" sections associated with the @since tags. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#nosince}nosince}} |
+*-----------------------+-----------+----------------+-----------+
+| notree                | Yes       | Boolean value. Omits the class/interface hierarchy pages from the generated docs. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#notree}notree}} |
+*-----------------------+-----------+----------------+-----------+
+| old                   | Yes       | Boolean value. This option created documentation with the appearance and functionality of documentation generated by Javadoc 1.1. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#1.1}1.1}} |
+*-----------------------+-----------+----------------+-----------+
+| overview              | Yes       | Specifies that javadoc should retrieve the text for the overview documentation from the "source" file specified by path/filename and place it on the Overview page (overview-summary.html). | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#overview}overview}} |
+*-----------------------+-----------+----------------+-----------+
+| package_              | Yes       | Boolean value. Shows only protected and public classes and members. The default value is 'true'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#package}package}} |
+*-----------------------+-----------+----------------+-----------+
+| private_              | Yes       | Boolean value. Shows all classes and members. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#private}private}} |
+*-----------------------+-----------+----------------+-----------+
+| protected_            | Yes       | Boolean value. Shows only protected and public classes and members. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#protected}protected}} |
+*-----------------------+-----------+----------------+-----------+
+| public_               | Yes       | Boolean value. Shows only public classes and members. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#public}public}} |
+*-----------------------+-----------+----------------+-----------+
+| quiet                 | Yes       | Boolean value. Shuts off non-error and non-warning messages, leaving only the warnings and errors appear, making them easier to view. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#quiet}quiet}} |
+*-----------------------+-----------+----------------+-----------+
+| serialwarn            | Yes       | Boolean value. Generates compile-time warnings for missing @serial tags. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#serialwarn}serialwarn}} |
+*-----------------------+-----------+----------------+-----------+
+| source                | Yes       | Boolean value. Necessary to enable javadoc to handle assertions present in J2SE v 1.4 source code. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#source}source}} |
+*-----------------------+-----------+----------------+-----------+
+| splitindex            | Yes       | Boolean value. Splits the index file into multiple files, alphabetically, one file per letter, plus a file for any index entries that start with non-alphabetical characters. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#splitindex}splitindex}} |
+*-----------------------+-----------+----------------+-----------+
+| stylesheetfile        | Yes       | Specifies the path of an alternate HTML stylesheet file. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#stylesheetfile}stylesheetfile}} |
+*-----------------------+-----------+----------------+-----------+
+| tag                   | Yes       | Enables the Javadoc tool to interpret a simple, one-argument custom block tag @tagname in doc comments. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#tag}tag}} |
+*-----------------------+-----------+----------------+-----------+
+| taglet                | Yes       | Specifies the class file that starts the taglet used in generating the documentation for that tag.  | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#taglet}taglet}} |
+*-----------------------+-----------+----------------+-----------+
+| tagletpath            | Yes       | Specifies the search paths for finding taglet class files (.class). | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#tagletpath}tagletpath}} |
+*-----------------------+-----------+----------------+-----------+
+| use                   | Yes       | Boolean value. Includes one "Use" page for each documented class and package. The default value is 'true'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#use}use}} |
+*-----------------------+-----------+----------------+-----------+
+| verbose               | Yes       | Boolean value. Provides more detailed messages while javadoc is running. The default value is 'false'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#verbose}verbose}} |
+*-----------------------+-----------+----------------+-----------+
+| version               | Yes       | Boolean value. Includes the @version text in the generated docs. The default value is 'true'. | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#version}version}} |
+*-----------------------+-----------+----------------+-----------+
+| windowtitle           | Yes       | Specifies the title to be placed in the HTML <title> tag. The default is '$pom.name $pom.version API' | {{{http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#windowtitle}windowtitle}} |
+*-----------------------+-----------+----------------+-----------+
