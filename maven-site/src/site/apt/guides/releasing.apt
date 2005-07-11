@@ -1,0 +1,35 @@
+ -----
+ Releasing
+ -----
+ The Maven Team
+ -----
+
+Releasing
+
+ The  release plugin provides some basic functionality for making releases, and updating 
+ the project SCM accordingly. A release is performed in 2 steps:
+ 
+   [[1]] Preparing the release.
+   
+   [[2]] Performing the release.
+ 
+Preparing the release
+
+ The <<<release:prepare>>> goal will:
+
+   [[1]] Verify that there are no uncommitted changes in the checkout
+   [[2]] Prompt for a desired version and tag name
+   [[3]] Modify the pom.xml 
+   [[4]] Tag the entire source tree with the new tag name
+
+-----
+m2 release:prepare -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm/tags
+-----
+
+ When this operation is over, your source control has the released code tagged and ready to deploy.
+
+Performing the release
+
+-----
+m2 release:perform -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm
+-----
