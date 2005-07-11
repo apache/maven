@@ -50,6 +50,8 @@ public abstract class AbstractGeneratorMojo
 
     /**
      * The goal prefix that will appear before the ":".
+     * 
+     * @parameter
      */
     protected String goalPrefix;
 

@@ -104,7 +104,7 @@ public class DefaultWagonManager
     {
         getLogger().info( "Uploading " + metadata );
         
-        putRemoteFile( repository, source, metadata.getRepositoryPath(), null );
+        putRemoteFile( repository, source, repository.formatAsFile( metadata.getRepositoryPath() ), null );
     }
 
     private void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
@@ -254,7 +254,7 @@ public class DefaultWagonManager
     public void getRepositoryMetadata( RepositoryMetadata metadata, ArtifactRepository remoteRepository, File destination )
     throws TransferFailedException, ResourceDoesNotExistException
     {
-        String remotePath = metadata.getRepositoryPath();
+        String remotePath = remoteRepository.formatAsFile( metadata.getRepositoryPath() );
     
         getLogger().info( "Retrieving " + metadata );
         

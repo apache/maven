@@ -6,13 +6,6 @@ public class RepositoryMetadataManagementException
 
     private final RepositoryMetadata metadata;
 
-    public RepositoryMetadataManagementException( RepositoryMetadata metadata )
-    {
-        super( "Failed to resolve repository metadata: " + metadata + ".");
-        
-        this.metadata = metadata;
-    }
-
     public RepositoryMetadataManagementException( RepositoryMetadata metadata, String message, Throwable cause )
     {
         super( "Failed to resolve repository metadata: " + metadata + ". Error was: " + cause.getMessage(), cause );
@@ -22,11 +15,11 @@ public class RepositoryMetadataManagementException
 
     public RepositoryMetadataManagementException( RepositoryMetadata metadata, String message )
     {
-        super( "Failed to resolve repository metadata: " + metadata + ".");
+        super( "Failed to resolve repository metadata: " + metadata + "." );
         
         this.metadata = metadata;
     }
-    
+
     public RepositoryMetadata getMetadata()
     {
         return metadata;

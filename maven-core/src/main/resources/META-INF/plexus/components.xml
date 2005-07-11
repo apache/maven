@@ -193,8 +193,8 @@
           <test-compile>compiler:testCompile</test-compile>
           <test>surefire:test</test>
           <package>jar:jar</package>
-          <install>install:install</install>
-          <deploy>deploy:deploy</deploy>
+          <install>install:install,plugin:install-mapping</install>
+          <deploy>deploy:deploy,plugin:deploy-mapping</deploy>
         </phases>
         <!-- END SNIPPET: maven-plugin-lifecycle -->
       </configuration>

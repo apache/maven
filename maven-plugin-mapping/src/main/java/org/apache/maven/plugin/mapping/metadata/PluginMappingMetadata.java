@@ -32,5 +32,10 @@ public class PluginMappingMetadata
     {
         return metadataFile;
     }
+    
+    public String toString()
+    {
+        return PLUGIN_MAPPING_FILE + " (plugin mappings) for group: \'" + groupId + "\'";
+    }
 
 }

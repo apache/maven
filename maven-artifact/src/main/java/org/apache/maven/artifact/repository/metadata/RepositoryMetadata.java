@@ -7,8 +7,8 @@ public interface RepositoryMetadata
     
     String getRepositoryPath();
     
-    void setFile( File metadataFile );
-    
     File getFile();
+    
+    void setFile( File file );
 
 }

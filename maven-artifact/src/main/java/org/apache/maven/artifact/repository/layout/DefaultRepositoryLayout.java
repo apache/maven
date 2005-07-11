@@ -33,7 +33,7 @@ public class DefaultRepositoryLayout
 
         StringBuffer path = new StringBuffer();
 
-        path.append( formatDirectory( artifact.getGroupId() ) ).append( '/' );
+        path.append( formatAsDirectory( artifact.getGroupId() ) ).append( '/' );
         path.append( artifact.getArtifactId() ).append( '/' );
         path.append( artifact.getBaseVersion() ).append( '/' );
         path.append( artifact.getArtifactId() ).append( '-' ).append( artifact.getVersion() );
@@ -55,7 +55,7 @@ public class DefaultRepositoryLayout
     {
         StringBuffer path = new StringBuffer();
 
-        path.append( formatDirectory( metadata.getGroupId() ) ).append( '/' );
+        path.append( formatAsDirectory( metadata.getGroupId() ) ).append( '/' );
         path.append( metadata.getArtifactId() ).append( '/' );
         if ( !metadata.getBaseVersion().equals( "RELEASE" ) )
         {
@@ -67,8 +67,26 @@ public class DefaultRepositoryLayout
         return path.toString();
     }
 
-    public String formatDirectory( String directory )
+    public String formatAsDirectory( String directory )
     {
         return directory.replace( '.', '/' );
+    }
+    
+    public String formatAsFile( String file )
+    {
+        int lastSlash = file.lastIndexOf('/');
+        
+        if( lastSlash > -1 )
+        {
+            String filePart = file.substring( lastSlash );
+            
+            String dirPart = file.substring( 0, lastSlash );
+            
+            return dirPart.replace('.', '/') + filePart;
+        }
+        else
+        {
+            return file;
+        }
     }
 }

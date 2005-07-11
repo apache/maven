@@ -5,10 +5,13 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 public interface RepositoryMetadataManager
 {
 
-    void get( RepositoryMetadata repositoryMetadata, ArtifactRepository remote, ArtifactRepository local )
+    void resolve( RepositoryMetadata repositoryMetadata, ArtifactRepository remote, ArtifactRepository local, String remoteRepositoryId )
         throws RepositoryMetadataManagementException;
     
-    void put( RepositoryMetadata repositoryMetadata, ArtifactRepository remote )
+    void deploy( RepositoryMetadata repositoryMetadata, ArtifactRepository remote )
+        throws RepositoryMetadataManagementException;
+    
+    void install( RepositoryMetadata repositoryMetadata, ArtifactRepository local, String remoteRepositoryId )
         throws RepositoryMetadataManagementException;
 
 }
