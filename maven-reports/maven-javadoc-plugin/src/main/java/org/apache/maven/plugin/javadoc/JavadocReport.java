@@ -44,6 +44,7 @@ import org.codehaus.plexus.util.cli.DefaultConsumer;
  * This class provides the Javadoc report support.
  * 
  * @goal javadoc
+ * @requiresDependencyResolution compile
  * 
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
@@ -737,7 +738,7 @@ public class JavadocReport
         catch ( Exception e )
         {
             getLog().debug( e );
-            throw new MavenReportException( "An error is occurred in javadoc report generation.", e );
+            throw new MavenReportException( "An error has occurred in javadoc report generation.", e );
         }
     }
 
