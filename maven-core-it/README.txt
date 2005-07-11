@@ -93,6 +93,10 @@ it0029: Test for pluginManagement injection of plugin configuration.
 it0030: Test for injection of dependencyManagement through parents of 
         dependency poms.
 
+it0031: Test usage of plugins.xml mapping file on the repository to resolve
+        plugin artifactId from it's prefix using the pluginGroups in
+        the provided settings.xml.
+
 -------------------------------------------------------------------------------
 
 - generated sources

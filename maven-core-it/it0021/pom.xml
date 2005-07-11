@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-it0021-plugin</artifactId>
@@ -25,4 +25,11 @@
     </profile>
   </profiles>
   
-</model>
+  <distributionManagement>
+    <repository>
+      <id>test-repo</id>
+      <name>Test Repository</name>
+      <url>file:/tmp/testRepo</url>
+    </repository>
+  </distributionManagement>
+</project>

@@ -1,4 +1,4 @@
-<model>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-it0013-plugin</artifactId>
@@ -20,4 +20,11 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-</model>
+  <distributionManagement>
+    <repository>
+      <id>test-repo</id>
+      <name>Test Repository</name>
+      <url>file:/tmp/testRepo</url>
+    </repository>
+  </distributionManagement>
+</project>

@@ -186,17 +186,16 @@
       <configuration>
         <!-- START SNIPPET: maven-plugin-lifecycle -->
         <phases>
+          <validate>plugin:validatePom</validate>
           <generate-resources>plugin:descriptor</generate-resources>
           <process-resources>resources:resources</process-resources>
           <compile>compiler:compile</compile>
           <process-test-resources>resources:testResources</process-test-resources>
           <test-compile>compiler:testCompile</test-compile>
           <test>surefire:test</test>
-          <package>jar:jar</package>
-          <install>install:install</install>
-          <deploy>deploy:deploy</deploy>
-          <!-- install>install:install,plugin:install-mapping</install>
-          <deploy>deploy:deploy,plugin:deploy-mapping</deploy -->>
+          <package>jar:jar,plugin:generateUpdatedMapping</package>
+          <install>install:install,plugin:installMapping</install>
+          <deploy>deploy:deploy,plugin:deployMapping</deploy>
         </phases>
         <!-- END SNIPPET: maven-plugin-lifecycle -->
       </configuration>

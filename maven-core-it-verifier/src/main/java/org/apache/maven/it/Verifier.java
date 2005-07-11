@@ -98,7 +98,7 @@ public class Verifier
     //
     // ----------------------------------------------------------------------
 
-    public void verify()
+    public void verify( boolean chokeOnErrorOutput )
         throws VerificationException
     {
         List lines = loadFile( basedir, "expected-results.txt" );
@@ -110,15 +110,18 @@ public class Verifier
             verifyExpectedResult( line );
         }
 
-        lines = loadFile( basedir, LOG_FILENAME );
-
-        for ( Iterator i = lines.iterator(); i.hasNext(); )
+        if ( chokeOnErrorOutput )
         {
-            String line = (String) i.next();
+            lines = loadFile( basedir, LOG_FILENAME );
 
-            if ( line.indexOf( "[ERROR]" ) >= 0 )
+            for ( Iterator i = lines.iterator(); i.hasNext(); )
             {
-                throw new VerificationException( "Error in execution." );
+                String line = (String) i.next();
+
+                if ( line.indexOf( "[ERROR]" ) >= 0 )
+                {
+                    throw new VerificationException( "Error in execution." );
+                }
             }
         }
     }
@@ -563,7 +566,7 @@ public class Verifier
     public static void main( String args[] )
     {
         String basedir = System.getProperty( "user.dir" );
-
+        
         localRepo = retrieveLocalRepo();
 
         List tests = null;
@@ -602,11 +605,17 @@ public class Verifier
 
                 Properties properties = verifier.loadProperties( "system.properties" );
 
+                Properties controlProperties = verifier.loadProperties( "verifier.properties" );
+
+                boolean chokeOnErrorOutput = Boolean.valueOf( controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
+
                 verifier.executeGoals( properties, "goals.txt" );
 
                 verifier.executeHook( "postbuild-hook.txt" );
 
-                verifier.verify();
+                System.out.println("*** Verifying: fail when [ERROR] detected? " + chokeOnErrorOutput + " ***");
+                
+                verifier.verify( chokeOnErrorOutput );
 
                 verifier.resetStreams();
 

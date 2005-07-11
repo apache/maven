@@ -4,8 +4,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 
 public interface RepositoryMetadataManager
 {
-
-    void resolve( RepositoryMetadata repositoryMetadata, ArtifactRepository remote, ArtifactRepository local, String remoteRepositoryId )
+    
+    void resolve( RepositoryMetadata repositoryMetadata, ArtifactRepository remote, ArtifactRepository local )
         throws RepositoryMetadataManagementException;
     
     void deploy( RepositoryMetadata repositoryMetadata, ArtifactRepository remote )

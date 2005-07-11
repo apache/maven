@@ -6,9 +6,14 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled
@@ -18,61 +23,49 @@ public class DefaultRepositoryMetadataManager
     // component requirement
     private WagonManager wagonManager;
 
-    public void resolve( RepositoryMetadata metadata, ArtifactRepository remote, ArtifactRepository local, String remoteId )
+    // only resolve repository metadata once per session...
+    private Map resolved = new HashMap();
+
+    public void resolve( RepositoryMetadata metadata, ArtifactRepository remote, ArtifactRepository local )
         throws RepositoryMetadataManagementException
     {
-        String metadataPath = local.formatAsFile( metadata.getRepositoryPath() );
+        File metadataFile = (File) resolved.get( metadata.getRepositoryPath() );
 
-        String realignedPath = metadataPath.replace( File.separatorChar, '/' );
-
-        if ( !realignedPath.startsWith( "/" ) )
+        if ( metadataFile == null )
         {
-            realignedPath = "/" + realignedPath;
-        }
+            metadataFile = constructLocalRepositoryFile( metadata, local, remote.getId() );
 
-        realignedPath = "/REPOSITORY-INF/" + remoteId + realignedPath;
-
-        File metadataFile = new File( local.getBasedir(), realignedPath );
-
-        if ( remote == null )
-        {
-            if ( metadataFile.exists() )
+            if ( remote == null )
             {
-                getLogger().warn( "Cannot retrieve repository metadata for: " + metadataPath + ". Using locally cached version instead." );
-                
-                getLogger().debug( "Error retrieving repository metadata: " + metadataPath + ". Reason: repository is null." );
-                
-                metadata.setFile( metadataFile );
+                throw new RepositoryMetadataManagementException( metadata,
+                                                                 "Cannot retrieve repository metadata from null repository." );
             }
             else
             {
-                throw new RepositoryMetadataManagementException( metadata, "Cannot retrieve repository metadata from null repository." );
-            }
-        }
-        else
-        {
-            try
-            {
-                wagonManager.getRepositoryMetadata( metadata, remote, metadataFile );
-
-                metadata.setFile( metadataFile );
-            }
-            catch ( TransferFailedException e )
-            {
-                throw new RepositoryMetadataManagementException( metadata, "Failed to download repository metadata.", e );
-            }
-            catch ( ResourceDoesNotExistException e )
-            {
-                if ( metadataFile.exists() )
+                try
                 {
-                    getLogger().warn( "Cannot find repository metadata for: " + metadataPath + ". Using locally cached version instead." );
-                    getLogger().debug( "Error retrieving repository metadata: " + metadataPath, e );
-                    
+                    wagonManager.getRepositoryMetadata( metadata, remote, metadataFile );
+
+                    verifyLocalRepositoryFile( metadataFile );
+
                     metadata.setFile( metadataFile );
                 }
-                else
+                catch ( TransferFailedException e )
                 {
-                    throw new RepositoryMetadataManagementException( metadata, "Remote repository metadata not found.", e );
+                    throw new RepositoryMetadataManagementException( metadata,
+                                                                     "Failed to download repository metadata.", e );
+                }
+                catch ( ResourceDoesNotExistException e )
+                {
+                    throw new RepositoryMetadataManagementException( metadata, "Remote repository metadata not found.",
+                                                                     e );
+                }
+                catch ( IOException e )
+                {
+                    throw new RepositoryMetadataManagementException(
+                                                                     metadata,
+                                                                     "Download of repository metadata resulted in an invalid file.",
+                                                                     e );
                 }
             }
         }
@@ -97,7 +90,7 @@ public class DefaultRepositoryMetadataManager
     }
 
     public void install( RepositoryMetadata metadata, ArtifactRepository local, String remoteRepositoryId )
-    throws RepositoryMetadataManagementException
+        throws RepositoryMetadataManagementException
     {
         String realignedPath = local.formatAsFile( metadata.getRepositoryPath() );
 
@@ -115,19 +108,58 @@ public class DefaultRepositoryMetadataManager
         try
         {
             File dir = metadataFile.getParentFile();
-            
+
             if ( !dir.exists() )
             {
                 dir.mkdirs();
             }
-            
+
             FileUtils.copyFile( metadata.getFile(), metadataFile );
         }
         catch ( IOException e )
         {
             throw new RepositoryMetadataManagementException( metadata, "Failed to install repository metadata.", e );
         }
-    
+
+    }
+
+    private File constructLocalRepositoryFile( RepositoryMetadata metadata, ArtifactRepository local, String remoteId )
+    {
+        String metadataPath = local.formatAsFile( metadata.getRepositoryPath() );
+
+        String realignedPath = metadataPath.replace( File.separatorChar, '/' );
+
+        if ( !realignedPath.startsWith( "/" ) )
+        {
+            realignedPath = "/" + realignedPath;
+        }
+
+        realignedPath = "/REPOSITORY-INF/" + remoteId + realignedPath;
+
+        return new File( local.getBasedir(), realignedPath );
+    }
+
+    private void verifyLocalRepositoryFile( File metadataFile )
+        throws IOException
+    {
+        Reader metadataReader = null;
+
+        try
+        {
+            metadataReader = new FileReader( metadataFile );
+
+            char[] cbuf = new char[16];
+
+            while ( metadataReader.read( cbuf ) > -1 )
+            {
+                // do nothing...just verify that it can be read.
+            }
+        }
+        finally
+        {
+            IOUtil.close( metadataReader );
+        }
+
     }
 
 }

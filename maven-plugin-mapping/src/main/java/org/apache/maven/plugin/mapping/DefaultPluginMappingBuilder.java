@@ -93,7 +93,7 @@ public class DefaultPluginMappingBuilder
 
             try
             {
-                repositoryMetadataManager.resolve( metadata, repository, localRepository, repository.getId() );
+                repositoryMetadataManager.resolve( metadata, repository, localRepository );
 
                 break;
             }
