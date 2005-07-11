@@ -95,7 +95,7 @@ public abstract class AbstractMavenReport
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "An error is occurred in " + getName( locale ) + " report generation." );
+            throw new MojoExecutionException( "An error has occurred in " + getName( locale ) + " report generation.", e );
         }
     }
 
