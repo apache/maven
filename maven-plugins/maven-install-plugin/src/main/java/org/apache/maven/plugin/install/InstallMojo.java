@@ -17,8 +17,6 @@ package org.apache.maven.plugin.install;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
@@ -39,27 +37,6 @@ import java.util.List;
 public class InstallMojo
     extends AbstractInstallMojo
 {
-    /**
-     * @parameter expression="${project.groupId}"
-     * @required
-     * @readonly
-     */
-    protected String groupId;
-
-    /**
-     * @parameter expression="${project.artifactId}"
-     * @required
-     * @readonly
-     */
-    protected String artifactId;
-
-    /**
-     * @parameter expression="${project.version}"
-     * @required
-     * @readonly
-     */
-    protected String version;
-
     /**
      * @parameter expression="${project.packaging}"
      * @required
@@ -91,6 +68,13 @@ public class InstallMojo
      * @parameter expression="${updateReleaseInfo}"
      */
     private boolean updateReleaseInfo = false;
+    
+    /**
+     * @parameter expression="${project.artifact}"
+     * @required
+     * @readonly
+     */
+    private Artifact artifact;
 
     /**
      * @parameter expression="${project.attachedArtifacts}
@@ -99,20 +83,11 @@ public class InstallMojo
      */
     private List attachedArtifacts;
 
-    /**
-     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
-     * @required
-     * @readonly
-     */
-    private ArtifactFactory artifactFactory;
-
     public void execute()
         throws MojoExecutionException
     {
-        // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
-        Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, version, null, packaging );
-
         boolean isPomArtifact = "pom".equals( packaging );
+        
         File pom = new File( basedir, "pom.xml" );
         if ( !isPomArtifact )
         {
@@ -126,7 +101,7 @@ public class InstallMojo
             metadata.setVersion( artifact.getVersion() );
             artifact.addMetadata( metadata );
         }
-
+        
         try
         {
             if ( isPomArtifact )

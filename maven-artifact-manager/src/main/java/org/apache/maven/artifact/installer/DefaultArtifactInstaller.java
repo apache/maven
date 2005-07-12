@@ -75,6 +75,7 @@ public class DefaultArtifactInstaller
             for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
             {
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                
                 metadata.storeInLocalRepository( localRepository );
             }
         }

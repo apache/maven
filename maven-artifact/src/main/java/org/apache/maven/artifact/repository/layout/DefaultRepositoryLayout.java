@@ -57,7 +57,7 @@ public class DefaultRepositoryLayout
 
         path.append( formatAsDirectory( metadata.getGroupId() ) ).append( '/' );
         path.append( metadata.getArtifactId() ).append( '/' );
-        if ( !metadata.getBaseVersion().equals( "RELEASE" ) )
+        if ( metadata.storedInArtifactDirectory() )
         {
             path.append( metadata.getBaseVersion() ).append( '/' );
         }

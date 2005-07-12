@@ -143,9 +143,8 @@ public class DefaultMavenProjectBuilder
         // ----------------------------------------------------------------------
 
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
-        Artifact projectArtifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),
-                                                                   project.getVersion(), null, project.getPackaging() );
-
+        Artifact projectArtifact = project.getArtifact();
+        
         Map managedVersions = createManagedVersionMap( project.getDependencyManagement() );
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 projectArtifact, managedVersions,
@@ -406,6 +405,12 @@ public class DefaultMavenProjectBuilder
         project.addProfileProperties( profileProperties );
 
         project.setActiveProfiles( activeProfiles );
+        
+        // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
+        Artifact projectArtifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),
+                                                                   project.getVersion(), null, project.getPackaging() );
+        
+        project.setArtifact( projectArtifact );
 
         project.setPluginArtifactRepositories(
             ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(), artifactRepositoryFactory,

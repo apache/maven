@@ -46,6 +46,11 @@ public abstract class AbstractArtifactMetadata
     {
         return filename;
     }
+    
+    public boolean storedInArtifactDirectory()
+    {
+        return true;
+    }
 
     public String getGroupId()
     {

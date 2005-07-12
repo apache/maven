@@ -36,6 +36,17 @@
         </requirement>
       </requirements>
     </component>
+    
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>latest</role-hint>
+      <implementation>org.apache.maven.artifact.transform.LatestArtifactTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
     <!--
      |
      | Resolver

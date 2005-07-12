@@ -58,6 +58,11 @@ public interface ArtifactMetadata
      * @return true or false
      */
     boolean exists();
+    
+    /**
+     * Whether this metadata should be stored alongside the artifact.
+     */
+    boolean storedInArtifactDirectory();
 
     String getGroupId();
 

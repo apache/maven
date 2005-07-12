@@ -102,6 +102,8 @@ public class MavenProject
     private List activeProfiles = new ArrayList();
 
     private Set dependencyArtifacts;
+    
+    private Artifact artifact;
 
     public MavenProject( Model model )
     {
@@ -143,6 +145,16 @@ public class MavenProject
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------
+    
+    public Artifact getArtifact()
+    {
+        return artifact;
+    }
+    
+    public void setArtifact( Artifact artifact )
+    {
+        this.artifact = artifact;
+    }
 
     //@todo I would like to get rid of this. jvz.
     public Model getModel()

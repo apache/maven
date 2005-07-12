@@ -193,7 +193,7 @@
           <process-test-resources>resources:testResources</process-test-resources>
           <test-compile>compiler:testCompile</test-compile>
           <test>surefire:test</test>
-          <package>jar:jar,plugin:generateUpdatedMapping</package>
+          <package>jar:jar,plugin:generateUpdatedMapping,plugin:addPluginArtifactMetadata</package>
           <install>install:install,plugin:installMapping</install>
           <deploy>deploy:deploy,plugin:deployMapping</deploy>
         </phases>
@@ -285,6 +285,9 @@
       <implementation>org.apache.maven.plugin.version.DefaultPluginVersionManager</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
         <requirement>
           <role>org.apache.maven.plugin.registry.MavenPluginRegistryBuilder</role>
         </requirement>

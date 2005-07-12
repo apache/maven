@@ -17,8 +17,6 @@ package org.apache.maven.plugin.deploy;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -45,25 +43,11 @@ public class DeployMojo
 {
 
     /**
-     * @parameter expression="${project.groupId}"
+     * @parameter expression="${project.artifact}"
      * @required
      * @readonly
      */
-    private String groupId;
-
-    /**
-     * @parameter expression="${project.artifactId}"
-     * @required
-     * @readonly
-     */
-    private String artifactId;
-
-    /**
-     * @parameter expression="${project.version}"
-     * @required
-     * @readonly
-     */
-    private String version;
+    private Artifact artifact;
 
     /**
      * @parameter expression="${project.packaging}"
@@ -121,13 +105,6 @@ public class DeployMojo
     private List attachedArtifacts;
 
     /**
-     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
-     * @required
-     * @readonly
-     */
-    private ArtifactFactory artifactFactory;
-
-    /**
      * @parameter expression="${updateReleaseInfo}"
      */
     private boolean updateReleaseInfo = false;
@@ -143,9 +120,6 @@ public class DeployMojo
         }
 
         // Deploy the POM
-        // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
-        Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, version, null, packaging );
-
         boolean isPomArtifact = "pom".equals( packaging );
         File pom = new File( parentDir, "pom.xml" );
         if ( !isPomArtifact )
