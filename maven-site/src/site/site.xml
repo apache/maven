@@ -31,11 +31,12 @@
     <menu name="User's Guide">
       <item name="Getting Started" href="/getting-started.html"/>
       <item name="Build Lifecycle" href="/lifecycle.html"/>
+      <item name="Plugin Overview" href="/plugin-overview.html"/>
       <item name="Dependency Mechanism" href="/dependencies.html"/>
       <item name="Creating a Site" href="/site.html"/>
     </menu>
     <menu name="Plugin Developers">
-      <item name="Developing Plugins" href="/developers/plugin-overview.html"/>
+      <item name="Plugin Development Guide" href="/developers/plugin-development-guide.html"/>
       <item name="Developing Plugins with Marmalade" href="/developers/developing-plugins-with-marmalade.html"/>
     </menu>
     <menu name="Reference">

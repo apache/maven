@@ -26,10 +26,66 @@ Plugin Overview
 
   Maven consists of a core engine which provides basic project-processing
   capabilities and build-process management, and a host of plugins which are
-  used to execute the actual build tasks.
+  used to execute the actual build tasks.  
   
-~~ Additional intro material here.
+** What is a Plugin?
+
+  "Maven" is really just a core framework for a collection of 
+  Maven Plugins.  In other words, plugins are where much of the real action is 
+  performed, plugins are used to: create jar files, create war files, compile 
+  code, unit test code, create project documentation, and on and on.  Almost 
+  any action that you can think of performing on a project is implemented as 
+  a Maven plugin.
   
+  Plugins are the central feature of Maven that allow for the reuse of
+  common build logic across multiple projects.  They do this by executing an
+  "action" (i.e. creating a WAR file or compiling unit tests) in the context
+  of a project's description - the Project Object Model (POM).  Plugin behavior
+  can be customized through a set of unique parameters which are exposed by a 
+  description of each plugin goal (or Mojo).
+  
+  One of the simplest plugins in Maven 2.0 is the Clean Plugin.  The 
+  {{{http://maven.apache.org/maven2/plugins/maven-clean-plugin/}Maven
+  Clean plugin}} (maven-clean-plugin) is responsible for removing the target 
+  directory of a Maven 2 project.  When you run "m2 clean:clean", Maven 2 executes
+  the "clean:clean" goal as defined in the Clean plug-in, and the target directory
+  is removed.  The Clean plugin 
+  {{{http://maven.apache.org/maven2/plugins/maven-clean-plugin/clean-mojo.html}defines 
+  a parameter}} which can be used to customize plugin behavior, this parameter is 
+  called outputDirectory and it defaults to ${project.build.directory}.    
+
+** What is a Mojo (<And Why the H--- is it Named 'Mojo'>)?
+
+  A Mojo is really just a goal in Maven 2, and plug-ins consist of 
+  any number of goals (Mojos).  Mojos can be defined as annotated Java classes or
+  as a XML plugin script if a plugin is defined in Marmalade.  A Mojo specifies 
+  metadata about a goal: a goal name, which phase of the lifecycle it fits into, 
+  and the parameters it is expecting.
+  
+  MOJO is a play on POJO (Plain-old-Java-object), substituting "Maven" for
+  "Plain".  Mojo is also an iteresting word (see {{{http://www.answers.com/mojo&r=67}definition}}.  
+  From {{{http://www.wikipedia.org}Wikipedia}}, a "mojo" is defined as:
+  "...a small bag worn by a person under the clothes (also known as a mojo hand). 
+  Such bags were thought to have supernatural powers, such as protecting from evil, 
+  bringing good luck, etc."
+
+** What is the Build Lifecycle? (Overview)
+
+  The build lifecycle is a series of common stages through which all project
+  builds naturally progress.  Plugin goals are bound to specific stages in the 
+  lifecycle.
+
+* Resources
+
+    [[1]] {{{developers/plugin-development-guide.html}Plugin development guide}}
+
+    [[2]] {{{plugin-management.html}Managing plugin configuration in large 
+          projects}}
+
+    [[3]] {{{plugin-configuration.html}Configuring plugins}}
+  
+* Comparison to Maven 1.x Plugins
+
 ** Similarities to Maven 1.x
 
   Maven 2.0 is similar to its predecessor in that it has two main 
@@ -105,29 +161,24 @@ Plugin Overview
   
 ** Why Change the Plugin Architecture?
 
-* Definitions
+  See the previous question for the long version, but the short version can
+  be summed up by the following list of benefits.
 
-** What is a Plugin?
-
-  Maven is a framework for the execution of plugin goals.  Every action you 
-  take in Maven is really just calling out to an existing maven plugin. 
-  When you compile, clean, create a JAR, generate a site, or execute
-  unit tests, Maven is executing goals from the appropriate plugins. 
-
-** What is a Mojo (<And Why the H--- is it Named 'Mojo'>)?
-
-  MOJO is a play on POJO (Plain-old-Java-object), substituting "Maven" for
-  "Plain".  A Mojo is really just a goal in Maven 2, and plug-ins consist of 
-  any number of goals (Mojos).
-
-** What is the Build Lifecycle? (Overview)
-
-* Resources
-
-    [[1]] {{{developers/plugin-development-guide.html}Plugin development guide}}
-
-    [[2]] {{{plugin-management.html}Managing plugin configuration in large 
-          projects}}
-
-    [[3]] {{{plugin-configuration.html}Configuring plugins}}
-
+    * A managed lifecycle
+    * Multiple implementation languages
+    * Reusability outside of the build system
+    * The ability to write Maven plugins entirely in Java
+    
+  In Maven 1.0, a plugin was defined using Jelly, and while it was possibly to 
+  write a plugin in Java, you still had to wrap your plugin with some obligatory
+  Jelly script.  An XML-based scripting language which is interpreted at run-time
+  isn't going to be the best choice for performance, and the development team
+  thought it wise to adopt an approach which would allow plugin developers to
+  choose from an array of plugin implementation choices.  The first choice in 
+  Maven 2 should be Java plugins, but if you are used to defining plugins in Jelly
+  you may also define a plugin using a scripting language known as Marmalade.
+  
+  To summarize, the development team saw some critical gaps in the API and 
+  architecture of Maven 1.0 plug-ins, and the team decided that addressing
+  these deficiencies was critical to the future progress of Maven from a useful
+  tool to something more robust.

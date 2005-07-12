@@ -33,3 +33,38 @@ Performing the release
 -----
 m2 release:perform -DtagBase=svn+ssh://svn.codehaus.org/home/projects/plexus/scm
 -----
+
+~~ -----
+~~ o had to update each component manually to change the version
+~~ o had to change the depMan element in the top-level POM
+~~ both tedious and error prone
+~~ o had to change the assembly file name
+~~ o had to change the webpapp file name
+
+~~ sign the release
+
+-----
+#!/bin/sh
+
+rel=$1
+
+if [ -z "$rel" ]; then
+  echo usage: $0 release
+    exit 1
+    fi
+    
+    exts="tar.gz tar.bz2 zip"
+    if [ -f "$rel.exe" ]; then
+      exts="$exts exe"
+      fi
+      
+      for i in $exts; do md5sum $rel.$i | sed 's/ .*$//g' >$rel.$i.md5; done
+      
+      for i in $exts; do gpg --armor --output $rel.$i.asc --detach-sig
+$rel.$i; done
+-----
+
+~~ o deploy to /www/www.apache.org/dist/maven/binaries
+
+~~ o even though we have said each module needs to specify its own version that
+~~ is really a pita. maybe there is a better way we can deal with that.
