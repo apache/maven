@@ -27,7 +27,7 @@
   
   <distributionManagement>
     <repository>
-      <id>test-repo</id>
+      <id>central</id>
       <name>Test Repository</name>
       <url>file:/tmp/testRepo</url>
     </repository>

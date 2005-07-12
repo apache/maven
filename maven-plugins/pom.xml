@@ -71,7 +71,7 @@
   </organization>
   <distributionManagement>
     <repository>
-      <id>repo1</id>
+      <id>central</id>
       <name>Maven Central Repository</name>
       <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2/plugins</url>
     </repository>

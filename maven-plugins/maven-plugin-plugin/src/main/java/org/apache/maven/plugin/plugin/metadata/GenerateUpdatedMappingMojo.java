@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @phase package
@@ -70,6 +71,24 @@ public class GenerateUpdatedMappingMojo
     {
         ArtifactRepository distributionRepository = project.getDistributionManagementArtifactRepository();
         
+        String distributionRepositoryId = distributionRepository.getId();
+
+        List remoteArtifactRepositories = project.getRemoteArtifactRepositories();
+
+        ArtifactRepository readRemoteRepository = null;
+
+        for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
+        {
+            ArtifactRepository currentRepository = (ArtifactRepository) it.next();
+
+            if ( distributionRepositoryId.equals( currentRepository.getId() ) )
+            {
+                readRemoteRepository = currentRepository;
+                
+                break;
+            }
+        }
+        
         PluginMappingXpp3Reader mappingReader = new PluginMappingXpp3Reader();
         
         PluginMap pluginMap = null;
@@ -78,7 +97,7 @@ public class GenerateUpdatedMappingMojo
         
         try
         {
-            repositoryMetadataManager.resolve( metadata, distributionRepository, localRepository );
+            repositoryMetadataManager.resolve( metadata, readRemoteRepository, localRepository );
             
             Reader reader = null;
             
@@ -109,15 +128,15 @@ public class GenerateUpdatedMappingMojo
             
             if ( cause != null && ( cause instanceof ResourceDoesNotExistException ) )
             {
-                getLog().info( "Cannot find " + metadata + " on remote repository. We'll create a new one." );
-                getLog().debug( "Metadata " + metadata + " not found.", e );
+                getLog().info( "Cannot find " + metadata + " on remote repository. Creating a new one." );
+                getLog().debug( "Metadata " + metadata + " cannot be resolved.", e );
                 
                 pluginMap = new PluginMap();
                 pluginMap.setGroupId( project.getGroupId() );
             }
             else
             {
-                throw new MojoExecutionException( "Cannot resolve plugin-mapping metadata: " + metadata, e );
+                throw new MojoExecutionException( "Failed to resolve " + metadata, e );
             }
         }
         

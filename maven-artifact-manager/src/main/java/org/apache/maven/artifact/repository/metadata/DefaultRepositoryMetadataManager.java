@@ -6,12 +6,9 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,8 +43,6 @@ public class DefaultRepositoryMetadataManager
                 {
                     wagonManager.getRepositoryMetadata( metadata, remote, metadataFile );
 
-                    verifyLocalRepositoryFile( metadataFile );
-
                     metadata.setFile( metadataFile );
                 }
                 catch ( TransferFailedException e )
@@ -58,13 +53,6 @@ public class DefaultRepositoryMetadataManager
                 catch ( ResourceDoesNotExistException e )
                 {
                     throw new RepositoryMetadataManagementException( metadata, "Remote repository metadata not found.",
-                                                                     e );
-                }
-                catch ( IOException e )
-                {
-                    throw new RepositoryMetadataManagementException(
-                                                                     metadata,
-                                                                     "Download of repository metadata resulted in an invalid file.",
                                                                      e );
                 }
             }
@@ -137,29 +125,6 @@ public class DefaultRepositoryMetadataManager
         realignedPath = "/REPOSITORY-INF/" + remoteId + realignedPath;
 
         return new File( local.getBasedir(), realignedPath );
-    }
-
-    private void verifyLocalRepositoryFile( File metadataFile )
-        throws IOException
-    {
-        Reader metadataReader = null;
-
-        try
-        {
-            metadataReader = new FileReader( metadataFile );
-
-            char[] cbuf = new char[16];
-
-            while ( metadataReader.read( cbuf ) > -1 )
-            {
-                // do nothing...just verify that it can be read.
-            }
-        }
-        finally
-        {
-            IOUtil.close( metadataReader );
-        }
-
     }
 
 }
