@@ -95,6 +95,12 @@
           <type>String</type>
         </field>
         <field>
+          <name>outputFileNameMapping</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <defaultValue>${artifactId}-${version}.${extension}</defaultValue>
+        </field>
+        <field>
           <name>unpack</name>
           <type>boolean</type>
           <defaultValue>false</defaultValue>

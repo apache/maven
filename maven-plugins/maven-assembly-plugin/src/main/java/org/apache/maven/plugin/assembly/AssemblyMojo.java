@@ -17,6 +17,8 @@ package org.apache.maven.plugin.assembly;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.IncludesArtifactFilter;
@@ -32,6 +34,7 @@ import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.tar.TarArchiver;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
+import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
@@ -48,6 +51,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -104,6 +109,14 @@ public class AssemblyMojo
      */
     private File workDirectory;
 
+    /**
+     * Handler to get the file extension matching a given artifactType
+     *
+     * @parameter expression="${component.org.apache.maven.artifact.handler.manager.ArtifactHandlerManager}"
+     * @required
+     */
+    private ArtifactHandlerManager artifactHandlerManager;
+ 
     public void execute()
         throws MojoExecutionException
     {
@@ -176,23 +189,23 @@ public class AssemblyMojo
     }
 
     private void processDependencySets( Archiver archiver, List dependencySets, boolean includeBaseDirectory )
-        throws ArchiverException, IOException
+        throws ArchiverException, IOException, Exception
     {
         for ( Iterator i = dependencySets.iterator(); i.hasNext(); )
         {
-            DependencySet depedencySet = (DependencySet) i.next();
-            String output = depedencySet.getOutputDirectory();
+            DependencySet dependencySet = (DependencySet) i.next();
+            String output = dependencySet.getOutputDirectory();
             output = getOutputDirectory( output, includeBaseDirectory );
 
             AndArtifactFilter filter = new AndArtifactFilter();
-            filter.add( new ScopeArtifactFilter( depedencySet.getScope() ) );
-            if ( !depedencySet.getIncludes().isEmpty() )
+            filter.add( new ScopeArtifactFilter( dependencySet.getScope() ) );
+            if ( !dependencySet.getIncludes().isEmpty() )
             {
-                filter.add( new IncludesArtifactFilter( depedencySet.getIncludes() ) );
+                filter.add( new IncludesArtifactFilter( dependencySet.getIncludes() ) );
             }
-            if ( !depedencySet.getExcludes().isEmpty() )
+            if ( !dependencySet.getExcludes().isEmpty() )
             {
-                filter.add( new ExcludesArtifactFilter( depedencySet.getExcludes() ) );
+                filter.add( new ExcludesArtifactFilter( dependencySet.getExcludes() ) );
             }
 
             // TODO: includes and excludes
@@ -203,7 +216,7 @@ public class AssemblyMojo
                 if ( filter.include( artifact ) )
                 {
                     String name = artifact.getFile().getName();
-                    if ( depedencySet.isUnpack() )
+                    if ( dependencySet.isUnpack() )
                     {
                         // TODO: something like zipfileset in plexus-archiver
 //                        archiver.addJar(  )
@@ -229,11 +242,48 @@ public class AssemblyMojo
                     }
                     else
                     {
-                        archiver.addFile( artifact.getFile(), output + name );
-                    }
+                        archiver.addFile( artifact.getFile(), output + evaluateFileNameMapping( dependencySet.getOutputFileNameMapping(), artifact ));
+                    }                    
                 }
             }
         }
+    }
+
+    private String evaluateFileNameMapping( String expression, Artifact artifact ) 
+        throws Exception
+    {
+        // this matches the last ${...} string
+        Pattern pat = Pattern.compile( "^(.*)\\$\\{([^\\}]+)\\}(.*)$" );
+        Matcher mat = pat.matcher(expression);
+
+        String left,right;
+        Object middle;
+
+        if ( mat.matches() ) 
+        {
+            left   = evaluateFileNameMapping( mat.group(1), artifact );
+            middle = ReflectionValueExtractor.evaluate( "dep." + mat.group(2), artifact );
+            right  = mat.group(3);
+
+            if ( middle == null )
+            {
+                // TODO: There should be a more generic way dealing with that. Having magic words is not good at all.
+                // probe for magic word
+                if ( mat.group(2).trim().equals( "extension" ))  
+                {
+                    ArtifactHandler artifactHandler  = artifactHandlerManager.getArtifactHandler( artifact.getType() );
+                    middle = artifactHandler.getExtension();
+                }
+                else
+                {
+                    middle = "${" + mat.group(2) + "}";
+                }
+            }
+           
+            return left + middle + right;
+        }
+
+        return expression;
     }
 
     private void unpackJar( File file, File tempLocation )
