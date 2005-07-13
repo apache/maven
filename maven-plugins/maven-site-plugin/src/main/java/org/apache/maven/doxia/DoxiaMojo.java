@@ -60,9 +60,10 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
- * Generate the project site.
+ * Generates the project site.
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id$
  * @goal site
  * @requiresDependencyResolution test
@@ -280,6 +281,14 @@ public class DoxiaMojo
                         throw new MojoExecutionException( "An error is occurred in project reports page generation.",
                                                           e );
                     }
+                }
+
+                // Generated Site Directory
+                File generatedSiteFile = new File( generatedSiteDirectory );
+                if ( generatedSiteFile.exists() )
+                {
+                    siteRenderer.render( generatedSiteFile, localeOutputDirectory,
+                                         getSiteDescriptor( reports, locale ), template, attributes, locale );
                 }
 
                 // Generate static site
