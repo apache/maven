@@ -304,8 +304,6 @@ public class DefaultMavenProjectBuilder
 
             Model current = currentProject.getModel();
 
-            forcePluginExecutionIdCollision( pomLocation, current );
-
             modelInheritanceAssembler.assembleModelInheritance( current, previous );
 
             previous = current;
@@ -322,38 +320,6 @@ public class DefaultMavenProjectBuilder
         }
         return project;
     }
-
-    private void forcePluginExecutionIdCollision( String pomLocation, Model model )
-        throws ProjectBuildingException
-    {
-        Build build = model.getBuild();
-
-        if ( build != null )
-        {
-            List plugins = build.getPlugins();
-
-            if ( plugins != null )
-            {
-                for ( Iterator it = plugins.iterator(); it.hasNext(); )
-                {
-                    Plugin plugin = (Plugin) it.next();
-
-                    // this will force an IllegalStateException, even if we don't have to do inheritance assembly.
-                    try
-                    {
-                        plugin.getExecutionsAsMap();
-                    }
-                    catch ( IllegalStateException collisionException )
-                    {
-                        throw new ProjectBuildingException(
-                            "Detected illegal plugin-execution configuration in: " + pomLocation +
-                                " Error output: \n\n" + collisionException.getMessage(), collisionException );
-                    }
-                }
-            }
-        }
-    }
-
 
     /**
      * @todo can this take in a model instead of a project and still be successful?
@@ -648,8 +614,6 @@ public class DefaultMavenProjectBuilder
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
 
         Model superModel = readModel( url );
-
-        forcePluginExecutionIdCollision( "<super-POM>", superModel );
 
         return superModel;
     }

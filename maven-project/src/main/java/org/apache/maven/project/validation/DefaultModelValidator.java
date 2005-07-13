@@ -16,10 +16,13 @@ package org.apache.maven.project.validation;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -57,10 +60,40 @@ public class DefaultModelValidator
 
             validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion() );
         }
+        
+        forcePluginExecutionIdCollision( model, result );
 
         return result;
     }
 
+    private void forcePluginExecutionIdCollision( Model model, ModelValidationResult result )
+    {
+        Build build = model.getBuild();
+    
+        if ( build != null )
+        {
+            List plugins = build.getPlugins();
+    
+            if ( plugins != null )
+            {
+                for ( Iterator it = plugins.iterator(); it.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) it.next();
+    
+                    // this will force an IllegalStateException, even if we don't have to do inheritance assembly.
+                    try
+                    {
+                        plugin.getExecutionsAsMap();
+                    }
+                    catch ( IllegalStateException collisionException )
+                    {
+                        result.addMessage( collisionException.getMessage() );
+                    }
+                }
+            }
+        }
+    }
+    
     ///////////////////////////////////////////////////////////////////////////
     // Field validator
 
