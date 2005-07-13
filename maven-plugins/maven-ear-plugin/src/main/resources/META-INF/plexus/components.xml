@@ -1,0 +1,19 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>ear</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: ear-lifecycle -->
+        <phases>
+          <generate-resources>ear:generate-application-xml</generate-resources>
+          <package>ear:ear</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: ear-lifecycle -->
+      </configuration>
+    </component>
+  </components>
+</component-set>
