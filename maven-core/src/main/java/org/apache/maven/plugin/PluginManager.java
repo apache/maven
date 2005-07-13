@@ -26,6 +26,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.List;
 
@@ -50,4 +51,7 @@ public interface PluginManager
                     ArtifactRepository localRepository )
         throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException,
         ArtifactResolutionException;
+
+    Object getPluginComponent( Plugin plugin, String role, String roleHint )
+        throws ComponentLookupException, PluginManagerException;
 }

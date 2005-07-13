@@ -1,0 +1,23 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>war</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: war-lifecycle -->
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>war:war</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: war-lifecycle -->
+      </configuration>
+    </component>
+  </components>
+</component-set>

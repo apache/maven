@@ -71,8 +71,8 @@
   </organization>
   <distributionManagement>
     <repository>
-      <id>central</id>
-      <name>Maven Central Repository</name>
+      <id>central-plugins</id>
+      <name>Maven Central Plugins Repository</name>
       <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2/plugins</url>
     </repository>
     <site>
@@ -80,6 +80,13 @@
       <url>scp://minotaur.apache.org/www/maven.apache.org/maven2/plugins/</url>
     </site>
   </distributionManagement>
+  <repositories>
+    <repository>
+      <id>central-plugins</id>
+      <name>Maven Central Plugins Repository</name>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2/plugins</url>
+    </repository>
+  </repositories>
   <modules>
     <module>maven-ant-plugin</module>
     <module>maven-assembly-plugin</module>

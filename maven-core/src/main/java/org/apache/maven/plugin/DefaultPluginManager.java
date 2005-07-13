@@ -914,4 +914,14 @@ public class DefaultPluginManager
         }
     }
 
+    public Object getPluginComponent( Plugin plugin, String role, String roleHint )
+        throws ComponentLookupException, PluginManagerException
+    {
+        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
+
+        PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
+
+        return pluginContainer.lookup( role, roleHint );
+    }
+
 }

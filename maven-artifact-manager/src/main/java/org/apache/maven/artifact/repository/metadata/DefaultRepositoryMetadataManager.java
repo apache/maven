@@ -21,12 +21,12 @@ public class DefaultRepositoryMetadataManager
     private WagonManager wagonManager;
 
     // only resolve repository metadata once per session...
-    private Map resolved = new HashMap();
+    private Map cachedMetadata = new HashMap();
 
     public void resolve( RepositoryMetadata metadata, ArtifactRepository remote, ArtifactRepository local )
         throws RepositoryMetadataManagementException
     {
-        File metadataFile = (File) resolved.get( metadata.getRepositoryPath() );
+        File metadataFile = (File) cachedMetadata.get( metadata.getRepositoryPath() );
 
         if ( metadataFile == null )
         {
@@ -41,8 +41,39 @@ public class DefaultRepositoryMetadataManager
             {
                 try
                 {
-                    wagonManager.getRepositoryMetadata( metadata, remote, metadataFile );
-
+                    File tempMetadataFile = File.createTempFile( "plugins.xml", null );
+                    
+                    try
+                    {
+                        wagonManager.getRepositoryMetadata( metadata, remote, tempMetadataFile );
+                        
+                        if( !metadataFile.exists() || ( metadataFile.lastModified() <= tempMetadataFile.lastModified() ) )
+                        {
+                            if ( !tempMetadataFile.renameTo( metadataFile ) )
+                            {
+                                FileUtils.copyFile( tempMetadataFile, metadataFile );
+                                
+                                tempMetadataFile.delete();
+                            }
+                        }
+                    }
+                    catch ( ResourceDoesNotExistException e )
+                    {
+                        if ( !metadataFile.exists() )
+                        {
+                            throw new RepositoryMetadataManagementException( metadata, "Remote repository metadata not found.",
+                                                                             e );
+                        }
+                        else
+                        {
+                            String message = "Cannot find " + metadata + " in remote repository - Using local copy.";
+                            
+                            getLogger().info( message );
+                            
+                            getLogger().debug( message, e );
+                        }
+                    }
+                    
                     metadata.setFile( metadataFile );
                 }
                 catch ( TransferFailedException e )
@@ -50,10 +81,9 @@ public class DefaultRepositoryMetadataManager
                     throw new RepositoryMetadataManagementException( metadata,
                                                                      "Failed to download repository metadata.", e );
                 }
-                catch ( ResourceDoesNotExistException e )
+                catch ( IOException e )
                 {
-                    throw new RepositoryMetadataManagementException( metadata, "Remote repository metadata not found.",
-                                                                     e );
+                    throw new RepositoryMetadataManagementException( metadata, "Error constructing temporary metadata download file.", e );
                 }
             }
         }

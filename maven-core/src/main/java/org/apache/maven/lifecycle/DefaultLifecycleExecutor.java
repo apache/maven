@@ -255,23 +255,11 @@ public class DefaultLifecycleExecutor
     private Map bindLifecycleForPackaging( MavenSession session, String selectedPhase, MavenProject project )
         throws ArtifactResolutionException, LifecycleExecutionException
     {
-        Map mappings;
-        String packaging = project.getPackaging();
-        try
-        {
-            LifecycleMapping m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
-            mappings = m.getPhases();
-        }
-        catch ( ComponentLookupException e )
-        {
-            getLogger().error( "No lifecycle mapping for type '" + packaging + "': using defaults" );
-            mappings = defaultPhases;
-        }
+        Map mappings = findMappingsForLifecycle( session, project );
 
         Map lifecycleMappings = new HashMap();
 
-        boolean finished = false;
-        for ( Iterator i = phases.iterator(); i.hasNext() && !finished; )
+        for ( Iterator i = phases.iterator(); i.hasNext(); )
         {
             String phase = (String) i.next();
 
@@ -291,11 +279,112 @@ public class DefaultLifecycleExecutor
 
             if ( phase.equals( selectedPhase ) )
             {
-                finished = true;
+                break;
             }
         }
 
         return lifecycleMappings;
+    }
+
+    private Map findMappingsForLifecycle( MavenSession session, MavenProject project ) 
+        throws LifecycleExecutionException
+    {
+        Map mappings;
+        
+        String packaging = project.getPackaging();
+        try
+        {
+            PluginMappingManager mappingManager = getPluginMappingManager( session, project );
+
+            Plugin pluginContainingLifecycleMapping = mappingManager.getByPackaging( packaging );
+
+            LifecycleMapping m = null;
+
+            if ( pluginContainingLifecycleMapping != null )
+            {
+                try
+                {
+                    pluginManager.verifyPlugin( pluginContainingLifecycleMapping, project, session.getSettings(), session.getLocalRepository() );
+                    
+                    m = (LifecycleMapping) pluginManager.getPluginComponent( pluginContainingLifecycleMapping,
+                                                                             LifecycleMapping.ROLE, packaging );
+
+                    mappings = m.getPhases();
+                }
+                catch ( ComponentLookupException e )
+                {
+                    throw new LifecycleExecutionException( "Plugin: " + pluginContainingLifecycleMapping.getKey()
+                        + " declares lifecycle mapping for: \'" + packaging
+                        + "\', but does not appear to contain the actual mapping among its component descriptors.", e );
+                }
+            }
+            else
+            {
+                try
+                {
+                    m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
+
+                    mappings = m.getPhases();
+                }
+                catch ( ComponentLookupException e )
+                {
+                    getLogger().warn(
+                                      "Lifecycle mappings not found for packaging: \'" + packaging
+                                          + "\'. Using defaults." );
+
+                    getLogger().debug( "Lifecycle mappings not found for packaging: \'" + packaging + "\'.", e );
+
+                    mappings = defaultPhases;
+                }
+            }
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new LifecycleExecutionException( "Cannot load plugin which defines lifecycle mappings for: \'" + packaging + "\'.", e );
+        }
+        catch ( PluginVersionResolutionException e )
+        {
+            throw new LifecycleExecutionException( "Cannot load plugin which defines lifecycle mappings for: \'" + packaging + "\'.", e );
+        }
+        catch ( PluginManagerException e )
+        {
+            throw new LifecycleExecutionException( "Cannot load lifecycle mappings.", e );
+        }
+        
+        return mappings;
+    }
+
+    private PluginMappingManager getPluginMappingManager( MavenSession session, MavenProject project ) 
+        throws LifecycleExecutionException
+    {
+        PluginMappingManager mappingManager = session.getPluginMappingManager();
+
+        // don't reassemble the plugin mappings if the session has already been configured with them.
+        if ( mappingManager == null )
+        {
+            try
+            {
+                List pluginGroupIds = session.getSettings().getPluginGroups();
+                List pluginRepositories = project.getPluginArtifactRepositories();
+                ArtifactRepository localRepository = session.getLocalRepository();
+
+                mappingManager = pluginMappingBuilder.loadPluginMappings( pluginGroupIds, pluginRepositories,
+                                                                          localRepository );
+
+                // lazily configure this on the session.
+                session.setPluginMappingManager( mappingManager );
+            }
+            catch ( RepositoryMetadataManagementException e )
+            {
+                throw new LifecycleExecutionException( "Cannot load plugin mappings.", e );
+            }
+            catch ( PluginMappingManagementException e )
+            {
+                throw new LifecycleExecutionException( "Cannot load plugin mappings.", e );
+            }
+        }
+        
+        return mappingManager;
     }
 
     /**
@@ -482,11 +571,11 @@ public class DefaultLifecycleExecutor
             // Steps for retrieving the plugin model instance:
             // 1. request directly from the plugin collector by prefix
             pluginDescriptor = pluginManager.getPluginDescriptorForPrefix( prefix );
-            
+
             if ( pluginDescriptor != null )
             {
                 plugin = new Plugin();
-                
+
                 plugin.setGroupId( pluginDescriptor.getGroupId() );
                 plugin.setArtifactId( pluginDescriptor.getArtifactId() );
                 plugin.setVersion( pluginDescriptor.getVersion() );
@@ -495,32 +584,7 @@ public class DefaultLifecycleExecutor
             // 2. use the plugin resolver to resolve the prefix in the search groups
             if ( plugin == null )
             {
-                PluginMappingManager mappingManager = session.getPluginMappingManager();
-
-                // don't reassemble the plugin mappings if the session has already been configured with them.
-                if ( mappingManager == null )
-                {
-                    try
-                    {
-                        List pluginGroupIds = session.getSettings().getPluginGroups();
-                        List pluginRepositories = project.getPluginArtifactRepositories();
-                        ArtifactRepository localRepository = session.getLocalRepository();
-
-                        mappingManager = pluginMappingBuilder.loadPluginMappings( pluginGroupIds, pluginRepositories,
-                                                                                  localRepository );
-                        
-                        // lazily configure this on the session.
-                        session.setPluginMappingManager( mappingManager );
-                    }
-                    catch ( RepositoryMetadataManagementException e )
-                    {
-                        throw new LifecycleExecutionException( "Cannot load plugin mappings.", e );
-                    }
-                    catch ( PluginMappingManagementException e )
-                    {
-                        throw new LifecycleExecutionException( "Cannot load plugin mappings.", e );
-                    }
-                }
+                PluginMappingManager mappingManager = getPluginMappingManager( session, project );
 
                 plugin = mappingManager.getByPrefix( prefix );
             }
@@ -547,7 +611,7 @@ public class DefaultLifecycleExecutor
         else if ( numTokens == 4 )
         {
             plugin = new Plugin();
-            
+
             plugin.setGroupId( tok.nextToken() );
             plugin.setArtifactId( tok.nextToken() );
             plugin.setVersion( tok.nextToken() );
@@ -592,7 +656,7 @@ public class DefaultLifecycleExecutor
     private void injectHandlerPluginConfiguration( MavenProject project, Plugin plugin )
     {
         String key = plugin.getKey();
-        
+
         Plugin buildPlugin = (Plugin) project.getBuild().getPluginsAsMap().get( key );
 
         if ( buildPlugin == null )
@@ -601,7 +665,7 @@ public class DefaultLifecycleExecutor
             if ( pluginManagement != null )
             {
                 Plugin managedPlugin = (Plugin) pluginManagement.getPluginsAsMap().get( key );
-                
+
                 if ( managedPlugin != null )
                 {
                     modelDefaultsInjector.mergePluginWithDefaults( plugin, managedPlugin );

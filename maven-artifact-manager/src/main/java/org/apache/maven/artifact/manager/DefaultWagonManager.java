@@ -337,7 +337,7 @@ public class DefaultWagonManager
                 // try to verify the SHA-1 checksum for this file.
                 try
                 {
-                    verifyChecksum( sha1ChecksumObserver, destination, remotePath, ".sha1", wagon );
+                    verifyChecksum( sha1ChecksumObserver, temp, remotePath, ".sha1", wagon );
                 }
                 catch ( WagonException sha1TryException )
                 {
@@ -364,7 +364,7 @@ public class DefaultWagonManager
                     {
                         try
                         {
-                            verifyChecksum( md5ChecksumObserver, destination, remotePath, ".md5", wagon );
+                            verifyChecksum( md5ChecksumObserver, temp, remotePath, ".md5", wagon );
                         }
                         catch ( WagonException md5TryException )
                         {
@@ -386,7 +386,7 @@ public class DefaultWagonManager
                             // otherwise, this was a failed transfer, and we don't want to retry.
                             else
                             {
-                                handleChecksumFailure( repository, "Error retrieving checksum file for " + destination,
+                                handleChecksumFailure( repository, "Error retrieving checksum file for " + remotePath,
                                                        md5TryException );
                             }
                         }

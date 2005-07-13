@@ -53,6 +53,15 @@
           <version>1.0.0</version>
           <description>The plugin artifactId</description>
         </field>
+        <field>
+          <name>packagingHandlers</name>
+          <version>1.0.0</version>
+          <description>A list of the packaging types supported by this plugin.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
     </class>
   </classes>
