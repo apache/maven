@@ -41,13 +41,17 @@
 
 #macro ( menuItem $item )
   #if ( $item.getChildCount() > 0 )
-    #set ( $collapse = "expanded" )
+    #if ( $item.getAttribute( "collapse" ) == "true" )
+      #set ( $collapse = "collapsed" )
+    #else
+      #set ( $collapse = "expanded" )
+    #end
   #else
     #set ( $collapse = "none" )
   #end
   #set ( $currentItemHref = $PathTool.calculateLink( $item.getAttribute( "href" ), $relativePath ) )
   <li class="$collapse">
-    #if ( $currentFileName == $currentItemHref )
+    #if ( $currentFileName.replaceAll('\\', '/') == $currentItemHref )
       <strong><a href="$currentItemHref">$item.getAttribute( "name" )</a></strong>
     #else
       <a href="$currentItemHref">$item.getAttribute( "name" )</a>
@@ -55,11 +59,13 @@
   </li>
   #if ( $item.getChildren() )
     #if ( $item.getChildCount() > 0 )
+      #if ( $collapse != "collapsed" )
       <ul>
         #foreach( $subitem in $item.getChildren() )
           #menuItem( $subitem )
         #end
       </ul>
+      #end
     #end
   #end
 #end
