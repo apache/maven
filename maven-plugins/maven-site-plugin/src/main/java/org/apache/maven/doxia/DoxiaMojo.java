@@ -37,10 +37,12 @@ import org.codehaus.plexus.siterenderer.sink.SiteRendererSink;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.SelectorUtils;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -75,6 +77,26 @@ public class DoxiaMojo
 
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
 
+    /** Patterns which should be excluded by default. */
+    private static final String[] DEFAULT_EXCLUDES = new String[] {
+        // Miscellaneous typical temporary files
+        "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
+
+        // CVS
+        "**/CVS", "**/CVS/**", "**/.cvsignore",
+
+        // SCCS
+        "**/SCCS", "**/SCCS/**",
+
+        // Visual SourceSafe
+        "**/vssver.scc",
+
+        // Subversion
+        "**/.svn", "**/.svn/**",
+
+        // Mac
+        "**/.DS_Store" };
+    
     /**
      * @parameter expression="${settings}"
      * @required
@@ -227,6 +249,12 @@ public class DoxiaMojo
 
                 File localeOutputDirectory = getOuputDirectory( locale );
 
+                // Safety
+                if ( !localeOutputDirectory.exists() )
+                {
+                    localeOutputDirectory.mkdirs();
+                }
+
                 //Generate reports
                 if ( reports != null )
                 {
@@ -283,14 +311,14 @@ public class DoxiaMojo
                     }
                 }
 
-                // Generated Site Directory
+                // Handle the GeneratedSite Directory
                 File generatedSiteFile = new File( generatedSiteDirectory );
                 if ( generatedSiteFile.exists() )
                 {
                     siteRenderer.render( generatedSiteFile, localeOutputDirectory,
                                          getSiteDescriptor( reports, locale ), template, attributes, locale );
                 }
-
+                
                 // Generate static site
                 File siteDirectoryFile;
 
@@ -305,6 +333,17 @@ public class DoxiaMojo
                     siteDirectoryFile = new File( siteDirectory, locale.getLanguage() );
                 }
 
+                // Try to generate the index.html
+                if ( !indexExists( siteDirectoryFile ) ) 
+                {
+                    getLog().info( "Generate an index file." );
+                    generateIndexPage( getSiteDescriptor( reports, locale ), locale );
+                }
+                else
+                {
+                    getLog().info( "Ignoring the index file generation." );
+                }
+                
                 siteRenderer.render( siteDirectoryFile, localeOutputDirectory,
                                      getSiteDescriptor( reports, locale ), template, attributes, locale );
 
@@ -484,6 +523,115 @@ public class DoxiaMojo
         return new StringInputStream( siteDescriptorContent );
     }
 
+    /**
+     * Try to find a file called "index" in each sub-directory from the site directory.
+     * We don't care about the extension.
+     * 
+     * @param siteDirectoryFile the site directory
+     * @return true if an index file was found, false otherwise
+     * @throws Exception if any
+     */
+    private boolean indexExists( File siteDirectoryFile )
+        throws Exception
+    {
+        getLog().debug( "Try to find an index file in the directory=[" + siteDirectoryFile + "]" );
+
+        File[] directories = siteDirectoryFile.listFiles( new FileFilter() {
+            public boolean accept(File file) {
+                for ( int i = 0; i < DEFAULT_EXCLUDES.length; i++) {
+                    if ( SelectorUtils.matchPath( DEFAULT_EXCLUDES[i], file.getName() ) ) {
+                        return false;
+                    }
+                }
+
+                return file.isDirectory();
+            }
+        });
+        
+        List indexFound = new ArrayList();
+        for ( int i = 0; i < directories.length; i++ )
+        {
+            List indexes = FileUtils.getFiles( directories[i], "index.*", null, true );
+            
+            if ( indexes.size() > 1 ) 
+            {
+                getLog().warn( "More than one index file exists in this directory [" + directories[i].getAbsolutePath() + "]." );
+                continue;
+            }
+
+            if ( indexes.size() == 1 ) 
+            {
+                getLog().debug( "Found [" + indexes.get(0) + "]" );
+
+                indexFound.add(indexes.get(0));
+            }
+        }
+
+        if ( indexFound.size() > 1 ) 
+        {
+            // TODO throw an Exception?
+            getLog().warn( "More than one index file exists in the project site directory. Checks the result." );
+            return true;
+        }
+        if ( indexFound.size() == 1 ) 
+        {
+            getLog().warn( "One index file was found in the project site directory." );
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Generated an index page.
+     * 
+     * @param siteDescriptor 
+     * @param locale 
+     * @throws Exception 
+     */
+    private void generateIndexPage( InputStream siteDescriptor, Locale locale )
+        throws Exception
+    {
+        String outputFileName = "index.html";
+
+        SiteRendererSink sink = siteRenderer.createSink( new File( siteDirectory ), outputFileName, siteDescriptor );
+
+        String title = i18n.getString( "site-plugin", locale, "report.index.title" ).trim() + " " + project.getName();
+
+        sink.head();
+        sink.title();
+        sink.text( title );
+        sink.title_();
+        sink.head_();
+        sink.body();
+
+        sink.section1();
+        sink.sectionTitle1();
+        sink.text( title );
+        sink.sectionTitle1_();
+
+        sink.paragraph();
+        if ( project.getDescription() != null )
+        {
+            // TODO How to handle i18n?
+            sink.text( project.getDescription() );
+        }
+        else
+        {
+            sink.text( i18n.getString( "site-plugin", locale, "report.index.nodescription" ) );
+        }
+        sink.paragraph_();
+
+        sink.body_();
+
+        sink.flush();
+
+        sink.close();
+
+        siteRenderer.generateDocument( new FileWriter( new File( getOuputDirectory( locale ), outputFileName ) ),
+                                       template, attributes, sink, locale );
+    }
+    
     private void generateProjectInfoPage( InputStream siteDescriptor, Locale locale )
         throws Exception
     {
