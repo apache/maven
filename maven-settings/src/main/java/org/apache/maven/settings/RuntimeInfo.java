@@ -25,10 +25,16 @@ public class RuntimeInfo
 
     private File file;
     
+    // using Boolean for 3VL (null for not-set, otherwise override with value)
     private Boolean pluginUpdateForced;
     
     // using Boolean for 3VL (null, true-to-all, false-to-all)
     private Boolean applyToAllPluginUpdates;
+    
+    private boolean pluginRegistryActive = true;
+    
+    // using Boolean for 3VL (null for not-set, otherwise override with value)
+    private Boolean checkLatest;
     
     private Map activeProfileToSourceLevel = new HashMap();
     
@@ -119,6 +125,16 @@ public class RuntimeInfo
     public String getLocalRepositorySourceLevel()
     {
         return localRepositorySourceLevel;
+    }
+    
+    public void setCheckLatestPluginVersion( Boolean checkLatest )
+    {
+        this.checkLatest = checkLatest;
+    }
+    
+    public Boolean getCheckLatestPluginVersion()
+    {
+        return checkLatest;
     }
 
 }

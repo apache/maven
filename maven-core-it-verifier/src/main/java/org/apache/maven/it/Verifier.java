@@ -493,9 +493,12 @@ public class Verifier
 
             cli.setExecutable( executable );
             
-            cli.createArgument().setValue( "-e" );
+//            cli.createArgument().setValue( "-e" );
+            cli.createArgument().setValue( "-X" );
             
-            cli.createArgument().setValue( "--no-plugin-updates" );
+            cli.createArgument().setValue( "--no-plugin-registry" );
+            
+            cli.createArgument().setValue( "--check-plugin-latest" );
             
             cli.createArgument().setValue( "--batch-mode" );
 

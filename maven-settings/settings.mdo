@@ -85,6 +85,13 @@
           <type>boolean</type>
           <defaultValue>true</defaultValue>
         </field>
+        <field>
+          <name>usePluginRegistry</name>
+          <version>1.0.0</version>
+          <description><![CDATA[Whether Maven should use the plugin-registry.xml file to manage plugin versions.]]></description>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
         <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
         <!-- field>
           <name>passwordStore</name>

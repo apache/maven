@@ -78,6 +78,12 @@
           <description>Specifies whether the user should be prompted to update plugins.</description>
         </field>
         <field>
+          <name>checkLatest</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>Whether to resolve plugin versions using LATEST metadata.</description>
+        </field>
+        <field>
           <name>plugins</name>
           <version>1.0.0</version>
           <description>Specified plugin update policy information.</description>

@@ -17,6 +17,7 @@ import org.apache.maven.plugin.registry.io.xpp3.PluginRegistryXpp3Writer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.inputhandler.InputHandler;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -82,11 +83,14 @@ public class DefaultPluginVersionManager
         // we're not going to prompt the user to accept a plugin update until we find one.
         boolean promptToPersist = false;
 
-        // determine the behavior WRT prompting the user and installing plugin updates.
-        Boolean pluginUpdateOverride = settings.getRuntimeInfo().getPluginUpdateOverride();
+        RuntimeInfo settingsRTInfo = settings.getRuntimeInfo();
 
-        // second pass...if the plugin is listed in the settings.xml, use the version from <useVersion/>.
-        if ( StringUtils.isEmpty( version ) )
+        // determine the behavior WRT prompting the user and installing plugin updates.
+        Boolean pluginUpdateOverride = settingsRTInfo.getPluginUpdateOverride();
+
+        // second pass...if we're using the plugin registry, and the plugin is listed in the plugin-registry.xml, use 
+        // the version from <useVersion/>.
+        if ( StringUtils.isEmpty( version ) && settings.isUsePluginRegistry() )
         {
             // resolve existing useVersion.
             version = resolveExistingFromPluginRegistry( groupId, artifactId );
@@ -102,8 +106,8 @@ public class DefaultPluginVersionManager
                 if ( Boolean.TRUE.equals( pluginUpdateOverride )
                     || ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
                 {
-                    updatedVersion = resolveMetaVersion( groupId, artifactId, project
-                        .getPluginArtifactRepositories(), localRepository, ReleaseArtifactTransformation.RELEASE_VERSION );
+                    updatedVersion = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(),
+                                                         localRepository, ReleaseArtifactTransformation.RELEASE_VERSION );
 
                     if ( StringUtils.isNotEmpty( updatedVersion ) && !updatedVersion.equals( version ) )
                     {
@@ -120,23 +124,31 @@ public class DefaultPluginVersionManager
                         }
                         else
                         {
-                            getLogger()
-                                .info( "Plugin \'" + constructPluginKey( groupId, artifactId ) + "\' has updates." );
+                            getLogger().info(
+                                              "Plugin \'" + constructPluginKey( groupId, artifactId )
+                                                  + "\' has updates." );
                         }
                     }
                 }
             }
         }
-        
+
         boolean forcePersist = false;
 
-        // third pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/> 
-        // in settings.xml.
-        if ( StringUtils.isEmpty( version ) )
+        // are we using the LATEST metadata to resolve plugin version?
+        Boolean rtCheckLatest = settingsRTInfo.getCheckLatestPluginVersion();
+
+        boolean checkLatestMetadata = Boolean.TRUE.equals( rtCheckLatest )
+            || ( !Boolean.FALSE.equals( rtCheckLatest ) && Boolean.valueOf( pluginRegistry.getCheckLatest() )
+                .booleanValue() );
+
+        // third pass...if we're checking for latest install/deploy, retrieve the version for LATEST metadata and also 
+        // set that resolved version as the <useVersion/> in settings.xml.
+        if ( StringUtils.isEmpty( version ) && checkLatestMetadata )
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(),
-                                             localRepository, ReleaseArtifactTransformation.RELEASE_VERSION );
+                                          localRepository, LatestArtifactTransformation.LATEST_VERSION );
 
             // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
             updatedVersion = version;
@@ -146,13 +158,13 @@ public class DefaultPluginVersionManager
             promptToPersist = false;
         }
 
-        // final pass...retrieve the version for LATEST and also set that resolved version as the <useVersion/> 
+        // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/> 
         // in settings.xml.
         if ( StringUtils.isEmpty( version ) )
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(),
-                                             localRepository, LatestArtifactTransformation.LATEST_VERSION );
+                                          localRepository, ReleaseArtifactTransformation.RELEASE_VERSION );
 
             // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
             updatedVersion = version;
@@ -169,73 +181,78 @@ public class DefaultPluginVersionManager
                                                         "Failed to resolve a valid version for this plugin" );
         }
 
-        // determine whether this build is running in interactive mode
-        // If it's not, then we'll defer to the autoUpdate setting from the registry 
-        // for a decision on updating the plugin in the registry...rather than prompting
-        // the user.
-        boolean inInteractiveMode = settings.isInteractiveMode();
-
-        // determines what should be done if we're in non-interactive mode.
-        // if true, then just update the registry with the new versions.
-        String s = getPluginRegistry( groupId, artifactId ).getAutoUpdate();
-        boolean autoUpdate = true;
-        if ( s != null )
+        // if the plugin registry is inactive, then the rest of this goop is useless...
+        if ( settings.isUsePluginRegistry() )
         {
-            autoUpdate = Boolean.valueOf( s ).booleanValue();
-        }
+            // determine whether this build is running in interactive mode
+            // If it's not, then we'll defer to the autoUpdate setting from the registry 
+            // for a decision on updating the plugin in the registry...rather than prompting
+            // the user.
+            boolean inInteractiveMode = settings.isInteractiveMode();
 
-        // We should persist by default if:
-        //
-        // 0. RELEASE or LATEST was used to resolve the plugin version (it's not in the registry)
-        //
-        // -OR-
-        //
-        // 1. we detected a change in the plugin version from what was in the registry, or
-        //      a. the plugin is not registered
-        // 2. the pluginUpdateOverride flag has NOT been set to Boolean.FALSE (suppression mode)
-        // 3. we're in interactive mode, or
-        //      a. the registry is declared to be in autoUpdate mode
-        //
-        // NOTE: This is only the default value; it may be changed as the result of prompting the user.
-        boolean persistUpdate = forcePersist || ( promptToPersist && !Boolean.FALSE.equals( pluginUpdateOverride )
-            && ( inInteractiveMode || autoUpdate ) );
+            // determines what should be done if we're in non-interactive mode.
+            // if true, then just update the registry with the new versions.
+            String s = getPluginRegistry( groupId, artifactId ).getAutoUpdate();
+            boolean autoUpdate = true;
+            if ( s != null )
+            {
+                autoUpdate = Boolean.valueOf( s ).booleanValue();
+            }
 
-        // retrieve the apply-to-all flag, if it's been set previously.
-        Boolean applyToAll = settings.getRuntimeInfo().getApplyToAllPluginUpdates();
+            // We should persist by default if:
+            //
+            // 0. RELEASE or LATEST was used to resolve the plugin version (it's not in the registry)
+            //
+            // -OR-
+            //
+            // 1. we detected a change in the plugin version from what was in the registry, or
+            //      a. the plugin is not registered
+            // 2. the pluginUpdateOverride flag has NOT been set to Boolean.FALSE (suppression mode)
+            // 3. we're in interactive mode, or
+            //      a. the registry is declared to be in autoUpdate mode
+            //
+            // NOTE: This is only the default value; it may be changed as the result of prompting the user.
+            boolean persistUpdate = forcePersist
+                || ( promptToPersist && !Boolean.FALSE.equals( pluginUpdateOverride ) && ( inInteractiveMode || autoUpdate ) );
 
-        // Incorporate interactive-mode CLI overrides, and previous decisions on apply-to-all, if appropriate.
-        //
-        // don't prompt if RELEASE or LATEST was used to resolve the plugin version
-        // don't prompt if not in interactive mode.
-        // don't prompt if the CLI pluginUpdateOverride is set (either suppression or force mode will stop prompting)
-        // don't prompt if the user has selected ALL/NONE previously in this session
-        //
-        // NOTE: We're incorporating here, to make the usages of this check more consistent and 
-        // resistant to change.
-        promptToPersist = promptToPersist && pluginUpdateOverride == null && applyToAll == null && inInteractiveMode;
+            // retrieve the apply-to-all flag, if it's been set previously.
+            Boolean applyToAll = settings.getRuntimeInfo().getApplyToAllPluginUpdates();
 
-        if ( promptToPersist )
-        {
-            persistUpdate = promptToPersistPluginUpdate( version, updatedVersion, groupId, artifactId, settings );
-        }
+            // Incorporate interactive-mode CLI overrides, and previous decisions on apply-to-all, if appropriate.
+            //
+            // don't prompt if RELEASE or LATEST was used to resolve the plugin version
+            // don't prompt if not in interactive mode.
+            // don't prompt if the CLI pluginUpdateOverride is set (either suppression or force mode will stop prompting)
+            // don't prompt if the user has selected ALL/NONE previously in this session
+            //
+            // NOTE: We're incorporating here, to make the usages of this check more consistent and 
+            // resistant to change.
+            promptToPersist = promptToPersist && pluginUpdateOverride == null && applyToAll == null
+                && inInteractiveMode;
 
-        // if it is determined that we should use this version, persist it as useVersion.
-        // cases where this version will be persisted:
-        // 1. the user is prompted and answers yes or all
-        // 2. the user has previously answered all in this session
-        // 3. the build is running in non-interactive mode, and the registry setting is for auto-update
-        if ( !Boolean.FALSE.equals( applyToAll ) && persistUpdate )
-        {
-            updatePluginVersionInRegistry( groupId, artifactId, updatedVersion );
+            if ( promptToPersist )
+            {
+                persistUpdate = promptToPersistPluginUpdate( version, updatedVersion, groupId, artifactId, settings );
+            }
 
-            // we're using the updated version of the plugin in this session as well.
-            version = updatedVersion;
-        }
-        // otherwise, if we prompted the user to update, we should treat this as a rejectedVersion, and
-        // persist it iff the plugin pre-exists and is in the user-level registry.
-        else if ( promptToPersist )
-        {
-            addNewVersionToRejectedListInExisting( groupId, artifactId, updatedVersion );
+            // if it is determined that we should use this version, persist it as useVersion.
+            // cases where this version will be persisted:
+            // 1. the user is prompted and answers yes or all
+            // 2. the user has previously answered all in this session
+            // 3. the build is running in non-interactive mode, and the registry setting is for auto-update
+            if ( !Boolean.FALSE.equals( applyToAll ) && persistUpdate )
+            {
+                updatePluginVersionInRegistry( groupId, artifactId, updatedVersion );
+
+                // we're using the updated version of the plugin in this session as well.
+                version = updatedVersion;
+            }
+            // otherwise, if we prompted the user to update, we should treat this as a rejectedVersion, and
+            // persist it iff the plugin pre-exists and is in the user-level registry.
+            else if ( promptToPersist )
+            {
+                addNewVersionToRejectedListInExisting( groupId, artifactId, updatedVersion );
+            }
         }
 
         return version;
@@ -587,26 +604,26 @@ public class DefaultPluginVersionManager
     }
 
     private String resolveMetaVersion( String groupId, String artifactId, List remoteRepositories,
-                                         ArtifactRepository localRepository, String metaVersionId )
+                                      ArtifactRepository localRepository, String metaVersionId )
         throws PluginVersionResolutionException
     {
-        Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, metaVersionId,
-                                                                   Artifact.SCOPE_RUNTIME, "pom" );
-        
+        Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, metaVersionId, Artifact.SCOPE_RUNTIME,
+                                                            "pom" );
+
         MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, projectBuilder, artifactFactory );
-        
+
         String version = null;
         try
         {
             metadataSource.retrieve( artifact, localRepository, remoteRepositories );
 
-            version = artifact.getBaseVersion();
+            version = artifact.getVersion();
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
             getLogger().debug( "Failed to resolve " + metaVersionId + " version", e );
         }
-        
+
         return version;
     }
 
