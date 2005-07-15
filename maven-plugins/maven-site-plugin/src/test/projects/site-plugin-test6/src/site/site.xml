@@ -37,7 +37,7 @@
       <!-- Standalone item --> 
       <item name="Item" href="/item.html" /> 
 
-      <!-- Uncollapsed Submenu --> 
+      <!-- Collapsed Submenu (default) --> 
       <item name="Alpha" href="/alpha/index.html"> 
         <item name="Alpha One" href="/alpha/one/index.html"/> 
         <item name="Alpha Two" href="/alpha/two/index.html"/> 
@@ -48,6 +48,24 @@
         <item name="Beta One" href="/beta/one/index.html" collapse="true"/> 
         <item name="Beta Two" href="/beta/two/index.html" collapse="true"/> 
       </item> 
+
+      <!-- UnCollapsed Submenu --> 
+      <item name="Theta" href="/theta/index.html" collapse="false"> 
+        <item name="Theta One" href="/theta/one/index.html"/> 
+        <item name="Theta Two" href="/theta/two/index.html"/> 
+      </item>
+      
+      <!-- Collapsed/UnCollapsed Submenus --> 
+      <item name="Gamma" href="/gamma/index.html"> 
+        <item name="Gamma One" href="/gamma/one/index.html">
+          <item name="Gamma One-One" href="/gamma/one/one/index.html"/> 
+          <item name="Gamma One-Two" href="/gamma/one/two/index.html"/> 
+        </item>
+        <item name="Gamma Two" href="/gamma/two/index.html" collapse="false">
+          <item name="Gamma Two-One" href="/gamma/two/one/index.html"/> 
+          <item name="Gamma Two-Two" href="/gamma/two/two/index.html"/> 
+        </item> 
+      </item>
     </menu>
     ${reports}
   </body>

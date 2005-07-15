@@ -40,18 +40,45 @@
 #end
 
 #macro ( menuItem $item )
+  #set ( $collapse = "none" )
+  #set ( $currentItemHref = $PathTool.calculateLink( $item.getAttribute( "href" ), $relativePath ) )
+  #set ( $currentFileName = $currentFileName.replaceAll( "\\", "/" ) )
+  #set ( $currentItemHref = $currentItemHref.replaceAll( "\\", "/" ) )
+  
+  #set ( $currentFileNameLastSlash = $currentFileName.lastIndexOf( "/" ) )
+  #if ( $currentFileNameLastSlash != -1)
+    #set ( $currentFileNameTmp = $currentFileName.substring( 0, $currentFileNameLastSlash ) )
+  #else
+    #set ( $currentFileNameTmp = $currentFileName.substring( 0, $currentFileName.lengh() ) )
+  #end
+
+  #set ( $currentItemHrefLastSlash = $currentItemHref.lastIndexOf( "/" ) )
+  #if ( $currentItemHrefLastSlash != -1)
+    #set ( $currentItemHrefTmp = $currentItemHref.substring( 0, $currentItemHrefLastSlash ) )
+  #else
+    #set ( $currentItemHrefTmp = $currentItemHref.substring( 0, $currentItemHref.lengh() ) )
+  #end
+
+  #set ( $tree = $currentFileNameTmp && $currentItemHrefTmp && $currentFileNameTmp.startsWith( $currentItemHrefTmp ) )
+
   #if ( $item.getChildCount() > 0 )
-    #if ( $item.getAttribute( "collapse" ) == "true" )
-      #set ( $collapse = "collapsed" )
+    #if ( ( $item.getAttribute( "collapse" ) ) && ( $item.getAttribute( "collapse" ).equalsIgnoreCase( "false" ) ) )
+      #set ( $collapse = "expanded" )
     #else
+      ## By default collapsed
+      #set ( $collapse = "collapsed" )
+    #end
+
+    #if ( $currentFileName == $currentItemHref )
       #set ( $collapse = "expanded" )
     #end
-  #else
-    #set ( $collapse = "none" )
+    
+    #if ( $tree )
+      #set ( $collapse = "expanded" )
+    #end
   #end
-  #set ( $currentItemHref = $PathTool.calculateLink( $item.getAttribute( "href" ), $relativePath ) )
-  <li class="$collapse">
-    #if ( $currentFileName.replaceAll('\\', '/') == $currentItemHref )
+  <li class="$collapse" $currentFileName $currentItemHref>
+    #if ( $currentFileName == $currentItemHref ) 
       <strong><a href="$currentItemHref">$item.getAttribute( "name" )</a></strong>
     #else
       <a href="$currentItemHref">$item.getAttribute( "name" )</a>
@@ -59,12 +86,12 @@
   </li>
   #if ( $item.getChildren() )
     #if ( $item.getChildCount() > 0 )
-      #if ( $collapse != "collapsed" )
-      <ul>
-        #foreach( $subitem in $item.getChildren() )
-          #menuItem( $subitem )
-        #end
-      </ul>
+      #if ( $collapse == "expanded" || $tree )
+        <ul>
+          #foreach( $subitem in $item.getChildren() )
+            #menuItem( $subitem )
+          #end
+        </ul>
       #end
     #end
   #end
