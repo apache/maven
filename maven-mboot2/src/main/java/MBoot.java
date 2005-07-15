@@ -38,7 +38,7 @@ import java.util.TreeMap;
 public class MBoot
 {
     String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin-api",
-        "maven-plugin-descriptor", "maven-artifact", "maven-artifact-manager", "maven-artifact-test",
+        "maven-artifact", "maven-plugin-descriptor", "maven-artifact-manager", "maven-artifact-test",
         "maven-plugin-mapping",
         "maven-script/maven-script-beanshell", "maven-script/maven-script-marmalade", "maven-project", "maven-profile",
         "maven-plugin-registry", "maven-reporting/maven-reporting-api", "maven-core", "maven-archiver",

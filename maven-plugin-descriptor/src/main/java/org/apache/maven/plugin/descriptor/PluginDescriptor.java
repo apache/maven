@@ -20,6 +20,8 @@ import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.classworlds.ClassRealm;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
 import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
@@ -59,6 +61,9 @@ public class PluginDescriptor
     private Map lifecycleMappings;
 
     private ClassRealm classRealm;
+
+    // calculated on-demand.
+    private Map artifactMap;
 
     // ----------------------------------------------------------------------
     //
@@ -216,6 +221,19 @@ public class PluginDescriptor
     public void setArtifacts( List artifacts )
     {
         this.artifacts = artifacts;
+        
+        // clear the calculated artifactMap
+        artifactMap = null;
+    }
+    
+    public Map getArtifactMap()
+    {
+        if ( artifactMap == null )
+        {
+            artifactMap = ArtifactUtils.artifactMap( getArtifacts() );
+        }
+        
+        return artifactMap;
     }
 
     public boolean equals( Object object )

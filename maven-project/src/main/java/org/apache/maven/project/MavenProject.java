@@ -17,6 +17,7 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -104,6 +106,9 @@ public class MavenProject
     private Set dependencyArtifacts;
     
     private Artifact artifact;
+
+    // calculated.
+    private Map artifactMap;
 
     public MavenProject( Model model )
     {
@@ -782,11 +787,24 @@ public class MavenProject
     public void setArtifacts( Set artifacts )
     {
         this.artifacts = artifacts;
+        
+        // flush the calculated artifactMap
+        artifactMap = null;
     }
 
     public Set getArtifacts()
     {
         return artifacts;
+    }
+
+    public Map getArtifactMap()
+    {
+        if ( artifactMap == null )
+        {
+            artifactMap = ArtifactUtils.artifactMap( getArtifacts() );
+        }
+        
+        return artifactMap;
     }
 
     public void setPluginArtifacts( Set pluginArtifacts )
