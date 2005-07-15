@@ -194,7 +194,7 @@ public class DefaultMavenProjectBuilder
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
-        MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository, externalProfiles );
+        MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository, Collections.EMPTY_LIST, externalProfiles );
 
         // Only translate the base directory for files in the source tree
         pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
@@ -216,7 +216,7 @@ public class DefaultMavenProjectBuilder
     {
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-        return build( "Artifact [" + artifact.getId() + "]", model, localRepository, Collections.EMPTY_LIST );
+        return build( "Artifact [" + artifact.getId() + "]", model, localRepository, remoteArtifactRepositories, Collections.EMPTY_LIST );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -263,17 +263,25 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository,
-                                List externalProfiles )
+                                List remoteArtifactRepositories, List externalProfiles )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
 
         LinkedList lineage = new LinkedList();
 
-        List aggregatedRemoteWagonRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
-                                                                                         artifactRepositoryFactory,
-                                                                                         container );
-
+        List aggregatedRemoteWagonRepositories;
+        if ( remoteArtifactRepositories == null || remoteArtifactRepositories.isEmpty() )
+        {
+            aggregatedRemoteWagonRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
+                                                                                       artifactRepositoryFactory,
+                                                                                       container );
+        }
+        else
+        {
+            aggregatedRemoteWagonRepositories = remoteArtifactRepositories;
+        }
+        
         for ( Iterator i = externalProfiles.iterator(); i.hasNext(); )
         {
             Profile externalProfile = (Profile) i.next();
