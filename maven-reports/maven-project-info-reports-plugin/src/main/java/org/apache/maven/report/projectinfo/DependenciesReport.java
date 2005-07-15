@@ -16,8 +16,8 @@ package org.apache.maven.report.projectinfo;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.AbstractMavenReport;
@@ -26,14 +26,20 @@ import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
+ * Generates the dependencies report.
+ * 
  * @goal dependencies
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id$
  * @plexus.component
  */
@@ -116,7 +122,7 @@ public class DependenciesReport
     {
         try
         {
-            DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject().getModel(), locale );
+            DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject(), locale );
 
             r.render();
         }
@@ -137,20 +143,19 @@ public class DependenciesReport
     static class DependenciesRenderer
         extends AbstractMavenReportRenderer
     {
-        private Model model;
+        private MavenProject project;
 
         private Locale locale;
 
-        public DependenciesRenderer( Sink sink, Model model, Locale locale )
+        public DependenciesRenderer( Sink sink, MavenProject project, Locale locale )
         {
             super( sink );
 
-            this.model = model;
+            this.project = project;
 
             this.locale = locale;
         }
 
-        // How to i18n these ...
         public String getTitle()
         {
             return getBundle( locale ).getString( "report.dependencies.title" );
@@ -160,7 +165,10 @@ public class DependenciesReport
         {
             startSection( getTitle() );
 
-            if ( model.getDependencies().isEmpty() )
+            // Dependencies report
+            List dependencies = project.getDependencies();
+            
+            if ( dependencies.isEmpty() )
             {
                 // TODO: should the report just be excluded?
                 paragraph( getBundle( locale ).getString( "report.dependencies.nolist" ) );
@@ -172,14 +180,12 @@ public class DependenciesReport
                 tableCaption( getBundle( locale ).getString( "report.dependencies.intro" ) );
 
                 String groupId = getBundle( locale ).getString( "report.dependencies.column.groupId" );
-
                 String artifactId = getBundle( locale ).getString( "report.dependencies.column.artifactId" );
-
                 String version = getBundle( locale ).getString( "report.dependencies.column.version" );
 
                 tableHeader( new String[]{groupId, artifactId, version} );
 
-                for ( Iterator i = model.getDependencies().iterator(); i.hasNext(); )
+                for ( Iterator i = dependencies.iterator(); i.hasNext(); )
                 {
                     Dependency d = (Dependency) i.next();
 
@@ -188,8 +194,91 @@ public class DependenciesReport
 
                 endTable();
             }
-
+            
             endSection();
+
+            // Transitive dependencies
+            if ( !dependencies.isEmpty() )
+            {
+                Set artifacts = getTransitiveDependencies( project );
+                
+                startSection( getBundle( locale ).getString( "report.transitivedependencies.title" ) );
+    
+                if ( artifacts.isEmpty() )
+                {
+                    // TODO: should the report just be excluded?
+                    paragraph( getBundle( locale ).getString( "report.transitivedependencies.nolist" ) );
+                }
+                else
+                {
+                    startTable();
+    
+                    tableCaption( getBundle( locale ).getString( "report.transitivedependencies.intro" ) );
+    
+                    String groupId = getBundle( locale ).getString( "report.transitivedependencies.column.groupId" );
+                    String artifactId = getBundle( locale ).getString( "report.transitivedependencies.column.artifactId" );
+                    String version = getBundle( locale ).getString( "report.transitivedependencies.column.version" );
+    
+                    tableHeader( new String[]{groupId, artifactId, version} );
+    
+                    for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+                    {
+                        Artifact artifact = (Artifact) i.next();
+    
+                        tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()} );
+                    }
+    
+                    endTable();
+                }
+
+                endSection();
+            }
+
+        }
+
+        /**
+         * Return a set of artifact which are not already present in the dependencies list.
+         *  
+         * @param project a Maven project
+         * @return a set of transitive dependencies
+         */
+        private Set getTransitiveDependencies( MavenProject project ) 
+        {            
+            Set result = new HashSet();
+
+            if ( ( project.getDependencies() == null ) ||
+                    ( project.getArtifacts() == null ) )
+            {
+                return result;
+            }
+            
+            List dependencies = project.getDependencies();
+            Set artifacts = project.getArtifacts();
+
+            for ( Iterator j = artifacts.iterator(); j.hasNext(); )
+            {
+                Artifact artifact = (Artifact)j.next();
+
+                boolean toadd = true;
+                for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+                {
+                    Dependency dependency = (Dependency) i.next();
+                    if ( ( artifact.getArtifactId().equals( dependency.getArtifactId() ) ) && 
+                            ( artifact.getGroupId().equals( dependency.getGroupId() ) )  && 
+                            ( artifact.getVersion().equals( dependency.getVersion() ) ) )
+                    {
+                        toadd = false;
+                        break;
+                    }
+                }
+                
+                if ( toadd )
+                {
+                    result.add( artifact );
+                }
+            }
+            
+            return result;
         }
     }
 
