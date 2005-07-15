@@ -113,6 +113,9 @@ public class DefaultPluginMappingBuilder
             try
             {
                 repositoryMetadataManager.resolve( metadata, repository, localRepository );
+                
+                // reset this to keep it from getting in the way when we succeed but not on first repo...
+                repositoryException = null;
 
                 break;
             }
