@@ -548,6 +548,11 @@ public class DoxiaMojo
             }
         });
         
+        if ( ( directories == null ) || ( directories.length  == 0 ) )
+        {
+            return false;
+        }
+        
         List indexFound = new ArrayList();
         for ( int i = 0; i < directories.length; i++ )
         {
