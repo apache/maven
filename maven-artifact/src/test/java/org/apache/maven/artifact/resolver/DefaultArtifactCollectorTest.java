@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
@@ -339,12 +340,12 @@ public class DefaultArtifactCollectorTest
     {
         Map artifacts = new HashMap();
 
-        public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             ArtifactSpec a = (ArtifactSpec) artifacts.get( artifact.getId() );
-            return createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
-                                    artifact.getDependencyFilter() );
+            return new ResolutionGroup( createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
+                                    artifact.getDependencyFilter() ), Collections.EMPTY_LIST );
         }
 
         private Set createArtifacts( ArtifactFactory artifactFactory, Set dependencies, String inheritedScope,

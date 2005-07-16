@@ -174,10 +174,10 @@ public class DefaultArtifactResolver
                                                               localRepository, remoteRepositories, source, filter,
                                                               artifactFactory, listeners );
 
-        for ( Iterator i = artifactResolutionResult.getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator i = artifactResolutionResult.getArtifactResolutionNodes().iterator(); i.hasNext(); )
         {
-            Artifact artifact = (Artifact) i.next();
-            resolve( artifact, remoteRepositories, localRepository );
+            ResolutionNode node = (ResolutionNode) i.next();
+            resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
         }
 
         return artifactResolutionResult;

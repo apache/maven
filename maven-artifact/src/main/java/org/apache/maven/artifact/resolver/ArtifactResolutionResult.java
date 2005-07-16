@@ -16,10 +16,9 @@ package org.apache.maven.artifact.resolver;
  * limitations under the License.
  */
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
-import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -27,27 +26,41 @@ import java.util.Collections;
  */
 public class ArtifactResolutionResult
 {
-    private Set artifacts = Collections.EMPTY_SET;
+    private Set resolutionNodes;
 
-    private Map conflicts;
-
+    // calculated.
+    private Set artifacts;
+    
     public ArtifactResolutionResult()
     {
-        conflicts = new HashMap();
     }
 
     public Set getArtifacts()
     {
+        if ( artifacts == null )
+        {
+            artifacts = new HashSet();
+            
+            for ( Iterator it = resolutionNodes.iterator(); it.hasNext(); )
+            {
+                ResolutionNode node = (ResolutionNode) it.next();
+                artifacts.add( node.getArtifact() );
+            }
+        }
+        
         return artifacts;
     }
-
-    public Map getConflicts()
+    
+    public Set getArtifactResolutionNodes()
     {
-        return conflicts;
+        return resolutionNodes;
     }
 
-    public void setArtifacts( Set artifacts )
+    public void setArtifactResolutionNodes( Set resolutionNodes )
     {
-        this.artifacts = artifacts;
+        this.resolutionNodes = resolutionNodes;
+        
+        // clear the cache
+        this.artifacts = null;
     }
 }

@@ -19,6 +19,7 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactComponentTestCase;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             {
                 Set dependencies = new HashSet();
 
@@ -104,7 +105,7 @@ public class ArtifactResolverTest
                     dependencies.add( createArtifact( "org.apache.maven", "h", "1.0", "jar" ) );
                 }
 
-                return dependencies;
+                return new ResolutionGroup( dependencies, remoteRepositories );
             }
         };
 
@@ -134,7 +135,7 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             {
                 Set dependencies = new HashSet();
 
@@ -143,7 +144,7 @@ public class ArtifactResolverTest
                     dependencies.add( createArtifact( "org.apache.maven", "j", "1.0", "jar" ) );
                 }
 
-                return dependencies;
+                return new ResolutionGroup( dependencies, remoteRepositories );
             }
         };
 

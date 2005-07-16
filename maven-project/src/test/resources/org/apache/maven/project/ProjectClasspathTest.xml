@@ -25,6 +25,9 @@
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
         <requirement>
+          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
         </requirement>
       </requirements>

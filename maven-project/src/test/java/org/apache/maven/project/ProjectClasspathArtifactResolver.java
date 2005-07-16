@@ -20,7 +20,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
@@ -28,6 +30,11 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -41,18 +48,26 @@ import java.util.Set;
 
 public class ProjectClasspathArtifactResolver
     extends DefaultArtifactResolver
+    implements Contextualizable
 {
+    private ArtifactRepositoryFactory repositoryFactory;
+    private PlexusContainer container;
+
     public static class Source
         implements ArtifactMetadataSource
     {
         private ArtifactFactory artifactFactory;
+        private final ArtifactRepositoryFactory repositoryFactory;
+        private final PlexusContainer container;
 
-        public Source( ArtifactFactory artifactFactory )
+        public Source( ArtifactFactory artifactFactory, ArtifactRepositoryFactory repositoryFactory, PlexusContainer container )
         {
             this.artifactFactory = artifactFactory;
+            this.repositoryFactory = repositoryFactory;
+            this.container = container;
         }
 
-        public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             Model model = null;
@@ -86,7 +101,20 @@ public class ProjectClasspathArtifactResolver
             {
                 IOUtil.close( r );
             }
-            return createArtifacts( model.getDependencies(), artifact.getScope() );
+            
+            Set artifacts = createArtifacts( model.getDependencies(), artifact.getScope() );
+            
+            List artifactRepositories;
+            try
+            {
+                artifactRepositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(), repositoryFactory, container );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new ArtifactMetadataRetrievalException( e );
+            }
+            
+            return new ResolutionGroup( artifacts, artifactRepositories );
         }
 
         protected Set createArtifacts( List dependencies, String inheritedScope )
@@ -108,7 +136,7 @@ public class ProjectClasspathArtifactResolver
             return projectArtifacts;
         }
     }
-
+    
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
@@ -121,7 +149,7 @@ public class ProjectClasspathArtifactResolver
         throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifacts, originatingArtifact, localRepository, remoteRepositories,
-                                          new Source( artifactFactory ), filter );
+                                          new Source( artifactFactory, repositoryFactory, container ), filter );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
@@ -130,7 +158,13 @@ public class ProjectClasspathArtifactResolver
         throws ArtifactResolutionException
     {
         return super.resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository,
-                                          new Source( artifactFactory ) );
+                                          new Source( artifactFactory, repositoryFactory, container ) );
+    }
+
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
 }

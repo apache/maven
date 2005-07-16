@@ -20,15 +20,14 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,8 +59,8 @@ public class DefaultArtifactCollector
     {
         Map resolvedArtifacts = new HashMap();
 
-        ResolutionNode root = new ResolutionNode( originatingArtifact );
-        root.addDependencies( artifacts, filter );
+        ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
+        root.addDependencies( artifacts, remoteRepositories, filter );
 
         recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
                  artifactFactory, listeners );
@@ -77,13 +76,13 @@ public class DefaultArtifactCollector
 
                 artifact.setDependencyTrail( node.getDependencyTrail() );
 
-                set.add( artifact );
+                set.add( node );
             }
         }
 
         ArtifactResolutionResult result = new ArtifactResolutionResult();
 
-        result.setArtifacts( set );
+        result.setArtifactResolutionNodes( set );
 
         return result;
     }
@@ -148,15 +147,17 @@ public class DefaultArtifactCollector
             {
                 try
                 {
-                    Set artifacts = source.retrieve( child.getArtifact(), localRepository, remoteRepositories );
-                    child.addDependencies( artifacts, filter );
+                    ResolutionGroup rGroup = source.retrieve( child.getArtifact(), localRepository, remoteRepositories );
+                    child.addDependencies( rGroup.getArtifacts(), rGroup.getResolutionRepositories(), filter );
                 }
                 catch ( CyclicDependencyException e )
                 {
                     // would like to throw this, but we have crappy stuff in the repo
                     // no logger to use here either just now
+                    
+                    // TODO: should the remoteRepositories list be null here?!
                     fireEvent( ResolutionListener.OMIT_FOR_CYCLE, listeners,
-                               new ResolutionNode( e.getArtifact(), child ) );
+                               new ResolutionNode( e.getArtifact(), null, child ) );
                 }
                 catch ( ArtifactMetadataRetrievalException e )
                 {
@@ -249,99 +250,4 @@ public class DefaultArtifactCollector
         }
     }
 
-    private static class ResolutionNode
-    {
-        private Artifact artifact;
-
-        private List children = null;
-
-        private final List parents;
-
-        private final int depth;
-
-        private final ResolutionNode parent;
-
-        public ResolutionNode( Artifact artifact )
-        {
-            this.artifact = artifact;
-            this.depth = 0;
-            this.parents = Collections.EMPTY_LIST;
-            this.parent = null;
-        }
-
-        public ResolutionNode( Artifact artifact, ResolutionNode parent )
-        {
-            this.artifact = artifact;
-            this.depth = parent.depth + 1;
-            this.parents = new ArrayList();
-            this.parents.addAll( parent.parents );
-            this.parents.add( parent.getKey() );
-            this.parent = parent;
-        }
-
-        public Artifact getArtifact()
-        {
-            return artifact;
-        }
-
-        public Object getKey()
-        {
-            return artifact.getDependencyConflictId();
-        }
-
-        public void addDependencies( Set artifacts, ArtifactFilter filter )
-            throws CyclicDependencyException
-        {
-            children = new ArrayList( artifacts.size() );
-
-            for ( Iterator i = artifacts.iterator(); i.hasNext(); )
-            {
-                Artifact a = (Artifact) i.next();
-
-                if ( filter == null || filter.include( a ) )
-                {
-                    if ( parents.contains( a.getDependencyConflictId() ) )
-                    {
-                        a.setDependencyTrail( getDependencyTrail() );
-
-                        throw new CyclicDependencyException( "A dependency has introduced a cycle", a );
-                    }
-
-                    children.add( new ResolutionNode( a, this ) );
-                }
-            }
-        }
-
-        public List getDependencyTrail()
-        {
-            List path = new LinkedList();
-            ResolutionNode node = this;
-            while ( node != null )
-            {
-                path.add( 0, node.getArtifact().getId() );
-                node = node.parent;
-            }
-            return path;
-        }
-
-        public boolean isResolved()
-        {
-            return children != null;
-        }
-
-        public Iterator getChildrenIterator()
-        {
-            return children.iterator();
-        }
-
-        public int getDepth()
-        {
-            return depth;
-        }
-
-        public void setArtifact( Artifact artifact )
-        {
-            this.artifact = artifact;
-        }
-    }
 }

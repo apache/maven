@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
@@ -27,7 +28,6 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -47,24 +47,17 @@ public class MavenMetadataSource
 {
     private MavenProjectBuilder mavenProjectBuilder;
 
-    private ArtifactResolver artifactResolver;
-
     private ArtifactFactory artifactFactory;
 
-    /**
-     * @todo remove.
-     */
-    private MavenXpp3Reader reader = new MavenXpp3Reader();
-
+    // TODO: Remove resolver from params list.
     public MavenMetadataSource( ArtifactResolver artifactResolver, MavenProjectBuilder projectBuilder,
                                 ArtifactFactory artifactFactory )
     {
-        this.artifactResolver = artifactResolver;
         this.mavenProjectBuilder = projectBuilder;
         this.artifactFactory = artifactFactory;
     }
 
-    public Set retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         // TODO: only metadata is really needed - resolve as metadata
@@ -82,12 +75,15 @@ public class MavenMetadataSource
                                                                       localRepository );
             dependencies = p.getDependencies();
             artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
+            
+            Set artifacts = createArtifacts( artifactFactory, dependencies, artifact.getScope(), artifact.getDependencyFilter() );
+            
+            return new ResolutionGroup( artifacts, p.getRemoteArtifactRepositories() );
         }
         catch ( ProjectBuildingException e )
         {
             throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
         }
-        return createArtifacts( artifactFactory, dependencies, artifact.getScope(), artifact.getDependencyFilter() );
     }
 
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,

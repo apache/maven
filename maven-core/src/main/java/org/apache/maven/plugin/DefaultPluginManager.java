@@ -19,6 +19,7 @@ package org.apache.maven.plugin;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -423,8 +424,11 @@ public class DefaultPluginManager
                 remoteRepositories.addAll( project.getPluginArtifactRepositories() );
                 
                 ArtifactRepository localRepository = session.getLocalRepository();
-                Set dependencies = metadataSource.retrieve( pluginArtifact, localRepository,
+                
+                ResolutionGroup resolutionGroup = metadataSource.retrieve( pluginArtifact, localRepository,
                                                             project.getPluginArtifactRepositories() );
+                
+                Set dependencies = resolutionGroup.getArtifacts();
     
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         localRepository,
