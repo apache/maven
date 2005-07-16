@@ -431,7 +431,16 @@ public class DefaultMavenProjectBuilder
         {
             List respositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(),
                                                                          artifactRepositoryFactory, container );
-            aggregatedRemoteWagonRepositories.addAll( respositories );
+            
+            for ( Iterator it = respositories.iterator(); it.hasNext(); )
+            {
+                ArtifactRepository repository = (ArtifactRepository) it.next();
+                
+                if ( !aggregatedRemoteWagonRepositories.contains( repository ) )
+                {
+                    aggregatedRemoteWagonRepositories.add( repository );
+                }
+            }
         }
 
         MavenProject project = new MavenProject( model );
