@@ -67,7 +67,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -75,6 +74,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.lang.reflect.Field;
 
 public class DefaultPluginManager
     extends AbstractLogEnabled
@@ -90,11 +90,11 @@ public class DefaultPluginManager
 
     // component requirements
     protected PathTranslator pathTranslator;
-    
+
     protected MavenPluginCollector pluginCollector;
-    
+
     protected PluginVersionManager pluginVersionManager;
-    
+
     protected ArtifactFactory artifactFactory;
 
     protected ArtifactResolver artifactResolver;
@@ -115,8 +115,8 @@ public class DefaultPluginManager
     {
         return pluginCollector.getPluginDescriptorForPrefix( prefix );
     }
-    
-    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings, 
+
+    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                           ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
@@ -126,9 +126,9 @@ public class DefaultPluginManager
         {
             String groupId = plugin.getGroupId();
             String artifactId = plugin.getArtifactId();
-            
+
             plugin.setVersion( pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings,
-                                                                 localRepository ) );
+                                                                          localRepository ) );
         }
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
@@ -136,17 +136,17 @@ public class DefaultPluginManager
         {
             try
             {
-                Artifact pluginArtifact = artifactFactory.createArtifact( plugin.getGroupId(), 
-                                                                          plugin.getArtifactId(), 
+                Artifact pluginArtifact = artifactFactory.createArtifact( plugin.getGroupId(),
+                                                                          plugin.getArtifactId(),
                                                                           plugin.getVersion(),
                                                                           Artifact.SCOPE_RUNTIME,
                                                                           MojoDescriptor.MAVEN_PLUGIN );
-    
+
                 // TODO: [jc; 2005-july-06] what's this for?
                 //plugin.setVersion( pluginArtifact.getBaseVersion() );
-                
+
                 addPlugin( plugin, pluginArtifact, project, localRepository );
-                
+
                 project.addPlugin( plugin );
             }
             catch ( PlexusContainerException e )
@@ -159,7 +159,7 @@ public class DefaultPluginManager
                 String groupId = plugin.getGroupId();
                 String artifactId = plugin.getArtifactId();
                 String version = plugin.getVersion();
-                
+
                 if (
                     ( groupId == null || artifactId == null || version == null ||
                         ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
@@ -173,7 +173,7 @@ public class DefaultPluginManager
                 }
             }
         }
-        
+
         return pluginCollector.getPluginDescriptor( plugin );
     }
 
@@ -212,7 +212,7 @@ public class DefaultPluginManager
 
             resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder, mojoDescriptor
                 .isDependencyResolutionRequired(), artifactFactory, project );
-            
+
             downloadDependencies( project, session, artifactResolver );
         }
 
@@ -247,7 +247,6 @@ public class DefaultPluginManager
             throw new MojoExecutionException( "Error looking up plugin: ", e );
         }
 
-        // !! This is ripe for refactoring to an aspect.
         // Event monitoring.
         String event = MavenEvents.MOJO_EXECUTION;
         EventDispatcher dispatcher = session.getEventDispatcher();
@@ -300,9 +299,9 @@ public class DefaultPluginManager
         forLookup.setGroupId( reportPlugin.getGroupId() );
         forLookup.setArtifactId( reportPlugin.getArtifactId() );
         forLookup.setVersion( reportPlugin.getVersion() );
-        
+
         PluginDescriptor pluginDescriptor = verifyPlugin( forLookup, project, session.getSettings(), localRepository );
-        
+
         List reports = new ArrayList();
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
         {
@@ -384,7 +383,7 @@ public class DefaultPluginManager
         PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration, mojoDescriptor
             .getMojoConfiguration() );
 
-        // TODO: plexus
+        // TODO: plexus changes to make this more like the component descriptor so this can be used instead
         //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
         //                                                                          mojoDescriptor.getConfiguration() );
 
@@ -410,63 +409,62 @@ public class DefaultPluginManager
         // otherwise, we have to finish resolving the plugin's classpath and start the container.
         if ( pluginDescriptor.getArtifacts() != null && pluginDescriptor.getArtifacts().size() == 1 )
         {
-            // TODO: this is a little shady...
             Artifact pluginArtifact = (Artifact) pluginDescriptor.getArtifacts().get( 0 );
 
             try
             {
                 MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder,
                                                                               artifactFactory );
-    
+
                 List remoteRepositories = new ArrayList();
-                
+
                 remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
                 remoteRepositories.addAll( project.getPluginArtifactRepositories() );
-                
+
                 ArtifactRepository localRepository = session.getLocalRepository();
-                
+
                 ResolutionGroup resolutionGroup = metadataSource.retrieve( pluginArtifact, localRepository,
-                                                            project.getPluginArtifactRepositories() );
-                
+                                                                           project.getPluginArtifactRepositories() );
+
                 Set dependencies = resolutionGroup.getArtifacts();
-    
+
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         localRepository,
                                                                                         remoteRepositories,
                                                                                         metadataSource,
                                                                                         artifactFilter );
-    
+
                 Set resolved = result.getArtifacts();
-    
+
                 for ( Iterator it = resolved.iterator(); it.hasNext(); )
                 {
                     Artifact artifact = (Artifact) it.next();
-    
+
                     if ( artifact != pluginArtifact )
                     {
                         pluginContainer.addJarResource( artifact.getFile() );
                     }
                 }
-    
+
                 pluginDescriptor.setClassRealm( pluginContainer.getContainerRealm() );
-    
+
                 // TODO: this is probably overkill as it is rarely used - can we use a mojo tag to signal this will be
                 // used or check its configuration? Also, when it is used, perhaps it is more effecient to resolve
                 // everything at once and apply the exclusion filter when constructing the plugin container above.
                 // Check this out with yourkit
                 ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
-    
+
                 ArtifactResolutionResult distroProvidedResult = artifactResolver
                     .resolveTransitively( dependencies, pluginArtifact, localRepository, remoteRepositories,
                                           metadataSource, distroProvidedFilter );
-    
+
                 Set distroProvided = distroProvidedResult.getArtifacts();
-    
+
                 List unfilteredArtifactList = new ArrayList( resolved.size() + distroProvided.size() );
-    
+
                 unfilteredArtifactList.addAll( resolved );
                 unfilteredArtifactList.addAll( distroProvided );
-    
+
                 pluginDescriptor.setArtifacts( unfilteredArtifactList );
             }
             catch ( ArtifactResolutionException e )
@@ -505,6 +503,8 @@ public class DefaultPluginManager
             {
                 // TODO: I defy anyone to find these messages in the '-X' output! Do we need a new log level?
                 // ideally, this would be elevated above the true debug output, but below the default INFO level...
+                // [BP] (2004-07-18): need to understand the context more but would prefer this could be either WARN or
+                // removed - shouldn't need DEBUG to diagnose a problem most of the time.
                 getLogger().debug(
                     "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'" +
                         mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
@@ -578,7 +578,8 @@ public class DefaultPluginManager
                 {
                     try
                     {
-                        // TODO: remove in beta-1
+                        // TODO: would like to remove in beta-1 as configurator should always be given, but it is
+                        // currently causing problems with published plugins.
                         Field field = findPluginField( plugin.getClass(), parameter.getName() );
                         boolean accessible = field.isAccessible();
                         if ( !accessible )
@@ -724,9 +725,8 @@ public class DefaultPluginManager
         {
             String configuratorId = mojoDescriptor.getComponentConfigurator();
 
-            // TODO: should this be known to the component factory instead? And if so, should configuration be part of lookup?
-            // [jc]: I don't think we can be that strict with the configurator. It makes some measure of sense that
-            // people may want different configurators for their java mojos...
+            // TODO: could the configuration be passed to lookup and the configurator known to plexus via the descriptor
+            // so that this meethod could entirely be handled by a plexus lookup?
             if ( StringUtils.isNotEmpty( configuratorId ) )
             {
                 configurator = (ComponentConfigurator) pluginContainer.lookup( ComponentConfigurator.ROLE,
@@ -791,7 +791,8 @@ public class DefaultPluginManager
     {
         StringBuffer message = new StringBuffer();
 
-        message.append( "The '" + parameter.getName() );
+        message.append( "The '" );
+        message.append( parameter.getName() );
         message.append( "' parameter is required for the execution of the " );
         message.append( mojo.getFullGoalName() );
         message.append( " mojo and cannot be null." );
@@ -858,7 +859,6 @@ public class DefaultPluginManager
         artifacts.add( "maven-plugin-descriptor" );
         artifacts.add( "maven-project" );
         artifacts.add( "maven-settings" );
-        artifacts.add( "oro" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-input-handler" );
         artifacts.add( "plexus-utils" );
@@ -869,6 +869,7 @@ public class DefaultPluginManager
         // TODO: remove doxia
         artifacts.add( "doxia-core" );
         artifacts.add( "maven-reporting-api" );
+        artifacts.add( "oro" );
         artifactFilter = new ExclusionSetFilter( artifacts );
     }
 
