@@ -29,5 +29,27 @@
         </p>
       </answer>
     </faq>
+    <faq id="using-ant-tasks">
+      <question>How can I use Ant tasks in Maven 2?</question>
+      <answer>
+        <p>
+          There are 3 alternatives:
+        </p>
+        <ul>
+          <li>
+            For use in a plugin written in Java, Beanshell or other Java-like scripting language, you can construct
+            the Ant tasks using the <a href="http://ant.apache.org/manual/antexternal.html">instructions given in the Ant
+            documentation</a>
+          </li>
+          <li>
+            You can write your plugin using Marmalade, and use the Ant tasks much like you would from Jelly in Maven 1.0.
+          </li>
+          <li>
+            If you have very small amounts of Ant script specific to your project, you can use the
+            <a href="http://www.neonics.com/projects/maven-antrun-plugin/">AntRun plugin</a>.
+          </li>
+        </ul>
+      </answer>
+    </faq>
   </part>
 </faqs>
