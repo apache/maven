@@ -212,6 +212,16 @@
           <type>String</type>
         </field>
         <field>
+          <name>prerequesites</name>
+          <version>4.0.0</version>
+          <description>
+            Describes the prerequesites in the build environment for this project.
+          </description>
+          <association>
+            <type>Prerequesites</type>
+          </association>
+        </field>
+        <field>
           <name>issueTrackingUrl</name>
           <version>3.0.0</version>
           <description><![CDATA[
@@ -427,7 +437,8 @@
           <association>
             <type>Repository</type>
           </association>
-          <comment>This element needs to be renamed as it conflicts with the existing notion of repositories in Maven.</comment>
+          <comment>This element needs to be renamed as it conflicts with the existing notion of repositories in
+            Maven.</comment>
         </field>
         <field>
           <name>organization</name>
@@ -561,7 +572,8 @@
             <type>Repository</type>
             <multiplicity>*</multiplicity>
           </association>
-          <comment>This may be removed or relocated in the near future. It is undecided whether plugins really need a remote repository set of their own.</comment>
+          <comment>This may be removed or relocated in the near future. It is undecided whether plugins really need a
+            remote repository set of their own.</comment>
         </field>
         <field>
           <name>dependencies</name>
@@ -622,7 +634,8 @@
             <type>Dependency</type>
             <multiplicity>*</multiplicity>
           </association>
-          <comment>These should ultimately only be compile time dependencies when transitive dependencies come into play.</comment>
+          <comment>These should ultimately only be compile time dependencies when transitive dependencies come into
+            play.</comment>
         </field>
         <field>
           <name>reports</name>
@@ -1040,7 +1053,7 @@
       <name>Contributor</name>
       <description>
         Description of a person who has contributed to the project, but who does
-        not have commit privileges. Usually, these contributions come in the 
+        not have commit privileges. Usually, these contributions come in the
         form of patches submitted.
       </description>
       <version>3.0.0+</version>
@@ -1995,14 +2008,16 @@
         <field>
           <name>layout</name>
           <version>4.0.0</version>
-          <description>The type of layout this repository uses for locating and storing artifacts - can be "legacy" or "default".</description>
+          <description>The type of layout this repository uses for locating and storing artifacts - can be "legacy" or
+            "default".</description>
           <type>String</type>
           <defaultValue>default</defaultValue>
         </field>
         <field>
           <name>checksumPolicy</name>
           <version>4.0.0</version>
-          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are "fail" or "warn"</description>
+          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are
+            "fail" or "warn"</description>
           <type>String</type>
           <defaultValue>warn</defaultValue>
         </field>
@@ -2071,7 +2086,8 @@
         <field>
           <name>inherited</name>
           <version>4.0.0</version>
-          <description><![CDATA[Whether this container's configuration should be propagated to child POMs.]]></description>
+          <description>
+            <![CDATA[Whether this container's configuration should be propagated to child POMs.]]></description>
           <type>String</type>
         </field>
         <field>
@@ -2125,7 +2141,8 @@
         <field>
           <name>executions</name>
           <version>4.0.0</version>
-          <description>Multiple specifications of a set of goals, each having (possibly) different configuration</description>
+          <description>Multiple specifications of a set of goals, each having (possibly) different
+            configuration</description>
           <association>
             <type>PluginExecution</type>
             <multiplicity>*</multiplicity>
@@ -2356,7 +2373,7 @@
           <required>true</required>
           <version>4.0.0</version>
           <type>String</type>
-          <description>The ID of this build profile, for activation 
+          <description>The ID of this build profile, for activation
             purposes.</description>
         </field>
         <field>
@@ -2504,7 +2521,8 @@
         <field>
           <name>reportSets</name>
           <version>4.0.0</version>
-          <description>Multiple specifications of a set of reports, each having (possibly) different configuration</description>
+          <description>Multiple specifications of a set of reports, each having (possibly) different
+            configuration</description>
           <association>
             <type>ReportSet</type>
             <multiplicity>*</multiplicity>
@@ -2618,6 +2636,21 @@
           ]]></code>
         </codeSegment>
       </codeSegments>
+    </class>
+    <class>
+      <name>Prerequesites</name>
+      <version>4.0.0</version>
+      <description>Describes the prerequesites a project can have</description>
+      <fields>
+        <field>
+          <name>maven</name>
+          <version>4.0.0</version>
+          <type>String</type>
+          <defaultValue>2.0-beta-1-SNAPSHOT</defaultValue>
+          <description>The minimum version of Maven required</description>
+          <required>false</required>
+        </field>
+      </fields>
     </class>
   </classes>
 </model>

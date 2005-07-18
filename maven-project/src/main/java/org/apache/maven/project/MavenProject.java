@@ -36,6 +36,7 @@ import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Prerequesites;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
@@ -104,7 +105,7 @@ public class MavenProject
     private List activeProfiles = new ArrayList();
 
     private Set dependencyArtifacts;
-    
+
     private Artifact artifact;
 
     // calculated.
@@ -150,12 +151,12 @@ public class MavenProject
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------
-    
+
     public Artifact getArtifact()
     {
         return artifact;
     }
-    
+
     public void setArtifact( Artifact artifact )
     {
         this.artifact = artifact;
@@ -385,8 +386,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
-                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
+                    Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
                     File file = a.getFile();
                     if ( file == null )
@@ -411,8 +412,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
-                    || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
+                    Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
                     list.add( a );
                 }
@@ -437,8 +438,8 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: let the scope handler deal with this
-            if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() )
-                || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+            if ( Artifact.SCOPE_TEST.equals( a.getScope() ) || Artifact.SCOPE_COMPILE.equals( a.getScope() ) ||
+                Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
 
@@ -644,6 +645,11 @@ public class MavenProject
         return model.getUrl();
     }
 
+    public Prerequesites getPrerequesites()
+    {
+        return model.getPrerequesites();
+    }
+
     public void setIssueManagement( IssueManagement issueManagement )
     {
         model.setIssueManagement( issueManagement );
@@ -787,7 +793,7 @@ public class MavenProject
     public void setArtifacts( Set artifacts )
     {
         this.artifacts = artifacts;
-        
+
         // flush the calculated artifactMap
         artifactMap = null;
     }
@@ -803,7 +809,7 @@ public class MavenProject
         {
             artifactMap = ArtifactUtils.artifactMap( getArtifacts() );
         }
-        
+
         return artifactMap;
     }
 
@@ -960,7 +966,7 @@ public class MavenProject
     }
 
     public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,
-                                        String goalId )
+                                         String goalId )
     {
         Xpp3Dom dom = null;
 

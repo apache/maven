@@ -19,6 +19,8 @@ package org.apache.maven;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
@@ -45,22 +47,25 @@ import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.usability.ErrorDiagnoser;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -82,9 +87,11 @@ public class DefaultMaven
     protected PlexusContainer container;
 
     protected Map errorDiagnosers;
-    
+
     protected MavenProfilesBuilder profilesBuilder;
-    
+
+    private ArtifactVersion mavenVersion;
+
     // ----------------------------------------------------------------------
     // Project execution
     // ----------------------------------------------------------------------
@@ -92,6 +99,15 @@ public class DefaultMaven
     public MavenExecutionResponse execute( MavenExecutionRequest request )
         throws ReactorException
     {
+        try
+        {
+            mavenVersion = getMavenVersion();
+        }
+        catch ( IOException e )
+        {
+            throw new ReactorException( "Unable to determine the executing version of Maven", e );
+        }
+
         if ( request.getSettings().isOffline() )
         {
             getLogger().info( "Maven is running in offline mode." );
@@ -119,15 +135,17 @@ public class DefaultMaven
 
         try
         {
-            projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive(), request.getSettings() );
+            projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive(),
+                                        request.getSettings() );
 
             projects = ProjectSorter.getSortedProjects( projects );
 
             if ( projects.isEmpty() )
             {
                 List externalProfiles = getActiveExternalProfiles( null, request.getSettings() );
-                
-                projects.add( projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(), externalProfiles ) );
+
+                projects.add(
+                    projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(), externalProfiles ) );
             }
         }
         catch ( IOException e )
@@ -204,6 +222,25 @@ public class DefaultMaven
         }
     }
 
+    private DefaultArtifactVersion getMavenVersion()
+        throws IOException
+    {
+        InputStream resourceAsStream = null;
+        try
+        {
+            Properties properties = new Properties();
+            resourceAsStream = getClass().getClassLoader().getResourceAsStream(
+                "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+            properties.load( resourceAsStream );
+
+            return new DefaultArtifactVersion( properties.getProperty( "version" ) );
+        }
+        finally
+        {
+            IOUtil.close( resourceAsStream );
+        }
+    }
+
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings )
         throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException
     {
@@ -214,6 +251,16 @@ public class DefaultMaven
             File file = (File) iterator.next();
 
             MavenProject project = getProject( file, localRepository, settings );
+
+            if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
+            {
+                DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequesites().getMaven() );
+                if ( mavenVersion.compareTo( version ) < 0 )
+                {
+                    throw new ProjectBuildingException( "Unable to build project '" + project.getFile() +
+                        "; it requires Maven version " + version.toString() );
+                }
+            }
 
             if ( project.getModules() != null && !project.getModules().isEmpty() && recursive )
             {
@@ -315,55 +362,55 @@ public class DefaultMaven
         {
             if ( pom.length() == 0 )
             {
-                throw new ProjectBuildingException( "The file " + pom.getAbsolutePath() + " you specified has zero length." );
+                throw new ProjectBuildingException(
+                    "The file " + pom.getAbsolutePath() + " you specified has zero length." );
             }
         }
 
         List externalProfiles = getActiveExternalProfiles( pom, settings );
-        
-        MavenProject project = projectBuilder.build( pom, localRepository, externalProfiles );
-        
-        return project;
+
+        return projectBuilder.build( pom, localRepository, externalProfiles );
     }
 
-    private List getActiveExternalProfiles( File pom, Settings settings ) throws ProjectBuildingException
+    private List getActiveExternalProfiles( File pom, Settings settings )
+        throws ProjectBuildingException
     {
         // TODO: apply profiles.xml and settings.xml Profiles here.
         List externalProfiles = new ArrayList();
-        
+
         List settingsProfiles = settings.getProfiles();
-        
-        if(settingsProfiles != null && !settingsProfiles.isEmpty())
+
+        if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
         {
             List settingsActiveProfileIds = settings.getActiveProfiles();
-            
+
             for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
             {
                 org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
-                
+
                 Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
-                
-                if( settingsActiveProfileIds.contains( rawProfile.getId() ) )
+
+                if ( settingsActiveProfileIds.contains( rawProfile.getId() ) )
                 {
                     profile.setActivation( new AlwaysOnActivation() );
                 }
-                
+
                 externalProfiles.add( profile );
             }
         }
-        
-        if( pom != null )
+
+        if ( pom != null )
         {
             try
             {
                 ProfilesRoot root = profilesBuilder.buildProfiles( pom.getParentFile() );
-                
-                if( root != null )
+
+                if ( root != null )
                 {
                     for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
                     {
                         org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
-                        
+
                         externalProfiles.add( ProfilesConversionUtils.convertFromProfileXmlProfile( rawProfile ) );
                     }
                 }
@@ -377,7 +424,7 @@ public class DefaultMaven
                 throw new ProjectBuildingException( "Cannot parse profiles.xml resource for pom: " + pom, e );
             }
         }
-        
+
         return externalProfiles;
     }
 
@@ -459,7 +506,7 @@ public class DefaultMaven
         getLogger().error( "BUILD ERROR" );
 
         line();
-        
+
         Throwable error = r.getException();
 
         String message = null;
@@ -482,9 +529,9 @@ public class DefaultMaven
         }
 
         getLogger().info( "Diagnosis: " + message );
-        
+
         line();
-        
+
         getLogger().error( "Cause: ", r.getException() );
 
         line();
@@ -572,8 +619,8 @@ public class DefaultMaven
 
         Runtime r = Runtime.getRuntime();
 
-        getLogger().info( "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" +
-                          ( r.totalMemory() / mb ) + "M" );
+        getLogger().info(
+            "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" + ( r.totalMemory() / mb ) + "M" );
     }
 
     protected void line()
