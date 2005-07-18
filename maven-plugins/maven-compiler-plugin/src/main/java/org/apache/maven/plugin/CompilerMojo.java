@@ -23,8 +23,6 @@ import java.util.List;
  * @phase compile
  * @requiresDependencyResolution compile
  * @description Compiles application sources
- * @todo change debug parameter type to Boolean
- * @todo change staleMillis parameter type to Long
  */
 
 public class CompilerMojo
