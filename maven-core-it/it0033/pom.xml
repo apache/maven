@@ -1,0 +1,19 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-core-it00xx</artifactId>
+  <packaging>ear</packaging>
+  <version>1.0</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+            <generateApplicationXml>true</generateApplicationXml>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

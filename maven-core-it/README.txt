@@ -99,6 +99,8 @@ it0031: Test usage of plugins.xml mapping file on the repository to resolve
 
 it0032: Tests that a specified Maven version requirement that is lower doesn't cause any problems
 
+it0033: Test an EAR generation
+
 -------------------------------------------------------------------------------
 
 - generated sources

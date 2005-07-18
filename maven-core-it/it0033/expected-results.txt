@@ -1,0 +1,3 @@
+target/maven-core-it00xx-1.0.ear
+target/maven-core-it00xx-1.0.ear!/META-INF/application.xml
+target/maven-core-it00xx-1.0.ear!/META-INF/appserver-application.xml
