@@ -97,6 +97,8 @@ it0031: Test usage of plugins.xml mapping file on the repository to resolve
         plugin artifactId from it's prefix using the pluginGroups in
         the provided settings.xml.
 
+it0032: Tests that a specified Maven version requirement that is lower doesn't cause any problems
+
 -------------------------------------------------------------------------------
 
 - generated sources
@@ -141,5 +143,7 @@ it1005: A build with two mojo java sources that declare the same goal.
 -------------------------------------------------------------------------------
 it1006: Tests collision on default execution id. Should throw an 
         IllegalStateException, since the model is incorrect.
+-------------------------------------------------------------------------------
+it1007: Should fail due to requiring a future version of Maven.
 -------------------------------------------------------------------------------
 
