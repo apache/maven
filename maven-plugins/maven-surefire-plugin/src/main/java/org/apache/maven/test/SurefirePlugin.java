@@ -91,7 +91,7 @@ public class SurefirePlugin
     /**
      * Specify this parameter if you want to use the test regex notation to select tests to run.
      *
-     * @parameter
+     * @parameter expression="${test}"
      */
     private String test;
 
