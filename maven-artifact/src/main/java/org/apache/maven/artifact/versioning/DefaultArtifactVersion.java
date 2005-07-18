@@ -65,7 +65,22 @@ public class DefaultArtifactVersion
             {
                 if ( otherVersion.qualifier != null )
                 {
-                    result = qualifier.compareTo( otherVersion.qualifier );
+                    if ( qualifier.length() > otherVersion.qualifier.length() &&
+                        qualifier.startsWith( otherVersion.qualifier ) )
+                    {
+                        // here, the longer one that otherwise match is considered older
+                        result = -1;
+                    }
+                    else if ( qualifier.length() < otherVersion.qualifier.length() &&
+                        otherVersion.qualifier.startsWith( qualifier ) )
+                    {
+                        // here, the longer one that otherwise match is considered older
+                        result = 1;
+                    }
+                    else
+                    {
+                        result = qualifier.compareTo( otherVersion.qualifier );
+                    }
                 }
                 else
                 {

@@ -137,6 +137,18 @@ public class DefaultArtifactVersionTest
         version = new DefaultArtifactVersion( "1.0-SNAPSHOT" );
         assertTrue( version.compareTo( new DefaultArtifactVersion( "1.0-beta-1" ) ) < 0 );
 
+        version = new DefaultArtifactVersion( "1.0-SNAPSHOT" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "1.0" ) ) < 0 );
+
+        version = new DefaultArtifactVersion( "1.0" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) > 0 );
+
+        version = new DefaultArtifactVersion( "1.0-alpha-1-SNAPSHOT" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "1.0-alpha-1" ) ) < 0 );
+
+        version = new DefaultArtifactVersion( "1.0-alpha-1" );
+        assertTrue( version.compareTo( new DefaultArtifactVersion( "1.0-alpha-1-SNAPSHOT" ) ) > 0 );
+
         version = new DefaultArtifactVersion( "1.0" );
         assertTrue( version.compareTo( new DefaultArtifactVersion( "1.0-1" ) ) < 0 );
 
