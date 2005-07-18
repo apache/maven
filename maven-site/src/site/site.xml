@@ -26,6 +26,7 @@
       <item name="Introduction" href="/index.html"/>
       <item name="General Information" href="/about.html"/>
       <item name="For Maven 1.0 Users" href="/maven1.html"/>
+      <item name="FAQ" href="/general.html"/>
       <item name="Road Map" href="/roadmap.html"/>
     </menu>
     <menu name="User's Guide">
