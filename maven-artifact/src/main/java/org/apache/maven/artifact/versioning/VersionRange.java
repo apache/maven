@@ -54,6 +54,8 @@ public class VersionRange
         List restrictions = new ArrayList();
         String process = spec;
         ArtifactVersion version = null;
+        ArtifactVersion upperBound = null;
+        ArtifactVersion lowerBound = null;
 
         while ( process.startsWith( "[" ) || process.startsWith( "(" ) )
         {
@@ -74,7 +76,20 @@ public class VersionRange
                 throw new InvalidVersionSpecificationException( "Unbounded range: " + spec );
             }
 
-            restrictions.add( parseRestriction( process.substring( 0, index + 1 ) ) );
+            Restriction restriction = parseRestriction( process.substring( 0, index + 1 ) );
+            if ( lowerBound == null )
+            {
+                lowerBound = restriction.getLowerBound();
+            }
+            if ( upperBound != null )
+            {
+                if ( restriction.getLowerBound() == null || restriction.getLowerBound().compareTo( upperBound ) < 0 )
+                {
+                    throw new InvalidVersionSpecificationException( "Ranges overlap: " + spec );
+                }
+            }
+            restrictions.add( restriction );
+            upperBound = restriction.getUpperBound();
 
             process = process.substring( index + 1 ).trim();
 
@@ -141,6 +156,11 @@ public class VersionRange
             if ( upperBound.length() > 0 )
             {
                 upperVersion = new DefaultArtifactVersion( upperBound );
+            }
+
+            if ( upperVersion != null && lowerVersion != null && upperVersion.compareTo( lowerVersion ) < 0 )
+            {
+                throw new InvalidVersionSpecificationException( "Range defies version ordering: " + spec );
             }
 
             restriction = new Restriction( lowerVersion, lowerBoundInclusive, upperVersion, upperBoundInclusive );
