@@ -39,9 +39,16 @@ public class DefaultArtifact
 
     private final String artifactId;
 
+    /**
+     * The resolved version for the artifact after conflict resolution and all transformations.
+     */
     private String version;
 
-    // TODO: should be final
+    /**
+     * The resolved version for the artifact after conflict resolution, that has not been transformed.
+     *
+     * @todo should be final
+     */
     private String baseVersion;
 
     private final String type;
@@ -72,6 +79,7 @@ public class DefaultArtifact
 
         this.artifactId = artifactId;
 
+        // TODO: this would be where we might have a min/max instead
         this.version = version;
 
         this.artifactHandler = artifactHandler;

@@ -86,9 +86,7 @@ public class DefaultArtifactFactory
         }
 
         ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
-        DefaultArtifact artifact = new DefaultArtifact( groupId, artifactId, version, desiredScope, type, classifier,
-                                                        handler );
 
-        return artifact;
+        return new DefaultArtifact( groupId, artifactId, version, desiredScope, type, classifier, handler );
     }
 }

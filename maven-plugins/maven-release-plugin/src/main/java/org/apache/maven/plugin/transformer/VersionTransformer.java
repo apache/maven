@@ -16,18 +16,15 @@ package org.apache.maven.plugin.transformer;
  * limitations under the License.
  */
 
-import java.util.Iterator;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.dom4j.Element;
 import org.dom4j.Node;
 
+import java.util.Iterator;
+
 /**
- *
- *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- *
  * @version $Id: VersionTransformer.java 115421 2004-06-01 02:20:18Z dion $
  */
 public class VersionTransformer
@@ -94,14 +91,14 @@ public class VersionTransformer
             }
             Node version = node.selectSingleNode( "version" );
 
+            String versionText = getDependency( groupId.getText(), artifactId.getText(), typeText ).getVersion();
             if ( version != null )
             {
-                version.setText( getDependency( groupId.getText(), artifactId.getText(), typeText ).getVersion() );
+                version.setText( versionText );
             }
             else
             {
-                dependency.addElement( "version" ).addText( getDependency( groupId.getText(), artifactId.getText(),
-                                                                           type.getText() ).getVersion() );
+                dependency.addElement( "version" ).addText( versionText );
             }
         }
         else if ( selectPluginsNodesXPathExpression().equals( node.getPath() ) )
@@ -147,9 +144,9 @@ public class VersionTransformer
             {
                 // Modify scm tag
                 Element scm = (Element) node;
-                
+
                 Node tag = node.selectSingleNode( "tag" );
-                
+
                 if ( tag == null )
                 {
                     if ( !"HEAD".equals( getUpdatedModel().getScm().getTag() ) )
@@ -161,10 +158,10 @@ public class VersionTransformer
                 {
                     tag.setText( getUpdatedModel().getScm().getTag() );
                 }
-                
+
                 // Modify scmConnections
                 Node connection = node.selectSingleNode( "connection" );
-                
+
                 if ( connection != null )
                 {
                     if ( !connection.getText().equals( getUpdatedModel().getScm().getConnection() ) )
@@ -172,9 +169,9 @@ public class VersionTransformer
                         connection.setText( getUpdatedModel().getScm().getConnection() );
                     }
                 }
-                
+
                 Node developerConnection = node.selectSingleNode( "developerConnection" );
-                
+
                 if ( developerConnection != null )
                 {
                     if ( !developerConnection.getText().equals( getUpdatedModel().getScm().getDeveloperConnection() ) )
@@ -192,8 +189,8 @@ public class VersionTransformer
         {
             Dependency dependency = (Dependency) i.next();
 
-            if ( dependency.getGroupId().equals( groupId ) && dependency.getArtifactId().equals( artifactId )
-                && dependency.getType().equals( type ) )
+            if ( dependency.getGroupId().equals( groupId ) && dependency.getArtifactId().equals( artifactId ) &&
+                dependency.getType().equals( type ) )
             {
                 return dependency;
             }
