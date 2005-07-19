@@ -32,6 +32,8 @@ public class Restriction
 
     private final boolean upperBoundInclusive;
 
+    static final Restriction EVERYTHING = new Restriction( null, false, null, false );
+
     public Restriction( ArtifactVersion lowerBound, boolean lowerBoundInclusive, ArtifactVersion upperBound,
                         boolean upperBoundInclusive )
     {

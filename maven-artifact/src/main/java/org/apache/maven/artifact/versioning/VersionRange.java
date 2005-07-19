@@ -110,6 +110,7 @@ public class VersionRange
             else
             {
                 version = new DefaultArtifactVersion( process );
+                restrictions.add( Restriction.EVERYTHING );
             }
         }
 
@@ -182,13 +183,9 @@ public class VersionRange
         List r1 = this.restrictions;
         List r2 = restriction.restrictions;
         List restrictions;
-        if ( r1.isEmpty() )
+        if ( r1.isEmpty() || r2.isEmpty() )
         {
-            restrictions = r2;
-        }
-        else if ( r2.isEmpty() )
-        {
-            restrictions = r1;
+            restrictions = Collections.EMPTY_LIST;
         }
         else
         {
