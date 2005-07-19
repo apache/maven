@@ -63,7 +63,7 @@ public class DependenciesTask
         ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
         MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
         ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        MavenMetadataSource metadataSource = new MavenMetadataSource( resolver, projectBuilder, artifactFactory );
+        MavenMetadataSource metadataSource = new MavenMetadataSource( projectBuilder, artifactFactory );
 
         List dependencies = this.dependencies;
 
@@ -101,8 +101,8 @@ public class DependenciesTask
         ArtifactResolutionResult result;
         try
         {
-            Artifact pomArtifact = artifactFactory.createArtifact( pom.getGroupId(), pom.getArtifactId(),
-                                                                   pom.getVersion(), null, pom.getPackaging() );
+            Artifact pomArtifact = artifactFactory.createBuildArtifact( pom.getGroupId(), pom.getArtifactId(),
+                                                                        pom.getVersion(), pom.getPackaging() );
 
             List listeners = Collections.EMPTY_LIST;
             if ( verbose )

@@ -20,6 +20,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -71,8 +72,7 @@ public class DefaultArtifact
 
     private List dependencyTrail;
 
-    // TODO: direct all through the artifact factory
-    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
+    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler )
     {
         this.groupId = groupId;
@@ -80,7 +80,7 @@ public class DefaultArtifact
         this.artifactId = artifactId;
 
         // TODO: this would be where we might have a min/max instead
-        this.version = version;
+        this.version = versionRange.getVersion();
 
         this.artifactHandler = artifactHandler;
 

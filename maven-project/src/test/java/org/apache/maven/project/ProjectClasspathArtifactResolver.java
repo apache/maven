@@ -27,6 +27,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -51,23 +52,28 @@ public class ProjectClasspathArtifactResolver
     implements Contextualizable
 {
     private ArtifactRepositoryFactory repositoryFactory;
+
     private PlexusContainer container;
 
     public static class Source
         implements ArtifactMetadataSource
     {
         private ArtifactFactory artifactFactory;
+
         private final ArtifactRepositoryFactory repositoryFactory;
+
         private final PlexusContainer container;
 
-        public Source( ArtifactFactory artifactFactory, ArtifactRepositoryFactory repositoryFactory, PlexusContainer container )
+        public Source( ArtifactFactory artifactFactory, ArtifactRepositoryFactory repositoryFactory,
+                       PlexusContainer container )
         {
             this.artifactFactory = artifactFactory;
             this.repositoryFactory = repositoryFactory;
             this.container = container;
         }
 
-        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                         List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             Model model = null;
@@ -101,19 +107,20 @@ public class ProjectClasspathArtifactResolver
             {
                 IOUtil.close( r );
             }
-            
+
             Set artifacts = createArtifacts( model.getDependencies(), artifact.getScope() );
-            
+
             List artifactRepositories;
             try
             {
-                artifactRepositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(), repositoryFactory, container );
+                artifactRepositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(),
+                                                                               repositoryFactory, container );
             }
             catch ( ProjectBuildingException e )
             {
                 throw new ArtifactMetadataRetrievalException( e );
             }
-            
+
             return new ResolutionGroup( artifacts, artifactRepositories );
         }
 
@@ -125,8 +132,10 @@ public class ProjectClasspathArtifactResolver
             {
                 Dependency d = (Dependency) i.next();
 
-                Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
-                                                                    d.getScope(), d.getType(), inheritedScope );
+                Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
+                                                                              new VersionRange( d.getVersion() ),
+                                                                              d.getType(), d.getScope(), 
+                                                                              inheritedScope );
                 if ( artifact != null )
                 {
                     projectArtifacts.add( artifact );
@@ -136,7 +145,7 @@ public class ProjectClasspathArtifactResolver
             return projectArtifacts;
         }
     }
-    
+
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {

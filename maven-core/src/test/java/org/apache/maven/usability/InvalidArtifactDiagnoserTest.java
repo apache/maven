@@ -1,6 +1,9 @@
 package org.apache.maven.usability;
 
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.codehaus.plexus.PlexusTestCase;
 
 import junit.framework.TestCase;
 
@@ -21,9 +24,8 @@ import junit.framework.TestCase;
  */
 
 public class InvalidArtifactDiagnoserTest
-    extends TestCase
+    extends PlexusTestCase
 {
-
     private InvalidArtifactDiagnoser diagnoser = new InvalidArtifactDiagnoser();
 
     public void testShouldDiagnoseArtifactWithMissingGroupId() throws Throwable
@@ -61,7 +63,7 @@ public class InvalidArtifactDiagnoserTest
 
         try
         {
-            new DefaultArtifact( groupId, artifactId, version, null, type, null, null );
+            createArtifact( groupId, artifactId, version, type );
 
             fail( "artifact creation did not fail; nothing to diagnose." );
         }
@@ -79,4 +81,12 @@ public class InvalidArtifactDiagnoserTest
             }
         }
     }
+
+    private Artifact createArtifact( String groupId, String artifactId, String version, String type )
+        throws Exception
+    {
+        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        return artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
+    }
+
 }

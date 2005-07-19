@@ -26,6 +26,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.MavenProject;
@@ -50,8 +51,7 @@ public class MavenMetadataSource
     private ArtifactFactory artifactFactory;
 
     // TODO: Remove resolver from params list.
-    public MavenMetadataSource( ArtifactResolver artifactResolver, MavenProjectBuilder projectBuilder,
-                                ArtifactFactory artifactFactory )
+    public MavenMetadataSource( MavenProjectBuilder projectBuilder, ArtifactFactory artifactFactory )
     {
         this.mavenProjectBuilder = projectBuilder;
         this.artifactFactory = artifactFactory;
@@ -61,8 +61,8 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         // TODO: only metadata is really needed - resolve as metadata
-        Artifact pomArtifact = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                               artifact.getVersion(), artifact.getScope(), "pom" );
+        Artifact pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                               artifact.getVersion(), artifact.getScope() );
 
         // TODO: this a very thin wrapper around a project builder - is it needed?
         List dependencies = null;
@@ -75,9 +75,10 @@ public class MavenMetadataSource
                                                                       localRepository );
             dependencies = p.getDependencies();
             artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
-            
-            Set artifacts = createArtifacts( artifactFactory, dependencies, artifact.getScope(), artifact.getDependencyFilter() );
-            
+
+            Set artifacts = createArtifacts( artifactFactory, dependencies, artifact.getScope(),
+                                             artifact.getDependencyFilter() );
+
             return new ResolutionGroup( artifacts, p.getRemoteArtifactRepositories() );
         }
         catch ( ProjectBuildingException e )
@@ -95,8 +96,9 @@ public class MavenMetadataSource
         {
             Dependency d = (Dependency) i.next();
 
-            Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
-                                                                d.getScope(), d.getType(), inheritedScope );
+            Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
+                                                                          new VersionRange( d.getVersion() ),
+                                                                          d.getType(), d.getScope(), inheritedScope );
 
             if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
             {

@@ -17,16 +17,43 @@ package org.apache.maven.artifact.factory;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 public interface ArtifactFactory
 {
     static String ROLE = ArtifactFactory.class.getName();
 
+    /**
+     * @deprecated
+     */
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                              String inheritedScope );
 
-    Artifact createArtifact( String groupId, String artifactId, String knownVersion, String scope, String type );
-    
-    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope,
-                                                  String type, String classifier );
+    // TODO: deprecate and chase down (probably used for copying only)
+    Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
+
+    /**
+     * @deprecated
+     */
+    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope, String type,
+                                           String classifier );
+
+    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type,
+                                           String classifier );
+
+    Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                       String scope );
+
+    Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                       String scope, String inheritedScope );
+
+    Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging );
+
+    Artifact createProjectArtifact( String groupId, String artifactId, String version );
+
+    Artifact createParentArtifact( String groupId, String artifactId, String version );
+
+    Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange );
+
+    Artifact createProjectArtifact( String groupId, String artifactId, String version, String scope );
 }

@@ -16,21 +16,21 @@ package org.apache.maven.artifact.ant;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Model;
 import org.apache.maven.profiles.activation.ProfileActivationUtils;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -104,20 +104,20 @@ public abstract class AbstractArtifactTask
             manager.addProxy( proxy.getType(), proxy.getHost(), proxy.getPort(), proxy.getUserName(),
                               proxy.getPassword(), proxy.getNonProxyHosts() );
         }
-        
+
         ArtifactRepositoryFactory repositoryFactory = null;
-        
+
         ArtifactRepository artifactRepository;
-        
+
         try
         {
             repositoryFactory = (ArtifactRepositoryFactory) lookup( ArtifactRepositoryFactory.ROLE );
-            
+
             String snapshotPolicy = repository.getSnapshotPolicy();
             String checksumPolicy = repository.getChecksumPolicy();
-            
-            artifactRepository = repositoryFactory.createArtifactRepository( "remote", repository.getUrl(), 
-                                                                             repositoryLayout, snapshotPolicy, 
+
+            artifactRepository = repositoryFactory.createArtifactRepository( "remote", repository.getUrl(),
+                                                                             repositoryLayout, snapshotPolicy,
                                                                              checksumPolicy );
         }
         finally
@@ -260,9 +260,9 @@ public abstract class AbstractArtifactTask
                 try
                 {
                     ClassWorld classWorld = new ClassWorld();
-                    
-                    ClassRealm classRealm = classWorld.newRealm( "plexus.core", getClass().getClassLoader() );
-                    
+
+                    classWorld.newRealm( "plexus.core", getClass().getClassLoader() );
+
                     embedder.start( classWorld );
                 }
                 catch ( PlexusContainerException e )
@@ -273,7 +273,7 @@ public abstract class AbstractArtifactTask
                 {
                     throw new BuildException( "Unable to create embedder ClassRealm", e );
                 }
-                
+
                 getProject().addReference( Embedder.class.getName(), embedder );
             }
         }
@@ -307,18 +307,18 @@ public abstract class AbstractArtifactTask
     protected Pom createDummyPom()
     {
         Model mavenModel = new Model();
-        
+
         mavenModel.setGroupId( "unspecified" );
         mavenModel.setArtifactId( "unspecified" );
         mavenModel.setVersion( "0.0" );
         mavenModel.setPackaging( "jar" );
-        
+
         MavenProject mavenProject = new MavenProject( mavenModel );
-        
+
         Pom pom = new Pom();
-        
+
         pom.setMavenProject( mavenProject );
-        
+
         return pom;
     }
 
@@ -360,8 +360,6 @@ public abstract class AbstractArtifactTask
     {
         ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
-        Artifact artifact = factory.createArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(), null,
-                                                    pom.getPackaging() );
-        return artifact;
+        return factory.createBuildArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(), pom.getPackaging() );
     }
 }

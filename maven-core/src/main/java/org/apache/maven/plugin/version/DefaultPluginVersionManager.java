@@ -601,11 +601,10 @@ public class DefaultPluginVersionManager
     private String resolveMetaVersion( String groupId, String artifactId, List remoteRepositories,
                                        ArtifactRepository localRepository, String metaVersionId )
     {
-        Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, metaVersionId, Artifact.SCOPE_RUNTIME,
-                                                            "pom" );
+        // TODO: check - this was SCOPE_RUNTIME before, now is null
+        Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
 
-        MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, projectBuilder,
-                                                                      artifactFactory );
+        MavenMetadataSource metadataSource = new MavenMetadataSource( projectBuilder, artifactFactory );
 
         String version = null;
         try

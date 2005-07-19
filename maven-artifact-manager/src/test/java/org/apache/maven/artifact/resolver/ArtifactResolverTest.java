@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactComponentTestCase;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.ArrayList;
@@ -82,6 +83,7 @@ public class ArtifactResolverTest
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
+        throws Exception
     {
         // for the anonymous classes
         return super.createArtifact( groupId, artifactId, version, type );
@@ -97,12 +99,20 @@ public class ArtifactResolverTest
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
             public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+                throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
 
                 if ( artifact.getArtifactId().equals( "g" ) )
                 {
-                    dependencies.add( createArtifact( "org.apache.maven", "h", "1.0", "jar" ) );
+                    try
+                    {
+                        dependencies.add( createArtifact( "org.apache.maven", "h", "1.0", "jar" ) );
+                    }
+                    catch ( Exception e )
+                    {
+                        throw new ArtifactMetadataRetrievalException( e );
+                    }
                 }
 
                 return new ResolutionGroup( dependencies, remoteRepositories );
@@ -136,12 +146,20 @@ public class ArtifactResolverTest
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
             public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+                throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
 
                 if ( artifact.getArtifactId().equals( "i" ) )
                 {
-                    dependencies.add( createArtifact( "org.apache.maven", "j", "1.0", "jar" ) );
+                    try
+                    {
+                        dependencies.add( createArtifact( "org.apache.maven", "j", "1.0", "jar" ) );
+                    }
+                    catch ( Exception e )
+                    {
+                        throw new ArtifactMetadataRetrievalException( e );
+                    }
                 }
 
                 return new ResolutionGroup( dependencies, remoteRepositories );

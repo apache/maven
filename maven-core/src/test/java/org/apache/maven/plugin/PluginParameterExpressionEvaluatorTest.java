@@ -17,9 +17,9 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
@@ -66,7 +66,8 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( expected, actual );
     }
 
-    private static MavenSession createSession( MavenProject project, PlexusContainer container, ArtifactRepository repo )
+    private static MavenSession createSession( MavenProject project, PlexusContainer container,
+                                               ArtifactRepository repo )
     {
         return new MavenSession( project, container, new Settings(), repo, new DefaultEventDispatcher(),
                                  Collections.EMPTY_LIST );
@@ -103,7 +104,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         PluginDescriptor pd = new PluginDescriptor();
 
-        Artifact artifact = new DefaultArtifact( "testGroup", "testArtifact", "1.0", Artifact.SCOPE_COMPILE, "jar", null, null );
+        Artifact artifact = createArtifact( "testGroup", "testArtifact", "1.0" );
 
         pd.setArtifacts( Collections.singletonList( artifact ) );
 
@@ -138,9 +139,17 @@ public class PluginParameterExpressionEvaluatorTest
         PlexusContainer container = getContainer();
         MavenSession session = createSession( project, container, repo );
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pluginDescriptor,
-                                                                                          null, container.getLogger(),
-                                                                                          project );
-        return expressionEvaluator;
+        return (ExpressionEvaluator) new PluginParameterExpressionEvaluator( session, pluginDescriptor, null,
+                                                                             container.getLogger(), project );
     }
+
+    protected Artifact createArtifact( String groupId, String artifactId, String version )
+        throws Exception
+    {
+        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+
+        // TODO: used to be SCOPE_COMPILE, check
+        return artifactFactory.createBuildArtifact( groupId, artifactId, version, "jar" );
+    }
+
 }

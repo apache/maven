@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 public class DefaultArtifactFactory
     implements ArtifactFactory
@@ -47,6 +48,49 @@ public class DefaultArtifactFactory
         return createArtifact( groupId, artifactId, version, scope, type, classifier, null );
     }
 
+    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type,
+                                                  String classifier )
+    {
+        return createArtifact( groupId, artifactId, version, null, type, classifier, null );
+    }
+
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                              String scope )
+    {
+        return createArtifact( groupId, artifactId, versionRange, null, type, null, null );
+    }
+
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                              String scope, String inheritedScope )
+    {
+        return createArtifact( groupId, artifactId, versionRange, scope, type, null, inheritedScope );
+    }
+
+    public Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging )
+    {
+        return createArtifact( groupId, artifactId, version, null, packaging, null, null );
+    }
+
+    public Artifact createProjectArtifact( String groupId, String artifactId, String version )
+    {
+        return createProjectArtifact( groupId, artifactId, version, null );
+    }
+
+    public Artifact createParentArtifact( String groupId, String artifactId, String version )
+    {
+        return createProjectArtifact( groupId, artifactId, version );
+    }
+
+    public Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange )
+    {
+        return createArtifact( groupId, artifactId, versionRange, Artifact.SCOPE_RUNTIME, "maven-plugin", null, null );
+    }
+
+    public Artifact createProjectArtifact( String groupId, String artifactId, String version, String scope )
+    {
+        return createArtifact( groupId, artifactId, version, scope, "pom" );
+    }
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                                     String inheritedScope )
     {
@@ -55,6 +99,22 @@ public class DefaultArtifactFactory
 
     private Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,
                                      String classifier, String inheritedScope )
+    {
+        // TODO: better constructor
+        VersionRange versionRange;
+        if ( version != null )
+        {
+            versionRange = new VersionRange( "[" + version + "]" );
+        }
+        else
+        {
+            versionRange = new VersionRange( null );
+        }
+        return createArtifact( groupId, artifactId, versionRange, scope, type, classifier, inheritedScope );
+    }
+
+    private Artifact createArtifact( String groupId, String artifactId, VersionRange versionRange, String scope,
+                                     String type, String classifier, String inheritedScope )
     {
         // TODO: can refactor - inherited scope calculation belongs in the collector, use scope handler
 
@@ -87,6 +147,6 @@ public class DefaultArtifactFactory
 
         ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
 
-        return new DefaultArtifact( groupId, artifactId, version, desiredScope, type, classifier, handler );
+        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler );
     }
 }

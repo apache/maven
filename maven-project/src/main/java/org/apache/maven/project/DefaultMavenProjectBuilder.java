@@ -24,6 +24,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -120,7 +121,7 @@ public class DefaultMavenProjectBuilder
                                                List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-        ArtifactMetadataSource source = new MavenMetadataSource( artifactResolver, this, artifactFactory );
+        ArtifactMetadataSource source = new MavenMetadataSource( this, artifactFactory );
         return buildWithDependencies( projectDescriptor, localRepository, source, externalProfiles );
     }
 
@@ -144,7 +145,7 @@ public class DefaultMavenProjectBuilder
 
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
         Artifact projectArtifact = project.getArtifact();
-        
+
         Map managedVersions = createManagedVersionMap( project.getDependencyManagement() );
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 projectArtifact, managedVersions,
@@ -166,8 +167,9 @@ public class DefaultMavenProjectBuilder
             {
                 Dependency d = (Dependency) i.next();
 
-                Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
-                                                                    d.getScope(), d.getType(), null );
+                Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
+                                                                              new VersionRange( d.getVersion() ),
+                                                                              d.getType(), d.getScope() );
 
                 map.put( d.getManagementKey(), artifact );
             }
@@ -194,7 +196,8 @@ public class DefaultMavenProjectBuilder
         // Always cache files in the source tree over those in the repository
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
-        MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository, Collections.EMPTY_LIST, externalProfiles );
+        MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
+                                      Collections.EMPTY_LIST, externalProfiles );
 
         // Only translate the base directory for files in the source tree
         pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
@@ -216,7 +219,8 @@ public class DefaultMavenProjectBuilder
     {
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-        return build( "Artifact [" + artifact.getId() + "]", model, localRepository, remoteArtifactRepositories, Collections.EMPTY_LIST );
+        return build( "Artifact [" + artifact.getId() + "]", model, localRepository, remoteArtifactRepositories,
+                      Collections.EMPTY_LIST );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -274,14 +278,14 @@ public class DefaultMavenProjectBuilder
         if ( remoteArtifactRepositories == null || remoteArtifactRepositories.isEmpty() )
         {
             aggregatedRemoteWagonRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
-                                                                                       artifactRepositoryFactory,
-                                                                                       container );
+                                                                                        artifactRepositoryFactory,
+                                                                                        container );
         }
         else
         {
             aggregatedRemoteWagonRepositories = remoteArtifactRepositories;
         }
-        
+
         for ( Iterator i = externalProfiles.iterator(); i.hasNext(); )
         {
             Profile externalProfile = (Profile) i.next();
@@ -379,16 +383,16 @@ public class DefaultMavenProjectBuilder
         project.addProfileProperties( profileProperties );
 
         project.setActiveProfiles( activeProfiles );
-        
+
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
-        Artifact projectArtifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),
-                                                                   project.getVersion(), null, project.getPackaging() );
-        
+        Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
+                                                                        project.getVersion(), project.getPackaging() );
+
         project.setArtifact( projectArtifact );
 
-        project.setPluginArtifactRepositories(
-            ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(), artifactRepositoryFactory,
-                                                    container ) );
+        project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(),
+                                                                                       artifactRepositoryFactory,
+                                                                                       container ) );
 
         DistributionManagement dm = model.getDistributionManagement();
         if ( dm != null )
@@ -401,9 +405,9 @@ public class DefaultMavenProjectBuilder
 
         if ( parentProject != null )
         {
-            Artifact parentArtifact = artifactFactory.createArtifact( parentProject.getGroupId(),
-                                                                      parentProject.getArtifactId(),
-                                                                      parentProject.getVersion(), null, "pom" );
+            Artifact parentArtifact = artifactFactory.createProjectArtifact( parentProject.getGroupId(),
+                                                                             parentProject.getArtifactId(),
+                                                                             parentProject.getVersion() );
             project.setParentArtifact( parentArtifact );
         }
 
@@ -415,9 +419,8 @@ public class DefaultMavenProjectBuilder
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            throw new ProjectBuildingException(
-                "Failed to validate POM for \'" + pomLocation + "\'.\n\n  Reason(s):\n" +
-                    validationResult.render( "  " ) );
+            throw new ProjectBuildingException( "Failed to validate POM for \'" + pomLocation +
+                "\'.\n\n  Reason(s):\n" + validationResult.render( "  " ) );
         }
 
         return project;
@@ -431,11 +434,11 @@ public class DefaultMavenProjectBuilder
         {
             List respositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(),
                                                                          artifactRepositoryFactory, container );
-            
+
             for ( Iterator it = respositories.iterator(); it.hasNext(); )
             {
                 ArtifactRepository repository = (ArtifactRepository) it.next();
-                
+
                 if ( !aggregatedRemoteWagonRepositories.contains( repository ) )
                 {
                     aggregatedRemoteWagonRepositories.add( repository );
@@ -473,8 +476,9 @@ public class DefaultMavenProjectBuilder
             // as we go in order to do this.
             // ----------------------------------------------------------------------
 
-            Artifact artifact = artifactFactory.createArtifact( parentModel.getGroupId(), parentModel.getArtifactId(),
-                                                                parentModel.getVersion(), null, "pom" );
+            Artifact artifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
+                                                                      parentModel.getArtifactId(),
+                                                                      parentModel.getVersion() );
 
             model = findModelFromRepository( artifact, aggregatedRemoteWagonRepositories, localRepository );
 
@@ -504,15 +508,13 @@ public class DefaultMavenProjectBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException(
-                "Failed to build model from file '" + file.getAbsolutePath() + "'.\nError: \'" +
-                    e.getLocalizedMessage() + "\'", e );
+            throw new ProjectBuildingException( "Failed to build model from file '" + file.getAbsolutePath() +
+                "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException(
-                "Failed to parse model from file '" + file.getAbsolutePath() + "'.\nError: \'" +
-                    e.getLocalizedMessage() + "\'", e );
+            throw new ProjectBuildingException( "Failed to parse model from file '" + file.getAbsolutePath() +
+                "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         finally
         {
@@ -531,15 +533,13 @@ public class DefaultMavenProjectBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException(
-                "Failed build model from URL \'" + url.toExternalForm() + "\'\nError: \'" + e.getLocalizedMessage() +
-                    "\'", e );
+            throw new ProjectBuildingException( "Failed build model from URL \'" + url.toExternalForm() +
+                "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new ProjectBuildingException(
-                "Failed to parse model from URL \'" + url.toExternalForm() + "\'\nError: \'" + e.getLocalizedMessage() +
-                    "\'", e );
+            throw new ProjectBuildingException( "Failed to parse model from URL \'" + url.toExternalForm() +
+                "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         finally
         {
@@ -580,8 +580,8 @@ public class DefaultMavenProjectBuilder
                 version = p.getVersion();
             }
 
-            Artifact artifact = artifactFactory.createArtifact( p.getGroupId(), p.getArtifactId(), version, null,
-                                                                "maven-plugin" );
+            Artifact artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
+                                                                      new VersionRange( version ) );
             if ( artifact != null )
             {
                 pluginArtifacts.add( artifact );

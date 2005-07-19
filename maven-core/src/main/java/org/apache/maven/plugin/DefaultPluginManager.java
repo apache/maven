@@ -29,6 +29,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.InversionArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
@@ -165,8 +166,8 @@ public class DefaultPluginManager
             String groupId = plugin.getGroupId();
             String artifactId = plugin.getArtifactId();
 
-            plugin.setVersion( pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings,
-                                                                          localRepository ) );
+            plugin.setVersion(
+                pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings, localRepository ) );
         }
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
@@ -174,14 +175,13 @@ public class DefaultPluginManager
         {
             try
             {
-                Artifact pluginArtifact = artifactFactory.createArtifact( plugin.getGroupId(),
-                                                                          plugin.getArtifactId(),
-                                                                          plugin.getVersion(),
-                                                                          Artifact.SCOPE_RUNTIME,
-                                                                          MojoDescriptor.MAVEN_PLUGIN );
+                VersionRange versionRange = new VersionRange( plugin.getVersion() );
+                Artifact pluginArtifact = artifactFactory.createPluginArtifact( plugin.getGroupId(),
+                                                                                plugin.getArtifactId(), versionRange );
 
-                // TODO: [jc; 2005-july-06] what's this for?
-                //plugin.setVersion( pluginArtifact.getBaseVersion() );
+                // I think this ensures the plugin is not resolved multiple times
+                // TODO: put it back
+//                plugin.setVersion( pluginArtifact.getBaseVersion() );
 
                 addPlugin( plugin, pluginArtifact, project, localRepository );
 
@@ -198,10 +198,9 @@ public class DefaultPluginManager
                 String artifactId = plugin.getArtifactId();
                 String version = plugin.getVersion();
 
-                if (
-                    ( groupId == null || artifactId == null || version == null ||
-                        ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
-                            version.equals( e.getVersion() ) ) ) && "maven-plugin".equals( e.getType() ) )
+                if ( ( groupId == null || artifactId == null || version == null || ( groupId.equals( e.getGroupId() ) &&
+                    artifactId.equals( e.getArtifactId() ) && version.equals( e.getVersion() ) ) ) &&
+                    "maven-plugin".equals( e.getType() ) )
                 {
                     throw new PluginNotFoundException( e );
                 }
@@ -222,7 +221,8 @@ public class DefaultPluginManager
         artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
         PlexusContainer child = container.createChildContainer( plugin.getKey(), Collections
-            .singletonList( pluginArtifact.getFile() ), Collections.EMPTY_MAP, Collections.singletonList( pluginCollector ) );
+            .singletonList( pluginArtifact.getFile() ), Collections.EMPTY_MAP,
+                                                        Collections.singletonList( pluginCollector ) );
 
         // this plugin's descriptor should have been discovered in the child creation, so we should be able to
         // circle around and set the artifacts and class realm
@@ -328,10 +328,9 @@ public class DefaultPluginManager
         }
     }
 
-    public List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project,
-                            MavenSession session, ArtifactRepository localRepository )
-        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException,
-        ArtifactResolutionException
+    public List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session,
+                            ArtifactRepository localRepository )
+        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException, ArtifactResolutionException
     {
         Plugin forLookup = new Plugin();
         forLookup.setGroupId( reportPlugin.getGroupId() );
@@ -360,7 +359,8 @@ public class DefaultPluginManager
                     MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, id );
 
                     String executionId = mojoExecution.getExecutionId();
-                    Xpp3Dom dom = project.getReportConfiguration( reportPlugin.getGroupId(), reportPlugin.getArtifactId(), executionId );
+                    Xpp3Dom dom = project.getReportConfiguration( reportPlugin.getGroupId(),
+                                                                  reportPlugin.getArtifactId(), executionId );
 
                     reports.add( getConfiguredMojo( mojoDescriptor, session, dom, project ) );
                 }
@@ -451,8 +451,7 @@ public class DefaultPluginManager
 
             try
             {
-                MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, mavenProjectBuilder,
-                                                                              artifactFactory );
+                MavenMetadataSource metadataSource = new MavenMetadataSource( mavenProjectBuilder, artifactFactory );
 
                 List remoteRepositories = new ArrayList();
 
@@ -543,9 +542,8 @@ public class DefaultPluginManager
                 // ideally, this would be elevated above the true debug output, but below the default INFO level...
                 // [BP] (2004-07-18): need to understand the context more but would prefer this could be either WARN or
                 // removed - shouldn't need DEBUG to diagnose a problem most of the time.
-                getLogger().debug(
-                    "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'" +
-                        mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
+                getLogger().debug( "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'" +
+                    mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
             }
         }
 
@@ -631,9 +629,8 @@ public class DefaultPluginManager
                         }
                         if ( fieldValue != null )
                         {
-                            getLogger().warn(
-                                "DEPRECATED: using default-value to set the default value of field '" +
-                                    parameter.getName() + "'" );
+                            getLogger().warn( "DEPRECATED: using default-value to set the default value of field '" +
+                                parameter.getName() + "'" );
                         }
                     }
                     catch ( NoSuchFieldException e )
@@ -920,14 +917,13 @@ public class DefaultPluginManager
                                                 ArtifactFactory artifactFactory, MavenProject project )
         throws ArtifactResolutionException
     {
-        MavenMetadataSource sourceReader = new MavenMetadataSource( artifactResolver, mavenProjectBuilder,
-                                                                    artifactFactory );
+        MavenMetadataSource sourceReader = new MavenMetadataSource( mavenProjectBuilder, artifactFactory );
 
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
-        Artifact artifact = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(),
-                                                            project.getVersion(), null, project.getPackaging() );
+        Artifact artifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
+                                                                 project.getVersion(), project.getPackaging() );
 
         // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
         // check this with yourkit as a hot spot.

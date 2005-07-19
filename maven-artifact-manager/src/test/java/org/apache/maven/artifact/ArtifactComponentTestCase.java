@@ -16,7 +16,7 @@
 
 package org.apache.maven.artifact;
 
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -56,10 +56,7 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "test", "file://" + f.getPath(),
-                                                                            repoLayout );
-
-        return localRepository;
+        return (ArtifactRepository) new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
     }
 
     protected String getRepositoryLayout()
@@ -77,10 +74,7 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", "file://" + f.getPath(),
-                                                                            repoLayout );
-
-        return localRepository;
+        return (ArtifactRepository) new DefaultArtifactRepository( "local", "file://" + f.getPath(), repoLayout );
     }
 
     protected ArtifactRepository remoteRepository()
@@ -93,11 +87,9 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository repository = new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
-                                                                       ArtifactRepository.SNAPSHOT_POLICY_NEVER,
-                                                                       ArtifactRepository.CHECKSUM_POLICY_WARN );
-
-        return repository;
+        return (ArtifactRepository) new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
+                                                                   ArtifactRepository.SNAPSHOT_POLICY_NEVER,
+                                                                   ArtifactRepository.CHECKSUM_POLICY_WARN );
     }
 
     protected ArtifactRepository badRemoteRepository()
@@ -106,10 +98,7 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        ArtifactRepository repository = new DefaultArtifactRepository( "test", "http://foo.bar/repository",
-                                                                       repoLayout );
-
-        return repository;
+        return (ArtifactRepository) new DefaultArtifactRepository( "test", "http://foo.bar/repository", repoLayout );
     }
 
     protected void assertRemoteArtifactPresent( Artifact artifact )
@@ -242,22 +231,24 @@ public abstract class ArtifactComponentTestCase
     }
 
     protected Artifact createArtifact( String artifactId, String version )
+        throws Exception
     {
         return createArtifact( artifactId, version, "jar" );
     }
 
     protected Artifact createArtifact( String artifactId, String version, String type )
+        throws Exception
     {
-        // TODO: fix handler instantiation
-        return new DefaultArtifact( "org.apache.maven", artifactId, version, null, type, null,
-                                    new DefaultArtifactHandler( type ) );
+        return createArtifact( "org.apache.maven", artifactId, version, type );
     }
 
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
+        throws Exception
     {
-        // TODO: fix handler instantiation
-        return new DefaultArtifact( groupId, artifactId, version, Artifact.SCOPE_COMPILE, type, null,
-                                    new DefaultArtifactHandler( type ) );
+        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+
+        // TODO: used to be SCOPE_COMPILE, check
+        return artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
     }
 
     protected void deleteLocalArtifact( Artifact artifact )
