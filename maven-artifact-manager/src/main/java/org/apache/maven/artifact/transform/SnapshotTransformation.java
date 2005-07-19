@@ -17,13 +17,12 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
-import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -81,7 +80,16 @@ public class SnapshotTransformation
         else if ( isSnapshot( artifact ) )
         {
             SnapshotArtifactMetadata metadata = null;
-            metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null );
+            
+            try
+            {
+                metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null );
+            }
+            catch ( ResourceDoesNotExistException e )
+            {
+                // ignore. We'll be creating this metadata if it doesn't exist...
+            }
+
             metadata.update();
 
             artifact.setVersion( metadata.constructVersion() );
@@ -95,29 +103,9 @@ public class SnapshotTransformation
         return artifact.getVersion().endsWith( SNAPSHOT_VERSION );
     }
 
-    protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
-                                                                    ArtifactRepository remoteRepository,
-                                                                    VersionArtifactMetadata localMetadata )
-        throws ArtifactMetadataRetrievalException
+    protected AbstractVersionArtifactMetadata createMetadata( Artifact artifact )
     {
-        SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
-        try
-        {
-            metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
-        }
-        catch ( ResourceDoesNotExistException e )
-        {
-            // No problem...
-            // this just means that there is no snapshot version file, so we keep timestamp = null, build = 0
-        }
-        return metadata;
+        return new SnapshotArtifactMetadata( artifact );
     }
 
-    protected VersionArtifactMetadata readFromLocalRepository( Artifact artifact, ArtifactRepository localRepository )
-        throws IOException
-    {
-        SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
-        metadata.readFromLocalRepository( localRepository );
-        return metadata;
-    }
 }

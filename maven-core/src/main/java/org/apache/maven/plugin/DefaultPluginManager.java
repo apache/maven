@@ -21,6 +21,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -40,6 +41,9 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.mapping.MavenPluginMappingBuilder;
+import org.apache.maven.plugin.mapping.PluginMappingManagementException;
+import org.apache.maven.plugin.mapping.PluginMappingManager;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
@@ -67,6 +71,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -74,7 +79,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.lang.reflect.Field;
 
 public class DefaultPluginManager
     extends AbstractLogEnabled
@@ -100,6 +104,8 @@ public class DefaultPluginManager
     protected ArtifactResolver artifactResolver;
 
     protected MavenProjectBuilder mavenProjectBuilder;
+    
+    protected MavenPluginMappingBuilder pluginMappingBuilder;
     // END component requirements
 
     public DefaultPluginManager()
@@ -112,8 +118,40 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
+        throws PluginManagerException
     {
         return pluginCollector.getPluginDescriptorForPrefix( prefix );
+    }
+    
+    public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project ) throws PluginManagerException
+    {
+        PluginMappingManager mappingManager = getPluginMappingManager( session, project );
+
+        Plugin plugin = mappingManager.getByPrefix( prefix );
+        
+        if ( plugin == null && !mappingManager.isRefreshed() )
+        {
+            getLogger().info( "Refreshing plugin mapping metadata; looking for plugin with prefix: \'" + prefix + "\'." );
+            
+            try
+            {
+                mappingManager = pluginMappingBuilder.refreshPluginMappingManager( session
+                    .getPluginMappingManager(), project.getPluginArtifactRepositories(), session
+                    .getLocalRepository() );
+            }
+            catch ( RepositoryMetadataManagementException e )
+            {
+                throw new PluginManagerException( "Error refreshing plugin mappings.", e );
+            }
+            catch ( PluginMappingManagementException e )
+            {
+                throw new PluginManagerException( "Error refreshing plugin mappings.", e );
+            }
+            
+            plugin = mappingManager.getByPrefix( prefix );
+        }
+        
+        return plugin;
     }
 
     public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
@@ -929,4 +967,36 @@ public class DefaultPluginManager
         return pluginContainer.lookup( role, roleHint );
     }
 
+    private PluginMappingManager getPluginMappingManager( MavenSession session, MavenProject project ) 
+    throws PluginManagerException
+{
+    PluginMappingManager mappingManager = session.getPluginMappingManager();
+
+    // don't reassemble the plugin mappings if the session has already been configured with them.
+    if ( mappingManager == null )
+    {
+        try
+        {
+            List pluginGroupIds = session.getSettings().getPluginGroups();
+            List pluginRepositories = project.getPluginArtifactRepositories();
+            ArtifactRepository localRepository = session.getLocalRepository();
+
+            mappingManager = pluginMappingBuilder.loadPluginMappings( pluginGroupIds, pluginRepositories,
+                                                                      localRepository );
+
+            // lazily configure this on the session.
+            session.setPluginMappingManager( mappingManager );
+        }
+        catch ( RepositoryMetadataManagementException e )
+        {
+            throw new PluginManagerException( "Cannot load plugin mappings.", e );
+        }
+        catch ( PluginMappingManagementException e )
+        {
+            throw new PluginManagerException( "Cannot load plugin mappings.", e );
+        }
+    }
+    
+    return mappingManager;
+}
 }

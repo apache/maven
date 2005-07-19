@@ -22,6 +22,9 @@
         <requirement>
           <role>org.apache.maven.project.MavenProjectBuilder</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.mapping.MavenPluginMappingBuilder</role>
+        </requirement>
       </requirements>
     </component>
 

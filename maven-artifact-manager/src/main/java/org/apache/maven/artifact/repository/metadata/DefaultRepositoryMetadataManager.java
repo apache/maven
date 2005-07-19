@@ -23,6 +23,12 @@ public class DefaultRepositoryMetadataManager
     // only resolve repository metadata once per session...
     private Map cachedMetadata = new HashMap();
 
+    public void resolveLocally( RepositoryMetadata metadata, ArtifactRepository local )
+        throws RepositoryMetadataManagementException
+    {
+        resolve( metadata, null, local );
+    }
+    
     public void resolve( RepositoryMetadata metadata, ArtifactRepository remote, ArtifactRepository local )
         throws RepositoryMetadataManagementException
     {
@@ -30,29 +36,25 @@ public class DefaultRepositoryMetadataManager
 
         if ( metadataFile == null )
         {
-            metadataFile = constructLocalRepositoryFile( metadata, local, remote.getId() );
+            metadataFile = constructLocalRepositoryFile( metadata, local );
 
-            if ( remote == null )
-            {
-                throw new RepositoryMetadataManagementException( metadata,
-                                                                 "Cannot retrieve repository metadata from null repository." );
-            }
-            else
+            if ( !metadataFile.exists() && remote != null )
             {
                 try
                 {
                     File tempMetadataFile = File.createTempFile( "plugins.xml", null );
-                    
+
                     try
                     {
                         wagonManager.getRepositoryMetadata( metadata, remote, tempMetadataFile );
-                        
-                        if( !metadataFile.exists() || ( metadataFile.lastModified() <= tempMetadataFile.lastModified() ) )
+
+                        if ( !metadataFile.exists()
+                            || ( metadataFile.lastModified() <= tempMetadataFile.lastModified() ) )
                         {
                             if ( !tempMetadataFile.renameTo( metadataFile ) )
                             {
                                 FileUtils.copyFile( tempMetadataFile, metadataFile );
-                                
+
                                 tempMetadataFile.delete();
                             }
                         }
@@ -61,20 +63,18 @@ public class DefaultRepositoryMetadataManager
                     {
                         if ( !metadataFile.exists() )
                         {
-                            throw new RepositoryMetadataManagementException( metadata, "Remote repository metadata not found.",
-                                                                             e );
+                            throw new RepositoryMetadataManagementException( metadata,
+                                                                             "Remote repository metadata not found.", e );
                         }
                         else
                         {
                             String message = "Cannot find " + metadata + " in remote repository - Using local copy.";
-                            
+
                             getLogger().info( message );
-                            
+
                             getLogger().debug( message, e );
                         }
                     }
-                    
-                    metadata.setFile( metadataFile );
                 }
                 catch ( TransferFailedException e )
                 {
@@ -83,9 +83,18 @@ public class DefaultRepositoryMetadataManager
                 }
                 catch ( IOException e )
                 {
-                    throw new RepositoryMetadataManagementException( metadata, "Error constructing temporary metadata download file.", e );
+                    throw new RepositoryMetadataManagementException(
+                                                                     metadata,
+                                                                     "Error constructing temporary metadata download file.",
+                                                                     e );
                 }
             }
+            else
+            {
+                getLogger().info( "Using local copy of " + metadata + " from: " + metadataFile );
+            }
+
+            metadata.setFile( metadataFile );
         }
     }
 
@@ -110,18 +119,7 @@ public class DefaultRepositoryMetadataManager
     public void install( RepositoryMetadata metadata, ArtifactRepository local, String remoteRepositoryId )
         throws RepositoryMetadataManagementException
     {
-        String realignedPath = local.formatAsFile( metadata.getRepositoryPath() );
-
-        realignedPath = realignedPath.replace( File.separatorChar, '/' );
-
-        if ( !realignedPath.startsWith( "/" ) )
-        {
-            realignedPath = "/" + realignedPath;
-        }
-
-        realignedPath = "/REPOSITORY-INF/" + remoteRepositoryId + realignedPath;
-
-        File metadataFile = new File( local.getBasedir(), realignedPath ).getAbsoluteFile();
+        File metadataFile = constructLocalRepositoryFile( metadata, local );
 
         try
         {
@@ -141,20 +139,27 @@ public class DefaultRepositoryMetadataManager
 
     }
 
-    private File constructLocalRepositoryFile( RepositoryMetadata metadata, ArtifactRepository local, String remoteId )
+    public void purgeLocalCopy( RepositoryMetadata metadata, ArtifactRepository local )
+        throws RepositoryMetadataManagementException
+    {
+        File metadataFile = constructLocalRepositoryFile( metadata, local );
+        
+        if ( metadataFile.exists() )
+        {
+            if ( !metadataFile.delete() )
+            {
+                throw new RepositoryMetadataManagementException( metadata, "Failed to purge local copy from: " + metadataFile );
+            }
+        }
+    }
+
+    private File constructLocalRepositoryFile( RepositoryMetadata metadata, ArtifactRepository local )
     {
         String metadataPath = local.formatAsFile( metadata.getRepositoryPath() );
 
-        String realignedPath = metadataPath.replace( File.separatorChar, '/' );
+        metadataPath = metadataPath.replace( File.separatorChar, '/' );
 
-        if ( !realignedPath.startsWith( "/" ) )
-        {
-            realignedPath = "/" + realignedPath;
-        }
-
-        realignedPath = "/REPOSITORY-INF/" + remoteId + realignedPath;
-
-        return new File( local.getBasedir(), realignedPath );
+        return new File( local.getBasedir(), metadataPath );
     }
 
 }

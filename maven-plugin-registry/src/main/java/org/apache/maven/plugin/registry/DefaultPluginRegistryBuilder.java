@@ -58,8 +58,8 @@ public class DefaultPluginRegistryBuilder
         
         globalRegistryFile = getFile( globalRegistryPath, "maven.home", MavenPluginRegistryBuilder.ALT_GLOBAL_PLUGIN_REG_LOCATION );
 
-        getLogger().debug( "Building Maven global-level settings from: '" + globalRegistryFile.getAbsolutePath() + "'" );
-        getLogger().debug( "Building Maven user-level settings from: '" + userRegistryFile.getAbsolutePath() + "'" );
+        getLogger().debug( "Building Maven global-level plugin registry from: '" + globalRegistryFile.getAbsolutePath() + "'" );
+        getLogger().debug( "Building Maven user-level plugin registry from: '" + userRegistryFile.getAbsolutePath() + "'" );
     }
     
     public PluginRegistry buildPluginRegistry()

@@ -12,4 +12,8 @@ public interface MavenPluginMappingBuilder
                                             ArtifactRepository localRepository )
         throws RepositoryMetadataManagementException, PluginMappingManagementException;
 
+    PluginMappingManager refreshPluginMappingManager( PluginMappingManager mappingManager, List pluginRepositories,
+                                                      ArtifactRepository localRepository )
+        throws RepositoryMetadataManagementException, PluginMappingManagementException;
+
 }

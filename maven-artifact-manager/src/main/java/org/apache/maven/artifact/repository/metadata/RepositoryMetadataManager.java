@@ -5,6 +5,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 public interface RepositoryMetadataManager
 {
     
+    void resolveLocally( RepositoryMetadata repositoryMetadata, ArtifactRepository local )
+        throws RepositoryMetadataManagementException;
+
     void resolve( RepositoryMetadata repositoryMetadata, ArtifactRepository remote, ArtifactRepository local )
         throws RepositoryMetadataManagementException;
     
@@ -12,6 +15,9 @@ public interface RepositoryMetadataManager
         throws RepositoryMetadataManagementException;
     
     void install( RepositoryMetadata repositoryMetadata, ArtifactRepository local, String remoteRepositoryId )
+        throws RepositoryMetadataManagementException;
+    
+    void purgeLocalCopy( RepositoryMetadata repositoryMetadata, ArtifactRepository local )
         throws RepositoryMetadataManagementException;
 
 }

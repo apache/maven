@@ -41,8 +41,12 @@ public interface PluginManager
     void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
         throws MojoExecutionException, PluginManagerException, ArtifactResolutionException;
 
-    PluginDescriptor getPluginDescriptorForPrefix( String prefix );
+    PluginDescriptor getPluginDescriptorForPrefix( String prefix )
+        throws PluginManagerException;
 
+    Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project ) 
+        throws PluginManagerException;
+    
     PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                   ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException;

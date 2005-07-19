@@ -29,14 +29,50 @@ public class DefaultPluginMappingBuilder
                                                    ArtifactRepository localRepository )
         throws RepositoryMetadataManagementException, PluginMappingManagementException
     {
-        List pluginGroupIds = new ArrayList( groupIds );
+        return loadPluginMappings( groupIds, pluginRepositories, localRepository, new PluginMappingManager() );
+    }
+
+    public PluginMappingManager refreshPluginMappingManager( PluginMappingManager mappingManager, List pluginRepositories,
+                                                             ArtifactRepository localRepository )
+        throws RepositoryMetadataManagementException, PluginMappingManagementException
+    {
+        // prevent performance drag from abuse of this method.
+        if ( mappingManager.isRefreshed() )
+        {
+            throw new PluginMappingManagementException( "Plugin-mappings have already been refreshed. Cannot re-refresh." );
+        }
         
+        getLogger().info( "Refreshing plugin-mapping metadata..." );
+        
+        List groupIds = new ArrayList();
+        
+        for ( Iterator it = mappingManager.getPluginMaps().iterator(); it.hasNext(); )
+        {
+            PluginMap map = (PluginMap) it.next();
+            
+            String groupId = map.getGroupId();
+            
+            groupIds.add( groupId );
+            
+            repositoryMetadataManager.purgeLocalCopy( new PluginMappingMetadata( groupId ), localRepository );
+        }
+        
+        mappingManager.markRefreshed();
+        
+        return loadPluginMappings(groupIds, pluginRepositories, localRepository, mappingManager);
+    }
+
+    private PluginMappingManager loadPluginMappings( List groupIds, List pluginRepositories,
+                                                    ArtifactRepository localRepository,
+                                                    PluginMappingManager mappingManager )
+        throws RepositoryMetadataManagementException, PluginMappingManagementException
+    {
+        List pluginGroupIds = new ArrayList( groupIds );
+
         if ( !pluginGroupIds.contains( "org.apache.maven.plugins" ) )
         {
             pluginGroupIds.add( "org.apache.maven.plugins" );
         }
-        
-        PluginMappingManager mappingManager = new PluginMappingManager();
 
         if ( pluginGroupIds != null )
         {
@@ -57,8 +93,9 @@ public class DefaultPluginMappingBuilder
                 }
                 catch ( RepositoryMetadataManagementException e )
                 {
-                    getLogger().warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
-                    
+                    getLogger()
+                        .warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
+
                     getLogger().debug( "Error resolving plugin-mapping metadata for groupId: " + groupId + ".", e );
                 }
             }
@@ -67,9 +104,10 @@ public class DefaultPluginMappingBuilder
         return mappingManager;
     }
 
-    private PluginMap readPluginMap( File mappingFile ) throws PluginMappingManagementException
+    private PluginMap readPluginMap( File mappingFile )
+        throws PluginMappingManagementException
     {
-        if( mappingFile.exists() )
+        if ( mappingFile.exists() )
         {
             Reader fileReader = null;
             try
@@ -77,8 +115,8 @@ public class DefaultPluginMappingBuilder
                 fileReader = new FileReader( mappingFile );
 
                 PluginMappingXpp3Reader mappingReader = new PluginMappingXpp3Reader();
-                
-                return mappingReader.read(fileReader);
+
+                return mappingReader.read( fileReader );
             }
             catch ( IOException e )
             {
@@ -113,7 +151,7 @@ public class DefaultPluginMappingBuilder
             try
             {
                 repositoryMetadataManager.resolve( metadata, repository, localRepository );
-                
+
                 // reset this to keep it from getting in the way when we succeed but not on first repo...
                 repositoryException = null;
 

@@ -12,6 +12,7 @@ public class PluginMappingManager
 {
 
     private List mappings = new ArrayList();
+    private boolean refreshed = false;
 
     private Map pluginDefinitionsByPrefix = new HashMap();
     private Map pluginDefinitionsByPackaging = new HashMap();
@@ -20,9 +21,34 @@ public class PluginMappingManager
     {
         mappings.add( pluginMap );
         
-        // flush the cache.
-        pluginDefinitionsByPrefix = null;
-        pluginDefinitionsByPackaging = null;
+        clearCache();
+    }
+    
+    public void markRefreshed()
+    {
+        this.refreshed = true;
+    }
+    
+    public boolean isRefreshed()
+    {
+        return refreshed;
+    }
+    
+    public List getPluginMaps()
+    {
+        return mappings;
+    }
+    
+    public void clear()
+    {
+        this.mappings = null;
+        clearCache();
+    }
+
+    private void clearCache()
+    {
+        this.pluginDefinitionsByPackaging = null;
+        this.pluginDefinitionsByPrefix = null;
     }
 
     public Plugin getByPrefix( String pluginPrefix )

@@ -18,9 +18,11 @@ package org.apache.maven.artifact.transform;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.IOException;
@@ -101,8 +103,19 @@ public abstract class AbstractVersionTransformation
                     getLogger().info(
                         artifact.getArtifactId() + ": checking for updates from " + remoteRepository.getId() );
 
-                    VersionArtifactMetadata remoteMetadata = retrieveFromRemoteRepository( artifact, remoteRepository, localMetadata );
-
+                    VersionArtifactMetadata remoteMetadata;
+                    
+                    try
+                    {
+                        remoteMetadata = retrieveFromRemoteRepository( artifact, remoteRepository, localMetadata );
+                    }
+                    catch ( ResourceDoesNotExistException e )
+                    {
+                        getLogger().debug( "Error resolving artifact version from metadata.", e );
+                        
+                        continue;
+                    }
+                    
                     int difference = remoteMetadata.compareTo( localMetadata );
                     if ( difference > 0 )
                     {
@@ -124,13 +137,13 @@ public abstract class AbstractVersionTransformation
         }
 
         String version = localMetadata.constructVersion();
-
+        
         // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
         if ( !artifact.getFile().exists() || localMetadata.newerThanFile( artifact.getFile() ) )
         {
             if ( getLogger().isInfoEnabled() && !alreadyResolved )
             {
-                if ( !version.equals( artifact.getBaseVersion() ) )
+                if ( version != null && !version.equals( artifact.getBaseVersion() ) )
                 {
                     String message = artifact.getArtifactId() + ": resolved to version " + version;
                     if ( artifact.getRepository() != null )
@@ -158,14 +171,27 @@ public abstract class AbstractVersionTransformation
         }
     }
 
-    protected abstract VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
-                                                                             ArtifactRepository remoteRepository,
-                                                                             VersionArtifactMetadata localMetadata )
-        throws ArtifactMetadataRetrievalException;
+    protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
+                                                                    ArtifactRepository remoteRepository,
+                                                                    VersionArtifactMetadata localMetadata )
+        throws ArtifactMetadataRetrievalException, ResourceDoesNotExistException
+    {
+        AbstractVersionArtifactMetadata metadata = createMetadata( artifact );
+        
+        metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
+        
+        return metadata;
+    }
+    
+    protected abstract AbstractVersionArtifactMetadata createMetadata( Artifact artifact );
 
-    protected abstract VersionArtifactMetadata readFromLocalRepository( Artifact artifact,
-                                                                        ArtifactRepository localRepository )
-        throws IOException;
+    private VersionArtifactMetadata readFromLocalRepository( Artifact artifact, ArtifactRepository localRepository )
+        throws IOException
+    {
+        AbstractVersionArtifactMetadata metadata = createMetadata( artifact );
+        metadata.readFromLocalRepository( localRepository );
+        return metadata;
+    }
 
     private Date getMidnightBoundary()
     {

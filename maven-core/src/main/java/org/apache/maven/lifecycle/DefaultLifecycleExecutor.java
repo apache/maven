@@ -570,7 +570,26 @@ public class DefaultLifecycleExecutor
 
             // Steps for retrieving the plugin model instance:
             // 1. request directly from the plugin collector by prefix
-            pluginDescriptor = pluginManager.getPluginDescriptorForPrefix( prefix );
+            try
+            {
+                pluginDescriptor = pluginManager.getPluginDescriptorForPrefix( prefix );
+            }
+            catch ( PluginManagerException e )
+            {
+                throw new LifecycleExecutionException( "Cannot resolve plugin-prefix: \'" + prefix + "\' from plugin collector.", e );
+            }
+            
+            if ( pluginDescriptor == null )
+            {
+                try
+                {
+                    plugin = pluginManager.getPluginDefinitionForPrefix( prefix, session, project );
+                }
+                catch ( PluginManagerException e )
+                {
+                    throw new LifecycleExecutionException( "Cannot resolve plugin-prefix: \'" + prefix + "\' from plugin mappings metadata.", e );
+                }
+            }
 
             if ( pluginDescriptor != null )
             {
@@ -581,15 +600,7 @@ public class DefaultLifecycleExecutor
                 plugin.setVersion( pluginDescriptor.getVersion() );
             }
 
-            // 2. use the plugin resolver to resolve the prefix in the search groups
-            if ( plugin == null )
-            {
-                PluginMappingManager mappingManager = getPluginMappingManager( session, project );
-
-                plugin = mappingManager.getByPrefix( prefix );
-            }
-
-            // 3. default to o.a.m.plugins and maven-<prefix>-plugin
+            // 2. default to o.a.m.plugins and maven-<prefix>-plugin
             if ( plugin == null )
             {
                 plugin = new Plugin();

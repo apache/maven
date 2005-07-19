@@ -17,7 +17,7 @@ public class PluginMappingMetadata
     {
         this.groupId = groupId;
     }
-
+    
     public String getRepositoryPath()
     {
         return groupId + "/" + PLUGIN_MAPPING_FILE;
