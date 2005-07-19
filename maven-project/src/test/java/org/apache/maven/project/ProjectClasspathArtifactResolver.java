@@ -27,6 +27,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -81,7 +82,7 @@ public class ProjectClasspathArtifactResolver
             try
             {
                 String scope = artifact.getArtifactId().substring( "scope-".length() );
-                if ( artifact.getGroupId().equals( "maven-test" ) )
+                if ( "maven-test".equals( artifact.getGroupId() ) )
                 {
                     String name = "/projects/scope/transitive-" + scope + "-dep.xml";
                     r = new InputStreamReader( getClass().getResourceAsStream( name ) );
@@ -108,7 +109,15 @@ public class ProjectClasspathArtifactResolver
                 IOUtil.close( r );
             }
 
-            Set artifacts = createArtifacts( model.getDependencies(), artifact.getScope() );
+            Set artifacts = null;
+            try
+            {
+                artifacts = createArtifacts( model.getDependencies(), artifact.getScope() );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new ArtifactMetadataRetrievalException( e );
+            }
 
             List artifactRepositories;
             try
@@ -125,6 +134,7 @@ public class ProjectClasspathArtifactResolver
         }
 
         protected Set createArtifacts( List dependencies, String inheritedScope )
+            throws InvalidVersionSpecificationException
         {
             Set projectArtifacts = new HashSet();
 
@@ -132,9 +142,9 @@ public class ProjectClasspathArtifactResolver
             {
                 Dependency d = (Dependency) i.next();
 
+                VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                 Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                              new VersionRange( d.getVersion() ),
-                                                                              d.getType(), d.getScope(), 
+                                                                              versionRange, d.getType(), d.getScope(),
                                                                               inheritedScope );
                 if ( artifact != null )
                 {

@@ -142,11 +142,11 @@ public class DefaultArtifactVersion
         return qualifier;
     }
 
-    public void parseVersion( String version )
+    public final void parseVersion( String version )
     {
         int index = version.indexOf( "-" );
 
-        String part1 = null;
+        String part1;
         String part2 = null;
 
         if ( index < 0 )
@@ -171,22 +171,40 @@ public class DefaultArtifactVersion
             }
         }
 
-        StringTokenizer tok = new StringTokenizer( part1, "." );
-        majorVersion = Integer.valueOf( tok.nextToken() );
-        if ( tok.hasMoreTokens() )
+        if ( part1.indexOf( "." ) < 0 )
         {
-            minorVersion = Integer.valueOf( tok.nextToken() );
+            try
+            {
+                majorVersion = Integer.valueOf( part1 );
+            }
+            catch ( NumberFormatException e )
+            {
+                // qualifier is the whole version, including "-"
+                qualifier = version;
+            }
         }
-        if ( tok.hasMoreTokens() )
+        else
         {
-            incrementalVersion = Integer.valueOf( tok.nextToken() );
+            StringTokenizer tok = new StringTokenizer( part1, "." );
+            majorVersion = Integer.valueOf( tok.nextToken() );
+            if ( tok.hasMoreTokens() )
+            {
+                minorVersion = Integer.valueOf( tok.nextToken() );
+            }
+            if ( tok.hasMoreTokens() )
+            {
+                incrementalVersion = Integer.valueOf( tok.nextToken() );
+            }
         }
     }
 
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
-        buf.append( majorVersion );
+        if ( majorVersion != null )
+        {
+            buf.append( majorVersion );
+        }
         if ( minorVersion != null )
         {
             buf.append( "." );
@@ -204,7 +222,10 @@ public class DefaultArtifactVersion
         }
         else if ( qualifier != null )
         {
-            buf.append( "-" );
+            if ( buf.length() > 0 )
+            {
+                buf.append( "-" );
+            }
             buf.append( qualifier );
         }
         return buf.toString();

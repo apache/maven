@@ -22,10 +22,10 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -62,7 +62,7 @@ public class MavenMetadataSource
     {
         // TODO: only metadata is really needed - resolve as metadata
         Artifact pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                               artifact.getVersion(), artifact.getScope() );
+                                                                      artifact.getVersion(), artifact.getScope() );
 
         // TODO: this a very thin wrapper around a project builder - is it needed?
         List dependencies = null;
@@ -85,10 +85,15 @@ public class MavenMetadataSource
         {
             throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
         }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+        }
     }
 
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
                                        ArtifactFilter dependencyFilter )
+        throws InvalidVersionSpecificationException
     {
         Set projectArtifacts = new HashSet();
 
@@ -97,8 +102,10 @@ public class MavenMetadataSource
             Dependency d = (Dependency) i.next();
 
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                          new VersionRange( d.getVersion() ),
-                                                                          d.getType(), d.getScope(), inheritedScope );
+                                                                          VersionRange.createFromVersionSpec(
+                                                                              d.getVersion() ), d.getType(),
+                                                                                                d.getScope(),
+                                                                                                inheritedScope );
 
             if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
             {

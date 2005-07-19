@@ -24,6 +24,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -158,6 +159,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private Map createManagedVersionMap( DependencyManagement dependencyManagement )
+        throws ProjectBuildingException
     {
         Map map;
         if ( dependencyManagement != null && dependencyManagement.getDependencies() != null )
@@ -167,11 +169,18 @@ public class DefaultMavenProjectBuilder
             {
                 Dependency d = (Dependency) i.next();
 
-                Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                              new VersionRange( d.getVersion() ),
-                                                                              d.getType(), d.getScope() );
-
-                map.put( d.getManagementKey(), artifact );
+                try
+                {
+                    VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+                    Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
+                                                                                  versionRange, d.getType(),
+                                                                                  d.getScope() );
+                    map.put( d.getManagementKey(), artifact );
+                }
+                catch ( InvalidVersionSpecificationException e )
+                {
+                    throw new ProjectBuildingException( "Unable to parse dependency version", e );
+                }
             }
         }
         else
@@ -499,8 +508,7 @@ public class DefaultMavenProjectBuilder
         try
         {
             reader = new FileReader( file );
-            Model model = modelReader.read( reader );
-            return model;
+            return modelReader.read( reader );
         }
         catch ( FileNotFoundException e )
         {
@@ -558,11 +566,20 @@ public class DefaultMavenProjectBuilder
     }
 
     protected Set createArtifacts( List dependencies )
+        throws ProjectBuildingException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
+        try
+        {
+            return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new ProjectBuildingException( "Unable to parse dependency version", e );
+        }
     }
 
     protected Set createPluginArtifacts( List plugins )
+        throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
 
@@ -580,8 +597,17 @@ public class DefaultMavenProjectBuilder
                 version = p.getVersion();
             }
 
-            Artifact artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
-                                                                      new VersionRange( version ) );
+            Artifact artifact = null;
+            try
+            {
+                artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
+                                                                 VersionRange.createFromVersionSpec( version ) );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new ProjectBuildingException( "Unable to parse plugin version", e );
+            }
+
             if ( artifact != null )
             {
                 pluginArtifacts.add( artifact );
@@ -630,9 +656,7 @@ public class DefaultMavenProjectBuilder
     {
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
 
-        Model superModel = readModel( url );
-
-        return superModel;
+        return readModel( url );
     }
 
     public void contextualize( Context context )

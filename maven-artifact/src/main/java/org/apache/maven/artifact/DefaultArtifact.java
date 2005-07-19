@@ -80,7 +80,7 @@ public class DefaultArtifact
         this.artifactId = artifactId;
 
         // TODO: this would be where we might have a min/max instead
-        this.version = versionRange != null ? versionRange.getRecommendedVersion() : null;
+        this.version = versionRange != null ? versionRange.getRecommendedVersion().toString() : null;
 
         this.artifactHandler = artifactHandler;
 

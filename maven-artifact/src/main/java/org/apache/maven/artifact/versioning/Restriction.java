@@ -24,15 +24,16 @@ package org.apache.maven.artifact.versioning;
  */
 public class Restriction
 {
-    private final String lowerBound;
+    private final ArtifactVersion lowerBound;
 
     private final boolean lowerBoundInclusive;
 
-    private final String upperBound;
+    private final ArtifactVersion upperBound;
 
     private final boolean upperBoundInclusive;
 
-    public Restriction( String lowerBound, boolean lowerBoundInclusive, String upperBound, boolean upperBoundInclusive )
+    public Restriction( ArtifactVersion lowerBound, boolean lowerBoundInclusive, ArtifactVersion upperBound,
+                        boolean upperBoundInclusive )
     {
         this.lowerBound = lowerBound;
         this.lowerBoundInclusive = lowerBoundInclusive;
@@ -40,7 +41,7 @@ public class Restriction
         this.upperBoundInclusive = upperBoundInclusive;
     }
 
-    public String getLowerBound()
+    public ArtifactVersion getLowerBound()
     {
         return lowerBound;
     }
@@ -50,7 +51,7 @@ public class Restriction
         return lowerBoundInclusive;
     }
 
-    public String getUpperBound()
+    public ArtifactVersion getUpperBound()
     {
         return upperBound;
     }

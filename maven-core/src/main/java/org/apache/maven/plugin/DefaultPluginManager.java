@@ -29,6 +29,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.InversionArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -105,7 +106,7 @@ public class DefaultPluginManager
     protected ArtifactResolver artifactResolver;
 
     protected MavenProjectBuilder mavenProjectBuilder;
-    
+
     protected MavenPluginMappingBuilder pluginMappingBuilder;
     // END component requirements
 
@@ -123,17 +124,19 @@ public class DefaultPluginManager
     {
         return pluginCollector.getPluginDescriptorForPrefix( prefix );
     }
-    
-    public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project ) throws PluginManagerException
+
+    public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
+        throws PluginManagerException
     {
         PluginMappingManager mappingManager = getPluginMappingManager( session, project );
 
         Plugin plugin = mappingManager.getByPrefix( prefix );
-        
+
         if ( plugin == null && !mappingManager.isRefreshed() )
         {
-            getLogger().info( "Refreshing plugin mapping metadata; looking for plugin with prefix: \'" + prefix + "\'." );
-            
+            getLogger().info(
+                "Refreshing plugin mapping metadata; looking for plugin with prefix: \'" + prefix + "\'." );
+
             try
             {
                 mappingManager = pluginMappingBuilder.refreshPluginMappingManager( session
@@ -148,10 +151,10 @@ public class DefaultPluginManager
             {
                 throw new PluginManagerException( "Error refreshing plugin mappings.", e );
             }
-            
+
             plugin = mappingManager.getByPrefix( prefix );
         }
-        
+
         return plugin;
     }
 
@@ -175,7 +178,7 @@ public class DefaultPluginManager
         {
             try
             {
-                VersionRange versionRange = new VersionRange( plugin.getVersion() );
+                VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
                 Artifact pluginArtifact = artifactFactory.createPluginArtifact( plugin.getGroupId(),
                                                                                 plugin.getArtifactId(), versionRange );
 
@@ -198,9 +201,12 @@ public class DefaultPluginManager
                 String artifactId = plugin.getArtifactId();
                 String version = plugin.getVersion();
 
-                if ( ( groupId == null || artifactId == null || version == null || ( groupId.equals( e.getGroupId() ) &&
-                    artifactId.equals( e.getArtifactId() ) && version.equals( e.getVersion() ) ) ) &&
-                    "maven-plugin".equals( e.getType() ) )
+                if ( groupId == null || artifactId == null || version == null )
+                {
+                    throw new PluginNotFoundException( e );
+                }
+                else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
+                    version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
                 {
                     throw new PluginNotFoundException( e );
                 }
@@ -208,6 +214,11 @@ public class DefaultPluginManager
                 {
                     throw e;
                 }
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(),
+                                                            "Invalid version specification", e );
             }
         }
 
@@ -256,7 +267,7 @@ public class DefaultPluginManager
 
         String goalName = mojoDescriptor.getFullGoalName();
 
-        Mojo plugin = null;
+        Mojo plugin;
 
         try
         {
@@ -477,7 +488,7 @@ public class DefaultPluginManager
                 {
                     Artifact artifact = (Artifact) it.next();
 
-                    if ( artifact != pluginArtifact )
+                    if ( !artifact.equals( pluginArtifact ) )
                     {
                         pluginContainer.addJarResource( artifact.getFile() );
                     }
@@ -534,7 +545,7 @@ public class DefaultPluginManager
 
             if ( parameterMap.containsKey( child.getName() ) )
             {
-                extractedConfiguration.addChild( DefaultPluginManager.copyConfiguration( child ) );
+                extractedConfiguration.addChild( copyConfiguration( child ) );
             }
             else
             {
@@ -711,7 +722,7 @@ public class DefaultPluginManager
         for ( int i = 0; i < children.length; i++ )
         {
             PlexusConfiguration child = children[i];
-            PlexusConfiguration childDom = (XmlPlexusConfiguration) dominant.getChild( child.getName(), false );
+            PlexusConfiguration childDom = dominant.getChild( child.getName(), false );
             if ( childDom != null )
             {
                 mergeConfiguration( childDom, child );
@@ -803,22 +814,24 @@ public class DefaultPluginManager
     private Field findPluginField( Class clazz, String key )
         throws NoSuchFieldException
     {
-        try
+        Field field = null;
+
+        while ( field == null )
         {
-            return clazz.getDeclaredField( key );
-        }
-        catch ( NoSuchFieldException e )
-        {
-            Class superclass = clazz.getSuperclass();
-            if ( superclass != Object.class )
+            try
             {
-                return findPluginField( superclass, key );
+                field = clazz.getDeclaredField( key );
             }
-            else
+            catch ( NoSuchFieldException e )
             {
-                throw e;
+                clazz = clazz.getSuperclass();
+                if ( clazz.equals( Object.class ) )
+                {
+                    throw e;
+                }
             }
         }
+        return field;
     }
 
     public static String createPluginParameterRequiredMessage( MojoDescriptor mojo, Parameter parameter,
@@ -963,36 +976,36 @@ public class DefaultPluginManager
         return pluginContainer.lookup( role, roleHint );
     }
 
-    private PluginMappingManager getPluginMappingManager( MavenSession session, MavenProject project ) 
-    throws PluginManagerException
-{
-    PluginMappingManager mappingManager = session.getPluginMappingManager();
-
-    // don't reassemble the plugin mappings if the session has already been configured with them.
-    if ( mappingManager == null )
+    private PluginMappingManager getPluginMappingManager( MavenSession session, MavenProject project )
+        throws PluginManagerException
     {
-        try
-        {
-            List pluginGroupIds = session.getSettings().getPluginGroups();
-            List pluginRepositories = project.getPluginArtifactRepositories();
-            ArtifactRepository localRepository = session.getLocalRepository();
+        PluginMappingManager mappingManager = session.getPluginMappingManager();
 
-            mappingManager = pluginMappingBuilder.loadPluginMappings( pluginGroupIds, pluginRepositories,
-                                                                      localRepository );
+        // don't reassemble the plugin mappings if the session has already been configured with them.
+        if ( mappingManager == null )
+        {
+            try
+            {
+                List pluginGroupIds = session.getSettings().getPluginGroups();
+                List pluginRepositories = project.getPluginArtifactRepositories();
+                ArtifactRepository localRepository = session.getLocalRepository();
 
-            // lazily configure this on the session.
-            session.setPluginMappingManager( mappingManager );
+                mappingManager = pluginMappingBuilder.loadPluginMappings( pluginGroupIds, pluginRepositories,
+                                                                          localRepository );
+
+                // lazily configure this on the session.
+                session.setPluginMappingManager( mappingManager );
+            }
+            catch ( RepositoryMetadataManagementException e )
+            {
+                throw new PluginManagerException( "Cannot load plugin mappings.", e );
+            }
+            catch ( PluginMappingManagementException e )
+            {
+                throw new PluginManagerException( "Cannot load plugin mappings.", e );
+            }
         }
-        catch ( RepositoryMetadataManagementException e )
-        {
-            throw new PluginManagerException( "Cannot load plugin mappings.", e );
-        }
-        catch ( PluginMappingManagementException e )
-        {
-            throw new PluginManagerException( "Cannot load plugin mappings.", e );
-        }
+
+        return mappingManager;
     }
-    
-    return mappingManager;
-}
 }

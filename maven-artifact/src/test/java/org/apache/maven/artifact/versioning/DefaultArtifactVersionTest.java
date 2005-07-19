@@ -75,7 +75,15 @@ public class DefaultArtifactVersionTest
         assertEquals( "check major version", 1, version.getMajorVersion() );
         assertEquals( "check minor version", 2, version.getMinorVersion() );
         assertEquals( "check incremental version", 0, version.getIncrementalVersion() );
+        assertEquals( "check build number", 0, version.getBuildNumber() );
         assertEquals( "check qualifier", "alpha-1-20050205.060708-1", version.getQualifier() );
+
+        version = new DefaultArtifactVersion( "RELEASE" );
+        assertEquals( "check major version", 0, version.getMajorVersion() );
+        assertEquals( "check minor version", 0, version.getMinorVersion() );
+        assertEquals( "check incremental version", 0, version.getIncrementalVersion() );
+        assertEquals( "check build number", 0, version.getBuildNumber() );
+        assertEquals( "check qualifier", "RELEASE", version.getQualifier() );
     }
 
     public void testVersionComparing()

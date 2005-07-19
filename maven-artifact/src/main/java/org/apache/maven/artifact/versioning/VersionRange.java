@@ -28,17 +28,17 @@ import java.util.List;
  */
 public class VersionRange
 {
-    private final String recommendedVersion;
+    private final ArtifactVersion recommendedVersion;
 
     private final List restrictions;
 
-    private VersionRange( String recommendedVersion, List restrictions )
+    private VersionRange( ArtifactVersion recommendedVersion, List restrictions )
     {
         this.recommendedVersion = recommendedVersion;
         this.restrictions = restrictions;
     }
 
-    public String getRecommendedVersion()
+    public ArtifactVersion getRecommendedVersion()
     {
         return recommendedVersion;
     }
@@ -51,9 +51,9 @@ public class VersionRange
     public static VersionRange createFromVersionSpec( String spec )
         throws InvalidVersionSpecificationException
     {
-        List exclusions = new ArrayList();
+        List restrictions = new ArrayList();
         String process = spec;
-        String version = null;
+        ArtifactVersion version = null;
 
         while ( process.startsWith( "[" ) || process.startsWith( "(" ) )
         {
@@ -74,7 +74,7 @@ public class VersionRange
                 throw new InvalidVersionSpecificationException( "Unbounded range: " + spec );
             }
 
-            exclusions.add( parseRestriction( process.substring( 0, index + 1 ) ) );
+            restrictions.add( parseRestriction( process.substring( 0, index + 1 ) ) );
 
             process = process.substring( index + 1 ).trim();
 
@@ -86,18 +86,18 @@ public class VersionRange
 
         if ( process.length() > 0 )
         {
-            if ( exclusions.size() > 0 )
+            if ( restrictions.size() > 0 )
             {
                 throw new InvalidVersionSpecificationException(
                     "Only fully-qualified sets allowed in multiple set scenario: " + spec );
             }
             else
             {
-                version = process;
+                version = new DefaultArtifactVersion( process );
             }
         }
 
-        return new VersionRange( version, exclusions );
+        return new VersionRange( version, restrictions );
     }
 
     private static Restriction parseRestriction( String spec )
@@ -118,7 +118,10 @@ public class VersionRange
             {
                 throw new InvalidVersionSpecificationException( "Single version must be surrounded by []: " + spec );
             }
-            restriction = new Restriction( process, lowerBoundInclusive, process, upperBoundInclusive );
+
+            ArtifactVersion version = new DefaultArtifactVersion( process );
+
+            restriction = new Restriction( version, lowerBoundInclusive, version, upperBoundInclusive );
         }
         else
         {
@@ -129,16 +132,18 @@ public class VersionRange
                 throw new InvalidVersionSpecificationException( "Range cannot have identical boundaries: " + spec );
             }
 
-            if ( lowerBound.length() == 0 )
+            ArtifactVersion lowerVersion = null;
+            if ( lowerBound.length() > 0 )
             {
-                lowerBound = null;
+                lowerVersion = new DefaultArtifactVersion( lowerBound );
             }
-            if ( upperBound.length() == 0 )
+            ArtifactVersion upperVersion = null;
+            if ( upperBound.length() > 0 )
             {
-                upperBound = null;
+                upperVersion = new DefaultArtifactVersion( upperBound );
             }
 
-            restriction = new Restriction( lowerBound, lowerBoundInclusive, upperBound, upperBoundInclusive );
+            restriction = new Restriction( lowerVersion, lowerBoundInclusive, upperVersion, upperBoundInclusive );
         }
 
         return restriction;
@@ -146,6 +151,27 @@ public class VersionRange
 
     public static VersionRange createFromVersion( String version )
     {
+        return new VersionRange( new DefaultArtifactVersion( version ), Collections.EMPTY_LIST );
+    }
+
+    public VersionRange restrict( VersionRange restriction )
+    {
+        ArtifactVersion version = max( recommendedVersion, restriction.getRecommendedVersion() );
+
+        // TODO
+
         return new VersionRange( version, Collections.EMPTY_LIST );
+    }
+
+    private ArtifactVersion max( ArtifactVersion v1, ArtifactVersion v2 )
+    {
+        if ( v1.compareTo( v2 ) > 0 )
+        {
+            return v1;
+        }
+        else
+        {
+            return v2;
+        }
     }
 }

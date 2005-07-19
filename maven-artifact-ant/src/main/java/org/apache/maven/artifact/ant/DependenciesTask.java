@@ -23,7 +23,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Repository;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.tools.ant.BuildException;
@@ -56,6 +58,9 @@ public class DependenciesTask
 
     private boolean verbose;
 
+    /**
+     * @noinspection RefusedBequest
+     */
     public void execute()
     {
         ArtifactRepository localRepo = createLocalArtifactRepository();
@@ -79,7 +84,7 @@ public class DependenciesTask
 
             for ( Iterator i = pom.getRepositories().iterator(); i.hasNext(); )
             {
-                org.apache.maven.model.Repository pomRepository = (org.apache.maven.model.Repository) i.next();
+                Repository pomRepository = (Repository) i.next();
 
                 remoteRepositories.add( createAntRemoteRepository( pomRepository ) );
             }
@@ -91,7 +96,15 @@ public class DependenciesTask
             pom = createDummyPom();
         }
 
-        Set artifacts = MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
+        Set artifacts;
+        try
+        {
+            artifacts = MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new BuildException( "Invalid version specification", e );
+        }
 
         log( "Resolving dependencies..." );
 
