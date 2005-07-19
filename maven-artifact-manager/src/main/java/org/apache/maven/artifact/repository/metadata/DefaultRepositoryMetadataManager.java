@@ -116,7 +116,7 @@ public class DefaultRepositoryMetadataManager
 
     }
 
-    public void install( RepositoryMetadata metadata, ArtifactRepository local, String remoteRepositoryId )
+    public void install( RepositoryMetadata metadata, ArtifactRepository local )
         throws RepositoryMetadataManagementException
     {
         File metadataFile = constructLocalRepositoryFile( metadata, local );

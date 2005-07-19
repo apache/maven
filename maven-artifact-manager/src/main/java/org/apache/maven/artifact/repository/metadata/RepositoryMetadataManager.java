@@ -14,7 +14,7 @@ public interface RepositoryMetadataManager
     void deploy( RepositoryMetadata repositoryMetadata, ArtifactRepository remote )
         throws RepositoryMetadataManagementException;
     
-    void install( RepositoryMetadata repositoryMetadata, ArtifactRepository local, String remoteRepositoryId )
+    void install( RepositoryMetadata repositoryMetadata, ArtifactRepository local )
         throws RepositoryMetadataManagementException;
     
     void purgeLocalCopy( RepositoryMetadata repositoryMetadata, ArtifactRepository local )

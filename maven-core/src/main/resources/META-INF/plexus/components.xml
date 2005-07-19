@@ -189,14 +189,13 @@
       <configuration>
         <!-- START SNIPPET: maven-plugin-lifecycle -->
         <phases>
-          <validate>plugin:validatePom</validate>
           <generate-resources>plugin:descriptor</generate-resources>
           <process-resources>resources:resources</process-resources>
           <compile>compiler:compile</compile>
           <process-test-resources>resources:testResources</process-test-resources>
           <test-compile>compiler:testCompile</test-compile>
           <test>surefire:test</test>
-          <package>jar:jar,plugin:generateUpdatedMapping,plugin:addPluginArtifactMetadata</package>
+          <package>jar:jar,plugin:addPluginArtifactMetadata</package>
           <install>install:install,plugin:installMapping</install>
           <deploy>deploy:deploy,plugin:deployMapping</deploy>
         </phases>
