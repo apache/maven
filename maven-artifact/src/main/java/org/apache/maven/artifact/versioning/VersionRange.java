@@ -18,6 +18,7 @@ package org.apache.maven.artifact.versioning;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -178,14 +179,47 @@ public class VersionRange
     {
         ArtifactVersion version = max( recommendedVersion, restriction.getRecommendedVersion() );
 
-        // TODO
+        List r1 = this.restrictions;
+        List r2 = restriction.restrictions;
+        List restrictions = Collections.EMPTY_LIST;
+        if ( !r1.isEmpty() || !r2.isEmpty() )
+        {
+            // TODO: amalgamate
+            restrictions = new ArrayList( r1.size() + r2.size() );
+            restrictions.addAll( r1 );
+            restrictions.addAll( r2 );
 
-        return new VersionRange( version, Collections.EMPTY_LIST );
+            boolean found = false;
+            for ( Iterator i = restrictions.iterator(); i.hasNext() && !found; )
+            {
+                Restriction r = (Restriction) i.next();
+
+                if ( r.containsVersion( version ) )
+                {
+                    found = true;
+                }
+            }
+
+            if ( !found )
+            {
+                version = null;
+            }
+        }
+
+        return new VersionRange( version, restrictions );
     }
 
     private ArtifactVersion max( ArtifactVersion v1, ArtifactVersion v2 )
     {
-        if ( v1.compareTo( v2 ) > 0 )
+        if ( v1 == null )
+        {
+            return v2;
+        }
+        if ( v2 == null )
+        {
+            return v1;
+        }
+        else if ( v1.compareTo( v2 ) > 0 )
         {
             return v1;
         }
