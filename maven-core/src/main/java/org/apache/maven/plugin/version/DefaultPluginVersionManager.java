@@ -56,7 +56,6 @@ public class DefaultPluginVersionManager
     extends AbstractLogEnabled
     implements PluginVersionManager
 {
-
     private MavenPluginRegistryBuilder mavenPluginRegistryBuilder;
 
     private ArtifactResolver artifactResolver;
@@ -71,7 +70,7 @@ public class DefaultPluginVersionManager
     private PluginRegistry pluginRegistry;
 
     public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
-                                       ArtifactRepository localRepository )
+                                        ArtifactRepository localRepository )
         throws PluginVersionResolutionException
     {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
@@ -103,11 +102,12 @@ public class DefaultPluginVersionManager
                 //  a. the CLI switch to force plugin updates is set, OR BOTH OF THE FOLLOWING:
                 //  b. the CLI switch to suppress plugin updates is NOT set, AND
                 //  c. the update interval for the plugin has triggered an update check.
-                if ( Boolean.TRUE.equals( pluginUpdateOverride )
-                    || ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
+                if ( Boolean.TRUE.equals( pluginUpdateOverride ) ||
+                    ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
                 {
                     updatedVersion = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(),
-                                                         localRepository, ReleaseArtifactTransformation.RELEASE_VERSION );
+                                                         localRepository,
+                                                         ReleaseArtifactTransformation.RELEASE_VERSION );
 
                     if ( StringUtils.isNotEmpty( updatedVersion ) && !updatedVersion.equals( version ) )
                     {
@@ -125,8 +125,7 @@ public class DefaultPluginVersionManager
                         else
                         {
                             getLogger().info(
-                                              "Plugin \'" + constructPluginKey( groupId, artifactId )
-                                                  + "\' has updates." );
+                                "Plugin \'" + constructPluginKey( groupId, artifactId ) + "\' has updates." );
                         }
                     }
                 }
@@ -138,8 +137,8 @@ public class DefaultPluginVersionManager
         // are we using the LATEST metadata to resolve plugin version?
         Boolean rtCheckLatest = settingsRTInfo.getCheckLatestPluginVersion();
 
-        boolean checkLatestMetadata = Boolean.TRUE.equals( rtCheckLatest )
-            || ( !Boolean.FALSE.equals( rtCheckLatest ) && Boolean.valueOf( pluginRegistry.getCheckLatest() )
+        boolean checkLatestMetadata = Boolean.TRUE.equals( rtCheckLatest ) ||
+            ( !Boolean.FALSE.equals( rtCheckLatest ) && Boolean.valueOf( pluginRegistry.getCheckLatest() )
                 .booleanValue() );
 
         // third pass...if we're checking for latest install/deploy, retrieve the version for LATEST metadata and also 
@@ -147,8 +146,8 @@ public class DefaultPluginVersionManager
         if ( StringUtils.isEmpty( version ) && checkLatestMetadata )
         {
             // 1. resolve the version to be used
-            version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(),
-                                          localRepository, LatestArtifactTransformation.LATEST_VERSION );
+            version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(), localRepository,
+                                          LatestArtifactTransformation.LATEST_VERSION );
 
             // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
             updatedVersion = version;
@@ -163,8 +162,8 @@ public class DefaultPluginVersionManager
         if ( StringUtils.isEmpty( version ) )
         {
             // 1. resolve the version to be used
-            version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(),
-                                          localRepository, ReleaseArtifactTransformation.RELEASE_VERSION );
+            version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(), localRepository,
+                                          ReleaseArtifactTransformation.RELEASE_VERSION );
 
             // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
             updatedVersion = version;
@@ -212,8 +211,8 @@ public class DefaultPluginVersionManager
             //      a. the registry is declared to be in autoUpdate mode
             //
             // NOTE: This is only the default value; it may be changed as the result of prompting the user.
-            boolean persistUpdate = forcePersist
-                || ( promptToPersist && !Boolean.FALSE.equals( pluginUpdateOverride ) && ( inInteractiveMode || autoUpdate ) );
+            boolean persistUpdate = forcePersist || ( promptToPersist &&
+                !Boolean.FALSE.equals( pluginUpdateOverride ) && ( inInteractiveMode || autoUpdate ) );
 
             // retrieve the apply-to-all flag, if it's been set previously.
             Boolean applyToAll = settings.getRuntimeInfo().getApplyToAllPluginUpdates();
@@ -227,8 +226,8 @@ public class DefaultPluginVersionManager
             //
             // NOTE: We're incorporating here, to make the usages of this check more consistent and 
             // resistant to change.
-            promptToPersist = promptToPersist && pluginUpdateOverride == null && applyToAll == null
-                && inInteractiveMode;
+            promptToPersist = promptToPersist && pluginUpdateOverride == null && applyToAll == null &&
+                inInteractiveMode;
 
             if ( promptToPersist )
             {
@@ -280,7 +279,7 @@ public class DefaultPluginVersionManager
             else
             {
                 SimpleDateFormat format = new SimpleDateFormat(
-                                                                org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
+                    org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
 
                 try
                 {
@@ -290,9 +289,8 @@ public class DefaultPluginVersionManager
                 }
                 catch ( ParseException e )
                 {
-                    getLogger().warn(
-                                      "Last-checked date for plugin {" + constructPluginKey( groupId, artifactId )
-                                          + "} is invalid. Checking for updates." );
+                    getLogger().warn( "Last-checked date for plugin {" + constructPluginKey( groupId, artifactId ) +
+                        "} is invalid. Checking for updates." );
 
                     return true;
                 }
@@ -311,7 +309,7 @@ public class DefaultPluginVersionManager
     }
 
     private boolean promptToPersistPluginUpdate( String version, String updatedVersion, String groupId,
-                                                String artifactId, Settings settings )
+                                                 String artifactId, Settings settings )
         throws PluginVersionResolutionException
     {
         try
@@ -412,13 +410,13 @@ public class DefaultPluginVersionManager
 
             writeUserRegistry( groupId, artifactId, pluginRegistry );
 
-            getLogger().warn(
-                              "Plugin version: " + rejectedVersion + " added to your rejectedVersions list.\n"
-                                  + "You will not be prompted for this version again.\n\nPlugin: " + pluginKey );
+            getLogger().warn( "Plugin version: " + rejectedVersion + " added to your rejectedVersions list.\n" +
+                "You will not be prompted for this version again.\n\nPlugin: " + pluginKey );
         }
         else
         {
-            getLogger().warn( "Cannot add rejectedVersion entry for: " + rejectedVersion + ".\n\nPlugin: " + pluginKey );
+            getLogger().warn(
+                "Cannot add rejectedVersion entry for: " + rejectedVersion + ".\n\nPlugin: " + pluginKey );
         }
     }
 
@@ -440,7 +438,7 @@ public class DefaultPluginVersionManager
     }
 
     private org.apache.maven.plugin.registry.Plugin getPlugin( String groupId, String artifactId,
-                                                              PluginRegistry pluginRegistry )
+                                                               PluginRegistry pluginRegistry )
     {
         Map pluginsByKey = null;
 
@@ -512,16 +510,15 @@ public class DefaultPluginVersionManager
             if ( PluginRegistry.GLOBAL_LEVEL.equals( plugin.getSourceLevel() ) )
             {
                 // do nothing. We don't rewrite the globals, under any circumstances.
-                getLogger().warn(
-                                  "Cannot update registered version for plugin {" + groupId + ":" + artifactId
-                                      + "}; it is specified in the global registry." );
+                getLogger().warn( "Cannot update registered version for plugin {" + groupId + ":" + artifactId +
+                    "}; it is specified in the global registry." );
             }
             else
             {
                 plugin.setUseVersion( version );
 
                 SimpleDateFormat format = new SimpleDateFormat(
-                                                                org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
+                    org.apache.maven.plugin.registry.Plugin.LAST_CHECKED_DATE_FORMAT );
 
                 plugin.setLastChecked( format.format( new Date() ) );
             }
@@ -563,9 +560,7 @@ public class DefaultPluginVersionManager
             catch ( IOException e )
             {
                 // TODO: should we soften this to a warning??
-                throw new PluginVersionResolutionException(
-                                                            groupId,
-                                                            artifactId,
+                throw new PluginVersionResolutionException( groupId, artifactId,
                                                             "Cannot rewrite user-level plugin-registry.xml with new plugin version.",
                                                             e );
             }
@@ -604,13 +599,13 @@ public class DefaultPluginVersionManager
     }
 
     private String resolveMetaVersion( String groupId, String artifactId, List remoteRepositories,
-                                      ArtifactRepository localRepository, String metaVersionId )
-        throws PluginVersionResolutionException
+                                       ArtifactRepository localRepository, String metaVersionId )
     {
         Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, metaVersionId, Artifact.SCOPE_RUNTIME,
                                                             "pom" );
 
-        MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, projectBuilder, artifactFactory );
+        MavenMetadataSource metadataSource = new MavenMetadataSource( artifactResolver, projectBuilder,
+                                                                      artifactFactory );
 
         String version = null;
         try
