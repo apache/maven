@@ -147,6 +147,7 @@ public class VersionRangeTest
         assertEquals( CHECK_VERSION_RECOMMENDATION, "1.1", mergedRange.getRecommendedVersion().toString() );
         assertEquals( CHECK_NUM_RESTRICTIONS, 0, mergedRange.getRestrictions().size() );
 
+        // TODO: test reversed restrictions on all below
         range1 = VersionRange.createFromVersionSpec( "[1.0,)" );
         range2 = VersionRange.createFromVersionSpec( "1.1" );
         mergedRange = range1.restrict( range2 );
@@ -254,6 +255,163 @@ public class VersionRangeTest
         assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
         assertEquals( CHECK_UPPER_BOUND, "1.0", restriction.getUpperBound().toString() );
         assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "(,1.0], [1.1,)" );
+        range2 = VersionRange.createFromVersionSpec( "1.2" );
+        mergedRange = range1.restrict( range2 );
+        assertEquals( CHECK_VERSION_RECOMMENDATION, "1.2", mergedRange.getRecommendedVersion().toString() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 2, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertNull( CHECK_LOWER_BOUND, restriction.getLowerBound() );
+        assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.0", restriction.getUpperBound().toString() );
+        assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+        restriction = (Restriction) restrictions.get( 1 );
+        assertEquals( CHECK_LOWER_BOUND, "1.1", restriction.getLowerBound().toString() );
+        assertTrue( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertNull( CHECK_UPPER_BOUND, restriction.getUpperBound() );
+        assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "(,1.0], [1.1,)" );
+        range2 = VersionRange.createFromVersionSpec( "1.0.5" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 2, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertNull( CHECK_LOWER_BOUND, restriction.getLowerBound() );
+        assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.0", restriction.getUpperBound().toString() );
+        assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+        restriction = (Restriction) restrictions.get( 1 );
+        assertEquals( CHECK_LOWER_BOUND, "1.1", restriction.getLowerBound().toString() );
+        assertTrue( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertNull( CHECK_UPPER_BOUND, restriction.getUpperBound() );
+        assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "(,1.1), (1.1,)" );
+        range2 = VersionRange.createFromVersionSpec( "1.1" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 2, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertNull( CHECK_LOWER_BOUND, restriction.getLowerBound() );
+        assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.1", restriction.getUpperBound().toString() );
+        assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+        restriction = (Restriction) restrictions.get( 1 );
+        assertEquals( CHECK_LOWER_BOUND, "1.1", restriction.getLowerBound().toString() );
+        assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertNull( CHECK_UPPER_BOUND, restriction.getUpperBound() );
+        assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "[1.1,1.3]" );
+        range2 = VersionRange.createFromVersionSpec( "(1.1,)" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertEquals( CHECK_LOWER_BOUND, "1.1", restriction.getLowerBound().toString() );
+        assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.3", restriction.getUpperBound().toString() );
+        assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "(,1.3)" );
+        range2 = VersionRange.createFromVersionSpec( "[1.2,1.3]" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertEquals( CHECK_LOWER_BOUND, "1.2", restriction.getLowerBound().toString() );
+        assertTrue( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.3", restriction.getUpperBound().toString() );
+        assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "[1.1,1.3]" );
+        range2 = VersionRange.createFromVersionSpec( "[1.2,)" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertEquals( CHECK_LOWER_BOUND, "1.2", restriction.getLowerBound().toString() );
+        assertTrue( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.3", restriction.getUpperBound().toString() );
+        assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "(,1.3]" );
+        range2 = VersionRange.createFromVersionSpec( "[1.2,1.4]" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertEquals( CHECK_LOWER_BOUND, "1.2", restriction.getLowerBound().toString() );
+        assertTrue( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.3", restriction.getUpperBound().toString() );
+        assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "(1.2,1.3]" );
+        range2 = VersionRange.createFromVersionSpec( "[1.1,1.4]" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertEquals( CHECK_LOWER_BOUND, "1.2", restriction.getLowerBound().toString() );
+        assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.3", restriction.getUpperBound().toString() );
+        assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "(1.2,1.3)" );
+        range2 = VersionRange.createFromVersionSpec( "[1.1,1.4]" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertEquals( CHECK_LOWER_BOUND, "1.2", restriction.getLowerBound().toString() );
+        assertFalse( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.3", restriction.getUpperBound().toString() );
+        assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "[1.2,1.3)" );
+        range2 = VersionRange.createFromVersionSpec( "[1.1,1.4]" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertEquals( CHECK_LOWER_BOUND, "1.2", restriction.getLowerBound().toString() );
+        assertTrue( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.3", restriction.getUpperBound().toString() );
+        assertFalse( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        range1 = VersionRange.createFromVersionSpec( "[1.0,1.1]" );
+        range2 = VersionRange.createFromVersionSpec( "[1.1,1.4]" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
+        restriction = (Restriction) restrictions.get( 0 );
+        assertEquals( CHECK_LOWER_BOUND, "1.1", restriction.getLowerBound().toString() );
+        assertTrue( CHECK_LOWER_BOUND_INCLUSIVE, restriction.isLowerBoundInclusive() );
+        assertEquals( CHECK_UPPER_BOUND, "1.1", restriction.getUpperBound().toString() );
+        assertTrue( CHECK_UPPER_BOUND_INCLUSIVE, restriction.isUpperBoundInclusive() );
+
+        // TODO: specify this differently from no restriction - no restriction should be null, or one restriction with null ends?
+        range1 = VersionRange.createFromVersionSpec( "[1.0,1.1)" );
+        range2 = VersionRange.createFromVersionSpec( "[1.1,1.4]" );
+        mergedRange = range1.restrict( range2 );
+        assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
+        restrictions = mergedRange.getRestrictions();
+        assertEquals( CHECK_NUM_RESTRICTIONS, 0, restrictions.size() );
+
+        // TODO: multiple on one side, multiple on both sides, boundaries
     }
 
     private void checkInvalidRange( String version )

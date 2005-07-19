@@ -181,14 +181,22 @@ public class VersionRange
 
         List r1 = this.restrictions;
         List r2 = restriction.restrictions;
-        List restrictions = Collections.EMPTY_LIST;
-        if ( !r1.isEmpty() || !r2.isEmpty() )
+        List restrictions;
+        if ( r1.isEmpty() )
         {
-            // TODO: amalgamate
-            restrictions = new ArrayList( r1.size() + r2.size() );
-            restrictions.addAll( r1 );
-            restrictions.addAll( r2 );
+            restrictions = r2;
+        }
+        else if ( r2.isEmpty() )
+        {
+            restrictions = r1;
+        }
+        else
+        {
+            restrictions = intersection( r1, r2 );
+        }
 
+        if ( version != null && restrictions.size() > 0 )
+        {
             boolean found = false;
             for ( Iterator i = restrictions.iterator(); i.hasNext() && !found; )
             {
@@ -207,6 +215,155 @@ public class VersionRange
         }
 
         return new VersionRange( version, restrictions );
+    }
+
+    private List intersection( List r1, List r2 )
+    {
+        List restrictions = new ArrayList( Math.min( r1.size(), r2.size() ) );
+        Iterator i1 = r1.iterator();
+        Iterator i2 = r2.iterator();
+        Restriction res1 = (Restriction) i1.next();
+        Restriction res2 = (Restriction) i2.next();
+
+        boolean done = false;
+        while ( !done )
+        {
+            if ( res1.getLowerBound() == null || res2.getUpperBound() == null ||
+                res1.getLowerBound().compareTo( res2.getUpperBound() ) <= 0 )
+            {
+                if ( res1.getUpperBound() == null || res2.getLowerBound() == null ||
+                    res1.getUpperBound().compareTo( res2.getLowerBound() ) >= 0 )
+                {
+                    ArtifactVersion lower;
+                    ArtifactVersion upper;
+                    boolean lowerInclusive;
+                    boolean upperInclusive;
+
+                    // overlaps
+                    if ( res1.getLowerBound() == null )
+                    {
+                        lower = res2.getLowerBound();
+                        lowerInclusive = res2.isLowerBoundInclusive();
+                    }
+                    else if ( res2.getLowerBound() == null )
+                    {
+                        lower = res1.getLowerBound();
+                        lowerInclusive = res1.isLowerBoundInclusive();
+                    }
+                    else
+                    {
+                        int comparison = res1.getLowerBound().compareTo( res2.getLowerBound() );
+                        if ( comparison < 0 )
+                        {
+                            lower = res2.getLowerBound();
+                            lowerInclusive = res2.isLowerBoundInclusive();
+                        }
+                        else if ( comparison == 0 )
+                        {
+                            lower = res1.getLowerBound();
+                            lowerInclusive = res1.isLowerBoundInclusive() && res2.isLowerBoundInclusive();
+                        }
+                        else
+                        {
+                            lower = res1.getLowerBound();
+                            lowerInclusive = res1.isLowerBoundInclusive();
+                        }
+                    }
+
+                    if ( res1.getUpperBound() == null )
+                    {
+                        upper = res2.getUpperBound();
+                        upperInclusive = res2.isUpperBoundInclusive();
+                    }
+                    else if ( res2.getUpperBound() == null )
+                    {
+                        upper = res1.getUpperBound();
+                        upperInclusive = res1.isUpperBoundInclusive();
+                    }
+                    else
+                    {
+                        int comparison = res1.getUpperBound().compareTo( res2.getUpperBound() );
+                        if ( comparison < 0 )
+                        {
+                            upper = res1.getUpperBound();
+                            upperInclusive = res1.isUpperBoundInclusive();
+                        }
+                        else if ( comparison == 0 )
+                        {
+                            upper = res1.getUpperBound();
+                            upperInclusive = res1.isUpperBoundInclusive() && res2.isUpperBoundInclusive();
+                        }
+                        else
+                        {
+                            upper = res2.getUpperBound();
+                            upperInclusive = res2.isUpperBoundInclusive();
+                        }
+                    }
+
+                    // don't add if they are equal and one is not inclusive
+                    if ( lower == null || upper == null || lower.compareTo( upper ) != 0 )
+                    {
+                        restrictions.add( new Restriction( lower, lowerInclusive, upper, upperInclusive ) );
+                    }
+                    else if ( lowerInclusive && upperInclusive )
+                    {
+                        restrictions.add( new Restriction( lower, lowerInclusive, upper, upperInclusive ) );
+                    }
+
+                    //noinspection ObjectEquality
+                    if ( upper == res2.getUpperBound() )
+                    {
+                        // advance res2
+                        if ( i2.hasNext() )
+                        {
+                            res2 = (Restriction) i2.next();
+                        }
+                        else
+                        {
+                            done = true;
+                        }
+                    }
+                    else
+                    {
+                        // advance res1
+                        if ( i1.hasNext() )
+                        {
+                            res1 = (Restriction) i1.next();
+                        }
+                        else
+                        {
+                            done = true;
+                        }
+                    }
+                }
+                else
+                {
+                    // move on to next in r1
+                    if ( i1.hasNext() )
+                    {
+                        res1 = (Restriction) i1.next();
+                    }
+                    else
+                    {
+                        done = true;
+                    }
+                }
+            }
+            else
+            {
+                // move on to next in r2
+                if ( i2.hasNext() )
+                {
+                    res2 = (Restriction) i2.next();
+                }
+                else
+                {
+                    done = true;
+                }
+            }
+        }
+
+        return restrictions;
     }
 
     private ArtifactVersion max( ArtifactVersion v1, ArtifactVersion v2 )
