@@ -25,9 +25,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -115,9 +115,10 @@ public class MavenCli
 
         initializeSystemProperties( commandLine );
 
-        if( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
-            System.setProperty(ProfileActivationUtils.ACTIVE_PROFILE_IDS, commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES ) );
+            System.setProperty( ProfileActivationUtils.ACTIVE_PROFILE_IDS,
+                                commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES ) );
         }
 
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
@@ -192,8 +193,8 @@ public class MavenCli
             settings.setInteractiveMode( false );
         }
 
-        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES )
-            || commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
+        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) ||
+            commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
         {
             settings.getRuntimeInfo().setPluginUpdateOverride( Boolean.TRUE );
         }
@@ -201,7 +202,7 @@ public class MavenCli
         {
             settings.getRuntimeInfo().setPluginUpdateOverride( Boolean.FALSE );
         }
-        
+
         if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_LATEST_CHECK ) )
         {
             settings.getRuntimeInfo().setCheckLatestPluginVersion( Boolean.TRUE );
@@ -210,7 +211,7 @@ public class MavenCli
         {
             settings.getRuntimeInfo().setCheckLatestPluginVersion( Boolean.FALSE );
         }
-        
+
         if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_REGISTRY ) )
         {
             settings.setUsePluginRegistry( false );
@@ -309,9 +310,9 @@ public class MavenCli
         }
     }
 
-    private static MavenExecutionRequest createRequest( List files, Embedder embedder,
-                                                        CommandLine commandLine, Settings settings,
-                                                        EventDispatcher eventDispatcher, LoggerManager manager )
+    private static MavenExecutionRequest createRequest( List files, Embedder embedder, CommandLine commandLine,
+                                                        Settings settings, EventDispatcher eventDispatcher,
+                                                        LoggerManager manager )
         throws ComponentLookupException
     {
         MavenExecutionRequest request = null;
@@ -412,13 +413,13 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
         {
-            System.out.println( "+ Enabling strict checksum verification on all artifact downloads.");
+            System.out.println( "+ Enabling strict checksum verification on all artifact downloads." );
 
             artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepository.CHECKSUM_POLICY_FAIL );
         }
         else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
         {
-            System.out.println( "+ Disabling strict checksum verification on all artifact downloads.");
+            System.out.println( "+ Disabling strict checksum verification on all artifact downloads." );
 
             artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepository.CHECKSUM_POLICY_WARN );
         }
@@ -506,14 +507,11 @@ public class MavenCli
 
         public static final char DEBUG = 'X';
 
-        // TODO: [jc] Is there a better switch than '-e' for this?
         public static final char ERRORS = 'e';
 
         public static final char HELP = 'h';
 
         public static final char VERSION = 'v';
-
-//        public static final char LIST_GOALS = 'g';
 
         private Options options = null;
 
@@ -526,13 +524,13 @@ public class MavenCli
         public static final String FORCE_PLUGIN_UPDATES = "check-plugin-updates";
 
         public static final String FORCE_PLUGIN_UPDATES2 = "update-plugins";
-        
+
         public static final String SUPPRESS_PLUGIN_UPDATES = "no-plugin-updates";
-        
+
         public static final String SUPPRESS_PLUGIN_REGISTRY = "no-plugin-registry";
-        
+
         public static final String FORCE_PLUGIN_LATEST_CHECK = "check-plugin-latest";
-        
+
         public static final String SUPPRESS_PLUGIN_LATEST_CHECK = "no-plugin-latest";
 
         public static final char CHECKSUM_FAILURE_POLICY = 'C';
@@ -542,20 +540,24 @@ public class MavenCli
         public CLIManager()
         {
             options = new Options();
-            options.addOption( OptionBuilder.withLongOpt( "define" ).hasArg().withDescription(
-                "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
-            options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create(
-                OFFLINE ) );
+            options.addOption(
+                OptionBuilder.withLongOpt( "define" ).hasArg().withDescription( "Define a system property" ).create(
+                    SET_SYSTEM_PROPERTY ) );
+            options.addOption(
+                OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create( OFFLINE ) );
 //            options.addOption( OptionBuilder.withLongOpt( "mojoDescriptors" ).withDescription(
 //                "Display available mojoDescriptors" ).create( LIST_GOALS ) );
-            options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create(
-                HELP ) );
-            options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
-                VERSION ) );
-            options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
-                DEBUG ) );
-            options.addOption( OptionBuilder.withLongOpt( "errors" ).withDescription(
-                "Produce execution error messages" ).create( ERRORS ) );
+            options.addOption(
+                OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create( HELP ) );
+            options.addOption(
+                OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
+                    VERSION ) );
+            options.addOption(
+                OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
+                    DEBUG ) );
+            options.addOption(
+                OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create(
+                    ERRORS ) );
             options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
                 "Execute goals for project found in the reactor" ).create( REACTOR ) );
             options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(
@@ -563,20 +565,30 @@ public class MavenCli
             options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription(
                 "Update all snapshots regardless of repository policies" ).create( UPDATE_SNAPSHOTS ) );
             options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription(
-                "Comma-delimited list of profiles to activate").hasArg().create( ACTIVATE_PROFILES ) );
-            
-            options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription( "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
-            
-            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_UPDATES ).withDescription( "Force upToDate check for any relevant registered plugins" ).create() );
-            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_UPDATES2 ).withDescription( "Synonym for " + FORCE_PLUGIN_UPDATES ).create() );
-            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_UPDATES ).withDescription( "Suppress upToDate check for any relevant registered plugins" ).create() );
-            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_LATEST_CHECK ).withDescription( "Force checking of LATEST metadata for plugin versions" ).create() );
-            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_LATEST_CHECK ).withDescription( "Suppress checking of LATEST metadata for plugin versions" ).create() );
-            
-            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_REGISTRY ).withDescription( "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create() );
-            
-            options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription( "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
-            options.addOption( OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create( CHECKSUM_WARNING_POLICY ) );
+                "Comma-delimited list of profiles to activate" ).hasArg().create( ACTIVATE_PROFILES ) );
+
+            options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription(
+                "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
+
+            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_UPDATES ).withDescription(
+                "Force upToDate check for any relevant registered plugins" ).create( "cpu" ) );
+            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_UPDATES2 ).withDescription(
+                "Synonym for " + FORCE_PLUGIN_UPDATES ).create( "up" ) );
+            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_UPDATES ).withDescription(
+                "Suppress upToDate check for any relevant registered plugins" ).create( "npu" ) );
+            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_LATEST_CHECK ).withDescription(
+                "Force checking of LATEST metadata for plugin versions" ).create( "cpl" ) );
+            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_LATEST_CHECK ).withDescription(
+                "Suppress checking of LATEST metadata for plugin versions" ).create( "npl" ) );
+
+            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_REGISTRY ).withDescription(
+                "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( "npr" ) );
+
+            options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription(
+                "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
+            options.addOption(
+                OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create(
+                    CHECKSUM_WARNING_POLICY ) );
         }
 
         public CommandLine parse( String[] args )
