@@ -186,14 +186,24 @@ public class DefaultArtifactVersion
         else
         {
             StringTokenizer tok = new StringTokenizer( part1, "." );
-            majorVersion = Integer.valueOf( tok.nextToken() );
-            if ( tok.hasMoreTokens() )
+            try
             {
-                minorVersion = Integer.valueOf( tok.nextToken() );
+                majorVersion = Integer.valueOf( tok.nextToken() );
+                if ( tok.hasMoreTokens() )
+                {
+                    minorVersion = Integer.valueOf( tok.nextToken() );
+                }
+                if ( tok.hasMoreTokens() )
+                {
+                    incrementalVersion = Integer.valueOf( tok.nextToken() );
+                }
             }
-            if ( tok.hasMoreTokens() )
+            catch ( NumberFormatException e )
             {
-                incrementalVersion = Integer.valueOf( tok.nextToken() );
+                // qualifier is the whole version, including "-"
+                qualifier = version;
+                majorVersion = null;
+                minorVersion = null;
             }
         }
     }
