@@ -80,7 +80,7 @@ public class DefaultArtifact
         this.artifactId = artifactId;
 
         // TODO: this would be where we might have a min/max instead
-        this.version = versionRange.getVersion();
+        this.version = versionRange != null ? versionRange.getRecommendedVersion() : null;
 
         this.artifactHandler = artifactHandler;
 
@@ -188,8 +188,7 @@ public class DefaultArtifact
 
     public String getId()
     {
-        return getDependencyConflictId() + ( hasClassifier() ? ( ":" + getClassifier() ) : "" ) + ":" +
-            getBaseVersion();
+        return getDependencyConflictId() + ( hasClassifier() ? ":" + getClassifier() : "" ) + ":" + getBaseVersion();
     }
 
     public String getDependencyConflictId()

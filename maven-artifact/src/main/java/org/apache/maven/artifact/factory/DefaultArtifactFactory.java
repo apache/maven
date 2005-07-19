@@ -101,14 +101,10 @@ public class DefaultArtifactFactory
                                      String classifier, String inheritedScope )
     {
         // TODO: better constructor
-        VersionRange versionRange;
+        VersionRange versionRange = null;
         if ( version != null )
         {
-            versionRange = new VersionRange( "[" + version + "]" );
-        }
-        else
-        {
-            versionRange = new VersionRange( null );
+            versionRange = VersionRange.createFromVersion( version );
         }
         return createArtifact( groupId, artifactId, versionRange, scope, type, classifier, inheritedScope );
     }
@@ -127,13 +123,11 @@ public class DefaultArtifactFactory
         {
             return null;
         }
-
-        // vvv added to retain compile scope. Remove if you want compile inherited as runtime
         else if ( Artifact.SCOPE_COMPILE.equals( scope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
         {
+            // added to retain compile scope. Remove if you want compile inherited as runtime
             desiredScope = Artifact.SCOPE_COMPILE;
         }
-        // ^^^ added to retain compile scope. Remove if you want compile inherited as runtime
 
         if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
         {
