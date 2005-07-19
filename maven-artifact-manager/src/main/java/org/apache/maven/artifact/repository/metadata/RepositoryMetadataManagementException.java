@@ -8,14 +8,14 @@ public class RepositoryMetadataManagementException
 
     public RepositoryMetadataManagementException( RepositoryMetadata metadata, String message, Throwable cause )
     {
-        super( "Failed to resolve repository metadata: " + metadata + ". Error was: " + cause.getMessage(), cause );
+        super( "Failed to resolve repository metadata: " + metadata + ".\n\nOriginal message: " + message + "\n\nError was: " + cause.getMessage(), cause );
         
         this.metadata = metadata;
     }
 
     public RepositoryMetadataManagementException( RepositoryMetadata metadata, String message )
     {
-        super( "Failed to resolve repository metadata: " + metadata + "." );
+        super( "Failed to resolve repository metadata: " + metadata + ".\n\nOriginal message: " + message );
         
         this.metadata = metadata;
     }

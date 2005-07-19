@@ -1,6 +1,7 @@
 package org.apache.maven.plugin.mapping;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.InvalidRepositoryMetadataException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.plugin.mapping.io.xpp3.PluginMappingXpp3Reader;
@@ -107,6 +108,8 @@ public class DefaultPluginMappingBuilder
     private PluginMap readPluginMap( File mappingFile )
         throws PluginMappingManagementException
     {
+        PluginMap result = null;
+        
         if ( mappingFile.exists() )
         {
             Reader fileReader = null;
@@ -116,7 +119,7 @@ public class DefaultPluginMappingBuilder
 
                 PluginMappingXpp3Reader mappingReader = new PluginMappingXpp3Reader();
 
-                return mappingReader.read( fileReader );
+                result = mappingReader.read( fileReader );
             }
             catch ( IOException e )
             {
@@ -131,10 +134,8 @@ public class DefaultPluginMappingBuilder
                 IOUtil.close( fileReader );
             }
         }
-        else
-        {
-            return null;
-        }
+        
+        return result;
     }
 
     private File resolveMappingMetadata( String groupId, List pluginRepositories, ArtifactRepository localRepository )
@@ -155,7 +156,16 @@ public class DefaultPluginMappingBuilder
                 // reset this to keep it from getting in the way when we succeed but not on first repo...
                 repositoryException = null;
 
-                break;
+                File metadataFile = metadata.getFile();
+                
+                if ( metadataFile != null && metadataFile.exists() )
+                {
+                    break;
+                }
+            }
+            catch ( InvalidRepositoryMetadataException e )
+            {
+                repositoryMetadataManager.purgeLocalCopy( metadata, localRepository );
             }
             catch ( RepositoryMetadataManagementException e )
             {

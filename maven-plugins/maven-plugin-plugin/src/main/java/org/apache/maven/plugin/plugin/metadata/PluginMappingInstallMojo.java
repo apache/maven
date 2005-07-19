@@ -1,5 +1,6 @@
 package org.apache.maven.plugin.plugin.metadata;
 
+import org.apache.maven.artifact.repository.metadata.InvalidRepositoryMetadataException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -20,11 +21,21 @@ public class PluginMappingInstallMojo
         
         try
         {
-            getRepositoryMetadataManager().resolveLocally( metadata, getLocalRepository() );
+            try
+            {
+                getRepositoryMetadataManager().resolveLocally( metadata, getLocalRepository() );
+            }
+            catch ( InvalidRepositoryMetadataException e )
+            {
+                getRepositoryMetadataManager().purgeLocalCopy( metadata, getLocalRepository() );
+            }
             
-            updatePluginMap( metadata );
+            boolean shouldUpdate = updatePluginMap( metadata );
 
-            getRepositoryMetadataManager().install( metadata, getLocalRepository() );
+            if ( shouldUpdate )
+            {
+                getRepositoryMetadataManager().install( metadata, getLocalRepository() );
+            }
         }
         catch ( RepositoryMetadataManagementException e )
         {

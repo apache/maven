@@ -46,9 +46,12 @@ public class PluginMappingDeployMojo
         {
             getRepositoryMetadataManager().resolve( metadata, distributionRepository, getLocalRepository() );
 
-            updatePluginMap( metadata );
+            boolean shouldUpdate = updatePluginMap( metadata );
 
-            getRepositoryMetadataManager().deploy( metadata, distributionRepository );
+            if ( shouldUpdate )
+            {
+                getRepositoryMetadataManager().deploy( metadata, distributionRepository );
+            }
         }
         catch ( RepositoryMetadataManagementException e )
         {

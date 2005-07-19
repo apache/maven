@@ -27,7 +27,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
-import org.apache.maven.artifact.resolver.filter.InversionArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -73,9 +72,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -496,24 +498,18 @@ public class DefaultPluginManager
 
                 pluginDescriptor.setClassRealm( pluginContainer.getContainerRealm() );
 
-                // TODO: this is probably overkill as it is rarely used - can we use a mojo tag to signal this will be
-                // used or check its configuration? Also, when it is used, perhaps it is more effecient to resolve
-                // everything at once and apply the exclusion filter when constructing the plugin container above.
-                // Check this out with yourkit
-                ArtifactFilter distroProvidedFilter = new InversionArtifactFilter( artifactFilter );
+                List unresolved = new ArrayList( dependencies );
+                
+                unresolved.removeAll( resolved );
+                
+                resolveCoreArtifacts( unresolved );
 
-                ArtifactResolutionResult distroProvidedResult = artifactResolver
-                    .resolveTransitively( dependencies, pluginArtifact, localRepository, remoteRepositories,
-                                          metadataSource, distroProvidedFilter );
+                List allResolved = new ArrayList( resolved.size() + unresolved.size() );
+                
+                allResolved.addAll( resolved );
+                allResolved.addAll( unresolved );
 
-                Set distroProvided = distroProvidedResult.getArtifacts();
-
-                List unfilteredArtifactList = new ArrayList( resolved.size() + distroProvided.size() );
-
-                unfilteredArtifactList.addAll( resolved );
-                unfilteredArtifactList.addAll( distroProvided );
-
-                pluginDescriptor.setArtifacts( unfilteredArtifactList );
+                pluginDescriptor.setArtifacts( allResolved );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -527,6 +523,41 @@ public class DefaultPluginManager
             {
                 throw new PluginConfigurationException( "Cannot resolve plugin dependencies", e );
             }
+        }
+    }
+
+    private Map resolvedCoreArtifactFiles = new HashMap();
+    
+    private void resolveCoreArtifacts( List unresolved )
+        throws PluginConfigurationException
+    {
+        for ( Iterator it = unresolved.iterator(); it.hasNext(); )
+        {
+            Artifact artifact = (Artifact) it.next();
+            
+            File artifactFile = (File) resolvedCoreArtifactFiles.get( artifact.getId() );
+            
+            if ( artifactFile == null )
+            {
+                String resource = "/META-INF/maven/" + artifact.getGroupId() + "/" + artifact.getArtifactId() + "/pom.xml";
+                
+                URL resourceUrl = container.getContainerRealm().getResource( resource );
+                
+                if ( resourceUrl == null )
+                {
+                    throw new PluginConfigurationException( "Cannot resolve core artifact: " + artifact.getId() );
+                }
+                
+                String artifactPath = resourceUrl.getPath();
+                
+                artifactPath = artifactPath.substring( 0, artifactPath.length() - resource.length() );
+                
+                artifactFile = new File( artifactPath );
+                
+                resolvedCoreArtifactFiles.put( artifact.getId(), artifactFile );
+            }
+            
+            artifact.setFile( artifactFile );
         }
     }
 
@@ -905,6 +936,8 @@ public class DefaultPluginManager
         artifacts.add( "maven-monitor" );
         artifacts.add( "maven-plugin-api" );
         artifacts.add( "maven-plugin-descriptor" );
+        artifacts.add( "maven-plugin-mapping" );
+        artifacts.add( "maven-plugin-registry" );
         artifacts.add( "maven-project" );
         artifacts.add( "maven-settings" );
         artifacts.add( "plexus-container-default" );

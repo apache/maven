@@ -6,9 +6,12 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,22 +45,9 @@ public class DefaultRepositoryMetadataManager
             {
                 try
                 {
-                    File tempMetadataFile = File.createTempFile( "plugins.xml", null );
-
                     try
                     {
-                        wagonManager.getRepositoryMetadata( metadata, remote, tempMetadataFile );
-
-                        if ( !metadataFile.exists()
-                            || ( metadataFile.lastModified() <= tempMetadataFile.lastModified() ) )
-                        {
-                            if ( !tempMetadataFile.renameTo( metadataFile ) )
-                            {
-                                FileUtils.copyFile( tempMetadataFile, metadataFile );
-
-                                tempMetadataFile.delete();
-                            }
-                        }
+                        wagonManager.getRepositoryMetadata( metadata, remote, metadataFile );
                     }
                     catch ( ResourceDoesNotExistException e )
                     {
@@ -81,20 +71,43 @@ public class DefaultRepositoryMetadataManager
                     throw new RepositoryMetadataManagementException( metadata,
                                                                      "Failed to download repository metadata.", e );
                 }
-                catch ( IOException e )
-                {
-                    throw new RepositoryMetadataManagementException(
-                                                                     metadata,
-                                                                     "Error constructing temporary metadata download file.",
-                                                                     e );
-                }
             }
             else
             {
                 getLogger().info( "Using local copy of " + metadata + " from: " + metadataFile );
             }
 
-            metadata.setFile( metadataFile );
+            if ( metadataFile.exists() )
+            {
+                if ( !verifyFileNotEmpty( metadataFile ) )
+                {
+                    throw new InvalidRepositoryMetadataException( metadata, "Metadata located in file: " + metadataFile + " appears to be corrupt (file is empty). DOWNLOAD FAILED." );
+                }
+                
+                cachedMetadata.put( metadata.getRepositoryPath(), metadataFile );
+            }
+        }
+        
+        metadata.setFile( metadataFile );
+    }
+
+    private boolean verifyFileNotEmpty( File metadataFile )
+    {
+        InputStream verifyInputStream = null;
+        
+        try
+        {
+            verifyInputStream = new FileInputStream( metadataFile );
+            
+            return verifyInputStream.available() > 0;
+        }
+        catch( IOException e )
+        {
+            return false;
+        }
+        finally
+        {
+            IOUtil.close( verifyInputStream );
         }
     }
 
