@@ -219,7 +219,7 @@ public class VersionRange
 
     private List intersection( List r1, List r2 )
     {
-        List restrictions = new ArrayList( Math.min( r1.size(), r2.size() ) );
+        List restrictions = new ArrayList( r1.size() + r2.size() );
         Iterator i1 = r1.iterator();
         Iterator i2 = r2.iterator();
         Restriction res1 = (Restriction) i1.next();
