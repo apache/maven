@@ -78,9 +78,7 @@ public class DefaultArtifact
 
         this.artifactId = artifactId;
 
-        this.versionRange = versionRange;
-
-        this.version = versionRange == null ? null : versionRange.getRecommendedVersion().toString();
+        setVersionRange( versionRange );
 
         this.artifactHandler = artifactHandler;
 
@@ -113,7 +111,7 @@ public class DefaultArtifact
                                                   "The type cannot be empty." );
         }
 
-        if ( getVersion() == null )
+        if ( version == null && versionRange == null )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
                                                   "The version cannot be empty." );
@@ -229,7 +227,10 @@ public class DefaultArtifact
         result = 37 * result + groupId.hashCode();
         result = 37 * result + artifactId.hashCode();
         result = 37 * result + type.hashCode();
-        result = 37 * result + version.hashCode();
+        if ( version != null )
+        {
+            result = 37 * result + version.hashCode();
+        }
         result = 37 * result + ( classifier != null ? classifier.hashCode() : 0 );
         return result;
     }
@@ -380,4 +381,29 @@ public class DefaultArtifact
     {
         this.scope = scope;
     }
+
+    public VersionRange getVersionRange()
+    {
+        return versionRange;
+    }
+
+    public final void setVersionRange( VersionRange versionRange )
+    {
+        this.versionRange = versionRange;
+
+        if ( versionRange != null && versionRange.getRecommendedVersion() != null )
+        {
+            this.version = versionRange.getRecommendedVersion().toString();
+        }
+        else
+        {
+            this.version = null;
+        }
+    }
+
+    public void selectVersion( String version )
+    {
+        this.version = version;
+    }
+
 }

@@ -23,6 +23,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,41 +62,47 @@ public class DefaultArtifactCollector
         Map resolvedArtifacts = new HashMap();
 
         ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
-        root.addDependencies( artifacts, remoteRepositories, filter );
 
-        recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
-                 artifactFactory, listeners );
-
-        Set set = new HashSet();
-
-        for ( Iterator i = resolvedArtifacts.values().iterator(); i.hasNext(); )
+        try
         {
-            ResolutionNode node = (ResolutionNode) i.next();
-            if ( !node.equals( root ) )
+            root.addDependencies( artifacts, remoteRepositories, filter );
+
+            recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
+                     artifactFactory, listeners );
+
+            Set set = new HashSet();
+
+            for ( Iterator i = resolvedArtifacts.values().iterator(); i.hasNext(); )
             {
-                Artifact artifact = node.getArtifact();
+                ResolutionNode node = (ResolutionNode) i.next();
+                if ( !node.equals( root ) )
+                {
+                    Artifact artifact = node.getArtifact();
 
-                artifact.setDependencyTrail( node.getDependencyTrail() );
+                    artifact.setDependencyTrail( node.getDependencyTrail() );
 
-                set.add( node );
+                    set.add( node );
+                }
             }
+
+            ArtifactResolutionResult result = new ArtifactResolutionResult();
+            result.setArtifactResolutionNodes( set );
+            return result;
         }
-
-        ArtifactResolutionResult result = new ArtifactResolutionResult();
-
-        result.setArtifactResolutionNodes( set );
-
-        return result;
+        catch ( OverConstrainedVersionException e )
+        {
+            throw new ArtifactResolutionException( "Unable to mediate dependency", e );
+        }
     }
 
     private void recurse( ResolutionNode node, Map resolvedArtifacts, Map managedVersions,
                           ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
                           ArtifactFilter filter, ArtifactFactory artifactFactory, List listeners )
-        throws CyclicDependencyException, TransitiveArtifactResolutionException
+        throws CyclicDependencyException, TransitiveArtifactResolutionException, OverConstrainedVersionException
     {
         fireEvent( ResolutionListener.TEST_ARTIFACT, listeners, node );
 
-        // TODO: conflict resolvers, shouldn't be munging original artifact perhaps?
+        // TODO: use as a conflict resolver
         Object key = node.getKey();
         if ( managedVersions.containsKey( key ) )
         {
@@ -116,6 +124,25 @@ public class DefaultArtifactCollector
         if ( previous != null )
         {
             // TODO: use as conflict resolver(s), chain and introduce version mediation
+            VersionRange previousRange = previous.getArtifact().getVersionRange();
+            VersionRange currentRange = node.getArtifact().getVersionRange();
+
+            if ( previousRange == null )
+            {
+                // version was already resolved
+                node.getArtifact().setVersion( previous.getArtifact().getVersion() );
+            }
+            else if ( currentRange == null )
+            {
+                // version was already resolved
+                previous.getArtifact().setVersion( node.getArtifact().getVersion() );
+            }
+            else
+            {
+                VersionRange newRange = previousRange.restrict( currentRange );
+                previous.getArtifact().setVersionRange( newRange );
+                node.getArtifact().setVersionRange( newRange );
+            }
 
             // previous one is more dominant
             if ( previous.getDepth() <= node.getDepth() )
@@ -145,10 +172,18 @@ public class DefaultArtifactCollector
             ResolutionNode child = (ResolutionNode) i.next();
             if ( !child.isResolved() )
             {
+                Artifact artifact = child.getArtifact();
                 try
                 {
-                    ResolutionGroup rGroup = source.retrieve( child.getArtifact(), localRepository,
-                                                              remoteRepositories );
+                    if ( artifact.getVersion() == null )
+                    {
+                        // set the recommended version
+                        VersionRange versionRange = artifact.getVersionRange();
+                        String version = versionRange.getSelectedVersion().toString();
+                        artifact.selectVersion( version );
+                    }
+
+                    ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
                     child.addDependencies( rGroup.getArtifacts(), rGroup.getResolutionRepositories(), filter );
                 }
                 catch ( CyclicDependencyException e )
@@ -162,9 +197,8 @@ public class DefaultArtifactCollector
                 }
                 catch ( ArtifactMetadataRetrievalException e )
                 {
-                    child.getArtifact().setDependencyTrail( node.getDependencyTrail() );
-                    throw new TransitiveArtifactResolutionException( e.getMessage(), child.getArtifact(),
-                                                                     remoteRepositories, e );
+                    artifact.setDependencyTrail( node.getDependencyTrail() );
+                    throw new TransitiveArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                 }
 
                 recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,

@@ -135,6 +135,73 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( a );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
                       res.getArtifacts() );
+        assertEquals( "Check version", "3.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+    }
+
+    public void testResolveNearestWithRanges()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        ArtifactSpec c = a.addDependency( "c", "2.0" );
+
+        b.addDependency( "c", "[1.0,3.0]" );
+
+        ArtifactResolutionResult res = collect( a );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
+                      res.getArtifacts() );
+        assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
+    }
+
+    public void testCompatibleRanges()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        a.addDependency( "c", "[2.0,2.5]" );
+        b.addDependency( "c", "[1.0,3.0]" );
+
+        ArtifactResolutionResult res = collect( a );
+
+        ArtifactSpec c = createArtifact( "c", "2.5" );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
+                      res.getArtifacts() );
+        assertEquals( "Check version", "2.5", getArtifact( "c", res.getArtifacts() ).getVersion() );
+    }
+
+    public void testIncompatibleRanges()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        a.addDependency( "c", "[2.4,3.0]" );
+
+        b.addDependency( "c", "[1.0,2.0]" );
+
+        try
+        {
+            ArtifactResolutionResult res = collect( a );
+            fail( "Should not succeed collecting, got: " + res.getArtifacts() );
+        }
+        catch ( ArtifactResolutionException expected )
+        {
+        }
+    }
+
+    public void testUnboundedRange()
+        throws ArtifactResolutionException
+    {
+        ArtifactSpec a = createArtifact( "a", "1.0" );
+        ArtifactSpec b = a.addDependency( "b", "1.0" );
+        a.addDependency( "c", "[2.0,]" );
+        b.addDependency( "c", "[1.0,]" );
+
+        ArtifactResolutionResult res = collect( a );
+
+        ArtifactSpec c = createArtifact( "c", "RELEASE" );
+        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
+                      res.getArtifacts() );
+        assertEquals( "Check version", "RELEASE", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
     public void testResolveManagedVersion()
@@ -303,8 +370,9 @@ public class DefaultArtifactCollectorTest
     private ArtifactSpec createArtifact( String id, String version, String scope )
     {
         ArtifactSpec spec = new ArtifactSpec();
-        spec.artifact = artifactFactory.createArtifact( GROUP_ID, id, version, scope, "jar" );
-        source.artifacts.put( spec.artifact.getId(), spec );
+        Artifact artifact = artifactFactory.createArtifact( GROUP_ID, id, version, scope, "jar" );
+        spec.artifact = artifact;
+        source.artifacts.put( source.getKey( artifact ), spec );
         return spec;
     }
 
@@ -346,7 +414,9 @@ public class DefaultArtifactCollectorTest
                                          List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
-            ArtifactSpec a = (ArtifactSpec) artifacts.get( artifact.getId() );
+            String key = getKey( artifact );
+
+            ArtifactSpec a = (ArtifactSpec) artifacts.get( key );
             try
             {
                 return new ResolutionGroup( createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
@@ -356,6 +426,11 @@ public class DefaultArtifactCollectorTest
             {
                 throw new ArtifactMetadataRetrievalException( e );
             }
+        }
+
+        private String getKey( Artifact artifact )
+        {
+            return artifact.getDependencyConflictId() + ":" + artifact.getVersionRange();
         }
 
         private Set createArtifacts( ArtifactFactory artifactFactory, Set dependencies, String inheritedScope,

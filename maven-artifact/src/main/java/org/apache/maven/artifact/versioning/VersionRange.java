@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class VersionRange
 {
+    private final ArtifactVersion RELEASE = new DefaultArtifactVersion( "RELEASE" );
+
     private final ArtifactVersion recommendedVersion;
 
     private final List restrictions;
@@ -380,6 +382,68 @@ public class VersionRange
         else
         {
             return v2;
+        }
+    }
+
+    public ArtifactVersion getSelectedVersion()
+        throws OverConstrainedVersionException
+    {
+        ArtifactVersion version;
+        if ( recommendedVersion != null )
+        {
+            version = recommendedVersion;
+        }
+        else
+        {
+            if ( restrictions.size() == 0 )
+            {
+                throw new OverConstrainedVersionException( "The artifact has no valid ranges" );
+            }
+            else
+            {
+                Restriction restriction = (Restriction) restrictions.get( restrictions.size() - 1 );
+                // TODO: how can we find the latest release before something to facilitate ) at the end?
+                version = restriction.getUpperBound();
+                if ( version == null )
+                {
+                    version = RELEASE;
+                }
+            }
+        }
+        return version;
+    }
+
+    public String toString()
+    {
+        if ( recommendedVersion != null )
+        {
+            return recommendedVersion.toString();
+        }
+        else
+        {
+            StringBuffer buf = new StringBuffer();
+            for ( Iterator i = restrictions.iterator(); i.hasNext(); )
+            {
+                Restriction r = (Restriction) i.next();
+
+                buf.append( r.isLowerBoundInclusive() ? "[" : "(" );
+                if ( r.getLowerBound() != null )
+                {
+                    buf.append( r.getLowerBound().toString() );
+                }
+                buf.append( "," );
+                if ( r.getUpperBound() != null )
+                {
+                    buf.append( r.getUpperBound().toString() );
+                }
+                buf.append( r.isUpperBoundInclusive() ? "]" : ")" );
+
+                if ( i.hasNext() )
+                {
+                    buf.append( "," );
+                }
+            }
+            return buf.toString();
         }
     }
 }
