@@ -1,5 +1,6 @@
 package test;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class SurefirePlugin
         SurefireBooter surefireBooter = new SurefireBooter();
 
         surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
-                                   new Object[]{basedir, includes, excludes} );
+                                   new Object[]{new File( basedir, "target/test-classes" ), includes, excludes} );
 
         for ( Iterator i = classpathElements.iterator(); i.hasNext(); )
         {
