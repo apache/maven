@@ -25,7 +25,7 @@ fi
 
 HOME_DIR=`pwd`
 DIR=m2-build
-REPO=maven-repo-local
+REPO=$HOME_DIR/maven-repo-local
 SCM_LOG=scm.log
 TIMESTAMP=`date +%Y%m%d.%H%M%S`
 WWW=$HOME/public_html
@@ -123,7 +123,7 @@ fi
     (
       cd $DIR/maven-components
   
-      sh m2-bootstrap-all.sh -Dmaven.repo.local="$HOME_DIR/$REPO" -Dmaven.home="$M2_HOME" --update-snapshots
+      sh m2-bootstrap-all.sh -Dmaven.repo.local="$REPO" -Dmaven.home="$M2_HOME" --update-snapshots
       ret=$?; if [ $ret != 0 ]; then exit $ret; fi
     )    
     ret=$?; if [ $ret != 0 ]; then exit $ret; fi
@@ -137,7 +137,7 @@ fi
     mkdir -p $DEPLOY_DIR > /dev/null 2>&1
 
     # Assumes pwd is still $HOME_DIR
-    tar czf $DEPLOY_DIR/$DIST m2
+    gtar czf $DEPLOY_DIR/$DIST m2
 
   else
   
