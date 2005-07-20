@@ -403,6 +403,8 @@ public class VersionRange
             {
                 Restriction restriction = (Restriction) restrictions.get( restrictions.size() - 1 );
                 // TODO: how can we find the latest release before something to facilitate ) at the end?
+                // Also, how can we find the latest release when there no RELEASE metadata? We need to be maintaining
+                // a version list in the repository
                 version = restriction.getUpperBound();
                 if ( version == null )
                 {
