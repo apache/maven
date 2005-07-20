@@ -54,6 +54,11 @@ public class VersionRange
     public static VersionRange createFromVersionSpec( String spec )
         throws InvalidVersionSpecificationException
     {
+        if ( spec == null )
+        {
+            return null;
+        }
+
         List restrictions = new ArrayList();
         String process = spec;
         ArtifactVersion version = null;
