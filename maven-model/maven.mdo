@@ -1579,9 +1579,10 @@
           <description><![CDATA[The URL to the organization's home page.]]></description>
           <type>String</type>
         </field>
+        <!-- TODO: deprecated in 4 -->
         <field>
           <name>logo</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description><![CDATA[
             The URL to the organization's logo image.  This can be an URL relative
             to the base directory of the generated web site,

@@ -82,7 +82,6 @@
   </dependencyManagement>
 
   <build>
-    <nagEmailAddress>jason@maven.org</nagEmailAddress>
     <sourceDirectory>sourceDirectory</sourceDirectory>
     <testSourceDirectory>unitTestSourceDirectory</testSourceDirectory>
     <resources>
@@ -114,16 +113,4 @@
       </testResource>
     </testResources>
   </build>
-
-  <reports>
-    <plugins>
-      <plugin>
-        <artifactId>maven-jdepend-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reports>
-
 </project>
