@@ -1,5 +1,7 @@
+package org.apache.maven.plugin.clover;
+
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,36 +15,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.maven.plugin.clover;
 
+import com.cenqua.clover.reporters.html.HtmlReporter;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import com.cenqua.clover.reporters.html.HtmlReporter;
-
 /**
- * @goal report
- * @execute phase="test" lifecycle="clover"
- * @description Generate a Clover report
- * 
+ * Generate a Clover report.
+ *
  * @author <a href="mailto:vmassol@apache.org">Vincent Massol</a>
  * @version $Id$
+ * @goal report
+ * @execute phase="test" lifecycle="clover"
  */
-public class CloverReportMojo extends AbstractMavenReport
+public class CloverReportMojo
+    extends AbstractMavenReport
 {
     /**
-     * @parameter
+     * @parameter expression="${project.build.directory}/clover/clover.db"
      * @required
      */
     private String cloverDatabase;
 
     /**
-     * @parameter expression="${project.build.directory}/site"
+     * @parameter expression="${project.build.directory}/site/clover"
      * @required
      */
     private String outputDirectory;
@@ -67,10 +68,10 @@ public class CloverReportMojo extends AbstractMavenReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        int result = HtmlReporter.mainImpl(createCliArgs());
-        if (result != 0)
+        int result = HtmlReporter.mainImpl( createCliArgs() );
+        if ( result != 0 )
         {
-            throw new MavenReportException("Clover has failed to instrument the source files");
+            throw new MavenReportException( "Clover has failed to instrument the source files" );
         }
     }
 
@@ -80,14 +81,8 @@ public class CloverReportMojo extends AbstractMavenReport
      */
     private String[] createCliArgs()
     {
-        String [] cliArgs = {
-
-            "-t", "Maven Clover report",
-            "-p", (String) this.project.getCompileSourceRoots().get(0),
-            "-i", this.cloverDatabase,
-            "-o", this.outputDirectory };
-
-        return cliArgs;
+        return new String[]{"-t", "Maven Clover report", "-p", (String) this.project.getCompileSourceRoots().get( 0 ),
+            "-i", this.cloverDatabase, "-o", this.outputDirectory};
     }
 
     public String getOutputName()
@@ -105,7 +100,7 @@ public class CloverReportMojo extends AbstractMavenReport
 
     private static ResourceBundle getBundle( Locale locale )
     {
-        return ResourceBundle.getBundle("clover-report", locale, CloverReportMojo.class.getClassLoader() );
+        return ResourceBundle.getBundle( "clover-report", locale, CloverReportMojo.class.getClassLoader() );
     }
 
     /**

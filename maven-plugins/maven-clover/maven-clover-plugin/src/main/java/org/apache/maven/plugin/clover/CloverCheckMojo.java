@@ -19,8 +19,8 @@ package org.apache.maven.plugin.clover;
 import com.cenqua.clover.cfg.Percentage;
 import com.cenqua.clover.tasks.CloverPassTask;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Taskdef;
 
 /**
@@ -43,7 +43,7 @@ public class CloverCheckMojo
     protected String cloverDatabase;
 
     /**
-     * @parameter expression="70"
+     * @parameter default-value="70"
      * @required
      */
     protected float targetPercentage;
@@ -69,6 +69,8 @@ public class CloverCheckMojo
         antProject.init();
 
         registerCloverAntTasks( antProject );
+
+        getLog().info( "Checking for coverage of " + targetPercentage + "%" );
 
         CloverPassTask cloverPassTask = (CloverPassTask) antProject.createTask( "clover-check" );
         cloverPassTask.setInitString( this.cloverDatabase );
