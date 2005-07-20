@@ -54,7 +54,7 @@ public class SurefirePlugin
     /**
      * @parameter expression="${maven.test.failure.ignore}"
      */
-    private boolean testFailureIgnore = false;
+    private boolean testFailureIgnore;
 
     /**
      * @parameter expression="${basedir}"
@@ -66,13 +66,13 @@ public class SurefirePlugin
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      */
-    private String classesDirectory;
+    private File classesDirectory;
 
     /**
      * @parameter expression="${project.build.testOutputDirectory}"
      * @required
      */
-    private String testClassesDirectory;
+    private File testClassesDirectory;
 
     /**
      * @parameter expression="${project.testClasspathElements}"
@@ -190,7 +190,7 @@ public class SurefirePlugin
             }
 
             surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
-                                       new Object[]{basedir, includes, excludes} );
+                                       new Object[]{testClassesDirectory, includes, excludes} );
         }
 
         // ----------------------------------------------------------------------
@@ -212,9 +212,9 @@ public class SurefirePlugin
         }
 
 
-        surefireBooter.addClassPathUrl( new File( classesDirectory ).getPath() );
+        surefireBooter.addClassPathUrl( classesDirectory.getPath() );
 
-        surefireBooter.addClassPathUrl( new File( testClassesDirectory ).getPath() );
+        surefireBooter.addClassPathUrl( testClassesDirectory.getPath() );
 
         for ( Iterator i = pluginArtifacts.iterator(); i.hasNext(); )
         {
@@ -231,7 +231,7 @@ public class SurefirePlugin
 
         surefireBooter.addReport( "org.codehaus.surefire.report.FileReporter" );
 
-        boolean success = false;
+        boolean success;
         try
         {
             success = surefireBooter.run();
@@ -259,7 +259,7 @@ public class SurefirePlugin
 
     protected String[] split( String str, String separator, int max )
     {
-        StringTokenizer tok = null;
+        StringTokenizer tok;
         if ( separator == null )
         {
             // Null separator means we're using StringTokenizer's default
@@ -279,7 +279,7 @@ public class SurefirePlugin
 
         String[] list = new String[listSize];
         int i = 0;
-        int lastTokenBegin = 0;
+        int lastTokenBegin;
         int lastTokenEnd = 0;
         while ( tok.hasMoreTokens() )
         {
