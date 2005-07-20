@@ -24,6 +24,8 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.Arrays;
@@ -313,9 +315,9 @@ public class DefaultArtifactCollectorTest
 
     private class ArtifactSpec
     {
-        Artifact artifact;
+        private Artifact artifact;
 
-        Set dependencies = new HashSet();
+        private Set dependencies = new HashSet();
 
         public ArtifactSpec addDependency( String id, String version )
         {
@@ -338,18 +340,27 @@ public class DefaultArtifactCollectorTest
     private class Source
         implements ArtifactMetadataSource
     {
-        Map artifacts = new HashMap();
+        private Map artifacts = new HashMap();
 
-        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                         List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             ArtifactSpec a = (ArtifactSpec) artifacts.get( artifact.getId() );
-            return new ResolutionGroup( createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
-                                    artifact.getDependencyFilter() ), Collections.EMPTY_LIST );
+            try
+            {
+                return new ResolutionGroup( createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
+                                                             artifact.getDependencyFilter() ), Collections.EMPTY_LIST );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new ArtifactMetadataRetrievalException( e );
+            }
         }
 
         private Set createArtifacts( ArtifactFactory artifactFactory, Set dependencies, String inheritedScope,
                                      ArtifactFilter dependencyFilter )
+            throws InvalidVersionSpecificationException
         {
             Set projectArtifacts = new HashSet();
 
@@ -357,8 +368,10 @@ public class DefaultArtifactCollectorTest
             {
                 Artifact d = (Artifact) i.next();
 
-                Artifact artifact = artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
-                                                                    d.getScope(), d.getType(), inheritedScope );
+                VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+                Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
+                                                                              versionRange, d.getType(), d.getScope(),
+                                                                              inheritedScope );
 
                 if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
                 {
