@@ -19,8 +19,8 @@ package org.apache.maven.report.projectinfo;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.AbstractMavenReport;
+import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
@@ -35,12 +35,11 @@ import java.util.Set;
 
 /**
  * Generates the dependencies report.
- * 
- * @goal dependencies
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id$
+ * @goal dependencies
  * @plexus.component
  */
 public class DependenciesReport
@@ -107,7 +106,7 @@ public class DependenciesReport
     }
 
     /**
-     * @see org.apache.maven.reporting.AbstractMavenReport#getSiteRenderer()
+     * @see AbstractMavenReport#getSiteRenderer()
      */
     protected SiteRenderer getSiteRenderer()
     {
@@ -126,7 +125,7 @@ public class DependenciesReport
 
             r.render();
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             throw new MavenReportException( "Can't write the report " + getOutputName(), e );
         }
@@ -167,7 +166,7 @@ public class DependenciesReport
 
             // Dependencies report
             List dependencies = project.getDependencies();
-            
+
             if ( dependencies.isEmpty() )
             {
                 // TODO: should the report just be excluded?
@@ -194,16 +193,16 @@ public class DependenciesReport
 
                 endTable();
             }
-            
+
             endSection();
 
             // Transitive dependencies
             if ( !dependencies.isEmpty() )
             {
                 Set artifacts = getTransitiveDependencies( project );
-                
+
                 startSection( getBundle( locale ).getString( "report.transitivedependencies.title" ) );
-    
+
                 if ( artifacts.isEmpty() )
                 {
                     // TODO: should the report just be excluded?
@@ -212,22 +211,24 @@ public class DependenciesReport
                 else
                 {
                     startTable();
-    
+
                     tableCaption( getBundle( locale ).getString( "report.transitivedependencies.intro" ) );
-    
+
                     String groupId = getBundle( locale ).getString( "report.transitivedependencies.column.groupId" );
-                    String artifactId = getBundle( locale ).getString( "report.transitivedependencies.column.artifactId" );
+                    String artifactId = getBundle( locale ).getString(
+                        "report.transitivedependencies.column.artifactId" );
                     String version = getBundle( locale ).getString( "report.transitivedependencies.column.version" );
-    
+
                     tableHeader( new String[]{groupId, artifactId, version} );
-    
+
                     for ( Iterator i = artifacts.iterator(); i.hasNext(); )
                     {
                         Artifact artifact = (Artifact) i.next();
-    
-                        tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()} );
+
+                        tableRow(
+                            new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()} );
                     }
-    
+
                     endTable();
                 }
 
@@ -238,52 +239,52 @@ public class DependenciesReport
 
         /**
          * Return a set of artifact which are not already present in the dependencies list.
-         *  
+         *
          * @param project a Maven project
          * @return a set of transitive dependencies
+         * @todo check if this works with version ranges
          */
-        private Set getTransitiveDependencies( MavenProject project ) 
-        {            
+        private Set getTransitiveDependencies( MavenProject project )
+        {
             Set result = new HashSet();
 
-            if ( ( project.getDependencies() == null ) ||
-                    ( project.getArtifacts() == null ) )
+            if ( project.getDependencies() == null || project.getArtifacts() == null )
             {
                 return result;
             }
-            
+
             List dependencies = project.getDependencies();
             Set artifacts = project.getArtifacts();
 
             for ( Iterator j = artifacts.iterator(); j.hasNext(); )
             {
-                Artifact artifact = (Artifact)j.next();
+                Artifact artifact = (Artifact) j.next();
 
                 boolean toadd = true;
                 for ( Iterator i = dependencies.iterator(); i.hasNext(); )
                 {
                     Dependency dependency = (Dependency) i.next();
-                    if ( ( artifact.getArtifactId().equals( dependency.getArtifactId() ) ) && 
-                            ( artifact.getGroupId().equals( dependency.getGroupId() ) )  && 
-                            ( artifact.getVersion().equals( dependency.getVersion() ) ) )
+                    if ( artifact.getArtifactId().equals( dependency.getArtifactId() ) &&
+                        artifact.getGroupId().equals( dependency.getGroupId() ) &&
+                        artifact.getVersion().equals( dependency.getVersion() ) )
                     {
                         toadd = false;
                         break;
                     }
                 }
-                
+
                 if ( toadd )
                 {
                     result.add( artifact );
                 }
             }
-            
+
             return result;
         }
     }
 
     private static ResourceBundle getBundle( Locale locale )
     {
-        return ResourceBundle.getBundle("project-info-report", locale, DependenciesReport.class.getClassLoader() );
+        return ResourceBundle.getBundle( "project-info-report", locale, DependenciesReport.class.getClassLoader() );
     }
 }

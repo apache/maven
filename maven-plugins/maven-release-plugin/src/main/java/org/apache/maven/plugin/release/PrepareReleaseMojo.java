@@ -42,12 +42,12 @@ import java.util.Properties;
 /**
  * Prepare for a release in SCM
  *
+ * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @version $Id: DoxiaMojo.java 169372 2005-05-09 22:47:34Z evenisse $
  * @goal prepare
  * @requiresDependencyResolution test
- *
- * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @author <a href="mailto:jason@maven.org>Jason van Zyl</a>
- * @version $Id: DoxiaMojo.java 169372 2005-05-09 22:47:34Z evenisse $
+ * @todo check how this works with version ranges
  */
 public class PrepareReleaseMojo
     extends AbstractReleaseMojo
@@ -58,7 +58,7 @@ public class PrepareReleaseMojo
      * @readonly
      */
     private String basedir;
-    
+
     /**
      * @parameter expression="${settings.interactiveMode}"
      * @readonly
@@ -127,8 +127,7 @@ public class PrepareReleaseMojo
         for ( Iterator i = changedFiles.iterator(); i.hasNext(); )
         {
             ScmFile f = (ScmFile) i.next();
-            if ( f.getPath().equals( "pom.xml.backup" ) ||
-                 f.getPath().equals( RELEASE_PROPS ) )
+            if ( f.getPath().equals( "pom.xml.backup" ) || f.getPath().equals( RELEASE_PROPS ) )
             {
                 i.remove();
             }
@@ -147,7 +146,8 @@ public class PrepareReleaseMojo
                 message.append( "\n" );
             }
 
-            throw new MojoExecutionException( "Cannot prepare the release because you have local modifications : \n" + message.toString() );
+            throw new MojoExecutionException(
+                "Cannot prepare the release because you have local modifications : \n" + message.toString() );
         }
     }
 
@@ -230,8 +230,8 @@ public class PrepareReleaseMojo
                 message.append( "\n" );
             }
 
-            throw new MojoExecutionException( "Can't release project due to non released dependencies :\n"
-                + message.toString() );
+            throw new MojoExecutionException(
+                "Can't release project due to non released dependencies :\n" + message.toString() );
         }
     }
 
@@ -278,8 +278,8 @@ public class PrepareReleaseMojo
 
             model.getScm().setConnection( rewriteScmConnection( model.getScm().getConnection(), getTagLabel() ) );
 
-            model.getScm().setDeveloperConnection( rewriteScmConnection( model.getScm().getDeveloperConnection(),
-                                                                         getTagLabel() ) );
+            model.getScm().setDeveloperConnection(
+                rewriteScmConnection( model.getScm().getDeveloperConnection(), getTagLabel() ) );
         }
 
         try
@@ -323,10 +323,10 @@ public class PrepareReleaseMojo
                 for ( Iterator j = model.getDependencies().iterator(); j.hasNext(); )
                 {
                     Dependency dependency = (Dependency) j.next();
-                    if ( artifact.getGroupId().equals( dependency.getGroupId() )
-                        && artifact.getArtifactId().equals( dependency.getArtifactId() )
-                        && artifact.getBaseVersion().equals( dependency.getVersion() )
-                        && artifact.getType().equals( dependency.getType() ) )
+                    if ( artifact.getGroupId().equals( dependency.getGroupId() ) &&
+                        artifact.getArtifactId().equals( dependency.getArtifactId() ) &&
+                        artifact.getBaseVersion().equals( dependency.getVersion() ) &&
+                        artifact.getType().equals( dependency.getType() ) )
                     {
                         dependency.setVersion( artifact.getVersion() );
                     }
@@ -343,8 +343,8 @@ public class PrepareReleaseMojo
                 for ( Iterator j = model.getBuild().getPlugins().iterator(); j.hasNext(); )
                 {
                     Plugin plugin = (Plugin) j.next();
-                    if ( artifact.getGroupId().equals( plugin.getGroupId() )
-                        && artifact.getArtifactId().equals( plugin.getArtifactId() ) )
+                    if ( artifact.getGroupId().equals( plugin.getGroupId() ) &&
+                        artifact.getArtifactId().equals( plugin.getArtifactId() ) )
                     {
                         plugin.setGroupId( artifact.getGroupId() );
                         plugin.setVersion( artifact.getVersion() );
@@ -361,7 +361,7 @@ public class PrepareReleaseMojo
 
             transformer.setProject( project.getFile() );
 
-            transformer.setUpdatedModel ( model );
+            transformer.setUpdatedModel( model );
 
             transformer.transformNodes();
 
@@ -389,7 +389,8 @@ public class PrepareReleaseMojo
         {
             nextVersionString = Integer.toString( Integer.parseInt( nextVersionString ) + 1 );
 
-            projectVersion = projectVersion.substring( 0, projectVersion.lastIndexOf( "-" ) + 1 ) + nextVersionString + SNAPSHOT;
+            projectVersion = projectVersion.substring( 0, projectVersion.lastIndexOf( "-" ) + 1 ) + nextVersionString +
+                SNAPSHOT;
         }
         catch ( NumberFormatException e )
         {
@@ -426,7 +427,7 @@ public class PrepareReleaseMojo
 
             transformer.setProject( project.getFile() );
 
-            transformer.setUpdatedModel ( model );
+            transformer.setUpdatedModel( model );
 
             transformer.transformNodes();
 
@@ -570,11 +571,11 @@ public class PrepareReleaseMojo
         {
             if ( scmConnection.startsWith( "svn" ) )
             {
-                if ( scmConnection.endsWith( "trunk/") )
+                if ( scmConnection.endsWith( "trunk/" ) )
                 {
                     scmConnection = scmConnection.substring( 0, scmConnection.length() - "trunk/".length() );
                 }
-                if ( scmConnection.endsWith( "branches/") )
+                if ( scmConnection.endsWith( "branches/" ) )
                 {
                     scmConnection = scmConnection.substring( 0, scmConnection.length() - "branches/".length() );
                 }

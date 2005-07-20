@@ -65,7 +65,7 @@ public class MavenMetadataSource
                                                                       artifact.getVersion(), artifact.getScope() );
 
         // TODO: this a very thin wrapper around a project builder - is it needed?
-        List dependencies = null;
+        List dependencies;
 
         // Use the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
         // associated artifacts.
@@ -101,11 +101,10 @@ public class MavenMetadataSource
         {
             Dependency d = (Dependency) i.next();
 
+            VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                          VersionRange.createFromVersionSpec(
-                                                                              d.getVersion() ), d.getType(),
-                                                                                                d.getScope(),
-                                                                                                inheritedScope );
+                                                                          versionRange, d.getType(), d.getScope(),
+                                                                          inheritedScope );
 
             if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
             {
