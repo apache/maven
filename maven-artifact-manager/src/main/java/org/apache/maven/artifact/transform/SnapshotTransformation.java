@@ -79,22 +79,23 @@ public class SnapshotTransformation
         }
         else if ( isSnapshot( artifact ) )
         {
+            SnapshotArtifactMetadata metadata;
+
             try
             {
-                SnapshotArtifactMetadata metadata;
-            
                 metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null );
-
-                metadata.update();
-
-                artifact.setVersion( metadata.constructVersion() );
-
-                artifact.addMetadata( metadata );
             }
             catch ( ResourceDoesNotExistException e )
             {
                 // ignore. We'll be creating this metadata if it doesn't exist...
+                metadata = (SnapshotArtifactMetadata) createMetadata( artifact );
             }
+
+            metadata.update();
+
+            artifact.setVersion( metadata.constructVersion() );
+
+            artifact.addMetadata( metadata );
         }
     }
 
