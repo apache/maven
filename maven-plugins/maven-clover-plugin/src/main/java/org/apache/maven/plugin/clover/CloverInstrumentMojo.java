@@ -1,5 +1,7 @@
+package org.apache.maven.plugin.clover;
+
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,43 +15,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.maven.plugin.clover;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.io.File;
-
+import com.cenqua.clover.CloverInstr;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.project.MavenProject;
 
-import com.cenqua.clover.CloverInstr;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
+ * Instrument source roots.
+ *
+ * @author <a href="mailto:vmassol@apache.org">Vincent Massol</a>
+ * @version $Id$
  * @goal instrument
  * @phase generate-sources
  * @requiresDependencyResolution test
- * @description Instrument source roots
- * 
- * @author <a href="mailto:vmassol@apache.org">Vincent Massol</a>
- * @version $Id$
  */
-public class CloverInstrumentMojo extends AbstractCloverMojo
+public class CloverInstrumentMojo
+    extends AbstractCloverMojo
 {
     /**
      * @parameter
      * @required
      */
-	private String cloverOutputDirectory;
+    private String cloverOutputDirectory;
 
     /**
      * @parameter
      * @required
      */
-	private String cloverDatabase;
+    private String cloverDatabase;
 
     /**
      * @parameter expression="${project}"
@@ -75,33 +76,35 @@ public class CloverInstrumentMojo extends AbstractCloverMojo
 
     private void init()
     {
-        new File(this.cloverOutputDirectory).mkdirs();
+        new File( this.cloverOutputDirectory ).mkdirs();
 
-        this.cloverOutputSourceDirectory = new File(this.cloverOutputDirectory, "src").getPath();
+        this.cloverOutputSourceDirectory = new File( this.cloverOutputDirectory, "src" ).getPath();
     }
 
-    public void execute() throws MojoExecutionException
+    public void execute()
+        throws MojoExecutionException
     {
         init();
 
         registerLicenseFile();
-        
-        int result = CloverInstr.mainImpl(createCliArgs());
-	    if (result != 0)
-		{
-			throw new MojoExecutionException("Clover has failed to instrument the source files");
-		}
 
-	    addGeneratedSourcesToCompileRoots();
-//	    addCloverDependencyToCompileClasspath();
+        int result = CloverInstr.mainImpl( createCliArgs() );
+        if ( result != 0 )
+        {
+            throw new MojoExecutionException( "Clover has failed to instrument the source files" );
+        }
+
+        addGeneratedSourcesToCompileRoots();
+        addCloverDependencyToCompileClasspath();
 
         // Explicitely set the output directory to be the Clover one so that all other plugins executing
         // thereafter output files in the Clover output directory and not in the main output directory.
         // TODO: Ulgy hack below. Changing the directory should be enough for changing the values of all other
         // properties depending on it!
-        this.project.getBuild().setDirectory(this.cloverOutputDirectory);
-        this.project.getBuild().setOutputDirectory(new File(this.cloverOutputDirectory, "classes").getPath());
-        this.project.getBuild().setTestOutputDirectory(new File(this.cloverOutputDirectory, "test-classes").getPath());
+        this.project.getBuild().setDirectory( this.cloverOutputDirectory );
+        this.project.getBuild().setOutputDirectory( new File( this.cloverOutputDirectory, "classes" ).getPath() );
+        this.project.getBuild().setTestOutputDirectory(
+            new File( this.cloverOutputDirectory, "test-classes" ).getPath() );
     }
 
     /**
@@ -109,48 +112,48 @@ public class CloverInstrumentMojo extends AbstractCloverMojo
      */
     private void addGeneratedSourcesToCompileRoots()
     {
-        this.project.getCompileSourceRoots().remove(0);
-        this.project.addCompileSourceRoot(this.cloverOutputSourceDirectory);
+        this.project.getCompileSourceRoots().remove( 0 );
+        this.project.addCompileSourceRoot( this.cloverOutputSourceDirectory );
     }
-/*
+
     private void addCloverDependencyToCompileClasspath()
+        throws MojoExecutionException
     {
         Artifact cloverArtifact = null;
         Iterator artifacts = this.pluginArtifacts.iterator();
-        while (artifacts.hasNext())
+        while ( artifacts.hasNext() && cloverArtifact == null )
         {
             Artifact artifact = (Artifact) artifacts.next();
-            if (artifact.getArtifactId().equalsIgnoreCase("clover"))
+            if ( "clover".equalsIgnoreCase( artifact.getArtifactId() ) )
             {
                 cloverArtifact = artifact;
-                break;
             }
         }
 
-        List artifactsToAdd = new ArrayList();
-        artifactsToAdd.add(cloverArtifact);
-        
-        this.project.addArtifacts(artifactsToAdd, this.factory); 
+        if ( cloverArtifact == null )
+        {
+            throw new MojoExecutionException( "Couldn't find 'clover' artifact in plugin dependencies" );
+        }
+
+        cloverArtifact = factory.createArtifact( cloverArtifact.getGroupId(), cloverArtifact.getArtifactId(),
+                                                 cloverArtifact.getVersion(), Artifact.SCOPE_COMPILE,
+                                                 cloverArtifact.getType() );
+
+        // TODO: use addArtifacts
+        Set set = new HashSet( project.getDependencyArtifacts() );
+        set.add( cloverArtifact );
+        project.setDependencyArtifacts( set );
     }
-*/
 
-	/**
-	 * @return the CLI args to be passed to CloverInstr
-	 * @todo handle multiple source roots. At the moment only the first source root is instrumented
-	 */
-	private String[] createCliArgs()
-	{
-		String [] cliArgs = {
-
-            // TODO: Temporary while we wait for surefire to be able to fork unit tests. See
-            // http://jira.codehaus.org/browse/MNG-441
-            "-p", "threaded",
-            "-f", "100",
-            
-            "-i", this.cloverDatabase, 
-            "-s", (String) this.project.getCompileSourceRoots().get(0),
-            "-d", this.cloverOutputSourceDirectory };
-
-		return cliArgs; 
-	}
+    /**
+     * @return the CLI args to be passed to CloverInstr
+     * @todo handle multiple source roots. At the moment only the first source root is instrumented
+     */
+    private String[] createCliArgs()
+    {
+        // TODO: Temporary while we wait for surefire to be able to fork unit tests. See
+        // http://jira.codehaus.org/browse/MNG-441
+        return new String[]{"-p", "threaded", "-f", "100", "-i", this.cloverDatabase, "-s",
+            (String) this.project.getCompileSourceRoots().get( 0 ), "-d", this.cloverOutputSourceDirectory};
+    }
 }
