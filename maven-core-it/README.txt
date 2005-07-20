@@ -101,6 +101,8 @@ it0032: Tests that a specified Maven version requirement that is lower doesn't c
 
 it0033: Test an EAR generation
 
+it0034: Test version range junit [3.7,) resolves to 3.8.1
+
 -------------------------------------------------------------------------------
 
 - generated sources
@@ -147,5 +149,8 @@ it1006: Tests collision on default execution id. Should throw an
         IllegalStateException, since the model is incorrect.
 -------------------------------------------------------------------------------
 it1007: Should fail due to requiring a future version of Maven.
+-------------------------------------------------------------------------------
+it1008: Should fail due to requiring a version range for junit that doesn't exist
+        in the repository. Currently succeeds (MNG-614)
 -------------------------------------------------------------------------------
 
