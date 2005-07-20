@@ -19,8 +19,17 @@ package org.apache.maven.reporting;
 import org.apache.commons.validator.EmailValidator;
 import org.apache.commons.validator.UrlValidator;
 import org.codehaus.doxia.sink.Sink;
+import org.codehaus.plexus.util.StringUtils;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
+ * An abstract class to manage report generation.
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
@@ -32,7 +41,7 @@ public abstract class AbstractMavenReportRenderer
 {
     protected Sink sink;
 
-    private int section = 0;
+    private int section;
 
     public AbstractMavenReportRenderer( Sink sink )
     {
@@ -45,7 +54,7 @@ public abstract class AbstractMavenReportRenderer
 
         sink.title();
 
-        sink.text( getTitle() );
+        text( getTitle() );
 
         sink.title_();
 
@@ -104,7 +113,7 @@ public abstract class AbstractMavenReportRenderer
                 break;
         }
 
-        sink.text( name );
+        text( name );
 
         switch ( section )
         {
@@ -167,70 +176,23 @@ public abstract class AbstractMavenReportRenderer
     {
         sink.tableHeaderCell();
 
-        sink.text( text );
+        text( text );
 
         sink.tableHeaderCell_();
     }
 
+    /**
+     * Add a cell in a table.
+     * <p>The text could be a link patterned text defined by <code>{text, url}</code></p>
+     *
+     * @param text
+     * @see #linkPatternedText(String)
+     */
     protected void tableCell( String text )
     {
         sink.tableCell();
 
-        if ( text != null )
-        {
-            sink.text( text );
-        }
-        else
-        {
-            sink.nonBreakingSpace();
-        }
-
-        sink.tableCell_();
-    }
-
-    /**
-     * Create a cell with a potential link.
-     *
-     * @param text the text
-     * @param href the href
-     */
-    protected void tableCellWithLink( String text, String href )
-    {
-        sink.tableCell();
-
-        if ( text != null )
-        {
-            if ( href != null )
-            {
-                String[] schemes = {"http", "https"};
-                UrlValidator urlValidator = new UrlValidator( schemes );
-
-                if ( EmailValidator.getInstance().isValid( href ) )
-                {
-                    link( "mailto:" + href, text );
-                }
-                else if ( href.toLowerCase().startsWith( "mailto:" ) )
-                {
-                    link( href, text );
-                }
-                else if ( urlValidator.isValid( href ) )
-                {
-                    link( href, text );
-                }
-                else
-                {
-                    sink.text( text );
-                }
-            }
-            else
-            {
-                sink.text( text );
-            }
-        }
-        else
-        {
-            sink.nonBreakingSpace();
-        }
+        linkPatternedText( text );
 
         sink.tableCell_();
     }
@@ -242,31 +204,6 @@ public abstract class AbstractMavenReportRenderer
         for ( int i = 0; i < content.length; i++ )
         {
             tableCell( content[i] );
-        }
-
-        sink.tableRow_();
-    }
-
-    /**
-     * Create a new row : each cell could have a link.
-     * <br>
-     * The arrays should have the same size.
-     *
-     * @param texts an array of text
-     * @param hrefs an array of href
-     */
-    protected void tableRowWithLink( String[] texts, String[] hrefs )
-    {
-        if ( hrefs.length != texts.length )
-        {
-            throw new IllegalArgumentException( "The arrays should have the same size" );
-        }
-
-        sink.tableRow();
-
-        for ( int i = 0; i < texts.length; i++ )
-        {
-            tableCellWithLink( texts[i], hrefs[i] );
         }
 
         sink.tableRow_();
@@ -287,7 +224,7 @@ public abstract class AbstractMavenReportRenderer
     protected void tableCaption( String caption )
     {
         sink.tableCaption();
-        sink.text( caption );
+        text( caption );
         sink.tableCaption_();
     }
 
@@ -295,7 +232,7 @@ public abstract class AbstractMavenReportRenderer
     {
         sink.paragraph();
 
-        sink.text( paragraph );
+        text( paragraph );
 
         sink.paragraph_();
     }
@@ -304,9 +241,349 @@ public abstract class AbstractMavenReportRenderer
     {
         sink.link( href );
 
-        sink.text( name );
+        text( name );
 
         sink.link_();
+    }
+
+    /**
+     * Add a new text.
+     * <p>If text is empty of has a null value, add the "-" charater</p>
+     *
+     * @param text a string
+     */
+    protected void text( String text )
+    {
+        if ( text == null || text.length() == 0 ) // Take care of spaces
+        {
+            sink.text( "-" );
+        }
+        else
+        {
+            sink.text( text );
+        }
+    }
+
+    /**
+     * Add a verbatim text.
+     *
+     * @param text a string
+     * @see #text(String)
+     */
+    protected void verbatimText( String text )
+    {
+        sink.verbatim( true );
+
+        text( text );
+
+        sink.verbatim_();
+    }
+
+    /**
+     * Add a verbatim text with a specific link.
+     *
+     * @param text a string
+     * @param href an href could be null
+     * @see #link(String, String)
+     */
+    protected void verbatimLink( String text, String href )
+    {
+        if ( StringUtils.isEmpty( href ) )
+        {
+            verbatimText( text );
+        }
+        else
+        {
+            sink.verbatim( true );
+
+            link( href, text );
+
+            sink.verbatim_();
+        }
+    }
+
+    /**
+     * Add a Javascript code.
+     *
+     * @param jsCode a string of Javascript
+     */
+    protected void javaScript( String jsCode )
+    {
+        sink.rawText( "<script type=\"text/javascript\">\n" + jsCode + "</script>" );
+    }
+
+    /**
+     * Add a text with links inside.
+     * <p>The text variable should contained this given pattern <code>{text, url}</code>
+     * to handle the link creation.</p>
+     *
+     * @param text a text with link pattern defined.
+     * @see #text(String)
+     * @see #applyPattern(String)
+     */
+    public void linkPatternedText( String text )
+    {
+        if ( StringUtils.isEmpty( text ) )
+        {
+            text( text );
+        }
+        else
+        {
+            Map segments = applyPattern( text );
+
+            if ( segments == null )
+            {
+                text( text );
+            }
+            else
+            {
+                for ( Iterator it = segments.entrySet().iterator(); it.hasNext(); )
+                {
+                    Map.Entry entry = (Map.Entry) it.next();
+
+                    String name = (String) entry.getKey();
+                    String href = (String) entry.getValue();
+
+                    if ( href == null )
+                    {
+                        text( name );
+                    }
+                    else
+                    {
+                        if ( getValidHref( href ) != null )
+                        {
+                            link( getValidHref( href ), name );
+                        }
+                        else
+                        {
+                            text( text );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Create a link pattern text defined by <code>{text, url}</code>.
+     * <p>This created pattern could be used by the method <code>linkPatternedText(String)</code> to
+     * handle a text with link.</p>
+     *
+     * @param text
+     * @param href
+     * @return a link pattern
+     * @see #linkPatternedText(String)
+     */
+    protected static String createLinkPatternedText( String text, String href )
+    {
+        if ( text == null )
+        {
+            return text;
+        }
+
+        if ( href == null )
+        {
+            return text;
+        }
+
+        StringBuffer sb = new StringBuffer();
+        sb.append( "{" ).append( text ).append( ", " ).append( href ).append( "}" );
+
+        return sb.toString();
+    }
+
+    /**
+     * Convenience method to display a <code>Properties</code> object comma separated.
+     *
+     * @param props
+     * @return the properties object as comma separated String
+     */
+    protected static String propertiesToString( Properties props )
+    {
+        StringBuffer sb = new StringBuffer();
+
+        if ( props == null || props.isEmpty() )
+        {
+            return sb.toString();
+        }
+
+        for ( Iterator i = props.keySet().iterator(); i.hasNext(); )
+        {
+            String key = (String) i.next();
+            sb.append( key ).append( "=" ).append( props.get( key ) );
+            if ( i.hasNext() )
+            {
+                sb.append( ", " );
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Return a valid href.
+     * <p>A valid href could start by <code>mailto:</code></p>.
+     *
+     * @param href an href
+     * @return a valid href or null if the href is not valid.
+     */
+    private static String getValidHref( String href )
+    {
+        href = href.trim();
+
+        String[] schemes = {"http", "https"};
+        UrlValidator urlValidator = new UrlValidator( schemes );
+
+        if ( EmailValidator.getInstance().isValid( href ) )
+        {
+            return "mailto:" + href;
+        }
+        else if ( href.toLowerCase().startsWith( "mailto:" ) )
+        {
+            return href;
+        }
+        else if ( urlValidator.isValid( href ) )
+        {
+            return href;
+        }
+        else
+        {
+            // TODO Waiting for new release of Validator
+            // http://issues.apache.org/bugzilla/show_bug.cgi?id=30686
+            String hrefTmp;
+            if ( !href.trim().endsWith( "/" ) )
+            {
+                hrefTmp = href + "/index.html";
+            }
+            else
+            {
+                hrefTmp = href + "index.html";
+            }
+
+            if ( urlValidator.isValid( hrefTmp ) )
+            {
+                return href;
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * The method parses a text an apply the given pattern <code>{text, url}</code> to create
+     * a map of text/href.
+     *
+     * @param text a text with or without the pattern <code>{text, url}</code>
+     * @return a map of text/href
+     */
+    private static Map applyPattern( String text )
+    {
+        if ( StringUtils.isEmpty( text ) )
+        {
+            return null;
+        }
+
+        // Map defined by key/value name/href
+        // If href == null, it means 
+        Map segments = new LinkedHashMap();
+
+        // TODO Special case http://jira.codehaus.org/browse/MEV-40
+        if ( text.indexOf( "${" ) != -1 )
+        {
+            int lastComma = text.lastIndexOf( "," );
+            int lastSemi = text.lastIndexOf( "}" );
+            if ( lastComma != -1 && lastSemi != -1 )
+            {
+                segments.put( text.substring( lastComma + 1, lastSemi ).trim(), null );
+            }
+            else
+            {
+                segments.put( text, null );
+            }
+
+            return segments;
+        }
+
+        boolean inQuote = false;
+        int braceStack = 0;
+        int lastOffset = 0;
+
+        for ( int i = 0; i < text.length(); i++ )
+        {
+            char ch = text.charAt( i );
+
+            if ( ch == '\'' && !inQuote )
+            {
+                // handle: ''
+                if ( i + 1 < text.length() && text.charAt( i + 1 ) == '\'' )
+                {
+                    i++;
+                }
+                else
+                {
+                    inQuote = true;
+                }
+            }
+            else
+            {
+                switch ( ch )
+                {
+                    case '{':
+                        if ( !inQuote )
+                        {
+                            if ( braceStack == 0 )
+                            {
+                                if ( i != 0 ) // handle { at first character
+                                {
+                                    segments.put( text.substring( lastOffset, i ), null );
+                                }
+                                lastOffset = i + 1;
+                                braceStack++;
+                            }
+                        }
+                        break;
+                    case '}':
+                        if ( !inQuote )
+                        {
+                            braceStack--;
+                            if ( braceStack == 0 )
+                            {
+                                String subString = text.substring( lastOffset, i );
+                                lastOffset = i + 1;
+
+                                int lastComma = subString.lastIndexOf( "," );
+                                if ( lastComma != -1 )
+                                {
+                                    segments.put( subString.substring( 0, lastComma ).trim(),
+                                                  subString.substring( lastComma + 1 ).trim() );
+                                }
+                                else
+                                {
+                                    segments.put( subString.substring( 0, lastComma ).trim(), null );
+                                }
+                            }
+                        }
+                        break;
+                    case '\'':
+                        inQuote = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        if ( !StringUtils.isEmpty( text.substring( lastOffset, text.length() ) ) )
+        {
+            segments.put( text.substring( lastOffset, text.length() ), null );
+        }
+
+        if ( braceStack != 0 )
+        {
+            throw new IllegalArgumentException( "Unmatched braces in the pattern." );
+        }
+
+        return Collections.unmodifiableMap( segments );
     }
 
     public abstract String getTitle();
