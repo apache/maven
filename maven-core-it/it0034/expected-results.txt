@@ -1,0 +1,1 @@
+target/maven-core-it0034-1.0-SNAPSHOT/WEB-INF/lib/junit-3.8.1.jar
