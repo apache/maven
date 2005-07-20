@@ -35,7 +35,15 @@ public class MojoExecutionException extends Exception
         this.longMessage = longMessage;
     }
 
+    /**
+     * @deprecated
+     */
     public MojoExecutionException( String message, Exception cause )
+    {
+        super( message, cause );
+    }
+
+    public MojoExecutionException( String message, Throwable cause )
     {
         super( message, cause );
     }
@@ -48,5 +56,10 @@ public class MojoExecutionException extends Exception
     public String getLongMessage()
     {
         return longMessage;
+    }
+
+    public Object getSource()
+    {
+        return source;
     }
 }
