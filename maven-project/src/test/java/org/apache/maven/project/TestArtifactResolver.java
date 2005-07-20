@@ -48,7 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class ProjectClasspathArtifactResolver
+public class TestArtifactResolver
     extends DefaultArtifactResolver
     implements Contextualizable
 {
@@ -56,7 +56,7 @@ public class ProjectClasspathArtifactResolver
 
     private PlexusContainer container;
 
-    public static class Source
+    static class Source
         implements ArtifactMetadataSource
     {
         private ArtifactFactory artifactFactory;
@@ -109,7 +109,7 @@ public class ProjectClasspathArtifactResolver
                 IOUtil.close( r );
             }
 
-            Set artifacts = null;
+            Set artifacts;
             try
             {
                 artifacts = createArtifacts( model.getDependencies(), artifact.getScope() );
@@ -156,6 +156,9 @@ public class ProjectClasspathArtifactResolver
         }
     }
 
+    /**
+     * @noinspection RefusedBequest
+     */
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {

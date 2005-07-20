@@ -103,9 +103,8 @@ public abstract class MavenProjectTestCase
     protected MavenProject getProjectWithDependencies( File pom )
         throws Exception
     {
-        return projectBuilder.buildWithDependencies( pom, getLocalRepository(),
-                                                     new ProjectClasspathArtifactResolver.Source( artifactFactory, artifactRepositoryFactory, getContainer() ),
-                                                     Collections.EMPTY_LIST );
+        return projectBuilder.buildWithDependencies( pom, getLocalRepository(), new TestArtifactResolver.Source(
+            artifactFactory, artifactRepositoryFactory, getContainer() ), Collections.EMPTY_LIST );
     }
 
     protected MavenProject getProject( File pom )

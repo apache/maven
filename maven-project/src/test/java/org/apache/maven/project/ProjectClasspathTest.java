@@ -36,12 +36,12 @@ public class ProjectClasspathTest
         File f = getFileForClasspathResource( dir + "project-with-scoped-dependencies.xml" );
 
         // XXX: Because this test fails, we resort to crude reflection hacks, see PLX-108 for the solution
-//        assertEquals( ProjectClasspathArtifactResolver.class, getContainer().lookup( ArtifactResolver.ROLE ).getClass() );
+//        assertEquals( TestArtifactResolver.class, getContainer().lookup( ArtifactResolver.ROLE ).getClass() );
         MavenProjectBuilder builder = (MavenProjectBuilder) getContainer().lookup( MavenProjectBuilder.ROLE );
         Field declaredField = builder.getClass().getDeclaredField( "artifactResolver" );
         boolean acc = declaredField.isAccessible();
         declaredField.setAccessible( true );
-        declaredField.set( builder, getContainer().lookup( ProjectClasspathArtifactResolver.class.getName() ) );
+        declaredField.set( builder, getContainer().lookup( TestArtifactResolver.class.getName() ) );
         declaredField.setAccessible( acc );
         // XXX: end hack
 

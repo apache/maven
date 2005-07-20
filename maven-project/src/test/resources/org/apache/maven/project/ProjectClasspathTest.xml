@@ -1,9 +1,9 @@
 <plexus>
   <components>
-<!-- Due to PLX-108, have to work around it...
+    <!-- Due to PLX-108, have to work around it...
     <component>
       <role>org.apache.maven.artifact.ArtifactResolver</role>
-      <implementation>org.apache.maven.project.ProjectClasspathArtifactResolver</implementation>
+      <implementation>org.apache.maven.project.TestArtifactResolvertion>
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>
@@ -15,8 +15,8 @@
     </component>
     -->
     <component>
-      <role>org.apache.maven.project.ProjectClasspathArtifactResolver</role>
-      <implementation>org.apache.maven.project.ProjectClasspathArtifactResolver</implementation>
+      <role>org.apache.maven.project.TestArtifactResolver</role>
+      <implementation>org.apache.maven.project.TestArtifactResolver</implementation>
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>
