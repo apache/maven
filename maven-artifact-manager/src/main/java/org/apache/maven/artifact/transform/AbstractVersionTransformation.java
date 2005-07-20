@@ -104,7 +104,9 @@ public abstract class AbstractVersionTransformation
                         artifact.getArtifactId() + ": checking for updates from " + remoteRepository.getId() );
 
                     VersionArtifactMetadata remoteMetadata;
-                    
+
+                    checkedUpdates = true;
+
                     try
                     {
                         remoteMetadata = retrieveFromRemoteRepository( artifact, remoteRepository, localMetadata );
@@ -112,10 +114,10 @@ public abstract class AbstractVersionTransformation
                     catch ( ResourceDoesNotExistException e )
                     {
                         getLogger().debug( "Error resolving artifact version from metadata.", e );
-                        
+
                         continue;
                     }
-                    
+
                     int difference = remoteMetadata.compareTo( localMetadata );
                     if ( difference > 0 )
                     {
@@ -124,7 +126,6 @@ public abstract class AbstractVersionTransformation
 
                         localMetadata = remoteMetadata;
                     }
-                    checkedUpdates = true;
                 }
             }
 
@@ -137,7 +138,7 @@ public abstract class AbstractVersionTransformation
         }
 
         String version = localMetadata.constructVersion();
-        
+
         // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
         if ( !artifact.getFile().exists() || localMetadata.newerThanFile( artifact.getFile() ) )
         {
@@ -177,12 +178,12 @@ public abstract class AbstractVersionTransformation
         throws ArtifactMetadataRetrievalException, ResourceDoesNotExistException
     {
         AbstractVersionArtifactMetadata metadata = createMetadata( artifact );
-        
+
         metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
-        
+
         return metadata;
     }
-    
+
     protected abstract AbstractVersionArtifactMetadata createMetadata( Artifact artifact );
 
     private VersionArtifactMetadata readFromLocalRepository( Artifact artifact, ArtifactRepository localRepository )
