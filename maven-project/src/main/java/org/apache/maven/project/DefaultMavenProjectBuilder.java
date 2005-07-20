@@ -292,7 +292,7 @@ public class DefaultMavenProjectBuilder
         }
         else
         {
-            aggregatedRemoteWagonRepositories = remoteArtifactRepositories;
+            aggregatedRemoteWagonRepositories = new ArrayList( remoteArtifactRepositories );
         }
 
         for ( Iterator i = externalProfiles.iterator(); i.hasNext(); )
