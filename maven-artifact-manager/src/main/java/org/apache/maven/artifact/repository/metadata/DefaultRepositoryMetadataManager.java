@@ -1,5 +1,21 @@
 package org.apache.maven.artifact.repository.metadata;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -31,7 +47,7 @@ public class DefaultRepositoryMetadataManager
     {
         resolve( metadata, null, local );
     }
-    
+
     public void resolve( RepositoryMetadata metadata, ArtifactRepository remote, ArtifactRepository local )
         throws RepositoryMetadataManagementException
     {
@@ -54,7 +70,8 @@ public class DefaultRepositoryMetadataManager
                         if ( !metadataFile.exists() )
                         {
                             throw new RepositoryMetadataManagementException( metadata,
-                                                                             "Remote repository metadata not found.", e );
+                                                                             "Remote repository metadata not found.",
+                                                                             e );
                         }
                         else
                         {
@@ -81,27 +98,28 @@ public class DefaultRepositoryMetadataManager
             {
                 if ( !verifyFileNotEmpty( metadataFile ) )
                 {
-                    throw new InvalidRepositoryMetadataException( metadata, "Metadata located in file: " + metadataFile + " appears to be corrupt (file is empty). DOWNLOAD FAILED." );
+                    throw new InvalidRepositoryMetadataException( metadata, "Metadata located in file: " +
+                        metadataFile + " appears to be corrupt (file is empty). DOWNLOAD FAILED." );
                 }
-                
+
                 cachedMetadata.put( metadata.getRepositoryPath(), metadataFile );
             }
         }
-        
+
         metadata.setFile( metadataFile );
     }
 
     private boolean verifyFileNotEmpty( File metadataFile )
     {
         InputStream verifyInputStream = null;
-        
+
         try
         {
             verifyInputStream = new FileInputStream( metadataFile );
-            
+
             return verifyInputStream.available() > 0;
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             return false;
         }
@@ -156,12 +174,13 @@ public class DefaultRepositoryMetadataManager
         throws RepositoryMetadataManagementException
     {
         File metadataFile = constructLocalRepositoryFile( metadata, local );
-        
+
         if ( metadataFile.exists() )
         {
             if ( !metadataFile.delete() )
             {
-                throw new RepositoryMetadataManagementException( metadata, "Failed to purge local copy from: " + metadataFile );
+                throw new RepositoryMetadataManagementException( metadata,
+                                                                 "Failed to purge local copy from: " + metadataFile );
             }
         }
     }
