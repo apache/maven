@@ -17,15 +17,19 @@ package org.apache.maven.report.projectinfo;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.reporting.AbstractMavenReport;
+import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
+import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,12 +38,13 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 /**
- * Generates the dependencies report.
- *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id$
+ * Generates the Project Dependencies report.
+ * 
  * @goal dependencies
+ * 
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton </a>
+ * @version $Id$
  * @plexus.component
  */
 public class DependenciesReport
@@ -64,6 +69,20 @@ public class DependenciesReport
      * @readonly
      */
     private MavenProject project;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+     * @required
+     * @readonly
+     */
+    private ArtifactFactory artifactFactory;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.project.MavenProjectBuilder}"
+     * @required
+     * @readonly
+     */
+    private MavenProjectBuilder mavenProjectBuilder;
 
     /**
      * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
@@ -106,7 +125,7 @@ public class DependenciesReport
     }
 
     /**
-     * @see AbstractMavenReport#getSiteRenderer()
+     * @see org.apache.maven.reporting.AbstractMavenReport#getSiteRenderer()
      */
     protected SiteRenderer getSiteRenderer()
     {
@@ -121,7 +140,8 @@ public class DependenciesReport
     {
         try
         {
-            DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject(), locale );
+            DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject(), locale, mavenProjectBuilder,
+                                                               artifactFactory );
 
             r.render();
         }
@@ -146,13 +166,22 @@ public class DependenciesReport
 
         private Locale locale;
 
-        public DependenciesRenderer( Sink sink, MavenProject project, Locale locale )
+        private ArtifactFactory artifactFactory;
+
+        private MavenProjectBuilder mavenProjectBuilder;
+
+        public DependenciesRenderer( Sink sink, MavenProject project, Locale locale,
+                                    MavenProjectBuilder mavenProjectBuilder, ArtifactFactory artifactFactory )
         {
             super( sink );
 
             this.project = project;
 
             this.locale = locale;
+
+            this.mavenProjectBuilder = mavenProjectBuilder;
+
+            this.artifactFactory = artifactFactory;
         }
 
         public String getTitle()
@@ -162,124 +191,175 @@ public class DependenciesReport
 
         public void renderBody()
         {
-            startSection( getTitle() );
-
             // Dependencies report
             List dependencies = project.getDependencies();
 
-            if ( dependencies.isEmpty() )
+            if ( ( dependencies == null ) || ( dependencies.isEmpty() ) )
             {
+                startSection( getTitle() );
+
                 // TODO: should the report just be excluded?
                 paragraph( getBundle( locale ).getString( "report.dependencies.nolist" ) );
+
+                endSection();
+
+                return;
+            }
+
+            startSection( getTitle() );
+
+            startTable();
+
+            tableCaption( getBundle( locale ).getString( "report.dependencies.intro" ) );
+
+            String groupId = getBundle( locale ).getString( "report.dependencies.column.groupId" );
+            String artifactId = getBundle( locale ).getString( "report.dependencies.column.artifactId" );
+            String version = getBundle( locale ).getString( "report.dependencies.column.version" );
+            String description = getBundle( locale ).getString( "report.dependencies.column.description" );
+            String url = getBundle( locale ).getString( "report.dependencies.column.url" );
+
+            tableHeader( new String[] { groupId, artifactId, version, description, url } );
+
+            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+            {
+                Dependency dependency = (Dependency) i.next();
+
+                Artifact artifact = artifactFactory.createArtifact( dependency.getGroupId(),
+                                                                    dependency.getArtifactId(),
+                                                                    dependency.getVersion(), dependency.getScope(),
+                                                                    dependency.getType() );
+                MavenProject artifactProject = null;
+                try
+                {
+                    artifactProject = getMavenProjectFromRepository( artifact );
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    throw new IllegalArgumentException(
+                                                        "Can't find a valid Maven project in the repository for the artifact ["
+                                                            + artifact + "]." );
+                }
+
+                tableRow( new String[] {
+                    dependency.getGroupId(),
+                    dependency.getArtifactId(),
+                    dependency.getVersion(),
+                    artifactProject.getDescription(),
+                    createLinkPatternedText( artifactProject.getUrl(), artifactProject.getUrl() ) } );
+            }
+
+            endTable();
+
+            endSection();
+
+            // Transitive dependencies
+            Set artifacts = getTransitiveDependencies( project );
+
+            startSection( getBundle( locale ).getString( "report.transitivedependencies.title" ) );
+
+            if ( artifacts.isEmpty() )
+            {
+                paragraph( getBundle( locale ).getString( "report.transitivedependencies.nolist" ) );
             }
             else
             {
                 startTable();
 
-                tableCaption( getBundle( locale ).getString( "report.dependencies.intro" ) );
+                tableCaption( getBundle( locale ).getString( "report.transitivedependencies.intro" ) );
 
-                String groupId = getBundle( locale ).getString( "report.dependencies.column.groupId" );
-                String artifactId = getBundle( locale ).getString( "report.dependencies.column.artifactId" );
-                String version = getBundle( locale ).getString( "report.dependencies.column.version" );
+                tableHeader( new String[] { groupId, artifactId, version, description, url } );
 
-                tableHeader( new String[]{groupId, artifactId, version} );
-
-                for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
                 {
-                    Dependency d = (Dependency) i.next();
+                    Artifact artifact = (Artifact) i.next();
 
-                    tableRow( new String[]{d.getGroupId(), d.getArtifactId(), d.getVersion()} );
+                    MavenProject artifactProject = null;
+                    try
+                    {
+                        artifactProject = getMavenProjectFromRepository( artifact );
+                    }
+                    catch ( ProjectBuildingException e )
+                    {
+                        throw new IllegalArgumentException(
+                                                            "Can't find a valid Maven project in the repository for the artifact ["
+                                                                + artifact + "]." );
+                    }
+                    System.out.println( "nklj-----------------------------" );
+                    System.out.println( artifactProject.getUrl() );
+                    tableRow( new String[] {
+                        artifact.getGroupId(),
+                        artifact.getArtifactId(),
+                        artifact.getVersion(),
+                        artifactProject.getDescription(),
+                        createLinkPatternedText( artifactProject.getUrl(), artifactProject.getUrl() ) } );
                 }
 
                 endTable();
             }
 
             endSection();
-
-            // Transitive dependencies
-            if ( !dependencies.isEmpty() )
-            {
-                Set artifacts = getTransitiveDependencies( project );
-
-                startSection( getBundle( locale ).getString( "report.transitivedependencies.title" ) );
-
-                if ( artifacts.isEmpty() )
-                {
-                    // TODO: should the report just be excluded?
-                    paragraph( getBundle( locale ).getString( "report.transitivedependencies.nolist" ) );
-                }
-                else
-                {
-                    startTable();
-
-                    tableCaption( getBundle( locale ).getString( "report.transitivedependencies.intro" ) );
-
-                    String groupId = getBundle( locale ).getString( "report.transitivedependencies.column.groupId" );
-                    String artifactId = getBundle( locale ).getString(
-                        "report.transitivedependencies.column.artifactId" );
-                    String version = getBundle( locale ).getString( "report.transitivedependencies.column.version" );
-
-                    tableHeader( new String[]{groupId, artifactId, version} );
-
-                    for ( Iterator i = artifacts.iterator(); i.hasNext(); )
-                    {
-                        Artifact artifact = (Artifact) i.next();
-
-                        tableRow(
-                            new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()} );
-                    }
-
-                    endTable();
-                }
-
-                endSection();
-            }
-
         }
 
         /**
-         * Return a set of artifact which are not already present in the dependencies list.
-         *
-         * @param project a Maven project
-         * @return a set of transitive dependencies
-         * @todo check if this works with version ranges
+         * Return a set of <code>Artifacts</code> which are not already
+         * present in the dependencies list.
+         * 
+         * @param project
+         *            a Maven project
+         * @return a set of transitive dependencies as artifacts
          */
         private Set getTransitiveDependencies( MavenProject project )
         {
-            Set result = new HashSet();
-
-            if ( project.getDependencies() == null || project.getArtifacts() == null )
-            {
-                return result;
-            }
+            Set transitiveDependencies = new HashSet();
 
             List dependencies = project.getDependencies();
             Set artifacts = project.getArtifacts();
+
+            if ( ( dependencies == null ) || ( artifacts == null ) )
+            {
+                return transitiveDependencies;
+            }
+
+            List dependenciesAsArtifacts = new ArrayList( dependencies.size() );
+            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+            {
+                Dependency dependency = (Dependency) i.next();
+
+                Artifact artifact = artifactFactory.createArtifact( dependency.getGroupId(),
+                                                                    dependency.getArtifactId(),
+                                                                    dependency.getVersion(), dependency.getScope(),
+                                                                    dependency.getType() );
+                dependenciesAsArtifacts.add( artifact );
+            }
 
             for ( Iterator j = artifacts.iterator(); j.hasNext(); )
             {
                 Artifact artifact = (Artifact) j.next();
 
-                boolean toadd = true;
-                for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+                if ( !dependenciesAsArtifacts.contains( artifact ) )
                 {
-                    Dependency dependency = (Dependency) i.next();
-                    if ( artifact.getArtifactId().equals( dependency.getArtifactId() ) &&
-                        artifact.getGroupId().equals( dependency.getGroupId() ) &&
-                        artifact.getVersion().equals( dependency.getVersion() ) )
-                    {
-                        toadd = false;
-                        break;
-                    }
-                }
-
-                if ( toadd )
-                {
-                    result.add( artifact );
+                    transitiveDependencies.add( artifact );
                 }
             }
 
-            return result;
+            return transitiveDependencies;
+        }
+
+        /**
+         * Get the <code>Maven project</code> from the repository depending
+         * the <code>Artifact</code> given.
+         * 
+         * @param artifact
+         *            an artifact
+         * @return the Maven project for the given artifact
+         * @throws ProjectBuildingException
+         *             if any
+         */
+        private MavenProject getMavenProjectFromRepository( Artifact artifact )
+            throws ProjectBuildingException
+        {
+            return mavenProjectBuilder.buildFromRepository( artifact, project.getRepositories(), artifact
+                .getRepository() );
         }
     }
 

@@ -30,6 +30,13 @@
   <packaging>maven-plugin</packaging>
   <name>Maven Project Info Reports Plugin</name>
   <inceptionYear>2005</inceptionYear>
+  <dependencies>
+    <dependency>
+      <groupId>commons-validator</groupId>
+      <artifactId>commons-validator</artifactId>
+      <version>1.1.4</version>
+    </dependency>
+  </dependencies>
   <developers>
     <developer>
       <id>vsiveton</id>
