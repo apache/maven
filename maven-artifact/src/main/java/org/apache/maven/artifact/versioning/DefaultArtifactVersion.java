@@ -99,7 +99,7 @@ public class DefaultArtifactVersion
 
     private int compareIntegers( Integer i1, Integer i2 )
     {
-        if ( i1 == i2 )
+        if ( i1 == null ? i2 == null : i1.equals( i2 ) )
         {
             return 0;
         }
@@ -196,6 +196,14 @@ public class DefaultArtifactVersion
                 if ( tok.hasMoreTokens() )
                 {
                     incrementalVersion = Integer.valueOf( tok.nextToken() );
+                }
+                if ( tok.hasMoreTokens() )
+                {
+                    // qualifier is the whole version, including "-"
+                    qualifier = version;
+                    majorVersion = null;
+                    minorVersion = null;
+                    incrementalVersion = null;
                 }
             }
             catch ( NumberFormatException e )
