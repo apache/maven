@@ -173,7 +173,7 @@ public class SurefirePlugin
             }
 
             surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
-                                       new Object[]{basedir, includes, excludes} );
+                                       new Object[]{ new File( basedir ), includes, excludes} );
         }
         else
         {
