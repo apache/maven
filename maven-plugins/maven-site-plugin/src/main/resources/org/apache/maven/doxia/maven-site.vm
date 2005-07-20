@@ -39,17 +39,17 @@
   #end
 #end
 
-#macro ( displayTree $display $item)
-  #if ( $item.getChildren() && $item.getChildCount() > 0 )
+#macro ( displayTree $display $item )
+  #if ( $item && $item.getChildren() && $item.getChildCount() > 0 )
     #foreach( $subitem in $item.getChildren() )
       #set ( $subitemHref = $PathTool.calculateLink( $subitem.getAttribute( "href" ), $relativePath ) )
-      #set ( $subitemHref = $$subitemHref.replaceAll( "\\", "/" ) )
+      #set ( $subitemHref = $subitemHref.replaceAll( "\\", "/" ) )
 
       #if ( $currentFileName == $subitemHref ) 
         #set ( $display = true )
       #end
           
-      #displayTree($display $subitem)
+      #displayTree( $display $subitem )
     #end
   #end
 #end
@@ -60,7 +60,7 @@
   #set ( $currentFileName = $currentFileName.replaceAll( "\\", "/" ) )
   #set ( $currentItemHref = $currentItemHref.replaceAll( "\\", "/" ) )
 
-  #if ( $item.getChildCount() > 0 )
+  #if ( $item && $item.getChildCount() > 0 )
     #if ( ( $item.getAttribute( "collapse" ) ) && ( $item.getAttribute( "collapse" ).equalsIgnoreCase( "false" ) ) )
       #set ( $collapse = "expanded" )
     #else
@@ -79,10 +79,10 @@
       <a href="$currentItemHref">$item.getAttribute( "name" )</a>
     #end
   </li>
-  #if ( $item.getChildren() && $item.getChildCount() > 0 )
+  #if ( $item && $item.getChildren() && $item.getChildCount() > 0 )
     #set ( $display = false )
     #set ( $itemTmp = $item )
-    #displayTree($display $itemTmp)
+    #displayTree( $display $itemTmp )
 
     #if ( $collapse == "expanded" || $display )
       <ul>
