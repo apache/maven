@@ -70,7 +70,7 @@ public class DefaultArtifactCollector
         for ( Iterator i = resolvedArtifacts.values().iterator(); i.hasNext(); )
         {
             ResolutionNode node = (ResolutionNode) i.next();
-            if ( node != root )
+            if ( !node.equals( root ) )
             {
                 Artifact artifact = node.getArtifact();
 
@@ -120,11 +120,11 @@ public class DefaultArtifactCollector
             // previous one is more dominant
             if ( previous.getDepth() <= node.getDepth() )
             {
-                checkScopeUpdate( node, previous, artifactFactory, listeners );
+                checkScopeUpdate( node, previous, listeners );
             }
             else
             {
-                checkScopeUpdate( previous, node, artifactFactory, listeners );
+                checkScopeUpdate( previous, node, listeners );
             }
 
             if ( previous.getDepth() <= node.getDepth() )
@@ -147,14 +147,15 @@ public class DefaultArtifactCollector
             {
                 try
                 {
-                    ResolutionGroup rGroup = source.retrieve( child.getArtifact(), localRepository, remoteRepositories );
+                    ResolutionGroup rGroup = source.retrieve( child.getArtifact(), localRepository,
+                                                              remoteRepositories );
                     child.addDependencies( rGroup.getArtifacts(), rGroup.getResolutionRepositories(), filter );
                 }
                 catch ( CyclicDependencyException e )
                 {
                     // would like to throw this, but we have crappy stuff in the repo
                     // no logger to use here either just now
-                    
+
                     // TODO: should the remoteRepositories list be null here?!
                     fireEvent( ResolutionListener.OMIT_FOR_CYCLE, listeners,
                                new ResolutionNode( e.getArtifact(), null, child ) );
@@ -174,15 +175,14 @@ public class DefaultArtifactCollector
         fireEvent( ResolutionListener.FINISH_PROCESSING_CHILDREN, listeners, node );
     }
 
-    private void checkScopeUpdate( ResolutionNode node, ResolutionNode previous, ArtifactFactory artifactFactory,
-                                   List listeners )
+    private void checkScopeUpdate( ResolutionNode node, ResolutionNode previous, List listeners )
     {
         boolean updateScope = false;
         Artifact newArtifact = node.getArtifact();
         Artifact previousArtifact = previous.getArtifact();
 
-        if ( Artifact.SCOPE_RUNTIME.equals( newArtifact.getScope() ) &&
-            ( Artifact.SCOPE_TEST.equals( previousArtifact.getScope() ) ||
+        if ( Artifact.SCOPE_RUNTIME.equals( newArtifact.getScope() ) && (
+            Artifact.SCOPE_TEST.equals( previousArtifact.getScope() ) ||
                 Artifact.SCOPE_PROVIDED.equals( previousArtifact.getScope() ) ) )
         {
             updateScope = true;
@@ -198,12 +198,10 @@ public class DefaultArtifactCollector
         {
             fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, previous, newArtifact );
 
-            Artifact artifact = artifactFactory.createArtifact( previousArtifact.getGroupId(),
-                                                                previousArtifact.getArtifactId(),
-                                                                previousArtifact.getVersion(), newArtifact.getScope(),
-                                                                previousArtifact.getType() );
-            // TODO: can I just change the scope?
-            previous.setArtifact( artifact );
+            // previously we cloned the artifact, but it is more effecient to just update the scope
+            // if problems are later discovered that the original object needs its original scope value, cloning may
+            // again be appropriate
+            previousArtifact.setScope( newArtifact.getScope() );
         }
     }
 

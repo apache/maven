@@ -41,11 +41,6 @@ public class DefaultArtifact
     private final String artifactId;
 
     /**
-     * The resolved version for the artifact after conflict resolution and all transformations.
-     */
-    private String version;
-
-    /**
      * The resolved version for the artifact after conflict resolution, that has not been transformed.
      *
      * @todo should be final
@@ -72,6 +67,10 @@ public class DefaultArtifact
 
     private List dependencyTrail;
 
+    private String version;
+
+    private VersionRange versionRange;
+
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler )
     {
@@ -79,8 +78,9 @@ public class DefaultArtifact
 
         this.artifactId = artifactId;
 
-        // TODO: this would be where we might have a min/max instead
-        this.version = versionRange != null ? versionRange.getRecommendedVersion().toString() : null;
+        this.versionRange = versionRange;
+
+        this.version = versionRange == null ? null : versionRange.getRecommendedVersion().toString();
 
         this.artifactHandler = artifactHandler;
 
@@ -97,23 +97,26 @@ public class DefaultArtifact
     {
         if ( empty( groupId ) )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The groupId cannot be empty." );
+            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
+                                                  "The groupId cannot be empty." );
         }
 
         if ( artifactId == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, version, type,
+            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
                                                   "The artifactId cannot be empty." );
         }
 
         if ( type == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The type cannot be empty." );
+            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
+                                                  "The type cannot be empty." );
         }
 
-        if ( version == null )
+        if ( getVersion() == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "The version cannot be empty." );
+            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
+                                                  "The version cannot be empty." );
         }
     }
 
@@ -155,6 +158,7 @@ public class DefaultArtifact
     public void setVersion( String version )
     {
         this.version = version;
+        this.versionRange = null;
     }
 
     public String getType()
@@ -264,6 +268,9 @@ public class DefaultArtifact
         {
             return false;
         }
+
+        // We don't consider the version range in the comparison, just the resolved version
+
         return true;
     }
 
@@ -319,6 +326,7 @@ public class DefaultArtifact
                     }
                     if ( result == 0 )
                     {
+                        // We don't consider the version range in the comparison, just the resolved version
                         result = version.compareTo( a.getVersion() );
                     }
                 }
