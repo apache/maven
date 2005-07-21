@@ -283,17 +283,15 @@ public class DefaultMavenProjectBuilder
 
         LinkedList lineage = new LinkedList();
 
-        List aggregatedRemoteWagonRepositories;
-        if ( remoteArtifactRepositories == null || remoteArtifactRepositories.isEmpty() )
+        Set aggregatedRemoteWagonRepositories = new HashSet();
+        if ( remoteArtifactRepositories != null && !remoteArtifactRepositories.isEmpty() )
         {
-            aggregatedRemoteWagonRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
-                                                                                        artifactRepositoryFactory,
-                                                                                        container );
+            aggregatedRemoteWagonRepositories.addAll( remoteArtifactRepositories );
         }
-        else
-        {
-            aggregatedRemoteWagonRepositories = new ArrayList( remoteArtifactRepositories );
-        }
+
+        aggregatedRemoteWagonRepositories.addAll( ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
+                                                                                          artifactRepositoryFactory,
+                                                                                          container ) );
 
         for ( Iterator i = externalProfiles.iterator(); i.hasNext(); )
         {
@@ -307,14 +305,13 @@ public class DefaultMavenProjectBuilder
                                                                                         artifactRepositoryFactory,
                                                                                         container );
 
-                if ( !aggregatedRemoteWagonRepositories.contains( artifactRepo ) )
-                {
-                    aggregatedRemoteWagonRepositories.add( artifactRepo );
-                }
+                aggregatedRemoteWagonRepositories.add( artifactRepo );
             }
         }
 
-        MavenProject project = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository );
+        List repositories = new ArrayList( aggregatedRemoteWagonRepositories );
+
+        MavenProject project = assembleLineage( model, lineage, repositories, localRepository );
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         Model previous = superModel;
@@ -332,7 +329,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, aggregatedRemoteWagonRepositories, externalProfiles );
+            project = processProjectLogic( pomLocation, project, repositories, externalProfiles );
         }
         catch ( ModelInterpolationException e )
         {

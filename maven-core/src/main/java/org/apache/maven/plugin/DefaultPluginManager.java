@@ -51,8 +51,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.settings.Settings;
 import org.apache.maven.reporting.MavenReport;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -344,7 +344,8 @@ public class DefaultPluginManager
 
     public List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session,
                             ArtifactRepository localRepository )
-        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException, ArtifactResolutionException
+        throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException,
+        ArtifactResolutionException
     {
         Plugin forLookup = new Plugin();
         forLookup.setGroupId( reportPlugin.getGroupId() );
@@ -359,7 +360,6 @@ public class DefaultPluginManager
             MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
 
             // TODO: check ID is correct for reports
-            // TODO: this returns mojos that aren't reports
             // if the POM configured no reports, give all from plugin
             if ( reportSet == null || reportSet.getReports().contains( mojoDescriptor.getGoal() ) )
             {
@@ -476,11 +476,6 @@ public class DefaultPluginManager
             {
                 MavenMetadataSource metadataSource = new MavenMetadataSource( mavenProjectBuilder, artifactFactory );
 
-                List remoteRepositories = new ArrayList();
-
-                remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
-                remoteRepositories.addAll( project.getPluginArtifactRepositories() );
-
                 ArtifactRepository localRepository = session.getLocalRepository();
 
                 ResolutionGroup resolutionGroup = metadataSource.retrieve( pluginArtifact, localRepository,
@@ -490,7 +485,7 @@ public class DefaultPluginManager
 
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         localRepository,
-                                                                                        remoteRepositories,
+                                                                                        resolutionGroup.getResolutionRepositories(),
                                                                                         metadataSource,
                                                                                         artifactFilter );
 
@@ -549,7 +544,8 @@ public class DefaultPluginManager
 
             if ( artifactFile == null )
             {
-                String resource = "/META-INF/maven/" + artifact.getGroupId() + "/" + artifact.getArtifactId() + "/pom.xml";
+                String resource = "/META-INF/maven/" + artifact.getGroupId() + "/" + artifact.getArtifactId() +
+                    "/pom.xml";
 
                 URL resourceUrl = container.getContainerRealm().getResource( resource );
 
