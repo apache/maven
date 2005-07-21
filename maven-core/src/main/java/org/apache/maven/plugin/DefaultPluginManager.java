@@ -52,6 +52,7 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -286,7 +287,7 @@ public class DefaultPluginManager
                 dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
             }
 
-            plugin = getConfiguredMojo( mojoDescriptor, session, dom, project );
+            plugin = getConfiguredMojo( mojoDescriptor, session, dom, project, false );
         }
         catch ( PluginConfigurationException e )
         {
@@ -375,7 +376,11 @@ public class DefaultPluginManager
                     Xpp3Dom dom = project.getReportConfiguration( reportPlugin.getGroupId(),
                                                                   reportPlugin.getArtifactId(), executionId );
 
-                    reports.add( getConfiguredMojo( mojoDescriptor, session, dom, project ) );
+                    Mojo reportMojo = getConfiguredMojo( mojoDescriptor, session, dom, project, true );
+                    if ( reportMojo != null )
+                    {
+                        reports.add( reportMojo );
+                    }
                 }
                 catch ( ComponentLookupException e )
                 {
@@ -401,12 +406,12 @@ public class DefaultPluginManager
     }
 
     private Mojo getConfiguredMojo( MojoDescriptor mojoDescriptor, MavenSession session, Xpp3Dom dom,
-                                    MavenProject project )
+                                    MavenProject project, boolean report )
         throws ComponentLookupException, PluginConfigurationException, PluginManagerException
     {
-        PlexusContainer pluginContainer = getPluginContainer( mojoDescriptor.getPluginDescriptor() );
-
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+
+        PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
 
         // if this is the first time this plugin has been used, the plugin's container will only
         // contain the plugin's artifact in isolation; we need to finish resolving the plugin's
@@ -414,6 +419,11 @@ public class DefaultPluginManager
         ensurePluginContainerIsComplete( pluginDescriptor, pluginContainer, project, session );
 
         Mojo plugin = (Mojo) pluginContainer.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
+        if ( report && !( plugin instanceof MavenReport ) )
+        {
+            // TODO: the mojoDescriptor should actually capture this information so we don't get this far
+            return null;
+        }
 
         plugin.setLog( mojoLogger );
 

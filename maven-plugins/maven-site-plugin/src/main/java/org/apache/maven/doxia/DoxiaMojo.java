@@ -908,19 +908,6 @@ public class DoxiaMojo
             {
                 ReportPlugin reportPlugin = (ReportPlugin) it.next();
 
-//                try
-//                {
-//                    pluginManager.verifyPlugin( reportPlugin, project, settings, localRepository );
-//                }
-//                catch ( PluginVersionResolutionException e )
-//                {
-//                    throw new MojoExecutionException( "Cannot resolve version for report plugin", e );
-//                }
-//                catch ( PluginManagerException e )
-//                {
-//                    throw new MojoExecutionException( "Cannot find report plugin", e );
-//                }
-
                 try
                 {
                     List reportSets = reportPlugin.getReportSets();
@@ -943,16 +930,7 @@ public class DoxiaMojo
                         }
                     }
 
-                    for ( Iterator i = reportsList.iterator(); i.hasNext(); )
-                    {
-                        Object obj = i.next();
-
-                        //TODO: Remove this test when getReports will return only reports object
-                        if ( obj instanceof MavenReport )
-                        {
-                            reports.add( obj );
-                        }
-                    }
+                    reports.addAll( reportsList );
                 }
                 catch ( PluginManagerException e )
                 {
