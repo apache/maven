@@ -15,7 +15,6 @@
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-alpha-4</version>
     </dependency>
-    <!-- TODO: remove -->
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-api</artifactId>

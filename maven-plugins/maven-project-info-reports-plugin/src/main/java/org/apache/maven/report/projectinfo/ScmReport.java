@@ -115,16 +115,9 @@ public class ScmReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        try
-        {
-            ScmRenderer r = new ScmRenderer( getSink(), getProject().getModel(), locale );
+        ScmRenderer r = new ScmRenderer( getSink(), getProject().getModel(), locale );
 
-            r.render();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( "Can't write the report " + getOutputName(), e );
-        }
+        r.render();
     }
 
     /**

@@ -48,7 +48,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-site-renderer</artifactId>
-      <version>1.0-alpha-2-20050715.080727-2</version>
+      <version>1.0-alpha-2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>

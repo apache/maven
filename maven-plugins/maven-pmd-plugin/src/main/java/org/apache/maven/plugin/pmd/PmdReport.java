@@ -120,15 +120,7 @@ public class PmdReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        Sink sink = null;
-        try
-        {
-            sink = getSink();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( "Can't obtain sink for PMD report.", e );
-        }
+        Sink sink = getSink();
 
         PMD pmd = new PMD();
         RuleContext ruleContext = new RuleContext();

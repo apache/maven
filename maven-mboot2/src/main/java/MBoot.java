@@ -41,7 +41,7 @@ public class MBoot
         "maven-artifact", "maven-plugin-descriptor", "maven-artifact-manager", "maven-artifact-test",
         "maven-plugin-mapping",
         "maven-script/maven-script-beanshell", "maven-script/maven-script-marmalade", "maven-project", "maven-profile",
-        "maven-plugin-registry", "maven-reporting/maven-reporting-api", "maven-core", "maven-archiver",
+        "maven-plugin-registry", "maven-reporting/maven-reporting-api", "maven-reporting/maven-reporting-impl", "maven-core", "maven-archiver",
         "maven-plugin-tools/maven-plugin-tools-api", "maven-plugin-tools/maven-plugin-tools-java",
         "maven-plugin-tools/maven-plugin-tools-beanshell", "maven-plugin-tools/maven-plugin-tools-pluggy",
         "maven-plugin-tools/maven-plugin-tools-marmalade", "maven-core-it-verifier"};

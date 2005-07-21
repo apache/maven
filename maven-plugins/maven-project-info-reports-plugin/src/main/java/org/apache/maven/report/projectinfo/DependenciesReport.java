@@ -138,17 +138,10 @@ public class DependenciesReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        try
-        {
-            DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject(), locale, mavenProjectBuilder,
-                                                               artifactFactory );
+        DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject(), locale, mavenProjectBuilder,
+                                                           artifactFactory );
 
-            r.render();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( "Can't write the report " + getOutputName(), e );
-        }
+        r.render();
     }
 
     /**

@@ -18,7 +18,6 @@ package org.apache.maven.reporting;
 
 import org.codehaus.doxia.sink.Sink;
 
-import java.io.IOException;
 import java.io.File;
 import java.util.Locale;
 
@@ -47,9 +46,6 @@ public interface MavenReport
     String getCategoryName();
 
     String getDescription( Locale locale );
-
-    Sink getSink()
-        throws IOException;
 
     // TODO: remove?
     void setReportOutputDirectory( File outputDirectory );

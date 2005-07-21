@@ -1,7 +1,7 @@
 package org.apache.maven.reporting;
 
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,7 @@ public abstract class AbstractMavenReport
 
     /**
      * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
+     * @deprecated
      */
     public void generate( Sink sink, Locale locale )
         throws MavenReportException
@@ -124,12 +125,6 @@ public abstract class AbstractMavenReport
 
     protected void closeReport()
     {
-    }
-
-    public Sink getSink()
-        throws IOException
-    {
-        return sink;
     }
 
     public String getCategoryName()
@@ -204,5 +199,10 @@ public abstract class AbstractMavenReport
     public void setReportOutputDirectory( File reportOutputDirectory )
     {
         this.reportOutputDirectory = reportOutputDirectory;
+    }
+
+    public Sink getSink()
+    {
+        return sink;
     }
 }

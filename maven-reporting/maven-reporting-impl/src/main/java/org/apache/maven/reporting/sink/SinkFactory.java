@@ -1,14 +1,7 @@
 package org.apache.maven.reporting.sink;
 
-import java.io.File;
-import java.io.InputStream;
-
-import org.codehaus.doxia.sink.Sink;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
-import org.codehaus.plexus.util.StringInputStream;
-
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +15,13 @@ import org.codehaus.plexus.util.StringInputStream;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import java.io.File;
+import java.io.InputStream;
+
+import org.codehaus.doxia.sink.Sink;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
+import org.codehaus.plexus.util.StringInputStream;
 
 /**
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>

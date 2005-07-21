@@ -115,16 +115,9 @@ public class IssueTrackingReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        try
-        {
-            IssueTrackingRenderer r = new IssueTrackingRenderer( getSink(), getProject().getModel(), locale );
+        IssueTrackingRenderer r = new IssueTrackingRenderer( getSink(), getProject().getModel(), locale );
 
-            r.render();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( "Can't write the report " + getOutputName(), e );
-        }
+        r.render();
     }
 
     /**

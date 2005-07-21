@@ -119,16 +119,9 @@ public class TeamListReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        try
-        {
-            TeamListRenderer r = new TeamListRenderer( getSink(), getProject().getModel(), locale );
+        TeamListRenderer r = new TeamListRenderer( getSink(), getProject().getModel(), locale );
 
-            r.render();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( "Can't write the report " + getOutputName(), e );
-        }
+        r.render();
     }
 
     /**

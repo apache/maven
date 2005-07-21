@@ -123,16 +123,9 @@ public class LicenseReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        try
-        {
-            LicenseRenderer r = new LicenseRenderer( getSink(), getProject(), locale );
+        LicenseRenderer r = new LicenseRenderer( getSink(), getProject(), locale );
 
-            r.render();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( "Can't write the report " + getOutputName(), e );
-        }
+        r.render();
     }
 
     /**

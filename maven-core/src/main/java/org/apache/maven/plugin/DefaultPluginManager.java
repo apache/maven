@@ -499,13 +499,13 @@ public class DefaultPluginManager
                 pluginDescriptor.setClassRealm( pluginContainer.getContainerRealm() );
 
                 List unresolved = new ArrayList( dependencies );
-                
+
                 unresolved.removeAll( resolved );
-                
+
                 resolveCoreArtifacts( unresolved );
 
                 List allResolved = new ArrayList( resolved.size() + unresolved.size() );
-                
+
                 allResolved.addAll( resolved );
                 allResolved.addAll( unresolved );
 
@@ -527,36 +527,36 @@ public class DefaultPluginManager
     }
 
     private Map resolvedCoreArtifactFiles = new HashMap();
-    
+
     private void resolveCoreArtifacts( List unresolved )
         throws PluginConfigurationException
     {
         for ( Iterator it = unresolved.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-            
+
             File artifactFile = (File) resolvedCoreArtifactFiles.get( artifact.getId() );
-            
+
             if ( artifactFile == null )
             {
                 String resource = "/META-INF/maven/" + artifact.getGroupId() + "/" + artifact.getArtifactId() + "/pom.xml";
-                
+
                 URL resourceUrl = container.getContainerRealm().getResource( resource );
-                
+
                 if ( resourceUrl == null )
                 {
                     throw new PluginConfigurationException( "Cannot resolve core artifact: " + artifact.getId() );
                 }
-                
+
                 String artifactPath = resourceUrl.getPath();
-                
+
                 artifactPath = artifactPath.substring( 0, artifactPath.length() - resource.length() );
-                
+
                 artifactFile = new File( artifactPath );
-                
+
                 resolvedCoreArtifactFiles.put( artifact.getId(), artifactFile );
             }
-            
+
             artifact.setFile( artifactFile );
         }
     }
@@ -926,7 +926,6 @@ public class DefaultPluginManager
         Set artifacts = new HashSet();
         artifacts.add( "classworlds" );
         artifacts.add( "commons-cli" );
-        artifacts.add( "commons-validator" );
         artifacts.add( "jline" );
         artifacts.add( "jsch" );
         artifacts.add( "maven-artifact" );
@@ -938,6 +937,7 @@ public class DefaultPluginManager
         artifacts.add( "maven-plugin-descriptor" );
         artifacts.add( "maven-plugin-mapping" );
         artifacts.add( "maven-plugin-registry" );
+        artifacts.add( "maven-profile" );
         artifacts.add( "maven-project" );
         artifacts.add( "maven-settings" );
         artifacts.add( "plexus-container-default" );
@@ -947,10 +947,8 @@ public class DefaultPluginManager
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
         artifacts.add( "wagon-ssh" );
-        // TODO: remove doxia
-        artifacts.add( "doxia-core" );
+        artifacts.add( "doxia-sink-api" );
         artifacts.add( "maven-reporting-api" );
-        artifacts.add( "oro" );
         artifactFilter = new ExclusionSetFilter( artifacts );
     }
 

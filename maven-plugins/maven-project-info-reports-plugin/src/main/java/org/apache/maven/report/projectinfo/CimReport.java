@@ -118,16 +118,9 @@ public class CimReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        try
-        {
-            CimRenderer r = new CimRenderer( getSink(), getProject().getModel(), locale );
+        CimRenderer r = new CimRenderer( getSink(), getProject().getModel(), locale );
 
-            r.render();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( "Can't write the report " + getOutputName(), e );
-        }
+        r.render();
     }
 
     /**

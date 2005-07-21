@@ -21,24 +21,41 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>maven-plugin-parent</artifactId>
-    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-reporting</artifactId>
+    <groupId>org.apache.maven.reporting</groupId>
     <version>2.0-beta-1-SNAPSHOT</version>
   </parent>
-  <artifactId>maven-project-info-reports-plugin</artifactId>
-  <version>2.0-alpha-2-SNAPSHOT</version>
-  <packaging>maven-plugin</packaging>
-  <name>Maven Project Info Reports Plugin</name>
-  <inceptionYear>2005</inceptionYear>
+  <artifactId>maven-reporting-impl</artifactId>
+  <developers>
+    <developer>
+      <id>vsiveton</id>
+      <name>Vincent Siveton</name>
+      <email>vincent.siveton@gmail.com</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+  </developers>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
+      <artifactId>maven-project</artifactId>
       <version>2.0-beta-1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
-      <artifactId>maven-reporting-impl</artifactId>
+      <artifactId>maven-reporting-api</artifactId>
+      <version>2.0-beta-1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>doxia</groupId>
+      <artifactId>doxia-core</artifactId>
+      <version>1.0-alpha-4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
       <version>2.0-beta-1-SNAPSHOT</version>
     </dependency>
     <dependency>
@@ -46,17 +63,10 @@
       <artifactId>commons-validator</artifactId>
       <version>1.1.4</version>
     </dependency>
+    <dependency>
+      <groupId>oro</groupId>
+      <artifactId>oro</artifactId>
+      <version>2.0.7</version>
+    </dependency>
   </dependencies>
-  <developers>
-    <developer>
-      <id>vsiveton</id>
-      <name>Vincent Siveton</name>
-      <email>vsiveton@apache.org</email>
-      <organization>Apache Software Foundation</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-      <timezone>-5</timezone>
-    </developer>
-  </developers>
 </project>

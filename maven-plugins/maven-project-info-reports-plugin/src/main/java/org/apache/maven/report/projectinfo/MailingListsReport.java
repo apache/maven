@@ -116,16 +116,9 @@ public class MailingListsReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        try
-        {
-            MailingListsRenderer r = new MailingListsRenderer( getSink(), getProject().getModel(), locale );
+        MailingListsRenderer r = new MailingListsRenderer( getSink(), getProject().getModel(), locale );
 
-            r.render();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( "Can't write the report " + getOutputName(), e );
-        }
+        r.render();
     }
 
     /**
