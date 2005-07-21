@@ -17,6 +17,7 @@ package org.apache.maven.report.projectinfo;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
@@ -85,6 +86,13 @@ public class DependenciesReport
     private MavenProjectBuilder mavenProjectBuilder;
 
     /**
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    private ArtifactRepository localRepository;
+
+    /**
      * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
      */
     public String getName( Locale locale )
@@ -139,7 +147,7 @@ public class DependenciesReport
         throws MavenReportException
     {
         DependenciesRenderer r = new DependenciesRenderer( getSink(), getProject(), locale, mavenProjectBuilder,
-                                                           artifactFactory );
+                                                           artifactFactory, localRepository );
 
         r.render();
     }
@@ -163,8 +171,11 @@ public class DependenciesReport
 
         private MavenProjectBuilder mavenProjectBuilder;
 
+        private ArtifactRepository localRepository;
+
         public DependenciesRenderer( Sink sink, MavenProject project, Locale locale,
-                                    MavenProjectBuilder mavenProjectBuilder, ArtifactFactory artifactFactory )
+                                    MavenProjectBuilder mavenProjectBuilder, ArtifactFactory artifactFactory,
+                                    ArtifactRepository localRepository )
         {
             super( sink );
 
@@ -175,6 +186,8 @@ public class DependenciesReport
             this.mavenProjectBuilder = mavenProjectBuilder;
 
             this.artifactFactory = artifactFactory;
+
+            this.localRepository = localRepository;
         }
 
         public String getTitle()
@@ -187,7 +200,7 @@ public class DependenciesReport
             // Dependencies report
             List dependencies = project.getDependencies();
 
-            if ( ( dependencies == null ) || ( dependencies.isEmpty() ) )
+            if ( dependencies == null || dependencies.isEmpty() )
             {
                 startSection( getTitle() );
 
@@ -224,7 +237,7 @@ public class DependenciesReport
                 MavenProject artifactProject = null;
                 try
                 {
-                    artifactProject = getMavenProjectFromRepository( artifact );
+                    artifactProject = getMavenProjectFromRepository( artifact, localRepository );
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -269,7 +282,7 @@ public class DependenciesReport
                     MavenProject artifactProject = null;
                     try
                     {
-                        artifactProject = getMavenProjectFromRepository( artifact );
+                        artifactProject = getMavenProjectFromRepository( artifact, localRepository );
                     }
                     catch ( ProjectBuildingException e )
                     {
@@ -277,8 +290,6 @@ public class DependenciesReport
                                                             "Can't find a valid Maven project in the repository for the artifact ["
                                                                 + artifact + "]." );
                     }
-                    System.out.println( "nklj-----------------------------" );
-                    System.out.println( artifactProject.getUrl() );
                     tableRow( new String[] {
                         artifact.getGroupId(),
                         artifact.getArtifactId(),
@@ -308,7 +319,7 @@ public class DependenciesReport
             List dependencies = project.getDependencies();
             Set artifacts = project.getArtifacts();
 
-            if ( ( dependencies == null ) || ( artifacts == null ) )
+            if ( dependencies == null || artifacts == null )
             {
                 return transitiveDependencies;
             }
@@ -341,18 +352,17 @@ public class DependenciesReport
         /**
          * Get the <code>Maven project</code> from the repository depending
          * the <code>Artifact</code> given.
-         * 
+         *
          * @param artifact
          *            an artifact
          * @return the Maven project for the given artifact
-         * @throws ProjectBuildingException
+         * @throws org.apache.maven.project.ProjectBuildingException
          *             if any
          */
-        private MavenProject getMavenProjectFromRepository( Artifact artifact )
+        private MavenProject getMavenProjectFromRepository( Artifact artifact, ArtifactRepository localRepository )
             throws ProjectBuildingException
         {
-            return mavenProjectBuilder.buildFromRepository( artifact, project.getRepositories(), artifact
-                .getRepository() );
+            return mavenProjectBuilder.buildFromRepository( artifact, project.getRepositories(), localRepository );
         }
     }
 
