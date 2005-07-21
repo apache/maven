@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
-  <artifactId>maven-core-it-support</artifactId>
+  <artifactId>maven-core-it-support-old-location</artifactId>
   <packaging>jar</packaging>
   <version>1.1</version>
   <distributionManagement>
@@ -11,5 +11,9 @@
       <name>Maven Central Repository</name>
       <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
+    <relocation>
+      <artifactId>maven-core-it-support</artifactId>
+      <message>Testing</message>
+    </relocation>
   </distributionManagement>
 </model>

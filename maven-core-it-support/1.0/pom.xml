@@ -9,7 +9,7 @@
     <repository>
       <id>repo1</id>
       <name>Maven Central Repository</name>
-      <url>scp://repo1.maven.org/home/projects/maven/repository/ibiblio-v2</url>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/to-ibiblio/maven2</url>
     </repository>
   </distributionManagement>
 </model>
