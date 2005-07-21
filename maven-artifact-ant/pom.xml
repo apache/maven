@@ -41,7 +41,7 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.0-alpha-3</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
