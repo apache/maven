@@ -18,6 +18,8 @@ package org.apache.maven.repository.checker;
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
+import org.codehaus.plexus.util.FileUtils;
+
 import java.io.File;
 import java.io.FileReader;
 
