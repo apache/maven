@@ -127,15 +127,6 @@ cd ..
 
 echo
 echo -----------------------------------------------------------------------
-echo Rebuilding maven2 reports
-echo -----------------------------------------------------------------------
-cd maven-reports
-@REM update the release info to ensure these versions get used in the integration tests
-call m2 --no-plugin-registry --check-plugin-latest --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
-cd ..
-
-echo
-echo -----------------------------------------------------------------------
 echo Running integration tests
 echo -----------------------------------------------------------------------
 cd maven-core-it

@@ -63,18 +63,6 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 
 (
-  echo "-----------------------------------------------------------------------"
-  echo " Rebuilding maven2 reports ... "
-  echo "-----------------------------------------------------------------------"  
-
-  cd maven-reports
-  # update the release info to ensure these versions get used in the integration tests
-  m2 --no-plugin-registry --check-plugin-latest --batch-mode -DupdateReleaseInfo=true -e $ARGS clean:clean install
-  ret=$?; if [ $ret != 0 ]; then exit $ret; fi
-)
-ret=$?; if [ $ret != 0 ]; then exit $ret; fi
-
-(
   cd ./maven-core-it
   echo
   echo "Running maven-core integration tests ..."

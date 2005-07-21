@@ -90,6 +90,7 @@
   <modules>
     <module>maven-ant-plugin</module>
     <module>maven-assembly-plugin</module>
+    <module>maven-checkstyle-plugin</module>
     <module>maven-clean-plugin</module>
     <module>maven-clover-plugin</module>
     <module>maven-compiler-plugin</module>
@@ -100,8 +101,11 @@
     <module>maven-idea-plugin</module>
     <module>maven-install-plugin</module>
     <module>maven-jar-plugin</module>
+    <module>maven-javadoc-plugin</module>
     <module>maven-plugin-plugin</module>
+    <module>maven-pmd-plugin</module>
     <module>maven-projecthelp-plugin</module>
+    <module>maven-project-info-reports-plugin</module>
     <module>maven-release-plugin</module>
     <module>maven-resources-plugin</module>
     <module>maven-site-plugin</module>
