@@ -2,6 +2,8 @@
 
 # ----------------------------------------------------------------------------------
 
+. $HOME/.profile
+
 CMD=$1
 
 [ "$1" = "" ] && echo && echo "You must specify a checkout or update!" && echo && exit 1
