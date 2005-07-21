@@ -1,0 +1,29 @@
+<assembly>
+  <id>bin</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>tar.bz2</format>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/bin</directory>
+      <outputDirectory>bin</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target</directory>
+      <outputDirectory>lib</outputDirectory>
+      <includes>
+        <include>maven-repository-checker-*.jar</include>
+      </includes>
+      <excludes>
+        <exclude>maven-repository-checker-*-sources.jar</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>lib</outputDirectory>
+    </dependencySet>
+  </dependencySets>
+</assembly>
