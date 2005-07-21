@@ -19,6 +19,7 @@ package org.apache.maven.doxia;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -77,8 +78,10 @@ public class DoxiaMojo
 
     private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
 
-    /** Patterns which should be excluded by default. */
-    private static final String[] DEFAULT_EXCLUDES = new String[] {
+    /**
+     * Patterns which should be excluded by default.
+     */
+    private static final String[] DEFAULT_EXCLUDES = new String[]{
         // Miscellaneous typical temporary files
         "**/*~", "**/#*#", "**/.#*", "**/%*%", "**/._*",
 
@@ -95,8 +98,8 @@ public class DoxiaMojo
         "**/.svn", "**/.svn/**",
 
         // Mac
-        "**/.DS_Store" };
-    
+        "**/.DS_Store"};
+
     /**
      * @parameter expression="${settings}"
      * @required
@@ -219,7 +222,7 @@ public class DoxiaMojo
             }
             catch ( MalformedURLException e )
             {
-                throw new MojoExecutionException( templateDirectory + " isn't a valid URL." );
+                throw new MojoExecutionException( templateDirectory + " isn't a valid URL.", e );
             }
         }
 
@@ -315,10 +318,10 @@ public class DoxiaMojo
                 File generatedSiteFile = new File( generatedSiteDirectory );
                 if ( generatedSiteFile.exists() )
                 {
-                    siteRenderer.render( generatedSiteFile, localeOutputDirectory,
-                                         getSiteDescriptor( reports, locale ), template, attributes, locale );
+                    siteRenderer.render( generatedSiteFile, localeOutputDirectory, getSiteDescriptor( reports, locale ),
+                                         template, attributes, locale );
                 }
-                
+
                 // Generate static site
                 File siteDirectoryFile;
 
@@ -334,7 +337,7 @@ public class DoxiaMojo
                 }
 
                 // Try to generate the index.html
-                if ( !indexExists( siteDirectoryFile ) ) 
+                if ( !indexExists( siteDirectoryFile ) )
                 {
                     getLog().info( "Generate an index file." );
                     generateIndexPage( getSiteDescriptor( reports, locale ), locale );
@@ -343,12 +346,12 @@ public class DoxiaMojo
                 {
                     getLog().info( "Ignoring the index file generation." );
                 }
-                
-                siteRenderer.render( siteDirectoryFile, localeOutputDirectory,
-                                     getSiteDescriptor( reports, locale ), template, attributes, locale );
 
-                siteRenderer.render( siteDirectoryFile, localeOutputDirectory,
-                                     getSiteDescriptor( reports, locale ), template, attributes, locale );
+                siteRenderer.render( siteDirectoryFile, localeOutputDirectory, getSiteDescriptor( reports, locale ),
+                                     template, attributes, locale );
+
+                siteRenderer.render( siteDirectoryFile, localeOutputDirectory, getSiteDescriptor( reports, locale ),
+                                     template, attributes, locale );
 
                 File cssDirectory = new File( siteDirectory, "css" );
                 File imagesDirectory = new File( siteDirectory, "images" );
@@ -402,9 +405,8 @@ public class DoxiaMojo
             }
             else
             {
-                throw new MojoExecutionException(
-                    "'" + report.getCategoryName() + "' category define for " + report.getName( defaultLocale ) +
-                        " mojo isn't valid." );
+                throw new MojoExecutionException( "'" + report.getCategoryName() + "' category define for " +
+                    report.getName( defaultLocale ) + " mojo isn't valid." );
             }
         }
     }
@@ -413,47 +415,42 @@ public class DoxiaMojo
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<menu name=\"Project Documentation\">\n" );
-        buffer.append(
-            "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.about" ) + " " +
-                project.getName() + "\" href=\"/index.html\"/>\n" );
+        buffer.append( "    <item name=\"" );
+        buffer.append( i18n.getString( "site-plugin", locale, "report.menu.about" ) );
+        buffer.append( " " );
+        buffer.append( project.getName() );
+        buffer.append( "\" href=\"/index.html\"/>\n" );
 
-        if ( projectInfos.size() > 0 )
-        {
-            buffer.append(
-                "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectinformation" ) +
-                    "\" href=\"/project-info.html\" collapse=\"true\">\n" );
-
-            for ( Iterator i = projectInfos.iterator(); i.hasNext(); )
-            {
-                MavenReport report = (MavenReport) i.next();
-                buffer.append(
-                    "        <item name=\"" + report.getName( locale ) + "\" href=\"/" + report.getOutputName() +
-                        ".html\"/>\n" );
-            }
-
-            buffer.append( "    </item>\n" );
-        }
-
-        if ( projectReports.size() > 0 )
-        {
-            buffer.append(
-                "    <item name=\"" + i18n.getString( "site-plugin", locale, "report.menu.projectreports" ) +
-                    "\" href=\"/maven-reports.html\" collapse=\"true\">\n" );
-
-            for ( Iterator i = projectReports.iterator(); i.hasNext(); )
-            {
-                MavenReport report = (MavenReport) i.next();
-                buffer.append(
-                    "        <item name=\"" + report.getName( locale ) + "\" href=\"/" + report.getOutputName() +
-                        ".html\"/>\n" );
-            }
-
-            buffer.append( "    </item>\n" );
-        }
+        writeReportSubMenu( projectInfos, buffer, locale, "report.menu.projectinformation", "project-info.html" );
+        writeReportSubMenu( projectReports, buffer, locale, "report.menu.projectreports", "maven-reports.html" );
 
         buffer.append( "</menu>\n" );
 
         return buffer.toString();
+    }
+
+    private void writeReportSubMenu( List reports, StringBuffer buffer, Locale locale, String key, String indexFilename )
+    {
+        if ( reports.size() > 0 )
+        {
+            buffer.append( "    <item name=\"" );
+            buffer.append( i18n.getString( "site-plugin", locale, key ) );
+            buffer.append( "\" href=\"/" );
+            buffer.append( indexFilename );
+            buffer.append( "\" collapse=\"true\">\n" );
+
+            for ( Iterator i = reports.iterator(); i.hasNext(); )
+            {
+                MavenReport report = (MavenReport) i.next();
+                buffer.append( "        <item name=\"" );
+                buffer.append( report.getName( locale ) );
+                buffer.append( "\" href=\"/" );
+                buffer.append( report.getOutputName() );
+                buffer.append( ".html\"/>\n" );
+            }
+
+            buffer.append( "    </item>\n" );
+        }
     }
 
     /**
@@ -464,7 +461,7 @@ public class DoxiaMojo
     {
         File siteDescriptor = new File( siteDirectory, "site_" + locale.getLanguage() + ".xml" );
 
-        String siteDescriptorContent = "";
+        String siteDescriptorContent;
 
         try
         {
@@ -475,7 +472,7 @@ public class DoxiaMojo
             else
             {
                 siteDescriptor = new File( siteDirectory, "site.xml" );
-                
+
                 if ( siteDescriptor.exists() )
                 {
                     siteDescriptorContent = FileUtils.fileRead( siteDescriptor );
@@ -526,7 +523,7 @@ public class DoxiaMojo
     /**
      * Try to find a file called "index" in each sub-directory from the site directory.
      * We don't care about the extension.
-     * 
+     *
      * @param siteDirectoryFile the site directory
      * @return true if an index file was found, false otherwise
      * @throws Exception if any
@@ -536,63 +533,68 @@ public class DoxiaMojo
     {
         getLog().debug( "Try to find an index file in the directory=[" + siteDirectoryFile + "]" );
 
-        File[] directories = siteDirectoryFile.listFiles( new FileFilter() {
-            public boolean accept(File file) {
-                for ( int i = 0; i < DEFAULT_EXCLUDES.length; i++) {
-                    if ( SelectorUtils.matchPath( DEFAULT_EXCLUDES[i], file.getName() ) ) {
+        File[] directories = siteDirectoryFile.listFiles( new FileFilter()
+        {
+            public boolean accept( File file )
+            {
+                for ( int i = 0; i < DEFAULT_EXCLUDES.length; i++ )
+                {
+                    if ( SelectorUtils.matchPath( DEFAULT_EXCLUDES[i], file.getName() ) )
+                    {
                         return false;
                     }
                 }
 
                 return file.isDirectory();
             }
-        });
-        
-        if ( ( directories == null ) || ( directories.length  == 0 ) )
+        } );
+
+        if ( directories == null || directories.length == 0 )
         {
             return false;
         }
-        
+
         List indexFound = new ArrayList();
         for ( int i = 0; i < directories.length; i++ )
         {
             List indexes = FileUtils.getFiles( directories[i], "index.*", null, true );
-            
-            if ( indexes.size() > 1 ) 
+
+            if ( indexes.size() > 1 )
             {
-                getLog().warn( "More than one index file exists in this directory [" + directories[i].getAbsolutePath() + "]." );
+                getLog().warn(
+                    "More than one index file exists in this directory [" + directories[i].getAbsolutePath() + "]." );
                 continue;
             }
 
-            if ( indexes.size() == 1 ) 
+            if ( indexes.size() == 1 )
             {
-                getLog().debug( "Found [" + indexes.get(0) + "]" );
+                getLog().debug( "Found [" + indexes.get( 0 ) + "]" );
 
-                indexFound.add(indexes.get(0));
+                indexFound.add( indexes.get( 0 ) );
             }
         }
 
-        if ( indexFound.size() > 1 ) 
+        if ( indexFound.size() > 1 )
         {
             // TODO throw an Exception?
             getLog().warn( "More than one index file exists in the project site directory. Checks the result." );
             return true;
         }
-        if ( indexFound.size() == 1 ) 
+        if ( indexFound.size() == 1 )
         {
             getLog().warn( "One index file was found in the project site directory." );
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Generated an index page.
-     * 
-     * @param siteDescriptor 
-     * @param locale 
-     * @throws Exception 
+     *
+     * @param siteDescriptor
+     * @param locale
+     * @throws Exception
      */
     private void generateIndexPage( InputStream siteDescriptor, Locale locale )
         throws Exception
@@ -636,7 +638,7 @@ public class DoxiaMojo
         siteRenderer.generateDocument( new FileWriter( new File( getOuputDirectory( locale ), outputFileName ) ),
                                        template, attributes, sink, locale );
     }
-    
+
     private void generateProjectInfoPage( InputStream siteDescriptor, Locale locale )
         throws Exception
     {
@@ -904,7 +906,7 @@ public class DoxiaMojo
         {
             for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
             {
-                org.apache.maven.model.ReportPlugin reportPlugin = (org.apache.maven.model.ReportPlugin) it.next();
+                ReportPlugin reportPlugin = (ReportPlugin) it.next();
 
 //                try
 //                {
@@ -927,11 +929,7 @@ public class DoxiaMojo
 
                     if ( reportSets == null || reportSets.isEmpty() )
                     {
-                        reportsList = pluginManager.getReports( reportPlugin,
-                                                                null,
-                                                                project,
-                                                                session,
-                                                                localRepository );
+                        reportsList = pluginManager.getReports( reportPlugin, null, project, session, localRepository );
 
                     }
                     else
@@ -940,10 +938,7 @@ public class DoxiaMojo
                         {
                             ReportSet reportSet = (ReportSet) j.next();
 
-                            reportsList = pluginManager.getReports( reportPlugin,
-                                                                    reportSet,
-                                                                    project,
-                                                                    session,
+                            reportsList = pluginManager.getReports( reportPlugin, reportSet, project, session,
                                                                     localRepository );
                         }
                     }
