@@ -108,18 +108,22 @@ public abstract class AbstractVersionArtifactMetadata
     public void storeInLocalRepository( ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        try
+        String version = constructVersion();
+        if ( version != null )
         {
-            String path = getLocalRepositoryLocation( localRepository ).getPath();
-            File file = new File( path );
-            // TODO: this should be centralised before the resolution of the artifact
-            file.getParentFile().mkdirs();
-            FileUtils.fileWrite( path, constructVersion() );
-            lastModified = file.lastModified();
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+            try
+            {
+                String path = getLocalRepositoryLocation( localRepository ).getPath();
+                File file = new File( path );
+                // TODO: this should be centralised before the resolution of the artifact
+                file.getParentFile().mkdirs();
+                FileUtils.fileWrite( path, version );
+                lastModified = file.lastModified();
+            }
+            catch ( IOException e )
+            {
+                throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+            }
         }
     }
 }
