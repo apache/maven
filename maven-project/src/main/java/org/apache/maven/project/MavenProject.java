@@ -302,6 +302,8 @@ public class MavenProject
     {
         List list = new ArrayList( getArtifacts().size() );
 
+        list.add( getBuild().getOutputDirectory() );
+
         for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
