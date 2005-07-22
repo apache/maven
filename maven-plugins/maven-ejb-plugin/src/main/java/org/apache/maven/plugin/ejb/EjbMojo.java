@@ -128,6 +128,7 @@ public class EjbMojo
                 // create archive
                 clientArchiver.createArchive( project, archive );
 
+                // TODO: shouldn't need classifer
                 Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(),
                                                                                   project.getArtifactId(),
                                                                                   project.getVersion(), null,
