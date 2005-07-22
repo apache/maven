@@ -59,6 +59,13 @@ public abstract class AbstractCompilerMojo
      * @parameter
      */
     private String target;
+   
+    /**
+     * The -encoding argument for the Java compiler
+     *
+     * @parameter
+     */
+    private String encoding;
     
     /**
      * The granularity in milliseconds of the last modification
@@ -117,6 +124,11 @@ public abstract class AbstractCompilerMojo
             compilerConfiguration.addCompilerOption( "-target", target );
         }
 
+        if ( encoding != null )
+        {
+            compilerConfiguration.addCompilerOption( "-encoding" , encoding );
+        }
+        
         compilerConfiguration.setDebug( debug );
 
         List messages = null;

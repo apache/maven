@@ -30,7 +30,6 @@ public class CompilationFailureException
 
             sb.append( compilerError ).append( LS );
         }
-
         return sb.toString();
     }
 }
