@@ -1,5 +1,5 @@
 <project name="foo" default="foo" xmlns:artifact="urn:maven-artifact-ant">
-<!--
+  <!--
     You either need to run the the 'initTaskDefs' task below and
     define the artifact namespace like above (choose anything you
     like except strings that start with 'antlib:'),
@@ -20,7 +20,7 @@
   <target name="initTaskDefs">
     <path id="maven.classpath">
       <!-- don't forget to set the value! -->
-      <pathelement location="target/maven-artifact-ant-2.0-alpha-3-dep.jar"/>
+      <pathelement location="target/maven-artifact-ant-2.0-beta-1-SNAPSHOT-dep.jar"/>
     </path>
 
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
@@ -48,6 +48,7 @@
         <exclusion groupId="junit" artifactId="junit"/>
       </dependency>
       <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
+      <dependency groupId="org.apache.maven" artifactId="maven-core-it-support-old-location" version="1.1"/>
       <localRepository refid="local.repository"/>
     </artifact:dependencies>
 
@@ -63,16 +64,18 @@
       <fileset refid="my.dependency.fileset"/>
     </copy>
 
-    <artifact:install file="target/maven-artifact-ant-2.0-alpha-3.jar">
+    <property name="outJar" value="${maven.project.build.directory}/${maven.project.build.finalName}.jar"/>
+
+    <artifact:install file="${outJar}">
       <pom refid="maven.project"/>
     </artifact:install>
 
-    <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
+    <artifact:deploy file="${outJar}">
       <remoteRepository refid="deploy.repository"/>
       <pom refid="maven.project"/>
     </artifact:deploy>
 
-    <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
+    <artifact:deploy file="${outJar}">
       <remoteRepository url="scp://localhost/tmp/deployment-repo">
         <authentication username="brett" privateKey="${user.home}/.ssh/id_dsa"/>
       </remoteRepository>
@@ -128,7 +131,8 @@
       <remoteRepository refid="deploy.repository"/>
     </artifact:dependencies>
 
-    <artifact:deploy file="target/maven-artifact-ant-2.0-alpha-3.jar">
+    <property name="outJar" value="${maven.project.build.directory}/${maven.project.build.finalName}.jar"/>
+    <artifact:deploy file="${outJar}">
       <localRepository refid="local.repository.scm"/>
       <remoteRepository refid="deploy.repository"/>
       <pom refid="maven.project"/>
