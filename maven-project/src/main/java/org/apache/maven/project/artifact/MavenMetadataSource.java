@@ -105,14 +105,14 @@ public class MavenMetadataSource
                 }
 
                 String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":" +
-                    artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n\n";
+                    artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
 
                 if ( relocation.getMessage() != null )
                 {
-                    message += relocation.getMessage();
+                    message += "  " + relocation.getMessage() + "\n";
                 }
 
-                getLogger().warn( message );
+                getLogger().warn( message + "\n" );
             }
             else
             {
