@@ -62,7 +62,6 @@ public class WarMojo
 
     /**
      * @todo Convert to File
-     * 
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      * @readonly
@@ -77,7 +76,6 @@ public class WarMojo
 
     /**
      * @todo Convert to File
-     * 
      * @parameter expression="${project.build.directory}/${project.build.finalName}"
      * @required
      */
@@ -85,7 +83,6 @@ public class WarMojo
 
     /**
      * @todo Convert to File
-     * 
      * @parameter expression="${basedir}/src/main/webapp"
      * @required
      */
@@ -124,7 +121,7 @@ public class WarMojo
                                String webXml )
         throws IOException
     {
-        if ( sourceDirectory != webappDirectory )
+        if ( !sourceDirectory.equals( webappDirectory ) )
         {
             getLog().info( "Copy webapp resources to " + webappDirectory.getAbsolutePath() );
 
@@ -141,10 +138,6 @@ public class WarMojo
         }
     }
 
-    /**
-     * @throws MojoExecutionException 
-     *
-     */
     public void buildWebapp( MavenProject project )
         throws IOException
     {
