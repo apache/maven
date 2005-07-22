@@ -196,7 +196,7 @@ public class DependenciesReport
         public void renderBody()
         {
             // Dependencies report
-            List dependencies = project.getDependencies();
+            Set dependencies = project.getDependencyArtifacts();
 
             if ( dependencies == null || dependencies.isEmpty() )
             {
@@ -226,11 +226,8 @@ public class DependenciesReport
 
             for ( Iterator i = dependencies.iterator(); i.hasNext(); )
             {
-                Dependency dependency = (Dependency) i.next();
+                Artifact artifact = (Artifact) i.next();
 
-                Artifact artifact = artifactFactory.createArtifact( dependency.getGroupId(), dependency.getArtifactId(),
-                                                                    dependency.getVersion(), dependency.getScope(),
-                                                                    dependency.getType() );
                 MavenProject artifactProject;
                 try
                 {
@@ -243,7 +240,7 @@ public class DependenciesReport
                         "Can't find a valid Maven project in the repository for the artifact [" + artifact + "]." );
                 }
 
-                tableRow( new String[]{dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
+                tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
                     artifactProject.getDescription(),
                     createLinkPatternedText( artifactProject.getUrl(), artifactProject.getUrl() )} );
             }
@@ -305,7 +302,7 @@ public class DependenciesReport
         {
             Set transitiveDependencies = new HashSet();
 
-            List dependencies = project.getDependencies();
+            Set dependencies = project.getDependencyArtifacts();
             Set artifacts = project.getArtifacts();
 
             if ( dependencies == null || artifacts == null )
@@ -313,22 +310,11 @@ public class DependenciesReport
                 return transitiveDependencies;
             }
 
-            List dependenciesAsArtifacts = new ArrayList( dependencies.size() );
-            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-            {
-                Dependency dependency = (Dependency) i.next();
-
-                Artifact artifact = artifactFactory.createArtifact( dependency.getGroupId(), dependency.getArtifactId(),
-                                                                    dependency.getVersion(), dependency.getScope(),
-                                                                    dependency.getType() );
-                dependenciesAsArtifacts.add( artifact );
-            }
-
             for ( Iterator j = artifacts.iterator(); j.hasNext(); )
             {
                 Artifact artifact = (Artifact) j.next();
 
-                if ( !dependenciesAsArtifacts.contains( artifact ) )
+                if ( !dependencies.contains( artifact ) )
                 {
                     transitiveDependencies.add( artifact );
                 }
