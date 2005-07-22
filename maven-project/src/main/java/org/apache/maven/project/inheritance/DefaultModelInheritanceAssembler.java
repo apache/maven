@@ -163,12 +163,8 @@ public class DefaultModelInheritanceAssembler
     private void assembleModelBaseInheritance( ModelBase child, ModelBase parent )
     {
         // Dependencies :: aggregate
-        List dependencies = parent.getDependencies();
-
-        List childDeps = child.getDependencies();
-
         Map mappedChildDeps = new TreeMap();
-        for ( Iterator it = childDeps.iterator(); it.hasNext(); )
+        for ( Iterator it = child.getDependencies().iterator(); it.hasNext(); )
         {
             Dependency dep = (Dependency) it.next();
             mappedChildDeps.put( dep.getManagementKey(), dep );
