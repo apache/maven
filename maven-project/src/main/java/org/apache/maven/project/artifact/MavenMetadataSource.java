@@ -145,7 +145,6 @@ public class MavenMetadataSource
         {
             Dependency d = (Dependency) i.next();
 
-            // TODO: validate
             VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getScope(),

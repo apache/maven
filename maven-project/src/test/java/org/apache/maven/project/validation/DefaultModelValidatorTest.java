@@ -85,6 +85,66 @@ public class DefaultModelValidatorTest
         assertEquals( "'version' is missing.", result.getMessage( 0 ) );
     }
 
+    public void testMissingDependencyArtifactId()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-dependency-artifactId-pom.xml" );
+
+        assertEquals( 1, result.getMessageCount() );
+
+        assertEquals( "'dependencies.dependency.artifactId' is missing.", result.getMessage( 0 ) );
+    }
+
+    public void testMissingDependencyGroupId()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-dependency-groupId-pom.xml" );
+
+        assertEquals( 1, result.getMessageCount() );
+
+        assertEquals( "'dependencies.dependency.groupId' is missing.", result.getMessage( 0 ) );
+    }
+
+    public void testMissingDependencyVersion()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-dependency-version-pom.xml" );
+
+        assertEquals( 1, result.getMessageCount() );
+
+        assertEquals( "'dependencies.dependency.version' is missing.", result.getMessage( 0 ) );
+    }
+
+    public void testMissingDependencyManagementArtifactId()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-dependency-mgmt-artifactId-pom.xml" );
+
+        assertEquals( 1, result.getMessageCount() );
+
+        assertEquals( "'dependencyManagement.dependencies.dependency.artifactId' is missing.", result.getMessage( 0 ) );
+    }
+
+    public void testMissingDependencyManagementGroupId()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-dependency-mgmt-groupId-pom.xml" );
+
+        assertEquals( 1, result.getMessageCount() );
+
+        assertEquals( "'dependencyManagement.dependencies.dependency.groupId' is missing.", result.getMessage( 0 ) );
+    }
+
+    public void testMissingDependencyManagementVersion()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-dependency-mgmt-version-pom.xml" );
+
+        assertEquals( 1, result.getMessageCount() );
+
+        assertEquals( "'dependencyManagement.dependencies.dependency.version' is missing.", result.getMessage( 0 ) );
+    }
+
     public void testMissingAll()
         throws Exception
     {
@@ -99,6 +159,16 @@ public class DefaultModelValidatorTest
         assertTrue( messages.contains( "\'artifactId\' is missing." ) );
         assertTrue( messages.contains( "\'version\' is missing." ) );
         // type is inherited from the super pom
+    }
+
+    public void testMissingPluginArtifactId()
+        throws Exception
+    {
+        ModelValidationResult result = validate( "missing-plugin-artifactId-pom.xml" );
+
+        assertEquals( 1, result.getMessageCount() );
+
+        assertEquals( "'build.plugins.plugin.artifactId' is missing.", result.getMessage( 0 ) );
     }
 
     private ModelValidationResult validate( String testName )

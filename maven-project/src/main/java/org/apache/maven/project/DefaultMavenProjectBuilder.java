@@ -438,10 +438,7 @@ public class DefaultMavenProjectBuilder
             project.setParentArtifact( parentArtifact );
         }
 
-        project.setRemoteArtifactRepositories( remoteRepositories );
-        project.setDependencyArtifacts( createArtifacts( project.getDependencies() ) );
-        project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
-
+        // Must validate before artifact construction to make sure dependencies are good
         ModelValidationResult validationResult = validator.validate( model );
 
         if ( validationResult.getMessageCount() > 0 )
@@ -449,6 +446,10 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( "Failed to validate POM for \'" + pomLocation +
                 "\'.\n\n  Reason(s):\n" + validationResult.render( "  " ) );
         }
+
+        project.setRemoteArtifactRepositories( remoteRepositories );
+        project.setDependencyArtifacts( createArtifacts( project.getDependencies() ) );
+        project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
 
         return project;
     }
