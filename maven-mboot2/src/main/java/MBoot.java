@@ -300,9 +300,6 @@ public class MBoot
         // Install maven-reporting parent POM
         installPomFile( localRepository, new File( basedir, "maven-reporting/pom.xml" ) );
 
-        // Install it-support POM
-        installPomFile( localRepository, new File( basedir, "maven-core-it-support/pom.xml" ) );
-
         ModelReader reader = new ModelReader( downloader, true );
 
         reader.parse( new File( basedir, "maven-mboot2/pom.xml" ) );
