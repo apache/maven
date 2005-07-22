@@ -1,1 +1,1 @@
-target/maven-core-it0034-1.0-SNAPSHOT/WEB-INF/lib/junit-3.8.1.jar
+${artifact:org.apache.maven:maven-core-it-support:1.1:jar}
