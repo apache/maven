@@ -255,17 +255,26 @@ public class DefaultMavenProjectBuilder
             try
             {
                 artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
+
+                File file = artifact.getFile();
+                model = readModel( file );
             }
             catch ( ArtifactResolutionException e )
             {
                 // TODO: a not found would be better vs other errors
-                throw new ProjectBuildingException( "Unable to find the POM in the repository", e );
-            }
+                // only not found should have the below behaviour
+//                throw new ProjectBuildingException( "Unable to find the POM in the repository", e );
 
-//                String path = localRepository.pathOfMetadata( new ProjectArtifactMetadata( artifact, null ) );
-//                File file = new File( localRepository.getBasedir(), path );
-            File file = artifact.getFile();
-            model = readModel( file );
+                getLogger().warn( "\n  ***** Using defaults for missing POM " + artifact.getId() + " *****\n" );
+
+                model = new Model();
+                model.setModelVersion( "4.0.0" );
+                model.setArtifactId( artifact.getArtifactId() );
+                model.setGroupId( artifact.getGroupId() );
+                model.setVersion( artifact.getVersion() );
+                // TOOD: not correct in some instances
+                model.setPackaging( artifact.getType() );
+            }
         }
 
         // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
