@@ -6,8 +6,6 @@ public class Person
 
     public void setName( String newName )
     {
-        assert true;
-
         this.name = newName;
     }
 
