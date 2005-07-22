@@ -11,6 +11,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -27,78 +28,78 @@ public class DefaultPluginMappingBuilder
     private RepositoryMetadataManager repositoryMetadataManager;
 
     public PluginMappingManager loadPluginMappings( List groupIds, List pluginRepositories,
-                                                   ArtifactRepository localRepository )
+                                                    ArtifactRepository localRepository )
         throws RepositoryMetadataManagementException, PluginMappingManagementException
     {
         return loadPluginMappings( groupIds, pluginRepositories, localRepository, new PluginMappingManager() );
     }
 
-    public PluginMappingManager refreshPluginMappingManager( PluginMappingManager mappingManager, List pluginRepositories,
+    public PluginMappingManager refreshPluginMappingManager( PluginMappingManager mappingManager,
+                                                             List pluginRepositories,
                                                              ArtifactRepository localRepository )
         throws RepositoryMetadataManagementException, PluginMappingManagementException
     {
         // prevent performance drag from abuse of this method.
         if ( mappingManager.isRefreshed() )
         {
-            throw new PluginMappingManagementException( "Plugin-mappings have already been refreshed. Cannot re-refresh." );
+            throw new PluginMappingManagementException(
+                "Plugin-mappings have already been refreshed. Cannot re-refresh." );
         }
-        
+
         getLogger().info( "Refreshing plugin-mapping metadata..." );
-        
+
         List groupIds = new ArrayList();
-        
+
         for ( Iterator it = mappingManager.getPluginMaps().iterator(); it.hasNext(); )
         {
             PluginMap map = (PluginMap) it.next();
-            
+
             String groupId = map.getGroupId();
-            
+
             groupIds.add( groupId );
-            
+
             repositoryMetadataManager.purgeLocalCopy( new PluginMappingMetadata( groupId ), localRepository );
         }
-        
+
         mappingManager.markRefreshed();
-        
-        return loadPluginMappings(groupIds, pluginRepositories, localRepository, mappingManager);
+
+        return loadPluginMappings( groupIds, pluginRepositories, localRepository, mappingManager );
     }
 
     private PluginMappingManager loadPluginMappings( List groupIds, List pluginRepositories,
-                                                    ArtifactRepository localRepository,
-                                                    PluginMappingManager mappingManager )
-        throws RepositoryMetadataManagementException, PluginMappingManagementException
+                                                     ArtifactRepository localRepository,
+                                                     PluginMappingManager mappingManager )
+        throws PluginMappingManagementException
     {
         List pluginGroupIds = new ArrayList( groupIds );
 
+        // TODO: use constant
         if ( !pluginGroupIds.contains( "org.apache.maven.plugins" ) )
         {
             pluginGroupIds.add( "org.apache.maven.plugins" );
         }
 
-        if ( pluginGroupIds != null )
+        for ( Iterator it = pluginGroupIds.iterator(); it.hasNext(); )
         {
-            for ( Iterator it = pluginGroupIds.iterator(); it.hasNext(); )
+            String groupId = (String) it.next();
+
+            try
             {
-                String groupId = (String) it.next();
+                File mappingFile = resolveMappingMetadata( groupId, pluginRepositories, localRepository );
 
-                try
+                PluginMap pluginMap = readPluginMap( mappingFile );
+
+                if ( pluginMap != null )
                 {
-                    File mappingFile = resolveMappingMetadata( groupId, pluginRepositories, localRepository );
-
-                    PluginMap pluginMap = readPluginMap( mappingFile );
-
-                    if ( pluginMap != null )
-                    {
-                        mappingManager.addPluginMap( pluginMap );
-                    }
+                    mappingManager.addPluginMap( pluginMap );
                 }
-                catch ( RepositoryMetadataManagementException e )
-                {
-                    getLogger()
-                        .warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
+            }
+            catch ( RepositoryMetadataManagementException e )
+            {
+                getLogger()
+                    .warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
 
-                    getLogger().debug( "Error resolving plugin-mapping metadata for groupId: " + groupId + ".", e );
-                }
+                getLogger().debug( "Error resolving plugin-mapping metadata for groupId: " + groupId + ".", e );
             }
         }
 
@@ -109,7 +110,7 @@ public class DefaultPluginMappingBuilder
         throws PluginMappingManagementException
     {
         PluginMap result = null;
-        
+
         if ( mappingFile.exists() )
         {
             Reader fileReader = null;
@@ -120,6 +121,10 @@ public class DefaultPluginMappingBuilder
                 PluginMappingXpp3Reader mappingReader = new PluginMappingXpp3Reader();
 
                 result = mappingReader.read( fileReader );
+            }
+            catch ( FileNotFoundException e )
+            {
+                throw new PluginMappingManagementException( "Cannot read plugin mappings from: " + mappingFile, e );
             }
             catch ( IOException e )
             {
@@ -134,7 +139,7 @@ public class DefaultPluginMappingBuilder
                 IOUtil.close( fileReader );
             }
         }
-        
+
         return result;
     }
 
@@ -157,7 +162,7 @@ public class DefaultPluginMappingBuilder
                 repositoryException = null;
 
                 File metadataFile = metadata.getFile();
-                
+
                 if ( metadataFile != null && metadataFile.exists() )
                 {
                     break;

@@ -1165,8 +1165,6 @@
         <field>
           <name>version</name>
           <version>3.0.0+</version>
-          <!-- [ jdcasey:01-Feb-2005 ] No longer required. We'll validate after injecting defaults. -->
-          <!-- required>true</required -->
           <description><![CDATA[
             The version of the dependency, e.g. <code>3.2.1</code>
           ]]></description>
@@ -1368,12 +1366,14 @@
           <version>4.0.0</version>
           <description><![CDATA[The artifact id of the project to exclude.]]></description>
           <type>String</type>
+          <required>true</required>
         </field>
         <field>
           <name>groupId</name>
           <version>4.0.0</version>
           <description><![CDATA[The group id of the project to exclude.]]></description>
           <type>String</type>
+          <required>true</required>
         </field>
       </fields>
     </class>
@@ -1652,12 +1652,14 @@
           <name>artifactId</name>
           <version>4.0.0</version>
           <description><![CDATA[The artifact id of the project to extend.]]></description>
+          <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>groupId</name>
           <version>4.0.0</version>
           <description><![CDATA[The group id of the project to extend.]]></description>
+          <required>true</required>
           <type>String</type>
         </field>
         <field>
@@ -2132,6 +2134,7 @@
           <name>groupId</name>
           <version>4.0.0</version>
           <type>String</type>
+          <required>true</required>
           <defaultValue>org.apache.maven.plugins</defaultValue>
         </field>
         <field>
@@ -2503,6 +2506,7 @@
           <name>groupId</name>
           <version>4.0.0</version>
           <type>String</type>
+          <required>true</required>
           <defaultValue>org.apache.maven.plugins</defaultValue>
         </field>
         <field>

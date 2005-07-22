@@ -45,8 +45,8 @@ import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -126,8 +126,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void executeGoal( String task, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException, PluginNotFoundException, MojoExecutionException,
-        ArtifactResolutionException
+        throws LifecycleExecutionException, PluginNotFoundException, MojoExecutionException, ArtifactResolutionException
     {
         if ( phases.contains( task ) )
         {
@@ -142,7 +141,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void executeGoalWithLifecycle( String task, MavenSession session, Map lifecycleMappings,
-                                          MavenProject project )
+                                           MavenProject project )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException
     {
         List goals = processGoalChain( task, lifecycleMappings );
@@ -224,7 +223,8 @@ public class DefaultLifecycleExecutor
                         String goal = (String) k.next();
                         MojoDescriptor desc = mojoDescriptor.getPluginDescriptor().getMojo( goal );
                         MojoExecution mojoExecution = new MojoExecution( desc, (Xpp3Dom) e.getConfiguration() );
-                        addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution, session.getSettings() );
+                        addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
+                                                session.getSettings() );
                     }
                 }
             }
@@ -286,11 +286,11 @@ public class DefaultLifecycleExecutor
         return lifecycleMappings;
     }
 
-    private Map findMappingsForLifecycle( MavenSession session, MavenProject project ) 
+    private Map findMappingsForLifecycle( MavenSession session, MavenProject project )
         throws LifecycleExecutionException
     {
         Map mappings;
-        
+
         String packaging = project.getPackaging();
         try
         {
@@ -298,14 +298,15 @@ public class DefaultLifecycleExecutor
 
             Plugin pluginContainingLifecycleMapping = mappingManager.getByPackaging( packaging );
 
-            LifecycleMapping m = null;
+            LifecycleMapping m;
 
             if ( pluginContainingLifecycleMapping != null )
             {
                 try
                 {
-                    pluginManager.verifyPlugin( pluginContainingLifecycleMapping, project, session.getSettings(), session.getLocalRepository() );
-                    
+                    pluginManager.verifyPlugin( pluginContainingLifecycleMapping, project, session.getSettings(),
+                                                session.getLocalRepository() );
+
                     m = (LifecycleMapping) pluginManager.getPluginComponent( pluginContainingLifecycleMapping,
                                                                              LifecycleMapping.ROLE, packaging );
 
@@ -313,9 +314,9 @@ public class DefaultLifecycleExecutor
                 }
                 catch ( ComponentLookupException e )
                 {
-                    throw new LifecycleExecutionException( "Plugin: " + pluginContainingLifecycleMapping.getKey()
-                        + " declares lifecycle mapping for: \'" + packaging
-                        + "\', but does not appear to contain the actual mapping among its component descriptors.", e );
+                    throw new LifecycleExecutionException( "Plugin: " + pluginContainingLifecycleMapping.getKey() +
+                        " declares lifecycle mapping for: \'" + packaging +
+                        "\', but does not appear to contain the actual mapping among its component descriptors.", e );
                 }
             }
             else
@@ -329,8 +330,7 @@ public class DefaultLifecycleExecutor
                 catch ( ComponentLookupException e )
                 {
                     getLogger().warn(
-                                      "Lifecycle mappings not found for packaging: \'" + packaging
-                                          + "\'. Using defaults." );
+                        "Lifecycle mappings not found for packaging: \'" + packaging + "\'. Using defaults." );
 
                     getLogger().debug( "Lifecycle mappings not found for packaging: \'" + packaging + "\'.", e );
 
@@ -340,21 +340,23 @@ public class DefaultLifecycleExecutor
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new LifecycleExecutionException( "Cannot load plugin which defines lifecycle mappings for: \'" + packaging + "\'.", e );
+            throw new LifecycleExecutionException(
+                "Cannot load plugin which defines lifecycle mappings for: \'" + packaging + "\'.", e );
         }
         catch ( PluginVersionResolutionException e )
         {
-            throw new LifecycleExecutionException( "Cannot load plugin which defines lifecycle mappings for: \'" + packaging + "\'.", e );
+            throw new LifecycleExecutionException(
+                "Cannot load plugin which defines lifecycle mappings for: \'" + packaging + "\'.", e );
         }
         catch ( PluginManagerException e )
         {
             throw new LifecycleExecutionException( "Cannot load lifecycle mappings.", e );
         }
-        
+
         return mappings;
     }
 
-    private PluginMappingManager getPluginMappingManager( MavenSession session, MavenProject project ) 
+    private PluginMappingManager getPluginMappingManager( MavenSession session, MavenProject project )
         throws LifecycleExecutionException
     {
         PluginMappingManager mappingManager = session.getPluginMappingManager();
@@ -383,7 +385,7 @@ public class DefaultLifecycleExecutor
                 throw new LifecycleExecutionException( "Cannot load plugin mappings.", e );
             }
         }
-        
+
         return mappingManager;
     }
 
@@ -401,8 +403,7 @@ public class DefaultLifecycleExecutor
         if ( plugin.getGoals() != null && !plugin.getGoals().isEmpty() )
         {
             getLogger().warn(
-                              "DEPRECATED: goal definitions for plugin '" + plugin.getKey()
-                                  + "' must be in an executions element" );
+                "DEPRECATED: goal definitions for plugin '" + plugin.getKey() + "' must be in an executions element" );
         }
 
         PluginDescriptor pluginDescriptor;
@@ -455,7 +456,8 @@ public class DefaultLifecycleExecutor
     /**
      * @deprecated
      */
-    private void bindGoalMapToLifecycle( PluginDescriptor pluginDescriptor, Map goalMap, Map phaseMap, Settings settings )
+    private void bindGoalMapToLifecycle( PluginDescriptor pluginDescriptor, Map goalMap, Map phaseMap,
+                                         Settings settings )
     {
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
         {
@@ -479,7 +481,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void bindExecutionToLifecycle( PluginDescriptor pluginDescriptor, Map phaseMap, PluginExecution execution,
-                                          Settings settings )
+                                           Settings settings )
         throws LifecycleExecutionException
     {
         for ( Iterator i = execution.getGoals().iterator(); i.hasNext(); )
@@ -510,7 +512,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void addToLifecycleMappings( Map lifecycleMappings, String phase, MojoExecution mojoExecution,
-                                        Settings settings )
+                                         Settings settings )
     {
         List goals = (List) lifecycleMappings.get( phase );
 
@@ -556,7 +558,7 @@ public class DefaultLifecycleExecutor
     private MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws ArtifactResolutionException, LifecycleExecutionException
     {
-        String goal = null;
+        String goal;
         Plugin plugin = null;
 
         PluginDescriptor pluginDescriptor = null;
@@ -576,9 +578,10 @@ public class DefaultLifecycleExecutor
             }
             catch ( PluginManagerException e )
             {
-                throw new LifecycleExecutionException( "Cannot resolve plugin-prefix: \'" + prefix + "\' from plugin collector.", e );
+                throw new LifecycleExecutionException(
+                    "Cannot resolve plugin-prefix: \'" + prefix + "\' from plugin collector.", e );
             }
-            
+
             if ( pluginDescriptor == null )
             {
                 try
@@ -587,7 +590,8 @@ public class DefaultLifecycleExecutor
                 }
                 catch ( PluginManagerException e )
                 {
-                    throw new LifecycleExecutionException( "Cannot resolve plugin-prefix: \'" + prefix + "\' from plugin mappings metadata.", e );
+                    throw new LifecycleExecutionException(
+                        "Cannot resolve plugin-prefix: \'" + prefix + "\' from plugin mappings metadata.", e );
                 }
             }
 
@@ -631,8 +635,8 @@ public class DefaultLifecycleExecutor
         }
         else
         {
-            String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or"
-                + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+            String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or" +
+                " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
             throw new LifecycleExecutionException( message );
         }
 
@@ -640,8 +644,8 @@ public class DefaultLifecycleExecutor
         {
             try
             {
-                pluginDescriptor = pluginManager.verifyPlugin( plugin, project, session.getSettings(), session
-                    .getLocalRepository() );
+                pluginDescriptor = pluginManager.verifyPlugin( plugin, project, session.getSettings(),
+                                                               session.getLocalRepository() );
             }
             catch ( PluginManagerException e )
             {

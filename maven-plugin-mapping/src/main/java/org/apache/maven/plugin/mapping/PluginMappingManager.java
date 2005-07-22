@@ -1,5 +1,21 @@
 package org.apache.maven.plugin.mapping;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.model.Plugin;
 
 import java.util.ArrayList;
@@ -12,33 +28,35 @@ public class PluginMappingManager
 {
 
     private List mappings = new ArrayList();
-    private boolean refreshed = false;
+
+    private boolean refreshed;
 
     private Map pluginDefinitionsByPrefix = new HashMap();
+
     private Map pluginDefinitionsByPackaging = new HashMap();
 
     public void addPluginMap( PluginMap pluginMap )
     {
         mappings.add( pluginMap );
-        
+
         clearCache();
     }
-    
+
     public void markRefreshed()
     {
         this.refreshed = true;
     }
-    
+
     public boolean isRefreshed()
     {
         return refreshed;
     }
-    
+
     public List getPluginMaps()
     {
         return mappings;
     }
-    
+
     public void clear()
     {
         this.mappings = null;
@@ -53,8 +71,7 @@ public class PluginMappingManager
 
     public Plugin getByPrefix( String pluginPrefix )
     {
-        synchronized ( this )
-        {
+        synchronized ( this ) {
             if ( pluginDefinitionsByPrefix == null )
             {
                 calculatePluginDefinitionsByPrefix();
@@ -66,8 +83,7 @@ public class PluginMappingManager
 
     public Plugin getByPackaging( String packaging )
     {
-        synchronized ( this )
-        {
+        synchronized ( this ) {
             if ( pluginDefinitionsByPackaging == null )
             {
                 calculatePluginDefinitionsByPackaging();
@@ -99,10 +115,11 @@ public class PluginMappingManager
 
                 plugin.setArtifactId( artifactId );
 
-                for ( Iterator packagingIterator = mapping.getPackagingHandlers().iterator(); packagingIterator.hasNext(); )
+                for ( Iterator packagingIterator = mapping.getPackagingHandlers().iterator();
+                      packagingIterator.hasNext(); )
                 {
                     String packaging = (String) packagingIterator.next();
-                    
+
                     pluginDefinitionsByPackaging.put( packaging, plugin );
                 }
             }
