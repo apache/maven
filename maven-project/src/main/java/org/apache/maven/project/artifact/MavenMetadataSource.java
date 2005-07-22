@@ -122,6 +122,8 @@ public class MavenMetadataSource
 
         try
         {
+            // TODO: we could possibly use p.getDependencyArtifacts instead, but they haven't been filtered or used the
+            // scope (should that be passed to the buildFromRepository method above?
             Set artifacts = createArtifacts( artifactFactory, p.getDependencies(), artifact.getScope(),
                                              artifact.getDependencyFilter() );
 
@@ -143,6 +145,7 @@ public class MavenMetadataSource
         {
             Dependency d = (Dependency) i.next();
 
+            // TODO: validate
             VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getScope(),

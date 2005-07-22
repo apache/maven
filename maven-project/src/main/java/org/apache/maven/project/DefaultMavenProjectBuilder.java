@@ -615,7 +615,7 @@ public class DefaultMavenProjectBuilder
                 version = p.getVersion();
             }
 
-            Artifact artifact = null;
+            Artifact artifact;
             try
             {
                 artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(),

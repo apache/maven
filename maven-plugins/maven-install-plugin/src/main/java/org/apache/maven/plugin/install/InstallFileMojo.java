@@ -17,7 +17,6 @@ package org.apache.maven.plugin.install;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -79,6 +78,7 @@ public class InstallFileMojo
     public void execute()
         throws MojoExecutionException
     {
+        // TODO: validate
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         Artifact artifact = artifactFactory.createArtifact( groupId, artifactId, version, null, packaging );
 
