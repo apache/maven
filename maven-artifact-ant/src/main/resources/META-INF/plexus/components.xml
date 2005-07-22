@@ -185,6 +185,19 @@
     </component>
 
     <component>
+      <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+      <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
       <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
       <implementation>org.apache.maven.artifact.resolver.DefaultArtifactCollector</implementation>
     </component>
