@@ -111,6 +111,14 @@ public class MavenProject
     // calculated.
     private Map artifactMap;
 
+    private Model originalModel;
+
+    private Map pluginArtifactMap;
+
+    private Set reportArtifacts;
+
+    private Map reportArtifactMap;
+
     public MavenProject( Model model )
     {
         this.model = model;
@@ -810,7 +818,7 @@ public class MavenProject
     {
         if ( artifactMap == null )
         {
-            artifactMap = ArtifactUtils.artifactMap( getArtifacts() );
+            artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
         }
 
         return artifactMap;
@@ -824,6 +832,36 @@ public class MavenProject
     public Set getPluginArtifacts()
     {
         return pluginArtifacts;
+    }
+    
+    public Map getPluginArtifactMap()
+    {
+        if ( pluginArtifactMap == null )
+        {
+            pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getPluginArtifacts() );
+        }
+        
+        return pluginArtifactMap;
+    }
+
+    public void setReportArtifacts( Set reportArtifacts )
+    {
+        this.reportArtifacts = reportArtifacts;
+    }
+    
+    public Set getReportArtifacts()
+    {
+        return reportArtifacts;
+    }
+
+    public Map getReportArtifactMap()
+    {
+        if ( reportArtifactMap == null )
+        {
+            reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getReportArtifacts() );
+        }
+        
+        return reportArtifactMap;
     }
 
     public void setParentArtifact( Artifact parentArtifact )
@@ -1096,6 +1134,14 @@ public class MavenProject
         pomWriter.write( writer, getModel() );
     }
 
+    public void writeOriginalModel( Writer writer )
+        throws IOException
+    {
+        MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+
+        pomWriter.write( writer, getOriginalModel() );
+    }
+
     public Set getDependencyArtifacts()
     {
         return dependencyArtifacts;
@@ -1105,4 +1151,38 @@ public class MavenProject
     {
         this.dependencyArtifacts = dependencyArtifacts;
     }
+    
+    public void setOriginalModel( Model originalModel )
+    {
+        this.originalModel = originalModel;
+    }
+    
+    public Model getOriginalModel()
+    {
+        return originalModel;
+    }
+
+    public boolean equals( Object other )
+    {
+        if ( other == this )
+        {
+            return true;
+        }
+        else if ( !( other instanceof MavenProject ) )
+        {
+            return false;
+        }
+        else
+        {
+            MavenProject otherProject = (MavenProject) other;
+            
+            return getId().equals( otherProject.getId() );
+        }
+    }
+    
+    public int hashCode()
+    {
+        return getId().hashCode();
+    }
+    
 }

@@ -19,7 +19,6 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.Artifact;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Iterator;
 
 /**
@@ -35,16 +34,14 @@ public class ProjectClasspathTest
     {
         File f = getFileForClasspathResource( dir + "project-with-scoped-dependencies.xml" );
 
-        // XXX: Because this test fails, we resort to crude reflection hacks, see PLX-108 for the solution
 //        assertEquals( TestArtifactResolver.class, getContainer().lookup( ArtifactResolver.ROLE ).getClass() );
-        MavenProjectBuilder builder = (MavenProjectBuilder) getContainer().lookup( MavenProjectBuilder.ROLE );
-        Field declaredField = builder.getClass().getDeclaredField( "artifactResolver" );
-        boolean acc = declaredField.isAccessible();
-        declaredField.setAccessible( true );
-        declaredField.set( builder, getContainer().lookup( TestArtifactResolver.class.getName() ) );
-        declaredField.setAccessible( acc );
-        // XXX: end hack
-
+        TestProjectBuilder builder = (TestProjectBuilder) getContainer().lookup( MavenProjectBuilder.ROLE, "test" );
+        
+        TestArtifactResolver testArtifactResolver = (TestArtifactResolver) getContainer().lookup( TestArtifactResolver.class.getName() );
+        
+        builder.setArtifactResolver( testArtifactResolver );
+        builder.setArtifactMetadataSource( testArtifactResolver.source() );
+        
         MavenProject project = getProjectWithDependencies( f );
 
         Artifact artifact;

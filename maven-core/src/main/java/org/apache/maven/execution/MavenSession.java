@@ -19,11 +19,9 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.mapping.PluginMappingManager;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
 
 import java.util.List;
 import java.util.Map;
@@ -36,8 +34,6 @@ public class MavenSession
 {
     private PlexusContainer container;
 
-    private MavenProject project;
-
     private ArtifactRepository localRepository;
 
     private List goals;
@@ -49,11 +45,14 @@ public class MavenSession
     // TODO: make this the central one, get rid of build settings...
     private final Settings settings;
 
-    public MavenSession( MavenProject project, PlexusContainer container, Settings settings,
-                         ArtifactRepository localRepository, EventDispatcher eventDispatcher, List goals )
-    {
-        this.project = project;
+    private List sortedProjects;
 
+    private final String executionRootDir;
+
+    public MavenSession( PlexusContainer container, Settings settings,
+                         ArtifactRepository localRepository, EventDispatcher eventDispatcher, List sortedProjects, 
+                         List goals, String executionRootDir )
+    {
         this.container = container;
 
         this.settings = settings;
@@ -61,26 +60,12 @@ public class MavenSession
         this.localRepository = localRepository;
 
         this.eventDispatcher = eventDispatcher;
+        
+        this.sortedProjects = sortedProjects;
 
         this.goals = goals;
         
-        // TODO: Go back to this when we get the container ready to configure mojos...
-        // NOTE: [jc] This is a possible way to add project, etc. to the container context to allow container-injected 
-        // mojo configuration.
-//        initializeContainerContext();
-    }
-
-    private void initializeContainerContext()
-    {
-        Context context = container.getContext();
-
-        context.put( "project", project );
-        context.put( "settings", settings );
-        context.put( "basedir", project.getBasedir().getAbsolutePath() );
-        context.put( "localRepository", localRepository );
-        
-        // TODO: remove this alias...change to ${project.build.finalName}
-        context.put( "maven.final.name", project.getBuild().getFinalName() );
+        this.executionRootDir = executionRootDir;
     }
 
     public PlexusContainer getContainer()
@@ -144,5 +129,15 @@ public class MavenSession
     public PluginMappingManager getPluginMappingManager()
     {
         return pluginMappingManager;
+    }
+    
+    public List getSortedProjects()
+    {
+        return sortedProjects;
+    }
+    
+    public String getExecutionRootDirectory()
+    {
+        return executionRootDir;
     }
 }

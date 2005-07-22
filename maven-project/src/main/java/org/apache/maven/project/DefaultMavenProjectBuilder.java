@@ -34,6 +34,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.activation.ProfileActivationCalculator;
@@ -85,14 +86,16 @@ public class DefaultMavenProjectBuilder
     // TODO: remove
     private PlexusContainer container;
 
-    private ArtifactResolver artifactResolver;
+    protected ArtifactResolver artifactResolver;
+    
+    protected ArtifactMetadataSource artifactMetadataSource;
 
     private ArtifactFactory artifactFactory;
 
     private ModelInheritanceAssembler modelInheritanceAssembler;
 
     private ModelValidator validator;
-
+    
     // TODO: make it a component
     private MavenXpp3Reader modelReader;
 
@@ -126,22 +129,6 @@ public class DefaultMavenProjectBuilder
                                                List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-        ArtifactMetadataSource source;
-        try
-        {
-            source = (ArtifactMetadataSource) container.lookup( ArtifactMetadataSource.ROLE );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ProjectBuildingException( "Unable to get the artifact metadata source component", e );
-        }
-        return buildWithDependencies( projectDescriptor, localRepository, source, externalProfiles );
-    }
-
-    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
-                                               ArtifactMetadataSource artifactMetadataSource, List externalProfiles )
-        throws ProjectBuildingException, ArtifactResolutionException
-    {
         MavenProject project = buildFromSourceFile( projectDescriptor, localRepository, externalProfiles );
 
         // ----------------------------------------------------------------------
@@ -160,6 +147,9 @@ public class DefaultMavenProjectBuilder
         Artifact projectArtifact = project.getArtifact();
 
         Map managedVersions = createManagedVersionMap( project.getDependencyManagement() );
+        
+        ensureMetadataSourceIsInitialized();
+        
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 projectArtifact, managedVersions,
                                                                                 localRepository,
@@ -168,6 +158,22 @@ public class DefaultMavenProjectBuilder
 
         project.setArtifacts( result.getArtifacts() );
         return project;
+    }
+    
+    private void ensureMetadataSourceIsInitialized() 
+        throws ProjectBuildingException
+    {
+        if ( artifactMetadataSource == null )
+        {
+            try
+            {
+                artifactMetadataSource = (ArtifactMetadataSource) container.lookup( ArtifactMetadataSource.ROLE );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new ProjectBuildingException( "Cannot lookup metadata source for building the project.", e );
+            }
+        }
     }
 
     private Map createManagedVersionMap( DependencyManagement dependencyManagement )
@@ -330,9 +336,13 @@ public class DefaultMavenProjectBuilder
             }
         }
 
+        Model originalModel = ModelUtils.cloneModel( model );
+        
         List repositories = new ArrayList( aggregatedRemoteWagonRepositories );
-
+        
         MavenProject project = assembleLineage( model, lineage, repositories, localRepository );
+
+        project.setOriginalModel( originalModel );
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
         Model previous = superModel;
@@ -630,6 +640,48 @@ public class DefaultMavenProjectBuilder
             if ( artifact != null )
             {
                 pluginArtifacts.add( artifact );
+            }
+        }
+
+        return pluginArtifacts;
+    }
+
+    protected Set createReportArtifacts( List reports )
+    throws ProjectBuildingException
+    {
+        Set pluginArtifacts = new HashSet();
+        
+        if ( reports != null )
+        {
+            for ( Iterator i = reports.iterator(); i.hasNext(); )
+            {
+                ReportPlugin p = (ReportPlugin) i.next();
+
+                String version;
+                if ( StringUtils.isEmpty( p.getVersion() ) )
+                {
+                    version = "RELEASE";
+                }
+                else
+                {
+                    version = p.getVersion();
+                }
+
+                Artifact artifact = null;
+                try
+                {
+                    artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(), VersionRange
+                        .createFromVersionSpec( version ) );
+                }
+                catch ( InvalidVersionSpecificationException e )
+                {
+                    throw new ProjectBuildingException( "Unable to parse plugin version", e );
+                }
+
+                if ( artifact != null )
+                {
+                    pluginArtifacts.add( artifact );
+                }
             }
         }
 

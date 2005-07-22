@@ -49,6 +49,9 @@ public class MavenMetadataSource
     extends AbstractLogEnabled
     implements ArtifactMetadataSource
 {
+    
+    public static final String ROLE_HINT = "maven";
+    
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ArtifactFactory artifactFactory;

@@ -230,9 +230,6 @@
           <role>org.apache.maven.plugin.registry.MavenPluginRegistryBuilder</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
         <requirement>

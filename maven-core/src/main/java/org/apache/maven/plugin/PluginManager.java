@@ -51,8 +51,7 @@ public interface PluginManager
                                   ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException;
 
-    List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session,
-                    ArtifactRepository localRepository )
+    List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session )
         throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException,
         ArtifactResolutionException;
 

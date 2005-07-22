@@ -17,7 +17,6 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
@@ -36,10 +35,6 @@ public interface MavenProjectBuilder
 
     MavenProject build( File project, ArtifactRepository localRepository, List profiles )
         throws ProjectBuildingException;
-
-    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
-                                        ArtifactMetadataSource artifactMetadataSource, List externalProfiles )
-        throws ProjectBuildingException, ArtifactResolutionException;
 
     MavenProject buildWithDependencies( File project, ArtifactRepository localRepository, List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException;

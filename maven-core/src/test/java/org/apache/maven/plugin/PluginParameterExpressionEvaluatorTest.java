@@ -66,11 +66,11 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( expected, actual );
     }
 
-    private static MavenSession createSession( MavenProject project, PlexusContainer container,
+    private static MavenSession createSession( PlexusContainer container,
                                                ArtifactRepository repo )
     {
-        return new MavenSession( project, container, new Settings(), repo, new DefaultEventDispatcher(),
-                                 Collections.EMPTY_LIST );
+        return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
+                                 Collections.EMPTY_LIST, Collections.EMPTY_LIST, "." );
     }
 
     public void testLocalRepositoryExtraction()
@@ -137,7 +137,7 @@ public class PluginParameterExpressionEvaluatorTest
         ArtifactRepository repo = new DefaultArtifactRepository( "local", "target/repo", repoLayout );
 
         PlexusContainer container = getContainer();
-        MavenSession session = createSession( project, container, repo );
+        MavenSession session = createSession( container, repo );
 
         return (ExpressionEvaluator) new PluginParameterExpressionEvaluator( session, pluginDescriptor, null,
                                                                              container.getLogger(), project );

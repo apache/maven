@@ -17,6 +17,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -112,7 +113,7 @@ public class DefaultPluginManager
 
     protected ArtifactResolver artifactResolver;
 
-    protected ArtifactMetadataSource metadataSource;
+    protected ArtifactMetadataSource artifactMetadataSource;
 
     protected MavenPluginMappingBuilder pluginMappingBuilder;
 
@@ -173,6 +174,15 @@ public class DefaultPluginManager
                                           ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
+        Artifact existingPluginArtifact = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
+        
+        return verifyPlugin( plugin, existingPluginArtifact, project, settings, localRepository );
+    }
+    
+    private PluginDescriptor verifyPlugin( Plugin plugin, Artifact existingArtifact, MavenProject project, Settings settings,
+                                          ArtifactRepository localRepository )
+        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
+    {
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
         if ( plugin.getVersion() == null )
@@ -188,6 +198,7 @@ public class DefaultPluginManager
             try
             {
                 VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
+
 
                 checkRequiredMavenVersion( plugin, localRepository, project.getPluginArtifactRepositories() );
 
@@ -382,17 +393,33 @@ public class DefaultPluginManager
         }
     }
 
-    public List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session,
-                            ArtifactRepository localRepository )
+    public List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session )
         throws PluginManagerException, PluginVersionResolutionException, PluginConfigurationException,
         ArtifactResolutionException
     {
         Plugin forLookup = new Plugin();
-        forLookup.setGroupId( reportPlugin.getGroupId() );
-        forLookup.setArtifactId( reportPlugin.getArtifactId() );
-        forLookup.setVersion( reportPlugin.getVersion() );
+        
+        String groupId = reportPlugin.getGroupId();
+        String artifactId = reportPlugin.getArtifactId();
+        
+        forLookup.setGroupId( groupId );
+        forLookup.setArtifactId( artifactId );
 
-        PluginDescriptor pluginDescriptor = verifyPlugin( forLookup, project, session.getSettings(), localRepository );
+        String version = reportPlugin.getVersion();
+        
+        Artifact existingPluginArtifact = (Artifact) project.getReportArtifactMap().get( reportPlugin.getKey() );
+        
+        if ( existingPluginArtifact == null
+            || !reportPlugin.getKey().equals( ArtifactUtils.versionlessKey( existingPluginArtifact ) )
+            || version == null )
+        {
+            version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, session.getSettings(), session.getLocalRepository(), true );
+        }
+        
+        forLookup.setVersion( version );
+        
+        PluginDescriptor pluginDescriptor = verifyPlugin( forLookup, existingPluginArtifact, project, session
+            .getSettings(), session.getLocalRepository() );
 
         List reports = new ArrayList();
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
@@ -516,7 +543,7 @@ public class DefaultPluginManager
             {
                 ArtifactRepository localRepository = session.getLocalRepository();
 
-                ResolutionGroup resolutionGroup = metadataSource.retrieve( pluginArtifact, localRepository,
+                ResolutionGroup resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository,
                                                                            project.getPluginArtifactRepositories() );
 
                 Set dependencies = resolutionGroup.getArtifacts();
@@ -524,7 +551,7 @@ public class DefaultPluginManager
                 ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                         localRepository,
                                                                                         resolutionGroup.getResolutionRepositories(),
-                                                                                        metadataSource,
+                                                                                        artifactMetadataSource,
                                                                                         artifactFilter );
 
                 Set resolved = result.getArtifacts();
@@ -1015,7 +1042,7 @@ public class DefaultPluginManager
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 artifact, context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
-                                                                                metadataSource, filter );
+                                                                                artifactMetadataSource, filter );
 
         project.setArtifacts( result.getArtifacts() );
     }

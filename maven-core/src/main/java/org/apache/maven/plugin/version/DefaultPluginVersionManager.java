@@ -21,7 +21,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.transform.LatestArtifactTransformation;
 import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -61,16 +60,14 @@ public class DefaultPluginVersionManager
 {
     private MavenPluginRegistryBuilder mavenPluginRegistryBuilder;
 
-    private ArtifactResolver artifactResolver;
-
     private ArtifactFactory artifactFactory;
 
     private InputHandler inputHandler;
 
+    private ArtifactMetadataSource artifactMetadataSource;
+
     // calculated.
     private PluginRegistry pluginRegistry;
-
-    private ArtifactMetadataSource metadataSource;
 
     private MavenProjectBuilder mavenProjectBuilder;
 
@@ -80,8 +77,15 @@ public class DefaultPluginVersionManager
                                         ArtifactRepository localRepository )
         throws PluginVersionResolutionException
     {
+        return resolvePluginVersion( groupId, artifactId, project, settings, localRepository, false );
+    }
+    
+    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
+                                        ArtifactRepository localRepository, boolean resolveAsReportPlugin )
+        throws PluginVersionResolutionException
+    {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
-        String version = getVersionFromPluginConfig( groupId, artifactId, project );
+        String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
 
         // we're NEVER going to persist POM-derived plugin versions.
         String updatedVersion = null;
@@ -474,33 +478,33 @@ public class DefaultPluginVersionManager
         return groupId + ":" + artifactId;
     }
 
-    private String getVersionFromPluginConfig( String groupId, String artifactId, MavenProject project )
+    private String getVersionFromPluginConfig( String groupId, String artifactId, MavenProject project, boolean resolveAsReportPlugin )
     {
         String version = null;
 
-        for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
-        {
-            Plugin plugin = (Plugin) it.next();
-
-            if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-            {
-                version = plugin.getVersion();
-
-                break;
-            }
-        }
-
-        // won't this overwrite the above loop if it exists in both places (unlikely, I know)??
-        // maybe that's the idea...?
-        if ( project.getReportPlugins() != null )
+        if ( resolveAsReportPlugin )
         {
             for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext(); )
             {
-                ReportPlugin reportPlugin = (ReportPlugin) it.next();
+                ReportPlugin plugin = (ReportPlugin) it.next();
 
-                if ( groupId.equals( reportPlugin.getGroupId() ) && artifactId.equals( reportPlugin.getArtifactId() ) )
+                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
                 {
-                    version = reportPlugin.getVersion();
+                    version = plugin.getVersion();
+
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
+            {
+                Plugin plugin = (Plugin) it.next();
+
+                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                {
+                    version = plugin.getVersion();
 
                     break;
                 }
@@ -620,7 +624,7 @@ public class DefaultPluginVersionManager
         String version = null;
         try
         {
-            metadataSource.retrieve( artifact, localRepository, remoteRepositories );
+            artifactMetadataSource.retrieve( artifact, localRepository, remoteRepositories );
 
             MavenProject project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
                                                                             localRepository );

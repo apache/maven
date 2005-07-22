@@ -52,6 +52,8 @@ public class TestArtifactResolver
     extends DefaultArtifactResolver
     implements Contextualizable
 {
+    public static final String ROLE = TestArtifactResolver.class.getName();
+    
     private ArtifactRepositoryFactory repositoryFactory;
 
     private PlexusContainer container;
@@ -154,6 +156,11 @@ public class TestArtifactResolver
 
             return projectArtifacts;
         }
+    }
+    
+    public Source source()
+    {
+        return new Source( artifactFactory, repositoryFactory, container );
     }
 
     /**

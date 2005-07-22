@@ -16,7 +16,6 @@ package org.apache.maven.doxia;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.ReportPlugin;
@@ -30,7 +29,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.i18n.I18N;
 import org.codehaus.plexus.siterenderer.Renderer;
 import org.codehaus.plexus.siterenderer.RendererException;
@@ -99,13 +97,6 @@ public class DoxiaMojo
 
         // Mac
         "**/.DS_Store"};
-
-    /**
-     * @parameter expression="${settings}"
-     * @required
-     * @readonly
-     */
-    private Settings settings;
 
     /**
      * @parameter expression="${basedir}/src/site"
@@ -178,13 +169,6 @@ public class DoxiaMojo
      * @readonly
      */
     private PluginManager pluginManager;
-
-    /**
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
-     */
-    private ArtifactRepository localRepository;
 
     /**
      * @parameter expression="${session}"
@@ -916,7 +900,7 @@ public class DoxiaMojo
 
                     if ( reportSets == null || reportSets.isEmpty() )
                     {
-                        reportsList = pluginManager.getReports( reportPlugin, null, project, session, localRepository );
+                        reportsList = pluginManager.getReports( reportPlugin, null, project, session );
 
                     }
                     else
@@ -925,8 +909,7 @@ public class DoxiaMojo
                         {
                             ReportSet reportSet = (ReportSet) j.next();
 
-                            reportsList = pluginManager.getReports( reportPlugin, reportSet, project, session,
-                                                                    localRepository );
+                            reportsList = pluginManager.getReports( reportPlugin, reportSet, project, session );
                         }
                     }
 

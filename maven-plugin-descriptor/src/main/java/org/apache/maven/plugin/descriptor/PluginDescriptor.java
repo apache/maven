@@ -223,7 +223,7 @@ public class PluginDescriptor
     {
         if ( artifactMap == null )
         {
-            artifactMap = ArtifactUtils.artifactMap( getArtifacts() );
+            artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
         }
         
         return artifactMap;

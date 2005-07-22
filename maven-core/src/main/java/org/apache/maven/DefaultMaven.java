@@ -177,6 +177,10 @@ public class DefaultMaven
 
         try
         {
+            MavenSession session = createSession( request, projects );
+            
+            List goals = request.getGoals();
+
             for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
             {
                 MavenProject project = (MavenProject) iterator.next();
@@ -189,7 +193,7 @@ public class DefaultMaven
 
                 try
                 {
-                    MavenExecutionResponse response = processProject( request, project, dispatcher );
+                    MavenExecutionResponse response = processProject( session, goals, project, dispatcher );
                     if ( response.isExecutionFailure() )
                     {
                         dispatcher.dispatchError( event, request.getBaseDirectory(), response.getException() );
@@ -262,14 +266,10 @@ public class DefaultMaven
         return projects;
     }
 
-    private MavenExecutionResponse processProject( MavenExecutionRequest request, MavenProject project,
+    private MavenExecutionResponse processProject( MavenSession session, List goals, MavenProject project,
                                                    EventDispatcher dispatcher )
         throws LifecycleExecutionException
     {
-        List goals = request.getGoals();
-
-        MavenSession session = createSession( request, project );
-
         // !! This is ripe for refactoring to an aspect.
         // Event monitoring.
         String event = MavenEvents.PROJECT_EXECUTION;
@@ -412,10 +412,10 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request, MavenProject project )
+    protected MavenSession createSession( MavenExecutionRequest request, List projects )
     {
-        return new MavenSession( project, container, request.getSettings(), request.getLocalRepository(),
-                                 request.getEventDispatcher(), request.getGoals() );
+        return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
+                                 request.getEventDispatcher(), projects, request.getGoals(), request.getBaseDirectory() );
     }
 
     /**

@@ -21,16 +21,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.scm.ScmBean;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.manager.ScmManager;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
-import java.util.Properties;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.File;
+import java.util.Properties;
 
 /**
  * 
@@ -39,7 +34,6 @@ import java.io.File;
  */
 public abstract class AbstractReleaseMojo
     extends AbstractMojo
-    implements Contextualizable
 {
     public static final String RELEASE_PROPS = "release.properties";
 
@@ -88,8 +82,11 @@ public abstract class AbstractReleaseMojo
      */
     protected MavenProject project;
 
-    private PlexusContainer container;
-
+    /**
+     * @parameter expression="${org.apache.maven.scm.manager.ScmManager}"
+     * @required
+     * @readonly
+     */
     protected ScmManager scmManager;
 
     private Properties releaseProperties;
@@ -130,18 +127,11 @@ public abstract class AbstractReleaseMojo
         return scm;
     }
 
-    public PlexusContainer getContainer()
-    {
-        return container;
-    }
-
     public void execute()
         throws MojoExecutionException
     {
         try
         {
-            initScmManager();
-
             if ( username == null )
             {
                 username = System.getProperty( "user.name" );
@@ -169,40 +159,10 @@ public abstract class AbstractReleaseMojo
             throw new MojoExecutionException( "Can't initialize ReleaseMojo.", e );
         }
 
-        try
-        {
-            executeTask();
-        }
-        finally
-        {
-            releaseScmManager();
-        }
+        executeTask();
     }
 
     protected abstract void executeTask()
         throws MojoExecutionException;
 
-    private void initScmManager()
-        throws Exception
-    {
-        scmManager = (ScmManager) container.lookup( ScmManager.ROLE );
-    }
-
-    private void releaseScmManager()
-    {
-        try
-        {
-            container.release( scmManager );
-        }
-        catch ( Exception e )
-        {
-            getLog().warn( "Error releasing component - ignoring", e );
-        }
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
 }

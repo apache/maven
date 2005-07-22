@@ -17,9 +17,14 @@ package org.apache.maven.plugin.release;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.scm.ScmBean;
 import org.apache.maven.plugin.transformer.PomTransformer;
@@ -27,16 +32,21 @@ import org.apache.maven.plugin.transformer.VersionTransformer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
+import org.apache.maven.scm.ScmFileStatus;
 import org.codehaus.plexus.components.inputhandler.InputHandler;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -64,8 +74,31 @@ public class PrepareReleaseMojo
      * @readonly
      */
     private boolean interactive = true;
+    
+    /**
+     * @parameter expression="${component.org.apache.maven.artifact.metadata.ArtifactMetadataSource}"
+     * @required
+     * @readonly
+     */
+    private ArtifactMetadataSource artifactMetadataSource;
+    
+    /**
+     * @parameter expression="${component.org.codehaus.plexus.components.inputhandler.InputHandler}"
+     * @required
+     * @readonly
+     */
+    private InputHandler inputHandler;
+    
+    /**
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    private ArtifactRepository localRepository;
 
     private static final String SNAPSHOT = "-SNAPSHOT";
+
+    private static final String RELEASE_POM = "release-pom.xml";
 
     private String projectVersion;
 
@@ -89,14 +122,46 @@ public class PrepareReleaseMojo
         checkForPresenceOfSnapshots();
 
         transformPomToReleaseVersionPom();
-
+        
+        generateReleasePropertiesFile();
+        
+        generateReleasePom();
+        
         checkInReleaseVersionPom();
 
         tagRelease();
 
         transformPomToSnapshotVersionPom();
+        
+        new File( basedir, RELEASE_POM ).delete();
 
         checkInSnapshotVersionPom();
+    }
+
+    private void generateReleasePropertiesFile() throws MojoExecutionException
+    {
+        try
+        {
+            Properties releaseProperties = new Properties();
+
+            releaseProperties.setProperty( "version", projectVersion );
+
+            releaseProperties.setProperty( USERNAME, username );
+
+            releaseProperties.setProperty( TAG, getTagLabel() );
+
+            releaseProperties.setProperty( SCM_URL, urlScm );
+
+            FileOutputStream os = new FileOutputStream( new File( project.getFile().getParentFile(), RELEASE_PROPS ) );
+
+            releaseProperties.store( os, "maven release plugin info" );
+
+            os.close();
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Cannote write release-version file.", e );
+        }
     }
 
     private boolean isSnapshot( String version )
@@ -250,9 +315,7 @@ public class PrepareReleaseMojo
         {
             getLog().info( "What is the new version? [" + projectVersion + "]" );
 
-            InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
-
-            String inputVersion = handler.readLine();
+            String inputVersion = inputHandler.readLine();
 
             if ( !StringUtils.isEmpty( inputVersion ) )
             {
@@ -282,77 +345,33 @@ public class PrepareReleaseMojo
                 rewriteScmConnection( model.getScm().getDeveloperConnection(), getTagLabel() ) );
         }
 
-        try
-        {
-            Properties releaseProperties = new Properties();
-
-            releaseProperties.setProperty( "version", projectVersion );
-
-            releaseProperties.setProperty( USERNAME, username );
-
-            releaseProperties.setProperty( TAG, getTagLabel() );
-
-            releaseProperties.setProperty( SCM_URL, urlScm );
-
-            FileOutputStream os = new FileOutputStream( new File( project.getFile().getParentFile(), RELEASE_PROPS ) );
-
-            releaseProperties.store( os, "maven release plugin info" );
-
-            os.close();
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Cannote write release-version file.", e );
-        }
-
         //Rewrite parent version
         if ( project.hasParent() )
         {
-            if ( isSnapshot( project.getParentArtifact().getBaseVersion() ) )
+            Artifact parentArtifact = project.getParentArtifact();
+            
+            if ( isSnapshot( parentArtifact.getBaseVersion() ) )
             {
-                model.getParent().setVersion( project.getParentArtifact().getVersion() );
+                String version = resolveVersion( parentArtifact, "parent" );
+                
+                model.getParent().setVersion( version );
             }
         }
-
-        //Rewrite dependencies version
-        for ( Iterator i = project.getArtifacts().iterator(); i.hasNext(); )
+        
+        //Rewrite dependencies section
+        Map artifactMap = ArtifactUtils.artifactMapByArtifactId( project.getArtifacts() );
+        
+        for ( Iterator i = model.getDependencies().iterator(); i.hasNext(); )
         {
-            Artifact artifact = (Artifact) i.next();
-            if ( isSnapshot( artifact.getBaseVersion() ) )
-            {
-                for ( Iterator j = model.getDependencies().iterator(); j.hasNext(); )
-                {
-                    Dependency dependency = (Dependency) j.next();
-                    if ( artifact.getGroupId().equals( dependency.getGroupId() ) &&
-                        artifact.getArtifactId().equals( dependency.getArtifactId() ) &&
-                        artifact.getBaseVersion().equals( dependency.getVersion() ) &&
-                        artifact.getType().equals( dependency.getType() ) )
-                    {
-                        dependency.setVersion( artifact.getVersion() );
-                    }
-                }
-            }
+            Dependency dep = (Dependency) i.next();
+            
+            String conflictId = ArtifactUtils.artifactId( dep.getGroupId(), dep.getArtifactId(), dep.getType(), dep.getVersion() );
+            
+            Artifact artifact = (Artifact) artifactMap.get( conflictId );
+            
+            dep.setVersion( artifact.getVersion() );
         }
-
-        //Rewrite plugins version
-        for ( Iterator i = project.getPluginArtifacts().iterator(); i.hasNext(); )
-        {
-            Artifact artifact = (Artifact) i.next();
-            if ( isSnapshot( artifact.getBaseVersion() ) )
-            {
-                for ( Iterator j = model.getBuild().getPlugins().iterator(); j.hasNext(); )
-                {
-                    Plugin plugin = (Plugin) j.next();
-                    if ( artifact.getGroupId().equals( plugin.getGroupId() ) &&
-                        artifact.getArtifactId().equals( plugin.getArtifactId() ) )
-                    {
-                        plugin.setGroupId( artifact.getGroupId() );
-                        plugin.setVersion( artifact.getVersion() );
-                    }
-                }
-            }
-        }
-
+        
         try
         {
             PomTransformer transformer = new VersionTransformer();
@@ -371,6 +390,154 @@ public class PrepareReleaseMojo
         {
             throw new MojoExecutionException( "Can't transform pom to its release version form.", e );
         }
+    }
+    
+    private void generateReleasePom() throws MojoExecutionException
+    {
+        MavenProject releaseProject = new MavenProject( project );
+        Model releaseModel = releaseProject.getModel();
+        
+        //Rewrite parent version
+        if ( project.hasParent() )
+        {
+            Artifact parentArtifact = project.getParentArtifact();
+            
+            if ( isSnapshot( parentArtifact.getBaseVersion() ) )
+            {
+                String version = resolveVersion( parentArtifact, "parent" );
+                
+                model.getParent().setVersion( version );
+            }
+        }
+
+        //Rewrite dependencies section
+        List newdeps = new ArrayList();
+        
+        for ( Iterator i = releaseProject.getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact artifact = (Artifact) i.next();
+            
+            Dependency newdep = new Dependency();
+            
+            newdep.setArtifactId( artifact.getArtifactId() );
+            newdep.setGroupId( artifact.getGroupId() );
+            newdep.setVersion( artifact.getVersion() );
+            newdep.setType( artifact.getType() );
+            newdep.setScope( artifact.getScope() );
+            
+            newdeps.add( newdep );
+        }
+        
+        releaseModel.setDependencies( newdeps );
+
+        //Rewrite plugins version
+        for ( Iterator i = releaseProject.getPluginArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact artifact = (Artifact) i.next();
+            if ( isSnapshot( artifact.getBaseVersion() ) )
+            {
+                for ( Iterator j = releaseModel.getBuild().getPlugins().iterator(); j.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) j.next();
+                    if ( ArtifactUtils.versionlessKey(artifact).equals( plugin.getKey() ) )
+                    {
+                        String version = resolveVersion( artifact, "plugin" );
+                        
+                        plugin.setGroupId( artifact.getGroupId() );
+                        plugin.setVersion( version );
+                    }
+                }
+            }
+        }
+        
+        //Rewrite report version
+        for ( Iterator i = releaseProject.getReportArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact artifact = (Artifact) i.next();
+            if ( isSnapshot( artifact.getBaseVersion() ) )
+            {
+                List reportPlugins = releaseProject.getReportPlugins();
+                
+                if ( reportPlugins != null )
+                {
+                    for ( Iterator j = reportPlugins.iterator(); j.hasNext(); )
+                    {
+                        ReportPlugin plugin = (ReportPlugin) j.next();
+                        if ( ArtifactUtils.versionlessKey(artifact).equals( plugin.getKey() ) )
+                        {
+                            String version = resolveVersion( artifact, "report" );
+                            
+                            plugin.setGroupId( artifact.getGroupId() );
+                            plugin.setVersion( version );
+                        }
+                    }
+                }
+            }
+        }
+        
+        File releasePomFile = new File( basedir, RELEASE_POM );
+        
+        Writer writer = null;
+        
+        try
+        {
+            writer = new FileWriter( releasePomFile );
+            
+            releaseProject.writeModel( writer );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Cannot write release-pom to: " + releasePomFile, e );
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
+        
+        try
+        {
+            ScmBean scm = getScm();
+
+            scm.setWorkingDirectory( basedir );
+
+            List scmChanges = scm.getStatus();
+            
+            for ( Iterator i = scmChanges.iterator(); i.hasNext(); )
+            {
+                ScmFile f = (ScmFile) i.next();
+                
+                if ( f.getPath().equals( "release-pom.xml" ) && f.getStatus() != ScmFileStatus.MODIFIED )
+                {
+                    getScm().add( RELEASE_POM );
+                }
+            }
+        }
+        catch ( ScmException e )
+        {
+            throw new MojoExecutionException( "Error updating the release-pom.xml.", e );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error updating the release-pom.xml.", e );
+        }
+    }
+
+    private String resolveVersion( Artifact artifact, String artifactUsage ) 
+        throws MojoExecutionException
+    {
+        if ( artifact.getFile() == null )
+        {
+            try
+            {
+                artifactMetadataSource.retrieve(artifact, localRepository, project.getPluginArtifactRepositories() );
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                throw new MojoExecutionException( "Cannot resolve " + artifactUsage + ": " + artifact.getId(), e );
+            }
+        }
+        
+        return artifact.getVersion();
     }
 
     private void transformPomToSnapshotVersionPom()
@@ -401,9 +568,7 @@ public class PrepareReleaseMojo
         {
             getLog().info( "What is the new version? [" + projectVersion + "]" );
 
-            InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
-
-            String inputVersion = handler.readLine();
+            String inputVersion = inputHandler.readLine();
 
             if ( !StringUtils.isEmpty( inputVersion ) )
             {
@@ -449,16 +614,16 @@ public class PrepareReleaseMojo
     private void checkInReleaseVersionPom()
         throws MojoExecutionException
     {
-        checkInPom( "[maven-release-plugin] prepare release " + projectVersion );
+        checkIn( "pom.xml,release-pom.xml", "[maven-release-plugin] prepare release " + projectVersion );
     }
 
     private void checkInSnapshotVersionPom()
         throws MojoExecutionException
     {
-        checkInPom( "[maven-release-plugin] prepare for development " + projectVersion );
+        checkIn( "pom.xml", "[maven-release-plugin] prepare for development " + projectVersion );
     }
 
-    private void checkInPom( String message )
+    private void checkIn( String includePattern, String message )
         throws MojoExecutionException
     {
         try
@@ -472,7 +637,7 @@ public class PrepareReleaseMojo
             // No tag here - we suppose user works on correct branch
             scm.setTag( null );
 
-            scm.checkin( message, "pom.xml", null );
+            scm.checkin( message, includePattern, null );
 
             scm.setTag( tag );
         }
@@ -508,9 +673,7 @@ public class PrepareReleaseMojo
                 {
                     getLog().info( "What tag name should be used? [ " + tag + " ]" );
 
-                    InputHandler handler = (InputHandler) getContainer().lookup( InputHandler.ROLE );
-
-                    String inputTag = handler.readLine();
+                    String inputTag = inputHandler.readLine();
 
                     if ( !StringUtils.isEmpty( inputTag ) )
                     {

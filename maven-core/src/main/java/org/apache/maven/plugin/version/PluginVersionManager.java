@@ -28,4 +28,7 @@ public interface PluginVersionManager
     String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings, ArtifactRepository localRepository )
         throws PluginVersionResolutionException;
 
+    String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings, ArtifactRepository localRepository, boolean resolveAsReportPlugin )
+        throws PluginVersionResolutionException;
+
 }

@@ -16,12 +16,11 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,18 +36,22 @@ public abstract class MavenProjectTestCase
 {
     protected MavenProjectBuilder projectBuilder;
 
-    private ArtifactFactory artifactFactory;
-
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
-
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
-        projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
-        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        artifactRepositoryFactory = (ArtifactRepositoryFactory) lookup( ArtifactRepositoryFactory.ROLE );
+        try
+        {
+            projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE, "test" );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // default over to the main project builder...
+            projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+        }
+        
+        System.out.println("Using project builder: " + projectBuilder.getClass().getName() + " for tests in: " + getClass().getName());
     }
 
     // ----------------------------------------------------------------------
@@ -103,8 +106,7 @@ public abstract class MavenProjectTestCase
     protected MavenProject getProjectWithDependencies( File pom )
         throws Exception
     {
-        return projectBuilder.buildWithDependencies( pom, getLocalRepository(), new TestArtifactResolver.Source(
-            artifactFactory, artifactRepositoryFactory, getContainer() ), Collections.EMPTY_LIST );
+        return projectBuilder.buildWithDependencies( pom, getLocalRepository(), Collections.EMPTY_LIST );
     }
 
     protected MavenProject getProject( File pom )

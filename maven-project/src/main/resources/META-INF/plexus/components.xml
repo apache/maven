@@ -114,6 +114,7 @@
       <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
       <implementation>org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler</implementation>
     </component>
+
 <!--
      |
      |
@@ -124,8 +125,28 @@
       <implementation>org.apache.maven.project.validation.DefaultModelValidator</implementation>
     </component>
 
+<!-- ********************* FIXME *******************************************
+| I realize this is duplicated but allows the project builder to work by itself
+-->
+    <component>
+      <role>org.apache.maven.project.path.PathTranslator</role>
+      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
+    </component>
+    
+    <component>
+      <role>org.apache.maven.project.ModelResolver</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.project.ModelResolver</implementation>
+      <requirements>
+        <requirement>
+		      <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+      </requirements>
+    </component>
+    
     <component>
       <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+      <role-hint>maven</role-hint>
       <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
       <requirements>
         <requirement>
@@ -135,14 +156,6 @@
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
       </requirements>
-    </component>
-
-<!-- ********************* FIXME *******************************************
-| I realize this is duplicated but allows the project builder to work by itself
--->
-    <component>
-      <role>org.apache.maven.project.path.PathTranslator</role>
-      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
     </component>
   </components>
 </component-set>
