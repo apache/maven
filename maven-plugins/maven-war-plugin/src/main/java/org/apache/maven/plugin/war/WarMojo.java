@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Build a war/webapp.
@@ -155,25 +156,33 @@ public class WarMojo
             FileUtils.copyDirectoryStructure( classesDirectory, webappClassesDirectory );
         }
 
-        List runtimeArtifacts = project.getRuntimeArtifacts();
+        Set artifacts = project.getArtifacts();
 
-        for ( Iterator iter = runtimeArtifacts.iterator(); iter.hasNext(); )
+        for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
         {
             Artifact artifact = (Artifact) iter.next();
 
+            // TODO: utilise appropriate methods from project builder
             // TODO: scope handler
             // Include runtime and compile time libraries
-            // [jc, 21-June]: handle TLDs as a special-case.
-            if ( "tld".equals( artifact.getType() ) )
+            if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) &&
+                !!Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
             {
-                FileUtils.copyFileToDirectory( artifact.getFile(), tldDirectory );
+                String type = artifact.getType();
+                if ( "tld".equals( type ) )
+                {
+                    FileUtils.copyFileToDirectory( artifact.getFile(), tldDirectory );
+                }
+                else if ( "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type ) )
+                {
+                    FileUtils.copyFileToDirectory( artifact.getFile(), libDirectory );
+                }
+                else
+                {
+                    getLog().debug( "Skipping artifact of type " + type + " for WEB-INF/lib" );
+                }
             }
-            // [jc, 21-June]: I'm removing ( "jar".equals( artifact.getType() ) ) from consideration here
-            // we'll handle anything that's in the runtime classpath and NOT a SCOPE_PROVIDED artifact.
-            else if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
-            {
-                FileUtils.copyFileToDirectory( artifact.getFile(), libDirectory );
-            }
+
         }
     }
 

@@ -331,6 +331,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
+            // TODO: classpath check doesn't belong here - that's the other method
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
@@ -412,6 +413,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
+            // TODO: classpath check doesn't belong here - that's the other method
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
@@ -494,6 +496,7 @@ public class MavenProject
         {
             Artifact a = (Artifact) i.next();
 
+            // TODO: classpath check doesn't belong here - that's the other method
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
@@ -543,12 +546,7 @@ public class MavenProject
         String type = artifact.getType();
 
         // TODO: utilise type handler
-        if ( "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type ) )
-        {
-            return true;
-        }
-
-        return false;
+        return "jar".equals( type ) || "ejb".equals( type ) || "ejb-client".equals( type );
     }
 
     // ----------------------------------------------------------------------
