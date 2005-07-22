@@ -165,12 +165,22 @@ public class DefaultModelInheritanceAssembler
         // Dependencies :: aggregate
         List dependencies = parent.getDependencies();
 
-        for ( Iterator iterator = dependencies.iterator(); iterator.hasNext(); )
+        List childDeps = child.getDependencies();
+
+        Map mappedChildDeps = new TreeMap();
+        for ( Iterator it = childDeps.iterator(); it.hasNext(); )
         {
-            Dependency dependency = (Dependency) iterator.next();
+            Dependency dep = (Dependency) it.next();
+            mappedChildDeps.put( dep.getManagementKey(), dep );
+        }
 
-            child.addDependency( dependency );
-
+        for ( Iterator it = parent.getDependencies().iterator(); it.hasNext(); )
+        {
+            Dependency dep = (Dependency) it.next();
+            if ( !mappedChildDeps.containsKey( dep.getManagementKey() ) )
+            {
+                child.addDependency( dep );
+            }
         }
 
         // Repositories :: aggregate

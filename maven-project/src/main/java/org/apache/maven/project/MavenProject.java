@@ -218,9 +218,9 @@ public class MavenProject
         }
     }
 
-    public void setDependencies( List denpendencies )
+    public void setDependencies( List dependencies )
     {
-        model.setDependencies( denpendencies );
+        model.setDependencies( dependencies );
     }
 
     public List getDependencies()
