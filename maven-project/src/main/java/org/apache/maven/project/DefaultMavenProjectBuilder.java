@@ -272,7 +272,7 @@ public class DefaultMavenProjectBuilder
                 model.setArtifactId( artifact.getArtifactId() );
                 model.setGroupId( artifact.getGroupId() );
                 model.setVersion( artifact.getVersion() );
-                // TOOD: not correct in some instances
+                // TODO: not correct in some instances
                 model.setPackaging( artifact.getType() );
             }
         }
