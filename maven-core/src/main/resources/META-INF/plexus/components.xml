@@ -20,7 +20,7 @@
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.MavenProjectBuilder</role>
+          <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.mapping.MavenPluginMappingBuilder</role>
@@ -210,7 +210,7 @@
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <requirements>
         <requirement>
-          <role>org.apache.maven.project.MavenProjectBuilder</role>
+          <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.registry.MavenPluginRegistryBuilder</role>

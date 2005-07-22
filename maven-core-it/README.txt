@@ -103,6 +103,8 @@ it0033: Test an EAR generation
 
 it0034: Test version range junit [3.7,) resolves to 3.8.1
 
+it0035: Test artifact relocation.
+
 -------------------------------------------------------------------------------
 
 - generated sources

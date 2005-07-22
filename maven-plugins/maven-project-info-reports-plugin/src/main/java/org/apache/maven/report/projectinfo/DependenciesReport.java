@@ -17,19 +17,18 @@ package org.apache.maven.report.projectinfo;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.AbstractMavenReport;
+import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.MavenReportException;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,12 +39,11 @@ import java.util.Set;
 
 /**
  * Generates the Project Dependencies report.
- * 
- * @goal dependencies
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton </a>
  * @version $Id$
+ * @goal dependencies
  * @plexus.component
  */
 public class DependenciesReport
@@ -174,8 +172,8 @@ public class DependenciesReport
         private ArtifactRepository localRepository;
 
         public DependenciesRenderer( Sink sink, MavenProject project, Locale locale,
-                                    MavenProjectBuilder mavenProjectBuilder, ArtifactFactory artifactFactory,
-                                    ArtifactRepository localRepository )
+                                     MavenProjectBuilder mavenProjectBuilder, ArtifactFactory artifactFactory,
+                                     ArtifactRepository localRepository )
         {
             super( sink );
 
@@ -224,34 +222,30 @@ public class DependenciesReport
             String description = getBundle( locale ).getString( "report.dependencies.column.description" );
             String url = getBundle( locale ).getString( "report.dependencies.column.url" );
 
-            tableHeader( new String[] { groupId, artifactId, version, description, url } );
+            tableHeader( new String[]{groupId, artifactId, version, description, url} );
 
             for ( Iterator i = dependencies.iterator(); i.hasNext(); )
             {
                 Dependency dependency = (Dependency) i.next();
 
-                Artifact artifact = artifactFactory.createArtifact( dependency.getGroupId(),
-                                                                    dependency.getArtifactId(),
+                Artifact artifact = artifactFactory.createArtifact( dependency.getGroupId(), dependency.getArtifactId(),
                                                                     dependency.getVersion(), dependency.getScope(),
                                                                     dependency.getType() );
-                MavenProject artifactProject = null;
+                MavenProject artifactProject;
                 try
                 {
+                    // TODO: can we use @requiresDependencyResolution instead, and capture the depth of artifacts in the artifact itself?
                     artifactProject = getMavenProjectFromRepository( artifact, localRepository );
                 }
                 catch ( ProjectBuildingException e )
                 {
                     throw new IllegalArgumentException(
-                                                        "Can't find a valid Maven project in the repository for the artifact ["
-                                                            + artifact + "]." );
+                        "Can't find a valid Maven project in the repository for the artifact [" + artifact + "]." );
                 }
 
-                tableRow( new String[] {
-                    dependency.getGroupId(),
-                    dependency.getArtifactId(),
-                    dependency.getVersion(),
+                tableRow( new String[]{dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
                     artifactProject.getDescription(),
-                    createLinkPatternedText( artifactProject.getUrl(), artifactProject.getUrl() ) } );
+                    createLinkPatternedText( artifactProject.getUrl(), artifactProject.getUrl() )} );
             }
 
             endTable();
@@ -273,13 +267,13 @@ public class DependenciesReport
 
                 tableCaption( getBundle( locale ).getString( "report.transitivedependencies.intro" ) );
 
-                tableHeader( new String[] { groupId, artifactId, version, description, url } );
+                tableHeader( new String[]{groupId, artifactId, version, description, url} );
 
                 for ( Iterator i = artifacts.iterator(); i.hasNext(); )
                 {
                     Artifact artifact = (Artifact) i.next();
 
-                    MavenProject artifactProject = null;
+                    MavenProject artifactProject;
                     try
                     {
                         artifactProject = getMavenProjectFromRepository( artifact, localRepository );
@@ -287,15 +281,11 @@ public class DependenciesReport
                     catch ( ProjectBuildingException e )
                     {
                         throw new IllegalArgumentException(
-                                                            "Can't find a valid Maven project in the repository for the artifact ["
-                                                                + artifact + "]." );
+                            "Can't find a valid Maven project in the repository for the artifact [" + artifact + "]." );
                     }
-                    tableRow( new String[] {
-                        artifact.getGroupId(),
-                        artifact.getArtifactId(),
-                        artifact.getVersion(),
+                    tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
                         artifactProject.getDescription(),
-                        createLinkPatternedText( artifactProject.getUrl(), artifactProject.getUrl() ) } );
+                        createLinkPatternedText( artifactProject.getUrl(), artifactProject.getUrl() )} );
                 }
 
                 endTable();
@@ -307,9 +297,8 @@ public class DependenciesReport
         /**
          * Return a set of <code>Artifacts</code> which are not already
          * present in the dependencies list.
-         * 
-         * @param project
-         *            a Maven project
+         *
+         * @param project a Maven project
          * @return a set of transitive dependencies as artifacts
          */
         private Set getTransitiveDependencies( MavenProject project )
@@ -329,8 +318,7 @@ public class DependenciesReport
             {
                 Dependency dependency = (Dependency) i.next();
 
-                Artifact artifact = artifactFactory.createArtifact( dependency.getGroupId(),
-                                                                    dependency.getArtifactId(),
+                Artifact artifact = artifactFactory.createArtifact( dependency.getGroupId(), dependency.getArtifactId(),
                                                                     dependency.getVersion(), dependency.getScope(),
                                                                     dependency.getType() );
                 dependenciesAsArtifacts.add( artifact );
@@ -353,15 +341,14 @@ public class DependenciesReport
          * Get the <code>Maven project</code> from the repository depending
          * the <code>Artifact</code> given.
          *
-         * @param artifact
-         *            an artifact
+         * @param artifact an artifact
          * @return the Maven project for the given artifact
-         * @throws org.apache.maven.project.ProjectBuildingException
-         *             if any
+         * @throws org.apache.maven.project.ProjectBuildingException if any
          */
         private MavenProject getMavenProjectFromRepository( Artifact artifact, ArtifactRepository localRepository )
             throws ProjectBuildingException
         {
+            // TODO: we should use the MavenMetadataSource instead
             return mavenProjectBuilder.buildFromRepository( artifact, project.getRepositories(), localRepository );
         }
     }

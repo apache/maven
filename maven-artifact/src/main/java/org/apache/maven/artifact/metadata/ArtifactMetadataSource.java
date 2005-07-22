@@ -27,6 +27,8 @@ import java.util.List;
  */
 public interface ArtifactMetadataSource
 {
+    String ROLE = ArtifactMetadataSource.class.getName();
+
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 }

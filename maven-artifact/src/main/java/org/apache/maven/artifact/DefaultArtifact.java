@@ -36,9 +36,9 @@ import java.util.List;
 public class DefaultArtifact
     implements Artifact
 {
-    private final String groupId;
+    private String groupId;
 
-    private final String artifactId;
+    private String artifactId;
 
     /**
      * The resolved version for the artifact after conflict resolution, that has not been transformed.
@@ -406,4 +406,13 @@ public class DefaultArtifact
         this.version = version;
     }
 
+    public void setGroupId( String groupId )
+    {
+        this.groupId = groupId;
+    }
+
+    public void setArtifactId( String artifactId )
+    {
+        this.artifactId = artifactId;
+    }
 }

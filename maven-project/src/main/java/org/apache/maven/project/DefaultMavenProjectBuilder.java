@@ -47,6 +47,7 @@ import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -118,11 +119,22 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
+    /**
+     * @todo move to metadatasource itself?
+     */
     public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
                                                List externalProfiles )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-        ArtifactMetadataSource source = new MavenMetadataSource( this, artifactFactory );
+        ArtifactMetadataSource source;
+        try
+        {
+            source = (ArtifactMetadataSource) container.lookup( ArtifactMetadataSource.ROLE );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new ProjectBuildingException( "Unable to get the artifact metadata source component", e );
+        }
         return buildWithDependencies( projectDescriptor, localRepository, source, externalProfiles );
     }
 

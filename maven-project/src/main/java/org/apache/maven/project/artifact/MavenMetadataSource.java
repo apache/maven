@@ -29,9 +29,11 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.Relocation;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,46 +46,89 @@ import java.util.Set;
  * @version $Id$
  */
 public class MavenMetadataSource
+    extends AbstractLogEnabled
     implements ArtifactMetadataSource
 {
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ArtifactFactory artifactFactory;
 
-    // TODO: Remove resolver from params list.
-    public MavenMetadataSource( MavenProjectBuilder projectBuilder, ArtifactFactory artifactFactory )
-    {
-        this.mavenProjectBuilder = projectBuilder;
-        this.artifactFactory = artifactFactory;
-    }
-
+    /**
+     * Retrieve the metadata for the project from the repository.
+     * Uses the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
+     * associated artifacts.
+     *
+     * @todo this a very thin wrapper around a project builder - is it needed?
+     */
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        // TODO: only metadata is really needed - resolve as metadata
-        Artifact pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                                      artifact.getVersion(), artifact.getScope() );
-
-        // TODO: this a very thin wrapper around a project builder - is it needed?
         List dependencies;
+        MavenProject p;
 
-        // Use the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
-        // associated artifacts.
+        Artifact pomArtifact;
+        boolean done = false;
+        do
+        {
+            // TODO: only metadata is really needed - resolve as metadata
+            pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                 artifact.getVersion(), artifact.getScope() );
+
+            try
+            {
+                p = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
+            }
+
+            Relocation relocation = null;
+
+            if ( p.getDistributionManagement() != null )
+            {
+                relocation = p.getDistributionManagement().getRelocation();
+            }
+            if ( relocation != null )
+            {
+                if ( relocation.getGroupId() != null )
+                {
+                    artifact.setGroupId( relocation.getGroupId() );
+                }
+                if ( relocation.getArtifactId() != null )
+                {
+                    artifact.setArtifactId( relocation.getArtifactId() );
+                }
+                if ( relocation.getVersion() != null )
+                {
+                    artifact.setVersion( relocation.getVersion() );
+                }
+
+                String message = pomArtifact + " has been relocated to " + artifact + ".\n";
+
+                if ( relocation.getMessage() != null )
+                {
+                    message += relocation.getMessage();
+                }
+
+//                getLogger().warn( message );
+            }
+            else
+            {
+                done = true;
+            }
+        }
+        while ( !done );
+
+        dependencies = p.getDependencies();
+        artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
+
         try
         {
-            MavenProject p = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories,
-                                                                      localRepository );
-            dependencies = p.getDependencies();
-            artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
-
             Set artifacts = createArtifacts( artifactFactory, dependencies, artifact.getScope(),
                                              artifact.getDependencyFilter() );
 
             return new ResolutionGroup( artifacts, p.getRemoteArtifactRepositories() );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
         }
         catch ( InvalidVersionSpecificationException e )
         {

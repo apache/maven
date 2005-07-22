@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -48,8 +49,6 @@ import org.apache.maven.plugin.mapping.PluginMappingManager;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
@@ -108,7 +107,7 @@ public class DefaultPluginManager
 
     protected ArtifactResolver artifactResolver;
 
-    protected MavenProjectBuilder mavenProjectBuilder;
+    protected ArtifactMetadataSource metadataSource;
 
     protected MavenPluginMappingBuilder pluginMappingBuilder;
     // END component requirements
@@ -262,7 +261,7 @@ public class DefaultPluginManager
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
 
-            resolveTransitiveDependencies( session, artifactResolver, mavenProjectBuilder, mojoDescriptor
+            resolveTransitiveDependencies( session, artifactResolver, mojoDescriptor
                 .isDependencyResolutionRequired(), artifactFactory, project );
 
             downloadDependencies( project, session, artifactResolver );
@@ -474,8 +473,6 @@ public class DefaultPluginManager
 
             try
             {
-                MavenMetadataSource metadataSource = new MavenMetadataSource( mavenProjectBuilder, artifactFactory );
-
                 ArtifactRepository localRepository = session.getLocalRepository();
 
                 ResolutionGroup resolutionGroup = metadataSource.retrieve( pluginArtifact, localRepository,
@@ -962,13 +959,10 @@ public class DefaultPluginManager
     // Artifact resolution
     // ----------------------------------------------------------------------
 
-    private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver,
-                                                MavenProjectBuilder mavenProjectBuilder, String scope,
+    private void resolveTransitiveDependencies( MavenSession context, ArtifactResolver artifactResolver, String scope,
                                                 ArtifactFactory artifactFactory, MavenProject project )
         throws ArtifactResolutionException
     {
-        MavenMetadataSource sourceReader = new MavenMetadataSource( mavenProjectBuilder, artifactFactory );
-
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
@@ -980,7 +974,7 @@ public class DefaultPluginManager
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 artifact, context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
-                                                                                sourceReader, filter );
+                                                                                metadataSource, filter );
 
         project.setArtifacts( result.getArtifacts() );
     }

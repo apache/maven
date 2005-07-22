@@ -114,4 +114,8 @@ public interface Artifact
     void setVersionRange( VersionRange newRange );
 
     void selectVersion( String version );
+
+    void setGroupId( String groupId );
+
+    void setArtifactId( String artifactId );
 }

@@ -1,8 +1,25 @@
 package org.apache.maven.plugin.version;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.transform.LatestArtifactTransformation;
@@ -15,8 +32,6 @@ import org.apache.maven.plugin.registry.PluginRegistryUtils;
 import org.apache.maven.plugin.registry.TrackableBase;
 import org.apache.maven.plugin.registry.io.xpp3.PluginRegistryXpp3Writer;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.inputhandler.InputHandler;
@@ -36,22 +51,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/*
- * Copyright 2001-2005 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 public class DefaultPluginVersionManager
     extends AbstractLogEnabled
     implements PluginVersionManager
@@ -62,12 +61,12 @@ public class DefaultPluginVersionManager
 
     private ArtifactFactory artifactFactory;
 
-    private MavenProjectBuilder projectBuilder;
-
     private InputHandler inputHandler;
 
     // calculated.
     private PluginRegistry pluginRegistry;
+
+    private ArtifactMetadataSource metadataSource;
 
     public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
                                         ArtifactRepository localRepository )
@@ -389,7 +388,7 @@ public class DefaultPluginVersionManager
             return shouldPersist;
 
         }
-        catch ( Exception e )
+        catch ( IOException e )
         {
             throw new PluginVersionResolutionException( groupId, artifactId, "Can't read user input.", e );
         }
@@ -440,7 +439,7 @@ public class DefaultPluginVersionManager
     private org.apache.maven.plugin.registry.Plugin getPlugin( String groupId, String artifactId,
                                                                PluginRegistry pluginRegistry )
     {
-        Map pluginsByKey = null;
+        Map pluginsByKey;
 
         if ( pluginRegistry != null )
         {
@@ -603,8 +602,6 @@ public class DefaultPluginVersionManager
     {
         // TODO: check - this was SCOPE_RUNTIME before, now is null
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
-
-        MavenMetadataSource metadataSource = new MavenMetadataSource( projectBuilder, artifactFactory );
 
         String version = null;
         try

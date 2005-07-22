@@ -1437,6 +1437,14 @@
           ]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>relocation</name>
+          <version>4.0.0</version>
+          <description>Relocation information if the artifact has been moved to a new group/artifactId</description>
+          <association>
+            <type>Relocation</type>
+          </association>
+        </field>
       </fields>
     </class>
     <class>
@@ -2650,6 +2658,38 @@
           <defaultValue>2.0-beta-1-SNAPSHOT</defaultValue>
           <description>The minimum version of Maven required</description>
           <required>false</required>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Relocation</name>
+      <version>4.0.0</version>
+      <description>Describes where an artifact has moved to. If any of the values are omitted, it is assumed to be the
+        same as it was before.</description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <description>The group the artifact has moved to</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <description>The new artifact ID of the artifact</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description>The new version of the artifact</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>message</name>
+          <version>4.0.0</version>
+          <description>An additional message to show the user about the move, such as the reason.</description>
+          <type>String</type>
         </field>
       </fields>
     </class>

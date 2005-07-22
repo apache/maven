@@ -17,6 +17,7 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -68,7 +69,7 @@ public class DependenciesTask
         ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
         MavenProjectBuilder projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
         ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        MavenMetadataSource metadataSource = new MavenMetadataSource( projectBuilder, artifactFactory );
+        MavenMetadataSource metadataSource = (MavenMetadataSource) lookup( ArtifactMetadataSource.ROLE );
 
         List dependencies = this.dependencies;
 
