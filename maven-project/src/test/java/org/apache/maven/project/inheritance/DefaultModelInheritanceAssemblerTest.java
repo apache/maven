@@ -263,7 +263,7 @@ public class DefaultModelInheritanceAssemblerTest
 
         Model child = makeRepositoryModel( "child", "central", "http://repo2.maven.org/maven/" );
 
-        List repos = new ArrayList( child.getRepositories() );
+        List repos = new ArrayList( parent.getRepositories() );
 
         assembler.assembleModelInheritance( child, parent );
 

@@ -66,7 +66,6 @@ public class DefaultModelInheritanceAssembler
         }
 
         // version
-        // TODO: I think according to the latest design docs, we don't want to inherit version at all
         if ( child.getVersion() == null )
         {
             // The parent version may have resolved to something different, so we take what we asked for...
@@ -183,10 +182,13 @@ public class DefaultModelInheritanceAssembler
         {
             Repository repository = (Repository) iterator.next();
 
-            if ( !childRepositories.contains( repository ) )
+            // parent will always override child repositories
+            // if there are duplicates
+            if ( childRepositories.contains( repository ) )
             {
-                child.addRepository( repository );
+                childRepositories.remove( repository );
             }
+            child.addRepository( repository );
         }
 
         // Mojo Repositories :: aggregate
@@ -395,12 +397,6 @@ public class DefaultModelInheritanceAssembler
 
     private void assembleBuildInheritance( Model child, Build parentBuild )
     {
-        // cannot inherit from null parent...
-        if ( parentBuild == null )
-        {
-            return;
-        }
-
         Build childBuild = child.getBuild();
 
         if ( parentBuild != null )
@@ -451,49 +447,45 @@ public class DefaultModelInheritanceAssembler
     private void assembleBuildBaseInheritance( BuildBase childBuild, BuildBase parentBuild )
     {
         // if the parent build is null, obviously we cannot inherit from it...
-        if ( parentBuild == null )
+        if ( parentBuild != null )
         {
-            return;
-        }
+            if ( childBuild.getDefaultGoal() == null )
+            {
+                childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
+            }
 
-        if ( childBuild.getDefaultGoal() == null )
-        {
-            childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
-        }
+            if ( childBuild.getFinalName() == null )
+            {
+                childBuild.setFinalName( parentBuild.getFinalName() );
+            }
 
-        if ( childBuild.getFinalName() == null )
-        {
-            childBuild.setFinalName( parentBuild.getFinalName() );
-        }
+            List resources = childBuild.getResources();
+            if ( resources == null || resources.isEmpty() )
+            {
+                childBuild.setResources( parentBuild.getResources() );
+            }
 
-        List resources = childBuild.getResources();
-        if ( resources == null || resources.isEmpty() )
-        {
-            childBuild.setResources( parentBuild.getResources() );
-        }
+            resources = childBuild.getTestResources();
+            if ( resources == null || resources.isEmpty() )
+            {
+                childBuild.setTestResources( parentBuild.getTestResources() );
+            }
 
-        resources = childBuild.getTestResources();
-        if ( resources == null || resources.isEmpty() )
-        {
-            childBuild.setTestResources( parentBuild.getTestResources() );
-        }
+            // Plugins are aggregated if Plugin.inherit != false
+            ModelUtils.mergePluginLists( childBuild, parentBuild, true );
 
-        // Plugins are aggregated if Plugin.inherit != false
-        ModelUtils.mergePluginLists( childBuild, parentBuild, true );
-
-        // Plugin management :: aggregate
-        if ( childBuild != null && parentBuild != null )
-        {
+            // Plugin management :: aggregate
             PluginManagement childPM = childBuild.getPluginManagement();
             PluginManagement parentPM = parentBuild.getPluginManagement();
-            
-            if( childPM == null && parentPM !=null )
+
+            if ( childPM == null && parentPM != null )
             {
                 childBuild.setPluginManagement( parentPM );
             }
             else
             {
-                ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(), false );
+                ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(),
+                                             false );
             }
         }
     }
