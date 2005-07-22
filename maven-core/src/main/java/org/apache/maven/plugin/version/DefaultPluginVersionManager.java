@@ -24,6 +24,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.transform.LatestArtifactTransformation;
 import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.registry.MavenPluginRegistryBuilder;
@@ -32,6 +34,8 @@ import org.apache.maven.plugin.registry.PluginRegistryUtils;
 import org.apache.maven.plugin.registry.TrackableBase;
 import org.apache.maven.plugin.registry.io.xpp3.PluginRegistryXpp3Writer;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.inputhandler.InputHandler;
@@ -68,6 +72,10 @@ public class DefaultPluginVersionManager
 
     private ArtifactMetadataSource metadataSource;
 
+    private MavenProjectBuilder mavenProjectBuilder;
+
+    private RuntimeInformation runtimeInformation;
+
     public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, Settings settings,
                                         ArtifactRepository localRepository )
         throws PluginVersionResolutionException
@@ -86,7 +94,7 @@ public class DefaultPluginVersionManager
         // determine the behavior WRT prompting the user and installing plugin updates.
         Boolean pluginUpdateOverride = settingsRTInfo.getPluginUpdateOverride();
 
-        // second pass...if we're using the plugin registry, and the plugin is listed in the plugin-registry.xml, use 
+        // second pass...if we're using the plugin registry, and the plugin is listed in the plugin-registry.xml, use
         // the version from <useVersion/>.
         if ( StringUtils.isEmpty( version ) && settings.isUsePluginRegistry() )
         {
@@ -140,7 +148,7 @@ public class DefaultPluginVersionManager
             ( !Boolean.FALSE.equals( rtCheckLatest ) && Boolean.valueOf( pluginRegistry.getCheckLatest() )
                 .booleanValue() );
 
-        // third pass...if we're checking for latest install/deploy, retrieve the version for LATEST metadata and also 
+        // third pass...if we're checking for latest install/deploy, retrieve the version for LATEST metadata and also
         // set that resolved version as the <useVersion/> in settings.xml.
         if ( StringUtils.isEmpty( version ) && checkLatestMetadata )
         {
@@ -148,15 +156,18 @@ public class DefaultPluginVersionManager
             version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(), localRepository,
                                           LatestArtifactTransformation.LATEST_VERSION );
 
-            // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
-            updatedVersion = version;
+            if ( version != null )
+            {
+                // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
+                updatedVersion = version;
 
-            // 3. Persist this version without prompting.
-            forcePersist = true;
-            promptToPersist = false;
+                // 3. Persist this version without prompting.
+                forcePersist = true;
+                promptToPersist = false;
+            }
         }
 
-        // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/> 
+        // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
         // in settings.xml.
         if ( StringUtils.isEmpty( version ) )
         {
@@ -164,12 +175,15 @@ public class DefaultPluginVersionManager
             version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(), localRepository,
                                           ReleaseArtifactTransformation.RELEASE_VERSION );
 
-            // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
-            updatedVersion = version;
+            if ( version != null )
+            {
+                // 2. Set the updatedVersion so the user will be prompted whether to make this version permanent.
+                updatedVersion = version;
 
-            // 3. Persist this version without prompting.
-            forcePersist = true;
-            promptToPersist = false;
+                // 3. Persist this version without prompting.
+                forcePersist = true;
+                promptToPersist = false;
+            }
         }
 
         // if we still haven't found a version, then fail early before we get into the update goop.
@@ -183,7 +197,7 @@ public class DefaultPluginVersionManager
         if ( settings.isUsePluginRegistry() )
         {
             // determine whether this build is running in interactive mode
-            // If it's not, then we'll defer to the autoUpdate setting from the registry 
+            // If it's not, then we'll defer to the autoUpdate setting from the registry
             // for a decision on updating the plugin in the registry...rather than prompting
             // the user.
             boolean inInteractiveMode = settings.isInteractiveMode();
@@ -599,8 +613,8 @@ public class DefaultPluginVersionManager
 
     private String resolveMetaVersion( String groupId, String artifactId, List remoteRepositories,
                                        ArtifactRepository localRepository, String metaVersionId )
+        throws PluginVersionResolutionException
     {
-        // TODO: check - this was SCOPE_RUNTIME before, now is null
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
 
         String version = null;
@@ -608,13 +622,43 @@ public class DefaultPluginVersionManager
         {
             metadataSource.retrieve( artifact, localRepository, remoteRepositories );
 
-            version = artifact.getVersion();
+            MavenProject project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
+                                                                            localRepository );
+
+            boolean pluginValid = true;
+
+            // if we don't have the required Maven version, then ignore an update
+            if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
+            {
+                DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
+                    project.getPrerequesites().getMaven() );
+                if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
+                {
+                    getLogger().info( "Ignoring available plugin update: " + artifact.getVersion() +
+                        " as it requires Maven version " + requiredVersion );
+                    pluginValid = false;
+                }
+            }
+
+            if ( pluginValid )
+            {
+                version = artifact.getVersion();
+            }
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
             getLogger().debug( "Failed to resolve " + metaVersionId + " version", e );
         }
-
+        catch ( ProjectBuildingException e )
+        {
+            throw new PluginVersionResolutionException( groupId, artifactId,
+                                                        "Unable to build resolve plugin project information", e );
+        }
+        catch ( IOException e )
+        {
+            throw new PluginVersionResolutionException( groupId, artifactId,
+                                                        "Unable to determine Maven version for comparison", e );
+        }
         return version;
     }
 

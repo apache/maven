@@ -19,8 +19,8 @@ package org.apache.maven.plugin;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -29,9 +29,11 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
@@ -49,6 +51,8 @@ import org.apache.maven.plugin.mapping.PluginMappingManager;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
@@ -73,6 +77,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
@@ -110,6 +115,10 @@ public class DefaultPluginManager
     protected ArtifactMetadataSource metadataSource;
 
     protected MavenPluginMappingBuilder pluginMappingBuilder;
+
+    protected RuntimeInformation runtimeInformation;
+
+    protected MavenProjectBuilder mavenProjectBuilder;
     // END component requirements
 
     public DefaultPluginManager()
@@ -141,9 +150,9 @@ public class DefaultPluginManager
 
             try
             {
-                mappingManager = pluginMappingBuilder.refreshPluginMappingManager( session
-                    .getPluginMappingManager(), project.getPluginArtifactRepositories(), session
-                    .getLocalRepository() );
+                mappingManager = pluginMappingBuilder.refreshPluginMappingManager( session.getPluginMappingManager(),
+                                                                                   project.getPluginArtifactRepositories(),
+                                                                                   session.getLocalRepository() );
             }
             catch ( RepositoryMetadataManagementException e )
             {
@@ -165,14 +174,12 @@ public class DefaultPluginManager
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
         // TODO: this should be possibly outside
-        // [HTTP-301] All version-resolution logic has been moved to DefaultPluginVersionManager. :)
+        // All version-resolution logic has been moved to DefaultPluginVersionManager.
         if ( plugin.getVersion() == null )
         {
-            String groupId = plugin.getGroupId();
-            String artifactId = plugin.getArtifactId();
-
-            plugin.setVersion(
-                pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, settings, localRepository ) );
+            String version = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(),
+                                                                        project, settings, localRepository );
+            plugin.setVersion( version );
         }
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
@@ -181,13 +188,11 @@ public class DefaultPluginManager
             try
             {
                 VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
+
+                checkRequiredMavenVersion( plugin, localRepository, project.getPluginArtifactRepositories() );
+
                 Artifact pluginArtifact = artifactFactory.createPluginArtifact( plugin.getGroupId(),
                                                                                 plugin.getArtifactId(), versionRange );
-
-                // I think this ensures the plugin is not resolved multiple times
-                // TODO: put it back
-//                plugin.setVersion( pluginArtifact.getBaseVersion() );
-
                 addPlugin( plugin, pluginArtifact, project, localRepository );
 
                 project.addPlugin( plugin );
@@ -225,6 +230,42 @@ public class DefaultPluginManager
         }
 
         return pluginCollector.getPluginDescriptor( plugin );
+    }
+
+    /**
+     * @todo would be better to store this in the plugin descriptor, but then it won't be available to the version
+     * manager which executes before the plugin is instantiated
+     */
+    private void checkRequiredMavenVersion( Plugin plugin, ArtifactRepository localRepository, List remoteRepositories )
+        throws PluginVersionResolutionException, PluginManagerException
+    {
+        try
+        {
+            Artifact artifact = artifactFactory.createProjectArtifact( plugin.getGroupId(), plugin.getArtifactId(),
+                                                                       plugin.getVersion() );
+            MavenProject project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
+                                                                            localRepository );
+            // if we don't have the required Maven version, then ignore an update
+            if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
+            {
+                DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
+                    project.getPrerequesites().getMaven() );
+                if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
+                {
+                    throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(),
+                                                                "Plugin requires Maven version " + requiredVersion );
+                }
+            }
+        }
+        catch ( ProjectBuildingException e )
+        {
+            throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(),
+                                                        "Unable to build project for plugin", e );
+        }
+        catch ( IOException e )
+        {
+            throw new PluginManagerException( "Unable to determine Maven version for comparison", e );
+        }
     }
 
     protected void addPlugin( Plugin plugin, Artifact pluginArtifact, MavenProject project,

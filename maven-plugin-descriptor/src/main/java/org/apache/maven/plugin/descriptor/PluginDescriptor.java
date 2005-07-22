@@ -139,17 +139,11 @@ public class PluginDescriptor
         return constructPluginKey( groupId, artifactId, version );
     }
 
-    /**
-     * @todo remove - harcoding.
-     */
     public static String getDefaultPluginArtifactId( String id )
     {
         return "maven-" + id + "-plugin";
     }
 
-    /**
-     * @todo remove - harcoding.
-     */
     public static String getDefaultPluginGroupId()
     {
         return "org.apache.maven.plugins";

@@ -25,6 +25,12 @@
         <requirement>
           <role>org.apache.maven.plugin.mapping.MavenPluginMappingBuilder</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.execution.RuntimeInformation</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
       </requirements>
     </component>
 
@@ -55,13 +61,21 @@
         <requirement>
           <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.execution.RuntimeInformation</role>
+        </requirement>
       </requirements>
     </component>
+
+    <component>
+      <role>org.apache.maven.execution.RuntimeInformation</role>
+      <implementation>org.apache.maven.execution.DefaultRuntimeInformation</implementation>
+    </component>
     <!--
-     |
-     |PluginConfigurationDiagnoser
-     |
-     -->
+    |
+    |PluginConfigurationDiagnoser
+    |
+    -->
     <component>
       <role>org.apache.maven.usability.ErrorDiagnoser</role>
       <role-hint>PluginConfigurationDiagnoser</role-hint>
@@ -223,6 +237,12 @@
         </requirement>
         <requirement>
           <role>org.codehaus.plexus.components.inputhandler.InputHandler</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.execution.RuntimeInformation</role>
         </requirement>
       </requirements>
     </component>

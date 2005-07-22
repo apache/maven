@@ -19,11 +19,11 @@ package org.apache.maven;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Profile;
@@ -53,19 +53,16 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -90,7 +87,13 @@ public class DefaultMaven
 
     protected MavenProfilesBuilder profilesBuilder;
 
-    private ArtifactVersion mavenVersion;
+    protected RuntimeInformation runtimeInformation;
+
+    private static final long MB = 1024 * 1024;
+
+    private static final int MS_PER_SEC = 1000;
+
+    private static final int SEC_PER_MIN = 60;
 
     // ----------------------------------------------------------------------
     // Project execution
@@ -99,15 +102,6 @@ public class DefaultMaven
     public MavenExecutionResponse execute( MavenExecutionRequest request )
         throws ReactorException
     {
-        try
-        {
-            mavenVersion = getMavenVersion();
-        }
-        catch ( IOException e )
-        {
-            throw new ReactorException( "Unable to determine the executing version of Maven", e );
-        }
-
         if ( request.getSettings().isOffline() )
         {
             getLogger().info( "Maven is running in offline mode." );
@@ -222,25 +216,6 @@ public class DefaultMaven
         }
     }
 
-    private DefaultArtifactVersion getMavenVersion()
-        throws IOException
-    {
-        InputStream resourceAsStream = null;
-        try
-        {
-            Properties properties = new Properties();
-            resourceAsStream = getClass().getClassLoader().getResourceAsStream(
-                "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
-            properties.load( resourceAsStream );
-
-            return new DefaultArtifactVersion( properties.getProperty( "version" ) );
-        }
-        finally
-        {
-            IOUtil.close( resourceAsStream );
-        }
-    }
-
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings )
         throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException
     {
@@ -255,7 +230,7 @@ public class DefaultMaven
             if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
             {
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequesites().getMaven() );
-                if ( mavenVersion.compareTo( version ) < 0 )
+                if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
                     throw new ProjectBuildingException( "Unable to build project '" + project.getFile() +
                         "; it requires Maven version " + version.toString() );
@@ -301,7 +276,7 @@ public class DefaultMaven
 
         dispatcher.dispatchStart( event, project.getId() );
 
-        MavenExecutionResponse response = null;
+        MavenExecutionResponse response;
         try
         {
             // Actual meat of the code.
@@ -613,14 +588,13 @@ public class DefaultMaven
 
         getLogger().info( "Finished at: " + finish );
 
-        final long mb = 1024 * 1024;
-
+        //noinspection CallToSystemGC
         System.gc();
 
         Runtime r = Runtime.getRuntime();
 
         getLogger().info(
-            "Final Memory: " + ( ( r.totalMemory() - r.freeMemory() ) / mb ) + "M/" + ( r.totalMemory() / mb ) + "M" );
+            "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / MB + "M/" + r.totalMemory() / MB + "M" );
     }
 
     protected void line()
@@ -630,11 +604,11 @@ public class DefaultMaven
 
     protected static String formatTime( long ms )
     {
-        long secs = ms / 1000;
+        long secs = ms / MS_PER_SEC;
 
-        long min = secs / 60;
+        long min = secs / SEC_PER_MIN;
 
-        secs = secs % 60;
+        secs = secs % SEC_PER_MIN;
 
         String msg = "";
 

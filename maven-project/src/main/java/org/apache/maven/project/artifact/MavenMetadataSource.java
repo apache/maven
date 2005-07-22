@@ -57,20 +57,17 @@ public class MavenMetadataSource
      * Retrieve the metadata for the project from the repository.
      * Uses the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
      * associated artifacts.
-     *
-     * @todo this a very thin wrapper around a project builder - is it needed?
      */
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        List dependencies;
         MavenProject p;
 
         Artifact pomArtifact;
         boolean done = false;
         do
         {
-            // TODO: only metadata is really needed - resolve as metadata
+            // TODO: can we just modify the original?
             pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
                                                                  artifact.getVersion(), artifact.getScope() );
 
@@ -121,12 +118,11 @@ public class MavenMetadataSource
         }
         while ( !done );
 
-        dependencies = p.getDependencies();
         artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
 
         try
         {
-            Set artifacts = createArtifacts( artifactFactory, dependencies, artifact.getScope(),
+            Set artifacts = createArtifacts( artifactFactory, p.getDependencies(), artifact.getScope(),
                                              artifact.getDependencyFilter() );
 
             return new ResolutionGroup( artifacts, p.getRemoteArtifactRepositories() );
