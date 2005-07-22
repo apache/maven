@@ -86,6 +86,11 @@ public class DefaultArtifact
 
         this.type = type;
 
+        if ( classifier == null )
+        {
+            classifier = artifactHandler.getClassifier();
+        }
+
         this.classifier = classifier;
 
         validateIdentity();
