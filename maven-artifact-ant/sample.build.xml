@@ -28,6 +28,12 @@
     </typedef>
   </target>
 
+  <target name="test-bad-dep" depends="initTaskDefs">
+    <artifact:dependencies pathId="dependency.classpath" filesetId="dependency.fileset">
+      <dependency groupId="foo" artifactId="foo" version="1.0-alpha-2"/>
+    </artifact:dependencies>
+  </target>
+
   <target name="test-pom" depends="initTaskDefs">
     <artifact:pom file="pom.xml" id="my.maven.project"/>
 
