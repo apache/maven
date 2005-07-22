@@ -34,8 +34,8 @@ import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.tar.TarArchiver;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
-import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,11 +55,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Assemble an application bundle or distribution.
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  * @goal assembly
  * @requiresDependencyResolution test
- * @description assemble an application bundle or distribution
+ * @execute phase="package"
  */
 public class AssemblyMojo
     extends AbstractMojo
@@ -67,10 +69,10 @@ public class AssemblyMojo
     private static final String[] EMPTY_STRING_ARRAY = {};
 
     /**
-    * @parameter expression="${basedir}"
-    * @required
-    * @readonly
-    */
+     * @parameter expression="${basedir}"
+     * @required
+     * @readonly
+     */
     private String basedir;
 
     /**
@@ -101,9 +103,9 @@ public class AssemblyMojo
      */
     private Set dependencies;
 
-    /** 
+    /**
      * Directory to unpack JARs into if needed
-     * 
+     *
      * @parameter expression="${project.build.directory}/assembly/work"
      * @required
      */
@@ -116,7 +118,7 @@ public class AssemblyMojo
      * @required
      */
     private ArtifactHandlerManager artifactHandlerManager;
- 
+
     public void execute()
         throws MojoExecutionException
     {
@@ -242,44 +244,45 @@ public class AssemblyMojo
                     }
                     else
                     {
-                        archiver.addFile( artifact.getFile(), output + evaluateFileNameMapping( dependencySet.getOutputFileNameMapping(), artifact ));
-                    }                    
+                        archiver.addFile( artifact.getFile(), output +
+                            evaluateFileNameMapping( dependencySet.getOutputFileNameMapping(), artifact ) );
+                    }
                 }
             }
         }
     }
 
-    private String evaluateFileNameMapping( String expression, Artifact artifact ) 
+    private String evaluateFileNameMapping( String expression, Artifact artifact )
         throws Exception
     {
         // this matches the last ${...} string
         Pattern pat = Pattern.compile( "^(.*)\\$\\{([^\\}]+)\\}(.*)$" );
-        Matcher mat = pat.matcher(expression);
+        Matcher mat = pat.matcher( expression );
 
         String left,right;
         Object middle;
 
-        if ( mat.matches() ) 
+        if ( mat.matches() )
         {
-            left   = evaluateFileNameMapping( mat.group(1), artifact );
-            middle = ReflectionValueExtractor.evaluate( "dep." + mat.group(2), artifact );
-            right  = mat.group(3);
+            left = evaluateFileNameMapping( mat.group( 1 ), artifact );
+            middle = ReflectionValueExtractor.evaluate( "dep." + mat.group( 2 ), artifact );
+            right = mat.group( 3 );
 
             if ( middle == null )
             {
                 // TODO: There should be a more generic way dealing with that. Having magic words is not good at all.
                 // probe for magic word
-                if ( mat.group(2).trim().equals( "extension" ))  
+                if ( mat.group( 2 ).trim().equals( "extension" ) )
                 {
-                    ArtifactHandler artifactHandler  = artifactHandlerManager.getArtifactHandler( artifact.getType() );
+                    ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
                     middle = artifactHandler.getExtension();
                 }
                 else
                 {
-                    middle = "${" + mat.group(2) + "}";
+                    middle = "${" + mat.group( 2 ) + "}";
                 }
             }
-           
+
             return left + middle + right;
         }
 
