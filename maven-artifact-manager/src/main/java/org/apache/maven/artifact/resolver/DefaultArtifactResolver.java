@@ -60,68 +60,66 @@ public class DefaultArtifactResolver
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
-        if ( artifact == null )
+        if ( artifact != null )
         {
-            return;
-        }
+            // ----------------------------------------------------------------------
+            // Check for the existence of the artifact in the specified local
+            // ArtifactRepository. If it is present then simply return as the
+            // request for resolution has been satisfied.
+            // ----------------------------------------------------------------------
 
-        // ----------------------------------------------------------------------
-        // Check for the existence of the artifact in the specified local
-        // ArtifactRepository. If it is present then simply return as the
-        // request for resolution has been satisfied.
-        // ----------------------------------------------------------------------
+            String localPath = localRepository.pathOf( artifact );
 
-        String localPath = localRepository.pathOf( artifact );
+            artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
 
-        artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
-
-        // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
-        {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
-            try
+            // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
+            for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
             {
-                transform.transformForResolve( artifact, remoteRepositories, localRepository );
-            }
-            catch ( ArtifactMetadataRetrievalException e )
-            {
-                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-            }
-        }
-
-        File destination = artifact.getFile();
-        if ( !destination.exists() )
-        {
-            try
-            {
-                if ( artifact.getRepository() != null )
+                ArtifactTransformation transform = (ArtifactTransformation) i.next();
+                try
                 {
-                    // the transformations discovered the artifact - so use it exclusively
-                    wagonManager.getArtifact( artifact, artifact.getRepository(), destination );
+                    transform.transformForResolve( artifact, remoteRepositories, localRepository );
                 }
-                else
+                catch ( ArtifactMetadataRetrievalException e )
                 {
-                    wagonManager.getArtifact( artifact, remoteRepositories, destination );
-                }
-
-                // must be after the artifact is downloaded
-                for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
-                {
-                    ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-                    metadata.storeInLocalRepository( localRepository );
+                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                 }
             }
-            catch ( ResourceDoesNotExistException e )
+
+            File destination = artifact.getFile();
+            if ( !destination.exists() )
             {
-                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-            }
-            catch ( TransferFailedException e )
-            {
-                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-            }
-            catch ( ArtifactMetadataRetrievalException e )
-            {
-                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                try
+                {
+                    if ( artifact.getRepository() != null )
+                    {
+                        // the transformations discovered the artifact - so use it exclusively
+                        wagonManager.getArtifact( artifact, artifact.getRepository(), destination );
+                    }
+                    else
+                    {
+                        wagonManager.getArtifact( artifact, remoteRepositories, destination );
+                    }
+
+                    // must be after the artifact is downloaded
+                    for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+                    {
+                        ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                        metadata.storeInLocalRepository( localRepository );
+                    }
+                }
+                catch ( ResourceDoesNotExistException e )
+                {
+                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                }
+                catch ( TransferFailedException e )
+                {
+                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                }
+                catch ( ArtifactMetadataRetrievalException e )
+                {
+                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                }
             }
         }
     }
