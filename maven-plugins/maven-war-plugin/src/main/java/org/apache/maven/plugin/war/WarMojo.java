@@ -166,7 +166,7 @@ public class WarMojo
             // TODO: scope handler
             // Include runtime and compile time libraries
             if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) &&
-                !!Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
+                !Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
             {
                 String type = artifact.getType();
                 if ( "tld".equals( type ) )
