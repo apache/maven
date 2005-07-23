@@ -149,7 +149,7 @@ public class DefaultPluginVersionManager
         Boolean rtCheckLatest = settingsRTInfo.getCheckLatestPluginVersion();
 
         boolean checkLatestMetadata = Boolean.TRUE.equals( rtCheckLatest ) ||
-            ( !Boolean.FALSE.equals( rtCheckLatest ) && Boolean.valueOf( pluginRegistry.getCheckLatest() )
+            ( !Boolean.FALSE.equals( rtCheckLatest ) && Boolean.valueOf( getPluginRegistry( groupId, artifactId).getCheckLatest() )
                 .booleanValue() );
 
         // third pass...if we're checking for latest install/deploy, retrieve the version for LATEST metadata and also
