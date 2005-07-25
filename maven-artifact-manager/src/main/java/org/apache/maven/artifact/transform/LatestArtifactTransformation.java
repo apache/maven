@@ -27,12 +27,10 @@ import java.util.List;
 public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {
-    public static final String LATEST_VERSION = "LATEST";
-
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        if ( LATEST_VERSION.equals( artifact.getVersion() ) )
+        if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) )
         {
             String version = resolveVersion( artifact, localRepository, remoteRepositories );
             if ( version != null && !version.equals( artifact.getVersion() ) )

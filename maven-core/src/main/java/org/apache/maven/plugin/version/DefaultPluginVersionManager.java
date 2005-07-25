@@ -158,7 +158,7 @@ public class DefaultPluginVersionManager
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project.getPluginArtifactRepositories(), localRepository,
-                                          LatestArtifactTransformation.LATEST_VERSION );
+                                          Artifact.LATEST_VERSION );
 
             if ( version != null )
             {

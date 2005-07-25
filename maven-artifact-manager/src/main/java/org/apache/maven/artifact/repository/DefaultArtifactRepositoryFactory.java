@@ -25,52 +25,67 @@ public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
     // TODO: use settings?
-    private String globalSnapshotPolicy = null;
+    private String globalUpdatePolicy;
 
-    private String globalChecksumPolicy = null;
+    private String globalChecksumPolicy;
+
+    private boolean globalEnable = true;
+
+    public ArtifactRepository createArtifactRepository( String id, String url,
+                                                        ArtifactRepositoryLayout repositoryLayout )
+    {
+        return new DefaultArtifactRepository( id, url, repositoryLayout );
+    }
 
     public ArtifactRepository createArtifactRepository( String id, String url,
                                                         ArtifactRepositoryLayout repositoryLayout,
-                                                        String snapshotPolicy, String checksumPolicy )
+                                                        ArtifactRepositoryPolicy snapshots,
+                                                        ArtifactRepositoryPolicy releases )
     {
-        ArtifactRepository repo = null;
-
-        String snapPolicy = snapshotPolicy;
-
-        if ( globalSnapshotPolicy != null )
+        if ( snapshots == null )
         {
-            snapPolicy = globalSnapshotPolicy;
+            snapshots = new ArtifactRepositoryPolicy();
         }
 
-        if ( snapPolicy == null )
+        if ( releases == null )
         {
-            snapPolicy = ArtifactRepository.SNAPSHOT_POLICY_NEVER;
+            releases = new ArtifactRepositoryPolicy();
         }
 
-        String csumPolicy = checksumPolicy;
+        if ( globalUpdatePolicy != null )
+        {
+            snapshots.setUpdatePolicy( globalUpdatePolicy );
+            releases.setUpdatePolicy( globalUpdatePolicy );
+        }
 
         if ( globalChecksumPolicy != null )
         {
-            csumPolicy = globalChecksumPolicy;
+            snapshots.setChecksumPolicy( globalChecksumPolicy );
+            releases.setChecksumPolicy( globalChecksumPolicy );
         }
 
-        if ( csumPolicy == null )
+        // TODO: needed, or can offline cover it?
+        if ( !globalEnable )
         {
-            csumPolicy = ArtifactRepository.CHECKSUM_POLICY_WARN;
+            snapshots.setEnabled( false );
+            releases.setEnabled( false );
         }
 
-        repo = new DefaultArtifactRepository( id, url, repositoryLayout, snapPolicy, csumPolicy );
-
-        return repo;
+        return new DefaultArtifactRepository( id, url, repositoryLayout, snapshots, releases );
     }
 
-    public void setGlobalSnapshotPolicy( String snapshotPolicy )
+    public void setGlobalUpdatePolicy( String updatePolicy )
     {
-        this.globalSnapshotPolicy = snapshotPolicy;
+        this.globalUpdatePolicy = updatePolicy;
     }
 
     public void setGlobalChecksumPolicy( String checksumPolicy )
     {
         this.globalChecksumPolicy = checksumPolicy;
+    }
+
+    public void setGlobalEnable( boolean enable )
+    {
+        this.globalEnable = enable;
     }
 }

@@ -132,8 +132,10 @@
         </field>
       </fields>
     </class>
+
+    <!-- TODO: reproduced from maven-model/maven.mdo, instead should inherit code and link to external docs -->
     <class>
-      <name>Repository</name>
+      <name>RepositoryBase</name>
       <version>1.0.0</version>
       <description><![CDATA[
          Repository contains the information needed
@@ -165,29 +167,12 @@
           <type>String</type>
         </field>
         <field>
-          <name>snapshotPolicy</name>
-          <version>1.0.0</version>
-          <description>The policy for downloading snapshots - can be "always",
-            "daily" (default), "interval:XXX" (in minutes) or "never".
-          </description>
-          <type>String</type>
-          <defaultValue>daily</defaultValue>
-        </field>
-        <field>
           <name>layout</name>
           <version>1.0.0</version>
-          <description>The type of layout this repository uses for locating and
-            storing artifacts - can be "legacy" or "default".</description>
+          <description>The type of layout this repository uses for locating and storing artifacts - can be "legacy" or
+            "default".</description>
           <type>String</type>
           <defaultValue>default</defaultValue>
-        </field>
-        <field>
-          <name>checksumPolicy</name>
-          <version>1.0.0</version>
-          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are
-            "fail" or "warn"</description>
-          <type>String</type>
-          <defaultValue>warn</defaultValue>
         </field>
       </fields>
       <codeSegments>
@@ -196,7 +181,7 @@
           <code><![CDATA[
             public boolean equals( Object obj )
             {
-                Repository other =  ( Repository ) obj;
+                RepositoryBase other =  (RepositoryBase) obj;
 
                 boolean retValue = false;
 
@@ -211,6 +196,95 @@
         </codeSegment>
       </codeSegments>
     </class>
+
+    <class>
+      <name>Repository</name>
+      <superClass>RepositoryBase</superClass>
+      <version>1.0.0</version>
+      <description>
+        Repository contains the information needed for establishing connections with remote repoistory
+      </description>
+      <fields>
+        <!-- TODO: deprecated -->
+        <field>
+          <name>snapshotPolicy</name>
+          <version>1.0.0</version>
+          <description>
+            The policy for downloading snapshots - can be "always", "daily" (default), "interval:XXX" (in minutes) or
+            "never" (repository is not checked, even if the snapshot is not present locally).
+          </description>
+          <type>String</type>
+        </field>
+        <!-- TODO: deprecated -->
+        <field>
+          <name>checksumPolicy</name>
+          <version>1.0.0</version>
+          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are
+            "fail" or "warn"</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>releases</name>
+          <version>1.0.0</version>
+          <description>How to handle downloading of releases from this repository</description>
+          <association>
+            <type>RepositoryPolicy</type>
+          </association>
+        </field>
+        <field>
+          <name>snapshots</name>
+          <version>1.0.0</version>
+          <description>How to handle downloading of snapshots from this repository</description>
+          <association>
+            <type>RepositoryPolicy</type>
+          </association>
+        </field>
+      </fields>
+      <!-- prevent modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+            public boolean equals( Object obj )
+            {
+                return super.equals( obj );
+            }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>RepositoryPolicy</name>
+      <version>1.0.0</version>
+      <description>Download policy</description>
+      <fields>
+        <field>
+          <name>enabled</name>
+          <version>1.0.0</version>
+          <description>Whether to use this repository for downloading this type of artifact</description>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
+        <field>
+          <name>updatePolicy</name>
+          <version>1.0.0</version>
+          <description>
+            The frequency for downloading updates - can be "always", "daily" (default), "interval:XXX" (in minutes) or
+            "never" (only if it doesn't exist locally).
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>checksumPolicy</name>
+          <version>1.0.0</version>
+          <description>What to do when verification of an artifact checksum fails - warn, fail, etc. Valid values are
+            "fail" or "warn"</description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
     <class>
       <name>ActivationProperty</name>
       <version>1.0.0</version>

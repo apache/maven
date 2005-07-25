@@ -32,26 +32,43 @@ public class DefaultArtifactRepository
     extends Repository
     implements ArtifactRepository
 {
-    private final String snapshotPolicy;
-    
-    private final String checksumPolicy;
-
     private final ArtifactRepositoryLayout layout;
 
+    private ArtifactRepositoryPolicy snapshots;
+
+    private ArtifactRepositoryPolicy releases;
+
+    /**
+     * Create a local repository or a deployment repository.
+     *
+     * @param id the unique identifier of the repository
+     * @param url the URL of the repository
+     * @param layout the layout of the repository
+     */
     public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
     {
-        this( id, url, layout, SNAPSHOT_POLICY_NEVER, CHECKSUM_POLICY_WARN );
+        this( id, url, layout, null, null );
     }
 
-    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, String snapshotPolicy, String checksumPolicy )
+    /**
+     * Create a remote download repository.
+     *
+     * @param id the unique identifier of the repository
+     * @param url the URL of the repository
+     * @param layout the layout of the repository
+     * @param snapshots the policies to use for snapshots
+     * @param releases the policies to use for releases
+     */
+    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
+                                      ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
     {
         super( id, url );
 
         this.layout = layout;
 
-        this.snapshotPolicy = snapshotPolicy;
-        
-        this.checksumPolicy = checksumPolicy;
+        this.snapshots = snapshots;
+
+        this.releases = releases;
     }
 
     public String pathOf( Artifact artifact )
@@ -63,7 +80,7 @@ public class DefaultArtifactRepository
     {
         return layout.pathOfMetadata( artifactMetadata );
     }
-    
+
     public String formatAsDirectory( String directory )
     {
         return layout.formatAsDirectory( directory );
@@ -74,19 +91,18 @@ public class DefaultArtifactRepository
         return layout.formatAsFile( file );
     }
 
-    public String getSnapshotPolicy()
+    public ArtifactRepositoryLayout getLayout()
     {
-        return snapshotPolicy;
-    }
-    
-    public String getChecksumPolicy()
-    {
-        return checksumPolicy;
-    }
-    
-    public boolean failOnChecksumMismatch()
-    {
-        return CHECKSUM_POLICY_FAIL.equals( checksumPolicy );
+        return layout;
     }
 
+    public ArtifactRepositoryPolicy getSnapshots()
+    {
+        return snapshots;
+    }
+
+    public ArtifactRepositoryPolicy getReleases()
+    {
+        return releases;
+    }
 }

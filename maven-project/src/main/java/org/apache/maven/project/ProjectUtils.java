@@ -18,8 +18,11 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.RepositoryBase;
+import org.apache.maven.model.RepositoryPolicy;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -56,6 +59,27 @@ public final class ProjectUtils
         return repos;
     }
 
+    public static ArtifactRepository buildArtifactRepositoryBase( RepositoryBase repo,
+                                                                  ArtifactRepositoryFactory artifactRepositoryFactory,
+                                                                  PlexusContainer container )
+        throws ProjectBuildingException
+    {
+        if ( repo != null )
+        {
+            String id = repo.getId();
+            String url = repo.getUrl();
+
+            // TODO: make this a map inside the factory instead, so no lookup needed
+            ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
+
+            return artifactRepositoryFactory.createArtifactRepository( id, url, layout );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public static ArtifactRepository buildArtifactRepository( Repository repo,
                                                               ArtifactRepositoryFactory artifactRepositoryFactory,
                                                               PlexusContainer container )
@@ -65,14 +89,18 @@ public final class ProjectUtils
         {
             String id = repo.getId();
             String url = repo.getUrl();
-            String snapshotPolicy = repo.getSnapshotPolicy();
-            String checksumPolicy = repo.getChecksumPolicy();
 
             // TODO: make this a map inside the factory instead, so no lookup needed
             ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
 
-            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshotPolicy,
-                                                                       checksumPolicy );
+            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots(),
+                                                                                repo.getSnapshotPolicy(),
+                                                                                repo.getChecksumPolicy() );
+            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases(),
+                                                                               repo.getSnapshotPolicy(),
+                                                                               repo.getChecksumPolicy() );
+
+            return artifactRepositoryFactory.createArtifactRepository( id, url, layout, snapshots, releases );
         }
         else
         {
@@ -80,21 +108,44 @@ public final class ProjectUtils
         }
     }
 
-    private static ArtifactRepositoryLayout getRepositoryLayout( Repository mavenRepo, PlexusContainer container )
+    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy,
+                                                                           String defaultUpdatePolicy,
+                                                                           String defaultChecksumPolicy )
+    {
+        boolean enabled = true;
+        String updatePolicy = defaultUpdatePolicy;
+        String checksumPolicy = defaultChecksumPolicy;
+
+        if ( policy != null )
+        {
+            enabled = policy.isEnabled();
+            if ( policy.getUpdatePolicy() != null )
+            {
+                updatePolicy = policy.getUpdatePolicy();
+            }
+            if ( policy.getChecksumPolicy() != null )
+            {
+                checksumPolicy = policy.getChecksumPolicy();
+            }
+        }
+
+        return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
+    }
+
+    private static ArtifactRepositoryLayout getRepositoryLayout( RepositoryBase mavenRepo, PlexusContainer container )
         throws ProjectBuildingException
     {
         String layout = mavenRepo.getLayout();
 
-        ArtifactRepositoryLayout repositoryLayout = null;
+        ArtifactRepositoryLayout repositoryLayout;
         try
         {
             repositoryLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
         }
         catch ( ComponentLookupException e )
         {
-            throw new ProjectBuildingException(
-                "Cannot find layout implementation corresponding to: \'" + layout +
-                    "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
+            throw new ProjectBuildingException( "Cannot find layout implementation corresponding to: \'" + layout +
+                "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
         }
         return repositoryLayout;
     }

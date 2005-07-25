@@ -24,6 +24,8 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.io.File;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Description of an artifact.
@@ -33,6 +35,12 @@ import java.util.List;
 public interface Artifact
     extends Comparable
 {
+    String LATEST_VERSION = "LATEST";
+
+    String SNAPSHOT_VERSION = "SNAPSHOT";
+
+    Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
+
     // TODO: into scope handler
     String SCOPE_COMPILE = "compile";
 
@@ -118,4 +126,6 @@ public interface Artifact
     void setGroupId( String groupId );
 
     void setArtifactId( String artifactId );
+
+    boolean isSnapshot();
 }

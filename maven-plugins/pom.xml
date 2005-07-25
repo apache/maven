@@ -71,6 +71,11 @@
     <url>http://www.apache.org/</url>
   </organization>
   <distributionManagement>
+    <snapshotRepository>
+      <id>central-plugins-snapshots</id>
+      <name>Maven Central Plugins Development Repository</name>
+      <url>scp://repo1.maven.org/home/projects/maven/repository-staging/snapshots/maven2/plugins</url>
+    </snapshotRepository>
     <repository>
       <id>central-plugins</id>
       <name>Maven Central Plugins Repository</name>
@@ -83,11 +88,18 @@
   </distributionManagement>
   <repositories>
     <repository>
-      <id>central-plugins</id>
-      <name>Maven Central Plugins Repository</name>
-      <url>http://repo1.maven.org/maven2/plugins</url>
+      <id>snapshots</id>
+      <name>Maven Central Development Repository</name>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>snapshots</id>
+      <name>Maven Central Plugins Development Repository</name>
+      <url>http://snapshots.maven.codehaus.org/maven2/plugins</url>
+    </pluginRepository>
+  </pluginRepositories>
   <modules>
     <module>maven-ant-plugin</module>
     <module>maven-assembly-plugin</module>

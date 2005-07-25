@@ -43,10 +43,8 @@ public class DefaultArtifactDeployer
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        File source = null;
-
         String extension = artifact.getArtifactHandler().getExtension();
-        source = new File( basedir, finalName + "." + extension );
+        File source = new File( basedir, finalName + "." + extension );
         deploy( source, artifact, deploymentRepository, localRepository );
     }
 

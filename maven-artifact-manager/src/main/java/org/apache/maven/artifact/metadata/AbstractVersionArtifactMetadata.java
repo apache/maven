@@ -39,7 +39,7 @@ public abstract class AbstractVersionArtifactMetadata
 {
     protected static final String SNAPSHOT_VERSION_FILE = "version.txt";
 
-    protected long lastModified = 0;
+    protected long lastModified;
 
     public AbstractVersionArtifactMetadata( Artifact artifact, String filename )
     {
@@ -82,7 +82,8 @@ public abstract class AbstractVersionArtifactMetadata
         }
     }
 
-    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager )
+    public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager,
+                                              String updatePolicy )
         throws ArtifactMetadataRetrievalException, ResourceDoesNotExistException
     {
         try
@@ -91,7 +92,7 @@ public abstract class AbstractVersionArtifactMetadata
             File destination = File.createTempFile( "maven-artifact", null );
             destination.deleteOnExit();
 
-            wagonManager.getArtifactMetadata( this, remoteRepository, destination );
+            wagonManager.getArtifactMetadata( this, remoteRepository, destination, updatePolicy );
 
             readFromFile( destination );
         }

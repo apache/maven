@@ -581,6 +581,22 @@ public class DefaultModelInheritanceAssembler
                     repository.setUrl( parentDistMgmt.getRepository().getUrl() );
                 }
             }
+
+            if ( childDistMgmt.getSnapshotRepository() == null )
+            {
+                if ( parentDistMgmt.getSnapshotRepository() != null )
+                {
+                    Repository repository = new Repository();
+
+                    childDistMgmt.setSnapshotRepository( repository );
+
+                    repository.setId( parentDistMgmt.getSnapshotRepository().getId() );
+
+                    repository.setName( parentDistMgmt.getSnapshotRepository().getName() );
+
+                    repository.setUrl( parentDistMgmt.getSnapshotRepository().getUrl() );
+                }
+            }
         }
     }
 

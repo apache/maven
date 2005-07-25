@@ -37,11 +37,6 @@ public abstract class AbstractArtifactMetadata
         this.filename = filename;
     }
 
-    public void setArtifact( Artifact artifact )
-    {
-        this.artifact = artifact;
-    }
-
     public String getFilename()
     {
         return filename;
@@ -71,4 +66,5 @@ public abstract class AbstractArtifactMetadata
     {
         return artifact.getBaseVersion();
     }
+
 }

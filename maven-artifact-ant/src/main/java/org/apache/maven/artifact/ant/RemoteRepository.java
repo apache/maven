@@ -29,11 +29,17 @@ public class RemoteRepository
 
     private Authentication authentication;
 
+    /** @deprecated use &lt;snapshots/&gt; and &lt;updatePolicy&gt; instead. */
     private String snapshotPolicy;
     
+    /** @deprecated use &lt;snapshots/&gt; and &lt;checksumPolicy&gt; instead. */
     private String checksumPolicy;
     
     private Proxy proxy;
+
+    private RepositoryPolicy snapshots;
+
+    private RepositoryPolicy releases;
 
     public String getUrl()
     {
@@ -83,5 +89,25 @@ public class RemoteRepository
     public void setChecksumPolicy( String checksumPolicy )
     {
         this.checksumPolicy = checksumPolicy;
+    }
+
+    public RepositoryPolicy getSnapshots()
+    {
+        return snapshots;
+    }
+
+    public void setSnapshots( RepositoryPolicy snapshots )
+    {
+        this.snapshots = snapshots;
+    }
+
+    public RepositoryPolicy getReleases()
+    {
+        return releases;
+    }
+
+    public void setReleases( RepositoryPolicy releases )
+    {
+        this.releases = releases;
     }
 }

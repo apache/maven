@@ -13,7 +13,7 @@ public class LatestArtifactMetadata
 
     public LatestArtifactMetadata( Artifact artifact )
     {
-        super( artifact, artifact.getArtifactId() + "-" + LatestArtifactTransformation.LATEST_VERSION + "." + SNAPSHOT_VERSION_FILE );
+        super( artifact, artifact.getArtifactId() + "-" + Artifact.LATEST_VERSION + "." + SNAPSHOT_VERSION_FILE );
     }
 
     public String constructVersion()
@@ -74,7 +74,7 @@ public class LatestArtifactMetadata
 
     public String getBaseVersion()
     {
-        return LatestArtifactTransformation.LATEST_VERSION;
+        return Artifact.LATEST_VERSION;
     }
     
     public boolean storedInArtifactDirectory()

@@ -21,10 +21,10 @@ import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 import java.util.List;
-import java.util.regex.Matcher;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -35,18 +35,10 @@ import java.util.regex.Matcher;
 public class SnapshotTransformation
     extends AbstractVersionTransformation
 {
-    public static final String SNAPSHOT_VERSION = "SNAPSHOT";
-
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        Matcher m = SnapshotArtifactMetadata.VERSION_FILE_PATTERN.matcher( artifact.getBaseVersion() );
-        if ( m.matches() )
-        {
-            // This corrects the base version, but ensure it is not resolved again
-            artifact.setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
-        }
-        else if ( isSnapshot( artifact ) )
+        if ( artifact.isSnapshot() )
         {
             String version = resolveVersion( artifact, localRepository, remoteRepositories );
             artifact.updateVersion( version, localRepository );
@@ -56,12 +48,7 @@ public class SnapshotTransformation
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        Matcher m = SnapshotArtifactMetadata.VERSION_FILE_PATTERN.matcher( artifact.getBaseVersion() );
-        if ( m.matches() )
-        {
-            artifact.setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
-        }
-        else if ( isSnapshot( artifact ) )
+        if ( artifact.isSnapshot() )
         {
             SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
             metadata.storeInLocalRepository( localRepository );
@@ -71,19 +58,14 @@ public class SnapshotTransformation
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
-        Matcher m = SnapshotArtifactMetadata.VERSION_FILE_PATTERN.matcher( artifact.getBaseVersion() );
-        if ( m.matches() )
-        {
-            // This corrects the base version, but ensure it is not updated again
-            artifact.setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
-        }
-        else if ( isSnapshot( artifact ) )
+        if ( artifact.isSnapshot() )
         {
             SnapshotArtifactMetadata metadata;
 
             try
             {
-                metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null );
+                metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null,
+                                                                                    ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
             }
             catch ( ResourceDoesNotExistException e )
             {
@@ -97,11 +79,6 @@ public class SnapshotTransformation
 
             artifact.addMetadata( metadata );
         }
-    }
-
-    private static boolean isSnapshot( Artifact artifact )
-    {
-        return artifact.getVersion().endsWith( SNAPSHOT_VERSION );
     }
 
     protected AbstractVersionArtifactMetadata createMetadata( Artifact artifact )

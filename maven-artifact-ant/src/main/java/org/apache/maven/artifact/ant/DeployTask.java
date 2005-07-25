@@ -17,7 +17,6 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -38,6 +37,8 @@ public class DeployTask
     extends AbstractArtifactTask
 {
     private RemoteRepository remoteRepository;
+
+    private RemoteRepository remoteSnapshotRepository;
 
     private File file;
 
@@ -60,10 +61,25 @@ public class DeployTask
                 throw new BuildException( "A distributionManagement element is required in your POM to deploy" );
             }
 
-            remoteRepository = createAntRemoteRepository( pom.getDistributionManagement().getRepository() );
+            remoteRepository = createAntRemoteRepositoryBase( pom.getDistributionManagement().getRepository() );
+        }
+
+        if ( remoteSnapshotRepository == null )
+        {
+            if ( pom.getDistributionManagement().getSnapshotRepository() != null )
+            {
+                remoteSnapshotRepository = createAntRemoteRepositoryBase(
+                    pom.getDistributionManagement().getSnapshotRepository() );
+            }
         }
 
         ArtifactRepository deploymentRepository = createRemoteArtifactRepository( remoteRepository );
+
+        ArtifactRepository snapshotRepository = null;
+        if ( remoteSnapshotRepository != null )
+        {
+            snapshotRepository = createRemoteArtifactRepository( remoteSnapshotRepository );
+        }
 
         // Deploy the POM
         Artifact artifact = createArtifact( pom );
@@ -98,6 +114,11 @@ public class DeployTask
     public RemoteRepository getRemoteRepository()
     {
         return remoteRepository;
+    }
+
+    public void addRemoteSnapshotRepository( RemoteRepository remoteSnapshotRepository )
+    {
+        this.remoteSnapshotRepository = remoteSnapshotRepository;
     }
 
     public void addRemoteRepository( RemoteRepository remoteRepository )

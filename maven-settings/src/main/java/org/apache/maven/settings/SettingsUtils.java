@@ -1,13 +1,5 @@
 package org.apache.maven.settings;
 
-import org.codehaus.plexus.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -24,9 +16,16 @@ import java.util.Map;
  * limitations under the License.
  */
 
+import org.codehaus.plexus.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 public final class SettingsUtils
 {
-
     private SettingsUtils()
     {
         // don't allow construction.
@@ -51,7 +50,7 @@ public final class SettingsUtils
                 dominantActiveProfiles = new ArrayList();
                 dominant.setActiveProfiles( dominantActiveProfiles );
             }
-            
+
             for ( Iterator it = recessiveActiveProfiles.iterator(); it.hasNext(); )
             {
                 String profileId = (String) it.next();
@@ -68,14 +67,14 @@ public final class SettingsUtils
         List dominantPluginGroupIds = dominant.getPluginGroups();
         List recessivePluginGroupIds = recessive.getPluginGroups();
 
-        if( recessivePluginGroupIds != null )
+        if ( recessivePluginGroupIds != null )
         {
-            if( dominantPluginGroupIds == null )
+            if ( dominantPluginGroupIds == null )
             {
                 dominantPluginGroupIds = new ArrayList();
                 dominant.setPluginGroups( dominantPluginGroupIds );
             }
-            
+
             for ( Iterator it = recessivePluginGroupIds.iterator(); it.hasNext(); )
             {
                 String pluginGroupId = (String) it.next();
@@ -142,7 +141,7 @@ public final class SettingsUtils
 
         profile.setSource( "settings.xml" );
 
-        org.apache.maven.settings.Activation settingsActivation = settingsProfile.getActivation();
+        Activation settingsActivation = settingsProfile.getActivation();
 
         if ( settingsActivation != null )
         {
@@ -150,7 +149,7 @@ public final class SettingsUtils
 
             activation.setJdk( settingsActivation.getJdk() );
 
-            org.apache.maven.settings.ActivationProperty settingsProp = settingsActivation.getProperty();
+            ActivationProperty settingsProp = settingsActivation.getProperty();
 
             if ( settingsProp != null )
             {
@@ -197,7 +196,25 @@ public final class SettingsUtils
         repo.setChecksumPolicy( settingsRepo.getChecksumPolicy() );
         repo.setUrl( settingsRepo.getUrl() );
 
+        if ( settingsRepo.getSnapshots() != null )
+        {
+            repo.setSnapshots( convertRepositoryPolicy( settingsRepo.getSnapshots() ) );
+        }
+        if ( settingsRepo.getReleases() != null )
+        {
+            repo.setReleases( convertRepositoryPolicy( settingsRepo.getReleases() ) );
+        }
+
         return repo;
+    }
+
+    private static org.apache.maven.model.RepositoryPolicy convertRepositoryPolicy( RepositoryPolicy settingsPolicy )
+    {
+        org.apache.maven.model.RepositoryPolicy policy = new org.apache.maven.model.RepositoryPolicy();
+        policy.setEnabled( settingsPolicy.isEnabled() );
+        policy.setUpdatePolicy( settingsPolicy.getUpdatePolicy() );
+        policy.setChecksumPolicy( settingsPolicy.getChecksumPolicy() );
+        return policy;
     }
 
 }

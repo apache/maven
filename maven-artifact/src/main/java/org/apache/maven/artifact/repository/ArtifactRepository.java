@@ -17,31 +17,17 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 
 /**
- * TODO: describe
+ * Specifies the repository used for artifact handling.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
 public interface ArtifactRepository
 {
-    String SNAPSHOT_POLICY_NEVER = "never";
-
-    String SNAPSHOT_POLICY_ALWAYS = "always";
-
-    String SNAPSHOT_POLICY_DAILY = "daily";
-
-    String SNAPSHOT_POLICY_INTERVAL = "interval";
-
-    String CHECKSUM_POLICY_FAIL = "fail";
-
-    String CHECKSUM_POLICY_WARN = "warn";
-
-    String CHECKSUM_ALGORITHM_SHA1 = "SHA-1";
-
-    String CHECKSUM_ALGORITHM_MD5 = "MD5";
 
     String pathOf( Artifact artifact );
 
@@ -55,13 +41,13 @@ public interface ArtifactRepository
 
     String getBasedir();
 
-    String getSnapshotPolicy();
-
     String getProtocol();
 
     String getId();
 
-    String getChecksumPolicy();
+    ArtifactRepositoryPolicy getSnapshots();
 
-    boolean failOnChecksumMismatch();
+    ArtifactRepositoryPolicy getReleases();
+
+    ArtifactRepositoryLayout getLayout();
 }

@@ -308,6 +308,7 @@ public class DefaultMavenProjectBuilder
     {
         Model superModel = getSuperModel();
 
+        //noinspection CollectionDeclaredAsConcreteClass
         LinkedList lineage = new LinkedList();
 
         Set aggregatedRemoteWagonRepositories = new HashSet();
@@ -434,8 +435,16 @@ public class DefaultMavenProjectBuilder
         DistributionManagement dm = model.getDistributionManagement();
         if ( dm != null )
         {
-            project.setDistributionManagementArtifactRepository(
-                ProjectUtils.buildArtifactRepository( dm.getRepository(), artifactRepositoryFactory, container ) );
+            ArtifactRepository repo = ProjectUtils.buildArtifactRepositoryBase( dm.getRepository(),
+                                                                                artifactRepositoryFactory, container );
+            project.setReleaseArtifactRepository( repo );
+
+            if ( dm.getSnapshotRepository() != null )
+            {
+                repo = ProjectUtils.buildArtifactRepositoryBase( dm.getSnapshotRepository(), artifactRepositoryFactory,
+                                                                 container );
+                project.setSnapshotArtifactRepository( repo );
+            }
         }
 
         project.setParent( parentProject );
@@ -464,6 +473,7 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
+    /** @noinspection CollectionDeclaredAsConcreteClass*/
     private MavenProject assembleLineage( Model model, LinkedList lineage, List aggregatedRemoteWagonRepositories,
                                           ArtifactRepository localRepository )
         throws ProjectBuildingException

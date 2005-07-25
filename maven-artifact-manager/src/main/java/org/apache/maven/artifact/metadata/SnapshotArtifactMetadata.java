@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Contains the information stored for a snapshot.
@@ -36,15 +35,13 @@ import java.util.regex.Pattern;
 public class SnapshotArtifactMetadata
     extends AbstractVersionArtifactMetadata
 {
-    private String timestamp = null;
+    private String timestamp;
 
-    private int buildNumber = 0;
+    private int buildNumber;
 
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
-
-    public static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
     // TODO: very quick and nasty hack to get the same timestamp across a build - not embedder friendly
     private static String sessionTimestamp = null;
@@ -74,7 +71,7 @@ public class SnapshotArtifactMetadata
 
     protected void setContent( String content )
     {
-        Matcher matcher = VERSION_FILE_PATTERN.matcher( content );
+        Matcher matcher = Artifact.VERSION_FILE_PATTERN.matcher( content );
         if ( matcher.matches() )
         {
             timestamp = matcher.group( 2 );
@@ -159,7 +156,7 @@ public class SnapshotArtifactMetadata
         if ( timestamp != null )
         {
             String fileTimestamp = getUtcDateFormatter().format( new Date( fileTime ) );
-            return ( fileTimestamp.compareTo( timestamp ) < 0 );
+            return fileTimestamp.compareTo( timestamp ) < 0;
         }
         return false;
     }

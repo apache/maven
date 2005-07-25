@@ -102,7 +102,25 @@ public class ProfilesConversionUtils
         repo.setChecksumPolicy( profileXmlRepo.getChecksumPolicy() );
         repo.setUrl( profileXmlRepo.getUrl() );
 
+        if ( profileXmlRepo.getSnapshots() != null )
+        {
+            repo.setSnapshots( convertRepositoryPolicy( profileXmlRepo.getSnapshots() ) );
+        }
+        if ( profileXmlRepo.getReleases() != null )
+        {
+            repo.setReleases( convertRepositoryPolicy( profileXmlRepo.getReleases() ) );
+        }
+
         return repo;
+    }
+
+    private static org.apache.maven.model.RepositoryPolicy convertRepositoryPolicy( RepositoryPolicy profileXmlRepo )
+    {
+        org.apache.maven.model.RepositoryPolicy policy = new org.apache.maven.model.RepositoryPolicy();
+        policy.setEnabled( profileXmlRepo.isEnabled() );
+        policy.setUpdatePolicy( profileXmlRepo.getUpdatePolicy() );
+        policy.setChecksumPolicy( profileXmlRepo.getChecksumPolicy() );
+        return policy;
     }
 
 }

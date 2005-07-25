@@ -18,6 +18,7 @@ package org.apache.maven.artifact;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
@@ -56,7 +57,7 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        return (ArtifactRepository) new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
+        return new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
     }
 
     protected String getRepositoryLayout()
@@ -74,7 +75,7 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        return (ArtifactRepository) new DefaultArtifactRepository( "local", "file://" + f.getPath(), repoLayout );
+        return new DefaultArtifactRepository( "local", "file://" + f.getPath(), repoLayout );
     }
 
     protected ArtifactRepository remoteRepository()
@@ -87,9 +88,8 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        return (ArtifactRepository) new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
-                                                                   ArtifactRepository.SNAPSHOT_POLICY_NEVER,
-                                                                   ArtifactRepository.CHECKSUM_POLICY_WARN );
+        return new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
+                                              new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
     }
 
     protected ArtifactRepository badRemoteRepository()
@@ -98,7 +98,7 @@ public abstract class ArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
                                                                                  "legacy" );
 
-        return (ArtifactRepository) new DefaultArtifactRepository( "test", "http://foo.bar/repository", repoLayout );
+        return new DefaultArtifactRepository( "test", "http://foo.bar/repository", repoLayout );
     }
 
     protected void assertRemoteArtifactPresent( Artifact artifact )

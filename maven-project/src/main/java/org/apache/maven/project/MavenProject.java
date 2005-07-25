@@ -100,7 +100,9 @@ public class MavenProject
 
     private List pluginArtifactRepositories;
 
-    private ArtifactRepository distMgmtArtifactRepository;
+    private ArtifactRepository releaseArtifactRepository;
+
+    private ArtifactRepository snapshotArtifactRepository;
 
     private List activeProfiles = new ArrayList();
 
@@ -833,14 +835,14 @@ public class MavenProject
     {
         return pluginArtifacts;
     }
-    
+
     public Map getPluginArtifactMap()
     {
         if ( pluginArtifactMap == null )
         {
             pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getPluginArtifacts() );
         }
-        
+
         return pluginArtifactMap;
     }
 
@@ -848,7 +850,7 @@ public class MavenProject
     {
         this.reportArtifacts = reportArtifacts;
     }
-    
+
     public Set getReportArtifacts()
     {
         return reportArtifacts;
@@ -860,7 +862,7 @@ public class MavenProject
         {
             reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getReportArtifacts() );
         }
-        
+
         return reportArtifactMap;
     }
 
@@ -957,14 +959,9 @@ public class MavenProject
         return pluginArtifactRepositories;
     }
 
-    public void setDistributionManagementArtifactRepository( ArtifactRepository distMgmtArtifactRepository )
-    {
-        this.distMgmtArtifactRepository = distMgmtArtifactRepository;
-    }
-
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
-        return distMgmtArtifactRepository;
+        return getArtifact().isSnapshot() ? snapshotArtifactRepository : releaseArtifactRepository;
     }
 
     public List getPluginRepositories()
@@ -1151,12 +1148,22 @@ public class MavenProject
     {
         this.dependencyArtifacts = dependencyArtifacts;
     }
-    
+
+    public void setReleaseArtifactRepository( ArtifactRepository releaseArtifactRepository )
+    {
+        this.releaseArtifactRepository = releaseArtifactRepository;
+    }
+
+    public void setSnapshotArtifactRepository( ArtifactRepository snapshotArtifactRepository )
+    {
+        this.snapshotArtifactRepository = snapshotArtifactRepository;
+    }
+
     public void setOriginalModel( Model originalModel )
     {
         this.originalModel = originalModel;
     }
-    
+
     public Model getOriginalModel()
     {
         return originalModel;
@@ -1175,14 +1182,13 @@ public class MavenProject
         else
         {
             MavenProject otherProject = (MavenProject) other;
-            
+
             return getId().equals( otherProject.getId() );
         }
     }
-    
+
     public int hashCode()
     {
         return getId().hashCode();
     }
-    
 }

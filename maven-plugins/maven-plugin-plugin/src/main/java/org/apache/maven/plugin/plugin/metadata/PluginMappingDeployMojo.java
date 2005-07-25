@@ -34,12 +34,13 @@ public class PluginMappingDeployMojo
         throws MojoExecutionException
     {
         RepositoryMetadata metadata = new PluginMappingMetadata( getProject().getGroupId() );
-        
+
         ArtifactRepository distributionRepository = getProject().getDistributionManagementArtifactRepository();
-        
+
         if ( distributionRepository == null )
         {
-            throw new MojoExecutionException( "No distribution repository specified. You must specify a <distributionManagement/> section with a valid <repository/> specified within." );
+            throw new MojoExecutionException(
+                "No distribution repository specified. You must specify a <distributionManagement/> section with a valid <repository/> specified within." );
         }
 
         try

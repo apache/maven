@@ -23,14 +23,17 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
  */
 public interface ArtifactRepositoryFactory
 {
+    String ROLE = ArtifactRepositoryFactory.class.getName();
 
-    public static final String ROLE = ArtifactRepositoryFactory.class.getName();
+    ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout );
 
-    public ArtifactRepository createArtifactRepository( String id, String url,
-                                                        ArtifactRepositoryLayout repositoryLayout,
-                                                        String snapshotPolicy, String checksumPolicy );
+    ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout,
+                                                 ArtifactRepositoryPolicy snapshots,
+                                                 ArtifactRepositoryPolicy releases );
 
-    void setGlobalSnapshotPolicy( String snapshotPolicy );
-    
+    void setGlobalUpdatePolicy( String snapshotPolicy );
+
     void setGlobalChecksumPolicy( String checksumPolicy );
+
+    void setGlobalEnable( boolean enable );
 }

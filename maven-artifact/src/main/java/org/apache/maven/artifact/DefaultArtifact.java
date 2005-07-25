@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -419,5 +420,19 @@ public class DefaultArtifact
     public void setArtifactId( String artifactId )
     {
         this.artifactId = artifactId;
+    }
+
+    public boolean isSnapshot()
+    {
+        Matcher m = VERSION_FILE_PATTERN.matcher( getBaseVersion() );
+        if ( m.matches() )
+        {
+            setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
+            return true;
+        }
+        else
+        {
+            return getVersion().endsWith( SNAPSHOT_VERSION ) || getVersion().equals( LATEST_VERSION );
+        }
     }
 }

@@ -32,6 +32,7 @@ import java.util.List;
 
 /**
  * Deploys an artifact to remote repository.
+ *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:jdcasey@apache.org">John Casey (refactoring only)</a>
  * @version $Id$
@@ -105,17 +106,17 @@ public class DeployMojo
     private List attachedArtifacts;
 
     /**
-     * @parameter expression="${updateReleaseInfo}"
+     * @parameter expression="${updateReleaseInfo}" default-value="false"
      */
-    private boolean updateReleaseInfo = false;
+    private boolean updateReleaseInfo;
 
     public void execute()
         throws MojoExecutionException
     {
         if ( deploymentRepository == null )
         {
-            String msg = "Deployment failed: repository element was not specified in the pom inside"
-                + " distributionManagement element";
+            String msg = "Deployment failed: repository element was not specified in the pom inside" +
+                " distributionManagement element";
             throw new MojoExecutionException( msg );
         }
 
@@ -151,7 +152,7 @@ public class DeployMojo
                 Artifact attached = (Artifact) i.next();
                 deployer.deploy( attached.getFile(), attached, deploymentRepository, localRepository );
             }
-       }
+        }
         catch ( ArtifactDeploymentException e )
         {
             // TODO: deployment exception that does not give a trace

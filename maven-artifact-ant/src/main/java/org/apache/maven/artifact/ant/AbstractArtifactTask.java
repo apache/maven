@@ -21,6 +21,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Model;
@@ -34,7 +35,6 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.DuplicateRealmException;
 import org.codehaus.plexus.PlexusContainerException;
@@ -113,12 +113,15 @@ public abstract class AbstractArtifactTask
         {
             repositoryFactory = (ArtifactRepositoryFactory) lookup( ArtifactRepositoryFactory.ROLE );
 
-            String snapshotPolicy = repository.getSnapshotPolicy();
-            String checksumPolicy = repository.getChecksumPolicy();
+            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repository.getSnapshots(),
+                                                                                repository.getSnapshotPolicy(),
+                                                                                repository.getChecksumPolicy() );
+            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repository.getReleases(),
+                                                                               repository.getSnapshotPolicy(),
+                                                                               repository.getChecksumPolicy() );
 
             artifactRepository = repositoryFactory.createArtifactRepository( "remote", repository.getUrl(),
-                                                                             repositoryLayout, snapshotPolicy,
-                                                                             checksumPolicy );
+                                                                             repositoryLayout, snapshots, releases );
         }
         finally
         {
@@ -133,6 +136,29 @@ public abstract class AbstractArtifactTask
         }
 
         return artifactRepository;
+    }
+
+    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy(
+        RepositoryPolicy policy, String defaultUpdatePolicy, String defaultChecksumPolicy )
+    {
+        boolean enabled = true;
+        String updatePolicy = defaultUpdatePolicy;
+        String checksumPolicy = defaultChecksumPolicy;
+
+        if ( policy != null )
+        {
+            enabled = policy.isEnabled();
+            if ( policy.getUpdatePolicy() != null )
+            {
+                updatePolicy = policy.getUpdatePolicy();
+            }
+            if ( policy.getChecksumPolicy() != null )
+            {
+                checksumPolicy = policy.getChecksumPolicy();
+            }
+        }
+
+        return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
     }
 
     protected LocalRepository getDefaultLocalRepository()
@@ -193,13 +219,30 @@ public abstract class AbstractArtifactTask
 
     protected RemoteRepository createAntRemoteRepository( org.apache.maven.model.Repository pomRepository )
     {
+        RemoteRepository r = createAntRemoteRepositoryBase( pomRepository );
+
+        r.setSnapshotPolicy( pomRepository.getSnapshotPolicy() );
+
+        if ( pomRepository.getSnapshots() != null )
+        {
+            r.setSnapshots( convertRepositoryPolicy( pomRepository.getSnapshots() ) );
+        }
+        if ( pomRepository.getReleases() != null )
+        {
+            r.setReleases( convertRepositoryPolicy( pomRepository.getReleases() ) );
+        }
+
+        return r;
+    }
+
+    protected RemoteRepository createAntRemoteRepositoryBase( org.apache.maven.model.RepositoryBase pomRepository )
+    {
         // TODO: actually, we need to not funnel this through the ant repository - we should pump settings into wagon
         // manager at the start like m2 does, and then match up by repository id
-        // As is, this could potentially cause a problem with 2 remote repositories with different authentication info  
+        // As is, this could potentially cause a problem with 2 remote repositories with different authentication info
 
         RemoteRepository r = new RemoteRepository();
         r.setUrl( pomRepository.getUrl() );
-        r.setSnapshotPolicy( pomRepository.getSnapshotPolicy() );
         r.setLayout( pomRepository.getLayout() );
 
         Server server = getSettings().getServer( pomRepository.getId() );
@@ -219,7 +262,6 @@ public abstract class AbstractArtifactTask
         {
             r.setUrl( mirror.getUrl() );
         }
-
         return r;
     }
 
@@ -360,6 +402,15 @@ public abstract class AbstractArtifactTask
     {
         ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
-        return factory.createBuildArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(), pom.getPackaging() );
+        return factory.createBuildArtifact( pom.getGroupId(), pom.getArtifactId(), pom.getVersion(),
+                                            pom.getPackaging() );
+    }
+
+    private static RepositoryPolicy convertRepositoryPolicy( org.apache.maven.model.RepositoryPolicy pomRepoPolicy )
+    {
+        RepositoryPolicy policy = new RepositoryPolicy();
+        policy.setEnabled( pomRepoPolicy.isEnabled() );
+        policy.setUpdatePolicy( pomRepoPolicy.getUpdatePolicy() );
+        return policy;
     }
 }

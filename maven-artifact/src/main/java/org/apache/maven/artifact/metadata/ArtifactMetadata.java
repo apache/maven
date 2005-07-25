@@ -46,14 +46,6 @@ public interface ArtifactMetadata
     String getFilename();
 
     /**
-     * Set the associated artifact.
-     *
-     * @param artifact the artifact
-     * @todo prefer not to have this, and just modify the artifacts as they are transformed
-     */
-    void setArtifact( Artifact artifact );
-
-    /**
      * Whether the artifact metadata exists.
      * @return true or false
      */
@@ -71,4 +63,5 @@ public interface ArtifactMetadata
     String getVersion();
 
     String getBaseVersion();
+
 }

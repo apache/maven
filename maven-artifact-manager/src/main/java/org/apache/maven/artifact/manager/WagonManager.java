@@ -54,7 +54,8 @@ public interface WagonManager
     void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
         throws TransferFailedException;
 
-    void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination )
+    void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination,
+                              String updatePolicy )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void putRepositoryMetadata( File source, RepositoryMetadata metadata, ArtifactRepository repository )

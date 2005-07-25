@@ -22,6 +22,7 @@ import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
@@ -69,62 +70,74 @@ public abstract class AbstractVersionTransformation
             boolean checkedUpdates = false;
             for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
             {
-                ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
+                ArtifactRepository repository = (ArtifactRepository) i.next();
 
-                String snapshotPolicy = remoteRepository.getSnapshotPolicy();
-                // TODO: should be able to calculate this less often
-                boolean checkForUpdates = false;
-                if ( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS.equals( snapshotPolicy ) )
+                ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots()
+                    : repository.getReleases();
+
+                if ( !policy.isEnabled() )
                 {
-                    checkForUpdates = true;
+                    getLogger().info( "Skipping disabled repository " + repository.getId() );
                 }
-                else if ( ArtifactRepository.SNAPSHOT_POLICY_DAILY.equals( snapshotPolicy ) )
+                else
                 {
-                    if ( !localMetadata.checkedSinceDate( getMidnightBoundary() ) )
+                    String updatePolicy = policy.getUpdatePolicy();
+                    // TODO: should be able to calculate this less often
+                    boolean checkForUpdates = false;
+                    if ( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS.equals( updatePolicy ) )
                     {
                         checkForUpdates = true;
                     }
-                }
-                else if ( snapshotPolicy.startsWith( ArtifactRepository.SNAPSHOT_POLICY_INTERVAL ) )
-                {
-                    String s = snapshotPolicy.substring( ArtifactRepository.SNAPSHOT_POLICY_INTERVAL.length() + 1 );
-                    int minutes = Integer.valueOf( s ).intValue();
-                    Calendar cal = Calendar.getInstance();
-                    cal.add( Calendar.MINUTE, -minutes );
-                    if ( !localMetadata.checkedSinceDate( cal.getTime() ) )
+                    else if ( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY.equals( updatePolicy ) )
                     {
-                        checkForUpdates = true;
+                        if ( !localMetadata.checkedSinceDate( getMidnightBoundary() ) )
+                        {
+                            checkForUpdates = true;
+                        }
                     }
-                }
-                // else assume "never"
-
-                if ( checkForUpdates )
-                {
-                    getLogger().info(
-                        artifact.getArtifactId() + ": checking for updates from " + remoteRepository.getId() );
-
-                    VersionArtifactMetadata remoteMetadata;
-
-                    checkedUpdates = true;
-
-                    try
+                    else if ( updatePolicy.startsWith( ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL ) )
                     {
-                        remoteMetadata = retrieveFromRemoteRepository( artifact, remoteRepository, localMetadata );
+                        String s = updatePolicy.substring(
+                            ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL.length() + 1 );
+                        int minutes = Integer.valueOf( s ).intValue();
+                        Calendar cal = Calendar.getInstance();
+                        cal.add( Calendar.MINUTE, -minutes );
+                        if ( !localMetadata.checkedSinceDate( cal.getTime() ) )
+                        {
+                            checkForUpdates = true;
+                        }
                     }
-                    catch ( ResourceDoesNotExistException e )
+                    // else assume "never"
+
+                    if ( checkForUpdates )
                     {
-                        getLogger().debug( "Error resolving artifact version from metadata.", e );
+                        getLogger().info(
+                            artifact.getArtifactId() + ": checking for updates from " + repository.getId() );
 
-                        continue;
-                    }
+                        VersionArtifactMetadata remoteMetadata;
 
-                    int difference = remoteMetadata.compareTo( localMetadata );
-                    if ( difference > 0 )
-                    {
-                        // remote is newer
-                        artifact.setRepository( remoteRepository );
+                        checkedUpdates = true;
 
-                        localMetadata = remoteMetadata;
+                        try
+                        {
+                            remoteMetadata = retrieveFromRemoteRepository( artifact, repository, localMetadata,
+                                                                           updatePolicy );
+                        }
+                        catch ( ResourceDoesNotExistException e )
+                        {
+                            getLogger().debug( "Error resolving artifact version from metadata.", e );
+
+                            continue;
+                        }
+
+                        int difference = remoteMetadata.compareTo( localMetadata );
+                        if ( difference > 0 )
+                        {
+                            // remote is newer
+                            artifact.setRepository( repository );
+
+                            localMetadata = remoteMetadata;
+                        }
                     }
                 }
             }
@@ -174,12 +187,13 @@ public abstract class AbstractVersionTransformation
 
     protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
                                                                     ArtifactRepository remoteRepository,
-                                                                    VersionArtifactMetadata localMetadata )
+                                                                    VersionArtifactMetadata localMetadata,
+                                                                    String updatePolicy )
         throws ArtifactMetadataRetrievalException, ResourceDoesNotExistException
     {
         AbstractVersionArtifactMetadata metadata = createMetadata( artifact );
 
-        metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager );
+        metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager, updatePolicy );
 
         return metadata;
     }

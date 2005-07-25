@@ -28,6 +28,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -401,27 +402,26 @@ public class MavenCli
         {
             settings.setOffline( true );
 
-            // TODO: this will still check to download if the artifact does not exist locally, instead of failing as it should in offline mode
-            artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_NEVER );
+            artifactRepositoryFactory.setGlobalEnable( false );
             snapshotPolicySet = true;
         }
 
         if ( !snapshotPolicySet && commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
         {
-            artifactRepositoryFactory.setGlobalSnapshotPolicy( ArtifactRepository.SNAPSHOT_POLICY_ALWAYS );
+            artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
         }
 
         if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
         {
             System.out.println( "+ Enabling strict checksum verification on all artifact downloads." );
 
-            artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepository.CHECKSUM_POLICY_FAIL );
+            artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL );
         }
         else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
         {
             System.out.println( "+ Disabling strict checksum verification on all artifact downloads." );
 
-            artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepository.CHECKSUM_POLICY_WARN );
+            artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
         }
 
         return localRepository;
