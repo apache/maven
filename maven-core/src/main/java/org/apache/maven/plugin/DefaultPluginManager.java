@@ -572,7 +572,7 @@ public class DefaultPluginManager
 
                 unresolved.removeAll( resolved );
 
-                resolveCoreArtifacts( unresolved );
+                resolveCoreArtifacts( unresolved, project.getRemoteArtifactRepositories(), localRepository );
 
                 List allResolved = new ArrayList( resolved.size() + unresolved.size() );
 
@@ -598,8 +598,8 @@ public class DefaultPluginManager
 
     private Map resolvedCoreArtifactFiles = new HashMap();
 
-    private void resolveCoreArtifacts( List unresolved )
-        throws PluginConfigurationException
+    private void resolveCoreArtifacts( List unresolved, List remoteRepositories, ArtifactRepository localRepository )
+        throws ArtifactResolutionException
     {
         for ( Iterator it = unresolved.iterator(); it.hasNext(); )
         {
@@ -616,14 +616,28 @@ public class DefaultPluginManager
 
                 if ( resourceUrl == null )
                 {
-                    throw new PluginConfigurationException( "Cannot resolve core artifact: " + artifact.getId() );
+                    artifactResolver.resolve( artifact, unresolved, localRepository );
+                    
+                    artifactFile = artifact.getFile();
                 }
+                else
+                {
+                    String artifactPath = resourceUrl.getPath();
 
-                String artifactPath = resourceUrl.getPath();
+                    artifactPath = artifactPath.substring( 0, artifactPath.length() - resource.length() );
+                    
+                    if ( artifactPath.endsWith( "/" ) )
+                    {
+                        artifactPath = artifactPath.substring( 0, artifactPath.length() - 1 );
+                    }
 
-                artifactPath = artifactPath.substring( 0, artifactPath.length() - resource.length() );
+                    if ( artifactPath.endsWith( "!" ) )
+                    {
+                        artifactPath = artifactPath.substring( 0, artifactPath.length() - 1 );
+                    }
 
-                artifactFile = new File( artifactPath );
+                    artifactFile = new File( artifactPath ).getAbsoluteFile();
+                }
 
                 resolvedCoreArtifactFiles.put( artifact.getId(), artifactFile );
             }
