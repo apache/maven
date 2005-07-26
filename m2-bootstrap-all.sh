@@ -67,7 +67,7 @@ ret=$?; if [ $ret != 0 ]; then exit $ret; fi
   echo
   echo "Running maven-core integration tests ..."
   echo 
-  ./maven-core-it.sh "$HOME_ARGS" $ARGS
+  ./maven-core-it.sh
   ret=$?; if [ $ret != 0 ]; then exit $ret; fi
 )
 ret=$?; if [ $ret != 0 ]; then exit $ret; fi
