@@ -20,10 +20,16 @@ import com.cenqua.clover.reporters.html.HtmlReporter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.apache.maven.reporting.MavenReport;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
+import org.codehaus.doxia.sink.Sink;
+import org.codehaus.doxia.module.xhtml.XhtmlSink;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.io.File;
 
 /**
  * Generate a Clover report.
@@ -33,8 +39,7 @@ import java.util.ResourceBundle;
  * @goal report
  * @execute phase="test" lifecycle="clover"
  */
-public class CloverReportMojo
-    extends AbstractMavenReport
+public class CloverReportMojo extends AbstractMojo implements MavenReport
 {
     /**
      * @parameter expression="${project.build.directory}/clover/clover.db"
@@ -61,6 +66,8 @@ public class CloverReportMojo
      * @readonly
      */
     private MavenProject project;
+
+    private File reportOutputDirectory;
 
     /**
      * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
@@ -133,5 +140,61 @@ public class CloverReportMojo
     public String getName( Locale locale )
     {
         return getBundle( locale ).getString( "report.clover.name" );
+    }
+
+    // The methods below are required because we don't extend AbstractMavenReport. The reason is that
+    // AbstractMavenReport does not support externally generated HTML report files.
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getReportOutputDirectory()
+     */
+    public File getReportOutputDirectory()
+    {
+        if ( this.reportOutputDirectory == null )
+        {
+            this.reportOutputDirectory = new File( getOutputDirectory() );
+        }
+        return this.reportOutputDirectory;
+    }
+
+    /**
+     * @see MavenReport#setReportOutputDirectory(java.io.File)
+     */
+    public void setReportOutputDirectory( File reportOutputDirectory )
+    {
+        this.reportOutputDirectory = reportOutputDirectory;
+    }
+
+    /**
+     * @see org.apache.maven.reporting.MavenReport#getCategoryName()
+     */
+    public String getCategoryName()
+    {
+        return CATEGORY_PROJECT_REPORTS;
+    }
+
+    /**
+     * @see MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
+     */
+    public void generate(Sink sink, Locale locale) throws MavenReportException
+    {
+        executeReport( locale );
+    }
+
+    /**
+     * @see org.apache.maven.plugin.Mojo#execute()
+     */
+    public void execute()
+        throws MojoExecutionException
+    {
+        try
+        {
+            generate( null, Locale.ENGLISH );
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "An error has occurred in " + getName( Locale.ENGLISH )
+                + " report generation.", e );
+        }
     }
 }
