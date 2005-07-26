@@ -269,8 +269,8 @@ public class DefaultLifecycleExecutor
                     String goal = tok.nextToken().trim();
 
                     MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project );
-                    addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ), session
-                        .getSettings() );
+                    addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ),
+                                            session.getSettings() );
                 }
             }
 
