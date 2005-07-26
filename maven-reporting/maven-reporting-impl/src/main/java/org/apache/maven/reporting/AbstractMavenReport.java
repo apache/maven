@@ -101,7 +101,6 @@ public abstract class AbstractMavenReport
 
     /**
      * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
-     * @deprecated
      */
     public void generate( Sink sink, Locale locale )
         throws MavenReportException
