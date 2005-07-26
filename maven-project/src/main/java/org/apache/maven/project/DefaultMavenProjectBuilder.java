@@ -224,7 +224,7 @@ public class DefaultMavenProjectBuilder
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
         MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
-                                      Collections.EMPTY_LIST, externalProfiles );
+                                      Collections.EMPTY_LIST, externalProfiles, projectDescriptor.getAbsoluteFile().getParentFile() );
 
         // Only translate the base directory for files in the source tree
         pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
@@ -247,7 +247,7 @@ public class DefaultMavenProjectBuilder
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         return build( "Artifact [" + artifact.getId() + "]", model, localRepository, remoteArtifactRepositories,
-                      Collections.EMPTY_LIST );
+                      Collections.EMPTY_LIST, null );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -303,7 +303,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository,
-                                List remoteArtifactRepositories, List externalProfiles )
+                                List remoteArtifactRepositories, List externalProfiles, File projectDir )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -341,7 +341,7 @@ public class DefaultMavenProjectBuilder
         
         List repositories = new ArrayList( aggregatedRemoteWagonRepositories );
         
-        MavenProject project = assembleLineage( model, lineage, repositories, localRepository );
+        MavenProject project = assembleLineage( model, lineage, repositories, localRepository, externalProfiles, projectDir );
 
         project.setOriginalModel( originalModel );
 
@@ -475,7 +475,7 @@ public class DefaultMavenProjectBuilder
 
     /** @noinspection CollectionDeclaredAsConcreteClass*/
     private MavenProject assembleLineage( Model model, LinkedList lineage, List aggregatedRemoteWagonRepositories,
-                                          ArtifactRepository localRepository )
+                                          ArtifactRepository localRepository, List externalProfiles, File projectDir )
         throws ProjectBuildingException
     {
         if ( !model.getRepositories().isEmpty() )
@@ -514,27 +514,81 @@ public class DefaultMavenProjectBuilder
             {
                 throw new ProjectBuildingException( "Missing version element from parent element" );
             }
+            
+            model = getCachedModel( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
+            
+            // the only way this will have a value is if we find the parent on disk...
+            File parentProjectDir = null;
+            
+            String parentRelativePath = parentModel.getRelativePath();
+            
+            // if we can't find a cached model matching the parent spec, then let's try to look on disk using
+            // <relativePath/>
+            if ( model == null && projectDir != null && StringUtils.isNotEmpty(parentRelativePath) )
+            {
+                File parentDescriptor = new File( projectDir, parentRelativePath );
+                
+                try
+                {
+                    parentDescriptor = parentDescriptor.getCanonicalFile();
+                }
+                catch ( IOException e )
+                {
+                    getLogger().debug( "Failed to canonicalize potential parent POM: \'" + parentDescriptor + "\'", e );
+                    
+                    parentDescriptor = null;
+                }
+                
+                if ( parentDescriptor != null && parentDescriptor.exists() )
+                {
+                    Model candidateParent = readModel( parentDescriptor );
+                    
+                    // this works because parent-version is still required...
+                    if ( parentModel.getGroupId().equals( candidateParent.getGroupId() )
+                        && parentModel.getArtifactId().equals( candidateParent.getArtifactId() )
+                        && ( parentModel.getVersion().equals( candidateParent.getVersion() ) 
+                            || ( candidateParent.getParent() != null 
+                                && parentModel.getVersion().equals(candidateParent.getParent().getVersion() ) ) ) )
+                    {
+                        model = candidateParent;
+                        
+                        parentProjectDir = parentDescriptor.getParentFile();
+                        
+                        getLogger().debug( "Using parent-POM from the project hierarchy at: \'" + parentModel.getRelativePath() + "\' for project: " + project.getId() );
+                    }
+                    else
+                    {
+                        getLogger().debug("Invalid parent-POM referenced by relative path: \'" + parentModel.getRelativePath() + "\'. It did not match parent specification in " + project.getId() );
+                    }
+                }
+            }
+            
+            Artifact parentArtifact = null;
 
-            //!! (**)
-            // ----------------------------------------------------------------------
-            // Do we have the necessary information to actually find the parent
-            // POMs here?? I don't think so ... Say only one remote repository is
-            // specified and that is ibiblio then this model that we just read doesn't
-            // have any repository information ... I think we might have to inherit
-            // as we go in order to do this.
-            // ----------------------------------------------------------------------
+            // only resolve the parent model from the repository system if we didn't find it on disk...
+            if ( model == null )
+            {
+                //!! (**)
+                // ----------------------------------------------------------------------
+                // Do we have the necessary information to actually find the parent
+                // POMs here?? I don't think so ... Say only one remote repository is
+                // specified and that is ibiblio then this model that we just read doesn't
+                // have any repository information ... I think we might have to inherit
+                // as we go in order to do this.
+                // ----------------------------------------------------------------------
 
-            Artifact artifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
-                                                                      parentModel.getArtifactId(),
-                                                                      parentModel.getVersion() );
+                parentArtifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
+                                                                       parentModel.getArtifactId(),
+                                                                       parentModel.getVersion() );
 
-            model = findModelFromRepository( artifact, aggregatedRemoteWagonRepositories, localRepository );
+                model = findModelFromRepository( parentArtifact, aggregatedRemoteWagonRepositories, localRepository );
+            }
 
-            MavenProject parent = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository );
+            MavenProject parent = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository, externalProfiles, parentProjectDir );
 
             project.setParent( parent );
 
-            project.setParentArtifact( artifact );
+            project.setParentArtifact( parentArtifact );
         }
 
         return project;

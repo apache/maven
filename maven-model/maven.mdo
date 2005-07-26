@@ -1675,6 +1675,13 @@
           <description><![CDATA[The version of the project to extend.]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>relativePath</name>
+          <version>4.0.0</version>
+          <description><![CDATA[The relative path of the parent-pom within the project hierarchy]]></description>
+          <type>String</type>
+          <defaultValue>../pom.xml</defaultValue>
+        </field>
       </fields>
     </class>
     <class>

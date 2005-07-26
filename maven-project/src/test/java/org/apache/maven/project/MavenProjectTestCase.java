@@ -41,17 +41,15 @@ public abstract class MavenProjectTestCase
     {
         super.setUp();
 
-        try
+        if ( getContainer().hasComponent( MavenProjectBuilder.ROLE, "test" ) )
         {
             projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE, "test" );
         }
-        catch ( ComponentLookupException e )
+        else
         {
             // default over to the main project builder...
             projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
         }
-        
-        System.out.println("Using project builder: " + projectBuilder.getClass().getName() + " for tests in: " + getClass().getName());
     }
 
     // ----------------------------------------------------------------------
