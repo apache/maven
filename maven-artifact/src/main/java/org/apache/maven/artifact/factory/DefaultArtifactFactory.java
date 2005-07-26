@@ -32,11 +32,6 @@ public class DefaultArtifactFactory
     {
     }
 
-    public DefaultArtifactFactory( ArtifactHandlerManager artifactHandlerManager )
-    {
-        this.artifactHandlerManager = artifactHandlerManager;
-    }
-
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return createArtifact( groupId, artifactId, version, scope, type, null, null );

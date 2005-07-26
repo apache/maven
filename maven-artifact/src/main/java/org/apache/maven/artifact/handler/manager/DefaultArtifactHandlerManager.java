@@ -18,7 +18,6 @@ package org.apache.maven.artifact.handler.manager;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 import java.util.Map;
 import java.util.Set;
@@ -32,8 +31,6 @@ public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
     private Map artifactHandlers;
-
-    private ArtifactRepositoryLayout artifactRepositoryLayout;
 
     public ArtifactHandler getArtifactHandler( String type )
     {
