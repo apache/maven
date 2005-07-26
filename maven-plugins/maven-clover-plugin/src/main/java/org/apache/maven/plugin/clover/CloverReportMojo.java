@@ -39,7 +39,7 @@ import java.io.File;
  * @goal report
  * @execute phase="test" lifecycle="clover"
  */
-public class CloverReportMojo extends AbstractMojo implements MavenReport
+public class CloverReportMojo extends AbstractMavenReport
 {
     /**
      * @parameter expression="${project.build.directory}/clover/clover.db"
@@ -94,7 +94,7 @@ public class CloverReportMojo extends AbstractMojo implements MavenReport
 
     public String getOutputName()
     {
-        return "clover";
+        return "clover/index";
     }
 
     /**
@@ -142,41 +142,11 @@ public class CloverReportMojo extends AbstractMojo implements MavenReport
         return getBundle( locale ).getString( "report.clover.name" );
     }
 
-    // The methods below are required because we don't extend AbstractMavenReport. The reason is that
-    // AbstractMavenReport does not support externally generated HTML report files.
-
     /**
-     * @see org.apache.maven.reporting.MavenReport#getReportOutputDirectory()
+     * @see org.apache.maven.reporting.MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
      */
-    public File getReportOutputDirectory()
-    {
-        if ( this.reportOutputDirectory == null )
-        {
-            this.reportOutputDirectory = new File( getOutputDirectory() );
-        }
-        return this.reportOutputDirectory;
-    }
-
-    /**
-     * @see MavenReport#setReportOutputDirectory(java.io.File)
-     */
-    public void setReportOutputDirectory( File reportOutputDirectory )
-    {
-        this.reportOutputDirectory = reportOutputDirectory;
-    }
-
-    /**
-     * @see org.apache.maven.reporting.MavenReport#getCategoryName()
-     */
-    public String getCategoryName()
-    {
-        return CATEGORY_PROJECT_REPORTS;
-    }
-
-    /**
-     * @see MavenReport#generate(org.codehaus.doxia.sink.Sink, java.util.Locale)
-     */
-    public void generate(Sink sink, Locale locale) throws MavenReportException
+    public void generate( Sink sink, Locale locale )
+        throws MavenReportException
     {
         executeReport( locale );
     }
