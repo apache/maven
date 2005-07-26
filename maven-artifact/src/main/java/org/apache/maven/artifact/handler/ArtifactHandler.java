@@ -22,7 +22,7 @@ package org.apache.maven.artifact.handler;
  */
 public interface ArtifactHandler
 {
-    static String ROLE = ArtifactHandler.class.getName();
+    String ROLE = ArtifactHandler.class.getName();
 
     String getExtension();
 

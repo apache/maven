@@ -2229,6 +2229,13 @@
           <type>String</type>
         </field>
         <field>
+          <name>extensions</name>
+          <version>4.0.0</version>
+          <type>boolean</type>
+          <description>Whether to load Maven extensions (such as packaging and type handlers) from this plugin</description>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
           <name>executions</name>
           <version>4.0.0</version>
           <description>Multiple specifications of a set of goals, each having (possibly) different

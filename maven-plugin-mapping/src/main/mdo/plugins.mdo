@@ -53,6 +53,7 @@
           <version>1.0.0</version>
           <description>The plugin artifactId</description>
         </field>
+        <!-- TODO: deprecated: remove -->
         <field>
           <name>packagingHandlers</name>
           <version>1.0.0</version>

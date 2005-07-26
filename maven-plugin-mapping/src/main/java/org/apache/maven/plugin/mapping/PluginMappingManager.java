@@ -26,14 +26,11 @@ import java.util.Map;
 
 public class PluginMappingManager
 {
-
     private List mappings = new ArrayList();
 
     private boolean refreshed;
 
     private Map pluginDefinitionsByPrefix = new HashMap();
-
-    private Map pluginDefinitionsByPackaging = new HashMap();
 
     public void addPluginMap( PluginMap pluginMap )
     {
@@ -65,7 +62,6 @@ public class PluginMappingManager
 
     private void clearCache()
     {
-        this.pluginDefinitionsByPackaging = null;
         this.pluginDefinitionsByPrefix = null;
     }
 
@@ -79,51 +75,6 @@ public class PluginMappingManager
         }
 
         return (Plugin) pluginDefinitionsByPrefix.get( pluginPrefix );
-    }
-
-    public Plugin getByPackaging( String packaging )
-    {
-        synchronized ( this ) {
-            if ( pluginDefinitionsByPackaging == null )
-            {
-                calculatePluginDefinitionsByPackaging();
-            }
-        }
-
-        return (Plugin) pluginDefinitionsByPackaging.get( packaging );
-    }
-
-    private void calculatePluginDefinitionsByPackaging()
-    {
-        pluginDefinitionsByPackaging = new HashMap();
-
-        for ( Iterator it = mappings.iterator(); it.hasNext(); )
-        {
-            PluginMap pluginMap = (PluginMap) it.next();
-
-            String groupId = pluginMap.getGroupId();
-
-            for ( Iterator pluginIterator = pluginMap.getPlugins().iterator(); pluginIterator.hasNext(); )
-            {
-                MappedPlugin mapping = (MappedPlugin) pluginIterator.next();
-
-                String artifactId = mapping.getArtifactId();
-
-                Plugin plugin = new Plugin();
-
-                plugin.setGroupId( groupId );
-
-                plugin.setArtifactId( artifactId );
-
-                for ( Iterator packagingIterator = mapping.getPackagingHandlers().iterator();
-                      packagingIterator.hasNext(); )
-                {
-                    String packaging = (String) packagingIterator.next();
-
-                    pluginDefinitionsByPackaging.put( packaging, plugin );
-                }
-            }
-        }
     }
 
     private void calculatePluginDefinitionsByPrefix()

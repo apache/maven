@@ -617,20 +617,20 @@ public class DefaultPluginManager
                 if ( resourceUrl == null )
                 {
                     artifactResolver.resolve( artifact, unresolved, localRepository );
-                    
+
                     artifactFile = artifact.getFile();
                 }
                 else
                 {
                     String artifactPath = resourceUrl.getPath();
-                    
+
                     if ( artifactPath.startsWith( "file:" ) )
                     {
                         artifactPath = artifactPath.substring( "file:".length() );
                     }
 
                     artifactPath = artifactPath.substring( 0, artifactPath.length() - resource.length() );
-                    
+
                     if ( artifactPath.endsWith( "/" ) )
                     {
                         artifactPath = artifactPath.substring( 0, artifactPath.length() - 1 );

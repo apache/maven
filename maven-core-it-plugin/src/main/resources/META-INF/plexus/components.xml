@@ -1,0 +1,29 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>coreit-packaging</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: plexus-application-lifecycle -->
+        <phases>
+          <package>core-it:package</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: plexus-application-lifecycle -->
+      </configuration>
+    </component>
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>coreit-artifact</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>coreit-artifact</type>
+        <extension>jar</extension>
+        <packaginge>coreit-packaging</packaginge>
+        <classifier>it</classifier>
+      </configuration>
+    </component>
+  </components>
+</component-set>

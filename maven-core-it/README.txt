@@ -116,6 +116,10 @@ it0039: Test reactor for projects that have release-pom.xml in addition to
         pom.xml. The release-pom.xml file should be chosen above pom.xml for
         these projects in the build.
 
+it0040: Test the use of a packaging from a plugin
+
+it0041: Test the use of a new type from a plugin
+
 -------------------------------------------------------------------------------
 
 - generated sources
@@ -165,5 +169,9 @@ it1007: Should fail due to requiring a future version of Maven.
 -------------------------------------------------------------------------------
 it1008: Should fail due to requiring a version range for junit that doesn't exist
         in the repository. Currently succeeds (MNG-614)
+-------------------------------------------------------------------------------
+it1009: Tests packaging from a plugin fails when extensions is not true.
+-------------------------------------------------------------------------------
+it1010: Tests a type from a plugin fails when extensions is not true.
 -------------------------------------------------------------------------------
 

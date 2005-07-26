@@ -17,7 +17,6 @@ package org.apache.maven.lifecycle;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
@@ -37,8 +36,6 @@ import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.mapping.MavenPluginMappingBuilder;
-import org.apache.maven.plugin.mapping.PluginMappingManagementException;
-import org.apache.maven.plugin.mapping.PluginMappingManager;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
@@ -287,106 +284,71 @@ public class DefaultLifecycleExecutor
     }
 
     private Map findMappingsForLifecycle( MavenSession session, MavenProject project )
-        throws LifecycleExecutionException
+        throws ArtifactResolutionException, LifecycleExecutionException
     {
-        Map mappings;
-
         String packaging = project.getPackaging();
+        LifecycleMapping m;
+
         try
         {
-            PluginMappingManager mappingManager = getPluginMappingManager( session, project );
-
-            Plugin pluginContainingLifecycleMapping = mappingManager.getByPackaging( packaging );
-
-            LifecycleMapping m;
-
-            if ( pluginContainingLifecycleMapping != null )
-            {
-                try
-                {
-                    pluginManager.verifyPlugin( pluginContainingLifecycleMapping, project, session.getSettings(),
-                                                session.getLocalRepository() );
-
-                    m = (LifecycleMapping) pluginManager.getPluginComponent( pluginContainingLifecycleMapping,
-                                                                             LifecycleMapping.ROLE, packaging );
-
-                    mappings = m.getPhases();
-                }
-                catch ( ComponentLookupException e )
-                {
-                    throw new LifecycleExecutionException( "Plugin: " + pluginContainingLifecycleMapping.getKey() +
-                        " declares lifecycle mapping for: \'" + packaging +
-                        "\', but does not appear to contain the actual mapping among its component descriptors.", e );
-                }
-            }
-            else
-            {
-                try
-                {
-                    m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
-
-                    mappings = m.getPhases();
-                }
-                catch ( ComponentLookupException e )
-                {
-                    getLogger().warn(
-                        "Lifecycle mappings not found for packaging: \'" + packaging + "\'. Using defaults." );
-
-                    getLogger().debug( "Lifecycle mappings not found for packaging: \'" + packaging + "\'.", e );
-
-                    mappings = defaultPhases;
-                }
-            }
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new LifecycleExecutionException(
-                "Cannot load plugin which defines lifecycle mappings for: \'" + packaging + "\'.", e );
+            m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging, session.getSettings(),
+                                                  session.getLocalRepository() );
         }
         catch ( PluginVersionResolutionException e )
         {
             throw new LifecycleExecutionException(
-                "Cannot load plugin which defines lifecycle mappings for: \'" + packaging + "\'.", e );
+                "Cannot load extension plugin obtaining lifecycle mappings for: \'" + packaging + "\'.", e );
         }
         catch ( PluginManagerException e )
         {
-            throw new LifecycleExecutionException( "Cannot load lifecycle mappings.", e );
+            throw new LifecycleExecutionException(
+                "Cannot load extension plugin obtaining lifecycle mappings for: \'" + packaging + "\'.", e );
         }
 
-        return mappings;
-    }
-
-    private PluginMappingManager getPluginMappingManager( MavenSession session, MavenProject project )
-        throws LifecycleExecutionException
-    {
-        PluginMappingManager mappingManager = session.getPluginMappingManager();
-
-        // don't reassemble the plugin mappings if the session has already been configured with them.
-        if ( mappingManager == null )
+        if ( m == null )
         {
             try
             {
-                List pluginGroupIds = session.getSettings().getPluginGroups();
-                List pluginRepositories = project.getPluginArtifactRepositories();
-                ArtifactRepository localRepository = session.getLocalRepository();
-
-                mappingManager = pluginMappingBuilder.loadPluginMappings( pluginGroupIds, pluginRepositories,
-                                                                          localRepository );
-
-                // lazily configure this on the session.
-                session.setPluginMappingManager( mappingManager );
+                m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
             }
-            catch ( RepositoryMetadataManagementException e )
+            catch ( ComponentLookupException e )
             {
-                throw new LifecycleExecutionException( "Cannot load plugin mappings.", e );
-            }
-            catch ( PluginMappingManagementException e )
-            {
-                throw new LifecycleExecutionException( "Cannot load plugin mappings.", e );
+                getLogger().warn(
+                    "Lifecycle mappings not found for packaging: \'" + packaging + "\'. Using defaults." );
+
+                getLogger().debug( "Lifecycle mappings not found for packaging: \'" + packaging + "\'.", e );
+
+                return defaultPhases;
             }
         }
 
-        return mappingManager;
+        return m.getPhases();
+    }
+
+    private Object findExtension( MavenProject project, String role, String roleHint, Settings settings,
+                                  ArtifactRepository localRepository )
+        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
+    {
+        for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
+        {
+            Plugin plugin = (Plugin) i.next();
+
+            if ( plugin.isExtensions() )
+            {
+                pluginManager.verifyPlugin( plugin, project, settings, localRepository );
+
+                // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
+                try
+                {
+                    return pluginManager.getPluginComponent( plugin, role, roleHint );
+                }
+                catch ( ComponentLookupException e )
+                {
+                    getLogger().debug( "Unable to find the lifecycle component in the extension", e );
+                }
+            }
+        }
+        return null;
     }
 
     /**
