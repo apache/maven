@@ -53,12 +53,15 @@ public final class ArtifactUtils
     public static Map artifactMapByVersionlessId( Collection artifacts )
     {
         Map artifactMap = new HashMap();
-
-        for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+        
+        if ( artifacts != null )
         {
-            Artifact artifact = (Artifact) it.next();
+            for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+            {
+                Artifact artifact = (Artifact) it.next();
 
-            artifactMap.put( versionlessKey( artifact ), artifact );
+                artifactMap.put( versionlessKey( artifact ), artifact );
+            }
         }
 
         return artifactMap;
@@ -68,11 +71,14 @@ public final class ArtifactUtils
     {
         Map artifactMap = new HashMap();
 
-        for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+        if ( artifacts != null )
         {
-            Artifact artifact = (Artifact) it.next();
+            for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+            {
+                Artifact artifact = (Artifact) it.next();
 
-            artifactMap.put( artifact.getId(), artifact );
+                artifactMap.put( artifact.getId(), artifact );
+            }
         }
 
         return artifactMap;
