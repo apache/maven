@@ -419,7 +419,7 @@ public class DefaultArtifactCollectorTest
             ArtifactSpec a = (ArtifactSpec) artifacts.get( key );
             try
             {
-                return new ResolutionGroup( createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
+                return new ResolutionGroup( artifact, createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
                                                              artifact.getDependencyFilter() ), Collections.EMPTY_LIST );
             }
             catch ( InvalidVersionSpecificationException e )

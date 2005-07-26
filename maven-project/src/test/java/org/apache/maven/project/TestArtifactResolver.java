@@ -132,7 +132,7 @@ public class TestArtifactResolver
                 throw new ArtifactMetadataRetrievalException( e );
             }
 
-            return new ResolutionGroup( artifacts, artifactRepositories );
+            return new ResolutionGroup( artifact, artifacts, artifactRepositories );
         }
 
         protected Set createArtifacts( List dependencies, String inheritedScope )

@@ -623,6 +623,11 @@ public class DefaultPluginManager
                 else
                 {
                     String artifactPath = resourceUrl.getPath();
+                    
+                    if ( artifactPath.startsWith( "file:" ) )
+                    {
+                        artifactPath = artifactPath.substring( "file:".length() );
+                    }
 
                     artifactPath = artifactPath.substring( 0, artifactPath.length() - resource.length() );
                     

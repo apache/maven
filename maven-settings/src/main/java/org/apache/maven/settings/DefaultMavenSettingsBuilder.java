@@ -52,6 +52,8 @@ public class DefaultMavenSettingsBuilder
     private File userSettingsFile;
 
     private File globalSettingsFile;
+    
+    private Settings loadedSettings;
 
     // ----------------------------------------------------------------------
     // Component Lifecycle
@@ -106,20 +108,25 @@ public class DefaultMavenSettingsBuilder
     public Settings buildSettings()
         throws IOException, XmlPullParserException
     {
-        Settings globalSettings = readSettings( globalSettingsFile );
-        Settings userSettings = readSettings( userSettingsFile );
-
-        if ( userSettings == null )
+        if ( loadedSettings == null )
         {
-            userSettings = new Settings();
-            userSettings.setRuntimeInfo( new RuntimeInfo( userSettings ) );
+            Settings globalSettings = readSettings( globalSettingsFile );
+            Settings userSettings = readSettings( userSettingsFile );
+
+            if ( userSettings == null )
+            {
+                userSettings = new Settings();
+                userSettings.setRuntimeInfo( new RuntimeInfo( userSettings ) );
+            }
+
+            SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+
+            setLocalRepository( userSettings );
+            
+            loadedSettings = userSettings;
         }
 
-        SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
-
-        setLocalRepository( userSettings );
-
-        return userSettings;
+        return loadedSettings;
     }
 
     private void setLocalRepository( Settings userSettings )

@@ -115,7 +115,7 @@ public class ArtifactResolverTest
                     }
                 }
 
-                return new ResolutionGroup( dependencies, remoteRepositories );
+                return new ResolutionGroup( artifact, dependencies, remoteRepositories );
             }
         };
 
@@ -162,7 +162,7 @@ public class ArtifactResolverTest
                     }
                 }
 
-                return new ResolutionGroup( dependencies, remoteRepositories );
+                return new ResolutionGroup( artifact, dependencies, remoteRepositories );
             }
         };
 

@@ -16,14 +16,15 @@ package org.apache.maven.plugin.coreit;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
-import java.io.IOException;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.List;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @goal touch
@@ -47,10 +48,10 @@ public class CoreItMojo
     private String outputDirectory;
 
     /** Test setting of plugin-artifacts on the PluginDescriptor instance.
-     * @parameter expression="${plugin.artifacts}"
+     * @parameter expression="${plugin.artifactMap}"
      * @required
      */
-    private List pluginArtifacts;
+    private Map pluginArtifacts;
 
     /**
      * @parameter expression="target/test-basedir-alignment"
@@ -66,6 +67,11 @@ public class CoreItMojo
      * @parameter
      */
     private String goalItem = "bar";
+    
+    /**
+     * @parameter expression="${artifactToFile}"
+     */
+    private String artifactToFile;
 
     public void execute()
         throws MojoExecutionException
@@ -81,16 +87,29 @@ public class CoreItMojo
         }
         
         touch( basedirAlignmentDirectory, "touch.txt" );
+        
+        File outDir = new File( outputDirectory );
 
         // Test parameter setting
         if ( pluginItem != null )
         {
-            touch( new File( outputDirectory ), pluginItem );
+            touch( outDir, pluginItem );
         }
 
         if ( goalItem != null )
         {
-            touch( new File( outputDirectory ), goalItem );
+            touch( outDir, goalItem );
+        }
+        
+        if ( artifactToFile != null )
+        {
+            Artifact artifact = (Artifact) pluginArtifacts.get( artifactToFile );
+            
+            File artifactFile = artifact.getFile();
+            
+            String filename = artifactFile.getAbsolutePath().replace('/', '_').replace(':', '_') + ".txt";
+            
+            touch( outDir, filename );
         }
 
         project.getBuild().setFinalName( "coreitified" );

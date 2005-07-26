@@ -130,7 +130,7 @@ public class MavenMetadataSource
             Set artifacts = createArtifacts( artifactFactory, p.getDependencies(), artifact.getScope(),
                                              artifact.getDependencyFilter() );
 
-            return new ResolutionGroup( artifacts, p.getRemoteArtifactRepositories() );
+            return new ResolutionGroup( pomArtifact, artifacts, p.getRemoteArtifactRepositories() );
         }
         catch ( InvalidVersionSpecificationException e )
         {

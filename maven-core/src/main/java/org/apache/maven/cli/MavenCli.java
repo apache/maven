@@ -493,17 +493,17 @@ public class MavenCli
 
         public static final char ACTIVATE_PROFILES = 'P';
 
-        public static final String FORCE_PLUGIN_UPDATES = "check-plugin-updates";
+        public static final String FORCE_PLUGIN_UPDATES = "cpu";
 
-        public static final String FORCE_PLUGIN_UPDATES2 = "update-plugins";
+        public static final String FORCE_PLUGIN_UPDATES2 = "up";
 
-        public static final String SUPPRESS_PLUGIN_UPDATES = "no-plugin-updates";
+        public static final String SUPPRESS_PLUGIN_UPDATES = "npu";
 
-        public static final String SUPPRESS_PLUGIN_REGISTRY = "no-plugin-registry";
+        public static final String SUPPRESS_PLUGIN_REGISTRY = "npr";
 
-        public static final String FORCE_PLUGIN_LATEST_CHECK = "check-plugin-latest";
+        public static final String FORCE_PLUGIN_LATEST_CHECK = "cpl";
 
-        public static final String SUPPRESS_PLUGIN_LATEST_CHECK = "no-plugin-latest";
+        public static final String SUPPRESS_PLUGIN_LATEST_CHECK = "npl";
 
         public static final char CHECKSUM_FAILURE_POLICY = 'C';
 
@@ -545,19 +545,19 @@ public class MavenCli
             options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription(
                 "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
 
-            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_UPDATES ).withDescription(
-                "Force upToDate check for any relevant registered plugins" ).create( "cpu" ) );
-            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_UPDATES2 ).withDescription(
-                "Synonym for " + FORCE_PLUGIN_UPDATES ).create( "up" ) );
-            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_UPDATES ).withDescription(
-                "Suppress upToDate check for any relevant registered plugins" ).create( "npu" ) );
-            options.addOption( OptionBuilder.withLongOpt( FORCE_PLUGIN_LATEST_CHECK ).withDescription(
-                "Force checking of LATEST metadata for plugin versions" ).create( "cpl" ) );
-            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_LATEST_CHECK ).withDescription(
-                "Suppress checking of LATEST metadata for plugin versions" ).create( "npl" ) );
+            options.addOption( OptionBuilder.withLongOpt( "check-plugin-updates" ).withDescription(
+                "Force upToDate check for any relevant registered plugins" ).create( FORCE_PLUGIN_UPDATES ) );
+            options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription(
+                "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
+            options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription(
+                "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
+            options.addOption( OptionBuilder.withLongOpt( "check-plugin-latest" ).withDescription(
+                "Force checking of LATEST metadata for plugin versions" ).create( FORCE_PLUGIN_LATEST_CHECK ) );
+            options.addOption( OptionBuilder.withLongOpt( "no-plugin-latest" ).withDescription(
+                "Suppress checking of LATEST metadata for plugin versions" ).create( SUPPRESS_PLUGIN_LATEST_CHECK ) );
 
-            options.addOption( OptionBuilder.withLongOpt( SUPPRESS_PLUGIN_REGISTRY ).withDescription(
-                "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( "npr" ) );
+            options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription(
+                "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( SUPPRESS_PLUGIN_REGISTRY ) );
 
             options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription(
                 "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );

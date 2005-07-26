@@ -20,8 +20,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.transform.LatestArtifactTransformation;
 import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.RuntimeInformation;
@@ -149,7 +149,7 @@ public class DefaultPluginVersionManager
         Boolean rtCheckLatest = settingsRTInfo.getCheckLatestPluginVersion();
 
         boolean checkLatestMetadata = Boolean.TRUE.equals( rtCheckLatest ) ||
-            ( !Boolean.FALSE.equals( rtCheckLatest ) && Boolean.valueOf( getPluginRegistry( groupId, artifactId).getCheckLatest() )
+            ( !Boolean.FALSE.equals( rtCheckLatest ) && Boolean.valueOf( getPluginRegistry( groupId, artifactId ).getCheckLatest() )
                 .booleanValue() );
 
         // third pass...if we're checking for latest install/deploy, retrieve the version for LATEST metadata and also
@@ -622,31 +622,41 @@ public class DefaultPluginVersionManager
         Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
 
         String version = null;
+        
         try
         {
-            artifactMetadataSource.retrieve( artifact, localRepository, remoteRepositories );
-
-            MavenProject project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
-                                                                            localRepository );
-
-            boolean pluginValid = true;
-
-            // if we don't have the required Maven version, then ignore an update
-            if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
+            ResolutionGroup resolutionGroup = artifactMetadataSource.retrieve( artifact, localRepository, remoteRepositories );
+            
+            // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
+            // artifact.
+            artifact = resolutionGroup.getPomArtifact();
+            
+            // make sure this artifact was actually resolved to a file in the repo...
+            if ( artifact.getFile() != null )
             {
-                DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
-                    project.getPrerequesites().getMaven() );
-                if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
+                MavenProject project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories,
+                                                                                localRepository );
+
+                boolean pluginValid = true;
+
+                // if we don't have the required Maven version, then ignore an update
+                if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
                 {
-                    getLogger().info( "Ignoring available plugin update: " + artifact.getVersion() +
-                        " as it requires Maven version " + requiredVersion );
-                    pluginValid = false;
+                    DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
+                        project.getPrerequesites().getMaven() );
+                    
+                    if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
+                    {
+                        getLogger().info( "Ignoring available plugin update: " + artifact.getVersion() +
+                            " as it requires Maven version " + requiredVersion );
+                        pluginValid = false;
+                    }
                 }
-            }
 
-            if ( pluginValid )
-            {
-                version = artifact.getVersion();
+                if ( pluginValid )
+                {
+                    version = artifact.getVersion();
+                }
             }
         }
         catch ( ArtifactMetadataRetrievalException e )
@@ -663,6 +673,7 @@ public class DefaultPluginVersionManager
             throw new PluginVersionResolutionException( groupId, artifactId,
                                                         "Unable to determine Maven version for comparison", e );
         }
+        
         return version;
     }
 
