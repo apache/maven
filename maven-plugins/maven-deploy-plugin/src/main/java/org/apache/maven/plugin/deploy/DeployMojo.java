@@ -86,7 +86,6 @@ public class DeployMojo
 
     /**
      * @parameter expression="${project.distributionManagementArtifactRepository}"
-     * @required
      * @readonly
      */
     private ArtifactRepository deploymentRepository;
