@@ -122,7 +122,7 @@ echo Rebuilding maven2 plugins
 echo -----------------------------------------------------------------------
 cd maven-plugins
 @REM update the release info to ensure these versions get used in the integration tests
-call m2 --no-plugin-registry --check-plugin-latest --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
+call m2 --no-plugin-registry --batch-mode -DupdateReleaseInfo=true -e %MAVEN_CMD_LINE_ARGS% clean:clean install
 cd ..
 
 echo
