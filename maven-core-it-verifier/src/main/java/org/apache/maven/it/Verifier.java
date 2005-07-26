@@ -187,7 +187,7 @@ public class Verifier
                 throw new VerificationException( e );
             }
         }
-        
+
         return lines;
     }
 
@@ -465,7 +465,7 @@ public class Verifier
         String mavenHome = System.getProperty( "maven.home" );
 
         List goals = loadFile( basedir, filename );
-        
+
         List cliOptions = loadFile( basedir, "cli-options.txt" );
 
         if ( goals.size() == 0 )
@@ -498,20 +498,20 @@ public class Verifier
             }
 
             cli.setExecutable( executable );
-            
+
             for ( Iterator it = cliOptions.iterator(); it.hasNext(); )
             {
                 String key = (String) it.next();
-                cli.createArgument().setValue(key);
+                cli.createArgument().setLine( key );
             }
 
             cli.createArgument().setValue( "-e" );
 //            cli.createArgument().setValue( "-X" );
-            
+
             cli.createArgument().setValue( "--no-plugin-registry" );
-            
+
             cli.createArgument().setValue( "--check-plugin-latest" );
-            
+
             cli.createArgument().setValue( "--batch-mode" );
 
             for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
@@ -519,9 +519,9 @@ public class Verifier
                 String key = (String) i.next();
                 cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
             }
-            
-            // Note: Make sure that the repo is surrounded by quotes as it can possibly have 
-            // spaces in its path.            
+
+            // Note: Make sure that the repo is surrounded by quotes as it can possibly have
+            // spaces in its path.
             cli.createArgument().setLine( "-Dmaven.repo.local=" + "\"" + localRepo + "\"" );
 
             for ( Iterator i = allGoals.iterator(); i.hasNext(); )
@@ -581,7 +581,7 @@ public class Verifier
     public static void main( String args[] )
     {
         String basedir = System.getProperty( "user.dir" );
-        
+
         localRepo = retrieveLocalRepo();
 
         List tests = null;
@@ -619,7 +619,7 @@ public class Verifier
                 verifier.executeHook( "prebuild-hook.txt" );
 
                 Properties properties = verifier.loadProperties( "system.properties" );
-                
+
                 Properties controlProperties = verifier.loadProperties( "verifier.properties" );
 
                 boolean chokeOnErrorOutput = Boolean.valueOf( controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
