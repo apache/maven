@@ -112,14 +112,6 @@ public class AssemblyMojo
      */
     private File workDirectory;
 
-    /**
-     * Handler to get the file extension matching a given artifactType
-     *
-     * @parameter expression="${component.org.apache.maven.artifact.handler.manager.ArtifactHandlerManager}"
-     * @required
-     */
-    private ArtifactHandlerManager artifactHandlerManager;
-
     public void execute()
         throws MojoExecutionException
     {
@@ -275,7 +267,7 @@ public class AssemblyMojo
                 // probe for magic word
                 if ( mat.group( 2 ).trim().equals( "extension" ) )
                 {
-                    ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
+                    ArtifactHandler artifactHandler = artifact.getArtifactHandler();
                     middle = artifactHandler.getExtension();
                 }
                 else
