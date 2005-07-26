@@ -560,10 +560,20 @@ public class DoxiaMojo
 
         if ( indexFound.size() > 1 )
         {
-            // TODO throw an Exception?
-            getLog().warn( "More than one index file exists in the project site directory. Checks the result." );
-            return true;
+            StringBuffer sb = new StringBuffer( "\n" );
+            for ( Iterator it = indexFound.iterator(); it.hasNext(); )
+            {
+                sb.append( " * " );
+                sb.append( ( (File) it.next() ).getAbsolutePath() );
+                if ( it.hasNext() )
+                {
+                    sb.append( "\n" );
+                }
+            }
+            throw new MavenReportException( "More than one index file exists in the project site directory. "
+                + "You have to delete one of these files: " + sb.toString() );
         }
+
         if ( indexFound.size() == 1 )
         {
             getLog().warn( "One index file was found in the project site directory." );
