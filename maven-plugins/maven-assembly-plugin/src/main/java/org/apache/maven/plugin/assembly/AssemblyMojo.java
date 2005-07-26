@@ -58,6 +58,7 @@ import java.util.regex.Pattern;
  * Assemble an application bundle or distribution.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id$
  * @goal assembly
  * @requiresDependencyResolution test
@@ -292,6 +293,12 @@ public class AssemblyMojo
     private void unpackJar( File file, File tempLocation )
         throws IOException
     {
+        if ( !file.getAbsolutePath().toLowerCase().trim().endsWith( "jar" ) )
+        {
+            getLog().warn( "Trying to unpack a none jar file " + file.getAbsolutePath() + " - IGNORING" );
+            return;
+        }
+
         JarFile jar = new JarFile( file );
         for ( Enumeration e = jar.entries(); e.hasMoreElements(); )
         {
