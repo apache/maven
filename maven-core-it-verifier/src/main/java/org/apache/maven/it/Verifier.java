@@ -10,7 +10,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -22,6 +21,8 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -131,10 +132,10 @@ public class Verifier
     {
         Properties properties = new Properties();
 
-        FileInputStream fis = null;
+        FileInputStream fis;
         try
         {
-              File propertiesFile = new File( basedir, filename );
+            File propertiesFile = new File( basedir, filename );
             if ( propertiesFile.exists() )
             {
                 fis = new FileInputStream( propertiesFile );
@@ -242,7 +243,7 @@ public class Verifier
         }
 
         String ext = a[3];
-        if ( a[3].equals( "maven-plugin" ) )
+        if ( "maven-plugin".equals( a[3] ) )
         {
             ext = "jar";
         }
@@ -320,7 +321,7 @@ public class Verifier
             cmd = line;
         }
 
-        if ( cmd.equals( "rm" ) )
+        if ( "rm".equals( cmd ) )
         {
             System.out.println( "Removing file: " + args );
 
@@ -401,11 +402,12 @@ public class Verifier
         {
             String urlString = "jar:file:" + basedir + "/" + line;
 
+            InputStream is = null;
             try
             {
                 URL url = new URL( urlString );
 
-                InputStream is = url.openStream();
+                is = url.openStream();
 
                 if ( is == null )
                 {
@@ -421,12 +423,23 @@ public class Verifier
                         throw new VerificationException( "Unwanted JAR resource was found: " + line );
                     }
                 }
-
-                is.close();
             }
             catch ( Exception e )
             {
                 throw new VerificationException( "Error looking for JAR resource", e );
+            }
+            finally
+            {
+                if ( is != null )
+                {
+                    try
+                    {
+                        is.close();
+                    }
+                    catch ( IOException e )
+                    {
+                    }
+                }
             }
         }
         else
@@ -479,7 +492,7 @@ public class Verifier
 
         allGoals.addAll( goals );
 
-        int ret = 0;
+        int ret;
 
         try
         {
@@ -506,7 +519,6 @@ public class Verifier
             }
 
             cli.createArgument().setValue( "-e" );
-//            cli.createArgument().setValue( "-X" );
 
             cli.createArgument().setValue( "--no-plugin-registry" );
 
@@ -579,6 +591,7 @@ public class Verifier
     // ----------------------------------------------------------------------
 
     public static void main( String args[] )
+        throws VerificationException
     {
         String basedir = System.getProperty( "user.dir" );
 
@@ -586,17 +599,34 @@ public class Verifier
 
         List tests = null;
 
-        try
+        if ( args.length == 0 )
         {
-            tests = loadFile( basedir, "integration-tests.txt" );
+            try
+            {
+                tests = loadFile( basedir, "integration-tests.txt" );
+            }
+            catch ( VerificationException e )
+            {
+                System.err.println( "Unable to load integration tests file" );
+
+                System.err.println( e.getMessage() );
+
+                System.exit( 2 );
+            }
         }
-        catch ( VerificationException e )
+        else
         {
-            System.err.println( "Unable to load integration tests file" );
-
-            System.err.println( e.getMessage() );
-
-            System.exit( 2 );
+            tests = new ArrayList( args.length );
+            NumberFormat fmt = new DecimalFormat( "0000" );
+            for ( int i = 0; i < args.length; i++ )
+            {
+                String test = args[i];
+                if ( !test.startsWith( "it" ) )
+                {
+                    test = "it" + fmt.format( Integer.valueOf( test ) );
+                }
+                tests.add( test );
+            }
         }
 
         if ( tests.size() == 0 )
@@ -612,7 +642,16 @@ public class Verifier
 
             System.out.print( test + "... " );
 
-            Verifier verifier = new Verifier( basedir + "/" + test );
+            String dir = basedir + "/" + test;
+
+            if ( !new File( dir, "pom.xml" ).exists() )
+            {
+                System.err.println( "Test " + test + " in " + dir + " does not exist" );
+
+                System.exit( 2 );
+            }
+
+            Verifier verifier = new Verifier( dir );
 
             try
             {
@@ -622,14 +661,15 @@ public class Verifier
 
                 Properties controlProperties = verifier.loadProperties( "verifier.properties" );
 
-                boolean chokeOnErrorOutput = Boolean.valueOf( controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
+                boolean chokeOnErrorOutput = Boolean.valueOf(
+                    controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
 
                 verifier.executeGoals( properties, "goals.txt" );
 
                 verifier.executeHook( "postbuild-hook.txt" );
 
-                System.out.println("*** Verifying: fail when [ERROR] detected? " + chokeOnErrorOutput + " ***");
-                
+                System.out.println( "*** Verifying: fail when [ERROR] detected? " + chokeOnErrorOutput + " ***" );
+
                 verifier.verify( chokeOnErrorOutput );
 
                 verifier.resetStreams();
@@ -644,9 +684,9 @@ public class Verifier
 
                 verifier.displayStreamBuffers();
 
-                System.out.println(">>>>>> Error Stacktrace:");
-                e.printStackTrace(System.out);
-                System.out.println("<<<<<< Error Stacktrace");
+                System.out.println( ">>>>>> Error Stacktrace:" );
+                e.printStackTrace( System.out );
+                System.out.println( "<<<<<< Error Stacktrace" );
 
                 verifier.displayLogFile();
 
@@ -660,9 +700,8 @@ public class Verifier
     static class UserModelReader
         extends DefaultHandler
     {
-
         private SAXParserFactory saxFactory;
-        
+
         private String localRepository;
 
         private StringBuffer currentBody = new StringBuffer();
@@ -706,8 +745,8 @@ public class Verifier
 
         private final void printParseError( String type, SAXParseException spe )
         {
-            System.err.println( type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: " +
-                                spe.getMessage() );
+            System.err.println(
+                type + " [line " + spe.getLineNumber() + ", row " + spe.getColumnNumber() + "]: " + spe.getMessage() );
         }
 
         public String getLocalRepository()
@@ -732,8 +771,8 @@ public class Verifier
                 }
                 else
                 {
-                    throw new SAXException( "Invalid mavenProfile entry. Missing one or more " +
-                                            "fields: {localRepository}." );
+                    throw new SAXException(
+                        "Invalid mavenProfile entry. Missing one or more " + "fields: {localRepository}." );
                 }
             }
 
