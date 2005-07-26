@@ -644,7 +644,7 @@ public class Verifier
 
             String dir = basedir + "/" + test;
 
-            if ( !new File( dir, "pom.xml" ).exists() )
+            if ( !new File( dir, "goals.txt" ).exists() )
             {
                 System.err.println( "Test " + test + " in " + dir + " does not exist" );
 
