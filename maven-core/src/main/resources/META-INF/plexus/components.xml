@@ -274,6 +274,42 @@
     </component>
 
     <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>plexus-application</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: plexus-application-lifecycle -->
+        <phases>
+          <generate-resources>plexus:app</generate-resources>
+          <package>plexus:bundle-application</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: plexus-application-lifecycle -->
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>plexus-service</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: plexus-service-lifecycle -->
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>plexus:service</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: plexus-service-lifecycle -->
+      </configuration>
+    </component>
+
+    <component>
       <role>org.apache.maven.plugin.version.PluginVersionManager</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.plugin.version.DefaultPluginVersionManager</implementation>
