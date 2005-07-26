@@ -1,0 +1,2 @@
+project/target/maven-core-it0039-p1-1.0.jar
+project2/target/maven-core-it0039-p2-1.0.jar

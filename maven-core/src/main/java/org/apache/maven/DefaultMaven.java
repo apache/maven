@@ -53,12 +53,14 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -73,6 +75,8 @@ public class DefaultMaven
     extends AbstractLogEnabled
     implements Maven, Contextualizable
 {
+    public static File userDir = new File( System.getProperty( "user.dir" ) );
+
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
@@ -129,7 +133,9 @@ public class DefaultMaven
 
         try
         {
-            projects = collectProjects( request.getFiles(), request.getLocalRepository(), request.isRecursive(),
+            List files = getProjectFiles( request );
+            
+            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
                                         request.getSettings() );
 
             projects = ProjectSorter.getSortedProjects( projects );
@@ -229,6 +235,11 @@ public class DefaultMaven
         {
             File file = (File) iterator.next();
 
+            if ( RELEASE_POMv4.equals( file.getName() ) )
+            {
+                getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
+            }
+            
             MavenProject project = getProject( file, localRepository, settings );
 
             if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
@@ -634,5 +645,78 @@ public class DefaultMaven
             msg += "< 1 second";
         }
         return msg;
+    }
+    
+    private List getProjectFiles( MavenExecutionRequest request )
+        throws IOException
+    {
+        List files = Collections.EMPTY_LIST;
+        
+        if ( request.isReactorActive() )
+        {
+            // TODO: should we now include the pom.xml in the current directory?
+//            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
+//            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
+
+            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 + ",**/" + RELEASE_POMv4 );
+            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 + "," + RELEASE_POMv4 );
+            
+            files = FileUtils.getFiles( userDir, includes, excludes );
+            
+            filterOneProjectFilePerDirectory( files );
+
+            // make sure there is consistent ordering on all platforms, rather than using the filesystem ordering
+            Collections.sort( files );
+        }
+        else if ( request.getPomFile() != null )
+        {
+            File projectFile = new File( request.getPomFile() ).getAbsoluteFile();
+
+            if ( projectFile.exists() )
+            {
+                files = Collections.singletonList( projectFile );
+            }
+        }
+        else
+        {
+            File projectFile = new File( userDir, RELEASE_POMv4 );
+
+            if ( !projectFile.exists() )
+            {
+                projectFile = new File( userDir, POMv4 );
+            }
+
+            if ( projectFile.exists() )
+            {
+                files = Collections.singletonList( projectFile );
+            }
+        }
+        return files;
+    }
+
+    private void filterOneProjectFilePerDirectory( List files )
+    {
+        List releaseDirs = new ArrayList();
+        
+        for ( Iterator it = files.iterator(); it.hasNext(); )
+        {
+            File projectFile = (File) it.next();
+            
+            if ( RELEASE_POMv4.equals( projectFile.getName() ) )
+            {
+                releaseDirs.add( projectFile.getParentFile() );
+            }
+        }
+        
+        for ( Iterator it = files.iterator(); it.hasNext(); )
+        {
+            File projectFile = (File) it.next();
+            
+            // remove pom.xml files where there is a sibling release-pom.xml file...
+            if ( !RELEASE_POMv4.equals( projectFile.getName() ) && releaseDirs.contains( projectFile.getParentFile() ) )
+            {
+                it.remove();
+            }
+        }
     }
 }

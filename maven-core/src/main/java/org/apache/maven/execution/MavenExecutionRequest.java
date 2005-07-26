@@ -37,8 +37,6 @@ public interface MavenExecutionRequest
 
     MavenSession getSession();
 
-    List getFiles();
-
     void addEventMonitor( EventMonitor monitor );
 
     EventDispatcher getEventDispatcher();
@@ -50,4 +48,12 @@ public interface MavenExecutionRequest
     void setRecursive( boolean recursive );
 
     boolean isRecursive();
+    
+    void setReactorActive( boolean reactorActive );
+    
+    boolean isReactorActive();
+    
+    void setPomFile( String pomFile );
+    
+    String getPomFile();
 }

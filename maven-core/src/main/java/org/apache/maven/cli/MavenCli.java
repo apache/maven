@@ -27,8 +27,8 @@ import org.apache.maven.Maven;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -48,14 +48,11 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -64,8 +61,6 @@ import java.util.Properties;
  */
 public class MavenCli
 {
-    public static final String POMv4 = "pom.xml";
-
     public static File userDir = new File( System.getProperty( "user.dir" ) );
 
     public static int main( String[] args, ClassWorld classWorld )
@@ -218,17 +213,6 @@ public class MavenCli
             settings.setUsePluginRegistry( false );
         }
 
-        List projectFiles = null;
-        try
-        {
-            projectFiles = getProjectFiles( commandLine );
-        }
-        catch ( IOException e )
-        {
-            showFatalError( "Error locating project files for reactor execution", e, showErrors );
-            return 1;
-        }
-
         Maven maven = null;
         MavenExecutionRequest request = null;
         LoggerManager manager = null;
@@ -241,7 +225,9 @@ public class MavenCli
                 manager.setThreshold( Logger.LEVEL_DEBUG );
             }
 
-            request = createRequest( projectFiles, embedder, commandLine, settings, eventDispatcher, manager );
+            request = createRequest( embedder, commandLine, settings, eventDispatcher, manager );
+            
+            setProjectFileOptions( commandLine, request );
 
             maven = createMavenInstance( embedder, settings.isInteractiveMode() );
         }
@@ -311,7 +297,7 @@ public class MavenCli
         }
     }
 
-    private static MavenExecutionRequest createRequest( List files, Embedder embedder, CommandLine commandLine,
+    private static MavenExecutionRequest createRequest( Embedder embedder, CommandLine commandLine,
                                                         Settings settings, EventDispatcher eventDispatcher,
                                                         LoggerManager manager )
         throws ComponentLookupException
@@ -321,7 +307,7 @@ public class MavenCli
         ArtifactRepository localRepository = createLocalRepository( embedder, settings, commandLine );
 
         request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
-                                                    commandLine.getArgList(), files, userDir.getPath() );
+                                                    commandLine.getArgList(), userDir.getPath() );
 
         // TODO [BP]: do we set one per mojo? where to do it?
         Logger logger = manager.getLoggerForComponent( Mojo.ROLE );
@@ -337,32 +323,16 @@ public class MavenCli
         return request;
     }
 
-    private static List getProjectFiles( CommandLine commandLine )
-        throws IOException
+    private static void setProjectFileOptions( CommandLine commandLine, MavenExecutionRequest request )
     {
-        List files = Collections.EMPTY_LIST;
         if ( commandLine.hasOption( CLIManager.REACTOR ) )
         {
-            // TODO: should we now include the pom.xml in the current directory?
-            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
-
-            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
-
-            files = FileUtils.getFiles( userDir, includes, excludes );
-
-            // make sure there is consistent ordering on all platforms, rather than using the filesystem ordering
-            Collections.sort( files );
+            request.setReactorActive( true );
         }
-        else
+        else if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
         {
-            File projectFile = new File( userDir, POMv4 );
-
-            if ( projectFile.exists() )
-            {
-                files = Collections.singletonList( projectFile );
-            }
+            request.setPomFile( commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
         }
-        return files;
     }
 
     private static Maven createMavenInstance( Embedder embedder, boolean interactive )
@@ -497,6 +467,8 @@ public class MavenCli
 
     static class CLIManager
     {
+        public static final char ALTERNATE_POM_FILE = 'f';
+        
         public static final char BATCH_MODE = 'B';
 
         public static final char SET_SYSTEM_PROPERTY = 'D';
@@ -540,6 +512,9 @@ public class MavenCli
         public CLIManager()
         {
             options = new Options();
+            
+            options.addOption( OptionBuilder.withLongOpt( "file").hasArg().withDescription( "Force the use of an alternate POM file." ).create( ALTERNATE_POM_FILE ) );
+            
             options.addOption(
                 OptionBuilder.withLongOpt( "define" ).hasArg().withDescription( "Define a system property" ).create(
                     SET_SYSTEM_PROPERTY ) );

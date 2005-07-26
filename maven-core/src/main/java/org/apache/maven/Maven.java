@@ -28,6 +28,10 @@ public interface Maven
 {
     static String ROLE = Maven.class.getName();
 
+    String POMv4 = "pom.xml";
+    
+    String RELEASE_POMv4 = "release-pom.xml";
+
     MavenExecutionResponse execute( MavenExecutionRequest request )
         throws ReactorException;
 }

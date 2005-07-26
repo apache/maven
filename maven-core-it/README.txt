@@ -105,6 +105,17 @@ it0034: Test version range junit [3.7,) resolves to 3.8.1
 
 it0035: Test artifact relocation.
 
+it0036: Test building from release-pom.xml when it's available
+
+it0037: Test building with alternate pom file using '-f'
+
+it0038: Test building project from outside the project directory using '-f'
+        option
+
+it0039: Test reactor for projects that have release-pom.xml in addition to
+        pom.xml. The release-pom.xml file should be chosen above pom.xml for
+        these projects in the build.
+
 -------------------------------------------------------------------------------
 
 - generated sources

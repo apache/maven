@@ -37,8 +37,6 @@ public class DefaultMavenExecutionRequest
 
     private final List goals;
 
-    private final List files;
-
     protected MavenSession session;
 
     private final EventDispatcher eventDispatcher;
@@ -49,8 +47,12 @@ public class DefaultMavenExecutionRequest
 
     private boolean recursive = true;
 
+    private boolean reactorActive;
+
+    private String pomFilename;
+
     public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
-                                         EventDispatcher eventDispatcher, List goals, List files, String baseDirectory )
+                                         EventDispatcher eventDispatcher, List goals, String baseDirectory )
     {
         this.localRepository = localRepository;
 
@@ -59,8 +61,6 @@ public class DefaultMavenExecutionRequest
         this.goals = goals;
 
         this.eventDispatcher = eventDispatcher;
-
-        this.files = files;
 
         this.baseDirectory = baseDirectory;
     }
@@ -104,11 +104,6 @@ public class DefaultMavenExecutionRequest
         return session;
     }
 
-    public List getProjectFiles()
-    {
-        return files;
-    }
-
     public void setSession( MavenSession session )
     {
         this.session = session;
@@ -124,8 +119,23 @@ public class DefaultMavenExecutionRequest
         return eventDispatcher;
     }
 
-    public List getFiles()
+    public void setReactorActive( boolean reactorActive )
     {
-        return files;
+        this.reactorActive = reactorActive;
+    }
+
+    public boolean isReactorActive()
+    {
+        return reactorActive;
+    }
+
+    public void setPomFile( String pomFilename )
+    {
+        this.pomFilename = pomFilename;
+    }
+
+    public String getPomFile()
+    {
+        return pomFilename;
     }
 }

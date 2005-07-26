@@ -160,30 +160,34 @@ public class Verifier
     {
         List lines = new ArrayList();
 
-        try
+        if ( file.exists() )
         {
-            BufferedReader reader = new BufferedReader( new FileReader( file ) );
-
-            String line = "";
-
-            while ( ( line = reader.readLine() ) != null )
+            try
             {
-                line = line.trim();
+                BufferedReader reader = new BufferedReader( new FileReader( file ) );
 
-                if ( line.startsWith( "#" ) || line.length() == 0 )
+                String line = "";
+
+                while ( ( line = reader.readLine() ) != null )
                 {
-                    continue;
+                    line = line.trim();
+
+                    if ( line.startsWith( "#" ) || line.length() == 0 )
+                    {
+                        continue;
+                    }
+
+                    lines.addAll( replaceArtifacts( line ) );
                 }
 
-                lines.addAll( replaceArtifacts( line ) );
+                reader.close();
             }
-
-            reader.close();
+            catch ( Exception e )
+            {
+                throw new VerificationException( e );
+            }
         }
-        catch ( Exception e )
-        {
-            throw new VerificationException( e );
-        }
+        
         return lines;
     }
 
@@ -461,6 +465,8 @@ public class Verifier
         String mavenHome = System.getProperty( "maven.home" );
 
         List goals = loadFile( basedir, filename );
+        
+        List cliOptions = loadFile( basedir, "cli-options.txt" );
 
         if ( goals.size() == 0 )
         {
@@ -493,6 +499,12 @@ public class Verifier
 
             cli.setExecutable( executable );
             
+            for ( Iterator it = cliOptions.iterator(); it.hasNext(); )
+            {
+                String key = (String) it.next();
+                cli.createArgument().setValue(key);
+            }
+
             cli.createArgument().setValue( "-e" );
 //            cli.createArgument().setValue( "-X" );
             
@@ -507,7 +519,7 @@ public class Verifier
                 String key = (String) i.next();
                 cli.createArgument().setLine( "-D" + key + "=" + properties.getProperty( key ) );
             }
-
+            
             // Note: Make sure that the repo is surrounded by quotes as it can possibly have 
             // spaces in its path.            
             cli.createArgument().setLine( "-Dmaven.repo.local=" + "\"" + localRepo + "\"" );
@@ -607,7 +619,7 @@ public class Verifier
                 verifier.executeHook( "prebuild-hook.txt" );
 
                 Properties properties = verifier.loadProperties( "system.properties" );
-
+                
                 Properties controlProperties = verifier.loadProperties( "verifier.properties" );
 
                 boolean chokeOnErrorOutput = Boolean.valueOf( controlProperties.getProperty( "failOnErrorOutput", "true" ) ).booleanValue();
