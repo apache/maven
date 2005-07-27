@@ -102,6 +102,8 @@ public class DefaultPluginManager
 
     private Log mojoLogger;
 
+    private Map resolvedCoreArtifactFiles = new HashMap();
+
     // component requirements
     protected PathTranslator pathTranslator;
 
@@ -174,15 +176,6 @@ public class DefaultPluginManager
                                           ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
     {
-        Artifact existingPluginArtifact = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
-        
-        return verifyPlugin( plugin, existingPluginArtifact, project, settings, localRepository );
-    }
-    
-    private PluginDescriptor verifyPlugin( Plugin plugin, Artifact existingArtifact, MavenProject project, Settings settings,
-                                          ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
-    {
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
         if ( plugin.getVersion() == null )
@@ -198,7 +191,6 @@ public class DefaultPluginManager
             try
             {
                 VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
-
 
                 checkRequiredMavenVersion( plugin, localRepository, project.getPluginArtifactRepositories() );
 
@@ -285,9 +277,10 @@ public class DefaultPluginManager
     {
         artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
-        PlexusContainer child = container.createChildContainer( plugin.getKey(), Collections
-            .singletonList( pluginArtifact.getFile() ), Collections.EMPTY_MAP,
-                                                        Collections.singletonList( pluginCollector ) );
+        PlexusContainer child = container.createChildContainer( plugin.getKey(),
+                                                                Collections.singletonList( pluginArtifact.getFile() ),
+                                                                Collections.EMPTY_MAP,
+                                                                Collections.singletonList( pluginCollector ) );
 
         // this plugin's descriptor should have been discovered in the child creation, so we should be able to
         // circle around and set the artifacts and class realm
@@ -398,27 +391,27 @@ public class DefaultPluginManager
         ArtifactResolutionException
     {
         Plugin forLookup = new Plugin();
-        
+
         String groupId = reportPlugin.getGroupId();
         String artifactId = reportPlugin.getArtifactId();
-        
+
         forLookup.setGroupId( groupId );
         forLookup.setArtifactId( artifactId );
 
         String version = reportPlugin.getVersion();
-        
+
         Artifact existingPluginArtifact = (Artifact) project.getReportArtifactMap().get( reportPlugin.getKey() );
-        
-        if ( existingPluginArtifact == null
-            || !reportPlugin.getKey().equals( ArtifactUtils.versionlessKey( existingPluginArtifact ) )
-            || version == null )
+
+        if ( existingPluginArtifact == null ||
+            !reportPlugin.getKey().equals( ArtifactUtils.versionlessKey( existingPluginArtifact ) ) || version == null )
         {
-            version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, session.getSettings(), session.getLocalRepository(), true );
+            version = pluginVersionManager.resolvePluginVersion( groupId, artifactId, project, session.getSettings(),
+                                                                 session.getLocalRepository(), true );
         }
-        
+
         forLookup.setVersion( version );
-        
-        PluginDescriptor pluginDescriptor = verifyPlugin( forLookup, existingPluginArtifact, project, session
+
+        PluginDescriptor pluginDescriptor = verifyPlugin( forLookup, project, session
             .getSettings(), session.getLocalRepository() );
 
         List reports = new ArrayList();
@@ -544,7 +537,7 @@ public class DefaultPluginManager
                 ArtifactRepository localRepository = session.getLocalRepository();
 
                 ResolutionGroup resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository,
-                                                                           project.getPluginArtifactRepositories() );
+                                                                                   project.getPluginArtifactRepositories() );
 
                 Set dependencies = resolutionGroup.getArtifacts();
 
@@ -572,7 +565,7 @@ public class DefaultPluginManager
 
                 unresolved.removeAll( resolved );
 
-                resolveCoreArtifacts( unresolved, project.getRemoteArtifactRepositories(), localRepository );
+                resolveCoreArtifacts( unresolved, localRepository );
 
                 List allResolved = new ArrayList( resolved.size() + unresolved.size() );
 
@@ -596,9 +589,7 @@ public class DefaultPluginManager
         }
     }
 
-    private Map resolvedCoreArtifactFiles = new HashMap();
-
-    private void resolveCoreArtifacts( List unresolved, List remoteRepositories, ArtifactRepository localRepository )
+    private void resolveCoreArtifacts( List unresolved, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         for ( Iterator it = unresolved.iterator(); it.hasNext(); )
