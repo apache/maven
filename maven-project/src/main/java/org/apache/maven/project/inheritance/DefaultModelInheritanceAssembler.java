@@ -189,13 +189,11 @@ public class DefaultModelInheritanceAssembler
         {
             Repository repository = (Repository) iterator.next();
 
-            // parent will always override child repositories
-            // if there are duplicates
-            if ( childRepositories.contains( repository ) )
+            // child will always override parent repositories if there are duplicates
+            if ( !childRepositories.contains( repository ) )
             {
-                childRepositories.remove( repository );
+                child.addRepository( repository );
             }
-            child.addRepository( repository );
         }
 
         // Mojo Repositories :: aggregate
