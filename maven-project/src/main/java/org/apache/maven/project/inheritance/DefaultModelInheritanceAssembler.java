@@ -136,6 +136,12 @@ public class DefaultModelInheritanceAssembler
             child.setDevelopers( parent.getDevelopers() );
         }
 
+        // licenses
+        if ( child.getLicenses().size() == 0 )
+        {
+            child.setLicenses( parent.getLicenses() );
+        }
+
         // developers
         if ( child.getContributors().size() == 0 )
         {
