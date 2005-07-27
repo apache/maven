@@ -74,21 +74,21 @@ public class PrepareReleaseMojo
      * @readonly
      */
     private boolean interactive = true;
-    
+
     /**
      * @parameter expression="${component.org.apache.maven.artifact.metadata.ArtifactMetadataSource}"
      * @required
      * @readonly
      */
     private ArtifactMetadataSource artifactMetadataSource;
-    
+
     /**
      * @parameter expression="${component.org.codehaus.plexus.components.inputhandler.InputHandler}"
      * @required
      * @readonly
      */
     private InputHandler inputHandler;
-    
+
     /**
      * @parameter expression="${localRepository}"
      * @required
@@ -122,23 +122,24 @@ public class PrepareReleaseMojo
         checkForPresenceOfSnapshots();
 
         transformPomToReleaseVersionPom();
-        
+
         generateReleasePropertiesFile();
-        
+
         generateReleasePom();
-        
+
         checkInReleaseVersionPom();
 
         tagRelease();
 
         transformPomToSnapshotVersionPom();
-        
+
         new File( basedir, RELEASE_POM ).delete();
 
         checkInSnapshotVersionPom();
     }
 
-    private void generateReleasePropertiesFile() throws MojoExecutionException
+    private void generateReleasePropertiesFile()
+        throws MojoExecutionException
     {
         try
         {
@@ -349,29 +350,30 @@ public class PrepareReleaseMojo
         if ( project.hasParent() )
         {
             Artifact parentArtifact = project.getParentArtifact();
-            
+
             if ( isSnapshot( parentArtifact.getBaseVersion() ) )
             {
                 String version = resolveVersion( parentArtifact, "parent" );
-                
+
                 model.getParent().setVersion( version );
             }
         }
-        
+
         //Rewrite dependencies section
         Map artifactMap = ArtifactUtils.artifactMapByArtifactId( project.getArtifacts() );
-        
+
         for ( Iterator i = model.getDependencies().iterator(); i.hasNext(); )
         {
             Dependency dep = (Dependency) i.next();
-            
-            String conflictId = ArtifactUtils.artifactId( dep.getGroupId(), dep.getArtifactId(), dep.getType(), dep.getVersion() );
-            
+
+            String conflictId = ArtifactUtils.artifactId( dep.getGroupId(), dep.getArtifactId(), dep.getType(),
+                                                          dep.getClassifier(), dep.getVersion() );
+
             Artifact artifact = (Artifact) artifactMap.get( conflictId );
-            
+
             dep.setVersion( artifact.getVersion() );
         }
-        
+
         try
         {
             PomTransformer transformer = new VersionTransformer();
@@ -391,43 +393,45 @@ public class PrepareReleaseMojo
             throw new MojoExecutionException( "Can't transform pom to its release version form.", e );
         }
     }
-    
-    private void generateReleasePom() throws MojoExecutionException
+
+    private void generateReleasePom()
+        throws MojoExecutionException
     {
         MavenProject releaseProject = new MavenProject( project );
         Model releaseModel = releaseProject.getModel();
-        
+
         //Rewrite parent version
         if ( project.hasParent() )
         {
             Artifact parentArtifact = project.getParentArtifact();
-            
+
             if ( isSnapshot( parentArtifact.getBaseVersion() ) )
             {
                 String version = resolveVersion( parentArtifact, "parent" );
-                
+
                 model.getParent().setVersion( version );
             }
         }
 
         //Rewrite dependencies section
         List newdeps = new ArrayList();
-        
+
         for ( Iterator i = releaseProject.getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact artifact = (Artifact) i.next();
-            
+
             Dependency newdep = new Dependency();
-            
+
             newdep.setArtifactId( artifact.getArtifactId() );
             newdep.setGroupId( artifact.getGroupId() );
             newdep.setVersion( artifact.getVersion() );
             newdep.setType( artifact.getType() );
             newdep.setScope( artifact.getScope() );
-            
+            newdep.setClassifier( artifact.getClassifier() );
+
             newdeps.add( newdep );
         }
-        
+
         releaseModel.setDependencies( newdeps );
 
         //Rewrite plugins version
@@ -439,17 +443,17 @@ public class PrepareReleaseMojo
                 for ( Iterator j = releaseModel.getBuild().getPlugins().iterator(); j.hasNext(); )
                 {
                     Plugin plugin = (Plugin) j.next();
-                    if ( ArtifactUtils.versionlessKey(artifact).equals( plugin.getKey() ) )
+                    if ( ArtifactUtils.versionlessKey( artifact ).equals( plugin.getKey() ) )
                     {
                         String version = resolveVersion( artifact, "plugin" );
-                        
+
                         plugin.setGroupId( artifact.getGroupId() );
                         plugin.setVersion( version );
                     }
                 }
             }
         }
-        
+
         //Rewrite report version
         for ( Iterator i = releaseProject.getReportArtifacts().iterator(); i.hasNext(); )
         {
@@ -457,16 +461,16 @@ public class PrepareReleaseMojo
             if ( isSnapshot( artifact.getBaseVersion() ) )
             {
                 List reportPlugins = releaseProject.getReportPlugins();
-                
+
                 if ( reportPlugins != null )
                 {
                     for ( Iterator j = reportPlugins.iterator(); j.hasNext(); )
                     {
                         ReportPlugin plugin = (ReportPlugin) j.next();
-                        if ( ArtifactUtils.versionlessKey(artifact).equals( plugin.getKey() ) )
+                        if ( ArtifactUtils.versionlessKey( artifact ).equals( plugin.getKey() ) )
                         {
                             String version = resolveVersion( artifact, "report" );
-                            
+
                             plugin.setGroupId( artifact.getGroupId() );
                             plugin.setVersion( version );
                         }
@@ -474,15 +478,15 @@ public class PrepareReleaseMojo
                 }
             }
         }
-        
+
         File releasePomFile = new File( basedir, RELEASE_POM );
-        
+
         Writer writer = null;
-        
+
         try
         {
             writer = new FileWriter( releasePomFile );
-            
+
             releaseProject.writeModel( writer );
         }
         catch ( IOException e )
@@ -493,7 +497,7 @@ public class PrepareReleaseMojo
         {
             IOUtil.close( writer );
         }
-        
+
         try
         {
             ScmBean scm = getScm();
@@ -501,11 +505,11 @@ public class PrepareReleaseMojo
             scm.setWorkingDirectory( basedir );
 
             List scmChanges = scm.getStatus();
-            
+
             for ( Iterator i = scmChanges.iterator(); i.hasNext(); )
             {
                 ScmFile f = (ScmFile) i.next();
-                
+
                 if ( f.getPath().equals( "release-pom.xml" ) && f.getStatus() != ScmFileStatus.MODIFIED )
                 {
                     getScm().add( RELEASE_POM );
@@ -522,21 +526,21 @@ public class PrepareReleaseMojo
         }
     }
 
-    private String resolveVersion( Artifact artifact, String artifactUsage ) 
+    private String resolveVersion( Artifact artifact, String artifactUsage )
         throws MojoExecutionException
     {
         if ( artifact.getFile() == null )
         {
             try
             {
-                artifactMetadataSource.retrieve(artifact, localRepository, project.getPluginArtifactRepositories() );
+                artifactMetadataSource.retrieve( artifact, localRepository, project.getPluginArtifactRepositories() );
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
                 throw new MojoExecutionException( "Cannot resolve " + artifactUsage + ": " + artifact.getId(), e );
             }
         }
-        
+
         return artifact.getVersion();
     }
 

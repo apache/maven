@@ -19,9 +19,9 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -387,6 +387,7 @@ public class MavenProject
                 dependency.setVersion( a.getVersion() );
                 dependency.setScope( a.getScope() );
                 dependency.setType( a.getType() );
+                dependency.setClassifier( a.getClassifier() );
 
                 list.add( dependency );
             }
@@ -471,6 +472,7 @@ public class MavenProject
                 dependency.setVersion( a.getVersion() );
                 dependency.setScope( a.getScope() );
                 dependency.setType( a.getType() );
+                dependency.setClassifier( a.getClassifier() );
 
                 list.add( dependency );
             }
@@ -552,6 +554,7 @@ public class MavenProject
                 dependency.setVersion( a.getVersion() );
                 dependency.setScope( a.getScope() );
                 dependency.setType( a.getType() );
+                dependency.setClassifier( a.getClassifier() );
 
                 list.add( dependency );
             }

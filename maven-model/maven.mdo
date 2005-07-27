@@ -1211,6 +1211,16 @@
           <defaultValue>jar</defaultValue>
         </field>
         <field>
+          <name>classifier</name>
+          <version>4.0.0</version>
+          <description>
+            The classifier of the dependency. This allows distinguishing two artifacts that belong to the same POM but
+            were built differently, and is appended to the filename after the version.
+          </description>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
           <name>properties</name>
           <version>3.0.0</version>
           <description><![CDATA[
@@ -1266,14 +1276,9 @@
         <codeSegment>
           <version>4.0.0</version>
           <code><![CDATA[
-            public String getId()
-            {
-                return groupId + ":" + artifactId + ":" + type + ":" + version;
-            }
-            
             public String getManagementKey()
             {
-                return groupId + ":" + artifactId + ":" + type;
+                return groupId + ":" + artifactId + ":" + type + classifier != null ? ":" + classifier : "";
             }
           ]]></code>
         </codeSegment>

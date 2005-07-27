@@ -49,9 +49,9 @@ public class MavenMetadataSource
     extends AbstractLogEnabled
     implements ArtifactMetadataSource
 {
-    
+
     public static final String ROLE_HINT = "maven";
-    
+
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ArtifactFactory artifactFactory;
@@ -150,8 +150,8 @@ public class MavenMetadataSource
 
             VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                          versionRange, d.getType(), d.getScope(),
-                                                                          inheritedScope );
+                                                                          versionRange, d.getType(), d.getClassifier(),
+                                                                          d.getScope(), inheritedScope );
 
             if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
             {

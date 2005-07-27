@@ -86,7 +86,7 @@ public class DefaultMavenProjectBuilder
     private PlexusContainer container;
 
     protected ArtifactResolver artifactResolver;
-    
+
     protected ArtifactMetadataSource artifactMetadataSource;
 
     private ArtifactFactory artifactFactory;
@@ -94,7 +94,7 @@ public class DefaultMavenProjectBuilder
     private ModelInheritanceAssembler modelInheritanceAssembler;
 
     private ModelValidator validator;
-    
+
     // TODO: make it a component
     private MavenXpp3Reader modelReader;
 
@@ -146,12 +146,13 @@ public class DefaultMavenProjectBuilder
         Artifact projectArtifact = project.getArtifact();
 
         Map managedVersions = createManagedVersionMap( project.getDependencyManagement() );
-        
+
         ensureMetadataSourceIsInitialized();
 
         try
         {
-            project.setDependencyArtifacts( MavenProject.createArtifacts( artifactFactory, project.getDependencies() ) );
+            project.setDependencyArtifacts(
+                MavenProject.createArtifacts( artifactFactory, project.getDependencies() ) );
         }
         catch ( InvalidVersionSpecificationException e )
         {
@@ -166,8 +167,8 @@ public class DefaultMavenProjectBuilder
         project.setArtifacts( result.getArtifacts() );
         return project;
     }
-    
-    private void ensureMetadataSourceIsInitialized() 
+
+    private void ensureMetadataSourceIsInitialized()
         throws ProjectBuildingException
     {
         if ( artifactMetadataSource == null )
@@ -199,7 +200,7 @@ public class DefaultMavenProjectBuilder
                     VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                     Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                                   versionRange, d.getType(),
-                                                                                  d.getScope() );
+                                                                                  d.getClassifier(), d.getScope() );
                     map.put( d.getManagementKey(), artifact );
                 }
                 catch ( InvalidVersionSpecificationException e )
@@ -231,7 +232,8 @@ public class DefaultMavenProjectBuilder
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
         MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
-                                      Collections.EMPTY_LIST, externalProfiles, projectDescriptor.getAbsoluteFile().getParentFile() );
+                                      Collections.EMPTY_LIST, externalProfiles,
+                                      projectDescriptor.getAbsoluteFile().getParentFile() );
 
         // Only translate the base directory for files in the source tree
         pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
@@ -345,10 +347,11 @@ public class DefaultMavenProjectBuilder
         }
 
         Model originalModel = ModelUtils.cloneModel( model );
-        
+
         List repositories = new ArrayList( aggregatedRemoteWagonRepositories );
-        
-        MavenProject project = assembleLineage( model, lineage, repositories, localRepository, externalProfiles, projectDir );
+
+        MavenProject project = assembleLineage( model, lineage, repositories, localRepository, externalProfiles,
+                                                projectDir );
 
         project.setOriginalModel( originalModel );
 
@@ -479,7 +482,9 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    /** @noinspection CollectionDeclaredAsConcreteClass*/
+    /**
+     * @noinspection CollectionDeclaredAsConcreteClass
+     */
     private MavenProject assembleLineage( Model model, LinkedList lineage, List aggregatedRemoteWagonRepositories,
                                           ArtifactRepository localRepository, List externalProfiles, File projectDir )
         throws ProjectBuildingException
@@ -520,20 +525,20 @@ public class DefaultMavenProjectBuilder
             {
                 throw new ProjectBuildingException( "Missing version element from parent element" );
             }
-            
+
             model = getCachedModel( parentModel.getGroupId(), parentModel.getArtifactId(), parentModel.getVersion() );
-            
+
             // the only way this will have a value is if we find the parent on disk...
             File parentProjectDir = null;
-            
+
             String parentRelativePath = parentModel.getRelativePath();
-            
+
             // if we can't find a cached model matching the parent spec, then let's try to look on disk using
             // <relativePath/>
-            if ( model == null && projectDir != null && StringUtils.isNotEmpty(parentRelativePath) )
+            if ( model == null && projectDir != null && StringUtils.isNotEmpty( parentRelativePath ) )
             {
                 File parentDescriptor = new File( projectDir, parentRelativePath );
-                
+
                 try
                 {
                     parentDescriptor = parentDescriptor.getCanonicalFile();
@@ -541,34 +546,37 @@ public class DefaultMavenProjectBuilder
                 catch ( IOException e )
                 {
                     getLogger().debug( "Failed to canonicalize potential parent POM: \'" + parentDescriptor + "\'", e );
-                    
+
                     parentDescriptor = null;
                 }
-                
+
                 if ( parentDescriptor != null && parentDescriptor.exists() )
                 {
                     Model candidateParent = readModel( parentDescriptor );
-                    
+
                     // this works because parent-version is still required...
-                    if ( parentModel.getGroupId().equals( candidateParent.getGroupId() )
-                        && parentModel.getArtifactId().equals( candidateParent.getArtifactId() )
-                        && ( parentModel.getVersion().equals( candidateParent.getVersion() ) 
-                            || ( candidateParent.getParent() != null 
-                                && parentModel.getVersion().equals(candidateParent.getParent().getVersion() ) ) ) )
+                    if ( parentModel.getGroupId().equals( candidateParent.getGroupId() ) &&
+                        parentModel.getArtifactId().equals( candidateParent.getArtifactId() ) && (
+                        parentModel.getVersion().equals( candidateParent.getVersion() ) || (
+                            candidateParent.getParent() != null &&
+                                parentModel.getVersion().equals( candidateParent.getParent().getVersion() ) ) ) )
                     {
                         model = candidateParent;
-                        
+
                         parentProjectDir = parentDescriptor.getParentFile();
-                        
-                        getLogger().debug( "Using parent-POM from the project hierarchy at: \'" + parentModel.getRelativePath() + "\' for project: " + project.getId() );
+
+                        getLogger().debug( "Using parent-POM from the project hierarchy at: \'" +
+                            parentModel.getRelativePath() + "\' for project: " + project.getId() );
                     }
                     else
                     {
-                        getLogger().debug("Invalid parent-POM referenced by relative path: \'" + parentModel.getRelativePath() + "\'. It did not match parent specification in " + project.getId() );
+                        getLogger().debug( "Invalid parent-POM referenced by relative path: \'" +
+                            parentModel.getRelativePath() + "\'. It did not match parent specification in " +
+                            project.getId() );
                     }
                 }
             }
-            
+
             Artifact parentArtifact = null;
 
             // only resolve the parent model from the repository system if we didn't find it on disk...
@@ -590,7 +598,8 @@ public class DefaultMavenProjectBuilder
                 model = findModelFromRepository( parentArtifact, aggregatedRemoteWagonRepositories, localRepository );
             }
 
-            MavenProject parent = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository, externalProfiles, parentProjectDir );
+            MavenProject parent = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository,
+                                                   externalProfiles, parentProjectDir );
 
             project.setParent( parent );
 
@@ -704,10 +713,10 @@ public class DefaultMavenProjectBuilder
     }
 
     protected Set createReportArtifacts( List reports )
-    throws ProjectBuildingException
+        throws ProjectBuildingException
     {
         Set pluginArtifacts = new HashSet();
-        
+
         if ( reports != null )
         {
             for ( Iterator i = reports.iterator(); i.hasNext(); )

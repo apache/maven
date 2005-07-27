@@ -419,8 +419,10 @@ public class DefaultArtifactCollectorTest
             ArtifactSpec a = (ArtifactSpec) artifacts.get( key );
             try
             {
-                return new ResolutionGroup( artifact, createArtifacts( artifactFactory, a.dependencies, artifact.getScope(),
-                                                             artifact.getDependencyFilter() ), Collections.EMPTY_LIST );
+                return new ResolutionGroup( artifact, createArtifacts( artifactFactory, a.dependencies,
+                                                                       artifact.getScope(),
+                                                                       artifact.getDependencyFilter() ),
+                                                      Collections.EMPTY_LIST );
             }
             catch ( InvalidVersionSpecificationException e )
             {
@@ -445,7 +447,8 @@ public class DefaultArtifactCollectorTest
 
                 VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                 Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                              versionRange, d.getType(), d.getScope(),
+                                                                              versionRange, d.getType(),
+                                                                              d.getClassifier(), d.getScope(),
                                                                               inheritedScope );
 
                 if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )

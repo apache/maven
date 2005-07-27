@@ -42,10 +42,10 @@ public interface ArtifactFactory
                                            String classifier );
 
     Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
-                                       String scope );
+                                       String classifier, String scope );
 
     Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
-                                       String scope, String inheritedScope );
+                                       String classifier, String scope, String inheritedScope );
 
     Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging );
 

@@ -83,6 +83,8 @@ public class VersionTransformer
 
             Node type = node.selectSingleNode( "type" );
 
+            Node classifier = node.selectSingleNode( "classifier" );
+
             String typeText = "jar";
 
             if ( type != null )
@@ -91,7 +93,8 @@ public class VersionTransformer
             }
             Node version = node.selectSingleNode( "version" );
 
-            String versionText = getDependency( groupId.getText(), artifactId.getText(), typeText ).getVersion();
+            String versionText = getDependency( groupId.getText(), artifactId.getText(), typeText,
+                                                classifier.getText() ).getVersion();
             if ( version != null )
             {
                 version.setText( versionText );
@@ -183,14 +186,16 @@ public class VersionTransformer
         }
     }
 
-    private Dependency getDependency( String groupId, String artifactId, String type )
+    private Dependency getDependency( String groupId, String artifactId, String type, String classifier )
     {
+        // TODO: equals() in Dependency would be better
         for ( Iterator i = getUpdatedModel().getDependencies().iterator(); i.hasNext(); )
         {
             Dependency dependency = (Dependency) i.next();
 
             if ( dependency.getGroupId().equals( groupId ) && dependency.getArtifactId().equals( artifactId ) &&
-                dependency.getType().equals( type ) )
+                dependency.getType().equals( type ) && dependency.getClassifier() != null
+                ? dependency.getClassifier().equals( classifier ) : classifier == null )
             {
                 return dependency;
             }

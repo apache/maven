@@ -50,15 +50,15 @@ public class DefaultArtifactFactory
     }
 
     public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
-                                              String scope )
+                                              String classifier, String scope )
     {
-        return createArtifact( groupId, artifactId, versionRange, null, type, null, null );
+        return createArtifact( groupId, artifactId, versionRange, null, type, classifier, null );
     }
 
     public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
-                                              String scope, String inheritedScope )
+                                              String classifier, String scope, String inheritedScope )
     {
-        return createArtifact( groupId, artifactId, versionRange, scope, type, null, inheritedScope );
+        return createArtifact( groupId, artifactId, versionRange, scope, type, classifier, inheritedScope );
     }
 
     public Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging )
