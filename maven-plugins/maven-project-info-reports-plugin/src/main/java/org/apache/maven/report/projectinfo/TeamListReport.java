@@ -27,7 +27,6 @@ import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -233,7 +232,8 @@ public class TeamListReport
 
                     tableCell( developer.getOrganization() );
 
-                    tableCell( developer.getOrganizationUrl() );
+                    tableCell( createLinkPatternedText( developer.getOrganizationUrl(), 
+                                                        developer.getOrganizationUrl() ) );
 
                     if ( developer.getRoles() != null )
                     {
@@ -333,8 +333,8 @@ public class TeamListReport
 
                     tableCell( contributor.getOrganization() );
 
-                    tableCell( createLinkPatternedText( contributor.getOrganizationUrl(), contributor
-                        .getOrganizationUrl() ) );
+                    tableCell( createLinkPatternedText( contributor.getOrganizationUrl(), 
+                                                        contributor.getOrganizationUrl() ) );
 
                     if ( contributor.getRoles() != null )
                     {
