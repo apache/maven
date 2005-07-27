@@ -475,6 +475,7 @@ public class DefaultWagonManager
             String actualChecksum = checksumObserver.getActualChecksum();
 
             File checksumFile = new File( destination + checksumFileExtension );
+            checksumFile.deleteOnExit();
             wagon.get( remotePath + checksumFileExtension, checksumFile );
 
             String expectedChecksum = FileUtils.fileRead( checksumFile );
