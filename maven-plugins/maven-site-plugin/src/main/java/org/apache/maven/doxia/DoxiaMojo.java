@@ -212,6 +212,16 @@ public class DoxiaMojo
 
         List reports = getReports();
 
+        if ( attributes == null )
+        {
+            attributes = new HashMap();
+        }
+
+        if ( attributes.get( "project" ) == null )
+        {
+            attributes.put( "project", project );
+        }
+        
         try
         {
             categorizeReports( reports );
