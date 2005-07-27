@@ -16,10 +16,11 @@ package org.apache.maven.lifecycle;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.extension.ExtensionManager;
@@ -141,6 +142,10 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( "Unable to initialise extensions", e );
         }
         catch ( PluginVersionResolutionException e )
+        {
+            throw new LifecycleExecutionException( "Unable to initialise extensions", e );
+        }
+        catch ( InvalidVersionSpecificationException e )
         {
             throw new LifecycleExecutionException( "Unable to initialise extensions", e );
         }

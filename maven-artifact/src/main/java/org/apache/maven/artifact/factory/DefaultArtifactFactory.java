@@ -86,9 +86,9 @@ public class DefaultArtifactFactory
         return createArtifact( groupId, artifactId, version, scope, "pom" );
     }
 
-    public Artifact createExtensionArtifact( String groupId, String artifactId, String version )
+    public Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange )
     {
-        return createArtifact( groupId, artifactId, version, Artifact.SCOPE_RUNTIME, "jar" );
+        return createArtifact( groupId, artifactId, versionRange, Artifact.SCOPE_RUNTIME, "jar", null, null );
     }
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type,

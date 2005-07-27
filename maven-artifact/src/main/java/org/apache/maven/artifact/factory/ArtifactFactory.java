@@ -57,5 +57,5 @@ public interface ArtifactFactory
 
     Artifact createProjectArtifact( String groupId, String artifactId, String version, String scope );
 
-    Artifact createExtensionArtifact( String groupId, String artifactId, String version );
+    Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange );
 }

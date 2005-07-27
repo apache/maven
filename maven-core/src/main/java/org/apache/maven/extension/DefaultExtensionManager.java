@@ -23,6 +23,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Extension;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusConstants;
@@ -31,6 +33,7 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -53,21 +56,36 @@ public class DefaultExtensionManager
     private PlexusContainer container;
 
     public void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PlexusContainerException
+        throws ArtifactResolutionException, PlexusContainerException, InvalidVersionSpecificationException
     {
-        // TODO: version may be null
-        Artifact artifact = artifactFactory.createExtensionArtifact( extension.getGroupId(), extension.getArtifactId(),
-                                                                     extension.getVersion() );
+        // TODO: this is duplicated with DefaultMavenProjectBuilder. Push into artifact factory.
+        String version;
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
-                                                                                project.getArtifact(),
-                                                                                project.getRemoteArtifactRepositories(),
-                                                                                localRepository,
-                                                                                artifactMetadataSource );
-        for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+        if ( StringUtils.isEmpty( extension.getVersion() ) )
         {
-            Artifact a = (Artifact) i.next();
-            container.addJarResource( a.getFile() );
+            version = "RELEASE";
+        }
+        else
+        {
+            version = extension.getVersion();
+        }
+
+        VersionRange versionRange = VersionRange.createFromVersionSpec( version );
+        Artifact artifact = artifactFactory.createExtensionArtifact( extension.getGroupId(), extension.getArtifactId(),
+                                                                     versionRange );
+
+        if ( artifact != null )
+        {
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( artifact ),
+                                                                                    project.getArtifact(),
+                                                                                    project.getRemoteArtifactRepositories(),
+                                                                                    localRepository,
+                                                                                    artifactMetadataSource );
+            for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+            {
+                Artifact a = (Artifact) i.next();
+                container.addJarResource( a.getFile() );
+            }
         }
     }
 
