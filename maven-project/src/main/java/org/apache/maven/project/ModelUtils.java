@@ -104,6 +104,11 @@ public final class ModelUtils
             return;
         }
 
+        if ( parent.isExtensions() )
+        {
+            child.setExtensions( true );
+        }
+
         if ( child.getVersion() == null && parent.getVersion() != null )
         {
             child.setVersion( parent.getVersion() );
