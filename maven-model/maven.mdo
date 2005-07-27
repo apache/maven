@@ -1278,7 +1278,7 @@
           <code><![CDATA[
             public String getManagementKey()
             {
-                return groupId + ":" + artifactId + ":" + type + classifier != null ? ":" + classifier : "";
+                return groupId + ":" + artifactId + ":" + type + (classifier != null ? ":" + classifier : "");
             }
           ]]></code>
         </codeSegment>
