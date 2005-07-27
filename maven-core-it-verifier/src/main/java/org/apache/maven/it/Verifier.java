@@ -533,8 +533,6 @@ public class Verifier
 
             cli.createArgument().setValue( "--no-plugin-registry" );
 
-            cli.createArgument().setValue( "--check-plugin-latest" );
-
             cli.createArgument().setValue( "--batch-mode" );
 
             for ( Iterator i = properties.keySet().iterator(); i.hasNext(); )
