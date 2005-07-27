@@ -20,7 +20,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.extension.ExtensionManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
+import org.apache.maven.model.Extension;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -40,6 +42,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -75,6 +78,8 @@ public class DefaultLifecycleExecutor
 
     private PluginManager pluginManager;
 
+    private ExtensionManager extensionManager;
+
     private List phases;
 
     private Map defaultPhases;
@@ -100,6 +105,12 @@ public class DefaultLifecycleExecutor
 
         try
         {
+            for ( Iterator i = project.getBuildExtensions().iterator(); i.hasNext(); )
+            {
+                Extension extension = (Extension) i.next();
+                extensionManager.addExtension( extension, project, session.getLocalRepository() );
+            }
+
             for ( Iterator i = tasks.iterator(); i.hasNext(); )
             {
                 String task = (String) i.next();
@@ -113,6 +124,10 @@ public class DefaultLifecycleExecutor
         catch ( ArtifactResolutionException e )
         {
             response.setException( e );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new LifecycleExecutionException( "Unable to initialise extensions", e );
         }
         finally
         {

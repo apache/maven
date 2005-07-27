@@ -981,6 +981,15 @@
           ]]></description>
           <type>String</type>
         </field>
+        <field>
+          <name>extensions</name>
+          <version>4.0.0</version>
+          <description>A set of build extensions to use from this project.</description>
+          <association>
+            <type>Extension</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
     </class>
     <class>
@@ -2239,7 +2248,8 @@
           <name>extensions</name>
           <version>4.0.0</version>
           <type>boolean</type>
-          <description>Whether to load Maven extensions (such as packaging and type handlers) from this plugin</description>
+          <description>Whether to load Maven extensions (such as packaging and type handlers) from this
+            plugin</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -2788,6 +2798,77 @@
           <type>String</type>
         </field>
       </fields>
+    </class>
+    <class>
+      <name>Extension</name>
+      <version>4.0.0</version>
+      <description>Describes a build extension to utilise</description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.0.0</version>
+          <description>The group of the extension's artifact.</description>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.0.0</version>
+          <description>The artifact ID of the extension</description>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <version>4.0.0</version>
+          <description>The version of the extension</description>
+          <type>String</type>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+
+        if ( !( o instanceof Extension ) )
+        {
+            return false;
+        }
+
+        Extension e = (Extension) o;
+
+        if ( !e.getArtifactId().equals( getArtifactId() ) )
+        {
+            return false;
+        }
+        else if ( !e.getGroupId().equals( getGroupId() ) )
+        {
+            return false;
+        }
+        else if ( e.getVersion() != null ? !e.getVersion().equals( getVersion() ) : getVersion() != null )
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public int hashCode()
+    {
+        int result = 17;
+        result = 37 * result + getArtifactId().hashCode();
+        result = 37 * result + getGroupId().hashCode();
+        result = 37 * result + getVersion() != null ? getVersion().hashCode() : 0;
+        return result;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
   </classes>
 </model>

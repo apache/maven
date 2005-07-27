@@ -1191,4 +1191,17 @@ public class MavenProject
     {
         return getId().hashCode();
     }
+
+    public List getBuildExtensions()
+    {
+        Build build = getBuild();
+        if ( build == null || build.getExtensions() == null )
+        {
+            return Collections.EMPTY_LIST;
+        }
+        else
+        {
+            return build.getExtensions();
+        }
+    }
 }

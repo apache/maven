@@ -34,6 +34,22 @@
       </requirements>
     </component>
 
+    <component>
+      <role>org.apache.maven.extension.ExtensionManager</role>
+      <implementation>org.apache.maven.extension.DefaultExtensionManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+        </requirement>
+      </requirements>
+    </component>
+
     <!-- Duplicated from Maven core as it is used in the plugin manager -->
     <component>
       <role>org.apache.maven.project.path.PathTranslator</role>
@@ -113,6 +129,9 @@
       <requirements>
         <requirement>
           <role>org.apache.maven.plugin.PluginManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.extension.ExtensionManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>

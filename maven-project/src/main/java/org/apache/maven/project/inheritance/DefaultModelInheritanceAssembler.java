@@ -21,6 +21,7 @@ import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.PluginManagement;
@@ -446,6 +447,9 @@ public class DefaultModelInheritanceAssembler
                 childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
             }
 
+            // Extensions are accumlated
+            mergeExtensionLists( childBuild, parentBuild );
+
             assembleBuildBaseInheritance( childBuild, parentBuild );
         }
     }
@@ -609,6 +613,18 @@ public class DefaultModelInheritanceAssembler
         else
         {
             return url + "/" + path;
+        }
+    }
+
+    private static void mergeExtensionLists( Build childBuild, Build parentBuild )
+    {
+        for ( Iterator i = parentBuild.getExtensions().iterator(); i.hasNext(); )
+        {
+            Extension e = (Extension) i.next();
+            if ( !childBuild.getExtensions().contains( e ) )
+            {
+                childBuild.addExtension( e );
+            }
         }
     }
 }

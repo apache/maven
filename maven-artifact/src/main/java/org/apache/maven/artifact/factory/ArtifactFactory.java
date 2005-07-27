@@ -21,7 +21,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 public interface ArtifactFactory
 {
-    static String ROLE = ArtifactFactory.class.getName();
+    String ROLE = ArtifactFactory.class.getName();
 
     /**
      * @deprecated
@@ -56,4 +56,6 @@ public interface ArtifactFactory
     Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange );
 
     Artifact createProjectArtifact( String groupId, String artifactId, String version, String scope );
+
+    Artifact createExtensionArtifact( String groupId, String artifactId, String version );
 }
