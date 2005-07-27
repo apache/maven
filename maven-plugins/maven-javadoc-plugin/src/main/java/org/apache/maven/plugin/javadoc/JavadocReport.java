@@ -1005,4 +1005,9 @@ public class JavadocReport
 
         IOUtil.close( w );
     }
+
+    public boolean isExternalReport()
+    {
+        return true;
+    }
 }

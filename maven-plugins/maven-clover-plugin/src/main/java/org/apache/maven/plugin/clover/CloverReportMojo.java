@@ -167,4 +167,9 @@ public class CloverReportMojo extends AbstractMavenReport
                 + " report generation.", e );
         }
     }
+
+    public boolean isExternalReport()
+    {
+        return true;
+    }
 }

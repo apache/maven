@@ -204,4 +204,9 @@ public abstract class AbstractMavenReport
     {
         return sink;
     }
+
+    public boolean isExternalReport()
+    {
+        return false;
+    }
 }

@@ -270,15 +270,18 @@ public class DoxiaMojo
 
                         report.generate( sink, locale );
 
-                        File outputFile = new File( localeOutputDirectory, outputFileName );
-
-                        if ( !outputFile.getParentFile().exists() )
+                        if ( !report.isExternalReport() )
                         {
-                            outputFile.getParentFile().mkdirs();
-                        }
+                            File outputFile = new File( localeOutputDirectory, outputFileName );
 
-                        siteRenderer.generateDocument( new FileWriter( outputFile ), template, attributes, sink,
-                                                       locale );
+                            if ( !outputFile.getParentFile().exists() )
+                            {
+                                outputFile.getParentFile().mkdirs();
+                            }
+
+                            siteRenderer.generateDocument( new FileWriter( outputFile ), template, attributes, sink,
+                                                           locale );
+                        }
                     }
                 }
 
