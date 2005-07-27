@@ -21,7 +21,7 @@
       <configuration>
         <type>coreit-artifact</type>
         <extension>jar</extension>
-        <packaginge>coreit-packaging</packaginge>
+        <packaging>coreit-packaging</packaging>
         <classifier>it</classifier>
       </configuration>
     </component>
