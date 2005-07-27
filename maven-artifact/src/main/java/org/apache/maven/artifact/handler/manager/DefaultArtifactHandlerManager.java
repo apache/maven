@@ -44,6 +44,11 @@ public class DefaultArtifactHandlerManager
         return handler;
     }
 
+    public void addHandlers( Map handlers )
+    {
+        artifactHandlers.putAll( handlers );
+    }
+
     public Set getHandlerTypes()
     {
         return artifactHandlers.keySet();

@@ -18,6 +18,8 @@ package org.apache.maven.artifact.handler.manager;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 
+import java.util.Map;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
@@ -27,4 +29,6 @@ public interface ArtifactHandlerManager
     String ROLE = ArtifactHandlerManager.class.getName();
 
     ArtifactHandler getArtifactHandler( String type );
+
+    void addHandlers( Map handlers );
 }

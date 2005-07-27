@@ -38,7 +38,6 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.activation.ProfileActivationCalculator;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -149,7 +148,15 @@ public class DefaultMavenProjectBuilder
         Map managedVersions = createManagedVersionMap( project.getDependencyManagement() );
         
         ensureMetadataSourceIsInitialized();
-        
+
+        try
+        {
+            project.setDependencyArtifacts( MavenProject.createArtifacts( artifactFactory, project.getDependencies() ) );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new ProjectBuildingException( "Error in dependency version", e );
+        }
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 projectArtifact, managedVersions,
                                                                                 localRepository,
@@ -467,7 +474,6 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setRemoteArtifactRepositories( remoteRepositories );
-        project.setDependencyArtifacts( createArtifacts( project.getDependencies() ) );
         project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
 
         return project;
@@ -656,19 +662,6 @@ public class DefaultMavenProjectBuilder
     private static String createCacheKey( String groupId, String artifactId, String version )
     {
         return groupId + ":" + artifactId + ":" + version;
-    }
-
-    protected Set createArtifacts( List dependencies )
-        throws ProjectBuildingException
-    {
-        try
-        {
-            return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new ProjectBuildingException( "Unable to parse dependency version", e );
-        }
     }
 
     protected Set createPluginArtifacts( List plugins )

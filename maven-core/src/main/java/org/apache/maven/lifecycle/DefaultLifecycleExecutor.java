@@ -18,6 +18,8 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.extension.ExtensionManager;
@@ -84,6 +86,8 @@ public class DefaultLifecycleExecutor
 
     private Map defaultPhases;
 
+    private ArtifactHandlerManager artifactHandlerManager;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -111,6 +115,9 @@ public class DefaultLifecycleExecutor
                 extensionManager.addExtension( extension, project, session.getLocalRepository() );
             }
 
+            Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );
+            artifactHandlerManager.addHandlers( handlers );
+
             for ( Iterator i = tasks.iterator(); i.hasNext(); )
             {
                 String task = (String) i.next();
@@ -126,6 +133,14 @@ public class DefaultLifecycleExecutor
             response.setException( e );
         }
         catch ( PlexusContainerException e )
+        {
+            throw new LifecycleExecutionException( "Unable to initialise extensions", e );
+        }
+        catch ( PluginManagerException e )
+        {
+            throw new LifecycleExecutionException( "Unable to initialise extensions", e );
+        }
+        catch ( PluginVersionResolutionException e )
         {
             throw new LifecycleExecutionException( "Unable to initialise extensions", e );
         }
@@ -364,6 +379,37 @@ public class DefaultLifecycleExecutor
             }
         }
         return null;
+    }
+
+    /**
+     * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
+     * lookup directly, or have them passed in
+     */
+    private Map findArtifactTypeHandlers( MavenProject project, Settings settings, ArtifactRepository localRepository )
+        throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException
+    {
+        Map map = new HashMap();
+        for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
+        {
+            Plugin plugin = (Plugin) i.next();
+
+            if ( plugin.isExtensions() )
+            {
+                pluginManager.verifyPlugin( plugin, project, settings, localRepository );
+
+                // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
+                try
+                {
+                    Map components = pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
+                    map.putAll( components );
+                }
+                catch ( ComponentLookupException e )
+                {
+                    getLogger().debug( "Unable to find the lifecycle component in the extension", e );
+                }
+            }
+        }
+        return map;
     }
 
     /**

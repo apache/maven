@@ -247,6 +247,12 @@ public class Verifier
         {
             ext = "jar";
         }
+        String classifier = null;
+        if ( "coreit-artifact".equals( a[3] ) )
+        {
+            ext = "jar";
+            classifier = "it";
+        }
 
         String repositoryPath;
         if ( "legacy".equals( localRepoLayout ) )
@@ -260,7 +266,12 @@ public class Verifier
 //            {
             repositoryPath = repositoryPath + "/" + a[1] + "/" + a[2];
 //            }
-            repositoryPath = repositoryPath + "/" + a[1] + "-" + a[2] + "." + ext;
+            repositoryPath = repositoryPath + "/" + a[1] + "-" + a[2];
+            if ( classifier != null )
+            {
+                repositoryPath = repositoryPath + "-" + classifier;
+            }
+            repositoryPath = repositoryPath + "." + ext;
         }
         else
         {

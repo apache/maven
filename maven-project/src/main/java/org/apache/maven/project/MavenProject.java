@@ -19,6 +19,8 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
@@ -42,6 +44,7 @@ import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -134,7 +137,10 @@ public class MavenProject
         this.file = project.file;
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be sure!
-        this.dependencyArtifacts = Collections.unmodifiableSet( project.dependencyArtifacts );
+        if ( project.dependencyArtifacts != null )
+        {
+            this.dependencyArtifacts = Collections.unmodifiableSet( project.dependencyArtifacts );
+        }
         if ( project.artifacts != null )
         {
             this.artifacts = Collections.unmodifiableSet( project.artifacts );
@@ -1203,5 +1209,14 @@ public class MavenProject
         {
             return build.getExtensions();
         }
+    }
+
+    /**
+     * @todo the lazy initialisation of this makes me uneasy.
+     */
+    public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies )
+        throws InvalidVersionSpecificationException
+    {
+        return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
     }
 }

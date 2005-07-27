@@ -139,6 +139,9 @@
         <requirement>
           <role>org.apache.maven.plugin.mapping.MavenPluginMappingBuilder</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
       </requirements>
       <configuration>
         <!-- START SNIPPET: lifecyle -->

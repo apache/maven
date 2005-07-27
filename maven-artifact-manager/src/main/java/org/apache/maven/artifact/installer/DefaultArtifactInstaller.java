@@ -35,13 +35,12 @@ public class DefaultArtifactInstaller
 {
     private List artifactTransformations;
 
+    /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        File source = null;
-
         String extension = artifact.getArtifactHandler().getExtension();
-        source = new File( basedir, finalName + "." + extension );
+        File source = new File( basedir, finalName + "." + extension );
 
         install( source, artifact, localRepository );
     }

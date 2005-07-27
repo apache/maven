@@ -1049,6 +1049,14 @@ public class DefaultPluginManager
 
         // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
         // check this with yourkit as a hot spot.
+        try
+        {
+            project.setDependencyArtifacts( MavenProject.createArtifacts( artifactFactory, project.getDependencies() ) );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new ArtifactResolutionException( "Error in dependency version", e );
+        }
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(),
                                                                                 artifact, context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
@@ -1083,6 +1091,16 @@ public class DefaultPluginManager
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
 
         return pluginContainer.lookup( role, roleHint );
+    }
+
+    public Map getPluginComponents( Plugin plugin, String role )
+        throws ComponentLookupException, PluginManagerException
+    {
+        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
+
+        PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
+
+        return pluginContainer.lookupMap( role );
     }
 
     private PluginMappingManager getPluginMappingManager( MavenSession session, MavenProject project )

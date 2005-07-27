@@ -29,6 +29,7 @@ import org.apache.maven.model.ReportSet;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -44,11 +45,11 @@ public interface PluginManager
     PluginDescriptor getPluginDescriptorForPrefix( String prefix )
         throws PluginManagerException;
 
-    Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project ) 
+    Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
         throws PluginManagerException;
-    
+
     PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
-                                  ArtifactRepository localRepository )
+                                   ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginManagerException, PluginVersionResolutionException;
 
     List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session )
@@ -56,5 +57,8 @@ public interface PluginManager
         ArtifactResolutionException;
 
     Object getPluginComponent( Plugin plugin, String role, String roleHint )
+        throws ComponentLookupException, PluginManagerException;
+
+    Map getPluginComponents( Plugin plugin, String role )
         throws ComponentLookupException, PluginManagerException;
 }
