@@ -16,6 +16,8 @@ package org.apache.maven.archiver;
  * limitations under the License.
  */
 
+import java.io.File;
+
 /**
  * Capture common archive configuration.
  *
@@ -25,34 +27,25 @@ package org.apache.maven.archiver;
  */
 public class MavenArchiveConfiguration
 {
-    /**
-     * @todo boolean instead
-     */
-    private String compress;
+    private boolean compress = true;
 
-    /**
-     * @todo boolean instead
-     */
-    private String index;
+    private boolean index;
 
-    /**
-     * @todo File instead
-     */
-    private String manifestFile;
+    private File manifestFile;
 
     private ManifestConfiguration manifest;
 
     public boolean isCompress()
     {
-        return compress != null ? Boolean.valueOf( compress ).booleanValue() : true;
+        return compress;
     }
 
     public boolean isIndex()
     {
-        return index != null ? Boolean.valueOf( index ).booleanValue() : false;
+        return index;
     }
 
-    public String getManifestFile()
+    public File getManifestFile()
     {
         return manifestFile;
     }
@@ -64,5 +57,25 @@ public class MavenArchiveConfiguration
             manifest = new ManifestConfiguration();
         }
         return manifest;
+    }
+
+    public void setCompress( boolean compress )
+    {
+        this.compress = compress;
+    }
+
+    public void setIndex( boolean index )
+    {
+        this.index = index;
+    }
+
+    public void setManifestFile( File manifestFile )
+    {
+        this.manifestFile = manifestFile;
+    }
+
+    public void setManifest( ManifestConfiguration manifest )
+    {
+        this.manifest = manifest;
     }
 }

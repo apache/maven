@@ -249,11 +249,11 @@ public class MavenArchiver
         // Create the manifest
         // ----------------------------------------------------------------------
 
-        String manifestFile = archiveConfiguration.getManifestFile();
+        File manifestFile = archiveConfiguration.getManifestFile();
 
-        if ( manifestFile != null && !"".equals( manifestFile ) )
+        if ( manifestFile != null )
         {
-            archiver.setManifest( new File( manifestFile ) );
+            archiver.setManifest( manifestFile );
         }
 
         Manifest manifest = getManifest( project, archiveConfiguration.getManifest() );
