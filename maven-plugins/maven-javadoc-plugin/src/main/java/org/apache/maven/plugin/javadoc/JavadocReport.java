@@ -62,8 +62,6 @@ public class JavadocReport
     /** The current class directory */
     private static final String RESOURCE_DIR = ClassUtils.getPackageName(JavadocReport.class).replace('.', '/');
 
-    private static final String DEFAULT_TEMPLATE = RESOURCE_DIR + "/maven-site.vm";
-    
     /** Default location for css */
     private static final String DEFAULT_CSS_NAME = "stylesheet.css";
     private static final String RESOURCE_CSS_DIR = RESOURCE_DIR + "/css";
@@ -277,7 +275,7 @@ public class JavadocReport
      * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#bottom">bottom</a>.
      * 
      * @parameter expression="${bottom}"
-     *            default-value="ISO-8859-1"
+     *            default-value="Copyright ${project.inceptionYear-currentYear} ${project.organization.name}. All Rights Reserved."
      */
     private String bottom;
 
