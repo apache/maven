@@ -270,6 +270,7 @@ public class DependenciesReport
                     MavenProject artifactProject;
                     try
                     {
+                        // TODO: can we use @requiresDependencyResolution instead, and capture the depth of artifacts in the artifact itself?
                         artifactProject = getMavenProjectFromRepository( artifact, localRepository );
                     }
                     catch ( ProjectBuildingException e )
