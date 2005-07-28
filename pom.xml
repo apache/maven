@@ -153,4 +153,11 @@
     <module>maven-script</module>
     <module>maven-settings</module>
   </modules>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 </project>
