@@ -9,6 +9,9 @@
       <name>Maven Repository Switchboard</name>
       <url>http://repo1.maven.org/maven2</url>
       <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
@@ -18,6 +21,9 @@
       <name>Maven Plugin Repository</name>
       <url>http://repo1.maven.org/maven2/plugins</url>
       <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </pluginRepository>
   </pluginRepositories>
 
