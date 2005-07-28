@@ -62,7 +62,7 @@ public final class ArtifactStatus
 
     private final String key;
 
-    private static Map map = null;
+    private static Map map;
 
     private ArtifactStatus( String key, int rank )
     {
