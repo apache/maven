@@ -435,4 +435,5 @@ public class DefaultArtifact
             return getVersion().endsWith( SNAPSHOT_VERSION ) || getVersion().equals( LATEST_VERSION );
         }
     }
+
 }

@@ -17,9 +17,11 @@ package org.apache.maven.project.artifact;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -76,6 +78,14 @@ public class ProjectArtifactMetadata
             MavenXpp3Reader modelReader = new MavenXpp3Reader();
             Model model = modelReader.read( reader );
             model.setVersion( getVersion() );
+
+            DistributionManagement distributionManagement = model.getDistributionManagement();
+            if ( distributionManagement == null )
+            {
+                distributionManagement = new DistributionManagement();
+                model.setDistributionManagement( distributionManagement );
+            }
+            distributionManagement.setStatus( ArtifactStatus.DEPLOYED.toString() );
 
             MavenXpp3Writer modelWriter = new MavenXpp3Writer();
             modelWriter.write( writer, model );

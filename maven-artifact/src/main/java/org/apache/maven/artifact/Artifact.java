@@ -24,7 +24,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.io.File;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -128,4 +127,5 @@ public interface Artifact
     void setArtifactId( String artifactId );
 
     boolean isSnapshot();
+
 }

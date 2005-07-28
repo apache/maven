@@ -1,4 +1,6 @@
-package org.apache.maven.artifact.repository;/*
+package org.apache.maven.artifact.repository;
+
+/*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +15,9 @@ package org.apache.maven.artifact.repository;/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Describes a set of policies for a repository to use under certain conditions.
@@ -33,6 +38,8 @@ public class ArtifactRepositoryPolicy
     public static final String CHECKSUM_POLICY_FAIL = "fail";
 
     public static final String CHECKSUM_POLICY_WARN = "warn";
+
+    public static final String CHECKSUM_POLICY_IGNORE = "ignore";
 
     private boolean enabled;
 
@@ -90,5 +97,41 @@ public class ArtifactRepositoryPolicy
     public String getChecksumPolicy()
     {
         return checksumPolicy;
+    }
+
+    public boolean checkOutOfDate( Date lastModified )
+    {
+        boolean checkForUpdates = false;
+
+        if ( UPDATE_POLICY_ALWAYS.equals( updatePolicy ) )
+        {
+            checkForUpdates = true;
+        }
+        else if ( UPDATE_POLICY_DAILY.equals( updatePolicy ) )
+        {
+            // Get midnight boundary
+            Calendar cal = Calendar.getInstance();
+            cal.set( Calendar.HOUR_OF_DAY, 0 );
+            cal.set( Calendar.MINUTE, 0 );
+            cal.set( Calendar.SECOND, 0 );
+            cal.set( Calendar.MILLISECOND, 0 );
+            if ( cal.getTime().after( lastModified ) )
+            {
+                checkForUpdates = true;
+            }
+        }
+        else if ( updatePolicy.startsWith( UPDATE_POLICY_INTERVAL ) )
+        {
+            String s = updatePolicy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
+            int minutes = Integer.valueOf( s ).intValue();
+            Calendar cal = Calendar.getInstance();
+            cal.add( Calendar.MINUTE, -minutes );
+            if ( cal.getTime().after( lastModified ) )
+            {
+                checkForUpdates = true;
+            }
+        }
+        // else assume "never"
+        return checkForUpdates;
     }
 }

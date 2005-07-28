@@ -60,6 +60,19 @@ public class DefaultArtifactResolver
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
+        resolve( artifact, remoteRepositories, localRepository, false );
+    }
+
+    public void resolveAlways( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+        throws ArtifactResolutionException
+    {
+        resolve( artifact, remoteRepositories, localRepository, true );
+    }
+
+    private void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository,
+                          boolean force )
+        throws ArtifactResolutionException
+    {
         if ( artifact != null )
         {
             // ----------------------------------------------------------------------
@@ -87,18 +100,18 @@ public class DefaultArtifactResolver
             }
 
             File destination = artifact.getFile();
-            if ( !destination.exists() )
+            if ( !destination.exists() || force )
             {
                 try
                 {
                     if ( artifact.getRepository() != null )
                     {
                         // the transformations discovered the artifact - so use it exclusively
-                        wagonManager.getArtifact( artifact, artifact.getRepository(), destination );
+                        wagonManager.getArtifact( artifact, artifact.getRepository() );
                     }
                     else
                     {
-                        wagonManager.getArtifact( artifact, remoteRepositories, destination );
+                        wagonManager.getArtifact( artifact, remoteRepositories );
                     }
 
                     // must be after the artifact is downloaded

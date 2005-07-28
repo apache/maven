@@ -76,7 +76,7 @@ public class ReleaseArtifactMetadata
     {
         long fileTime = file.lastModified();
 
-        return ( lastModified > fileTime );
+        return lastModified > fileTime;
     }
 
     public String toString()
@@ -98,7 +98,7 @@ public class ReleaseArtifactMetadata
     {
         return ReleaseArtifactTransformation.RELEASE_VERSION;
     }
-    
+
     public boolean storedInArtifactDirectory()
     {
         return false;

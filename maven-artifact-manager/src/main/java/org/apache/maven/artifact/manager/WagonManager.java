@@ -42,10 +42,10 @@ public interface WagonManager
     Wagon getWagon( String protocol )
         throws UnsupportedProtocolException;
 
-    void getArtifact( Artifact artifact, List remoteRepositories, File destination )
+    void getArtifact( Artifact artifact, List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifact( Artifact artifact, ArtifactRepository repository, File destination )
+    void getArtifact( Artifact artifact, ArtifactRepository repository )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
@@ -55,7 +55,7 @@ public interface WagonManager
         throws TransferFailedException;
 
     void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination,
-                              String updatePolicy )
+                              String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void putRepositoryMetadata( File source, RepositoryMetadata metadata, ArtifactRepository repository )

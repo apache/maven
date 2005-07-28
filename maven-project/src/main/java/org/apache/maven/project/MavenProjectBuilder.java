@@ -27,11 +27,11 @@ public interface MavenProjectBuilder
 {
     String ROLE = MavenProjectBuilder.class.getName();
 
-    static final String STANDALONE_SUPERPOM_GROUPID = "org.apache.maven";
+    String STANDALONE_SUPERPOM_GROUPID = "org.apache.maven";
 
-    static final String STANDALONE_SUPERPOM_ARTIFACTID = "super-pom";
+    String STANDALONE_SUPERPOM_ARTIFACTID = "super-pom";
 
-    static final String STANDALONE_SUPERPOM_VERSION = "2.0";
+    String STANDALONE_SUPERPOM_VERSION = "2.0";
 
     MavenProject build( File project, ArtifactRepository localRepository, List profiles )
         throws ProjectBuildingException;

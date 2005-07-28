@@ -204,7 +204,7 @@ public class DefaultWagonManager
         }
     }
 
-    public void getArtifact( Artifact artifact, List remoteRepositories, File destination )
+    public void getArtifact( Artifact artifact, List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         // TODO [BP]: The exception handling here needs some work
@@ -215,7 +215,7 @@ public class DefaultWagonManager
 
             try
             {
-                getArtifact( artifact, repository, destination );
+                getArtifact( artifact, repository );
 
                 successful = true;
             }
@@ -234,7 +234,7 @@ public class DefaultWagonManager
         }
     }
 
-    public void getArtifact( Artifact artifact, ArtifactRepository repository, File destination )
+    public void getArtifact( Artifact artifact, ArtifactRepository repository )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOf( artifact );
@@ -243,7 +243,7 @@ public class DefaultWagonManager
 
         if ( policy.isEnabled() )
         {
-            getRemoteFile( repository, destination, remotePath, downloadMonitor, policy.getUpdatePolicy() );
+            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy() );
         }
         else
         {
@@ -252,13 +252,13 @@ public class DefaultWagonManager
     }
 
     public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository repository, File destination,
-                                     String updatePolicy )
+                                     String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOfMetadata( metadata );
 
         getLogger().info( "Retrieving " + metadata );
-        getRemoteFile( repository, destination, remotePath, null, updatePolicy );
+        getRemoteFile( repository, destination, remotePath, null, checksumPolicy );
     }
 
     public void getRepositoryMetadata( RepositoryMetadata metadata, ArtifactRepository remoteRepository,
@@ -273,7 +273,7 @@ public class DefaultWagonManager
     }
 
     private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
-                                TransferListener downloadMonitor, String updatePolicy )
+                                TransferListener downloadMonitor, String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException, ChecksumFailedException
     {
         // TODO: better excetpions - transfer failed is not enough?
@@ -363,7 +363,7 @@ public class DefaultWagonManager
                     }
                     else
                     {
-                        handleChecksumFailure( updatePolicy, e.getMessage(), e.getCause() );
+                        handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
                     }
                 }
                 catch ( ResourceDoesNotExistException sha1TryException )
@@ -386,13 +386,13 @@ public class DefaultWagonManager
                         }
                         else
                         {
-                            handleChecksumFailure( updatePolicy, e.getMessage(), e.getCause() );
+                            handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
                         }
                     }
                     catch ( ResourceDoesNotExistException md5TryException )
                     {
                         // this was a failed transfer, and we don't want to retry.
-                        handleChecksumFailure( updatePolicy, "Error retrieving checksum file for " + remotePath,
+                        handleChecksumFailure( checksumPolicy, "Error retrieving checksum file for " + remotePath,
                                                md5TryException );
                     }
                 }
@@ -452,17 +452,19 @@ public class DefaultWagonManager
         }
     }
 
-    private void handleChecksumFailure( String updatePolicy, String message, Throwable cause )
+    private void handleChecksumFailure( String checksumPolicy, String message, Throwable cause )
         throws ChecksumFailedException
     {
-        if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals( updatePolicy ) )
+        if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals( checksumPolicy ) )
         {
             throw new ChecksumFailedException( message, cause );
         }
-        else
+        else if ( !ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals( checksumPolicy ) )
         {
+            // warn if it is set to anything other than ignore
             getLogger().warn( "*** CHECKSUM FAILED - " + message + " - IGNORING" );
         }
+        // otherwise it is ignore
     }
 
     private void verifyChecksum( ChecksumObserver checksumObserver, File destination, String remotePath,

@@ -1467,6 +1467,19 @@
             <type>Relocation</type>
           </association>
         </field>
+        <field>
+          <name>status</name>
+          <version>4.0.0</version>
+          <description>
+            Gives the status of this artifact in the remote repository. This must not be set in your local
+            project, as it is updated by tools placing it in the reposiory. Valid values are: none (default),
+            converted (repository manager converted this from an Maven 1 POM), partner (directly synced from a partner
+            Maven 2 repository), deployed (was deployed from a Maven 2 instance), verified (has been hand verified as
+            correct and final).
+          </description>
+          <required>false</required>
+          <type>String</type>
+        </field>
       </fields>
     </class>
     <class>

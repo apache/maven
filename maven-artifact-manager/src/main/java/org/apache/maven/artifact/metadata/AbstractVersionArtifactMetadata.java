@@ -60,16 +60,14 @@ public abstract class AbstractVersionArtifactMetadata
 
     protected abstract void setContent( String content );
 
-    // TODO: share
-    public boolean checkedSinceDate( Date date )
-    {
-        // Note that if last modified is 0, it didn't exist, so this will be true
-        return !date.after( new Date( lastModified ) );
-    }
-
     public boolean exists()
     {
         return lastModified > 0;
+    }
+
+    public Date getLastModified()
+    {
+        return new Date( lastModified );
     }
 
     public void readFromLocalRepository( ArtifactRepository localRepository )
@@ -83,7 +81,7 @@ public abstract class AbstractVersionArtifactMetadata
     }
 
     public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager,
-                                              String updatePolicy )
+                                              String checksumPolicy )
         throws ArtifactMetadataRetrievalException, ResourceDoesNotExistException
     {
         try
@@ -92,7 +90,7 @@ public abstract class AbstractVersionArtifactMetadata
             File destination = File.createTempFile( "maven-artifact", null );
             destination.deleteOnExit();
 
-            wagonManager.getArtifactMetadata( this, remoteRepository, destination, updatePolicy );
+            wagonManager.getArtifactMetadata( this, remoteRepository, destination, checksumPolicy );
 
             readFromFile( destination );
         }

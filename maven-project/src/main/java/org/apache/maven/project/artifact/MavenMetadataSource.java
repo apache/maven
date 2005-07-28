@@ -28,6 +28,7 @@ import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.project.MavenProject;
@@ -85,9 +86,10 @@ public class MavenMetadataSource
 
             Relocation relocation = null;
 
-            if ( p.getDistributionManagement() != null )
+            DistributionManagement distMgmt = p.getDistributionManagement();
+            if ( distMgmt != null )
             {
-                relocation = p.getDistributionManagement().getRelocation();
+                relocation = distMgmt.getRelocation();
             }
             if ( relocation != null )
             {
@@ -121,6 +123,7 @@ public class MavenMetadataSource
         }
         while ( !done );
 
+        // TODO: this could come straight from the project, negating the need to set it in the project itself?
         artifact.setDownloadUrl( pomArtifact.getDownloadUrl() );
 
         try

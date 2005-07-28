@@ -28,21 +28,25 @@ import java.util.Date;
 public interface VersionArtifactMetadata
     extends ArtifactMetadata, Comparable
 {
-    /**
-     * Determine if the metadata is considered newer than a given date.
-     * @return whether it is newer
-     */
-    boolean checkedSinceDate( Date date );
 
     /**
      * Determine if the metadata is considered newer than a given file.
+     *
      * @return whether it is newer
      */
     boolean newerThanFile( File file );
 
     /**
      * Get the resolved version from the metadata.
+     *
      * @return the resolved version
      */
     String constructVersion();
+
+    /**
+     * Determine when the metadata was last modified.
+     *
+     * @return the date the metadata was last modified.
+     */
+    Date getLastModified();
 }

@@ -17,10 +17,12 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -65,6 +67,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -235,6 +238,12 @@ public class DefaultMavenProjectBuilder
                                       Collections.EMPTY_LIST, externalProfiles,
                                       projectDescriptor.getAbsoluteFile().getParentFile() );
 
+        if ( project.getDistributionManagement() != null && project.getDistributionManagement().getStatus() != null )
+        {
+            throw new ProjectBuildingException(
+                "Invalid project file: distribution status must not be specified for a project outside of the repository" );
+        }
+
         // Only translate the base directory for files in the source tree
         pathTranslator.alignToBaseDirectory( project.getModel(), projectDescriptor );
 
@@ -273,6 +282,50 @@ public class DefaultMavenProjectBuilder
 
                 File file = artifact.getFile();
                 model = readModel( file );
+
+                String downloadUrl = null;
+                ArtifactStatus status = ArtifactStatus.NONE;
+
+                DistributionManagement distributionManagement = model.getDistributionManagement();
+                if ( distributionManagement != null )
+                {
+                    downloadUrl = distributionManagement.getDownloadUrl();
+
+                    status = ArtifactStatus.valueOf( distributionManagement.getStatus() );
+                }
+
+                // TODO: configurable actions dependant on status
+                if ( status.compareTo( ArtifactStatus.VERIFIED ) < 0 )
+                {
+                    // use default policy (enabled, daily update, warn on bad checksum)
+                    ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
+
+                    if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
+                    {
+                        getLogger().info(
+                            artifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
+                        try
+                        {
+                            artifactResolver.resolveAlways( artifact, remoteArtifactRepositories, localRepository );
+                        }
+                        catch ( ArtifactResolutionException e )
+                        {
+                            getLogger().warn( "Error updating POM - using existing version", e );
+                        }
+                    }
+                }
+
+                // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
+                // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
+                if ( downloadUrl != null )
+                {
+                    artifact.setDownloadUrl( downloadUrl );
+                }
+                else
+                {
+                    artifact.setDownloadUrl( model.getUrl() );
+                }
+
             }
             catch ( ArtifactResolutionException e )
             {
@@ -289,23 +342,9 @@ public class DefaultMavenProjectBuilder
                 model.setVersion( artifact.getVersion() );
                 // TODO: not correct in some instances
                 model.setPackaging( artifact.getType() );
-            }
-        }
 
-        // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
-        // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
-        String downloadUrl = null;
-        if ( model.getDistributionManagement() != null )
-        {
-            downloadUrl = model.getDistributionManagement().getDownloadUrl();
-        }
-        if ( downloadUrl != null )
-        {
-            artifact.setDownloadUrl( downloadUrl );
-        }
-        else
-        {
-            artifact.setDownloadUrl( model.getUrl() );
+                // TODO: save to disk with a "generated" status
+            }
         }
 
         return model;
@@ -461,9 +500,9 @@ public class DefaultMavenProjectBuilder
 
         if ( parentProject != null )
         {
-            Artifact parentArtifact = artifactFactory.createProjectArtifact( parentProject.getGroupId(),
-                                                                             parentProject.getArtifactId(),
-                                                                             parentProject.getVersion() );
+            Artifact parentArtifact = artifactFactory.createParentArtifact( parentProject.getGroupId(),
+                                                                            parentProject.getArtifactId(),
+                                                                            parentProject.getVersion() );
             project.setParentArtifact( parentArtifact );
         }
 

@@ -27,8 +27,6 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -81,33 +79,8 @@ public abstract class AbstractVersionTransformation
                 }
                 else
                 {
-                    String updatePolicy = policy.getUpdatePolicy();
                     // TODO: should be able to calculate this less often
-                    boolean checkForUpdates = false;
-                    if ( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS.equals( updatePolicy ) )
-                    {
-                        checkForUpdates = true;
-                    }
-                    else if ( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY.equals( updatePolicy ) )
-                    {
-                        if ( !localMetadata.checkedSinceDate( getMidnightBoundary() ) )
-                        {
-                            checkForUpdates = true;
-                        }
-                    }
-                    else if ( updatePolicy.startsWith( ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL ) )
-                    {
-                        String s = updatePolicy.substring(
-                            ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL.length() + 1 );
-                        int minutes = Integer.valueOf( s ).intValue();
-                        Calendar cal = Calendar.getInstance();
-                        cal.add( Calendar.MINUTE, -minutes );
-                        if ( !localMetadata.checkedSinceDate( cal.getTime() ) )
-                        {
-                            checkForUpdates = true;
-                        }
-                    }
-                    // else assume "never"
+                    boolean checkForUpdates = policy.checkOutOfDate( localMetadata.getLastModified() );
 
                     if ( checkForUpdates )
                     {
@@ -119,7 +92,7 @@ public abstract class AbstractVersionTransformation
                         try
                         {
                             remoteMetadata = retrieveFromRemoteRepository( artifact, repository, localMetadata,
-                                                                           updatePolicy );
+                                                                           policy.getChecksumPolicy() );
 
                             // we must only flag this after checking for updates, otherwise subsequent attempts will look
                             // for SNAPSHOT without checking the metadata
@@ -190,12 +163,12 @@ public abstract class AbstractVersionTransformation
     protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
                                                                     ArtifactRepository remoteRepository,
                                                                     VersionArtifactMetadata localMetadata,
-                                                                    String updatePolicy )
+                                                                    String checksumPolicy )
         throws ArtifactMetadataRetrievalException, ResourceDoesNotExistException
     {
         AbstractVersionArtifactMetadata metadata = createMetadata( artifact );
 
-        metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager, updatePolicy );
+        metadata.retrieveFromRemoteRepository( remoteRepository, wagonManager, checksumPolicy );
 
         return metadata;
     }
@@ -208,16 +181,6 @@ public abstract class AbstractVersionTransformation
         AbstractVersionArtifactMetadata metadata = createMetadata( artifact );
         metadata.readFromLocalRepository( localRepository );
         return metadata;
-    }
-
-    private Date getMidnightBoundary()
-    {
-        Calendar cal = Calendar.getInstance();
-        cal.set( Calendar.HOUR_OF_DAY, 0 );
-        cal.set( Calendar.MINUTE, 0 );
-        cal.set( Calendar.SECOND, 0 );
-        cal.set( Calendar.MILLISECOND, 0 );
-        return cal.getTime();
     }
 
     private boolean alreadyResolved( Artifact artifact )

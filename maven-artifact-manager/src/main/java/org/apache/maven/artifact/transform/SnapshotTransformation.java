@@ -65,7 +65,7 @@ public class SnapshotTransformation
             try
             {
                 metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null,
-                                                                                    ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
+                                                                                    ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
             }
             catch ( ResourceDoesNotExistException e )
             {

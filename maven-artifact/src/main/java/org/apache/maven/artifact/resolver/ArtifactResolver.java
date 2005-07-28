@@ -35,7 +35,7 @@ import java.util.Set;
  */
 public interface ArtifactResolver
 {
-    static String ROLE = ArtifactResolver.class.getName();
+    String ROLE = ArtifactResolver.class.getName();
 
     void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException;
@@ -62,5 +62,8 @@ public interface ArtifactResolver
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                                   ArtifactRepository localRepository, List remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
+        throws ArtifactResolutionException;
+
+    void resolveAlways( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException;
 }
