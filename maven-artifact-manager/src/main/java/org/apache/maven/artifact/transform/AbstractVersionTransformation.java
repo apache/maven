@@ -116,12 +116,14 @@ public abstract class AbstractVersionTransformation
 
                         VersionArtifactMetadata remoteMetadata;
 
-                        checkedUpdates = true;
-
                         try
                         {
                             remoteMetadata = retrieveFromRemoteRepository( artifact, repository, localMetadata,
                                                                            updatePolicy );
+
+                            // we must only flag this after checking for updates, otherwise subsequent attempts will look
+                            // for SNAPSHOT without checking the metadata
+                            checkedUpdates = true;
                         }
                         catch ( ResourceDoesNotExistException e )
                         {
