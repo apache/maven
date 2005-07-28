@@ -1,2 +1,3 @@
 target/maven-core-it0041-1.0-SNAPSHOT.jar
 ${artifact:org.apache.maven:maven-core-it-support:1.2:coreit-artifact}
+${artifact:org.apache.maven:maven-core-it-support:1.2:pom}
