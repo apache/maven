@@ -36,7 +36,7 @@ public final class EarModuleFactory
      */
     public static final EarModule newEarModule( Artifact artifact )
     {
-        if ( "jar".equals( artifact.getType() ) )
+        if ( "jar".equals( artifact.getType() ) || "ejb-client".equals( artifact.getType() ) )
         {
             return new JavaModule( getUri( artifact ), artifact );
         }
@@ -67,7 +67,16 @@ public final class EarModuleFactory
      */
     private static String getUri( Artifact artifact )
     {
-        return artifact.getFile().getName();
+		// FIXME: this should be in ArtifactHandler
+        if ( "ejb-client".equals( artifact.getType() ) )
+        {
+            return artifact.getArtifactId() + "-" + artifact.getVersion() +
+				"-client." + artifact.getArtifactHandler().getExtension();
+        }
+        else
+        {
+            return artifact.getFile().getName();
+        }
     }
 
     /**
