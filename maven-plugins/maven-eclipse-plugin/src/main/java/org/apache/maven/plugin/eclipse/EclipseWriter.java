@@ -46,7 +46,7 @@ public class EclipseWriter
         this.localRepository = localRepository;
     }
 
-    public void write( MavenProject project, MavenProject executedProject )
+    public void write( MavenProject project, MavenProject executedProject, List reactorProjects )
         throws EclipsePluginException
     {
         File basedir = project.getFile().getParentFile();
@@ -61,7 +61,7 @@ public class EclipseWriter
 
         writeEclipseProject( basedir, project, map );
 
-        writeEclipseClasspath( basedir, project, executedProject, map );
+        writeEclipseClasspath( basedir, project, executedProject, map, reactorProjects );
 
         System.out.println( "Wrote Eclipse project for " + project.getArtifactId() + " to " + basedir.getAbsolutePath() );
     }
@@ -155,7 +155,7 @@ public class EclipseWriter
     // .classpath
     // ----------------------------------------------------------------------
 
-    protected void writeEclipseClasspath( File basedir, MavenProject project, MavenProject executedProject, Map map )
+    protected void writeEclipseClasspath( File basedir, MavenProject project, MavenProject executedProject, Map map, List reactorProjects )
         throws EclipsePluginException
     {
         FileWriter w;
@@ -235,7 +235,7 @@ public class EclipseWriter
         {
             Artifact artifact = (Artifact) it.next();
             
-            addDependency( writer, artifact );
+            addDependency( writer, artifact, reactorProjects );
         }
 
         writer.endElement();
@@ -316,24 +316,57 @@ public class EclipseWriter
         }
     }
 
-    private void addDependency( XMLWriter writer, Artifact artifact )
+    private void addDependency( XMLWriter writer, Artifact artifact, List reactorProjects )
     {
-        File path = artifact.getFile();
-
+        String path = getProjectPath( reactorProjects, artifact );
+        
+        String kind = path == null ? "var" : "src";
+                
+        // fall-through when no local project could be found in the reactor
         if ( path == null )
         {
-            System.err.println( "The artifacts path was null. Artifact id: " + artifact.getId() );
+            File artifactPath = artifact.getFile();
 
-            return;
+            if ( artifactPath == null )
+            {
+                System.err.println( "The artifacts path was null. Artifact id: " + artifact.getId() );
+    
+                return;
+            }
+            
+            path = "M2_REPO/" + toRelative( localRepository, artifactPath.getPath() );
         }
 
         writer.startElement( "classpathentry" );
 
-        writer.addAttribute( "kind", "var" );
+        writer.addAttribute( "kind", kind );
 
-        writer.addAttribute( "path", "M2_REPO/" + toRelative( localRepository, path.getPath() ) );
+        writer.addAttribute( "path", path );
 
         writer.endElement();
+    }
+    
+    private String getProjectPath( List reactorProjects, Artifact artifact )
+    {
+        if ( reactorProjects == null )
+        {
+            return null;	// we're a single project
+        }
+        
+        for (Iterator it = reactorProjects.iterator(); it.hasNext(); )
+        {
+            MavenProject project = (MavenProject) it.next();
+            
+            if ( project.getGroupId().equals( artifact.getGroupId() )
+                && project.getArtifactId().equals( artifact.getArtifactId() )
+                && project.getVersion().equals( artifact.getVersion() )
+            )
+            {
+                return "/" + project.getArtifactId();
+            }
+        }
+        
+        return null;
     }
 
     private void close( Writer closeable )

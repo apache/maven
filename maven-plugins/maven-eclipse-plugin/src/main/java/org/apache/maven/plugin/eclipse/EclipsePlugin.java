@@ -22,6 +22,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * A Maven2 plugin which integrates the use of Maven2 with Eclipse.
@@ -57,6 +58,13 @@ public class EclipsePlugin
      * @readonly
      */
     private ArtifactRepository localRepository;
+
+    /**
+     * @parameter expression="${reactorProjects}"
+     * @required
+     * @readonly
+     */
+    private List reactorProjects;
 
     public EclipsePlugin()
     {
@@ -97,7 +105,7 @@ public class EclipsePlugin
                 executedProject = project;
             }
 
-            eclipseWriter.write( project, executedProject );
+            eclipseWriter.write( project, executedProject, reactorProjects );
         }
         catch ( EclipsePluginException e )
         {
