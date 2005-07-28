@@ -247,7 +247,7 @@ public class DefaultWagonManager
         }
         else
         {
-            getLogger().info( "Skipping disabled repository " + repository.getId() );
+            getLogger().debug( "Skipping disabled repository " + repository.getId() );
         }
     }
 
