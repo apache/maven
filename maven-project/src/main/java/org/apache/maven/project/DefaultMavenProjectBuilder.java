@@ -115,6 +115,8 @@ public class DefaultMavenProjectBuilder
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
 
+    private Map projectCache = new HashMap();
+
     public void initialize()
     {
         modelReader = new MavenXpp3Reader();
@@ -154,7 +156,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project.setDependencyArtifacts( project.createArtifacts( artifactFactory ) );
+            project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
         }
         catch ( InvalidVersionSpecificationException e )
         {
@@ -261,6 +263,13 @@ public class DefaultMavenProjectBuilder
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+        String cacheKey = createCacheKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+        MavenProject project = (MavenProject) projectCache.get( cacheKey );
+        if ( project != null )
+        {
+            return project;
+        }
+
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         return build( "Artifact [" + artifact.getId() + "]", model, localRepository, remoteArtifactRepositories,
@@ -416,6 +425,8 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( "Error building project from \'" + pomLocation + "\': " + model.getId(),
                                                 e );
         }
+        projectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ),
+                          project );
         return project;
     }
 
@@ -770,11 +781,11 @@ public class DefaultMavenProjectBuilder
                     version = p.getVersion();
                 }
 
-                Artifact artifact = null;
+                Artifact artifact;
                 try
                 {
-                    artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(), VersionRange
-                        .createFromVersionSpec( version ) );
+                    artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
+                                                                     VersionRange.createFromVersionSpec( version ) );
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {

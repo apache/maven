@@ -7,15 +7,15 @@
 	</parent>
 
   <groupId>test</groupId>
-  <artifactId>test-component-b</artifactId>
+  <artifactId>test-component-c</artifactId>
   <version>0.1</version>
-  <name>Test Component B</name>
-  <packaging>jar</packaging>
+  <name>Test Component C</name>
+  <packaging>war</packaging>
 
 	<dependencies>
 		<dependency>
 			<groupId>test</groupId>
-			<artifactId>test-component-a</artifactId>
+			<artifactId>test-component-b</artifactId>
 			<version>0.1</version>
 		</dependency>
 	</dependencies>

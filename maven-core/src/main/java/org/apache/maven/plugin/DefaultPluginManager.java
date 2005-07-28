@@ -1051,7 +1051,7 @@ public class DefaultPluginManager
         // check this with yourkit as a hot spot.
         try
         {
-            project.setDependencyArtifacts( project.createArtifacts( artifactFactory ) );
+            project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
         }
         catch ( InvalidVersionSpecificationException e )
         {

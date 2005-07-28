@@ -30,7 +30,7 @@ import java.util.Set;
 
 public class ResolutionNode
 {
-    private Artifact artifact;
+    private final Artifact artifact;
 
     private List children;
 
@@ -130,11 +130,6 @@ public class ResolutionNode
     public int getDepth()
     {
         return depth;
-    }
-
-    public void setArtifact( Artifact artifact )
-    {
-        this.artifact = artifact;
     }
 
     public List getRemoteRepositories()

@@ -17,9 +17,9 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -100,7 +100,7 @@ public class DependenciesTask
         Set artifacts;
         try
         {
-            artifacts = MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
+            artifacts = MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null, null );
         }
         catch ( InvalidVersionSpecificationException e )
         {

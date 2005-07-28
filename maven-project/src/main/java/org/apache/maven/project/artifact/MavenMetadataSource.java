@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -65,7 +66,7 @@ public class MavenMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        MavenProject p;
+        MavenProject project;
 
         Artifact pomArtifact;
         boolean done = false;
@@ -77,7 +78,7 @@ public class MavenMetadataSource
 
             try
             {
-                p = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+                project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
             }
             catch ( ProjectBuildingException e )
             {
@@ -86,7 +87,7 @@ public class MavenMetadataSource
 
             Relocation relocation = null;
 
-            DistributionManagement distMgmt = p.getDistributionManagement();
+            DistributionManagement distMgmt = project.getDistributionManagement();
             if ( distMgmt != null )
             {
                 relocation = distMgmt.getRelocation();
@@ -128,12 +129,12 @@ public class MavenMetadataSource
 
         try
         {
-            // TODO: we could possibly use p.getDependencyArtifacts instead, but they haven't been filtered or used the
-            // scope (should that be passed to the buildFromRepository method above?
-            Set artifacts = createArtifacts( artifactFactory, p.getDependencies(), artifact.getScope(),
-                                             artifact.getDependencyFilter() );
+            // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
+            // or used the inherited scope (should that be passed to the buildFromRepository method above?)
+            Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
+                                                     artifact.getDependencyFilter() );
 
-            return new ResolutionGroup( pomArtifact, artifacts, p.getRemoteArtifactRepositories() );
+            return new ResolutionGroup( pomArtifact, artifacts, project.getRemoteArtifactRepositories() );
         }
         catch ( InvalidVersionSpecificationException e )
         {
@@ -142,10 +143,10 @@ public class MavenMetadataSource
     }
 
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
-                                       ArtifactFilter dependencyFilter )
+                                       ArtifactFilter dependencyFilter, Map projectReferences )
         throws InvalidVersionSpecificationException
     {
-        Set projectArtifacts = new HashSet();
+        Set projectArtifacts = new HashSet( dependencies.size() );
 
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
@@ -183,6 +184,17 @@ public class MavenMetadataSource
                 }
 
                 artifact.setDependencyFilter( dependencyFilter );
+
+                if ( projectReferences != null )
+                {
+                    // TODO: use MavenProject getProjectReferenceId
+                    String refId = d.getGroupId() + ":" + d.getArtifactId();
+                    MavenProject project = (MavenProject) projectReferences.get( refId );
+                    if ( project != null && project.getArtifact() != null )
+                    {
+                        artifact = new ActiveProjectArtifact( project, artifact );
+                    }
+                }
 
                 projectArtifacts.add( artifact );
             }

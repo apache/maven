@@ -21,6 +21,7 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
@@ -53,12 +54,12 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.HashSet;
 
 /**
  * The concern of the project is provide runtime values based on the model. <p/>
@@ -1230,32 +1231,11 @@ public class MavenProject
     /**
      * @todo the lazy initialisation of this makes me uneasy.
      */
-    public Set createArtifacts( ArtifactFactory artifactFactory )
+    public Set createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
+                                ArtifactFilter dependencyFilter )
         throws InvalidVersionSpecificationException
     {
-        Set artifacts = new HashSet( getDependencies().size() );
-
-        List list = new ArrayList( getDependencies().size() );
-        for ( Iterator i = getDependencies().iterator(); i.hasNext(); )
-        {
-            Dependency dependency = (Dependency) i.next();
-            String refId = getProjectReferenceId( dependency.getGroupId(), dependency.getArtifactId() );
-            MavenProject project = (MavenProject) projectReferences.get( refId );
-            if ( project != null && project.getArtifact() != null )
-            {
-                // TODO: actually these need to be funnelled through the same process and the artifacts cloned somehow
-                project.getArtifact().setScope( dependency.getScope() );
-                artifacts.add( project.getArtifact() );
-            }
-            else
-            {
-                list.add( dependency );
-            }
-        }
-
-        artifacts.addAll( MavenMetadataSource.createArtifacts( artifactFactory, list, null, null ) );
-
-        return artifacts;
+        return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), null, null, projectReferences );
     }
 
     public void addProjectReference( MavenProject project )

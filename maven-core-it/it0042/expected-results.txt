@@ -1,3 +1,5 @@
 test-component-a/target/test-component-a-0.1.jar
-test-component-b/target/test-component-b-0.1.war
-test-component-b/target/test-component-b-0.1.war!/WEB-INF/lib/test-component-a-0.1.jar
+test-component-b/target/test-component-b-0.1.jar
+test-component-c/target/test-component-c-0.1.war
+test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/test-component-a-0.1.jar
+test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/test-component-b-0.1.jar
