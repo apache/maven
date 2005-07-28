@@ -14,7 +14,10 @@ package org.apache.maven.plugin;
  * the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+
 import java.util.List;
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -34,21 +37,29 @@ public class CompilerMojo
      * @readonly
      */
     private List compileSourceRoots;
-    
+
     /**
      * @parameter expression="${project.compileClasspathElements}"
      * @required
      * @readonly
      */
     private List classpathElements;
-    
+
     /**
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      * @readonly
      */
-    private String outputDirectory;
-    
+    private File outputDirectory;
+
+    /**
+     * @parameter expression="${project.artifact}"
+     * @required
+     * @readonly
+     * @todo this is an export variable, really
+     */
+    private Artifact projectArtifact;
+
     protected List getCompileSourceRoots()
     {
         return compileSourceRoots;
@@ -59,9 +70,16 @@ public class CompilerMojo
         return classpathElements;
     }
 
-    protected String getOutputDirectory()
+    protected File getOutputDirectory()
     {
         return outputDirectory;
     }
 
+    public void execute()
+        throws MojoExecutionException
+    {
+        super.execute();
+
+        projectArtifact.setFile( outputDirectory );
+    }
 }

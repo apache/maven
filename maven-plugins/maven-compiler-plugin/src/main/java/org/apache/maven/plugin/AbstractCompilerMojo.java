@@ -79,7 +79,7 @@ public abstract class AbstractCompilerMojo
 
     protected abstract List getCompileSourceRoots();
 
-    protected abstract String getOutputDirectory();
+    protected abstract File getOutputDirectory();
 
     public void execute()
         throws MojoExecutionException
@@ -97,7 +97,7 @@ public abstract class AbstractCompilerMojo
 
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
-        compilerConfiguration.setOutputLocation( getOutputDirectory() );
+        compilerConfiguration.setOutputLocation( getOutputDirectory().getAbsolutePath() );
         compilerConfiguration.setClasspathEntries( getClasspathElements() );
         compilerConfiguration.setSourceLocations( compileSourceRoots );
 
@@ -131,7 +131,7 @@ public abstract class AbstractCompilerMojo
         
         compilerConfiguration.setDebug( debug );
 
-        List messages = null;
+        List messages;
         try
         {
             messages = compiler.compile( compilerConfiguration );
@@ -169,8 +169,6 @@ public abstract class AbstractCompilerMojo
 
         scanner.addSourceMapping( mapping );
 
-        File outDir = new File( getOutputDirectory() );
-
         Set staleSources = new HashSet();
 
         for ( Iterator it = getCompileSourceRoots().iterator(); it.hasNext(); )
@@ -186,7 +184,7 @@ public abstract class AbstractCompilerMojo
 
             try
             {
-                staleSources.addAll( scanner.getIncludedSources( rootFile, outDir ) );
+                staleSources.addAll( scanner.getIncludedSources( rootFile, getOutputDirectory() ) );
             }
             catch ( InclusionScanException e )
             {

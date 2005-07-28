@@ -52,11 +52,13 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * The concern of the project is provide runtime values based on the model. <p/>
@@ -123,6 +125,8 @@ public class MavenProject
     private Set reportArtifacts;
 
     private Map reportArtifactMap;
+
+    private Map projectReferences = new HashMap();
 
     public MavenProject( Model model )
     {
@@ -329,12 +333,21 @@ public class MavenProject
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) )
                 {
-                    File file = a.getFile();
-                    if ( file == null )
+                    String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId() );
+                    MavenProject project = (MavenProject) projectReferences.get( refId );
+                    if ( project != null )
                     {
-                        throw new DependencyResolutionRequiredException( a );
+                        list.add( project.getBuild().getOutputDirectory() );
                     }
-                    list.add( file.getPath() );
+                    else
+                    {
+                        File file = a.getFile();
+                        if ( file == null )
+                        {
+                            throw new DependencyResolutionRequiredException( a );
+                        }
+                        list.add( file.getPath() );
+                    }
                 }
             }
         }
@@ -1217,9 +1230,41 @@ public class MavenProject
     /**
      * @todo the lazy initialisation of this makes me uneasy.
      */
-    public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies )
+    public Set createArtifacts( ArtifactFactory artifactFactory )
         throws InvalidVersionSpecificationException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null );
+        Set artifacts = new HashSet( getDependencies().size() );
+
+        List list = new ArrayList( getDependencies().size() );
+        for ( Iterator i = getDependencies().iterator(); i.hasNext(); )
+        {
+            Dependency dependency = (Dependency) i.next();
+            String refId = getProjectReferenceId( dependency.getGroupId(), dependency.getArtifactId() );
+            MavenProject project = (MavenProject) projectReferences.get( refId );
+            if ( project != null && project.getArtifact() != null )
+            {
+                // TODO: actually these need to be funnelled through the same process and the artifacts cloned somehow
+                project.getArtifact().setScope( dependency.getScope() );
+                artifacts.add( project.getArtifact() );
+            }
+            else
+            {
+                list.add( dependency );
+            }
+        }
+
+        artifacts.addAll( MavenMetadataSource.createArtifacts( artifactFactory, list, null, null ) );
+
+        return artifacts;
+    }
+
+    public void addProjectReference( MavenProject project )
+    {
+        projectReferences.put( getProjectReferenceId( project.getGroupId(), project.getArtifactId() ), project );
+    }
+
+    private static String getProjectReferenceId( String groupId, String artifactId )
+    {
+        return groupId + ":" + artifactId;
     }
 }

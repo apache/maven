@@ -98,6 +98,8 @@ public class JarMojo
             }
 
             archiver.createArchive( project, archive );
+
+            project.getArtifact().setFile( jarFile );
         }
         catch ( Exception e )
         {

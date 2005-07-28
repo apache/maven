@@ -1,0 +1,14 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>test-components</artifactId>
+		<groupId>test</groupId>
+		<version>0.1</version>
+	</parent>
+
+  <groupId>test</groupId>
+  <artifactId>test-component-a</artifactId>
+  <version>0.1</version>
+  <name>Test Component A</name>
+  <packaging>jar</packaging>
+</project>

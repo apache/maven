@@ -73,7 +73,8 @@ public class DefaultArtifactResolver
                           boolean force )
         throws ArtifactResolutionException
     {
-        if ( artifact != null )
+        // skip artifacts with a file - they are already resolved
+        if ( artifact != null && artifact.getFile() == null )
         {
             // ----------------------------------------------------------------------
             // Check for the existence of the artifact in the specified local

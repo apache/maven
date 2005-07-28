@@ -1,6 +1,7 @@
 package org.apache.maven.plugin;
 
 import java.util.List;
+import java.io.File;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -48,7 +49,7 @@ public class TestCompilerMojo
      * @required
      * @readonly
      */
-    private String outputDirectory;
+    private File outputDirectory;
 
     protected List getCompileSourceRoots()
     {
@@ -60,7 +61,7 @@ public class TestCompilerMojo
         return classpathElements;
     }
 
-    protected String getOutputDirectory()
+    protected File getOutputDirectory()
     {
         return outputDirectory;
     }

@@ -1,0 +1,13 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>test</groupId>
+  <artifactId>test-components</artifactId>
+  <version>0.1</version>
+  <name>Test Components</name>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>test-component-a</module>
+    <module>test-component-b</module>
+  </modules>
+</project>

@@ -19,6 +19,7 @@ package org.apache.maven.project;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.ReportPlugin;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
@@ -64,7 +65,7 @@ public class ProjectSorter
         {
             MavenProject project = (MavenProject) i.next();
 
-            String id = getProjectId( project );
+            String id = getId( project.getGroupId(), project.getArtifactId() );
 
             dag.addVertex( id );
 
@@ -75,16 +76,18 @@ public class ProjectSorter
         {
             MavenProject project = (MavenProject) i.next();
 
-            String id = getProjectId( project );
+            String id = getId( project.getGroupId(), project.getArtifactId() );
 
             for ( Iterator j = project.getDependencies().iterator(); j.hasNext(); )
             {
                 Dependency dependency = (Dependency) j.next();
 
-                String dependencyId = getDependencyId( dependency );
+                String dependencyId = getId( dependency.getGroupId(), dependency.getArtifactId() );
 
                 if ( dag.getVertex( dependencyId ) != null )
                 {
+                    project.addProjectReference( (MavenProject) projectMap.get( dependencyId ) );
+
                     dag.addEdge( id, dependencyId );
                 }
             }
@@ -92,7 +95,7 @@ public class ProjectSorter
             MavenProject parent = project.getParent();
             if ( parent != null )
             {
-                String parentId = getProjectId( parent );
+                String parentId = getId( parent.getGroupId(), parent.getArtifactId() );
                 if ( dag.getVertex( parentId ) != null )
                 {
                     dag.addEdge( id, parentId );
@@ -105,7 +108,7 @@ public class ProjectSorter
                 for ( Iterator j = buildPlugins.iterator(); j.hasNext(); )
                 {
                     Plugin plugin = (Plugin) j.next();
-                    String pluginId = getPluginId( plugin );
+                    String pluginId = getId( plugin.getGroupId(), plugin.getArtifactId() );
                     if ( dag.getVertex( pluginId ) != null )
                     {
                         dag.addEdge( id, pluginId );
@@ -118,8 +121,8 @@ public class ProjectSorter
             {
                 for ( Iterator j = reportPlugins.iterator(); j.hasNext(); )
                 {
-                    Plugin plugin = (Plugin) j.next();
-                    String pluginId = getPluginId( plugin );
+                    ReportPlugin plugin = (ReportPlugin) j.next();
+                    String pluginId = getId( plugin.getGroupId(), plugin.getArtifactId() );
                     if ( dag.getVertex( pluginId ) != null )
                     {
                         dag.addEdge( id, pluginId );
@@ -130,7 +133,7 @@ public class ProjectSorter
             for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
             {
                 Extension extension = (Extension) j.next();
-                String extensionId = getExtensionId( extension );
+                String extensionId = getId( extension.getGroupId(), extension.getArtifactId() );
                 if ( dag.getVertex( extensionId ) != null )
                 {
                     dag.addEdge( id, extensionId );
@@ -150,23 +153,8 @@ public class ProjectSorter
         return sortedProjects;
     }
 
-    private static String getExtensionId( Extension extension )
+    private static String getId( String groupId, String artifactId )
     {
-        return extension.getGroupId() + ":" + extension.getArtifactId();
-    }
-
-    private static String getPluginId( Plugin plugin )
-    {
-        return plugin.getGroupId() + ":" + plugin.getArtifactId();
-    }
-
-    private static String getDependencyId( Dependency dependency )
-    {
-        return dependency.getGroupId() + ":" + dependency.getArtifactId();
-    }
-
-    private static String getProjectId( MavenProject project )
-    {
-        return project.getGroupId() + ":" + project.getArtifactId();
+        return groupId + ":" + artifactId;
     }
 }

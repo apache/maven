@@ -120,6 +120,8 @@ it0040: Test the use of a packaging from a plugin
 
 it0041: Test the use of a new type from a plugin
 
+it0042: Test that the reactor can establish the artifact location of known projects for dependencies
+
 -------------------------------------------------------------------------------
 
 - generated sources

@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
  * Description of an artifact.
  *
  * @todo do we really need an interface here?
+ * @todo get rid of the multiple states we can have (project, parent, etc artifacts, file == null, snapshot, etc) - construct subclasses and use accordingly?
  */
 public interface Artifact
     extends Comparable
