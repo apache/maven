@@ -93,6 +93,10 @@ public class PluginParameterExpressionEvaluator
         {
             value = context;
         }
+        else if ( "reactorProjects".equals( expression ) )
+        {
+            value = context.getSortedProjects();
+        }
         else if ( "project".equals( expression ) )
         {
             value = project;
