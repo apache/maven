@@ -314,6 +314,7 @@ public class DefaultMavenProjectBuilder
                             artifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
                         try
                         {
+                            artifact.setFile( null );
                             artifactResolver.resolveAlways( artifact, remoteArtifactRepositories, localRepository );
                         }
                         catch ( ArtifactResolutionException e )
