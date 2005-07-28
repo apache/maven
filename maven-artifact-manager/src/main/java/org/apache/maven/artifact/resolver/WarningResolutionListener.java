@@ -19,6 +19,9 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Send resolution warning events to the warning log.
  *
@@ -29,6 +32,8 @@ public class WarningResolutionListener
     implements ResolutionListener
 {
     private Logger logger;
+
+    private static Set ignoredArtifacts = new HashSet();
 
     public WarningResolutionListener( Logger logger )
     {
@@ -61,10 +66,15 @@ public class WarningResolutionListener
 
     public void updateScopeCurrentPom( Artifact artifact, String scope )
     {
-        logger.warn( "\n\tArtifact " + artifact.getId() + " is having scope '" + artifact + "' replaced with '" +
-            scope + "'\n" +
-            "\tas a dependency has given a broader scope. If this is not intended, use -X to locate the dependency,\n" +
-            "\tor force the desired scope using dependencyManagement.\n" );
+        // TODO: better way than static? this might hide messages in a reactor
+        if ( !ignoredArtifacts.contains( artifact ) )
+        {
+            logger.warn( "\n\tArtifact " + artifact.getId() + " has scope '" + artifact.getScope() +
+                "' replaced with '" + scope + "'\n" +
+                "\tas a dependency has given a broader scope. If this is not intended, use -X to locate the dependency,\n" +
+                "\tor force the desired scope using dependencyManagement.\n" );
+            ignoredArtifacts.add( artifact );
+        }
     }
 
     public void updateScope( Artifact artifact, String scope )
