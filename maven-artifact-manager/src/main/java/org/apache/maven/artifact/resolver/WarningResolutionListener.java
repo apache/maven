@@ -20,19 +20,17 @@ import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * Send resolution events to the debug log.
+ * Send resolution warning events to the warning log.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class DebugResolutionListener
+public class WarningResolutionListener
     implements ResolutionListener
 {
     private Logger logger;
 
-    private String indent = "";
-
-    public DebugResolutionListener( Logger logger )
+    public WarningResolutionListener( Logger logger )
     {
         this.logger = logger;
     }
@@ -43,52 +41,37 @@ public class DebugResolutionListener
 
     public void startProcessChildren( Artifact artifact )
     {
-        indent += "  ";
     }
 
     public void endProcessChildren( Artifact artifact )
     {
-        indent = indent.substring( 2 );
     }
 
     public void includeArtifact( Artifact artifact )
     {
-        logger.debug( indent + artifact.getId() + " (selected)" );
     }
 
     public void omitForNearer( Artifact omitted, Artifact kept )
     {
-        logger.debug( indent + omitted.getId() + " (removed - nearer found: " + kept.getVersion() + ")" );
     }
 
     public void omitForCycle( Artifact omitted )
     {
-        logger.debug( indent + omitted.getId() + " (removed - causes a cycle in the graph)" );
     }
 
     public void updateScopeCurrentPom( Artifact artifact, String scope )
     {
-        updateScope( artifact, scope );
+        logger.warn( "\n\tArtifact " + artifact.getId() + " is having scope '" + artifact + "' replaced with '" +
+            scope + "'\n" +
+            "\tas a dependency has given a broader scope. If this is not intended, use -X to locate the dependency,\n" +
+            "\tor force the desired scope using dependencyManagement.\n" );
     }
 
     public void updateScope( Artifact artifact, String scope )
     {
-        logger.debug( indent + artifact.getId() + " (setting scope to: " + scope + ")" );
     }
 
     public void manageArtifact( Artifact artifact, Artifact replacement )
     {
-        String msg = indent + artifact.getId();
-        msg += " (";
-        if ( replacement.getVersion() != null )
-        {
-            msg += "applying version: " + replacement.getVersion() + ";";
-        }
-        if ( replacement.getScope() != null )
-        {
-            msg += "applying scope: " + replacement.getScope();
-        }
-        msg += ")";
-        logger.debug( msg );
     }
 }

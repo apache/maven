@@ -170,6 +170,8 @@ public class DefaultArtifactResolver
             listeners.add( new DebugResolutionListener( getLogger() ) );
         }
 
+        listeners.add( new WarningResolutionListener( getLogger() ) );
+
         return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
                                     remoteRepositories, source, filter, listeners );
 

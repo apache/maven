@@ -230,7 +230,17 @@ public class DefaultArtifactCollector
 
         if ( updateScope )
         {
-            fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, previous, newArtifact );
+            int event;
+            if ( previous.getDepth() < 2 )
+            {
+                event = ResolutionListener.UPDATE_SCOPE_CURRENT_POM;
+            }
+            else
+            {
+                event = ResolutionListener.UPDATE_SCOPE;
+            }
+
+            fireEvent( event, listeners, previous, newArtifact );
 
             // previously we cloned the artifact, but it is more effecient to just update the scope
             // if problems are later discovered that the original object needs its original scope value, cloning may
@@ -272,6 +282,9 @@ public class DefaultArtifactCollector
                     break;
                 case ResolutionListener.UPDATE_SCOPE:
                     listener.updateScope( node.getArtifact(), replacement.getScope() );
+                    break;
+                case ResolutionListener.UPDATE_SCOPE_CURRENT_POM:
+                    listener.updateScopeCurrentPom( node.getArtifact(), replacement.getScope() );
                     break;
                 case ResolutionListener.MANAGE_ARTIFACT:
                     listener.manageArtifact( node.getArtifact(), replacement );

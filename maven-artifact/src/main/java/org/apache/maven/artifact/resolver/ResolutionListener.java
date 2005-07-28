@@ -19,7 +19,7 @@ import org.apache.maven.artifact.Artifact;
 */
 
 /**
- * TODO: describe
+ * Listens to the resolution process and handles events.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
@@ -44,6 +44,8 @@ public interface ResolutionListener
 
     int OMIT_FOR_CYCLE = 8;
 
+    int UPDATE_SCOPE_CURRENT_POM = 9;
+
     void testArtifact( Artifact node );
 
     void startProcessChildren( Artifact artifact );
@@ -59,4 +61,6 @@ public interface ResolutionListener
     void manageArtifact( Artifact artifact, Artifact replacement );
 
     void omitForCycle( Artifact artifact );
+
+    void updateScopeCurrentPom( Artifact artifact, String scope );
 }
