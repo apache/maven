@@ -3,6 +3,7 @@
 # ----------------------------------------------------------------------------------
 
 . $HOME/.profile
+cd $HOME
 
 CMD=$1
 
@@ -15,18 +16,20 @@ DATE=`date`
 PID=$$
 RUNNING=`ps -ef | grep ci.sh | grep -v 'sh -c' | grep -v grep | grep -v $PID`
 if [ ! -z "$RUNNING" ]; then
-  echo "From: $FROM" > running_log
-  echo "To: $TO" >> running_log
-  echo "Subject: [maven2 build - SKIPPED - $CMD] $DATE" >>running_log
-  echo "" >> running_log
-  echo "ci.sh already running... exiting" >>running_log
-  echo "$RUNNING" >>running_log
-  /usr/sbin/sendmail -t < running_log
+  if [ "$CMD" = "checkout" ]; then
+    echo "From: $FROM" > running_log
+    echo "To: $TO" >> running_log
+    echo "Subject: [maven2 build - SKIPPED - $CMD] $DATE" >>running_log
+    echo "" >> running_log
+    echo "ci.sh already running... exiting" >>running_log
+    echo "$RUNNING" >>running_log
+    /usr/sbin/sendmail -t < running_log
+  fi
   exit 1
 fi
 
 HOME_DIR=`pwd`
-DIR=m2-build
+DIR=$HOME/m2-build
 REPO=$HOME_DIR/maven-repo-local
 SCM_LOG=scm.log
 TIMESTAMP=`date +%Y%m%d.%H%M%S`
@@ -58,6 +61,10 @@ mkdir -p $MESSAGE_DIR
 BUILD_REQUIRED=false
 if [ -f $HOME_DIR/build_required ]; then
   BUILD_REQUIRED=`cat $HOME_DIR/build_required`
+fi
+
+if [ ! -d $DIR/maven-components ]; then
+  CMD="checkout"
 fi
 
 (
