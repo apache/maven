@@ -54,7 +54,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1235,7 +1234,8 @@ public class MavenProject
                                 ArtifactFilter dependencyFilter )
         throws InvalidVersionSpecificationException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), null, null, projectReferences );
+        return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope,
+                                                    dependencyFilter, projectReferences );
     }
 
     public void addProjectReference( MavenProject project )
