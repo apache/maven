@@ -17,6 +17,8 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Extension;
+import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
@@ -96,6 +98,44 @@ public class ProjectSorter
                     dag.addEdge( id, parentId );
                 }
             }
+
+            List buildPlugins = project.getBuildPlugins();
+            if ( buildPlugins != null )
+            {
+                for ( Iterator j = buildPlugins.iterator(); j.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) j.next();
+                    String pluginId = getPluginId( plugin );
+                    if ( dag.getVertex( pluginId ) != null )
+                    {
+                        dag.addEdge( id, pluginId );
+                    }
+                }
+            }
+
+            List reportPlugins = project.getReportPlugins();
+            if ( reportPlugins != null )
+            {
+                for ( Iterator j = reportPlugins.iterator(); j.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) j.next();
+                    String pluginId = getPluginId( plugin );
+                    if ( dag.getVertex( pluginId ) != null )
+                    {
+                        dag.addEdge( id, pluginId );
+                    }
+                }
+            }
+
+            for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
+            {
+                Extension extension = (Extension) j.next();
+                String extensionId = getExtensionId( extension );
+                if ( dag.getVertex( extensionId ) != null )
+                {
+                    dag.addEdge( id, extensionId );
+                }
+            }
         }
 
         List sortedProjects = new ArrayList();
@@ -108,6 +148,16 @@ public class ProjectSorter
         }
 
         return sortedProjects;
+    }
+
+    private static String getExtensionId( Extension extension )
+    {
+        return extension.getGroupId() + ":" + extension.getArtifactId();
+    }
+
+    private static String getPluginId( Plugin plugin )
+    {
+        return plugin.getGroupId() + ":" + plugin.getArtifactId();
     }
 
     private static String getDependencyId( Dependency dependency )
