@@ -61,6 +61,8 @@ public class MojoDescriptor
     private String executeLifecycle;
 
     private String deprecated;
+    
+    private boolean aggregator = false;
 
     // ----------------------------------------------------------------------
     //
@@ -388,5 +390,15 @@ public class MojoDescriptor
     public void setExecuteLifecycle( String executeLifecycle )
     {
         this.executeLifecycle = executeLifecycle;
+    }
+    
+    public void setAggregator( boolean aggregator )
+    {
+        this.aggregator = aggregator;
+    }
+    
+    public boolean isAggregator()
+    {
+        return aggregator;
     }
 }

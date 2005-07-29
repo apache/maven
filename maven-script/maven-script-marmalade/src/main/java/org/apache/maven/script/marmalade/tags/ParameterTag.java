@@ -41,6 +41,8 @@ public class ParameterTag
 
     private boolean required = true;
 
+    private String defaultVal;
+
     protected void doExecute( MarmaladeExecutionContext context )
         throws MarmaladeExecutionException
     {
@@ -62,6 +64,7 @@ public class ParameterTag
         param.setRequired( required );
         param.setType( type );
         param.setDeprecated( deprecated );
+        param.setDefaultValue( defaultVal );
 
         return param;
     }
@@ -88,6 +91,7 @@ public class ParameterTag
 
     public void setDefault( String defaultVal )
     {
+        this.defaultVal = defaultVal;
     }
 
     public void setRequired( boolean required )

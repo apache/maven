@@ -16,28 +16,19 @@ package org.apache.maven.script.marmalade.tags;
  * limitations under the License.
  */
 
-import org.codehaus.marmalade.model.AbstractMarmaladeTag;
-import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
 
-import java.util.Iterator;
-
 /**
- * Aggregator tag for the actual meat of the mojo. Simply a pass-through
- * surrogate root tag for the eventual component-script (@see MojoTag).
- * 
  * @author jdcasey Created on Feb 8, 2005
  */
-public class ExecuteTag
-    extends AbstractMarmaladeTag
+public class ExecuteLifecycleTag
+    extends AbstractStringValuedBodyTag
 {
 
-    protected void doExecute( MarmaladeExecutionContext context ) throws MarmaladeExecutionException
+    protected void setValue( String value ) throws MarmaladeExecutionException
     {
-        for ( Iterator it = children().iterator(); it.hasNext(); )
-        {
-            it.next();
-        }
+        MetadataTag metadataTag = (MetadataTag) requireParent( MetadataTag.class );
+        metadataTag.setExecuteLifecycle( value );
     }
 
 }

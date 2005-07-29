@@ -167,6 +167,13 @@ public class PluginDescriptorBuilder
             mojo.setProjectRequired( Boolean.valueOf( requiresProject ).booleanValue() );
         }
 
+        String aggregator = c.getChild( "aggregator" ).getValue();
+
+        if ( aggregator != null )
+        {
+            mojo.setAggregator( Boolean.valueOf( aggregator ).booleanValue() );
+        }
+
         String requiresOnline = c.getChild( "requiresOnline" ).getValue();
 
         if ( requiresOnline != null )

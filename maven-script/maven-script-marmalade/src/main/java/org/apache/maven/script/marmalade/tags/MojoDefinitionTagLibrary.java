@@ -32,13 +32,15 @@ public class MojoDefinitionTagLibrary
         registerTag( "executionStrategy", ExecutionStrategyTag.class );
         registerTag( "goal", GoalTag.class );
         registerTag( "instantiationStrategy", InstantiationStrategyTag.class );
-        registerTag( "lifecyclePhase", LifecyclePhaseTag.class );
         registerTag( "metadata", MetadataTag.class );
         registerTag( "mojo", MojoTag.class );
         registerTag( "parameters", ParametersTag.class );
         registerTag( "parameter", ParameterTag.class );
         registerTag( "requiresDependencyResolution", RequiresDependencyResolutionTag.class );
         registerTag( "requiresProject", RequiresProjectTag.class );
+        registerTag( "requiresOnline", RequiresOnlineTag.class );
+        registerTag( "inheritByDefault", InheritByDefaultTag.class );
+        registerTag( "aggregator", AggregatorTag.class );
         registerTag( "name", ParamNameTag.class );
         registerTag( "expression", ParamExpressionTag.class );
         registerTag( "type", ParamTypeTag.class );

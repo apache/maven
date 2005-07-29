@@ -51,6 +51,7 @@ public class JavaMojoDescriptorExtractor
     implements MojoDescriptorExtractor
 {
     public static final String MAVEN_PLUGIN_INSTANTIATION = "instantiationStrategy";
+    
     public static final String CONFIGURATOR = "configurator";
 
     public static final String PARAMETER = "parameter";
@@ -76,6 +77,8 @@ public class JavaMojoDescriptorExtractor
     public static final String GOAL_REQUIRES_DEPENDENCY_RESOLUTION = "requiresDependencyResolution";
 
     public static final String GOAL_REQUIRES_PROJECT = "requiresProject";
+    
+    public static final String GOAL_IS_AGGREGATOR = "aggregator";
 
     public static final String GOAL_REQUIRES_ONLINE = "requiresOnline";
     
@@ -234,6 +237,17 @@ public class JavaMojoDescriptorExtractor
         if ( requiresProject != null )
         {
             mojoDescriptor.setProjectRequired( true );
+        }
+
+        // ----------------------------------------------------------------------
+        // Aggregator flag
+        // ----------------------------------------------------------------------
+
+        DocletTag aggregator = findInClassHierarchy( javaClass, GOAL_IS_AGGREGATOR );
+
+        if ( aggregator != null )
+        {
+            mojoDescriptor.setAggregator( true );
         }
 
         // ----------------------------------------------------------------------

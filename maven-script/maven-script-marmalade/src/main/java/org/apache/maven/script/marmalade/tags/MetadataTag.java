@@ -49,9 +49,17 @@ public class MetadataTag
 
     private List parameters = new ArrayList();
 
-    private String lifecyclePhase;
-
     private String description;
+
+    private boolean aggregator = false;
+
+    private boolean inheritByDefault = true;
+
+    private boolean requiresOnline;
+
+    private String executePhase;
+
+    private String executeLifecycle;
 
     protected boolean alwaysProcessChildren()
     {
@@ -99,6 +107,16 @@ public class MetadataTag
             descriptor.setInstantiationStrategy( instantiationStrategy );
         }
 
+        if ( notEmpty( executeLifecycle ) )
+        {
+            descriptor.setExecuteLifecycle( executeLifecycle );
+        }
+
+        if ( notEmpty( executePhase ) )
+        {
+            descriptor.setExecutePhase( executePhase );
+        }
+
         try
         {
             descriptor.setParameters( parameters );
@@ -110,6 +128,9 @@ public class MetadataTag
         
         descriptor.setDependencyResolutionRequired( requiresDependencyResolution );
         descriptor.setProjectRequired( requiresProject );
+        descriptor.setAggregator( aggregator );
+        descriptor.setInheritedByDefault( inheritByDefault );
+        descriptor.setOnlineRequired( requiresOnline );
 
         String basePath = (String) context.getVariable( MarmaladeMojoExecutionDirectives.SCRIPT_BASEPATH_INVAR,
                                                         getExpressionEvaluator() );
@@ -134,11 +155,6 @@ public class MetadataTag
     private boolean notEmpty( String test )
     {
         return test != null && test.trim().length() > 0;
-    }
-
-    public void setLifecyclePhase( String lifecyclePhase )
-    {
-        this.lifecyclePhase = lifecyclePhase;
     }
 
     public void setGoal( String goal )
@@ -174,6 +190,31 @@ public class MetadataTag
     public void setParameters( List parameters )
     {
         this.parameters = parameters;
+    }
+
+    public void setAggregator( boolean aggregator )
+    {
+        this.aggregator  = aggregator;
+    }
+
+    public void setInheritByDefault( boolean inheritByDefault )
+    {
+        this.inheritByDefault  = inheritByDefault;
+    }
+
+    public void setRequiresOnline( boolean requiresOnline )
+    {
+        this.requiresOnline = requiresOnline;
+    }
+
+    public void setExecutePhase( String executePhase )
+    {
+        this.executePhase = executePhase;
+    }
+
+    public void setExecuteLifecycle( String executeLifecycle )
+    {
+        this.executeLifecycle = executeLifecycle;
     }
 
 }

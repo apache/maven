@@ -21,14 +21,14 @@ import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
 /**
  * @author jdcasey Created on Feb 8, 2005
  */
-public class LifecyclePhaseTag
+public class ExecutePhaseTag
     extends AbstractStringValuedBodyTag
 {
 
     protected void setValue( String value ) throws MarmaladeExecutionException
     {
         MetadataTag metadataTag = (MetadataTag) requireParent( MetadataTag.class );
-        metadataTag.setLifecyclePhase( value );
+        metadataTag.setExecutePhase( value );
     }
 
 }
