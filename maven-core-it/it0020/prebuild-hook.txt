@@ -1,1 +1,2 @@
+rm ${artifact:org.apache.maven.plugins:maven-it0020-plugin:1.0-SNAPSHOT:maven-plugin}
 rm target/out.txt
