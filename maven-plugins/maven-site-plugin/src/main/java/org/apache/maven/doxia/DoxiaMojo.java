@@ -152,6 +152,12 @@ public class DoxiaMojo
     private String locales;
 
     /**
+     * @parameter expression="${addModules}"
+     *            default-value="true"
+     */
+    private boolean addModules;
+    
+    /**
      * @parameter expression="${component.org.codehaus.plexus.siterenderer.Renderer}"
      * @required
      * @readonly
@@ -443,6 +449,26 @@ public class DoxiaMojo
                 {
                     copyDirectory( resourcesDirectory, localeOutputDirectory );
                 }
+
+                // Copy the generated site in parent site if needed to provide module links
+                if ( addModules )
+                {
+                    MavenProject parentProject = project.getParent();
+                    if ( parentProject != null )
+                    {
+                        // TODO Handle user plugin configuration
+                        File parentSiteDir = new File( parentProject.getBasedir(), parentProject.getBuild().getDirectory()
+                            + File.separator + "site" + File.separator + project.getArtifactId() );
+    
+                        if ( !parentSiteDir.exists() )
+                        {
+                            parentSiteDir.mkdirs();
+                        }
+    
+                        File siteDir = new File( outputDirectory );
+                        FileUtils.copyDirectoryStructure( siteDir, parentSiteDir );
+                    }
+                }
             }
         }
         catch ( MavenReportException e )
@@ -484,8 +510,9 @@ public class DoxiaMojo
     private String getReportsMenu( Locale locale )
     {
         StringBuffer buffer = new StringBuffer();
-        // TODO i18n
-        buffer.append( "<menu name=\"Project Documentation\">\n" );
+        buffer.append( "<menu name=\"" );
+        buffer.append( i18n.getString( "site-plugin", locale, "report.menu.projectdocumentation" ) );
+        buffer.append( "\">\n" );
         buffer.append( "    <item name=\"" );
         buffer.append( i18n.getString( "site-plugin", locale, "report.menu.about" ) );
         buffer.append( " " );
@@ -524,6 +551,59 @@ public class DoxiaMojo
         }
     }
 
+    /**
+     * Generate a menu for modules
+     * 
+     * @param locale the locale wanted
+     * @return a XML menu for modules
+     */
+    private String getModulesMenu( Locale locale )
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append( "<menu name=\"" );
+        buffer.append( i18n.getString( "site-plugin", locale, "report.menu.projectmodules" ) );
+        buffer.append( "\">\n" );
+
+        List modules = project.getModules();
+        if ( project.getModules() != null )
+        {
+            for (Iterator it = modules.iterator(); it.hasNext();)
+            {
+                String module = (String)it.next();
+                
+                buffer.append( "    <item name=\"" );
+                buffer.append( module );
+                buffer.append( "\" href=\"" + module + "/index.html\"/>\n" );
+            }
+        }
+        
+        buffer.append( "</menu>\n" );
+
+        return buffer.toString();
+    }
+
+    /**
+     * Generate a menu for the parent project
+     * 
+     * @param locale the locale wanted
+     * @return a XML menu for the parent project
+     */
+    private String getProjectParentMenu( Locale locale )
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append( "<menu name=\"" );
+        buffer.append( i18n.getString( "site-plugin", locale, "report.menu.parentproject" ) );
+        buffer.append( "\">\n" );
+  
+        buffer.append( "    <item name=\"" );
+        buffer.append( project.getParent().getArtifactId() );
+        buffer.append( "\" href=\"../index.html\"/>\n" );
+        
+        buffer.append( "</menu>\n" );
+
+        return buffer.toString();
+    }
+    
     /**
      * @todo should only be needed once
      */
@@ -564,6 +644,19 @@ public class DoxiaMojo
         if ( reports != null )
         {
             props.put( "reports", getReportsMenu( locale ) );
+        }
+
+        if ( project.getParent() != null )
+        {
+            props.put( "parentProject", getProjectParentMenu( locale ) );
+        }
+        
+        if ( addModules )
+        {
+            if ( ( project.getModules() != null ) && ( project.getModules().size() > 0 ) )
+            {
+                props.put( "modules", getModulesMenu( locale ) );
+            }
         }
 
         // TODO: interpolate ${project.*} in general
