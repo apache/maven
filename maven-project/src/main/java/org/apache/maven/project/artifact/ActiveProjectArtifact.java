@@ -48,6 +48,8 @@ public class ActiveProjectArtifact
     {
         this.artifact = artifact;
         this.project = project;
+        
+        artifact.setFile( project.getArtifact().getFile() );
     }
 
     public File getFile()
@@ -99,6 +101,9 @@ public class ActiveProjectArtifact
     public void setFile( File destination )
     {
         artifact.setFile( destination );
+        
+        // TODO: [jc; 29-jul-05] Is this appropriate? I mean, isn't the point to use the project-file instead??
+        project.getArtifact().setFile( destination );
     }
 
     public String getBaseVersion()

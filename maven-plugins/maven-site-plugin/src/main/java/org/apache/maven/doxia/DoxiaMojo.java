@@ -1067,7 +1067,7 @@ public class DoxiaMojo
         }
         excludePattern.deleteCharAt( excludePattern.length() - 1 );
 
-        List siteFiles = FileUtils.getFileNames( directory, null, excludePattern.toString(), false, false );
+        List siteFiles = FileUtils.getFileNames( directory, null, excludePattern.toString(), false );
         for ( Iterator it = siteFiles.iterator(); it.hasNext(); )
         {
             String currentFile = ( (String) it.next() );
@@ -1089,7 +1089,7 @@ public class DoxiaMojo
 
             String filePattern = "**/" + key + ".*";
 
-            List files = FileUtils.getFileNames( directory, filePattern, excludePattern.toString(), true, false );
+            List files = FileUtils.getFileNames( directory, filePattern, excludePattern.toString(), true );
             if ( ( files != null ) && ( files.size() > 0 ) )
             {
                 List tmp = (List) duplicate.get( key.toLowerCase() );

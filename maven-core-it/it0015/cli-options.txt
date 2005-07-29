@@ -1,0 +1,1 @@
+--no-plugin-registry --check-plugin-latest
