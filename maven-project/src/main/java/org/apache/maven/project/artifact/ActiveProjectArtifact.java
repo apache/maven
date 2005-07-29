@@ -220,4 +220,14 @@ public class ActiveProjectArtifact
     {
         return artifact.compareTo( o );
     }
+
+    public void setResolved( boolean resolved )
+    {
+        artifact.setResolved( resolved );
+    }
+
+    public boolean isResolved()
+    {
+        return artifact.isResolved();
+    }
 }

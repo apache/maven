@@ -128,5 +128,9 @@ public interface Artifact
     void setArtifactId( String artifactId );
 
     boolean isSnapshot();
+    
+    void setResolved( boolean resolved );
+    
+    boolean isResolved();
 
 }

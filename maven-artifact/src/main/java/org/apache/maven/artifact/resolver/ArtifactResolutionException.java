@@ -150,6 +150,12 @@ public class ArtifactResolutionException
               remoteRepositories, artifact.getDownloadUrl(), artifact.getDependencyTrail(), t );
     }
 
+    public ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories )
+    {
+        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
+              remoteRepositories, artifact.getDownloadUrl(), artifact.getDependencyTrail() );
+    }
+
     public ArtifactResolutionException( String message, Artifact artifact )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), null,

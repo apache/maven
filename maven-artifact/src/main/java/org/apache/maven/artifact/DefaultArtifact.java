@@ -72,6 +72,8 @@ public class DefaultArtifact
 
     private VersionRange versionRange;
 
+    private boolean resolved = false;
+
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler )
     {
@@ -434,6 +436,16 @@ public class DefaultArtifact
         {
             return getVersion().endsWith( SNAPSHOT_VERSION ) || getVersion().equals( LATEST_VERSION );
         }
+    }
+
+    public void setResolved( boolean resolved )
+    {
+        this.resolved = resolved;
+    }
+
+    public boolean isResolved()
+    {
+        return resolved;
     }
 
 }

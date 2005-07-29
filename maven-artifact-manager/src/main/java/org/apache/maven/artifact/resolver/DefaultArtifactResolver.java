@@ -114,6 +114,11 @@ public class DefaultArtifactResolver
                     {
                         wagonManager.getArtifact( artifact, remoteRepositories );
                     }
+                    
+                    if ( !artifact.isResolved() )
+                    {
+                        throw new ArtifactResolutionException( "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.", artifact, remoteRepositories );
+                    }
 
                     // must be after the artifact is downloaded
                     for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
@@ -134,6 +139,11 @@ public class DefaultArtifactResolver
                 {
                     throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                 }
+            }
+            else if ( destination.exists() )
+            {
+                // locally resolved...no need to hit the remote repo.
+                artifact.setResolved( true );
             }
         }
     }
