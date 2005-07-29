@@ -125,11 +125,14 @@ public class DefaultMaven
         }
 
         EventDispatcher dispatcher = request.getEventDispatcher();
+        
         String event = MavenEvents.REACTOR_EXECUTION;
 
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
         List projects;
+        
+        MavenProject topLevelProject;
 
         try
         {
@@ -137,8 +140,14 @@ public class DefaultMaven
             
             projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
                                         request.getSettings() );
-
-            projects = ProjectSorter.getSortedProjects( projects );
+            
+            // the reasoning here is that the list is still unsorted according to dependency, so the first project
+            // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
+            
+            // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
+            topLevelProject = (MavenProject) projects.get( 0 );
+            
+            projects = ProjectSorter.getSortedProjects(projects);
 
             if ( projects.isEmpty() )
             {
@@ -149,10 +158,6 @@ public class DefaultMaven
             }
         }
         catch ( IOException e )
-        {
-            throw new ReactorException( "Error processing projects for the reactor: ", e );
-        }
-        catch ( CycleDetectedException e )
         {
             throw new ReactorException( "Error processing projects for the reactor: ", e );
         }
@@ -180,37 +185,72 @@ public class DefaultMaven
 
             return response;
         }
+        catch ( CycleDetectedException e )
+        {
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+            MavenExecutionResponse response = new MavenExecutionResponse();
+            response.setStart( new Date() );
+            response.setFinish( new Date() );
+            response.setException( e );
+            logFailure( response, e, null );
+
+            return response;
+        }
 
         try
         {
             MavenSession session = createSession( request, projects );
             
-            List goals = request.getGoals();
-
-            for ( Iterator iterator = projects.iterator(); iterator.hasNext(); )
+            try
             {
-                MavenProject project = (MavenProject) iterator.next();
-
-                line();
-
-                getLogger().info( "Building " + project.getName() );
-
-                line();
-
-                try
+                MavenExecutionResponse response = lifecycleExecutor.execute( session, topLevelProject, dispatcher );
+                
+                // TODO: is this perhaps more appropriate in the CLI?
+                if ( response.isExecutionFailure() )
                 {
-                    MavenExecutionResponse response = processProject( session, goals, project, dispatcher );
-                    if ( response.isExecutionFailure() )
+                    dispatcher.dispatchError( event, request.getBaseDirectory(), response.getException() );
+
+                    // TODO: yuck! Revisit when cleaning up the exception handling from the top down
+                    Throwable exception = response.getException();
+
+                    if ( exception instanceof MojoExecutionException )
                     {
-                        dispatcher.dispatchError( event, request.getBaseDirectory(), response.getException() );
-
-                        return response;
+                        if ( exception.getCause() == null )
+                        {
+                            MojoExecutionException e = (MojoExecutionException) exception;
+                            
+                            logFailure( response, e, e.getLongMessage() );
+                        }
+                        else
+                        {
+                            // TODO: throw exceptions like this, so "failures" are just that
+                            logError( response );
+                        }
                     }
+                    else if ( exception instanceof ArtifactResolutionException )
+                    {
+                        logFailure( response, exception, null );
+                    }
+                    else
+                    {
+                        // TODO: this should be a "FATAL" exception, reported to the
+                        // developers - however currently a LOT of
+                        // "user" errors fall through the cracks (like invalid POMs, as
+                        // one example)
+                        logError( response );
+                    }
+                    
+                    return response;
                 }
-                catch ( LifecycleExecutionException e )
+                else
                 {
-                    throw new ReactorException( "Error executing project within the reactor", e );
+                    logSuccess( response );
                 }
+            }
+            catch ( LifecycleExecutionException e )
+            {
+                throw new ReactorException( "Error executing project within the reactor", e );
             }
 
             dispatcher.dispatchEnd( event, request.getBaseDirectory() );
@@ -275,70 +315,6 @@ public class DefaultMaven
         }
 
         return projects;
-    }
-
-    private MavenExecutionResponse processProject( MavenSession session, List goals, MavenProject project,
-                                                   EventDispatcher dispatcher )
-        throws LifecycleExecutionException
-    {
-        // !! This is ripe for refactoring to an aspect.
-        // Event monitoring.
-        String event = MavenEvents.PROJECT_EXECUTION;
-
-        dispatcher.dispatchStart( event, project.getId() );
-
-        MavenExecutionResponse response;
-        try
-        {
-            // Actual meat of the code.
-            response = lifecycleExecutor.execute( goals, session, project );
-
-            dispatcher.dispatchEnd( event, project.getId() );
-        }
-        catch ( LifecycleExecutionException e )
-        {
-            dispatcher.dispatchError( event, project.getId(), e );
-            throw e;
-        }
-        // End event monitoring.
-
-        // TODO: is this perhaps more appropriate in the CLI?
-        if ( response.isExecutionFailure() )
-        {
-            // TODO: yuck! Revisit when cleaning up the exception handling from the top down
-            Throwable exception = response.getException();
-
-            if ( exception instanceof MojoExecutionException )
-            {
-                if ( exception.getCause() == null )
-                {
-                    MojoExecutionException e = (MojoExecutionException) exception;
-                    logFailure( response, e, e.getLongMessage() );
-                }
-                else
-                {
-                    // TODO: throw exceptions like this, so "failures" are just that
-                    logError( response );
-                }
-            }
-            else if ( exception instanceof ArtifactResolutionException )
-            {
-                logFailure( response, exception, null );
-            }
-            else
-            {
-                // TODO: this should be a "FATAL" exception, reported to the
-                // developers - however currently a LOT of
-                // "user" errors fall through the cracks (like invalid POMs, as
-                // one example)
-                logError( response );
-            }
-        }
-        else
-        {
-            logSuccess( response );
-        }
-        return response;
     }
 
     public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings )
@@ -691,6 +667,7 @@ public class DefaultMaven
                 files = Collections.singletonList( projectFile );
             }
         }
+        
         return files;
     }
 

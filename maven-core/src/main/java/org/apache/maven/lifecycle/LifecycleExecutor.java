@@ -18,9 +18,8 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.project.MavenProject;
-
-import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -30,7 +29,7 @@ public interface LifecycleExecutor
 {
     String ROLE = LifecycleExecutor.class.getName();
 
-    MavenExecutionResponse execute( List tasks, MavenSession session, MavenProject project )
+    MavenExecutionResponse execute( MavenSession session, MavenProject project, EventDispatcher dispatcher )
         throws LifecycleExecutionException;
 
 }

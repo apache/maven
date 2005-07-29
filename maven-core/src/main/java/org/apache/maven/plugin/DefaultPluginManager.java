@@ -276,7 +276,7 @@ public class DefaultPluginManager
         throws ArtifactResolutionException, PlexusContainerException
     {
         artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
-
+        
         PlexusContainer child = container.createChildContainer( plugin.getKey(),
                                                                 Collections.singletonList( pluginArtifact.getFile() ),
                                                                 Collections.EMPTY_MAP,
