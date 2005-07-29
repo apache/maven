@@ -82,6 +82,16 @@
       </roles>
       <timezone>-5</timezone>
     </developer>    
+    <developer>
+      <id>kenney</id>
+      <name>Kenney Westerhof</name>
+      <email>kenney@apache.org</email>
+      <organization>Neonics</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>    
   </developers>
   <dependencies>
     <dependency>
