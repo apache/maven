@@ -106,6 +106,26 @@
   #end
 #end
 
+#macro ( copyright )
+  #if ( $project )
+    #set ( $currentYear = ${currentDate.year} + 1900 )
+
+    #if ( ${project.inceptionYear} && ( ${project.inceptionYear} != ${currentYear.toString()} ) )
+      ${project.inceptionYear}-${currentYear}
+    #else
+      ${currentYear}
+    #end
+
+    #if ( ${project.organization} && ${project.organization.name} )
+      ${project.organization.name}
+    #else
+      Apache Software Foundation
+    #end
+  #else
+    2002-2005, Apache Software Foundation
+  #end
+#end
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
   <head>
@@ -151,25 +171,7 @@
       <hr/>
     </div>
     <div id="footer">
-      <div class="xright">&#169; 
-#if ( $project )
-  #set ( $currentYear = ${currentDate.year} + 1900 )
-
-  #if ( ${project.inceptionYear} && ( ${project.inceptionYear} != ${currentYear.toString()} ) )
-    ${project.inceptionYear}-${currentYear}
-  #else
-    ${currentYear}
-  #end
-
-  #if ( ${project.organization} && ${project.organization.name} )
-    ${project.organization.name}
-  #else
-    Apache Software Foundation
-  #end
-#else
-  2002-2005, Apache Software Foundation
-#end
-      </div>
+      <div class="xright">&#169;#copyright()</div>
       <div class="clear">
         <hr/>
       </div>
