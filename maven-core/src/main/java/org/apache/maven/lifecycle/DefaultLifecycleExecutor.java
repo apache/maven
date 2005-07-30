@@ -273,7 +273,8 @@ public class DefaultLifecycleExecutor
                 MojoDescriptor mojo = null;
                 try
                 {
-                    mojo = getMojoDescriptor( task, session, project );
+                    // definitely a CLI goal, can use prefix
+                    mojo = getMojoDescriptor( task, session, project, true );
                 }
                 catch ( LifecycleExecutionException e )
                 {
@@ -353,7 +354,8 @@ public class DefaultLifecycleExecutor
     private void executeStandaloneGoal( String task, MavenSession session, MavenProject project )
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException
     {
-        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project );
+        // guaranteed to come from the CLI and not be part of a phase
+        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project, true );
         executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), session, project );
     }
 
@@ -472,7 +474,9 @@ public class DefaultLifecycleExecutor
                 {
                     String goal = tok.nextToken().trim();
 
-                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project );
+                    // Not from the CLI, don't use prefix
+                    // TODO: [MNG-608] this needs to be false
+                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, true );
                     addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ),
                                             session.getSettings() );
                 }
@@ -752,7 +756,8 @@ public class DefaultLifecycleExecutor
         return goals;
     }
 
-    private MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
+    private MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project,
+                                              boolean canUsePrefixes )
         throws ArtifactResolutionException, LifecycleExecutionException
     {
         String goal;
@@ -762,7 +767,7 @@ public class DefaultLifecycleExecutor
 
         StringTokenizer tok = new StringTokenizer( task, ":" );
         int numTokens = tok.countTokens();
-        if ( numTokens == 2 )
+        if ( numTokens == 2 && canUsePrefixes )
         {
             String prefix = tok.nextToken();
             goal = tok.nextToken();
@@ -895,7 +900,7 @@ public class DefaultLifecycleExecutor
 
     private static class TaskSegment
     {
-        private boolean aggregate = false;
+        private boolean aggregate;
 
         private List tasks = new ArrayList();
 
