@@ -303,7 +303,7 @@ public class DefaultMavenProjectBuilder
                 }
 
                 // TODO: configurable actions dependant on status
-                if ( status.compareTo( ArtifactStatus.VERIFIED ) < 0 )
+                if ( !artifact.isSnapshot() && status.compareTo( ArtifactStatus.VERIFIED ) < 0 )
                 {
                     // use default policy (enabled, daily update, warn on bad checksum)
                     ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
