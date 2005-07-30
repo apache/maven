@@ -1,0 +1,109 @@
+  ---
+  Plugin Prefix Resolution
+  ---
+  John Casey
+  ---
+  30-July-2005
+  ---
+
+Plugin Prefix Resolution
+
+* Introduction
+
+  When you execute Maven using a standard lifecycle phase, resolving the
+  plugins that participate in that lifecycle is a relatively simple process.
+  However, when you directly invoke a mojo from the command line, as in the case
+  of <<clean:clean>>, Maven must have some way of reliably resolving the 
+  <<clean>> plugin prefix to the <<maven-clean-plugin>>. This provides brevity
+  for command-line invocations, while preserving the descriptiveness of the
+  plugin's real artifactId.
+
+  To complicate matters even more, not all plugins should be forced to have the 
+  same groupId in the repository. Since groupIds are presumed to be controlled
+  by one project, and multiple projects may release plugins for Maven, it
+  follows that plugin-prefix mappings must also accommodate multiple plugin
+  groupIds.
+
+  To address these concerns, Maven provides a new piece of repository-level 
+  metadata (not associated with any single artifact) for plugin groups, along
+  with a plugin mapping manager to organize multiple plugin groups and provide
+  search functionality.
+
+* Mapping Prefixes to Plugins
+
+  Quite simply, for each group of plugins in the Maven repository 
+  (distinguished by a common groupId), there exists a metadata file called 
+  <<<plugins.xml>>>. This file consists of the <<groupId>> (for clarity when 
+  the file is opened outside the context of the directory), and a group of 
+  <<plugin>> elements. Each <<plugin>> in this list contains a <<prefix>> 
+  element denoting the plugin's command-line prefix, and an <<artifactId>> 
+  element, which provides the other side of the prefix mapping and provides 
+  enough information to lookup and use the plugin. When a plugin is installed
+  or deployed, this metadata file is resolved and if necessary, the prefix
+  mapping for the plugin is updated. In the case of deployment, this metadata
+  file is persisted to the remote repository.
+
+* Configuring Maven to Search for Plugins
+
+  By default, Maven will search the groupId <<org.apache.maven.plugins>>
+  for prefix-to-artifactId mappings for the plugins it needs to perform a given
+  build. However, as previously mentioned, the user may have a need for 
+  third-party plugins. Since the Maven project is assumed to have control over
+  the default plugin groupId, this means configuring Maven to search other
+  groupId locations for plugin-prefix mappings.
+
+  As it turns out, this is simple. In the Maven settings file (per-user: 
+  <<<~/.m2/settings.xml>>>; global: <<<$M2_HOME/conf/settings.xml>>>), you can
+  provide a custom <<pluginGroups>> section, listing the plugin groupIds you
+  want to search (each groupId goes in its own <<pluginGroup>> sub-element).
+  For example, if my project uses a Modello model file, I might have the 
+  following in my settings:
+
++---+
+<pluginGroups>
+  <pluginGroup>org.codehaus.modello</pluginGroup>
+</pluginGroups>
++---+
+
+  This allows me to execute the following, which will generate Java classes
+  from the model:
+
++---+
+m2 -Dversion=4.0.0 -Dmodel=maven.mdo modello:java
++---+
+
+  Adding <<org.codehaus.modello>> to the list of groupIds searched for plugin
+  prefixes will automatically import all of the modello maven plugins, but it
+  <<will not>> block the import of plugins from the <<org.apache.maven.plugins>>
+  group - this plugin groupId is always the default, and cannot be suppressed.
+
+* Current Quirks
+
+  The following list of items are on the table to be listed as bugs, and fixed.
+  They currently amount to quirks in the prefix resolution process.
+
+  * The <<org.apache.maven.plugins>> groupId is only used if <<no other plugin
+    groupId can be found to match the given prefix>>. This means that I can 
+    develop a third-party plugin that overloads the <<<compiler>>> prefix, which
+    will drastically change the build behavior. Prefixes already mapped to the
+    <<org.apache.maven.plugins>> groupId should <<NOT>> be overridden, IMO.
+
+  * <<<plugins.xml>>> metadata are resolved from the first repository possible,
+    rather than being merged. If two plugin repositories provide plugins in the
+    the same groupId, none but the plugins in the first repository can be
+    found using plugin-prefix resolution. IMO, this is by design and should not
+    change, particularly if we agree that a single project maintains control
+    over the groupId in question.
+
+    <<NOTE:>> One interesting side-effect of this is that snapshot-capable
+    repositories may have subtle interactions with "normal" repositories in this
+    respect (with one repository suppressing or being suppressed by the other, 
+    but both serving the same project/groupId).
+
+  * If you are testing a new plugin, and perform an install, the <<<plugins.xml>>>
+    for that plugin groupId will only be modified locally. If, at the next build,
+    you reference a plugin prefix that is not mapped in the local copy of any 
+    configured plugin-prefix metadata, these metadata files will be re-resolved
+    from the remote repositories. This refresh step will erase the prefix mapping
+    for the locally installed plugin, erasing your ability to reference it without
+    configuring it explicitly in your <<<pom.xml>>>.
