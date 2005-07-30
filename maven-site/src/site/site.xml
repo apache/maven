@@ -33,7 +33,7 @@
       <item name="Getting Started" href="/getting-started.html"/>
       <item name="Build Lifecycle" href="/lifecycle.html"/>
       <item name="Plugin Overview" href="/plugin-overview.html"/>
-      <item name="Dependency Mechanism" href="/dependencies.html"/>
+      <item name="Dependency Mechanism" href="/dependency-mechanism.html"/>
       <item name="Creating a Site" href="/site.html"/>
     </menu>
     <menu name="Plugin Developers">

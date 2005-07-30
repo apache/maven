@@ -23,7 +23,8 @@
           project inherits from its parents, or from its dependencies, and so on.
         </p>
         <p>
-          There is no limit to the number of levels that dependencies can be gathered from, and will only cause a problem
+          There is no limit to the number of levels that dependencies can be gathered from, and will only cause a
+          problem
           if a cyclic dependency is discovered.
         </p>
         <p>
@@ -32,17 +33,18 @@
         </p>
         <ul>
           <li>
-            <i>Dependency mediation</i> - this determines what version of a dependency will be used when multiple
+            <i>Dependency mediation</i>- this determines what version of a dependency will be used when multiple
             different ones are encountered. Currently, Maven 2.0 only supports using the "nearest definition" - so
             you can always guarantee a version by declaring it explicitly in the project's POM.
           </li>
           <li>
-            <i>Dependency scope</i> - this allows you to only include dependencies appropriate for the current stage
+            <i>Dependency scope</i>- this allows you to only include dependencies appropriate for the current stage
             of the build. This is described in more detail below.
           </li>
         </ul>
         <p>
-          More features are planned, such as different mediation techniques and conflict management as well as reporting,
+          More features are planned, such as different mediation techniques and conflict management as well as
+          reporting,
           in later alpha versions of Maven 2.0.
         </p>
       </subsection>
@@ -56,19 +58,20 @@
         </p>
         <ul>
           <li>
-            <b>compile</b> - this is the default scope, used if none is specified. Compile dependencies are available
+            <b>compile</b>- this is the default scope, used if none is specified. Compile dependencies are available
             in all classpaths.
           </li>
           <li>
-            <b>provided</b> - this is much like compile, but indicates you expect the JDK or a container to provide it.
+            <b>provided</b>- this is much like compile, but indicates you expect the JDK or a container to provide it.
             It is only available on the compilation classpath, and is not transitive.
           </li>
           <li>
-            <b>runtime</b> - this scope indicates that the dependency is not required for compilation, but is for execution.
+            <b>runtime</b>- this scope indicates that the dependency is not required for compilation, but is for
+            execution.
             It is in the runtime and test classpaths, but not the compile classpath.
           </li>
           <li>
-            <b>test</b> - this scope indicates that the dependency is not required for normal use of the application, and
+            <b>test</b>- this scope indicates that the dependency is not required for normal use of the application, and
             is only available for the test compilation and execution phases.
           </li>
         </ul>
@@ -116,7 +119,7 @@
           </tr>
         </table>
         <p>
-          <b>(*) Note: </b> it is intended that this should be runtime instead, so that all compile dependencies must
+          <b>(*) Note:</b>it is intended that this should be runtime instead, so that all compile dependencies must
           be explicitly listed - however, there is the case where the library you depend on extends a class from another
           library, forcing you to have available at compile time. For this reason, compile time dependencies remain
           as compile scope even when they are transitive.
