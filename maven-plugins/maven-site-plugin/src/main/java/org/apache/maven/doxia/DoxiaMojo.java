@@ -52,11 +52,13 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -367,9 +369,9 @@ public class DoxiaMojo
                     for ( Iterator it = duplicate.entrySet().iterator(); it.hasNext(); )
                     {
                         Map.Entry entry = (Map.Entry) it.next();
-                        List values = (List) entry.getValue();
+                        Set values = (Set) entry.getValue();
 
-                        if ( values != null && values.size() > 1 )
+                        if ( values.size() > 1 )
                         {
                             if ( sb == null )
                             {
@@ -454,6 +456,9 @@ public class DoxiaMojo
                     MavenProject parentProject = project.getParent();
                     if ( parentProject != null )
                     {
+/* Not working: 1) parentProject.getBasedir() returns the current basedir for some reason, so it copies inside itself
+which loops forever, and 2) this might be better working as a top-level aggregation rather than pushing from the
+subprojects...
                         // TODO Handle user plugin configuration
                         File parentSiteDir = new File( parentProject.getBasedir(),
                                                        parentProject.getBuild().getDirectory() + File.separator +
@@ -466,6 +471,7 @@ public class DoxiaMojo
 
                         File siteDir = new File( outputDirectory );
                         FileUtils.copyDirectoryStructure( siteDir, parentSiteDir );
+*/
                     }
                 }
             }
@@ -1056,11 +1062,6 @@ public class DoxiaMojo
     private static void tryToFindDuplicates( File directory, Map duplicate )
         throws IOException
     {
-        if ( duplicate == null )
-        {
-            duplicate = new HashMap();
-        }
-
         String defaultExcludes = StringUtils.join( DEFAULT_EXCLUDES, "," );
         List siteFiles = FileUtils.getFileNames( directory, null, defaultExcludes, false );
         for ( Iterator it = siteFiles.iterator(); it.hasNext(); )
@@ -1082,22 +1083,13 @@ public class DoxiaMojo
             String key = currentFile.substring( currentFile.indexOf( File.separator ) + 1,
                                                 currentFile.lastIndexOf( "." ) );
 
-            String filePattern = "**/" + key + ".*";
-
-            List files = FileUtils.getFileNames( directory, filePattern, defaultExcludes, true );
-            if ( files != null && files.size() > 0 )
+            Set tmp = (Set) duplicate.get( key.toLowerCase() );
+            if ( tmp == null )
             {
-                List tmp = (List) duplicate.get( key.toLowerCase() );
-                if ( tmp == null )
-                {
-                    tmp = new ArrayList();
-                }
-                if ( !tmp.containsAll( files ) )
-                {
-                    tmp.addAll( files );
-                }
+                tmp = new HashSet();
                 duplicate.put( key.toLowerCase(), tmp );
             }
+            tmp.add( key );
         }
     }
 }
