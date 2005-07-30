@@ -42,7 +42,7 @@
         <executions>
           <execution>
             <configuration>
-              <targetPercentage>50</targetPercentage>
+              <targetPercentage>50%</targetPercentage>
             </configuration>
             <goals>
               <goal>check</goal>

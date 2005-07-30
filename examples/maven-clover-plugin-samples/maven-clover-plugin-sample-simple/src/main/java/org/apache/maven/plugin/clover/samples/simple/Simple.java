@@ -20,19 +20,9 @@ public class Simple
     public void someMethod()
     {
         int i = 0;
-        i = i + 1;
+        if (i > 0)
+        {
+            i = i + 1;
+        }
     }
-/*
-    public void someMethod2()
-    {
-        int i = 0;
-        i = i + 1;
-    }
-
-    public void someMethod3()
-    {
-        int i = 0;
-        i = i + 1;
-    }
-*/    
-} 
+}
