@@ -39,6 +39,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.activation.ProfileActivationCalculator;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
@@ -62,6 +63,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -352,7 +354,28 @@ public class DefaultMavenProjectBuilder
                 // TODO: not correct in some instances
                 model.setPackaging( artifact.getType() );
 
-                // TODO: save to disk with a "generated" status
+                model.setDistributionManagement( new DistributionManagement() );
+                model.getDistributionManagement().setStatus( ArtifactStatus.GENERATED.toString() );
+
+                File file = artifact.getFile();
+                file.getParentFile().mkdirs();
+
+                FileWriter writer = null;
+                try
+                {
+                    writer = new FileWriter( file );
+
+                    MavenXpp3Writer w = new MavenXpp3Writer();
+                    w.write( writer, model );
+                }
+                catch ( IOException ioe )
+                {
+                    getLogger().warn( "Attempted to write out a temporary generated POM, but failed", ioe );
+                }
+                finally
+                {
+                    IOUtil.close( writer );
+                }
             }
         }
 
