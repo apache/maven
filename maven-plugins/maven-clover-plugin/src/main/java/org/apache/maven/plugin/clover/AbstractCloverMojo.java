@@ -16,6 +16,8 @@
 package org.apache.maven.plugin.clover;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.Taskdef;
 
 public abstract class AbstractCloverMojo extends AbstractMojo
 {
@@ -40,4 +42,17 @@ public abstract class AbstractCloverMojo extends AbstractMojo
 
         System.setProperty("clover.license.path", licenseToUse);
     }
+
+    protected Project registerCloverAntTasks()
+    {
+        Project antProject = new Project();
+        antProject.init();
+
+        Taskdef taskdef = (Taskdef) antProject.createTask( "taskdef" );
+        taskdef.setResource( "clovertasks" );
+        taskdef.execute();
+
+        return antProject;
+    }
+
 }

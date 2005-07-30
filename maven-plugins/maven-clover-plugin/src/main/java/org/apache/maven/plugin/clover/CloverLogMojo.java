@@ -18,22 +18,22 @@ package org.apache.maven.plugin.clover;
 
 import com.cenqua.clover.cfg.Percentage;
 import com.cenqua.clover.tasks.CloverPassTask;
+import com.cenqua.clover.tasks.CloverLogTask;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Taskdef;
+import com_cenqua_clover.CloverVersionInfo;
 
 /**
- * Verify test percentage coverage and fail the build if it is below the defined threshold.
+ * Provides information on the current Clover database.
  *
  * @author <a href="mailto:vmassol@apache.org">Vincent Massol</a>
  * @version $Id$
- * @goal check
- * @phase verify
- * @execute phase="test" lifecycle="clover"
- * *
+ * @goal log
+ *
  */
-public class CloverCheckMojo
+public class CloverLogMojo
     extends AbstractCloverMojo
 {
     /**
@@ -42,33 +42,16 @@ public class CloverCheckMojo
      */
     protected String cloverDatabase;
 
-    /**
-     * @parameter default-value="70"
-     * @required
-     */
-    protected float targetPercentage;
-
     public void execute()
         throws MojoExecutionException
     {
         Project antProject = registerCloverAntTasks();
 
-        getLog().info( "Checking for coverage of " + targetPercentage + "%" );
+        CloverLogTask cloverLogTask = (CloverLogTask) antProject.createTask( "clover-log" );
+        cloverLogTask.setInitString( this.cloverDatabase );
+        cloverLogTask.setOutputProperty( "cloverlogproperty" );
+        cloverLogTask.execute();
 
-        CloverPassTask cloverPassTask = (CloverPassTask) antProject.createTask( "clover-check" );
-        cloverPassTask.setInitString( this.cloverDatabase );
-        cloverPassTask.setHaltOnFailure( true );
-        cloverPassTask.setTarget( new Percentage( this.targetPercentage ) );
-        cloverPassTask.setFailureProperty("clovercheckproperty");
-        try
-        {
-            cloverPassTask.execute();
-        }
-        catch ( BuildException e )
-        {
-            getLog().error( antProject.getProperty("clovercheckproperty") );
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
+        getLog().info( antProject.getProperty( "cloverlogproperty" ) );
     }
-
 }
