@@ -23,6 +23,15 @@ if [ ! -z "$M2_HOME" ]; then
   jvm_m2_home="-Dmaven.home=$M2_HOME"
 fi
 
-#java "$jvm_m2_home" $MAVEN_OPTS -cp "$cp" $verifier $@
-java "$jvm_m2_home" -cp "$cp" $verifier $@
+# Don't debug the verifier, debug m2
+opts=`echo $MAVEN_OPTS | sed 's/-Xdebug//' | sed 's/-Djava.compiler=NONE//' | sed 's/-Xnoagent//' | sed 's/-Xrunjdwp[^ ]*//'`
+
+# If you want to debug the verifier, make --debug the first argument
+if [ "$1" = "--debug" ]; then
+  shift
+  opts="$opts -Xdebug -Djava.compiler=NONE -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+  echo Debugging verifier on port 5005
+fi
+
+java "$jvm_m2_home" $opts -cp "$cp" $verifier $@
 
