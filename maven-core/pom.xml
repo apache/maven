@@ -11,6 +11,12 @@
   <name>Maven</name>
   <version>2.0-beta-1-SNAPSHOT</version>
   <dependencies>
+    <!-- Override JSCH version from wagon alpha-4 -->
+    <dependency>
+      <groupId>jsch</groupId>
+      <artifactId>jsch</artifactId>
+      <version>0.1.21</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
