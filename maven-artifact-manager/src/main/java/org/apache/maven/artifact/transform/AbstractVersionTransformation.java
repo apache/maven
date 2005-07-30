@@ -84,6 +84,8 @@ public abstract class AbstractVersionTransformation
 
                     if ( checkForUpdates )
                     {
+                        checkedUpdates = true;
+
                         getLogger().info(
                             artifact.getArtifactId() + ": checking for updates from " + repository.getId() );
 
@@ -93,10 +95,6 @@ public abstract class AbstractVersionTransformation
                         {
                             remoteMetadata = retrieveFromRemoteRepository( artifact, repository, localMetadata,
                                                                            policy.getChecksumPolicy() );
-
-                            // we must only flag this after checking for updates, otherwise subsequent attempts will look
-                            // for SNAPSHOT without checking the metadata
-                            checkedUpdates = true;
                         }
                         catch ( ResourceDoesNotExistException e )
                         {
@@ -117,7 +115,9 @@ public abstract class AbstractVersionTransformation
                 }
             }
 
-            if ( checkedUpdates )
+            // touch the file if it was checked for updates, but don't create it if it doesn't exist to avoid
+            // storing SNAPSHOT as the actual version which doesn't exist remotely.
+            if ( checkedUpdates && localMetadata.exists() )
             {
                 localMetadata.storeInLocalRepository( localRepository );
             }
