@@ -96,15 +96,15 @@ public class DefaultLifecycleExecutor
      * Execute a task. Each task may be a phase in the lifecycle or the
      * execution of a mojo.
      *
-     * @param tasks
      * @param session
      * @param project
+     * @param dispatcher
      */
     public MavenExecutionResponse execute( MavenSession session, MavenProject project, EventDispatcher dispatcher )
         throws LifecycleExecutionException
     {
         List taskSegments = segmentTaskListByAggregationNeeds( session.getGoals(), session, project );
-        
+
         MavenExecutionResponse response = new MavenExecutionResponse();
 
         response.setStart( new Date() );
@@ -155,20 +155,19 @@ public class DefaultLifecycleExecutor
     }
 
     private void executeTaskSegments( List taskSegments, MavenSession session, MavenProject project,
-                                     EventDispatcher dispatcher )
-        throws PluginNotFoundException, MojoExecutionException, ArtifactResolutionException,
-        LifecycleExecutionException
+                                      EventDispatcher dispatcher )
+        throws PluginNotFoundException, MojoExecutionException, ArtifactResolutionException, LifecycleExecutionException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
         {
             TaskSegment segment = (TaskSegment) it.next();
-            
+
             if ( segment.aggregate() )
             {
                 line();
 
                 getLogger().info( "Building " + project.getName() );
-                
+
                 getLogger().info( "  " + segment );
 
                 line();
@@ -188,29 +187,29 @@ public class DefaultLifecycleExecutor
 
                         executeGoal( task, session, project );
                     }
-                    
+
                     dispatcher.dispatchEnd( event, project.getId() + " ( " + segment + " )" );
                 }
                 catch ( LifecycleExecutionException e )
                 {
                     dispatcher.dispatchError( event, project.getId() + " ( " + segment + " )", e );
-                    
+
                     throw e;
                 }
             }
             else
             {
                 List sortedProjects = session.getSortedProjects();
-                
+
                 // iterate over projects, and execute on each...
                 for ( Iterator projectIterator = sortedProjects.iterator(); projectIterator.hasNext(); )
                 {
                     MavenProject currentProject = (MavenProject) projectIterator.next();
-                    
+
                     line();
 
                     getLogger().info( "Building " + currentProject.getName() );
-                    
+
                     getLogger().info( "  " + segment );
 
                     line();
@@ -229,13 +228,13 @@ public class DefaultLifecycleExecutor
 
                             executeGoal( task, session, currentProject );
                         }
-                        
+
                         dispatcher.dispatchEnd( event, currentProject.getId() + " ( " + segment + " )" );
                     }
                     catch ( LifecycleExecutionException e )
                     {
                         dispatcher.dispatchError( event, currentProject.getId() + " ( " + segment + " )", e );
-                        
+
                         throw e;
                     }
                 }
@@ -243,16 +242,15 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private List segmentTaskListByAggregationNeeds( List tasks, MavenSession session, MavenProject project ) 
-        throws LifecycleExecutionException
+    private List segmentTaskListByAggregationNeeds( List tasks, MavenSession session, MavenProject project )
     {
         List segments = new ArrayList();
-        
+
         TaskSegment currentSegment = null;
         for ( Iterator it = tasks.iterator(); it.hasNext(); )
         {
             String task = (String) it.next();
-            
+
             // if it's a phase, then we don't need to check whether it's an aggregator.
             // simply add it to the current task partition.
             if ( phases.contains( task ) )
@@ -262,12 +260,12 @@ public class DefaultLifecycleExecutor
                     segments.add( currentSegment );
                     currentSegment = null;
                 }
-                
+
                 if ( currentSegment == null )
                 {
                     currentSegment = new TaskSegment();
                 }
-                
+
                 currentSegment.add( task );
             }
             else
@@ -279,15 +277,17 @@ public class DefaultLifecycleExecutor
                 }
                 catch ( LifecycleExecutionException e )
                 {
-                    getLogger().info( "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
+                    getLogger().info(
+                        "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
                     getLogger().debug( "", e );
                 }
                 catch ( ArtifactResolutionException e )
                 {
-                    getLogger().info( "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
+                    getLogger().info(
+                        "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator." );
                     getLogger().debug( "", e );
                 }
-                
+
                 if ( mojo != null && mojo.isAggregator() )
                 {
                     if ( currentSegment != null && !currentSegment.aggregate() )
@@ -295,12 +295,12 @@ public class DefaultLifecycleExecutor
                         segments.add( currentSegment );
                         currentSegment = null;
                     }
-                    
+
                     if ( currentSegment == null )
                     {
                         currentSegment = new TaskSegment( true );
                     }
-                    
+
                     currentSegment.add( task );
                 }
                 else
@@ -310,19 +310,19 @@ public class DefaultLifecycleExecutor
                         segments.add( currentSegment );
                         currentSegment = null;
                     }
-                    
+
                     if ( currentSegment == null )
                     {
                         currentSegment = new TaskSegment();
                     }
-                    
+
                     currentSegment.add( task );
                 }
             }
         }
-        
+
         segments.add( currentSegment );
-        
+
         return segments;
     }
 
@@ -887,7 +887,7 @@ public class DefaultLifecycleExecutor
             project.addPlugin( plugin );
         }
     }
-    
+
     protected void line()
     {
         getLogger().info( "----------------------------------------------------------------------------" );
@@ -896,43 +896,44 @@ public class DefaultLifecycleExecutor
     private static class TaskSegment
     {
         private boolean aggregate = false;
+
         private List tasks = new ArrayList();
-        
+
         TaskSegment()
         {
-            
+
         }
-        
+
         TaskSegment( boolean aggregate )
         {
             this.aggregate = aggregate;
         }
-        
+
         public String toString()
         {
             StringBuffer message = new StringBuffer();
-            
+
             message.append( " task-segment: [" );
-            
+
             for ( Iterator it = tasks.iterator(); it.hasNext(); )
             {
                 String task = (String) it.next();
-                
+
                 message.append( task );
-                
+
                 if ( it.hasNext() )
                 {
-                    message.append( ", ");
+                    message.append( ", " );
                 }
             }
-            
+
             message.append( "]" );
-            
+
             if ( aggregate )
             {
                 message.append( " (aggregator-style)" );
             }
-            
+
             return message.toString();
         }
 
@@ -940,12 +941,12 @@ public class DefaultLifecycleExecutor
         {
             return aggregate;
         }
-        
+
         void add( String task )
         {
             tasks.add( task );
         }
-        
+
         List getTasks()
         {
             return tasks;
