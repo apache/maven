@@ -125,36 +125,38 @@ public class DefaultMaven
         }
 
         EventDispatcher dispatcher = request.getEventDispatcher();
-        
+
         String event = MavenEvents.REACTOR_EXECUTION;
 
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
         List projects;
-        
+
         MavenProject topLevelProject;
 
         try
         {
             List files = getProjectFiles( request );
-            
+
             projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
                                         request.getSettings() );
-            
+
             // the reasoning here is that the list is still unsorted according to dependency, so the first project
             // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
-            
-            // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
-            topLevelProject = (MavenProject) projects.get( 0 );
-            
-            projects = ProjectSorter.getSortedProjects(projects);
 
-            if ( projects.isEmpty() )
+            if ( !projects.isEmpty() )
+            {
+                // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
+                topLevelProject = (MavenProject) projects.get( 0 );
+                projects = ProjectSorter.getSortedProjects( projects );
+            }
+            else
             {
                 List externalProfiles = getActiveExternalProfiles( null, request.getSettings() );
 
-                projects.add(
-                    projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(), externalProfiles ) );
+                topLevelProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
+                                                                              externalProfiles );
+                projects.add( topLevelProject );
             }
         }
         catch ( IOException e )
@@ -201,11 +203,11 @@ public class DefaultMaven
         try
         {
             MavenSession session = createSession( request, projects );
-            
+
             try
             {
                 MavenExecutionResponse response = lifecycleExecutor.execute( session, topLevelProject, dispatcher );
-                
+
                 // TODO: is this perhaps more appropriate in the CLI?
                 if ( response.isExecutionFailure() )
                 {
@@ -219,7 +221,7 @@ public class DefaultMaven
                         if ( exception.getCause() == null )
                         {
                             MojoExecutionException e = (MojoExecutionException) exception;
-                            
+
                             logFailure( response, e, e.getLongMessage() );
                         }
                         else
@@ -240,7 +242,7 @@ public class DefaultMaven
                         // one example)
                         logError( response );
                     }
-                    
+
                     return response;
                 }
                 else
@@ -279,7 +281,7 @@ public class DefaultMaven
             {
                 getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
             }
-            
+
             MavenProject project = getProject( file, localRepository, settings );
 
             if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
@@ -402,7 +404,8 @@ public class DefaultMaven
     protected MavenSession createSession( MavenExecutionRequest request, List projects )
     {
         return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
-                                 request.getEventDispatcher(), projects, request.getGoals(), request.getBaseDirectory() );
+                                 request.getEventDispatcher(), projects, request.getGoals(),
+                                 request.getBaseDirectory() );
     }
 
     /**
@@ -622,12 +625,12 @@ public class DefaultMaven
         }
         return msg;
     }
-    
+
     private List getProjectFiles( MavenExecutionRequest request )
         throws IOException
     {
         List files = Collections.EMPTY_LIST;
-        
+
         if ( request.isReactorActive() )
         {
             // TODO: should we now include the pom.xml in the current directory?
@@ -636,9 +639,9 @@ public class DefaultMaven
 
             String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 + ",**/" + RELEASE_POMv4 );
             String excludes = System.getProperty( "maven.reactor.excludes", POMv4 + "," + RELEASE_POMv4 );
-            
+
             files = FileUtils.getFiles( userDir, includes, excludes );
-            
+
             filterOneProjectFilePerDirectory( files );
 
             // make sure there is consistent ordering on all platforms, rather than using the filesystem ordering
@@ -667,28 +670,28 @@ public class DefaultMaven
                 files = Collections.singletonList( projectFile );
             }
         }
-        
+
         return files;
     }
 
     private void filterOneProjectFilePerDirectory( List files )
     {
         List releaseDirs = new ArrayList();
-        
+
         for ( Iterator it = files.iterator(); it.hasNext(); )
         {
             File projectFile = (File) it.next();
-            
+
             if ( RELEASE_POMv4.equals( projectFile.getName() ) )
             {
                 releaseDirs.add( projectFile.getParentFile() );
             }
         }
-        
+
         for ( Iterator it = files.iterator(); it.hasNext(); )
         {
             File projectFile = (File) it.next();
-            
+
             // remove pom.xml files where there is a sibling release-pom.xml file...
             if ( !RELEASE_POMv4.equals( projectFile.getName() ) && releaseDirs.contains( projectFile.getParentFile() ) )
             {
