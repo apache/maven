@@ -1,0 +1,193 @@
+  ---
+  Plugin Registry Overview
+  ---
+  John Casey
+  ---
+  29-July-2005
+  ---
+
+Plugin Registry Overview
+
+* Introduction
+
+  The Maven 2 plugin registry (~/.m2/plugin-registry.xml) is a mechanism to 
+  help the user exert some control over their build environment. Rather than
+  simply fetching the latest version of every plugin used in a given build,
+  this registry allows the user to peg a plugin to a particular version, and
+  only update to newer versions under certain restricted circumstances. There
+  are various ways to configure or bypass this feature, and the feature itself
+  can be managed on either a per-user or global level.
+
+* A Tour of plugin-registry.xml
+
+  The plugin registry file (per-user: ~/.m2/plugin-registry.xml, global: 
+  $M2_HOME/conf/plugin-registry.xml) contains a set of plugin-version
+  registrations, along with some configuration parameters for the registry
+  itself.
+
+  Currently, the plugin registry supports configuration options for the 
+  following:
+
+  * <<updateInterval>> - Determines how often (or whether) the registered
+    plugins are checked for updates.
+
+    Combined with the <<lastChecked>> plugin attribute, this determines whether
+    a particular plugin will be checked for updates during a given build. Valid
+    settings are: never, always, and interval:TTT (TTT is a short specification 
+    for a time interval, which follows the pattern /([0-9]+[wdhm])+/). Intervals 
+    are specified down to the minute resolution. An example of an interval 
+    specification might be:
+
+    <<<interval:4w2h30m>>> (check every 4 weeks, 2 hours, and 30 minutes)
+
+  * <<autoUpdate>> - Specifies whether the user should be prompted before 
+    registering plugin-version updates. This is a boolean value, accepting
+    true/false.
+
+  * <<checkLatest>> - Specifies whether the LATEST artifact metadata should
+    be consulted while determining versions for <unregistered> plugins.
+
+    LATEST metadata is always published when a plugin is installed or deployed
+    to a repository, and so will always reference the newest copy of the plugin,
+    regardless of whether this is a snapshot version or not.
+
+    <NOTE:> Registered plugins will currently only ever be updated with the 
+    results of RELEASE metadata resolution.
+
+  Obviously, the plugin registry also contains information about resolved plugin
+  versions. The following information is tracked for each registered plugin:
+
+  * <<groupId>> - The plugin's group id.
+
+  * <<artifactId>> - The plugin's artifact id.
+
+  * <<lastChecked>> - The timestamp from the last time updates were checked for
+    this plugin.
+
+  * <<useVersion>> - The currently registered version for this plugin. This is
+    the version Maven will use when executing this plugin's mojos.
+
+  * <<rejectedVersions>> - A list of versions discovered for this plugin which
+    have been rejected by the user. This keeps Maven from continually prompting
+    the user to update a given plugin to the same new version.
+
+* Using (or not) the Plugin Registry
+
+  There are many ways you can override the default plugin registry settings.
+  Often, this will be desirable for a single, one-off build of a project that
+  deviates from your normal environment configuration. However, before discussing
+  these options, it's important to understand how the plugin registry resolves
+  versions for unregistered plugins, along with plugins in need of an update 
+  check.
+
+** Resolving Plugin Versions
+
+  The plugin registry uses a relatively straightforward algorithm for resolving
+  plugin versions. However, considerations for when to check, when to prompt the
+  user, and when to persist resolved plugin versions complicate this 
+  implementation considerably. In general, plugin versions are resolved using a 
+  four-step process:
+
+  [[1]] Check for a plugin configuration in the MavenProject instance. Any
+        plugin configuration found in the MavenProject is treated as authoritative,
+        and will stop the plugin-version resolution/persistence process when
+        found.
+
+  [[2]] If the plugin registry is enabled, check it for an existing registered 
+        version. If the plugin has been registered, a combination of the 
+        updateInterval configuration and the lastChecked attribute (on the 
+        plugin) determine whether the plugin needs to be checked for updates. 
+        If the plugin doesn't need an update check, the registered version is 
+        used.
+
+        If the plugin is due for an update check, the plugin-artifact's RELEASE
+        metadata is resolved. Resolution of this metadata may trigger a prompt
+        to notify the user of the new version, and/or persistence of the new
+        version in the registry. If the update is performed, the lastChecked
+        attribute is updated to reflect this.
+
+  [[3]] <If> the <<checkLatest>> configuration is set to <<<true>>>, or the
+        <<<'--check-plugin-latest'>>> CLI option (discussed later) is 
+        provided, then the LATEST artifact metadata is resolved for the plugin.
+
+        If this metadata is resolved successfully, that version is used.
+        This may trigger a prompt to ask the user whether to register the 
+        plugin, and a successive persistence step for the new plugin version.
+
+  [[4]] If the version still has not been resolved, RELEASE artifact 
+        metadata is checked for the plugin. If this metadata resolves 
+        successfully, it is the version used. This may also trigger a prompt
+        to ask the user whether to register the plugin, and a persistence step
+        registering the new plugin version.
+
+  I've alluded to prompting the user and persisting the plugin version into
+  the registry. Now, let's examine the circumstances under which these steps 
+  actually take place.
+
+  There are two cases where the user may be prompted to change the plugin
+  registry; when the plugin is not registered, and when the plugin is registered,
+  but an updated version is discovered. By default, the user is prompted to save
+  the resolved version for each plugin, with the option of specifying that a
+  decision should be remembered and applied to all (either yes to all, or no
+  to all) plugins registry updates. However, it is also possible to bypass
+  this behavior in the following ways:
+
+  * Specify <<autoUpdate>> == <<<true>>> in the plugin-registry.xml. This
+    configuration parameter means that the user is not prompted, and all
+    updated/discovered versions are to be persisted.
+
+  * Specify <<<'--batch-mode'>>> (or <<<'-B'>>>) from the command line.
+    This functions in the same way as the <<autoUpdate>> config parameter
+    above.
+
+  * Specify <<<'--no-plugin-updates'>>> | <<<'-npu'>>> from the command line.
+    This prevents any updates or new registrations from taking place, but
+    existing plugin versions in the registry will be used when available.
+
+  * Specify <<<'--check-plugin-updates'>>> | <<<'--update-plugins'>>> |
+    <<<'-up'>>> | <<<'-cpu'>>> (synonyms) from the command line.
+
+  * Specify <<<'--no-plugin-registry'>>> | <<<'-npr'>>> from the command line.
+    This prevents resolution of plugin versions using the plugin-registry.xml
+    file. The plugin version will be resolved either from the project or 
+    from the repository in this case.
+
+  * Specify <<usePluginRegistry>> == <<<false>>> in the settings.xml. This
+    configuration parameter will disable use of the plugin registry for the
+    entire build environment, as opposed to the immediate build execution
+    (as in the case of the corresponding command line switch above).
+
+    These force all registered plugins to be updated. The user will still
+    be prompted to approve plugin versions, unless one of the above switches
+    is also provided.
+
+** Summary of Command Line Options for the Plugin Registry
+
+  The following summary of command line options is provided for quick reference:
+
+  * <<<--no-plugin-registry>>> - Bypass the plugin registry.
+
+    <Synonym:> <<<-npr>>>
+
+  * <<<--no-plugin-latest>>> - Don't check the LATEST artifact metadata when
+    resolving plugin versions, regardless of the value of <<useLatest>> in 
+    the plugin-registry.xml file.
+
+    <Synonym:> <<<-npl>>>
+
+  * <<<--check-plugin-latest>>> - Check the LATEST artifact metadata when
+    resolving plugin versions, regardless of the value of <<useLatest>> in
+    the plugin-registry.xml file.
+
+    <Synonym:> <<<-cpl>>>
+
+  * <<<--no-plugin-updates>>> - Do not search for updated versions of registered
+    plugins. Only use the repository to resolve unregistered plugins.
+
+    <Synonym:> <<<-npu>>>
+
+  * <<<--check-plugin-updates>>> - Force the plugin version manager to check for
+    updated versions of any registered plugins, currently using RELEASE metadata
+    <<only>>.
+
+    <Synonyms:> <<<--update-plugins>>> <<<-up>>> <<<-cpu>>>
