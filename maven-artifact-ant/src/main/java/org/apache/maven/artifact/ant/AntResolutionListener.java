@@ -72,6 +72,11 @@ public class AntResolutionListener
         project.log( indent + artifact.getId() + " (settings scope to: " + scope + ")" );
     }
 
+    public void updateScopeCurrentPom( Artifact artifact, String scope )
+    {
+    	updateScope( artifact, scope );
+    }
+
     public void manageArtifact( Artifact artifact, Artifact replacement )
     {
         String msg = indent + artifact.getId();
