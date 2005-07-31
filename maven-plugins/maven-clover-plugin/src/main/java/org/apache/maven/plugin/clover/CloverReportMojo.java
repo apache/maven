@@ -20,16 +20,12 @@ import com.cenqua.clover.reporters.html.HtmlReporter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.reporting.MavenReport;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.doxia.sink.Sink;
-import org.codehaus.doxia.module.xhtml.XhtmlSink;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.io.File;
 
 /**
  * Generate a Clover report.
@@ -66,8 +62,6 @@ public class CloverReportMojo extends AbstractMavenReport
      * @readonly
      */
     private MavenProject project;
-
-    private File reportOutputDirectory;
 
     /**
      * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)

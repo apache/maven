@@ -16,7 +16,6 @@ package org.apache.maven.artifact.metadata;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**

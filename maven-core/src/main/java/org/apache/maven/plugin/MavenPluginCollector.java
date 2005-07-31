@@ -1,7 +1,6 @@
 package org.apache.maven.plugin;
 
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
@@ -10,7 +9,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 

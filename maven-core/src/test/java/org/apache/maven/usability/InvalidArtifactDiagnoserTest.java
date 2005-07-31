@@ -1,11 +1,8 @@
 package org.apache.maven.usability;
 
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.codehaus.plexus.PlexusTestCase;
-
-import junit.framework.TestCase;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.

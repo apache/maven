@@ -17,12 +17,10 @@ package org.apache.maven.plugin.clover;
  */
 
 import com.cenqua.clover.cfg.Percentage;
-import com.cenqua.clover.cfg.Interval;
 import com.cenqua.clover.tasks.CloverPassTask;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Taskdef;
 
 /**
  * Verify test percentage coverage and fail the build if it is below the defined threshold.

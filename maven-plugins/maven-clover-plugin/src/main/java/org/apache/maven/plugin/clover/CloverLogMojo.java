@@ -16,14 +16,9 @@ package org.apache.maven.plugin.clover;
  * limitations under the License.
  */
 
-import com.cenqua.clover.cfg.Percentage;
-import com.cenqua.clover.tasks.CloverPassTask;
 import com.cenqua.clover.tasks.CloverLogTask;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Taskdef;
-import com_cenqua_clover.CloverVersionInfo;
 
 /**
  * Provides information on the current Clover database.

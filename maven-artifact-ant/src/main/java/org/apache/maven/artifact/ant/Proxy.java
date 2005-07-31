@@ -16,9 +16,7 @@ package org.apache.maven.artifact.ant;
  * limitations under the License.
  */
 
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.proxy.ProxyInfo;
-import org.apache.maven.settings.Server;
 
 /**
  * Ant Wrapper for wagon proxy.

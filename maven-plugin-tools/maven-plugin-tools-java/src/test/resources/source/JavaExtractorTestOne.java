@@ -1,3 +1,4 @@
+package source;
 
 import org.apache.maven.plugin.AbstractMojo;
 
