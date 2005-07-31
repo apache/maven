@@ -1,0 +1,370 @@
+  ---
+  Build Profiles
+  ---
+  30-July-2005
+  ---
+  John Casey
+  ---
+
+Build Profiles
+
+* Introduction
+
+  Maven 2.0 goes to great lengths to ensure that builds are portable. Among
+  other things, this means allowing build configuration inside the POM, 
+  avoiding <<all>> filesystem references (in inhertiance, dependencies, and
+  other places), and leaning much more heavily on the local repository to
+  store the metadata needed to make this possible.
+
+  However, sometimes portability is not entirely possible. Under certain 
+  conditions, plugins may need to be configured with local filesystem paths.
+  Under other circumstances, a slightly different dependency set will be 
+  required, and the project's artifact name may need to be adjusted slightly.
+  And at still other times, you may even need to include a whole plugin in the
+  build lifecycle depending on the detected build environment.
+
+  To address these circumstances, Maven 2.0 introduces the concept of a build
+  profile. Profiles are specified using a subset of the elements available in
+  the POM itself (plus one extra section), and are triggered in any of a 
+  variety of ways. They modify the POM at build time, and are meant to be used
+  in complementary sets to give equivalent-but-different parameters for a set
+  of target environments (providing, for example, the path of the appserver root
+  in the development, testing, and production environments). As such, profiles
+  can easily lead to differing build results from different members of your team.
+  However, used properly, profiles can be used while still preserving 
+  project portability.
+
+* Profile Locations
+
+  Build profiles can be specified in any of three locations: 
+
+  * the Maven settings file
+  
+  * a file in the the project basedir called <<<profiles.xml>>>
+
+  * in the POM itself 
+
+  As we'll discuss later, the location of the profile determines what parameters 
+  of the POM it can modify.
+
+* Triggering Profiles
+
+  Profile triggering also happens in one of three general ways:
+
+  * Profiles can be explicitly specified using the <<<-P>>> CLI option.
+
+    This option takes an argument that is a comma-delimited list of
+    profile-ids to be used. When this option is specified, no profiles other
+    than those specified in the option argument will be activated.
+
+  * Profiles can be activated in the Maven settings, via the <<activeProfiles>>
+    section. This section takes a list of <<activeProfile>> elements, each
+    containing a profile-id inside.
+
+  * Profiles can be automatically triggered based on the detected state of
+    the build environment. These triggers are specified via an <<activation>>
+    section in the profile itself. Currently, this detection is limited to 
+    prefix-matching of the JDK version, the presence of a system property, or 
+    the value of a system property. Here are some examples:
+
++---+
+<activation>
+  <jdk>1.4</jdk>
+</activation>
++---+
+
+  This will trigger the profile when the JDK's version starts with "1.4" (eg.
+  "1.4.0_08", "1.4.2_07", "1.4").
+
++---+
+<activation>
+  <property>
+    <name>debug</name>
+  </property>
+</activation>
++---+
+
+  This will activate the profile when the system property "debug" is specified
+  with any value.
+
++---+
+<activation>
+  <property>
+    <name>environment</name>
+    <value>test</value>
+  </property>
+</activation>
++---+
+
+  This last example will trigger the profile when the system property 
+  "environment" is specified with the value "test".
+
+* What Can I Configure in a Profile?
+
+  Now that we've talked about where to specify profiles, and how to activate them,
+  it will be useful to talk about <what> you can specify in a profile. As with
+  the other aspects of profile configuration, this answer is not straightforward.
+
+  Depending on where you choose to configure your profile, you will have access
+  to varying POM configuration options. Profiles specified in external files 
+  (i.e in <<<settings.xml>>> or <<<profiles.xml>>>) are not portable in the 
+  strictest sense, because they externalize some of the build configuration from
+  the only project metadata that is maintained on the remote repositories: the 
+  POM. Therefore, you will only be able to modify the <<repositories>> and
+  <<pluginRepositories>> sections of the POM, plus an extra <<properties>>
+  section. 
+
+  The <<properties>> section allows you to specify free-form key-value pairs 
+  which will be included in the interpolation process for the POM. This allows
+  you to specify a plugin configuration in the form of $\{profile.provided.path\}.
+
+  On the other hand, if your profiles can be reasonably specified <inside> the
+  POM, you have many more options. The trade-off, of course, is that you can 
+  only modify <that> project and it's sub-modules. Since these profiles are 
+  specified inline, and therefore have a better chance of preserving portability,
+  it's reasonable to say you can add more information to them without the risk
+  of that information being unavailable to other users.
+
+  Profiles specified in the POM can modify the following POM elements:
+
+  * <<repositories>>
+  
+  * <<pluginRepositories>>
+
+  * <<dependencies>>
+
+  * <<plugins>>
+
+  * <<properties>> (not actually available in the main POM, but used behind the
+    scenes)
+
+  * <<modules>>
+
+  * <<reporting>>
+
+  * <<dependencyManagement>>
+
+  * <<distributionManagement>>
+
+  * a subset of the <<build>> element, which consists of:
+
+    * <<defaultGoal>>
+
+    * <<resources>>
+
+    * <<testResources>>
+
+    * <<finalName>>
+
+* Profile Pitfalls
+
+  We've already mentioned the fact that adding profiles to your build has the
+  potential to break portability for your project. We've even gone so far as to
+  highlight circumstances where profiles are likely to break project portability.
+  However, it's worth reiterating those points as part of a more coherent 
+  discussion about some pitfalls to avoid when using profiles.
+
+  There are two main problem areas to keep in mind when using profiles.
+  First are external properties, usually used in plugin configurations. These pose
+  the risk of breaking portability in your project. The other, more subtle area
+  is the incomplete specification of a natural set of profiles.
+
+** External Properties
+
+  External property definition concerns any property value defined outside
+  the <<<pom.xml>>> but not defined in a corresponding profile inside it.
+  The most obvious usage of properties in the POM is in plugin configuration.
+  While it is certainly possible to break project portability without properties, 
+  these critters can have subtle effects that cause builds to fail. For example, 
+  specifying appserver paths in a profile that is specified in the 
+  <<<settings.xml>>> may cause your integration test plugin to fail when another 
+  user on the team attempts to build without a similar <<<settings.xml>>>. 
+  Consider the following <<<pom.xml>>> snippet for a web application project:
+
++---+
+...
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.myco.plugins</groupId>
+      <artifactId>spiffy-integrationTest-plugin</artifactId>
+      <version>1.0</version>
+
+      <configuration>
+        <appserverHome>$\{appserver.home\}</appserverHome>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+...
++---+
+
+  Now, in your local <<<~/.m2/settings.xml>>>, you have:
+
++---+
+<profiles>
+  <profile>
+    <id>appserverConfig</id>
+    <properties>
+      <appserver.home>/path/to/appserver</appserver.home>
+    </properties>
+  </profile>
+</profiles>
+
+<activeProfiles>
+  <activeProfile>appserverConfig</activeProfile>
+</activeProfiles>
++---+
+
+  When you build the <<integration-test>> lifecycle phase, your integration
+  tests pass, since the path you've provided allows the test plugin to install
+  and test this web application.
+
+  <However>, when your your colleague attempts to build to <<integration-test>>,
+  his build fails spectacularly, complaining that it cannot resolve the plugin
+  configuration parameter \<appserverHome\>, or worse, that the value of that
+  parameter - literally $\{appserver.home\} - is invalid (if it warns you at all).
+
+  Congratulations, your project is now non-portable. Inlining this profile with
+  your <<<pom.xml>>> can help alleviate this, with the obvious drawback that
+  each project hierarchy (allowing for the effects of inheritance) now have to
+  specify this information. Since Maven provides good support for project
+  inheritance, it's possible to stick this sort of configuration in the 
+  <<pluginManagement>> section of a team-level POM or similar, and simply 
+  inherit the paths.
+
+  Another, less attractive answer might be standardization of development
+  environments. However, this will tend to compromise the productivity
+  gain that Maven is capable of providing.
+
+** Incomplete Specification of a Natural Profile Set
+
+  In addition to the above portability-breaker, it's easy to fail to cover all
+  cases with your profiles. When you do this, you're usually leaving one of
+  your target environments high and dry. Let's take the example <<<pom.xml>>> 
+  snippet from above one more time:
+
++---+
+...
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.myco.plugins</groupId>
+      <artifactId>spiffy-integrationTest-plugin</artifactId>
+      <version>1.0</version>
+
+      <configuration>
+        <appserverHome>$\{appserver.home\}</appserverHome>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+...
++---+
+
+  Now, consider the following profile, which would be specified inline with the
+  <<<pom.xml>>>:
+
++---+
+<profiles>
+  <profile>
+    <id>appserverConfig-dev</id>
+    
+    <activation>
+      <property>
+        <name>env</name>
+        <value>dev</value>
+      </property>
+    </activation>
+
+    <properties>
+      <appserver.home>/path/to/dev/appserver</appserver.home>
+    </properties>
+  </profile>
+</profiles>
++---+
+
+  This profile looks quite similar to the one from last example, with a few 
+  important exceptions: it's plainly geared toward a development environment,
+  and it has an activation section that will trigger its inclusion when the
+  system properties contain "env=dev". So, executing:
+
++---+
+m2 -Denv=dev integration-test
++---+
+
+  should result in a successful build. However, this won't:
+
++---+
+m2 -Denv=production integration-test
++---+
+
+  Why? Because, the resulting non-interpolated literal value of $\{appserver.home\}
+  will not be a valid path for deploying and testing your web application. We
+  haven't considered the case for the production environment when writing our
+  profiles. The "production" environment, along with "test" and possibly even
+  "local" constitute a natural set of target environments for which we may want
+  to build the integration-test lifecycle phase. The incomplete specification of
+  this natural set means we have effectively limited our valid target environments 
+  to the development environment. Your teammates - and probably your manager - 
+  will not see the humor in this. When you construct profiles to handle cases
+  such as these, be sure to address the entire set of target permutations.
+
+  As a quick aside, it's possible for user-specific profiles to act in a similar
+  way. This means that profiles for handling different environments which are 
+  keyed to the user can act up when the team adds a new developer. While I 
+  suppose this <could> act as useful training for the newbie, it's just wouldn't
+  be nice to throw them to the wolves in this way. Again, be sure to think of the
+  <whole> set of profiles.
+  
+
+* Naming Conventions
+
+  By now you've noticed that profiles are a natural way of addressing the problem of 
+  different build configuration requirements for different target environments. Above,
+  we discussed the concept of a "natural set" of profiles to address this situation,
+  and the importance of considering the whole set of profiles that will be required.
+
+  However, the question of how to organize and manage the evolution of that set is
+  non-trivial as well. Just as a good developer strives to write self-documenting
+  code, it's important that your profile id's give a hint to their intended use.
+  One good way to do this is to use the common system property trigger as part of
+  the name for the profile. This might result in names like <<env-dev>>, <<env-test>>,
+  and <<env-prod>> for profiles that are triggered by the system property <<env>>.
+  Such a system leaves a highly intuitive hint on how to activate a build targeted
+  at a particular environment. Thus, to activate a build for the test environment,
+  you need to activate <<env-test>> by issuing:
+
++---+
+m2 -Denv=test <phase>
++---+
+
+  The right command-line option can be had by simply substituting "=" for "-" in
+  the profile id.
+
+* Getting Help
+
+  If you get lost when working with a profile-enabled build, you can get a glance
+  into the build-time POM and active profiles using the <<maven-projecthelp-plugin>>.
+
+  To see the list of active profiles, issue:
+
++---+
+m2 projecthelp:active-profiles -Denv=test
++---+
+
+  This should render a bulleted list of the profiles (hopefully including one
+  named <<env-test>> for this build).
+
+  If you want to see the effect that the current active profiles have had on the
+  POM, issue:
+
++---+
+m2 projecthelp:effective-pom -Denv=test
++---+
+
+  This will print the effective POM for this build configuration out to the 
+  console. If you want to redirect it to a file called <<<effective-pom.xml>>>, 
+  use the command-line option <<<-Doutput=effective-pom.xml>>>.
+
+
