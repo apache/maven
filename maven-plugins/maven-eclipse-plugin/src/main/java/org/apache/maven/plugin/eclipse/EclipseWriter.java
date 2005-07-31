@@ -167,6 +167,8 @@ public class EclipseWriter
         {
             writer.startElement( "linkedResources" );
 
+            addFileLink( writer, projectBaseDir, basedir, project.getFile() );
+
             addSourceLinks( writer, projectBaseDir, basedir, executedProject.getCompileSourceRoots() );
 
             addResourceLinks( writer, projectBaseDir, basedir, executedProject.getBuild().getResources() );
@@ -302,7 +304,9 @@ public class EclipseWriter
 
                 sourceRoot = toRelative( projectBaseDir, sourceRoot );
                 if (!projectBaseDir.equals(basedir))
-                    sourceRoot = sourceRoot.replaceAll("/", "-");
+                {
+                    sourceRoot = sourceRoot.replaceAll( "/", "-" );
+                }
                 
                 writer.addAttribute( "path", sourceRoot );
 
@@ -353,7 +357,9 @@ public class EclipseWriter
             String resourceDir = resource.getDirectory();
             resourceDir = toRelative( projectBaseDir, resourceDir );
             if (!projectBaseDir.equals(basedir))
-                resourceDir = resourceDir.replaceAll("/", "-");
+            {
+                resourceDir = resourceDir.replaceAll( "/", "-" );
+            }
             
             writer.addAttribute( "path", resourceDir );
 
@@ -378,7 +384,7 @@ public class EclipseWriter
 
                 writer.startElement( "name" );
 
-                writer.writeText( toRelative( projectBaseDir, sourceRoot ).replaceAll("/", "-") );
+                writer.writeText( toRelative( projectBaseDir, sourceRoot ).replaceAll( "/", "-" ) );
                 
                 writer.endElement(); // name
 
@@ -411,7 +417,7 @@ public class EclipseWriter
 
                 writer.startElement( "name" );
 
-                writer.writeText( toRelative( projectBaseDir, resourceDir ).replaceAll("/", "-") );
+                writer.writeText( toRelative( projectBaseDir, resourceDir ).replaceAll( "/", "-" ) );
 
                 writer.endElement(); // name
 
@@ -432,6 +438,38 @@ public class EclipseWriter
         }
     }
     
+    private void addFileLink( XMLWriter writer, File projectBaseDir, File basedir, File file )
+    {
+        if ( file.isFile() )
+        {
+            writer.startElement( "link" );
+
+            writer.startElement( "name" );
+
+            writer.writeText( toRelative( projectBaseDir, file.toString() ).replaceAll( "/", "-" ) );
+
+            writer.endElement(); // name
+
+            writer.startElement( "type" );
+
+            writer.writeText( "1" );
+
+            writer.endElement(); // type
+
+            writer.startElement( "location" );
+
+            writer.writeText( file.toString() );
+
+            writer.endElement(); // location
+
+            writer.endElement(); // link
+        }
+        else
+        {
+            log.warn( "Not adding a file link to " + file + "; it is not a file" );
+        }
+    }
+ 
     /**
      * 
      * @param writer
