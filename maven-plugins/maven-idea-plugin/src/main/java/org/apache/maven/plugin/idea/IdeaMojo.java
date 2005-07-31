@@ -40,7 +40,7 @@ import java.util.Iterator;
  * Goal for generating IDEA files from a POM.
  *
  * @goal idea
- * @executePhase generate-sources
+ * @execute phase="generate-sources"
  * @requiresDependencyResolution test
  * @todo use dom4j or something. Xpp3Dom can't cope properly with entities and so on
  */
@@ -58,6 +58,14 @@ public class IdeaMojo
      * @parameter expression="${executedProject}"
      */
     private MavenProject executedProject;
+
+    /**
+     * Specify the name of the registered IDEA JDK to use
+     * for the project.
+     *
+     * @parameter
+     */
+    private String jdkName;
 
     public void execute()
         throws MojoExecutionException
@@ -123,6 +131,16 @@ public class IdeaMojo
             finally
             {
                 IOUtil.close( reader );
+            }
+
+            // Set the jdk name if set
+            if ( jdkName != null )
+            {
+                setJdkName( module );
+            }
+            else
+            {
+                getLog().warn( "jdkName is not set, you will have to set the JDK to use in IDEA." );
             }
 
             Xpp3Dom component = findComponent( module, "ProjectModuleManager" );
@@ -337,6 +355,12 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         element = createElement( element, "root" );
         element.setAttribute( "relative", "/" );
         element.setAttribute( "url", getModuleFileUrl( warSrc ) );
+    }
+
+    private void setJdkName( Xpp3Dom content )
+    {
+        Xpp3Dom component = findComponent( content, "ProjectRootManager" );
+        component.setAttribute( "project-jdk-name", jdkName );
     }
 
     private void addSourceFolder( Xpp3Dom content, String directory, boolean isTest )
