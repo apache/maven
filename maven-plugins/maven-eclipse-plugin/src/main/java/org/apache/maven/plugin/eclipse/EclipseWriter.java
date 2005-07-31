@@ -18,6 +18,7 @@ package org.apache.maven.plugin.eclipse;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,22 +37,28 @@ import java.util.Set;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @author <a href="mailto:kenney@neonics.com">Kenney Westerhof</a>
  * @version $Id$
  */
 public class EclipseWriter
 {
+    private Log log;
+    
     private File localRepository;
-
+    
     public void setLocalRepositoryFile( File localRepository )
     {
         this.localRepository = localRepository;
     }
+    
+    public void setLog(Log log)
+    {
+        this.log = log;
+    }
 
-    public void write( MavenProject project, MavenProject executedProject, List reactorProjects )
+    public void write( File outputDir, MavenProject project, MavenProject executedProject, List reactorProjects )
         throws EclipsePluginException
     {
-        File basedir = project.getFile().getParentFile();
-
         Map map = new HashMap();
 
         assertNotEmpty( project.getGroupId(), "groupId" );
@@ -58,19 +66,21 @@ public class EclipseWriter
         assertNotEmpty( project.getArtifactId(), "artifactId" );
 
         map.put( "project.artifactId", project.getArtifactId() );
+        
+        File projectBaseDir = project.getFile().getParentFile();
 
-        writeEclipseProject( basedir, project, map );
+        List referencedProjects = writeEclipseClasspath( projectBaseDir, outputDir, project, executedProject, map, reactorProjects );
+        
+        writeEclipseProject( projectBaseDir, outputDir, project, executedProject, referencedProjects, map );
 
-        writeEclipseClasspath( basedir, project, executedProject, map, reactorProjects );
-
-        System.out.println( "Wrote Eclipse project for " + project.getArtifactId() + " to " + basedir.getAbsolutePath() );
+        log.info( "Wrote Eclipse project for " + project.getArtifactId() + " to " + outputDir.getAbsolutePath() );
     }
 
     // ----------------------------------------------------------------------
     // .project
     // ----------------------------------------------------------------------
 
-    protected void writeEclipseProject( File basedir, MavenProject project, Map map )
+    protected void writeEclipseProject( File projectBaseDir, File basedir, MavenProject project, MavenProject executedProject, List referencedProjects, Map map )
         throws EclipsePluginException
     {
         FileWriter w;
@@ -111,11 +121,17 @@ public class EclipseWriter
 
         writer.endElement();
 
-        // TODO: Add project dependencies here
-        // Should look in the reactor for other projects
-
         writer.startElement( "projects" );
 
+        for ( Iterator it = referencedProjects.iterator(); it.hasNext(); )
+        {
+            writer.startElement( "project" );
+            
+            writer.writeText( ( (MavenProject) it.next() ).getArtifactId() );
+            
+            writer.endElement();
+        }
+        
         writer.endElement(); // projects
 
         writer.startElement( "buildSpec" );
@@ -146,6 +162,22 @@ public class EclipseWriter
 
         writer.endElement(); // natures
 
+
+        if ( ! projectBaseDir.equals( basedir ) )
+        {
+            writer.startElement( "linkedResources" );
+
+            addSourceLinks( writer, projectBaseDir, basedir, executedProject.getCompileSourceRoots() );
+
+            addResourceLinks( writer, projectBaseDir, basedir, executedProject.getBuild().getResources() );
+
+            addSourceLinks( writer, projectBaseDir, basedir, executedProject.getTestCompileSourceRoots() );
+
+            addResourceLinks( writer, projectBaseDir, basedir, executedProject.getBuild().getTestResources() );
+
+            writer.endElement(); // linedResources
+        }
+
         writer.endElement(); // projectDescription
 
         close( w );
@@ -155,7 +187,7 @@ public class EclipseWriter
     // .classpath
     // ----------------------------------------------------------------------
 
-    protected void writeEclipseClasspath( File basedir, MavenProject project, MavenProject executedProject, Map map, List reactorProjects )
+    protected List writeEclipseClasspath( File projectBaseDir, File basedir, MavenProject project, MavenProject executedProject, Map map, List reactorProjects )
         throws EclipsePluginException
     {
         FileWriter w;
@@ -177,11 +209,11 @@ public class EclipseWriter
         // The source roots
         // ----------------------------------------------------------------------
 
-        addSourceRoots( writer, project.getBasedir(),
+        addSourceRoots( writer, projectBaseDir, basedir,
                         executedProject.getCompileSourceRoots(),
                         null );
 
-        addResources( writer, project.getBasedir(),
+        addResources( writer, projectBaseDir, basedir,
                       project.getBuild().getResources(),
                       null );
 
@@ -189,11 +221,11 @@ public class EclipseWriter
         // The test sources and resources
         // ----------------------------------------------------------------------
 
-        addSourceRoots( writer, project.getBasedir(),
+        addSourceRoots( writer, projectBaseDir, basedir,
                         executedProject.getTestCompileSourceRoots(),
                         project.getBuild().getTestOutputDirectory() );
 
-        addResources( writer, project.getBasedir(),
+        addResources( writer, projectBaseDir, basedir,
                       project.getBuild().getTestResources(),
                       project.getBuild().getTestOutputDirectory() );
 
@@ -205,7 +237,7 @@ public class EclipseWriter
 
         writer.addAttribute( "kind", "output" );
 
-        writer.addAttribute( "path", toRelative( basedir, project.getBuild().getOutputDirectory() ) );
+        writer.addAttribute( "path", toRelative( projectBaseDir, project.getBuild().getOutputDirectory() ) );
 
         writer.endElement();
 
@@ -228,6 +260,8 @@ public class EclipseWriter
         // ----------------------------------------------------------------------
         // The dependencies
         // ----------------------------------------------------------------------
+        
+        List referencedProjects = new ArrayList();
 
         Set artifacts = project.getArtifacts();
 
@@ -235,19 +269,26 @@ public class EclipseWriter
         {
             Artifact artifact = (Artifact) it.next();
             
-            addDependency( writer, artifact, reactorProjects );
+            MavenProject refProject = addDependency( writer, artifact, reactorProjects );
+            
+            if ( refProject != null )
+            {
+                referencedProjects.add( refProject );
+            }
         }
 
         writer.endElement();
 
         close( w );
+        
+        return referencedProjects;
     }
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    private void addSourceRoots( XMLWriter writer, File basedir, List sourceRoots, String output )
+    private void addSourceRoots( XMLWriter writer, File projectBaseDir, File basedir, List sourceRoots, String output )
     {
         for ( Iterator it = sourceRoots.iterator(); it.hasNext(); )
         {
@@ -259,11 +300,15 @@ public class EclipseWriter
 
                 writer.addAttribute( "kind", "src" );
 
-                writer.addAttribute( "path", toRelative( basedir, sourceRoot ) );
+                sourceRoot = toRelative( projectBaseDir, sourceRoot );
+                if (!projectBaseDir.equals(basedir))
+                    sourceRoot = sourceRoot.replaceAll("/", "-");
+                
+                writer.addAttribute( "path", sourceRoot );
 
                 if ( output != null )
                 {
-                    writer.addAttribute( "output", toRelative( basedir, output ) );
+                    writer.addAttribute( "output", toRelative( projectBaseDir, output ) );
                 }
 
                 writer.endElement();
@@ -271,7 +316,7 @@ public class EclipseWriter
         }
     }
 
-    private void addResources( XMLWriter writer, File basedir, List resources, String output )
+    private void addResources( XMLWriter writer, File projectBaseDir, File basedir, List resources, String output )
     {
         for ( Iterator it = resources.iterator(); it.hasNext(); )
         {
@@ -279,17 +324,17 @@ public class EclipseWriter
 
             if ( resource.getIncludes().size() != 0 )
             {
-                System.err.println( "This plugin currently doesn't support include patterns for resources. Adding the entire directory." );
+                log.warn( "This plugin currently doesn't support include patterns for resources. Adding the entire directory." );
             }
 
             if ( resource.getExcludes().size() != 0 )
             {
-                System.err.println( "This plugin currently doesn't support exclude patterns for resources. Adding the entire directory." );
+                log.warn( "This plugin currently doesn't support exclude patterns for resources. Adding the entire directory." );
             }
 
             if ( !StringUtils.isEmpty( resource.getTargetPath() ) )
             {
-                System.err.println( "This plugin currently doesn't support target paths for resources." );
+                log.error( "This plugin currently doesn't support target paths for resources." );
 
                 return;
             }
@@ -305,36 +350,124 @@ public class EclipseWriter
 
             writer.addAttribute( "kind", "src" );
 
-            writer.addAttribute( "path", toRelative( basedir, resource.getDirectory() ) );
+            String resourceDir = resource.getDirectory();
+            resourceDir = toRelative( projectBaseDir, resourceDir );
+            if (!projectBaseDir.equals(basedir))
+                resourceDir = resourceDir.replaceAll("/", "-");
+            
+            writer.addAttribute( "path", resourceDir );
 
             if ( output != null )
             {
-                writer.addAttribute( "output", toRelative( basedir, output ) );
+                writer.addAttribute( "output", toRelative( projectBaseDir, output ) );
             }
 
             writer.endElement();
         }
     }
 
-    private void addDependency( XMLWriter writer, Artifact artifact, List reactorProjects )
+    private void addSourceLinks( XMLWriter writer, File projectBaseDir, File basedir, List sourceRoots )
     {
-        String path = getProjectPath( reactorProjects, artifact );
-        
-        String kind = path == null ? "var" : "src";
+        for ( Iterator it = sourceRoots.iterator(); it.hasNext(); )
+        {
+            String sourceRoot = (String) it.next();
+
+            if ( new File( sourceRoot ).isDirectory() )
+            {
+                writer.startElement( "link" );
+
+                writer.startElement( "name" );
+
+                writer.writeText( toRelative( projectBaseDir, sourceRoot ).replaceAll("/", "-") );
                 
-        // fall-through when no local project could be found in the reactor
-        if ( path == null )
+                writer.endElement(); // name
+
+                writer.startElement( "type" );
+
+                writer.writeText( "2" );
+
+                writer.endElement(); // type
+
+                writer.startElement( "location" );
+
+                writer.writeText( sourceRoot );
+
+                writer.endElement(); // location
+
+                writer.endElement(); // link
+            }
+        }
+    }
+
+    private void addResourceLinks( XMLWriter writer, File projectBaseDir, File basedir, List sourceRoots )
+    {
+        for ( Iterator it = sourceRoots.iterator(); it.hasNext(); )
+        {
+            String resourceDir = ((Resource) it.next() ).getDirectory();
+
+            if ( new File( resourceDir ).isDirectory() )
+            {
+                writer.startElement( "link" );
+
+                writer.startElement( "name" );
+
+                writer.writeText( toRelative( projectBaseDir, resourceDir ).replaceAll("/", "-") );
+
+                writer.endElement(); // name
+
+                writer.startElement( "type" );
+
+                writer.writeText( "2" );
+
+                writer.endElement(); // type
+
+                writer.startElement( "location" );
+
+                writer.writeText( resourceDir );
+
+                writer.endElement(); // location
+
+                writer.endElement(); // link
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @param writer
+     * @param artifact
+     * @param reactorProjects
+     * @return null or the reactorProject providing this dependency
+     */
+    private MavenProject addDependency( XMLWriter writer, Artifact artifact, List reactorProjects )
+    {
+        MavenProject reactorProject = findReactorProject( reactorProjects, artifact );
+
+        String path = null;
+        
+        String kind = null;
+        
+
+        if (reactorProject != null)
+        {
+            path = "/" + reactorProject.getArtifactId();
+            
+            kind = "src";
+        }
+        else
         {
             File artifactPath = artifact.getFile();
 
             if ( artifactPath == null )
             {
-                System.err.println( "The artifacts path was null. Artifact id: " + artifact.getId() );
+                log.error( "The artifacts path was null. Artifact id: " + artifact.getId() );
     
-                return;
+                return null;
             }
             
             path = "M2_REPO/" + toRelative( localRepository, artifactPath.getPath() );
+            
+            kind = "var";
         }
 
         writer.startElement( "classpathentry" );
@@ -344,9 +477,18 @@ public class EclipseWriter
         writer.addAttribute( "path", path );
 
         writer.endElement();
+        
+        return reactorProject;
     }
     
-    private String getProjectPath( List reactorProjects, Artifact artifact )
+    /**
+     * Utility method that locates a project producing the given artifact.
+     * 
+     * @param reactorProjects a list of projects to search.
+     * @param artifact the artifact a project should produce.
+     * @return null or the first project found producing the artifact.
+     */
+    private static MavenProject findReactorProject( List reactorProjects, Artifact artifact )
     {
         if ( reactorProjects == null )
         {
@@ -362,7 +504,7 @@ public class EclipseWriter
                 && project.getVersion().equals( artifact.getVersion() )
             )
             {
-                return "/" + project.getArtifactId();
+                return project;
             }
         }
         
