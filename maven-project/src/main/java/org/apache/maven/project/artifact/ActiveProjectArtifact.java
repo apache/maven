@@ -17,11 +17,11 @@ package org.apache.maven.project.artifact;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -31,11 +31,10 @@ import java.util.List;
  * Wraps an active project instance to be able to receive updates from its artifact without affecting the original
  * attributes of this artifact.
  *
- * @todo I think this exposes a design flaw in that the immutable and mutable parts of an artifact are in one class and
- * should be split. ie scope, file, etc depend on the context of use, whereas everything else is immutable.
- *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
+ * @todo I think this exposes a design flaw in that the immutable and mutable parts of an artifact are in one class and
+ * should be split. ie scope, file, etc depend on the context of use, whereas everything else is immutable.
  */
 public class ActiveProjectArtifact
     implements Artifact
@@ -48,7 +47,7 @@ public class ActiveProjectArtifact
     {
         this.artifact = artifact;
         this.project = project;
-        
+
         artifact.setFile( project.getArtifact().getFile() );
     }
 
@@ -101,7 +100,7 @@ public class ActiveProjectArtifact
     public void setFile( File destination )
     {
         artifact.setFile( destination );
-        
+
         // TODO: [jc; 29-jul-05] Is this appropriate? I mean, isn't the point to use the project-file instead??
         project.getArtifact().setFile( destination );
     }
@@ -234,5 +233,10 @@ public class ActiveProjectArtifact
     public boolean isResolved()
     {
         return artifact.isResolved();
+    }
+
+    public void setResolvedVersion( String version )
+    {
+        artifact.setResolvedVersion( version );
     }
 }
