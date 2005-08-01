@@ -26,4 +26,4 @@ if [ -z "$JAVA_HOME" ]; then
   JAVA_HOME=/usr/local/java
 fi
 
-$JAVA_HOME/bin/java -Xmx128M -Xms64M -Xincgc $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $*
+nice -n 19 $JAVA_HOME/bin/java -Xmx128M -Xms64M -Xincgc $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $*
