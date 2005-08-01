@@ -6,6 +6,7 @@
   <fileSets>
     <fileSet>
       <directory>src/main/bash</directory>
+      <outputDirectory>/</outputDirectory>
     </fileSet>
     <fileSet>
       <!-- TODO: use expressions instead: ${project.build.directory}, ${project.build.finalName}, or have a <build /> tag to include the built artifact -->

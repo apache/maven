@@ -3,9 +3,9 @@ package org.apache.maven.tools.repoclean.rewrite;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.model.v3_0_0.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.apache.maven.tools.repoclean.translate.PomV3ToV4Translator;
+import org.apache.maven.project.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.Reader;
@@ -45,7 +45,7 @@ public class V3PomRewriter
         {
             MavenXpp3Reader v3Reader = new MavenXpp3Reader();
 
-            org.apache.maven.model.v3_0_0.Model v3Model = v3Reader.read( from );
+            org.apache.maven.project.Model v3Model = v3Reader.read( from );
             v4Model = translator.translate( v3Model, reporter );
         }
         else
