@@ -72,7 +72,7 @@ public class DefaultArtifact
 
     private VersionRange versionRange;
 
-    private boolean resolved = false;
+    private boolean resolved;
 
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler )
@@ -164,6 +164,7 @@ public class DefaultArtifact
     public void setVersion( String version )
     {
         this.version = version;
+        this.baseVersion = version;
         this.versionRange = null;
     }
 
@@ -346,7 +347,7 @@ public class DefaultArtifact
 
     public void updateVersion( String version, ArtifactRepository localRepository )
     {
-        setVersion( version );
+        setResolvedVersion( version );
         setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );
     }
 
@@ -401,17 +402,19 @@ public class DefaultArtifact
 
         if ( versionRange != null && versionRange.getRecommendedVersion() != null )
         {
-            this.version = versionRange.getRecommendedVersion().toString();
+            selectVersion( versionRange.getRecommendedVersion().toString() );
         }
         else
         {
             this.version = null;
+            this.baseVersion = null;
         }
     }
 
     public void selectVersion( String version )
     {
         this.version = version;
+        this.baseVersion = version;
     }
 
     public void setGroupId( String groupId )
@@ -446,6 +449,12 @@ public class DefaultArtifact
     public boolean isResolved()
     {
         return resolved;
+    }
+
+    public void setResolvedVersion( String version )
+    {
+        this.version = version;
+        // retain baseVersion
     }
 
 }

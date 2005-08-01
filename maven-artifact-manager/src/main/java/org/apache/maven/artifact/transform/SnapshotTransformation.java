@@ -75,7 +75,7 @@ public class SnapshotTransformation
 
             metadata.update();
 
-            artifact.setVersion( metadata.constructVersion() );
+            artifact.setResolvedVersion( metadata.constructVersion() );
 
             artifact.addMetadata( metadata );
         }
