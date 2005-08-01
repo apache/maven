@@ -243,7 +243,7 @@ public class MBoot
             online = false;
         }
 
-        Repository localRepository = new Repository( "local", mavenRepoLocal, Repository.LAYOUT_DEFAULT );
+        Repository localRepository = new Repository( "local", mavenRepoLocal, Repository.LAYOUT_DEFAULT, false, false );
 
         if ( online )
         {
@@ -267,7 +267,7 @@ public class MBoot
                     Mirror m = (Mirror) j.next();
                     if ( m.getMirrorOf().equals( repo.getId() ) )
                     {
-                        newRemoteRepos.add( new Repository( m.getId(), m.getUrl(), repo.getLayout() ) );
+                        newRemoteRepos.add( new Repository( m.getId(), m.getUrl(), repo.getLayout(), repo.isSnapshots(), repo.isReleases() ) );
                         foundMirror = true;
                     }
                 }
