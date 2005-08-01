@@ -217,7 +217,7 @@ public class DefaultWagonManager
             {
                 getArtifact( artifact, repository );
 
-                successful = true;
+                successful = artifact.isResolved();
             }
             catch ( ResourceDoesNotExistException e )
             {
@@ -244,7 +244,7 @@ public class DefaultWagonManager
         if ( policy.isEnabled() )
         {
             getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy() );
-            
+
             artifact.setResolved( true );
         }
         else
