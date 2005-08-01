@@ -94,6 +94,10 @@ public class ModelReader
 
     private boolean insideDependencyManagement = false;
 
+    private boolean insideReleases;
+
+    private boolean insideSnapshots;
+
     public ModelReader( ArtifactDownloader downloader, boolean resolveTransitiveDependencies )
     {
         this.downloader = downloader;
@@ -156,6 +160,14 @@ public class ModelReader
             currentResource = new Resource();
 
             insideResource = true;
+        }
+        else if ( rawName.equals( "snapshots" ) && insideRepository )
+        {
+            insideSnapshots = true;
+        }
+        else if ( rawName.equals( "releases" ) && insideRepository )
+        {
+            insideReleases = true;
         }
         depth++;
     }
@@ -324,6 +336,25 @@ public class ModelReader
             {
                 currentRepository.setLayout( getBodyText() );
             }
+            else if ( rawName.equals( "enabled" ) )
+            {
+                if ( insideSnapshots )
+                {
+                    currentRepository.setSnapshots( Boolean.valueOf( getBodyText() ).booleanValue() );
+                }
+                else if ( insideReleases )
+                {
+                    currentRepository.setReleases( Boolean.valueOf( getBodyText() ).booleanValue() );
+                }
+            }
+            else if ( rawName.equals( "snapshots" ) )
+            {
+                insideSnapshots = false;
+            }
+            else if ( rawName.equals( "releases" ) )
+            {
+                insideReleases = false;
+            }
         }
         else if ( depth == 2 )
         {
@@ -409,9 +440,8 @@ public class ModelReader
             downloader.downloadDependencies( Collections.singletonList( pom ) );
 
             Repository localRepository = downloader.getLocalRepository();
-            p.parse(
-                localRepository.getMetadataFile( groupId, artifactId, version, type,
-                                                 artifactId + "-" + pom.getResolvedVersion() + ".pom" ) );
+            p.parse( localRepository.getMetadataFile( groupId, artifactId, version, type,
+                                                      artifactId + "-" + pom.getResolvedVersion() + ".pom" ) );
         }
         catch ( IOException e )
         {

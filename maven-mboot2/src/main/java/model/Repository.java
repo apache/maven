@@ -36,15 +36,21 @@ public class Repository
 
     private String id;
 
+    private boolean releases;
+
+    private boolean snapshots;
+
     public Repository()
     {
     }
 
-    public Repository( String id, String basedir, String layout )
+    public Repository( String id, String basedir, String layout, boolean snapshots, boolean releases )
     {
         this.id = id;
         this.basedir = basedir;
         this.layout = layout;
+        this.snapshots = snapshots;
+        this.releases = releases;
     }
 
     public File getArtifactFile( String groupId, String artifactId, String version, String type )
@@ -155,5 +161,25 @@ public class Repository
     public String getLayout()
     {
         return layout;
+    }
+
+    public void setReleases( boolean releases )
+    {
+        this.releases = releases;
+    }
+
+    public void setSnapshots( boolean snapshots )
+    {
+        this.snapshots = snapshots;
+    }
+
+    public boolean isReleases()
+    {
+        return releases;
+    }
+
+    public boolean isSnapshots()
+    {
+        return snapshots;
     }
 }

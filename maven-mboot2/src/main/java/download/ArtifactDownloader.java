@@ -116,6 +116,16 @@ public class ArtifactDownloader
         {
             Repository remoteRepo = (Repository) i.next();
 
+            boolean snapshot = isSnapshot( dep );
+            if ( snapshot && !remoteRepo.isSnapshots() )
+            {
+                continue;
+            }
+            if ( !snapshot && !remoteRepo.isReleases() )
+            {
+                continue;
+            }
+
             // The username and password parameters are not being used here.
             String url = remoteRepo.getBasedir() + "/" + remoteRepo.getArtifactPath( dep );
 
@@ -124,7 +134,7 @@ public class ArtifactDownloader
             try
             {
                 String version = dep.getVersion();
-                if ( isSnapshot( dep ) )
+                if ( snapshot )
                 {
                     String filename = getSnapshotMetadataFile( destinationFile.getName(), "SNAPSHOT.version.txt" );
                     File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
@@ -255,7 +265,7 @@ public class ArtifactDownloader
         if ( remoteRepositories.isEmpty() )
         {
             // TODO: use super POM?
-            remoteRepositories.add( new Repository( "central", REPO_URL, Repository.LAYOUT_DEFAULT ) );
+            remoteRepositories.add( new Repository( "central", REPO_URL, Repository.LAYOUT_DEFAULT, false, true ) );
         }
 
         return remoteRepositories;
