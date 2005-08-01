@@ -122,6 +122,8 @@ it0041: Test the use of a new type from a plugin
 
 it0042: Test that the reactor can establish the artifact location of known projects for dependencies
 
+it0043: Test for repository inheritence - ensure using the same id overrides the defaults
+
 -------------------------------------------------------------------------------
 
 - generated sources

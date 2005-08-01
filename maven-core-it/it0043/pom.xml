@@ -1,7 +1,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
-  <artifactId>maven-it1011</artifactId>
+  <artifactId>maven-it0043</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <repositories>
@@ -21,13 +21,13 @@
   </pluginRepositories>
 
 
-	<dependencies>
-		<dependency>
-			<artifactId>junit</artifactId>
-			<groupId>junit</groupId>
-			<version>3.8.1</version>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <artifactId>junit</artifactId>
+      <groupId>junit</groupId>
+      <version>3.8.1</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -40,7 +40,7 @@
               <goal>effective-pom</goal>
             </goals>
             <configuration>
-              <output>target/effective-pom.xml</output>
+              <output>${project.build.directory}/effective-pom.xml</output>
             </configuration>
           </execution>
         </executions>
