@@ -163,13 +163,15 @@ public class TeamListReport
             startSection( getBundle( locale ).getString( "report.team-list.intro.title" ) );
 
             // To handle JS
-            StringBuffer javascript = new StringBuffer( "function offsetDate(id, offset) {" )
-                .append( "var now = new Date() ;" ).append( "var nowTime = now.getTime() ;" )
-                .append( "var localOffset = now.getTimezoneOffset() ;" )
-                .append( "var developerTime = nowTime + ( offset * 60 * 60 * 1000 ) + ( localOffset * 60 * 1000 ) ;" )
-                .append( "var developerDate = new Date(developerTime) ;" ).append( "" )
-                .append( "document.getElementById(id).innerHTML = developerDate;" ).append( "}" ).append( "" )
-                .append( "function init(){" );
+            StringBuffer javascript = new StringBuffer( "function offsetDate(id, offset) {\n" )
+                .append( "    var now = new Date();\n" )
+                .append( "    var nowTime = now.getTime();\n" )
+                .append( "    var localOffset = now.getTimezoneOffset();\n" )
+                .append( "    var developerTime = nowTime + ( offset * 60 * 60 * 1000 ) + ( localOffset * 60 * 1000 );\n" )
+                .append( "    var developerDate = new Date(developerTime);\n" ).append( "\n" )
+                .append( "    document.getElementById(id).innerHTML = developerDate;\n" ).append( "}\n" )
+                .append( "\n" )
+                .append( "function init(){\n" );
 
             // Intoduction
             paragraph( getBundle( locale ).getString( "report.team-list.intro.description1" ) );
@@ -232,8 +234,7 @@ public class TeamListReport
 
                     tableCell( developer.getOrganization() );
 
-                    tableCell( createLinkPatternedText( developer.getOrganizationUrl(), 
-                                                        developer.getOrganizationUrl() ) );
+                    tableCell( createLinkPatternedText( developer.getOrganizationUrl(), developer.getOrganizationUrl() ) );
 
                     if ( developer.getRoles() != null )
                     {
@@ -253,7 +254,7 @@ public class TeamListReport
                     text( developer.getTimezone() );
                     if ( !StringUtils.isEmpty( developer.getTimezone() ) )
                     {
-                        javascript.append( "offsetDate('developer-" + developersRows + "', '" );
+                        javascript.append( "    offsetDate('developer-" + developersRows + "', '" );
                         javascript.append( developer.getTimezone() );
                         javascript.append( "');\n" );
                     }
@@ -333,8 +334,8 @@ public class TeamListReport
 
                     tableCell( contributor.getOrganization() );
 
-                    tableCell( createLinkPatternedText( contributor.getOrganizationUrl(), 
-                                                        contributor.getOrganizationUrl() ) );
+                    tableCell( createLinkPatternedText( contributor.getOrganizationUrl(), contributor
+                        .getOrganizationUrl() ) );
 
                     if ( contributor.getRoles() != null )
                     {
@@ -354,7 +355,7 @@ public class TeamListReport
                     text( contributor.getTimezone() );
                     if ( !StringUtils.isEmpty( contributor.getTimezone() ) )
                     {
-                        javascript.append( "offsetDate('contributor-" + contributorsRows + "', '" );
+                        javascript.append( "    offsetDate('contributor-" + contributorsRows + "', '" );
                         javascript.append( contributor.getTimezone() );
                         javascript.append( "');\n" );
                     }
@@ -384,7 +385,7 @@ public class TeamListReport
             endSection();
 
             // To handle JS
-            javascript.append( "}" ).append( "window.onload = init();" );
+            javascript.append( "}\n" ).append( "\n" ).append( "window.onLoad = init();\n" );
             javaScript( javascript.toString() );
         }
     }
