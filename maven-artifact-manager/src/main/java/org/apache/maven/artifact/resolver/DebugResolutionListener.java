@@ -53,7 +53,7 @@ public class DebugResolutionListener
 
     public void includeArtifact( Artifact artifact )
     {
-        logger.debug( indent + artifact.getId() + " (selected)" );
+        logger.debug( indent + artifact.getId() + " (selected for " + artifact.getScope() + ")" );
     }
 
     public void omitForNearer( Artifact omitted, Artifact kept )
