@@ -41,4 +41,34 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>all-models</id>
+      <build>
+        <finalName>${pom.artifactId}-${pom.version}-all</finalName>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.modello</groupId>
+            <artifactId>modello-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>v3</id>
+                <configuration>
+                  <version>3.0.0</version>
+                  <packageWithVersion>true</packageWithVersion>
+                </configuration>
+                <goals>
+                  <goal>xpp3-writer</goal>
+                  <goal>java</goal>
+                  <goal>xpp3-reader</goal>
+                  <goal>xsd</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
