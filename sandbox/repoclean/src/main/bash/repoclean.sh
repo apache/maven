@@ -1,23 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-mypath=`which $0`
+mydir=`dirname $0`
 
-mydir=`pwd`
-
-if [ "" != "$mypath" ]; then
-
-  mydir=`dirname $mypath`
-
-fi
-
-CP=$mydir/lib/repoclean-1.0-SNAPSHOT.jar
-
-for lib in `ls -1 $mydir/lib | grep -v 'repoclean'`
-do
-
-  CP=$CP:$mydir/lib/$lib
-
-done
+CP=`ls -1 $mydir/lib/*.jar | tr '\n' ':'`
 
 cygwin=false
 case "`uname`" in
@@ -41,4 +26,4 @@ if [ -z "$JAVA_HOME" ]; then
   JAVA_HOME=/usr/local/java
 fi
 
-nice -n 19 $JAVA_HOME/bin/java -Xmx128M -Xms64M -Xincgc $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $*
+$JAVA_HOME/bin/java -Xmx128M -Xms64M -Xincgc $JAVA_OPTS -classpath ${CP} org.apache.maven.tools.repoclean.Main $*

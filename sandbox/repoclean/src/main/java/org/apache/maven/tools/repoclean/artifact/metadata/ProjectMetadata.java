@@ -69,6 +69,11 @@ public class ProjectMetadata
         return artifact.getFile() != null && artifact.getFile().exists();
     }
 
+    public boolean storedInArtifactDirectory()
+    {
+        return true;
+    }
+
     public String getGroupId()
     {
         return artifact.getGroupId();

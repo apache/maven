@@ -1,12 +1,5 @@
 package org.apache.maven.tools.repoclean.discover;
 
-import org.apache.maven.tools.repoclean.report.PathLister;
-import org.apache.maven.tools.repoclean.report.ReportWriteException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.DirectoryScanner;
-
-import java.io.File;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -23,22 +16,31 @@ import java.io.File;
  * limitations under the License.
  */
 
+import org.apache.maven.tools.repoclean.report.PathLister;
+import org.apache.maven.tools.repoclean.report.ReportWriteException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.DirectoryScanner;
+
+import java.io.File;
+
 public abstract class AbstractArtifactDiscoverer
     extends AbstractLogEnabled
     implements ArtifactDiscoverer
 {
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-    protected String[] scanForArtifactPaths( File repositoryBase, String blacklistedPatterns, PathLister excludesLister )
+    protected String[] scanForArtifactPaths( File repositoryBase, String blacklistedPatterns,
+                                             PathLister excludesLister )
         throws ReportWriteException
     {
-        String[] blacklisted = null;
+        String[] blacklisted;
         if ( blacklistedPatterns != null && blacklistedPatterns.length() > 0 )
         {
             blacklisted = blacklistedPatterns.split( "," );
         }
         else
         {
-            blacklisted = new String[0];
+            blacklisted = EMPTY_STRING_ARRAY;
         }
 
         String[] allExcludes = new String[STANDARD_DISCOVERY_EXCLUDES.length + blacklisted.length];

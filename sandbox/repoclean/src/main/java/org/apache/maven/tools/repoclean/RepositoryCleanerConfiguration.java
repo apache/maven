@@ -52,8 +52,10 @@ public class RepositoryCleanerConfiguration
     private boolean force;
 
     private String blacklistedPatterns;
-    
-    private boolean reportWarningEnabled = false;
+
+    private boolean reportWarningEnabled;
+
+    private boolean convertSnapshots;
 
     public void setSourceRepositoryPath( String sourceRepositoryPath )
     {
@@ -215,4 +217,13 @@ public class RepositoryCleanerConfiguration
         this.reportWarningEnabled = reportWarningEnabled;
     }
 
+    public boolean isConvertSnapshots()
+    {
+        return convertSnapshots;
+    }
+
+    public void setConvertSnapshots( boolean convertSnapshots )
+    {
+        this.convertSnapshots = convertSnapshots;
+    }
 }

@@ -1,14 +1,5 @@
 package org.apache.maven.tools.repoclean.digest;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.tools.repoclean.TestSupport;
-import org.apache.maven.tools.repoclean.report.DummyReporter;
-import org.apache.maven.tools.repoclean.transaction.RewriteTransaction;
-import org.codehaus.plexus.PlexusTestCase;
-
-import java.io.File;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -25,16 +16,34 @@ import java.io.File;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.tools.repoclean.TestSupport;
+import org.apache.maven.tools.repoclean.report.DummyReporter;
+import org.apache.maven.tools.repoclean.transaction.RewriteTransaction;
+import org.codehaus.plexus.PlexusTestCase;
+
+import java.io.File;
+
 public class ArtifactDigestVerifierTest
     extends PlexusTestCase
 {
+    private ArtifactFactory artifactFactory;
+
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+    }
 
     public void testShouldWriteBothMD5AndSHA1DigestFiles()
         throws Exception
     {
         DigestVerifier verifier = (DigestVerifier) lookup( DigestVerifier.ROLE );
 
-        Artifact artifact = new DefaultArtifact( "testGroup", "testArtifact", "1.0", "jar" );
+        Artifact artifact = artifactFactory.createBuildArtifact( "testGroup", "testArtifact", "1.0", "jar" );
 
         File artifactFile = TestSupport.getResource( "digest/ArtifactDigestorTest/digestFormatVerifyArtifact.jar" );
 

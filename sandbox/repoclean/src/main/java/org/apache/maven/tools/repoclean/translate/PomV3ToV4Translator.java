@@ -1,12 +1,27 @@
 package org.apache.maven.tools.repoclean.translate;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
@@ -14,12 +29,13 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Notifier;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Reports;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
-import org.apache.maven.project.UnitTest;
+import org.apache.maven.model.v3_0_0.UnitTest;
 import org.apache.maven.tools.repoclean.report.ReportWriteException;
 import org.apache.maven.tools.repoclean.report.Reporter;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -33,21 +49,6 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
- * ==================================================================== Copyright 2001-2004 The
- * Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License. ====================================================================
- */
-
 /**
  * @author jdcasey
  */
@@ -59,7 +60,7 @@ public class PomV3ToV4Translator
 
     private transient List discoveredPlugins = new ArrayList();
 
-    public Model translate( org.apache.maven.project.Model v3Model, Reporter reporter )
+    public Model translate( org.apache.maven.model.v3_0_0.Model v3Model, Reporter reporter )
         throws ReportWriteException
     {
         try
@@ -155,7 +156,7 @@ public class PomV3ToV4Translator
         return source == null ? null : source.replace( '+', '-' );
     }
 
-    private CiManagement translateCiManagementInfo( org.apache.maven.project.Build v3Build )
+    private CiManagement translateCiManagementInfo( org.apache.maven.model.v3_0_0.Build v3Build )
     {
         CiManagement ciMgmt = null;
 
@@ -178,7 +179,7 @@ public class PomV3ToV4Translator
         return ciMgmt;
     }
 
-    private void warnOfUnsupportedMainModelElements( org.apache.maven.project.Model v3Model, Reporter reporter )
+    private void warnOfUnsupportedMainModelElements( org.apache.maven.model.v3_0_0.Model v3Model, Reporter reporter )
         throws ReportWriteException
     {
         if ( StringUtils.isNotEmpty( v3Model.getExtend() ) )
@@ -230,11 +231,11 @@ public class PomV3ToV4Translator
         }
     }
 
-    private Scm translateScm( org.apache.maven.project.Model v3Model )
+    private Scm translateScm( org.apache.maven.model.v3_0_0.Model v3Model )
     {
         Scm scm = null;
 
-        org.apache.maven.project.Repository repo = v3Model.getRepository();
+        org.apache.maven.model.v3_0_0.Repository repo = v3Model.getRepository();
         if ( repo != null )
         {
             scm = new Scm();
@@ -246,13 +247,13 @@ public class PomV3ToV4Translator
         return scm;
     }
 
-    private Reports translateReports( List v3Reports, Reporter reporter )
+    private Reporting translateReports( List v3Reports, Reporter reporter )
         throws ReportWriteException
     {
-        Reports reports = null;
+        Reporting reports = null;
         if ( v3Reports != null && !v3Reports.isEmpty() )
         {
-            reports = new Reports();
+            reports = new Reporting();
             for ( Iterator it = v3Reports.iterator(); it.hasNext(); )
             {
                 String reportName = (String) it.next();
@@ -273,7 +274,7 @@ public class PomV3ToV4Translator
                     reportPluginName = matcher.group( 1 );
                 }
 
-                Plugin reportPlugin = new Plugin();
+                ReportPlugin reportPlugin = new ReportPlugin();
 
                 reportPlugin.setGroupId( "maven" );
 
@@ -289,12 +290,6 @@ public class PomV3ToV4Translator
 
                 reporter.warn( info.toString() );
 
-                Goal reportGoal = new Goal();
-
-                reportGoal.setId( "report" );
-
-                reportPlugin.addGoal( reportGoal );
-
                 reports.addPlugin( reportPlugin );
             }
         }
@@ -302,7 +297,7 @@ public class PomV3ToV4Translator
         return reports;
     }
 
-    private Organization translateOrganization( org.apache.maven.project.Organization v3Organization,
+    private Organization translateOrganization( org.apache.maven.model.v3_0_0.Organization v3Organization,
                                                 Reporter reporter )
         throws ReportWriteException
     {
@@ -332,7 +327,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3MailingLists.iterator(); it.hasNext(); )
             {
-                org.apache.maven.project.MailingList v3List = (org.apache.maven.project.MailingList) it
+                org.apache.maven.model.v3_0_0.MailingList v3List = (org.apache.maven.model.v3_0_0.MailingList) it
                     .next();
                 MailingList list = new MailingList();
                 list.setArchive( v3List.getArchive() );
@@ -355,7 +350,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3Licenses.iterator(); it.hasNext(); )
             {
-                org.apache.maven.project.License v3License = (org.apache.maven.project.License) it.next();
+                org.apache.maven.model.v3_0_0.License v3License = (org.apache.maven.model.v3_0_0.License) it.next();
                 License license = new License();
                 license.setComments( v3License.getComments() );
                 license.setName( v3License.getName() );
@@ -368,7 +363,7 @@ public class PomV3ToV4Translator
         return licenses;
     }
 
-    private IssueManagement translateIssueManagement( org.apache.maven.project.Model v3Model )
+    private IssueManagement translateIssueManagement( org.apache.maven.model.v3_0_0.Model v3Model )
     {
         IssueManagement issueMgmt = null;
 
@@ -383,7 +378,7 @@ public class PomV3ToV4Translator
     }
 
     private DistributionManagement translateDistributionManagement( PomKey pomKey,
-                                                                    org.apache.maven.project.Model v3Model )
+                                                                    org.apache.maven.model.v3_0_0.Model v3Model )
         throws PomTranslationException
     {
         DistributionManagement distributionManagement = new DistributionManagement();
@@ -482,7 +477,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3Developers.iterator(); it.hasNext(); )
             {
-                org.apache.maven.project.Developer v3Developer = (org.apache.maven.project.Developer) it
+                org.apache.maven.model.v3_0_0.Developer v3Developer = (org.apache.maven.model.v3_0_0.Developer) it
                     .next();
 
                 Developer developer = new Developer();
@@ -510,7 +505,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3Deps.iterator(); it.hasNext(); )
             {
-                org.apache.maven.project.Dependency v3Dep = (org.apache.maven.project.Dependency) it.next();
+                org.apache.maven.model.v3_0_0.Dependency v3Dep = (org.apache.maven.model.v3_0_0.Dependency) it.next();
 
                 String groupId = format( v3Dep.getGroupId() );
                 String artifactId = format( v3Dep.getArtifactId() );
@@ -605,7 +600,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3Contributors.iterator(); it.hasNext(); )
             {
-                org.apache.maven.project.Contributor v3Contributor = (org.apache.maven.project.Contributor) it
+                org.apache.maven.model.v3_0_0.Contributor v3Contributor = (org.apache.maven.model.v3_0_0.Contributor) it
                     .next();
 
                 Contributor contributor = new Contributor();
@@ -624,7 +619,7 @@ public class PomV3ToV4Translator
         return contributors;
     }
 
-    private Build translateBuild( org.apache.maven.project.Build v3Build, Reporter reporter )
+    private Build translateBuild( org.apache.maven.model.v3_0_0.Build v3Build, Reporter reporter )
         throws ReportWriteException
     {
         Build build = null;
@@ -714,7 +709,7 @@ public class PomV3ToV4Translator
         return build;
     }
 
-    private void warnOfUnsupportedBuildElements( org.apache.maven.project.Build v3Build, Reporter reporter )
+    private void warnOfUnsupportedBuildElements( org.apache.maven.model.v3_0_0.Build v3Build, Reporter reporter )
         throws ReportWriteException
     {
         if ( notEmpty( v3Build.getSourceModifications() ) )
@@ -741,7 +736,7 @@ public class PomV3ToV4Translator
         {
             for ( Iterator it = v3Resources.iterator(); it.hasNext(); )
             {
-                org.apache.maven.project.Resource v3Resource = (org.apache.maven.project.Resource) it.next();
+                org.apache.maven.model.v3_0_0.Resource v3Resource = (org.apache.maven.model.v3_0_0.Resource) it.next();
                 Resource resource = new Resource();
 
                 resource.setDirectory( v3Resource.getDirectory() );

@@ -35,13 +35,13 @@ public class PomV3ToV4TranslatorTest
 
         Reporter reporter = new DummyReporter();
 
-        org.apache.maven.project.Dependency v3Dep = new org.apache.maven.project.Dependency();
+        org.apache.maven.model.v3_0_0.Dependency v3Dep = new org.apache.maven.model.v3_0_0.Dependency();
         v3Dep.setGroupId( "testGroup" );
         v3Dep.setArtifactId( "testArtifact" );
         v3Dep.setVersion( "1.0" );
         v3Dep.addProperty( "scope", "test" );
 
-        org.apache.maven.project.Model v3Model = new org.apache.maven.project.Model();
+        org.apache.maven.model.v3_0_0.Model v3Model = new org.apache.maven.model.v3_0_0.Model();
         v3Model.addDependency( v3Dep );
 
         Model result = translator.translate( v3Model, reporter );
@@ -56,13 +56,13 @@ public class PomV3ToV4TranslatorTest
 
         Reporter reporter = new DummyReporter();
 
-        org.apache.maven.project.Dependency v3Dep = new org.apache.maven.project.Dependency();
+        org.apache.maven.model.v3_0_0.Dependency v3Dep = new org.apache.maven.model.v3_0_0.Dependency();
         v3Dep.setGroupId( "testGroup" );
         v3Dep.setArtifactId( "testArtifact" );
         v3Dep.setVersion( "1.0" );
         v3Dep.setType( "plugin" );
 
-        org.apache.maven.project.Model v3Model = new org.apache.maven.project.Model();
+        org.apache.maven.model.v3_0_0.Model v3Model = new org.apache.maven.model.v3_0_0.Model();
         v3Model.addDependency( v3Dep );
 
         Model result = translator.translate( v3Model, reporter );
@@ -83,13 +83,13 @@ public class PomV3ToV4TranslatorTest
 
         Reporter reporter = new DummyReporter();
 
-        org.apache.maven.project.Dependency v3Dep = new org.apache.maven.project.Dependency();
+        org.apache.maven.model.v3_0_0.Dependency v3Dep = new org.apache.maven.model.v3_0_0.Dependency();
         v3Dep.setGroupId( "maven" );
         v3Dep.setArtifactId( "testArtifact" );
         v3Dep.setVersion( "1.0" );
         v3Dep.setType( "plugin" );
 
-        org.apache.maven.project.Model v3Model = new org.apache.maven.project.Model();
+        org.apache.maven.model.v3_0_0.Model v3Model = new org.apache.maven.model.v3_0_0.Model();
         v3Model.addDependency( v3Dep );
 
         Model result = translator.translate( v3Model, reporter );

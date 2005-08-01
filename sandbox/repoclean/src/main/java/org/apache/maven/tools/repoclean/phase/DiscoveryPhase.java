@@ -40,7 +40,7 @@ public class DiscoveryPhase
     private PlexusContainer container;
 
     public List execute( File reportsBase, File sourceRepositoryBase, RepositoryCleanerConfiguration configuration,
-                        Reporter repoReporter )
+                         Reporter repoReporter )
         throws Exception
     {
         Logger logger = getLogger();
@@ -70,8 +70,9 @@ public class DiscoveryPhase
                 kickoutLister = new PathLister( kickoutsList );
                 excludeLister = new PathLister( excludesList );
 
-                artifacts = artifactDiscoverer.discoverArtifacts( sourceRepositoryBase, repoReporter, configuration
-                    .getBlacklistedPatterns(), excludeLister, kickoutLister );
+                artifacts = artifactDiscoverer.discoverArtifacts( sourceRepositoryBase, repoReporter,
+                                                                  configuration.getBlacklistedPatterns(), excludeLister,
+                                                                  kickoutLister, configuration.isConvertSnapshots() );
             }
             catch ( Exception e )
             {

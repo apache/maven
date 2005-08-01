@@ -16,6 +16,7 @@ package org.apache.maven.tools.repoclean;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.tools.repoclean.index.ArtifactIndexer;
 import org.apache.maven.tools.repoclean.phase.DiscoveryPhase;
@@ -79,7 +80,8 @@ public class RepositoryCleaner
             FileReporter repoReporter = null;
             try
             {
-                repoReporter = new FileReporter( reportsBase, "repository.report.txt", configuration.isReportWarningEnabled() );
+                repoReporter = new FileReporter( reportsBase, "repository.report.txt",
+                                                 configuration.isReportWarningEnabled() );
 
                 List artifacts;
 
@@ -95,15 +97,15 @@ public class RepositoryCleaner
                                                                                     configuration
                                                                                         .getSourceRepositoryLayout() );
 
-                        ArtifactRepository sourceRepo = new ArtifactRepository( "source", "file://"
-                            + sourceRepositoryBase.getAbsolutePath(), sourceLayout );
+                        ArtifactRepository sourceRepo = new DefaultArtifactRepository( "source", "file://" +
+                            sourceRepositoryBase.getAbsolutePath(), sourceLayout );
 
                         targetLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE,
                                                                                     configuration
                                                                                         .getTargetRepositoryLayout() );
 
-                        ArtifactRepository targetRepo = new ArtifactRepository( "target", "file://"
-                            + targetRepositoryBase.getAbsolutePath(), targetLayout );
+                        ArtifactRepository targetRepo = new DefaultArtifactRepository( "target", "file://" +
+                            targetRepositoryBase.getAbsolutePath(), targetLayout );
 
                         if ( logger.isDebugEnabled() )
                         {
@@ -139,7 +141,8 @@ public class RepositoryCleaner
                 if ( repoReporter.hasWarning() && logger.isDebugEnabled() )
                 {
                     logger
-                        .warn( "Warning encountered while rewriting one or more artifacts from source repository to target repository." );
+                        .warn(
+                            "Warning encountered while rewriting one or more artifacts from source repository to target repository." );
                 }
             }
             finally
@@ -160,8 +163,8 @@ public class RepositoryCleaner
 
                 StringBuffer contentBuffer = new StringBuffer();
 
-                contentBuffer.append( "Errors occurred while performing maven-1 to maven-2 repository conversion.\n\n"
-                    + "For more details, see:\n\n" );
+                contentBuffer.append( "Errors occurred while performing maven-1 to maven-2 repository conversion.\n\n" +
+                    "For more details, see:\n\n" );
 
                 contentBuffer.append( configuration.getErrorReportLink().replaceAll( "#date", dateSubdir ) );
 
@@ -202,8 +205,8 @@ public class RepositoryCleaner
         }
         else if ( !targetRepositoryBase.isDirectory() )
         {
-            logger.error( "Cannot write to target repository \'" + targetRepositoryBase
-                + "\' because it is not a directory." );
+            logger.error(
+                "Cannot write to target repository \'" + targetRepositoryBase + "\' because it is not a directory." );
 
             targetRepositoryBase = null;
         }

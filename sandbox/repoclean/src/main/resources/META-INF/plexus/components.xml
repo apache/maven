@@ -68,11 +68,6 @@
       <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
       <role-hint>alpha-bridging</role-hint>
       <implementation>org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-      </requirements>
     </component>
     <!--
      |
@@ -82,7 +77,11 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>plugin</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.LegacyPluginHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>plugin</type>
+        <extension>jar</extension>
+      </configuration>
     </component>
     <!--
      |
@@ -92,7 +91,11 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>distribution</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.JarDistroHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>distribution</type>
+        <extension>jar</extension>
+      </configuration>
     </component>
     <!--
      |
@@ -102,7 +105,12 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>distribution-tgz</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.TgzDistroHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>distribution-tgz</type>
+        <directory>distributions</directory>
+        <extension>tar.gz</extension>
+      </configuration>
     </component>
     <!--
      |
@@ -112,7 +120,12 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>distribution-zip</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.ZipDistroHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>distribution-zip</type>
+        <directory>distributions</directory>
+        <extension>zip</extension>
+      </configuration>
     </component>
     <!--
      |
@@ -122,7 +135,10 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>tld</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.TldHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>tld</type>
+      </configuration>
     </component>
     <!--
      |
@@ -132,7 +148,10 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>dtd</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.DtdHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>dtd</type>
+      </configuration>
     </component>
     <!--
      |
@@ -142,7 +161,10 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ear</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.EarHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>ear</type>
+      </configuration>
     </component>
     <!--
      |
@@ -152,7 +174,23 @@
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>rar</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.RarHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>rar</type>
+      </configuration>
+    </component>
+    <!--
+    |
+    |
+    |
+    -->
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>sar</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>sar</type>
+      </configuration>
     </component>
     <!--
      |
@@ -160,19 +198,9 @@
      |
      -->
     <component>
-      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>sar</role-hint>
-      <implementation>org.apache.maven.tools.repoclean.artifact.handler.SarHandler</implementation>
-    </component>
-    <!--
-     |
-     |
-     |
-     -->
-     <component>
       <role>org.apache.maven.tools.repoclean.index.ArtifactIndexer</role>
       <implementation>org.apache.maven.tools.repoclean.index.ArtifactIndexer</implementation>
-     </component>
+    </component>
     <!--
      |
      |

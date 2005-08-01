@@ -36,7 +36,7 @@ public class DefaultArtifactDiscoverer
     private ArtifactFactory artifactFactory;
 
     public List discoverArtifacts( File repositoryBase, Reporter reporter, String blacklistedPatterns,
-                                  PathLister excludeLister, PathLister kickoutLister )
+                                   PathLister excludeLister, PathLister kickoutLister, boolean convertSnapshots )
         throws Exception
     {
         List artifacts = new ArrayList();
@@ -47,21 +47,24 @@ public class DefaultArtifactDiscoverer
         {
             String path = artifactPaths[i];
 
-            Artifact artifact = buildArtifact( repositoryBase, path, kickoutLister );
+            Artifact artifact = buildArtifact( path );
 
             if ( artifact != null )
             {
-                artifacts.add( artifact );
+                if ( convertSnapshots || !artifact.isSnapshot() )
+                {
+                    artifacts.add( artifact );
+                }
             }
         }
 
         return artifacts;
     }
 
-    private Artifact buildArtifact( File repositoryBase, String path, PathLister kickoutLister )
+    private Artifact buildArtifact( String path )
         throws Exception
     {
-        Artifact result = null;
+        Artifact result;
 
         List pathParts = new ArrayList();
         StringTokenizer st = new StringTokenizer( path, "/" );

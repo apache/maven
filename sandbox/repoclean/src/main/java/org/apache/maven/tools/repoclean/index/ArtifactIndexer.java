@@ -9,7 +9,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class ArtifactIndexer
     public void writeAritfactIndex( List artifacts, File targetRepositoryBase )
     {
         List sortedArtifacts = new ArrayList( artifacts );
-        Collections.sort( sortedArtifacts, new ArtifactIdComparator() );
+        Collections.sort( sortedArtifacts );
 
         File indexFile = new File( targetRepositoryBase, ".index.txt" );
         FileWriter indexWriter = null;
@@ -64,19 +63,4 @@ public class ArtifactIndexer
             IOUtil.close( indexWriter );
         }
     }
-
-    private static final class ArtifactIdComparator
-        implements Comparator
-    {
-
-        public int compare( Object first, Object second )
-        {
-            Artifact firstArtifact = (Artifact) first;
-            Artifact secondArtifact = (Artifact) second;
-
-            return firstArtifact.getConflictId().compareTo( secondArtifact.getConflictId() );
-        }
-
-    }
-
 }
