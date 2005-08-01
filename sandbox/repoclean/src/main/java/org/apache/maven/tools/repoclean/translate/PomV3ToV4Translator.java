@@ -132,7 +132,8 @@ public class PomV3ToV4Translator
                 model.setName( v3Model.getName() );
                 model.setOrganization( translateOrganization( v3Model.getOrganization(), reporter ) );
                 model.setPackaging( "jar" );
-                model.setReports( translateReports( v3Model.getReports(), reporter ) );
+                // TODO: not very good conversion - just omit for now
+//                model.setReporting( translateReports( v3Model.getReports(), reporter ) );
                 model.setScm( translateScm( v3Model ) );
                 model.setUrl( v3Model.getUrl() );
 
