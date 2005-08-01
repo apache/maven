@@ -69,14 +69,14 @@ public class RewritePhase
     private PlexusContainer container;
 
     public List execute( List artifacts, ArtifactRepository sourceRepo, ArtifactRepository targetRepo,
-                        RepositoryCleanerConfiguration configuration, File reportsBase, Reporter repoReporter )
+                         RepositoryCleanerConfiguration configuration, File reportsBase, Reporter repoReporter )
         throws ReportWriteException
     {
         Logger logger = getLogger();
 
         List rewritten = new ArrayList();
 
-        File sourceBase = null;
+        File sourceBase;
         try
         {
             sourceBase = new File( new URL( sourceRepo.getUrl() ).getPath() );
@@ -88,7 +88,7 @@ public class RewritePhase
             return null;
         }
 
-        File targetBase = null;
+        File targetBase;
         try
         {
             targetBase = new File( new URL( targetRepo.getUrl() ).getPath() );
@@ -103,25 +103,21 @@ public class RewritePhase
         for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-            
-            RewriteTransaction transaction = new RewriteTransaction( artifact );
 
-            String artifactReportPath = buildArtifactReportPath( artifact );
+            RewriteTransaction transaction = new RewriteTransaction( artifact );
 
             try
             {
-                boolean errorOccurred = false;
-
                 File artifactSource = new File( sourceRepo.getBasedir(), sourceRepo.pathOf( artifact ) );
-                File artifactTarget = new File( targetRepo.getBasedir(), targetRepo.pathOf( artifact ).replace( '+',
-                                                                                                                '-' ) );
+                File artifactTarget = new File( targetRepo.getBasedir(),
+                                                targetRepo.pathOf( artifact ).replace( '+', '-' ) );
 
                 transaction.addFile( artifactTarget );
 
                 artifact.setFile( artifactSource );
 
-                boolean targetMissingOrOlder = !artifactTarget.exists()
-                    || artifactTarget.lastModified() < artifactSource.lastModified();
+                boolean targetMissingOrOlder = !artifactTarget.exists() ||
+                    artifactTarget.lastModified() < artifactSource.lastModified();
 
                 if ( artifactSource.exists() && ( configuration.force() || targetMissingOrOlder ) )
                 {
@@ -143,17 +139,17 @@ public class RewritePhase
 
                         if ( logger.isDebugEnabled() )
                         {
-                            logger.debug( "Copying artifact[" + artifact.getId() + "] from \'" + artifactSource
-                                + "\' to \'" + artifactTarget + "\'." );
+                            logger.debug( "Copying artifact[" + artifact.getId() + "] from \'" + artifactSource +
+                                "\' to \'" + artifactTarget + "\'." );
                         }
 
-                        copyArtifact( artifact, artifactTarget, repoReporter );
+                        copyArtifact( artifact, artifactTarget );
                     }
 
                     if ( logger.isDebugEnabled() )
                     {
-                        logger.debug( "working on digest for artifact[" + artifact.getId() + "] with groupId: \'"
-                            + artifact.getGroupId() + "\'" );
+                        logger.debug( "working on digest for artifact[" + artifact.getId() + "] with groupId: \'" +
+                            artifact.getGroupId() + "\'" );
                     }
 
                     digestVerifier.verifyDigest( artifactSource, artifactTarget, transaction, repoReporter,
@@ -161,19 +157,19 @@ public class RewritePhase
 
                     rewriteMetadata( artifact, transaction, sourceBase, sourceRepo, targetBase, targetRepo,
                                      repoReporter, configuration.reportOnly() );
-                    
+
                     rewritten.add( artifact );
                 }
                 else if ( !targetMissingOrOlder )
                 {
-                    repoReporter.warn( "Target file for artifact is present and not stale. (Artifact: \'"
-                        + artifact.getId() + "\' in path: \'" + artifactSource + "\' with target path: "
-                        + artifactTarget + ")...SKIPPING" );
+                    repoReporter.warn( "Target file for artifact is present and not stale. (Artifact: \'" +
+                        artifact.getId() + "\' in path: \'" + artifactSource + "\' with target path: " +
+                        artifactTarget + ")...SKIPPING" );
                 }
                 else
                 {
-                    repoReporter.warn( "Cannot find source file for artifact: \'" + artifact.getId()
-                        + "\' under path: \'" + artifactSource + "\'...SKIPPING" );
+                    repoReporter.warn( "Cannot find source file for artifact: \'" + artifact.getId() +
+                        "\' under path: \'" + artifactSource + "\'...SKIPPING" );
                 }
             }
             catch ( Exception e )
@@ -187,7 +183,8 @@ public class RewritePhase
                     }
                     catch ( RollbackException re )
                     {
-                        repoReporter.error( "Error rolling back conversion transaction (artifact: " + artifact.getId() + ").", re );
+                        repoReporter.error(
+                            "Error rolling back conversion transaction (artifact: " + artifact.getId() + ").", re );
                     }
                 }
                 else
@@ -195,20 +192,20 @@ public class RewritePhase
                     repoReporter.warn( "NOT Rolling back conversion for: " + artifact + "; we are in --force mode." );
                 }
 
-                repoReporter.error( "Error while rewriting file or POM for artifact: \'" + artifact.getId()
-                    + "\'.", e );
+                repoReporter.error( "Error while rewriting file or POM for artifact: \'" + artifact.getId() + "\'.",
+                                    e );
             }
         }
 
-        logger.info( "Actual number of artifacts rewritten: " + rewritten.size() + " (" + ( rewritten.size() * 2 )
-            + " including POMs)." );
+        logger.info( "Actual number of artifacts rewritten: " + rewritten.size() + " (" + rewritten.size() * 2 +
+            " including POMs)." );
 
         return rewritten;
     }
 
     private void rewriteMetadata( Artifact artifact, RewriteTransaction transaction, File sourceBase,
-                                 ArtifactRepository sourceRepo, File targetBase, ArtifactRepository targetRepo,
-                                 Reporter artifactReporter, boolean reportOnly )
+                                  ArtifactRepository sourceRepo, File targetBase, ArtifactRepository targetRepo,
+                                  Reporter artifactReporter, boolean reportOnly )
         throws Exception
     {
         // SNAPSHOT metadata
@@ -217,8 +214,7 @@ public class RewritePhase
         File snapshotSource = new File( sourceBase, sourceRepo.pathOfMetadata( snapshot ) );
         File snapshotTarget = new File( targetBase, targetRepo.pathOfMetadata( snapshot ) );
 
-        freshenSupplementalMetadata( snapshot, snapshotSource, snapshotTarget, transaction, artifactReporter,
-                                     reportOnly );
+        freshenSupplementalMetadata( snapshotSource, snapshotTarget, transaction, artifactReporter, reportOnly );
 
         // RELEASE metadata
         ArtifactMetadata release = new ReleaseArtifactMetadata( artifact );
@@ -226,7 +222,7 @@ public class RewritePhase
         File releaseSource = new File( sourceBase, sourceRepo.pathOfMetadata( release ) );
         File releaseTarget = new File( targetBase, targetRepo.pathOfMetadata( release ) );
 
-        freshenSupplementalMetadata( release, releaseSource, releaseTarget, transaction, artifactReporter, reportOnly );
+        freshenSupplementalMetadata( releaseSource, releaseTarget, transaction, artifactReporter, reportOnly );
 
         // The rest is for POM metadata - translation and bridging of locations in the target repo may be required.
         ArtifactMetadata pom = new ProjectMetadata( artifact );
@@ -246,10 +242,10 @@ public class RewritePhase
             {
                 shouldRewritePom = false;
 
-                freshenSupplementalMetadata( pom, sourcePom, targetPom, transaction, artifactReporter, reportOnly );
+                freshenSupplementalMetadata( sourcePom, targetPom, transaction, artifactReporter, reportOnly );
             }
         }
-        else if( targetPom.exists() )
+        else if ( targetPom.exists() )
         {
             // we have a target pom for this artifact already, and we'll only be making up a new pom.
             // let's leave the existing one alone.
@@ -257,9 +253,9 @@ public class RewritePhase
         }
 
         File bridgedTargetPom = null;
-        
+
         boolean wroteBridge = false;
-        
+
         if ( shouldRewritePom )
         {
             ArtifactPomRewriter artifactPomRewriter = null;
@@ -299,8 +295,8 @@ public class RewritePhase
                     IOUtil.close( to );
                 }
 
-                wroteBridge = bridgePomLocations( pom, targetPom, bridgedTargetPom, artifactReporter,
-                                                          transaction, reportOnly );
+                wroteBridge = bridgePomLocations( targetPom, bridgedTargetPom, artifactReporter, transaction,
+                                                  reportOnly );
             }
             finally
             {
@@ -316,19 +312,17 @@ public class RewritePhase
                 }
             }
         }
-        
+
         digestVerifier.verifyDigest( sourcePom, targetPom, transaction, artifactReporter, reportOnly );
 
         if ( wroteBridge )
         {
-            digestVerifier.verifyDigest( sourcePom, bridgedTargetPom, transaction, artifactReporter,
-                                         reportOnly );
+            digestVerifier.verifyDigest( sourcePom, bridgedTargetPom, transaction, artifactReporter, reportOnly );
         }
     }
 
-    private void freshenSupplementalMetadata( ArtifactMetadata metadata, File source, File target,
-                                             RewriteTransaction transaction, Reporter artifactReporter,
-                                             boolean reportOnly )
+    private void freshenSupplementalMetadata( File source, File target, RewriteTransaction transaction,
+                                              Reporter artifactReporter, boolean reportOnly )
         throws IOException, DigestException, ReportWriteException
     {
         if ( source.exists() )
@@ -386,19 +380,7 @@ public class RewritePhase
         }
     }
 
-    private String buildArtifactReportPath( Artifact artifact )
-    {
-        String classifier = artifact.getClassifier();
-        String groupId = artifact.getGroupId().replace( '.', '/' );
-        String artifactId = artifact.getArtifactId();
-        String type = artifact.getType();
-        String version = artifact.getVersion();
-
-        return groupId + "/" + artifactId + "/" + type + "/"
-            + ( ( classifier != null ) ? ( classifier + "-" ) : ( "" ) ) + version + ".report.txt";
-    }
-
-    private void copyArtifact( Artifact artifact, File artifactTarget, Reporter reporter )
+    private void copyArtifact( Artifact artifact, File artifactTarget )
         throws IOException
     {
         File artifactSource = artifact.getFile();
@@ -433,19 +415,19 @@ public class RewritePhase
         }
     }
 
-    private boolean bridgePomLocations( ArtifactMetadata pom, File targetPom, File bridgedTargetPom, Reporter reporter,
-                                       RewriteTransaction transaction, boolean reportOnly )
+    private boolean bridgePomLocations( File targetPom, File bridgedTargetPom, Reporter reporter,
+                                        RewriteTransaction transaction, boolean reportOnly )
         throws IOException, ReportWriteException, DigestException
     {
         if ( targetPom.equals( bridgedTargetPom ) )
         {
-            reporter.warn( "Cannot create legacy-compatible copy of POM at: " + targetPom
-                + "; legacy-compatible path is the same as the converted POM itself." );
+            reporter.warn( "Cannot create legacy-compatible copy of POM at: " + targetPom +
+                "; legacy-compatible path is the same as the converted POM itself." );
 
             return false;
         }
 
-        freshenSupplementalMetadata( pom, targetPom, bridgedTargetPom, transaction, reporter, reportOnly );
+        freshenSupplementalMetadata( targetPom, bridgedTargetPom, transaction, reporter, reportOnly );
 
         return true;
     }

@@ -279,13 +279,11 @@ public class PomV3ToV4Translator
 
                 reportPlugin.setArtifactId( reportPluginName );
 
-                reportPlugin.setVersion( "1.0-SNAPSHOT" );
-
                 StringBuffer info = new StringBuffer();
 
-                info.append( "Using some contrived information for report: \'" ).append( reportName ).append( "\'.\n" )
+                info.append( "Using some derived information for report: \'" ).append( reportName ).append( "\'.\n" )
                     .append( "\to groupId: \'maven\'\n" ).append( "\to artifactId: \'" ).append( reportPluginName )
-                    .append( "\'\n" ).append( "\to version: \'1.0-SNAPSHOT\'\n" ).append( "\to goal: \'report\'\n" )
+                    .append( "\'\n" ).append( "\to goal: \'report\'\n" )
                     .append( "\n" )
                     .append( "These values were extracted using the v3 report naming convention, but may be wrong." );
 
@@ -655,7 +653,6 @@ public class PomV3ToV4Translator
                     Plugin plugin = new Plugin();
                     plugin.setGroupId( "org.apache.maven.plugins" );
                     plugin.setArtifactId( "surefire" );
-                    plugin.setVersion( "1.0-SNAPSHOT" );
 
                     Xpp3Dom config = new Xpp3Dom( "configuration" );
 
