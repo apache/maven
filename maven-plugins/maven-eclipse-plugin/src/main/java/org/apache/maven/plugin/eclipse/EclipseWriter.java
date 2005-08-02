@@ -396,7 +396,7 @@ public class EclipseWriter
 
                 writer.startElement( "location" );
 
-                writer.writeText( sourceRoot );
+                writer.writeText( sourceRoot.replaceAll("\\\\", "/") );
 
                 writer.endElement(); // location
 
@@ -429,7 +429,7 @@ public class EclipseWriter
 
                 writer.startElement( "location" );
 
-                writer.writeText( resourceDir );
+                writer.writeText( resourceDir.replaceAll( "\\\\", "/" ) );
 
                 writer.endElement(); // location
 
@@ -458,7 +458,7 @@ public class EclipseWriter
 
             writer.startElement( "location" );
 
-            writer.writeText( file.toString() );
+            writer.writeText( file.toString().replaceAll( "\\\\", "/" ) );
 
             writer.endElement(); // location
 
