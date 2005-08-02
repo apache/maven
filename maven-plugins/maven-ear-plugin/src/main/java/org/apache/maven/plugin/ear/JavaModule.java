@@ -16,32 +16,40 @@ package org.apache.maven.plugin.ear;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.codehaus.plexus.util.xml.XMLWriter;
+
 /**
- * The base exception of the EAR plugin.
+ * The {@link EarModule} implementation for a J2EE client module.
  *
  * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
  * @version $Id$
  */
-public class EarPluginException
-    extends Exception
+public class JavaModule
+    extends AbstractEarModule
 {
+    protected static final String JAVA_MODULE = "java";
 
-    public EarPluginException()
+    public JavaModule()
     {
     }
 
-    public EarPluginException( String message )
+    public JavaModule( Artifact a )
     {
-        super( message );
+        super( a );
     }
 
-    public EarPluginException( Throwable cause )
+    public void appendModule( XMLWriter writer, String version )
     {
-        super( cause );
+        writer.startElement( MODULE_ELEMENT );
+        writer.startElement( JAVA_MODULE );
+        writer.writeText( getUri() );
+        writer.endElement();
+        writer.endElement();
     }
 
-    public EarPluginException( String message, Throwable cause )
+    protected String getType()
     {
-        super( message, cause );
+        return "jar";
     }
 }

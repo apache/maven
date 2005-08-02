@@ -1,0 +1,126 @@
+ ---
+ Ear Plugin: configuration examples
+ ---
+ Stéphane Nicoll
+ ---
+ 31-Jul-2005
+ ---
+
+Introduction
+
+  The Ear plugin allows to generate automatically the descriptor deployment, e.g.
+  application.xml. This generation is already customized by basic configuration
+  items, see <<TODO: ADD A LINK HERE>>.
+
+  Ear modules might be further customized as follows:
+
+   * contextRoot: the custom context root for a web application
+
+   * bundleDir: the directory in the EAR structure where the artifact will be stored
+
+   * bundleFileName: the name of the artifact in the EAR structure
+
+   * uri: the complete path in the EAR structure for the artifact
+
+Customizing the context root
+
+  The sample below shows how to customize the context root of an artifact to be placed
+  in the EAR file:
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+           [...]
+           <modules>
+             <webModule>
+               <groupId>artifactGroupId</groupId>
+               <artifactId>artifactId</artifactId>
+               <contextRoot>/custom-context-root</contextRoot>
+             </webModule>
+          </modules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------
+
+Customizing a module location
+
+  The sample below shows how to place a library in the APP-INF/lib directory of the EAR file:
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+           [...]
+           <modules>
+             <javaModule>
+               <groupId>artifactGroupId</groupId>
+               <artifactId>artifactId</artifactId>
+               <bundleDir>APP-INF/lib</bundleDir>
+             </javaModule>
+          </modules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------
+
+Customizing a module file name
+
+  The sample below shows how to rename a module being placed in the EAR file:
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+           [...]
+           <modules>
+             <javaModule>
+               <groupId>artifactGroupId</groupId>
+               <artifactId>artifactId</artifactId>
+               <bundleFileName>anotherName-1.2.3.jar</bundleFileName>
+             </javaModule>
+          </modules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------
+
+Customizing a module uri
+
+  This is actually a combination of customizing the module's location and file
+  name. The sample below shows how to specify the URI of a module being placed
+  in the EAR file:
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+           [...]
+           <modules>
+             <javaModule>
+               <groupId>artifactGroupId</groupId>
+               <artifactId>artifactId</artifactId>
+               <uri>APP-INF/lib/anotherName-1.2.3.jar</uri>
+             </javaModule>
+          </modules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------

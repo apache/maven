@@ -18,12 +18,12 @@ package org.apache.maven.plugin.ear;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.ear.module.EarModule;
-import org.apache.maven.plugin.ear.module.EarModuleFactory;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -46,9 +46,15 @@ public abstract class AbstractEarMojo
      * @parameter expression="${project}"
      * @required
      * @readonly
-     * @description "the maven project to use"
      */
     private MavenProject project;
+
+    /**
+     * The ear modules configuration.
+     *
+     * @parameter
+     */
+    private EarModule[] modules;
 
     /**
      * Directory that resources are copied to during the build.
@@ -56,38 +62,75 @@ public abstract class AbstractEarMojo
      * @parameter expression="${project.build.directory}/${project.build.finalName}"
      * @required
      */
-    private String earDirectory;
+    private String workDirectory;
 
-    private List modules;
+    private List earModules;
 
     private File buildDir;
 
-    protected List getModules()
+    public void execute()
+        throws MojoExecutionException
     {
-        if ( modules == null )
+        getLog().debug( "Resolving ear modules ..." );
+
+        if ( modules != null && modules.length > 0 )
         {
-            // Gather modules and copy them
-            modules = new ArrayList();
-            Set artifacts = project.getArtifacts();
-            for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+
+            // Let's validate user-defined modules
+            EarModule module = null;
+            try
             {
-                Artifact artifact = (Artifact) iter.next();
-                if ( !Artifact.SCOPE_TEST.equals( artifact.getScope())  ||
-                    !Artifact.SCOPE_PROVIDED.equals( artifact.getScope()) )
+                for ( int i = 0; i < modules.length; i++ )
                 {
-                    EarModule module = EarModuleFactory.newEarModule( artifact );
-                    modules.add( module );
+                    module = (EarModule) modules[i];
+                    getLog().debug( "Resolving ear module[" + module + "]" );
+                    module.resolveArtifact( project.getArtifacts() );
                 }
             }
+            catch ( EarPluginException e )
+            {
+                throw new MojoExecutionException( "Failed to initialize ear modules", e );
+            }
+            earModules = new ArrayList( Arrays.asList( modules ) );
         }
-        return modules;
+        else
+        {
+            earModules = new ArrayList();
+        }
+
+        // Let's add other modules
+        Set artifacts = project.getArtifacts();
+        for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+        {
+            Artifact artifact = (Artifact) iter.next();
+
+            // Artifact is not yet registered and it has neither test, nor a
+            // provided scope
+            if ( !isArtifactRegistered( artifact, earModules ) && (
+                !Artifact.SCOPE_TEST.equals( artifact.getScope() ) ||
+                    !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) ) )
+            {
+                EarModule module = EarModuleFactory.newEarModule( artifact );
+                earModules.add( module );
+            }
+        }
+
+    }
+
+    protected List getModules()
+    {
+        if ( earModules == null )
+        {
+            throw new IllegalStateException( "Ear modules have not been initialized" );
+        }
+        return earModules;
     }
 
     protected File getBuildDir()
     {
         if ( buildDir == null )
         {
-            buildDir = new File( earDirectory );
+            buildDir = new File( workDirectory );
         }
         return buildDir;
     }
@@ -97,8 +140,22 @@ public abstract class AbstractEarMojo
         return project;
     }
 
-    protected String getEarDirectory()
+    protected String getWorkDirectory()
     {
-        return earDirectory;
+        return workDirectory;
+    }
+
+    private static boolean isArtifactRegistered( Artifact a, List currentList )
+    {
+        Iterator i = currentList.iterator();
+        while ( i.hasNext() )
+        {
+            EarModule em = (EarModule) i.next();
+            if ( em.getArtifact().equals( a ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

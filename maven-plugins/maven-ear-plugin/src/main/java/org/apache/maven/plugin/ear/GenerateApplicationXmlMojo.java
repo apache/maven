@@ -91,6 +91,9 @@ public class GenerateApplicationXmlMojo
     public void execute()
         throws MojoExecutionException
     {
+        // Initializes ear modules
+        super.execute();
+
         getLog().debug( " ======= GenerateApplicationXmlMojo settings =======" );
         getLog().debug( "generateApplicationXml[" + generateApplicationXml + "]" );
         getLog().debug( "version[" + version + "]" );

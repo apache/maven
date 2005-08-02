@@ -19,7 +19,6 @@ package org.apache.maven.plugin.ear;
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.ear.module.EarModule;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -32,7 +31,7 @@ import java.util.List;
  * Builds J2EE Enteprise Archive (EAR) files.
  *
  * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
- * @version $Id $
+ * @version $Id$
  * @goal ear
  * @phase package
  * @requiresDependencyResolution test
@@ -77,7 +76,7 @@ public class EarMojo
      *
      * @parameter alias="earName" expression="${project.build.finalName}"
      * @required
-     * @readonly     
+     * @readonly
      */
     private String finalName;
 
@@ -100,11 +99,14 @@ public class EarMojo
     public void execute()
         throws MojoExecutionException
     {
+        // Initializes ear modules
+        super.execute();
+
         getLog().debug( " ======= EarMojo settings =======" );
         getLog().debug( "earSourceDirectory[" + earSourceDirectory + "]" );
         getLog().debug( "manifestLocation[" + manifestLocation + "]" );
         getLog().debug( "applicationXmlLocation[" + applicationXmlLocation + "]" );
-        getLog().debug( "earDirectory[" + getEarDirectory() + "]" );
+        getLog().debug( "workDirectory[" + getWorkDirectory() + "]" );
         getLog().debug( "outputDirectory[" + outputDirectory + "]" );
         getLog().debug( "finalName[" + finalName + "]" );
         getLog().debug( "excludedDependencies[" + excludedDependencies + "]" );
@@ -115,9 +117,9 @@ public class EarMojo
             for ( Iterator iter = getModules().iterator(); iter.hasNext(); )
             {
                 EarModule module = (EarModule) iter.next();
-                getLog().info( "Copying artifact[" + module.getArtifact().getGroupId() + ", " +
-                               module.getArtifact().getId() + ", " + module.getArtifact().getType() + "]" );
-                FileUtils.copyFileToDirectory( module.getArtifact().getFile(), getBuildDir() );
+                getLog().info( "Copying artifact[" + module + "] to[" + module.getUri() + "]" );
+                File destinationFile = buildDestinationFile( getBuildDir(), module.getUri() );
+                FileUtils.copyFile( module.getArtifact().getFile(), destinationFile );
             }
         }
         catch ( IOException e )
@@ -144,7 +146,8 @@ public class EarMojo
         File ddFile = new File( getBuildDir(), APPLICATION_XML_URI );
         if ( !ddFile.exists() )
         {
-            throw new MojoExecutionException( "Deployment descriptor: " + ddFile.getAbsolutePath() + " does not exist." );
+            throw new MojoExecutionException(
+                "Deployment descriptor: " + ddFile.getAbsolutePath() + " does not exist." );
         }
 
         try
@@ -160,5 +163,10 @@ public class EarMojo
         {
             throw new MojoExecutionException( "Error assembling EAR", e );
         }
+    }
+
+    private static File buildDestinationFile( File buildDir, String uri )
+    {
+        return new File( buildDir, uri );
     }
 }

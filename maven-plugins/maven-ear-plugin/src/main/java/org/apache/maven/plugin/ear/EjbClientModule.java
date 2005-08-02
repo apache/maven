@@ -16,32 +16,29 @@ package org.apache.maven.plugin.ear;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+
 /**
- * The base exception of the EAR plugin.
+ * The {@link EarModule} implementation for an Ejb-client module.
  *
  * @author <a href="stephane.nicoll@gmail.com">Stephane Nicoll</a>
  * @version $Id$
  */
-public class EarPluginException
-    extends Exception
+public class EjbClientModule
+    extends JavaModule
 {
 
-    public EarPluginException()
+    public EjbClientModule()
     {
     }
 
-    public EarPluginException( String message )
+    public EjbClientModule( Artifact a )
     {
-        super( message );
+        super( a );
     }
 
-    public EarPluginException( Throwable cause )
+    protected String getType()
     {
-        super( cause );
-    }
-
-    public EarPluginException( String message, Throwable cause )
-    {
-        super( message, cause );
+        return "ejb-client";
     }
 }

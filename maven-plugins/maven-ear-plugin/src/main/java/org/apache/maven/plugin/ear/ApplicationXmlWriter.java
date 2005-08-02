@@ -1,6 +1,5 @@
 package org.apache.maven.plugin.ear;
 
-import org.apache.maven.plugin.ear.module.EarModule;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
