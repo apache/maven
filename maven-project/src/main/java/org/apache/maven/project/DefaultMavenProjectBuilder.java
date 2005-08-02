@@ -357,6 +357,7 @@ public class DefaultMavenProjectBuilder
                 model.setDistributionManagement( new DistributionManagement() );
                 model.getDistributionManagement().setStatus( ArtifactStatus.GENERATED.toString() );
 
+/* TODO: we should only do this if we can verify the existence of the JAR itself
                 File file = artifact.getFile();
                 file.getParentFile().mkdirs();
 
@@ -376,6 +377,7 @@ public class DefaultMavenProjectBuilder
                 {
                     IOUtil.close( writer );
                 }
+*/
             }
         }
 
