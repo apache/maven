@@ -152,9 +152,11 @@ public class MavenProject
         this.pluginArtifacts = Collections.unmodifiableSet( project.pluginArtifacts );
         this.remoteArtifactRepositories = Collections.unmodifiableList( project.remoteArtifactRepositories );
         this.pluginArtifactRepositories = Collections.unmodifiableList( project.pluginArtifactRepositories );
-        this.attachedArtifacts = Collections.unmodifiableList( project.getAttachedArtifacts() );
         this.collectedProjects = Collections.unmodifiableList( project.collectedProjects );
         this.activeProfiles = Collections.unmodifiableList( project.activeProfiles );
+
+        // clone properties modifyable by plugins in a forked lifecycle
+        this.attachedArtifacts = new ArrayList( project.getAttachedArtifacts() );
 
         // no need for execution project
 
