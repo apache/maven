@@ -66,6 +66,8 @@ public class ModelReader
 
     private List testResources = new ArrayList();
 
+    private Map managedDependencies = new HashMap();
+
     private Dependency currentDependency;
 
     private Resource currentResource;
@@ -119,6 +121,13 @@ public class ModelReader
         return m.values();
     }
 
+    public Collection getManagedDependencies()
+    {
+        Map m = new HashMap();
+        m.putAll( managedDependencies );
+        return m.values();
+    }
+
     public List getResources()
     {
         return resources;
@@ -138,12 +147,9 @@ public class ModelReader
         }
         else if ( rawName.equals( "dependency" ) )
         {
-            if ( !insideDependencyManagement )
-            {
-                currentDependency = new Dependency();
+            currentDependency = new Dependency();
 
-                insideDependency = true;
-            }
+            insideDependency = true;
         }
         else if ( rawName.equals( "dependencyManagement" ) )
         {
@@ -218,6 +224,8 @@ public class ModelReader
 
             addDependencies( p.getDependencies(), parentDependencies, null );
 
+            addDependencies( p.getManagedDependencies(), managedDependencies, null );
+
             resources.addAll( p.getResources() );
 
             insideParent = false;
@@ -226,18 +234,14 @@ public class ModelReader
         {
             insideDependency = false;
 
-            if ( !hasDependency( currentDependency, dependencies ) )
+            if ( insideDependencyManagement )
             {
-                if ( resolveTransitiveDependencies )
-                {
-                    ModelReader p = retrievePom( currentDependency.getGroupId(), currentDependency.getArtifactId(),
-                                                 currentDependency.getVersion(), currentDependency.getType(),
-                                                 resolveTransitiveDependencies );
-
-                    addDependencies( p.getDependencies(), transitiveDependencies, currentDependency.getScope() );
-                }
+                managedDependencies.put( currentDependency.getConflictId(), currentDependency );
             }
-            dependencies.put( currentDependency.getConflictId(), currentDependency );
+            else
+            {
+                dependencies.put( currentDependency.getConflictId(), currentDependency );
+            }
         }
         else if ( rawName.equals( "dependencyManagement" ) )
         {
@@ -375,10 +379,43 @@ public class ModelReader
                 packaging = getBodyText();
             }
         }
+        else if ( depth == 1 ) // model / project
+        {
+            resolveDependencies();
+        }
 
         bodyText = new StringBuffer();
 
         depth--;
+    }
+
+    private void resolveDependencies()
+        throws SAXException
+    {
+        for ( Iterator it = dependencies.values().iterator(); it.hasNext(); )
+        {
+            Dependency dependency = (Dependency) it.next();
+
+            if ( dependency.getVersion() == null )
+            {
+                Dependency managedDependency = (Dependency) managedDependencies.get( dependency.getConflictId() );
+                if ( managedDependency == null )
+                {
+                    throw new NullPointerException( "[" + groupId + ":" + artifactId +":" + packaging + ":" + version + "] " +
+                            "Dependency " + dependency.getConflictId() + " is missing a version, and nothing is found in dependencyManagement. ");
+                }
+                dependency.setVersion( managedDependency.getVersion() );
+            }
+
+            if ( resolveTransitiveDependencies )
+            {
+                ModelReader p = retrievePom( dependency.getGroupId(), dependency.getArtifactId(),
+                                             dependency.getVersion(), dependency.getType(),
+                                             resolveTransitiveDependencies );
+
+                addDependencies( p.getDependencies(), transitiveDependencies, dependency.getScope() );
+            }
+        }
     }
 
     private void addDependencies( Collection dependencies, Map target, String inheritedScope )
