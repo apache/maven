@@ -54,7 +54,7 @@ public class ScopeArtifactFilter
         }
         else if ( DefaultArtifact.SCOPE_TEST.equals( scope ) )
         {
-            providedScope = false;
+            providedScope = true;
             compileScope = true;
             runtimeScope = true;
             testScope = true;
