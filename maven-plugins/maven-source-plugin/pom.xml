@@ -19,7 +19,6 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-4</version>
       <scope>test</scope>
     </dependency>
     <dependency>

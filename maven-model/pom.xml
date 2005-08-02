@@ -15,7 +15,6 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>1.0.1</version>
     </dependency>
   </dependencies>
   <build>

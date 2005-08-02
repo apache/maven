@@ -24,7 +24,6 @@
     <dependency>
       <groupId>plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-4</version>
     </dependency>
   </dependencies>
   <build>
