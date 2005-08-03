@@ -5,11 +5,9 @@ import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Date;
 import java.util.Properties;
 
@@ -53,6 +51,8 @@ public class ReleaseProgressTracker
     public static final String CP_PREPARED_RELEASE = "prepared-release";
 
     private Properties releaseProperties;
+
+    private boolean resumeAtCheckpoint = false;
 
     private ReleaseProgressTracker()
     {
@@ -230,11 +230,16 @@ public class ReleaseProgressTracker
         releaseProperties.setProperty( CHECKPOINT_PREFIX + pointName, "OK" );
     }
 
-    public boolean reachedCheckpoint( String pointName )
+    public boolean verifyCheckpoint( String pointName )
     {
         checkLoaded();
 
-        return "OK".equals( releaseProperties.getProperty( CHECKPOINT_PREFIX + pointName ) );
+        return resumeAtCheckpoint && "OK".equals( releaseProperties.getProperty( CHECKPOINT_PREFIX + pointName ) );
+    }
+
+    public void setResumeAtCheckpoint( boolean resumeAtCheckpoint )
+    {
+        this.resumeAtCheckpoint = resumeAtCheckpoint;
     }
 
 }

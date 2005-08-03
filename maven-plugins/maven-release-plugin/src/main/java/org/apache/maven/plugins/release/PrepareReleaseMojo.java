@@ -166,7 +166,7 @@ public class PrepareReleaseMojo
             getLog().warn( "Error writing checkpoint.", e );
         }
 
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_PREPARED_RELEASE ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_PREPARED_RELEASE ) )
         {
             checkForLocalModifications();
 
@@ -228,7 +228,7 @@ public class PrepareReleaseMojo
     private void transformPomToSnapshotVersionPom( MavenProject project )
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_POM_TRANSORMED_FOR_DEVELOPMENT ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_POM_TRANSORMED_FOR_DEVELOPMENT ) )
         {
             if ( isSnapshot( project.getVersion() ) )
             {
@@ -373,7 +373,7 @@ public class PrepareReleaseMojo
                 try
                 {
                     releaseProgress = ReleaseProgressTracker.load( basedir );
-
+                    
                     releaseProgress.verifyResumeCapable();
                 }
                 catch ( IOException e )
@@ -394,6 +394,8 @@ public class PrepareReleaseMojo
                                    "Cannot read existing release progress file from directory: " + basedir
                                        + ". Creating new instance." );
                 }
+
+                releaseProgress.setResumeAtCheckpoint( resume );
 
                 releaseProgress.setUsername( username );
 
@@ -441,7 +443,7 @@ public class PrepareReleaseMojo
     private void checkForLocalModifications()
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_LOCAL_MODIFICATIONS_CHECKED ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_LOCAL_MODIFICATIONS_CHECKED ) )
         {
             getLog().info( "Verifying there are no local modifications ..." );
 
@@ -512,7 +514,7 @@ public class PrepareReleaseMojo
     private void checkForPresenceOfSnapshots( MavenProject project )
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_SNAPSHOTS_CHECKED ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_SNAPSHOTS_CHECKED ) )
         {
             getLog().info( "Checking lineage for snapshots ..." );
 
@@ -612,7 +614,7 @@ public class PrepareReleaseMojo
     private void transformPomToReleaseVersionPom( MavenProject project )
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE ) )
         {
             if ( !isSnapshot( project.getVersion() ) )
             {
@@ -751,7 +753,7 @@ public class PrepareReleaseMojo
     private void generateReleasePom( MavenProject project )
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_GENERATED_RELEASE_POM ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_GENERATED_RELEASE_POM ) )
         {
             MavenProject releaseProject = new MavenProject( project );
             Model releaseModel = releaseProject.getModel();
@@ -947,7 +949,7 @@ public class PrepareReleaseMojo
     private void checkInRelease()
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION ) )
         {
             checkIn( "**/pom.xml,**/release-pom.xml", "[maven-release-plugin] prepare release" );
 
@@ -965,7 +967,7 @@ public class PrepareReleaseMojo
     private void removeReleasePoms()
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_REMOVED_RELEASE_POM ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_REMOVED_RELEASE_POM ) )
         {
             File currentReleasePomFile = null;
 
@@ -1028,7 +1030,7 @@ public class PrepareReleaseMojo
     private void checkInNextSnapshot()
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_DEVELOPMENT_VERSION ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_DEVELOPMENT_VERSION ) )
         {
             checkIn( "**/pom.xml", "[maven-release-plugin] prepare for next development iteration" );
 
@@ -1113,7 +1115,7 @@ public class PrepareReleaseMojo
     private void tagRelease()
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().reachedCheckpoint( ReleaseProgressTracker.CP_TAGGED_RELEASE ) )
+        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_TAGGED_RELEASE ) )
         {
             String tag = getTagLabel();
 
