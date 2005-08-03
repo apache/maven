@@ -108,6 +108,12 @@ public class DefaultMavenSettingsBuilder
     public Settings buildSettings()
         throws IOException, XmlPullParserException
     {
+        return buildSettings( userSettingsFile );
+    }
+    
+    public Settings buildSettings( File userSettingsFile )
+        throws IOException, XmlPullParserException
+    {
         if ( loadedSettings == null )
         {
             Settings globalSettings = readSettings( globalSettingsFile );

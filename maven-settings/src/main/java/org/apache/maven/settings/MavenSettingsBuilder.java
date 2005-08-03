@@ -19,6 +19,7 @@ package org.apache.maven.settings;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -34,5 +35,8 @@ public interface MavenSettingsBuilder
     String ALT_LOCAL_REPOSITORY_LOCATION = "maven.repo.local";
 
     Settings buildSettings()
+        throws IOException, XmlPullParserException;
+    
+    Settings buildSettings( File userSettingsFile )
         throws IOException, XmlPullParserException;
 }

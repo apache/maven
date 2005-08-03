@@ -124,6 +124,8 @@ it0042: Test that the reactor can establish the artifact location of known proje
 
 it0043: Test for repository inheritence - ensure using the same id overrides the defaults
 
+it0044: Test --settings CLI option
+
 -------------------------------------------------------------------------------
 
 - generated sources

@@ -160,13 +160,37 @@ public class MavenCli
             showFatalError( "Unable to start the embedded plexus container", e, showErrors );
             return 1;
         }
+        
+        String userSettingsPath = null;
+        
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
+        {
+            userSettingsPath = commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS );
+        }
 
-        Settings settings;
+        Settings settings = null;
         try
         {
             MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );
+            
+            if ( userSettingsPath != null )
+            {
+                File userSettingsFile = new File( userSettingsPath );
+                
+                if ( userSettingsFile.exists() && !userSettingsFile.isDirectory() )
+                {
+                    settings = settingsBuilder.buildSettings( userSettingsFile );
+                }
+                else
+                {
+                    System.out.println("WARNING: Alternate user settings file: " + userSettingsPath + " is invalid. Using default path." );
+                }
+            }
 
-            settings = settingsBuilder.buildSettings();
+            if ( settings == null )
+            {
+                settings = settingsBuilder.buildSettings();
+            }
         }
         catch ( IOException e )
         {
@@ -509,6 +533,8 @@ public class MavenCli
 
         public static final char CHECKSUM_WARNING_POLICY = 'c';
 
+        private static final char ALTERNATE_USER_SETTINGS = 's';
+
         public CLIManager()
         {
             options = new Options();
@@ -564,6 +590,10 @@ public class MavenCli
             options.addOption(
                 OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create(
                     CHECKSUM_WARNING_POLICY ) );
+            
+            options.addOption( OptionBuilder.withLongOpt( "settings" )
+                .withDescription( "Alternate path for the user settings file" ).hasArg()
+                .create( ALTERNATE_USER_SETTINGS ) );
         }
 
         public CommandLine parse( String[] args )
