@@ -40,7 +40,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.activation.ProfileActivationCalculator;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
@@ -64,7 +63,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -386,7 +384,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository,
-                                List remoteArtifactRepositories, List externalProfiles, File projectDir )
+                                List parentSearchRepositories, List externalProfiles, File projectDir )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -395,10 +393,6 @@ public class DefaultMavenProjectBuilder
         LinkedList lineage = new LinkedList();
 
         Set aggregatedRemoteWagonRepositories = new HashSet();
-        if ( remoteArtifactRepositories != null && !remoteArtifactRepositories.isEmpty() )
-        {
-            aggregatedRemoteWagonRepositories.addAll( remoteArtifactRepositories );
-        }
 
         aggregatedRemoteWagonRepositories.addAll( ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
                                                                                           artifactRepositoryFactory,
@@ -422,10 +416,8 @@ public class DefaultMavenProjectBuilder
 
         Model originalModel = ModelUtils.cloneModel( model );
 
-        List repositories = new ArrayList( aggregatedRemoteWagonRepositories );
-
-        MavenProject project = assembleLineage( model, lineage, repositories, localRepository, externalProfiles,
-                                                projectDir );
+        MavenProject project = assembleLineage( model, lineage, localRepository, externalProfiles, projectDir,
+                                                parentSearchRepositories, aggregatedRemoteWagonRepositories );
 
         project.setOriginalModel( originalModel );
 
@@ -445,7 +437,8 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, repositories, externalProfiles );
+            project = processProjectLogic( pomLocation, project, new ArrayList( aggregatedRemoteWagonRepositories ),
+                                           externalProfiles );
         }
         catch ( ModelInterpolationException e )
         {
@@ -562,8 +555,9 @@ public class DefaultMavenProjectBuilder
     /**
      * @noinspection CollectionDeclaredAsConcreteClass
      */
-    private MavenProject assembleLineage( Model model, LinkedList lineage, List aggregatedRemoteWagonRepositories,
-                                          ArtifactRepository localRepository, List externalProfiles, File projectDir )
+    private MavenProject assembleLineage( Model model, LinkedList lineage, ArtifactRepository localRepository,
+                                          List externalProfiles, File projectDir, List parentSearchRepositories,
+                                          Set aggregatedRemoteWagonRepositories )
         throws ProjectBuildingException
     {
         if ( !model.getRepositories().isEmpty() )
@@ -672,11 +666,15 @@ public class DefaultMavenProjectBuilder
                                                                        parentModel.getArtifactId(),
                                                                        parentModel.getVersion() );
 
-                model = findModelFromRepository( parentArtifact, aggregatedRemoteWagonRepositories, localRepository );
+                // we must add the repository this POM was found in too, by chance it may be located where the parent is
+                // we can't query the parent to ask where it is :)
+                List remoteRepositories = new ArrayList( aggregatedRemoteWagonRepositories );
+                remoteRepositories.addAll( parentSearchRepositories );
+                model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository );
             }
 
-            MavenProject parent = assembleLineage( model, lineage, aggregatedRemoteWagonRepositories, localRepository,
-                                                   externalProfiles, parentProjectDir );
+            MavenProject parent = assembleLineage( model, lineage, localRepository, externalProfiles, parentProjectDir,
+                                                   parentSearchRepositories, aggregatedRemoteWagonRepositories );
 
             project.setParent( parent );
 
@@ -855,8 +853,9 @@ public class DefaultMavenProjectBuilder
                 Artifact artifact;
                 try
                 {
-                    artifact = artifactFactory.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(), VersionRange
-                        .createFromVersionSpec( version ) );
+                    artifact = artifactFactory.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(),
+                                                                        VersionRange
+                                                                            .createFromVersionSpec( version ) );
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {

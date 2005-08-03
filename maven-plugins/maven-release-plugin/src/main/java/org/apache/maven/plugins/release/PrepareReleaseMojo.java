@@ -232,8 +232,8 @@ public class PrepareReleaseMojo
         {
             if ( isSnapshot( project.getVersion() ) )
             {
-                throw new MojoExecutionException( "This project is a snapshot (" + project.getVersion()
-                    + "). It appears that the release version has not been committed." );
+                throw new MojoExecutionException( "This project is a snapshot (" + project.getVersion() +
+                    "). It appears that the release version has not been committed." );
             }
 
             Model model = project.getOriginalModel();
@@ -345,7 +345,8 @@ public class PrepareReleaseMojo
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "Cannot write development version of pom to: " + project.getFile(), e );
+                throw new MojoExecutionException( "Cannot write development version of pom to: " + project.getFile(),
+                                                  e );
             }
             finally
             {
@@ -373,13 +374,13 @@ public class PrepareReleaseMojo
                 try
                 {
                     releaseProgress = ReleaseProgressTracker.load( basedir );
-                    
+
                     releaseProgress.verifyResumeCapable();
                 }
                 catch ( IOException e )
                 {
-                    throw new MojoExecutionException( "Cannot read existing release progress file from directory: "
-                        + basedir + ". Cannot resume." );
+                    throw new MojoExecutionException(
+                        "Cannot read existing release progress file from directory: " + basedir + ". Cannot resume." );
                 }
             }
             else
@@ -390,9 +391,8 @@ public class PrepareReleaseMojo
                 }
                 catch ( IOException e )
                 {
-                    getLog().warn(
-                                   "Cannot read existing release progress file from directory: " + basedir
-                                       + ". Creating new instance." );
+                    getLog().warn( "Cannot read existing release progress file from directory: " + basedir +
+                        ". Creating new instance." );
                 }
 
                 releaseProgress.setResumeAtCheckpoint( resume );
@@ -487,8 +487,7 @@ public class PrepareReleaseMojo
                 }
 
                 throw new MojoExecutionException(
-                                                  "Cannot prepare the release because you have local modifications : \n"
-                                                      + message.toString() );
+                    "Cannot prepare the release because you have local modifications : \n" + message.toString() );
             }
 
             try
@@ -596,8 +595,8 @@ public class PrepareReleaseMojo
                     message.append( "\n" );
                 }
 
-                throw new MojoExecutionException( "Can't release project due to non released dependencies :\n"
-                    + message.toString() );
+                throw new MojoExecutionException(
+                    "Can't release project due to non released dependencies :\n" + message.toString() );
             }
 
             try
@@ -925,8 +924,8 @@ public class PrepareReleaseMojo
             {
                 try
                 {
-                    artifactMetadataSource
-                        .retrieve( artifact, localRepository, project.getPluginArtifactRepositories() );
+                    artifactMetadataSource.retrieve( artifact, localRepository,
+                                                     project.getPluginArtifactRepositories() );
                 }
                 catch ( ArtifactMetadataRetrievalException e )
                 {
