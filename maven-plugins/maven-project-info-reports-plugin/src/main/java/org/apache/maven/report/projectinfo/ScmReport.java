@@ -22,11 +22,19 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.MavenReportException;
+import org.apache.maven.scm.manager.NoSuchScmProviderException;
+import org.apache.maven.scm.manager.ScmManager;
+import org.apache.maven.scm.provider.clearcase.repository.ClearCaseScmProviderRepository;
+import org.apache.maven.scm.provider.cvslib.repository.CvsScmProviderRepository;
+import org.apache.maven.scm.provider.perforce.repository.PerforceScmProviderRepository;
+import org.apache.maven.scm.provider.starteam.repository.StarteamScmProviderRepository;
+import org.apache.maven.scm.provider.svn.repository.SvnScmProviderRepository;
+import org.apache.maven.scm.repository.ScmRepository;
+import org.apache.maven.scm.repository.ScmRepositoryException;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -60,6 +68,13 @@ public class ScmReport
      * @readonly
      */
     private MavenProject project;
+
+    /**
+     * @parameter expression="${component.org.apache.maven.scm.manager.ScmManager}"
+     * @required
+     * @readonly
+     */
+    protected ScmManager scmManager;
 
     /**
      * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
@@ -115,7 +130,7 @@ public class ScmReport
     public void executeReport( Locale locale )
         throws MavenReportException
     {
-        ScmRenderer r = new ScmRenderer( getSink(), getProject().getModel(), locale );
+        ScmRenderer r = new ScmRenderer( scmManager, getSink(), getProject().getModel(), locale );
 
         r.render();
     }
@@ -135,9 +150,18 @@ public class ScmReport
 
         private Locale locale;
 
-        public ScmRenderer( Sink sink, Model model, Locale locale )
+        private ScmManager scmManager;
+
+        /** To support more SCM */
+        private String anonymousConnection;
+
+        private String devConnection;
+
+        public ScmRenderer( ScmManager scmManager, Sink sink, Model model, Locale locale )
         {
             super( sink );
+
+            this.scmManager = scmManager;
 
             this.model = model;
 
@@ -169,32 +193,59 @@ public class ScmReport
                 return;
             }
 
-            String connection = scm.getConnection();
-            String devConnection = scm.getDeveloperConnection();
+            anonymousConnection = scm.getConnection();
+            devConnection = scm.getDeveloperConnection();
 
-            boolean isSvnConnection = isScmSystem( connection, "svn" );
-            boolean isCvsConnection = isScmSystem( connection, "cvs" );
-            boolean isVssConnection = isScmSystem( connection, "vss" );
+            ScmRepository anonymousRepository = getScmRepository( anonymousConnection );
+            ScmRepository devRepository = getScmRepository( devConnection );
 
-            boolean isSvnDevConnection = isScmSystem( devConnection, "svn" );
-            boolean isCvsDevConnection = isScmSystem( devConnection, "cvs" );
-            boolean isVssDevConnection = isScmSystem( devConnection, "vss" );
+            // Overview section
+            renderOverViewSection( anonymousRepository );
 
-            // Overview
+            // Web access section
+            renderWebAccesSection( scm.getUrl() );
+
+            // Anonymous access section if needed
+            renderAnonymousAccessSection( anonymousRepository );
+
+            // Developer access section
+            renderDeveloperAccessSection( devRepository );
+
+            // Access from behind a firewall section if needed
+            renderAccessBehindFirewallSection( devRepository );
+
+            // Access through a proxy section if needed
+            renderAccessThroughProxySection( anonymousRepository, devRepository );
+        }
+
+        /**
+         * Render the overview section
+         * 
+         * @param anonymousRepository the anonymous repository
+         */
+        private void renderOverViewSection( ScmRepository anonymousRepository )
+        {
             startSection( getBundle( locale ).getString( "report.scm.overview.title" ) );
 
-            if ( isSvnConnection )
+            if ( isScmSystem( anonymousRepository, "clearcase" ) )
             {
-                linkPatternedText( getBundle( locale ).getString( "report.scm.svn.intro" ) );
-
+                linkPatternedText( getBundle( locale ).getString( "report.scm.clearcase.intro" ) );
             }
-            else if ( isCvsConnection )
+            else if ( isScmSystem( anonymousRepository, "cvs" ) )
             {
                 linkPatternedText( getBundle( locale ).getString( "report.scm.cvs.intro" ) );
             }
-            else if ( isVssConnection )
+            else if ( isScmSystem( anonymousRepository, "perforce" ) )
             {
-                linkPatternedText( getBundle( locale ).getString( "report.scm.vss.intro" ) );
+                linkPatternedText( getBundle( locale ).getString( "report.scm.perforce.intro" ) );
+            }
+            else if ( isScmSystem( anonymousRepository, "starteam" ) )
+            {
+                linkPatternedText( getBundle( locale ).getString( "report.scm.starteam.intro" ) );
+            }
+            else if ( isScmSystem( anonymousRepository, "svn" ) )
+            {
+                linkPatternedText( getBundle( locale ).getString( "report.scm.svn.intro" ) );
             }
             else
             {
@@ -202,11 +253,18 @@ public class ScmReport
             }
 
             endSection();
+        }
 
-            // Web access
+        /**
+         * Render the web access section
+         * 
+         * @param scmUrl The URL to the project's browsable repository.
+         */
+        private void renderWebAccesSection( String scmUrl )
+        {
             startSection( getBundle( locale ).getString( "report.scm.webaccess.title" ) );
 
-            if ( scm.getUrl() == null )
+            if ( scmUrl == null )
             {
                 paragraph( getBundle( locale ).getString( "report.scm.webaccess.nourl" ) );
             }
@@ -214,146 +272,127 @@ public class ScmReport
             {
                 paragraph( getBundle( locale ).getString( "report.scm.webaccess.url" ) );
 
-                verbatimLink( scm.getUrl(), scm.getUrl() );
+                verbatimLink( scmUrl, scmUrl );
             }
 
             endSection();
+        }
 
-            // Anonymous access
-            if ( !StringUtils.isEmpty( connection ) )
+        /**
+         * Render the anonymous access section depending the repository.
+         * <p>Note: ClearCase, Starteam et Perforce seems to have no anonymous access.</>
+         * 
+         * @param anonymousRepository the anonymous repository
+         */
+        private void renderAnonymousAccessSection( ScmRepository anonymousRepository )
+        {
+            if ( ( isScmSystem( anonymousRepository, "clearcase" ) )
+                || ( isScmSystem( anonymousRepository, "perforce" ) )
+                || ( isScmSystem( anonymousRepository, "starteam" ) ) )
             {
-                // Validation
-                validConnection( connection );
-
-                startSection( getBundle( locale ).getString( "report.scm.anonymousaccess.title" ) );
-
-                if ( isSvnConnection )
-                {
-                    paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.svn.intro" ) );
-
-                    // Example:
-                    // $> svn checkout
-                    // http://svn.apache.org/repos/asf/maven/components/trunk
-                    // maven
-
-                    StringBuffer sb = new StringBuffer();
-                    sb.append( "$>svn checkout " ).append( getSvnRoot( connection ) ).append( " " )
-                        .append( model.getArtifactId() );
-                    verbatimText( sb.toString() );
-                }
-                else if ( isCvsConnection )
-                {
-                    paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.cvs.intro" ) );
-
-                    // Example:
-                    // cvs -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic
-                    // login
-                    // cvs -z3 -d
-                    // :pserver:anoncvs@cvs.apache.org:/home/cvspublic co
-                    // maven-plugins/dist
-
-                    String[] connectionDef = StringUtils.split( connection, ":" );
-
-                    StringBuffer command = new StringBuffer();
-                    command.append( "$>cvs -d " ).append( getCvsRoot( connection, "" ) ).append( " login" );
-                    command.append( "\n" );
-                    command.append( "$>cvs -z3 -d " ).append( getCvsRoot( connection, "" ) ).append( " co " )
-                        .append( getCvsModule( connection ) );
-                    verbatimText( command.toString() );
-                }
-                else if ( isVssConnection )
-                {
-                    paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.vss.intro" ) );
-
-                    verbatimText( getVssRoot( connection, "" ) );
-                }
-                else
-                {
-                    paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.general.intro" ) );
-
-                    verbatimText( connection.substring( 4 ) );
-                }
-
-                endSection();
+                return;
             }
 
-            // Developer access
-            if ( !StringUtils.isEmpty( devConnection ) )
+            startSection( getBundle( locale ).getString( "report.scm.anonymousaccess.title" ) );
+
+            if ( ( anonymousRepository != null ) && ( isScmSystem( anonymousRepository, "cvs" ) ) )
             {
-                // Validation
-                validConnection( devConnection );
+                CvsScmProviderRepository cvsRepo = (CvsScmProviderRepository) anonymousRepository
+                    .getProviderRepository();
 
-                startSection( getBundle( locale ).getString( "report.scm.devaccess.title" ) );
+                anonymousAccessCVS( cvsRepo );
+            }
+            else if ( ( anonymousRepository != null ) && ( isScmSystem( anonymousRepository, "svn" ) ) )
+            {
+                SvnScmProviderRepository svnRepo = (SvnScmProviderRepository) anonymousRepository
+                    .getProviderRepository();
 
-                if ( isSvnDevConnection )
-                {
-                    paragraph( getBundle( locale ).getString( "report.scm.devaccess.svn.intro1" ) );
+                anonymousAccessSVN( svnRepo );
+            }
+            else
+            {
+                paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.general.intro" ) );
 
-                    // Example:
-                    // $> svn checkout
-                    // https://svn.apache.org/repos/asf/maven/components/trunk
-                    // maven
-
-                    StringBuffer sb = new StringBuffer();
-                    sb.append( "$>svn checkout " ).append( getSvnRoot( devConnection ) ).append( " " )
-                        .append( model.getArtifactId() );
-                    verbatimText( sb.toString() );
-
-                    paragraph( getBundle( locale ).getString( "report.scm.devaccess.svn.intro2" ) );
-
-                    sb = new StringBuffer();
-                    sb.append( "$>svn commit --username your-username -m \"A message\"" );
-                    verbatimText( sb.toString() );
-                }
-                else if ( isCvsDevConnection )
-                {
-                    paragraph( getBundle( locale ).getString( "report.scm.devaccess.cvs.intro" ) );
-
-                    // Example:
-                    // cvs -d :pserver:username@cvs.apache.org:/home/cvs login
-                    // cvs -z3 -d :ext:username@cvs.apache.org:/home/cvs co
-                    // maven-plugins/dist
-
-                    String[] connectionDef = StringUtils.split( devConnection, ":" );
-
-                    StringBuffer command = new StringBuffer();
-                    command.append( "$>cvs -d " ).append( getCvsRoot( devConnection, "username" ) ).append( " login" );
-                    command.append( "\n" );
-                    command.append( "$>cvs -z3 -d " ).append( getCvsRoot( devConnection, "username" ) ).append( " co " )
-                        .append( getCvsModule( devConnection ) );
-                    verbatimText( command.toString() );
-                }
-                else if ( isVssDevConnection )
-                {
-                    paragraph( getBundle( locale ).getString( "report.scm.devaccess.vss.intro" ) );
-
-                    verbatimText( getVssRoot( connection, "username" ) );
-                }
-                else
-                {
-                    paragraph( getBundle( locale ).getString( "report.scm.devaccess.general.intro" ) );
-
-                    verbatimText( connection.substring( 4 ) );
-                }
-
-                endSection();
+                verbatimText( anonymousConnection.substring( 4 ) );
             }
 
-            // Access from behind a firewall
+            endSection();
+        }
+
+        /**
+         * Render the developer access section
+         * 
+         * @param devRepository the dev repository
+         */
+        private void renderDeveloperAccessSection( ScmRepository devRepository )
+        {
+            startSection( getBundle( locale ).getString( "report.scm.devaccess.title" ) );
+
+            if ( ( devRepository != null ) && ( isScmSystem( devRepository, "clearcase" ) ) )
+            {
+                ClearCaseScmProviderRepository clearCaseRepo = (ClearCaseScmProviderRepository) devRepository
+                    .getProviderRepository();
+
+                developerAccessClearCase( clearCaseRepo );
+            }
+            else if ( ( devRepository != null ) && ( isScmSystem( devRepository, "cvs" ) ) )
+            {
+                CvsScmProviderRepository cvsRepo = (CvsScmProviderRepository) devRepository.getProviderRepository();
+
+                developerAccessCVS( cvsRepo );
+            }
+            else if ( ( devRepository != null ) && ( isScmSystem( devRepository, "perforce" ) ) )
+            {
+                PerforceScmProviderRepository perforceRepo = (PerforceScmProviderRepository) devRepository
+                    .getProviderRepository();
+
+                developerAccessPerforce( perforceRepo );
+            }
+            else if ( ( devRepository != null ) && ( isScmSystem( devRepository, "starteam" ) ) )
+            {
+                StarteamScmProviderRepository starteamRepo = (StarteamScmProviderRepository) devRepository
+                    .getProviderRepository();
+
+                developerAccessStarteam( starteamRepo );
+            }
+            else if ( ( devRepository != null ) && ( isScmSystem( devRepository, "svn" ) ) )
+            {
+                SvnScmProviderRepository svnRepo = (SvnScmProviderRepository) devRepository.getProviderRepository();
+
+                developerAccessSVN( svnRepo );
+            }
+            else
+            {
+                paragraph( getBundle( locale ).getString( "report.scm.devaccess.general.intro" ) );
+
+                verbatimText( devConnection.substring( 4 ) );
+            }
+
+            endSection();
+        }
+
+        /**
+         * Render the access from behind a firewall section
+         * 
+         * @param devRepository the dev repository
+         */
+        private void renderAccessBehindFirewallSection( ScmRepository devRepository )
+        {
             startSection( getBundle( locale ).getString( "report.scm.accessbehindfirewall.title" ) );
 
-            if ( isSvnDevConnection )
+            if ( ( devRepository != null ) && ( isScmSystem( devRepository, "svn" ) ) )
             {
+                SvnScmProviderRepository svnRepo = (SvnScmProviderRepository) devRepository.getProviderRepository();
+
                 paragraph( getBundle( locale ).getString( "report.scm.accessbehindfirewall.svn.intro" ) );
 
                 StringBuffer sb = new StringBuffer();
-                sb.append( "$>svn checkout " ).append( getSvnRoot( devConnection ) ).append( " " )
-                    .append( model.getArtifactId() );
+                sb.append( "$>svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
                 verbatimText( sb.toString() );
             }
-            else if ( isCvsDevConnection )
+            else if ( ( devRepository != null ) && ( isScmSystem( devRepository, "cvs" ) ) )
             {
-                paragraph( getBundle( locale ).getString( "report.scm.accessbehindfirewall.cvs.intro" ) );
+                linkPatternedText( getBundle( locale ).getString( "report.scm.accessbehindfirewall.cvs.intro" ) );
             }
             else
             {
@@ -361,9 +400,17 @@ public class ScmReport
             }
 
             endSection();
+        }
 
-            // Access through a proxy
-            if ( isSvnConnection || isSvnDevConnection )
+        /**
+         * Render the access from behind a firewall section
+         * 
+         * @param anonymousRepository the anonymous repository
+         * @param devRepository the dev repository
+         */
+        private void renderAccessThroughProxySection( ScmRepository anonymousRepository, ScmRepository devRepository )
+        {
+            if ( ( isScmSystem( anonymousRepository, "svn" ) ) || ( isScmSystem( devRepository, "svn" ) ) )
             {
                 startSection( getBundle( locale ).getString( "report.scm.accessthroughtproxy.title" ) );
 
@@ -372,7 +419,8 @@ public class ScmReport
                 paragraph( getBundle( locale ).getString( "report.scm.accessthroughtproxy.svn.intro3" ) );
 
                 StringBuffer sb = new StringBuffer();
-                sb.append( "[global]" ).append( "\n" );
+                sb.append( "[global]" );
+                sb.append( "\n" );
                 sb.append( "http-proxy-host = your.proxy.name" ).append( "\n" );
                 sb.append( "http-proxy-port = 3128" ).append( "\n" );
                 verbatimText( sb.toString() );
@@ -381,165 +429,241 @@ public class ScmReport
             }
         }
 
+        // Clearcase
+
         /**
-         * Checks if a SCM connection is a SVN, CVS...
+         * Create the documentation to provide an developer access with a <code>Clearcase</code> SCM.
+         * For example, generate the following command line:
+         * <p>cleartool checkout module</p>
          * 
-         * @return true if the SCM is a SVN, CVS server, false otherwise.
+         * @param clearCaseRepo
          */
-        private static boolean isScmSystem( String connection, String scm )
+        private void developerAccessClearCase( ClearCaseScmProviderRepository clearCaseRepo )
         {
-            if ( StringUtils.isEmpty( connection ) )
+            paragraph( getBundle( locale ).getString( "report.scm.devaccess.clearcase.intro" ) );
+
+            StringBuffer command = new StringBuffer();
+            command.append( "$>cleartool checkout " ).append( clearCaseRepo.getModule() );
+
+            verbatimText( command.toString() );
+        }
+
+        // CVS
+
+        /**
+         * Create the documentation to provide an anonymous access with a <code>CVS</code> SCM.
+         * For example, generate the following command line:
+         * <p>cvs -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic login</p>
+         * <p>cvs -z3 -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic co maven-plugins/dist</p>
+         * 
+         * @see <a href="https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115">https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115</a>
+         * 
+         * @param cvsRepo
+         */
+        private void anonymousAccessCVS( CvsScmProviderRepository cvsRepo )
+        {
+            paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.cvs.intro" ) );
+
+            StringBuffer command = new StringBuffer();
+            command.append( "$>cvs -d " ).append( cvsRepo.getCvsRoot() ).append( " login" );
+            command.append( "\n" );
+            command.append( "$>cvs -z3 -d " ).append( cvsRepo.getCvsRoot() );
+            command.append( " co " ).append( cvsRepo.getModule() );
+
+            verbatimText( command.toString() );
+        }
+
+        /**
+         * Create the documentation to provide an developer access with a <code>CVS</code> SCM.
+         * For example, generate the following command line:
+         * <p>cvs -d :pserver:username@cvs.apache.org:/home/cvs login</p>
+         * <p>cvs -z3 -d :ext:username@cvs.apache.org:/home/cvs co maven-plugins/dist</p>
+         * 
+         * @see <a href="https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115">https://www.cvshome.org/docs/manual/cvs-1.12.12/cvs_16.html#SEC115</a>
+         * 
+         * @param cvsRepo
+         */
+        private void developerAccessCVS( CvsScmProviderRepository cvsRepo )
+        {
+            paragraph( getBundle( locale ).getString( "report.scm.devaccess.cvs.intro" ) );
+
+            // Safety: remove the username if present
+            String cvsRoot = StringUtils.replace( cvsRepo.getCvsRoot(), cvsRepo.getUser(), "username" );
+
+            StringBuffer command = new StringBuffer();
+            command.append( "$>cvs -d " ).append( cvsRoot ).append( " login" );
+            command.append( "\n" );
+            command.append( "$>cvs -z3 -d " ).append( cvsRoot ).append( " co " ).append( cvsRepo.getModule() );
+
+            verbatimText( command.toString() );
+        }
+
+        // Perforce
+
+        /**
+         * Create the documentation to provide an developer access with a <code>Perforce</code> SCM.
+         * For example, generate the following command line:
+         * <p>p4 -H hostname -p port -u username -P password path</p>
+         * <p>p4 -H hostname -p port -u username -P password path submit -c changement</p>
+         * 
+         * @see <a href="http://www.perforce.com/perforce/doc.051/manuals/cmdref/index.html">http://www.perforce.com/perforce/doc.051/manuals/cmdref/index.html</>
+         * 
+         * @param perforceRepo
+         */
+        private void developerAccessPerforce( PerforceScmProviderRepository perforceRepo )
+        {
+            paragraph( getBundle( locale ).getString( "report.scm.devaccess.perforce.intro" ) );
+
+            StringBuffer command = new StringBuffer();
+            command.append( "$>p4" );
+            if ( !StringUtils.isEmpty( perforceRepo.getHost() ) )
+            {
+                command.append( " -H " ).append( perforceRepo.getHost() );
+            }
+            if ( perforceRepo.getPort() > 0 )
+            {
+                command.append( " -p " + perforceRepo.getPort() );
+            }
+            command.append( " -u username" );
+            command.append( " -P password" );
+            command.append( " " );
+            command.append( perforceRepo.getPath() );
+            command.append( "\n" );
+            command.append( "$>p4 submit -c \"A comment\"" );
+
+            verbatimText( command.toString() );
+        }
+
+        // Starteam
+
+        /**
+         * Create the documentation to provide an developer access with a <code>Starteam</code> SCM.
+         * For example, generate the following command line:
+         * <p>stcmd co -x -nologo -stop -p myusername:mypassword@myhost:1234/projecturl -is</p>
+         * <p>stcmd ci -x -nologo -stop -p myusername:mypassword@myhost:1234/projecturl -f NCI -is</p>
+         * 
+         * @param starteamRepo
+         */
+        private void developerAccessStarteam( StarteamScmProviderRepository starteamRepo )
+        {
+            paragraph( getBundle( locale ).getString( "report.scm.devaccess.starteam.intro" ) );
+
+            StringBuffer command = new StringBuffer();
+
+            // Safety: remove the username/password if present
+            String fullUrl = StringUtils.replace( starteamRepo.getFullUrl(), starteamRepo.getUser(), "username" );
+            fullUrl = StringUtils.replace( fullUrl, starteamRepo.getPassword(), "password" );
+
+            command.append( "$>stcmd co -x -nologo -stop -p " );
+            command.append( fullUrl );
+            command.append( " -is" );
+            command.append( "\n" );
+            command.append( "$>stcmd ci -x -nologo -stop -p " );
+            command.append( fullUrl );
+            command.append( " -f NCI -is" );
+
+            verbatimText( command.toString() );
+        }
+
+        // SVN
+
+        /**
+         * Create the documentation to provide an anonymous access with a <code>SVN</code> SCM.
+         * For example, generate the following command line:
+         * <p>svn checkout http://svn.apache.org/repos/asf/maven/components/trunk maven</p>
+         * 
+         * @see <a href="http://svnbook.red-bean.com/">http://svnbook.red-bean.com/</a>
+         * 
+         * @param svnRepo
+         */
+        private void anonymousAccessSVN( SvnScmProviderRepository svnRepo )
+        {
+            paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.svn.intro" ) );
+
+            StringBuffer sb = new StringBuffer();
+            sb.append( "$>svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
+
+            verbatimText( sb.toString() );
+        }
+
+        /**
+         * Create the documentation to provide an developer access with a <code>SVN</code> SCM.
+         * For example, generate the following command line:
+         * <p>svn checkout https://svn.apache.org/repos/asf/maven/components/trunk maven</p>
+         * <p>svn commit --username your-username -m "A message"</p>
+         * 
+         * @see <a href="http://svnbook.red-bean.com/">http://svnbook.red-bean.com/</a>
+         * 
+         * @param svnRepo
+         */
+        private void developerAccessSVN( SvnScmProviderRepository svnRepo )
+        {
+            paragraph( getBundle( locale ).getString( "report.scm.devaccess.svn.intro1" ) );
+
+            StringBuffer sb = new StringBuffer();
+
+            sb.append( "$>svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
+
+            verbatimText( sb.toString() );
+
+            paragraph( getBundle( locale ).getString( "report.scm.devaccess.svn.intro2" ) );
+
+            sb = new StringBuffer();
+            sb.append( "$>svn commit --username your-username -m \"A message\"" );
+
+            verbatimText( sb.toString() );
+        }
+
+        /**
+         * Return a <code>SCM repository</code> defined by a given url
+         * 
+         * @param scmUrl an SCM URL
+         * @return a valid SCM repository or null
+         */
+        public ScmRepository getScmRepository( String scmUrl )
+        {
+            if ( scmUrl == null )
+            {
+                return null;
+            }
+
+            try
+            {
+                return scmManager.makeScmRepository( scmUrl );
+            }
+            catch ( NoSuchScmProviderException e )
+            {
+                return null;
+            }
+            catch ( ScmRepositoryException e )
+            {
+                return null;
+            }
+        }
+
+        /**
+         * Convenience method that return true is the defined <code>SCM repository</code> is a known provider.
+         * <p>Actually, we fully support Clearcase, CVS, Perforce, Starteam, SVN by the maven-scm-providers component.</p>
+         * 
+         * @see <a href="http://svn.apache.org/repos/asf/maven/scm/trunk/maven-scm-providers/">maven-scm-providers</a>
+         * 
+         * @param scmRepository a SCM repository 
+         * @param scmProvider a SCM provider name 
+         * @return true if the provider of the given SCM repository is equal to the given scm provider.
+         */
+        private static boolean isScmSystem( ScmRepository scmRepository, String scmProvider )
+        {
+            if ( StringUtils.isEmpty( scmProvider ) )
             {
                 return false;
             }
 
-            if ( StringUtils.isEmpty( scm ) )
-            {
-                return false;
-            }
-
-            if ( connection.toLowerCase().substring( 4 ).startsWith( scm ) )
+            if ( ( scmRepository != null ) && ( scmProvider.equalsIgnoreCase( scmRepository.getProvider() ) ) )
             {
                 return true;
             }
 
             return false;
-        }
-
-        /**
-         * Get the SVN root from a connection
-         * 
-         * @param connection
-         *            a valid SVN connection
-         * @return the svn connection
-         */
-        private static String getSvnRoot( String connection )
-        {
-            if ( !isScmSystem( connection, "svn" ) )
-            {
-                throw new IllegalArgumentException( "Cannot get the SVN root from a none SVN SCM." );
-            }
-
-            String[] connectionDef = StringUtils.split( connection, ":" );
-
-            if ( connectionDef.length != 4 )
-            {
-                throw new IllegalArgumentException( "The SVN repository connection is not valid." );
-            }
-
-            return connectionDef[2] + ":" + connectionDef[3];
-        }
-
-        /**
-         * Get the CVS root from the connection
-         * 
-         * @param connection
-         *            a valid CVS connection
-         * @param username
-         * @return the CVS root
-         */
-        private static String getCvsRoot( String connection, String username )
-        {
-            if ( !isScmSystem( connection, "cvs" ) )
-            {
-                throw new IllegalArgumentException( "Cannot get the CVS root from a none CVS SCM." );
-            }
-
-            String[] connectionDef = StringUtils.split( connection, ":" );
-
-            if ( connectionDef.length != 6 )
-            {
-                throw new IllegalArgumentException( "The CVS repository connection is not valid." );
-            }
-
-            if ( connectionDef[3].indexOf( '@' ) >= 0 )
-            {
-                if ( StringUtils.isEmpty( username ) )
-                {
-                    username = connectionDef[3].substring( 0, connectionDef[3].indexOf( '@' ) );
-                }
-                connectionDef[3] = username + "@" + connectionDef[3].substring( connectionDef[3].indexOf( '@' ) + 1 );
-            }
-
-            return ":" + connectionDef[2] + ":" + connectionDef[3] + ":" + connectionDef[4];
-        }
-
-        /**
-         * Get the CVS module from a connection
-         * 
-         * @param connection
-         *            a valid CVS connection
-         * @return the CVS module
-         */
-        private static String getCvsModule( String connection )
-        {
-            if ( !isScmSystem( connection, "cvs" ) )
-            {
-                throw new IllegalArgumentException( "Cannot get the CVS root from a none CVS SCM." );
-            }
-            String[] connectionDef = StringUtils.split( connection, ":" );
-
-            if ( connectionDef.length != 6 )
-            {
-                throw new IllegalArgumentException( "The CVS repository connection is not valid." );
-            }
-
-            return connectionDef[5];
-        }
-
-        /**
-         * Get a VSS root.
-         * 
-         * @param connection
-         *            a valid VSS connection
-         * @param username
-         * @return the VSS root
-         */
-        private static String getVssRoot( String connection, String username )
-        {
-            if ( !isScmSystem( connection, "vss" ) )
-            {
-                throw new IllegalArgumentException( "Cannot get the VSS root from a none VSS SCM." );
-            }
-
-            String[] connectionDef = StringUtils.split( connection, ":" );
-
-            if ( connectionDef.length != 5 )
-            {
-                throw new IllegalArgumentException( "The VSS repository connection is not valid." );
-            }
-
-            if ( StringUtils.isEmpty( username ) )
-            {
-                username = connectionDef[3];
-            }
-
-            return connectionDef[1] + ":" + connectionDef[2] + ":" + username + ":" + connectionDef[4];
-        }
-
-        /**
-         * Convenience method that valid a given connection.
-         * <p>
-         * Throw an <code>IllegalArgumentException</code> if the connection is
-         * not a valid one.
-         * </p>
-         * 
-         * @param connection
-         */
-        private static void validConnection( String connection )
-        {
-            if ( StringUtils.isEmpty( connection ) )
-            {
-                throw new IllegalArgumentException( "The source repository connection could not be null." );
-            }
-            if ( connection.length() < 4 )
-            {
-                throw new IllegalArgumentException( "The source repository connection is too short." );
-            }
-            if ( !connection.startsWith( "scm" ) )
-            {
-                throw new IllegalArgumentException( "The source repository connection must start with scm." );
-            }
         }
     }
 
