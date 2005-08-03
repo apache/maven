@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.release;
+package org.apache.maven.plugins.release;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -17,15 +17,20 @@ package org.apache.maven.plugin.release;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.release.helpers.ReleaseProgressTracker;
+import org.apache.maven.plugins.release.helpers.ScmHelper;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.DefaultConsumer;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
+import java.io.IOException;
+
 /**
  * Perform a release from SCM
  *
+ * @aggregator
  * @goal perform
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
@@ -35,9 +40,24 @@ public class PerformReleaseMojo
     extends AbstractReleaseMojo
 {
     /**
+     * @parameter expression="${basedir}"
+     * @required
+     * @readonly
+     */
+    private String basedir;
+
+    /**
      * @parameter expression="${goals}"
      */
     private String goals = "deploy";
+
+    /**
+     * @parameter expression="${project.build.directory}/checkout"
+     * @required
+     */
+    protected String workingDirectory;
+
+    private ReleaseProgressTracker releaseProgress;
 
     protected void executeTask()
         throws MojoExecutionException
@@ -50,11 +70,15 @@ public class PerformReleaseMojo
     private void checkout()
         throws MojoExecutionException
     {
-        System.out.println( "Checking out the project to perform the release ..." );
+        getLog().info( "Checking out the project to perform the release ..." );
 
         try
         {
-            getScm().checkout();
+            ScmHelper scm = getScm();
+
+            scm.setWorkingDirectory( workingDirectory );
+
+            scm.checkout();
         }
         catch ( Exception e )
         {
@@ -78,7 +102,7 @@ public class PerformReleaseMojo
         cl.createArgument().setLine( goals );
 
         cl.createArgument().setLine( "-DupdateReleaseInfo=true" );
-        
+
         cl.createArgument().setLine( "--no-plugin-updates" );
 
         StreamConsumer consumer = new DefaultConsumer();
@@ -91,5 +115,24 @@ public class PerformReleaseMojo
         {
             throw new MojoExecutionException( "Can't run goal " + goals, e );
         }
+    }
+
+    protected ReleaseProgressTracker getReleaseProgress()
+        throws MojoExecutionException
+    {
+        if ( releaseProgress == null )
+        {
+            try
+            {
+                releaseProgress = ReleaseProgressTracker.load( basedir );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Failed to load release information from file: "
+                    + ReleaseProgressTracker.getReleaseProgressFilename(), e );
+            }
+        }
+
+        return releaseProgress;
     }
 }

@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.scm;
+package org.apache.maven.plugins.release.helpers;
 
 /* =====================================================================
  *   Copyright 2001-2005 The Apache Software Foundation.
@@ -20,14 +20,15 @@ package org.apache.maven.plugin.scm;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmResult;
+import org.apache.maven.scm.manager.ScmManager;
 import org.apache.maven.scm.provider.svn.repository.SvnScmProviderRepository;
 import org.apache.maven.scm.command.add.AddScmResult;
 import org.apache.maven.scm.command.checkin.CheckInScmResult;
 import org.apache.maven.scm.command.checkout.CheckOutScmResult;
+import org.apache.maven.scm.command.remove.RemoveScmResult;
 import org.apache.maven.scm.command.status.StatusScmResult;
 import org.apache.maven.scm.command.tag.TagScmResult;
 import org.apache.maven.scm.command.update.UpdateScmResult;
-import org.apache.maven.scm.manager.ScmManager;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -40,9 +41,9 @@ import java.util.List;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
- * @version $Id: DoxiaMojo.java 169372 2005-05-09 22:47:34Z evenisse $
+ * @version $Id$
  */
-public class ScmBean
+public class ScmHelper
 {
     private String username;
 
@@ -99,7 +100,7 @@ public class ScmBean
                 }
             }
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
             throw new ScmException( "Can't load the scm provider.", e );
         }
@@ -141,7 +142,8 @@ public class ScmBean
             FileUtils.mkdir( workingDirectory );
         }
 
-        CheckOutScmResult result = getScmManager().checkOut( repository, new ScmFileSet( checkoutDirectory ), tag );
+        CheckOutScmResult result = getScmManager().getProviderByRepository( repository )
+            .checkOut( repository, new ScmFileSet( checkoutDirectory ), tag );
 
         checkResult( result );
     }
@@ -154,7 +156,8 @@ public class ScmBean
         checkoutDirectory = new File( workingDirectory );
 
         // TODO: want includes/excludes?
-        UpdateScmResult result = getScmManager().update( repository, new ScmFileSet( new File( workingDirectory ) ), tag );
+        UpdateScmResult result = getScmManager().getProviderByRepository( repository )
+            .update( repository, new ScmFileSet( new File( workingDirectory ) ), tag );
 
         checkResult( result );
     }
@@ -167,7 +170,8 @@ public class ScmBean
         ScmRepository repository = getScmRepository();
 
         // TODO: want includes/excludes?
-        StatusScmResult result = getScmManager().status( repository, new ScmFileSet( new File( workingDirectory ) ) );
+        StatusScmResult result = getScmManager().getProviderByRepository( repository )
+            .status( repository, new ScmFileSet( new File( workingDirectory ) ) );
 
         checkResult( result );
 
@@ -175,14 +179,27 @@ public class ScmBean
 
         return changedFiles;
     }
-    
-    public void add( String file ) throws ScmException, IOException
+
+    public void add( String file )
+        throws ScmException, IOException
     {
         ScmRepository repository = getScmRepository();
-        
+
         ScmFileSet fs = new ScmFileSet( new File( workingDirectory ), file, null );
-        
-        AddScmResult result = getScmManager().add(repository, fs);
+
+        AddScmResult result = getScmManager().getProviderByRepository( repository ).add( repository, fs );
+
+        checkResult( result );
+    }
+
+    public void remove( String message, String file )
+        throws ScmException, IOException
+    {
+        ScmRepository repository = getScmRepository();
+
+        ScmFileSet fs = new ScmFileSet( new File( workingDirectory ), file, null );
+
+        RemoveScmResult result = getScmManager().getProviderByRepository( repository ).remove( repository, fs, message );
 
         checkResult( result );
     }
@@ -192,10 +209,8 @@ public class ScmBean
     {
         ScmRepository repository = getScmRepository();
 
-        CheckInScmResult result = getScmManager().checkIn( repository,
-                                                           new ScmFileSet( new File( workingDirectory ), includes, excludes ),
-                                                           tag,
-                                                           message );
+        CheckInScmResult result = getScmManager().getProviderByRepository( repository )
+            .checkIn( repository, new ScmFileSet( new File( workingDirectory ), includes, excludes ), tag, message );
         checkResult( result );
     }
 
@@ -205,7 +220,8 @@ public class ScmBean
         ScmRepository repository = getScmRepository();
 
         // TODO: want includes/excludes?
-        TagScmResult result = getScmManager().tag( repository, new ScmFileSet( new File( workingDirectory ) ), tag );
+        TagScmResult result = getScmManager().getProviderByRepository( repository )
+            .tag( repository, new ScmFileSet( new File( workingDirectory ) ), tag );
 
         checkResult( result );
     }
@@ -282,4 +298,3 @@ public class ScmBean
         this.password = password;
     }
 }
-
