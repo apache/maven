@@ -37,7 +37,6 @@ import org.apache.maven.plugins.release.helpers.ScmHelper;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
-import org.apache.maven.scm.ScmFileStatus;
 import org.codehaus.plexus.components.inputhandler.InputHandler;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -187,9 +186,10 @@ public class PrepareReleaseMojo
 
                 transformPomToReleaseVersionPom( project );
 
-                generateReleasePom( project );
             }
 
+            generateReleasePoms();
+            
             checkInRelease();
 
             tagRelease();
@@ -749,165 +749,175 @@ public class PrepareReleaseMojo
         }
     }
 
-    private void generateReleasePom( MavenProject project )
+    private void generateReleasePoms()
         throws MojoExecutionException
     {
         if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_GENERATED_RELEASE_POM ) )
         {
-            MavenProject releaseProject = new MavenProject( project );
-            Model releaseModel = releaseProject.getModel();
-
-            //Rewrite parent version
-            if ( project.hasParent() )
-            {
-                Artifact parentArtifact = project.getParentArtifact();
-
-                if ( isSnapshot( parentArtifact.getBaseVersion() ) )
-                {
-                    String version = resolveVersion( parentArtifact, "parent", releaseProject );
-
-                    releaseModel.getParent().setVersion( version );
-                }
-            }
-
-            Set artifacts = releaseProject.getArtifacts();
-
-            if ( artifacts != null )
-            {
-                //Rewrite dependencies section
-                List newdeps = new ArrayList();
-
-                for ( Iterator i = releaseProject.getArtifacts().iterator(); i.hasNext(); )
-                {
-                    Artifact artifact = (Artifact) i.next();
-
-                    Dependency newdep = new Dependency();
-
-                    newdep.setArtifactId( artifact.getArtifactId() );
-                    newdep.setGroupId( artifact.getGroupId() );
-                    newdep.setVersion( artifact.getVersion() );
-                    newdep.setType( artifact.getType() );
-                    newdep.setScope( artifact.getScope() );
-                    newdep.setClassifier( artifact.getClassifier() );
-
-                    newdeps.add( newdep );
-                }
-
-                releaseModel.setDependencies( newdeps );
-            }
-
-            List plugins = releaseProject.getBuildPlugins();
-
-            if ( plugins != null )
-            {
-                //Rewrite plugins version
-                Map pluginArtifacts = releaseProject.getPluginArtifactMap();
-
-                for ( Iterator i = plugins.iterator(); i.hasNext(); )
-                {
-                    Plugin plugin = (Plugin) i.next();
-
-                    Artifact artifact = (Artifact) pluginArtifacts.get( plugin.getKey() );
-
-                    String version = resolveVersion( artifact, "plugin", releaseProject );
-
-                    plugin.setVersion( version );
-                }
-            }
-
-            List reports = releaseProject.getReportPlugins();
-
-            if ( reports != null )
-            {
-                //Rewrite report version
-                Map reportArtifacts = releaseProject.getReportArtifactMap();
-
-                for ( Iterator i = reports.iterator(); i.hasNext(); )
-                {
-                    ReportPlugin plugin = (ReportPlugin) i.next();
-
-                    Artifact artifact = (Artifact) reportArtifacts.get( plugin.getKey() );
-
-                    String version = resolveVersion( artifact, "report", releaseProject );
-
-                    plugin.setVersion( version );
-                }
-            }
-
-            List extensions = releaseProject.getBuildExtensions();
-
-            if ( extensions != null )
-            {
-                //Rewrite extension version
-                Map extensionArtifacts = releaseProject.getExtensionArtifactMap();
-
-                for ( Iterator i = extensions.iterator(); i.hasNext(); )
-                {
-                    Extension ext = (Extension) i.next();
-
-                    String extensionId = ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() );
-
-                    Artifact artifact = (Artifact) extensionArtifacts.get( extensionId );
-
-                    String version = resolveVersion( artifact, "extension", releaseProject );
-
-                    ext.setVersion( version );
-                }
-            }
-
-            File releasePomFile = new File( basedir, RELEASE_POM );
-
-            Writer writer = null;
+            String canonicalBasedir;
 
             try
             {
-                writer = new FileWriter( releasePomFile );
-
-                releaseProject.writeModel( writer );
+                canonicalBasedir = trimPathForScmCalculation( new File( basedir ) );
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "Cannot write release-pom to: " + releasePomFile, e );
-            }
-            finally
-            {
-                IOUtil.close( writer );
+                throw new MojoExecutionException( "Cannot canonicalize basedir: " + basedir, e );
             }
 
-            try
+            for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
             {
-                ScmHelper scm = getScm();
+                MavenProject project = (MavenProject) it.next();
+                
+                MavenProject releaseProject = new MavenProject( project );
+                Model releaseModel = releaseProject.getModel();
 
-                scm.setWorkingDirectory( basedir );
-
-                List scmChanges = scm.getStatus();
-
-                for ( Iterator i = scmChanges.iterator(); i.hasNext(); )
+                //Rewrite parent version
+                if ( project.hasParent() )
                 {
-                    ScmFile f = (ScmFile) i.next();
+                    Artifact parentArtifact = project.getParentArtifact();
 
-                    if ( f.getPath().equals( "release-pom.xml" ) && f.getStatus() != ScmFileStatus.MODIFIED )
+                    if ( isSnapshot( parentArtifact.getBaseVersion() ) )
                     {
-                        getScm().add( RELEASE_POM );
+                        String version = resolveVersion( parentArtifact, "parent", releaseProject );
+
+                        releaseModel.getParent().setVersion( version );
                     }
                 }
-            }
-            catch ( ScmException e )
-            {
-                throw new MojoExecutionException( "Error updating the release-pom.xml.", e );
-            }
-            catch ( IOException e )
-            {
-                throw new MojoExecutionException( "Error updating the release-pom.xml.", e );
-            }
 
-            try
-            {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_GENERATED_RELEASE_POM );
-            }
-            catch ( IOException e )
-            {
-                getLog().warn( "Error writing checkpoint.", e );
+                Set artifacts = releaseProject.getArtifacts();
+
+                if ( artifacts != null )
+                {
+                    //Rewrite dependencies section
+                    List newdeps = new ArrayList();
+
+                    for ( Iterator i = releaseProject.getArtifacts().iterator(); i.hasNext(); )
+                    {
+                        Artifact artifact = (Artifact) i.next();
+
+                        Dependency newdep = new Dependency();
+
+                        newdep.setArtifactId( artifact.getArtifactId() );
+                        newdep.setGroupId( artifact.getGroupId() );
+                        newdep.setVersion( artifact.getVersion() );
+                        newdep.setType( artifact.getType() );
+                        newdep.setScope( artifact.getScope() );
+                        newdep.setClassifier( artifact.getClassifier() );
+
+                        newdeps.add( newdep );
+                    }
+
+                    releaseModel.setDependencies( newdeps );
+                }
+
+                List plugins = releaseProject.getBuildPlugins();
+
+                if ( plugins != null )
+                {
+                    //Rewrite plugins version
+                    Map pluginArtifacts = releaseProject.getPluginArtifactMap();
+
+                    for ( Iterator i = plugins.iterator(); i.hasNext(); )
+                    {
+                        Plugin plugin = (Plugin) i.next();
+
+                        Artifact artifact = (Artifact) pluginArtifacts.get( plugin.getKey() );
+
+                        String version = resolveVersion( artifact, "plugin", releaseProject );
+
+                        plugin.setVersion( version );
+                    }
+                }
+
+                List reports = releaseProject.getReportPlugins();
+
+                if ( reports != null )
+                {
+                    //Rewrite report version
+                    Map reportArtifacts = releaseProject.getReportArtifactMap();
+
+                    for ( Iterator i = reports.iterator(); i.hasNext(); )
+                    {
+                        ReportPlugin plugin = (ReportPlugin) i.next();
+
+                        Artifact artifact = (Artifact) reportArtifacts.get( plugin.getKey() );
+
+                        String version = resolveVersion( artifact, "report", releaseProject );
+
+                        plugin.setVersion( version );
+                    }
+                }
+
+                List extensions = releaseProject.getBuildExtensions();
+
+                if ( extensions != null )
+                {
+                    //Rewrite extension version
+                    Map extensionArtifacts = releaseProject.getExtensionArtifactMap();
+
+                    for ( Iterator i = extensions.iterator(); i.hasNext(); )
+                    {
+                        Extension ext = (Extension) i.next();
+
+                        String extensionId = ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() );
+
+                        Artifact artifact = (Artifact) extensionArtifacts.get( extensionId );
+
+                        String version = resolveVersion( artifact, "extension", releaseProject );
+
+                        ext.setVersion( version );
+                    }
+                }
+
+                File releasePomFile = new File( basedir, RELEASE_POM );
+
+                Writer writer = null;
+
+                try
+                {
+                    writer = new FileWriter( releasePomFile );
+
+                    releaseProject.writeModel( writer );
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( "Cannot write release-pom to: " + releasePomFile, e );
+                }
+                finally
+                {
+                    IOUtil.close( writer );
+                }
+
+                try
+                {
+                    String releasePomPath = trimPathForScmCalculation( releasePomFile );
+                    
+                    releasePomPath = releasePomPath.substring( canonicalBasedir.length() );
+                    
+                    ScmHelper scm = getScm();
+
+                    scm.setWorkingDirectory( basedir );
+
+                    scm.add( releasePomPath );
+                }
+                catch ( ScmException e )
+                {
+                    throw new MojoExecutionException( "Error adding the release-pom.xml: " + releasePomFile, e );
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( "Error adding the release-pom.xml: " + releasePomFile, e );
+                }
+
+                try
+                {
+                    getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_GENERATED_RELEASE_POM );
+                }
+                catch ( IOException e )
+                {
+                    getLog().warn( "Error writing checkpoint.", e );
+                }
             }
         }
     }
