@@ -236,7 +236,12 @@ public class JavaMojoDescriptorExtractor
 
         if ( requiresProject != null )
         {
-            mojoDescriptor.setProjectRequired( true );
+            String requiresProjectValue = requiresProject.getValue();
+            
+            if ( requiresProjectValue != null )
+            {
+                mojoDescriptor.setProjectRequired( Boolean.valueOf( requiresProjectValue ).booleanValue() );
+            }
         }
 
         // ----------------------------------------------------------------------

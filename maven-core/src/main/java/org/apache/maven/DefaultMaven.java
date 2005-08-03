@@ -140,14 +140,15 @@ public class DefaultMaven
 
             projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
                                         request.getSettings() );
-
+            
             // the reasoning here is that the list is still unsorted according to dependency, so the first project
             // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
 
             if ( !projects.isEmpty() )
             {
                 // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
-                topLevelProject = (MavenProject) projects.get( 0 );
+                topLevelProject = findTopLevelProject( projects, request.getPomFile() );
+                
                 projects = ProjectSorter.getSortedProjects( projects );
             }
             else
@@ -266,6 +267,49 @@ public class DefaultMaven
 
             throw e;
         }
+    }
+
+    private MavenProject findTopLevelProject( List projects, String customPomPath ) throws IOException
+    {
+        File topPomFile;
+        
+        if ( customPomPath != null )
+        {
+            topPomFile = new File( customPomPath ).getCanonicalFile();
+        }
+        else
+        {
+            topPomFile = new File( userDir, RELEASE_POMv4 );
+            
+            if ( !topPomFile.exists() )
+            {
+                topPomFile = new File( userDir, POMv4 );
+                
+                if ( !topPomFile.exists() )
+                {
+                    getLogger().warn( "Cannot find top-level project file in directory: " + userDir + ". Using first project in project-list." );
+                    
+                    return (MavenProject) projects.get( 0 );
+                }
+            }
+        }
+        
+        MavenProject topProject = null;
+        
+        for ( Iterator it = projects.iterator(); it.hasNext(); )
+        {
+            MavenProject project = (MavenProject) it.next();
+            
+            File projectFile = project.getFile().getCanonicalFile();
+            
+            if ( topPomFile.equals( projectFile ) )
+            {
+                topProject = project;
+                break;
+            }
+        }
+        
+        return topProject;
     }
 
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings )

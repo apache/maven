@@ -126,6 +126,8 @@ it0043: Test for repository inheritence - ensure using the same id overrides the
 
 it0044: Test --settings CLI option
 
+it0045: Test non-reactor behavior when plugin declares "@requiresProject false"
+
 -------------------------------------------------------------------------------
 
 - generated sources

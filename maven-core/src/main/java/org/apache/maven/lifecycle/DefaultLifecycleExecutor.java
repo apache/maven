@@ -289,7 +289,10 @@ public class DefaultLifecycleExecutor
                     getLogger().debug( "", e );
                 }
 
-                if ( mojo != null && mojo.isAggregator() )
+                // if the mojo descriptor was found, determine aggregator status according to:
+                // 1. whether the mojo declares itself an aggregator
+                // 2. whether the mojo DOES NOT require a project to function (implicitly avoid reactor)
+                if ( mojo != null && ( mojo.isAggregator() || !mojo.isProjectRequired() ) )
                 {
                     if ( currentSegment != null && !currentSegment.aggregate() )
                     {

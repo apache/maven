@@ -1,7 +1,7 @@
 <model>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven</groupId>
-  <artifactId>maven-it0023</artifactId>
+  <artifactId>maven-it0044</artifactId>
   <version>1.0-SNAPSHOT</version>
   
   <build>

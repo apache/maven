@@ -33,6 +33,7 @@ import java.util.Map;
  * Builds archetype containers.
  *
  * @goal create
+ * @requiresProject false
  */
 public class MavenArchetypeMojo
     extends AbstractMojo
