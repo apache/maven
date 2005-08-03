@@ -108,7 +108,7 @@ public abstract class AbstractEarMojo
             // provided scope
             if ( !isArtifactRegistered( artifact, earModules ) &&
                  !Artifact.SCOPE_TEST.equals( artifact.getScope() ) &&
-                 !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() )
+                 !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
             {
                 EarModule module = EarModuleFactory.newEarModule( artifact );
                 earModules.add( module );
