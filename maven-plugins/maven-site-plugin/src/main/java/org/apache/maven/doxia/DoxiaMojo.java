@@ -257,9 +257,10 @@ public class DoxiaMojo
                 }
             }
 
+            Locale locale;
             for ( Iterator iterator = localesList.iterator(); iterator.hasNext(); )
             {
-                Locale locale = (Locale) iterator.next();
+                locale = (Locale) iterator.next();
 
                 File localeOutputDirectory = getOuputDirectory( locale );
 
@@ -272,9 +273,10 @@ public class DoxiaMojo
                 //Generate reports
                 if ( reports != null )
                 {
+                    MavenReport report;
                     for ( Iterator j = reports.iterator(); j.hasNext(); )
                     {
-                        MavenReport report = (MavenReport) j.next();
+                        report = (MavenReport) j.next();
 
                         getLog().info( "Generate \"" + report.getName( locale ) + "\" report." );
 
@@ -365,10 +367,10 @@ public class DoxiaMojo
                 if ( duplicate.size() > 0 )
                 {
                     StringBuffer sb = null;
-
+                    Map.Entry entry;
                     for ( Iterator it = duplicate.entrySet().iterator(); it.hasNext(); )
                     {
-                        Map.Entry entry = (Map.Entry) it.next();
+                        entry = (Map.Entry) it.next();
                         Set values = (Set) entry.getValue();
 
                         if ( values.size() > 1 )
@@ -614,6 +616,11 @@ subprojects...
 
     /**
      * @todo should only be needed once
+     * 
+     * @param reports  a list of reports
+     * @param locale the current locale
+     * @return the inpustream 
+     * @throws MojoExecutionException is any 
      */
     private InputStream getSiteDescriptor( List reports, Locale locale )
         throws MojoExecutionException
@@ -663,7 +670,8 @@ subprojects...
         {
             if ( project.getModules() != null && project.getModules().size() > 0 )
             {
-                props.put( "modules", getModulesMenu( locale ) );
+                /* See the Not working section, around line 460*/
+                //props.put( "modules", getModulesMenu( locale ) );
             }
         }
 
@@ -1003,9 +1011,10 @@ subprojects...
         List reports = new ArrayList();
         if ( reportPlugins != null )
         {
+            ReportPlugin reportPlugin;
             for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
             {
-                ReportPlugin reportPlugin = (ReportPlugin) it.next();
+                reportPlugin = (ReportPlugin) it.next();
 
                 try
                 {
@@ -1020,9 +1029,10 @@ subprojects...
                     }
                     else
                     {
+                        ReportSet reportSet;
                         for ( Iterator j = reportSets.iterator(); j.hasNext(); )
                         {
-                            ReportSet reportSet = (ReportSet) j.next();
+                            reportSet = (ReportSet) j.next();
 
                             reportsList = pluginManager.getReports( reportPlugin, reportSet, project, session );
                         }
@@ -1052,8 +1062,8 @@ subprojects...
     }
 
     /**
-     * Convenience method that try to find duplicate files in a given directory.
-     * <p>The scan is case unsensitive.</p>
+     * Convenience method that try to find duplicate files in sub-directories of a given directory.
+     * <p>The scan is case sensitive.</p>
      *
      * @param directory the directory to scan
      * @param duplicate the map to update
@@ -1063,33 +1073,51 @@ subprojects...
         throws IOException
     {
         String defaultExcludes = StringUtils.join( DEFAULT_EXCLUDES, "," );
-        List siteFiles = FileUtils.getFileNames( directory, null, defaultExcludes, false );
-        for ( Iterator it = siteFiles.iterator(); it.hasNext(); )
-        {
-            String currentFile = (String) it.next();
+        
+        List siteFileNames = FileUtils.getFileNames( directory, null, defaultExcludes, false );
 
-            if ( currentFile.lastIndexOf( File.separator ) == -1 )
+        String currentFileName;
+        for ( Iterator it = siteFileNames.iterator(); it.hasNext(); )
+        {
+            currentFileName = (String) it.next();
+
+            if ( currentFileName.lastIndexOf( File.separator ) == -1 )
             {
                 // ignore files directly in the directory
                 continue;
             }
 
-            if ( currentFile.lastIndexOf( "." ) == -1 )
+            if ( currentFileName.lastIndexOf( "." ) == -1 )
             {
                 // ignore files without extension
                 continue;
             }
 
-            String key = currentFile.substring( currentFile.indexOf( File.separator ) + 1,
-                                                currentFile.lastIndexOf( "." ) );
+            String key = currentFileName.substring( currentFileName.indexOf( File.separator ) + 1,
+                                                currentFileName.lastIndexOf( "." ) );
 
-            Set tmp = (Set) duplicate.get( key.toLowerCase() );
-            if ( tmp == null )
+            String filePattern = "**/" + key + ".*";
+
+            List duplicateFileNames = FileUtils.getFileNames( directory, filePattern, defaultExcludes, false );
+            Set duplicatedFileNamesSet = (Set) duplicate.get( key.toLowerCase() );
+            if ( duplicatedFileNamesSet == null )
             {
-                tmp = new HashSet();
-                duplicate.put( key.toLowerCase(), tmp );
+                duplicatedFileNamesSet = new HashSet();
             }
-            tmp.add( key );
+
+            String tmp;
+            for ( Iterator it2 = duplicateFileNames.iterator(); it2.hasNext(); )
+            {
+                tmp = (String) it2.next();
+                if ( tmp.lastIndexOf( File.separator ) == -1 )
+                {
+                    // ignore files directly in the directory
+                    continue;
+                }
+
+                duplicatedFileNamesSet.add( directory.getAbsolutePath() + File.separator + tmp );
+            }
+            duplicate.put( key.toLowerCase(), duplicatedFileNamesSet );
         }
     }
 }
