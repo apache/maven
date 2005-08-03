@@ -126,6 +126,10 @@ public class MavenProject
 
     private Map reportArtifactMap;
 
+    private Set extensionArtifacts;
+
+    private Map extensionArtifactMap;
+
     private Map projectReferences = new HashMap();
 
     public MavenProject( Model model )
@@ -890,6 +894,26 @@ public class MavenProject
         return reportArtifactMap;
     }
 
+    public void setExtensionArtifacts( Set extensionArtifacts )
+    {
+        this.extensionArtifacts = extensionArtifacts;
+    }
+    
+    public Set getExtensionArtifacts()
+    {
+        return this.extensionArtifacts;
+    }
+    
+    public Map getExtensionArtifactMap()
+    {
+        if ( extensionArtifactMap == null )
+        {
+            extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getExtensionArtifacts() );
+        }
+        
+        return extensionArtifactMap;
+    }
+    
     public void setParentArtifact( Artifact parentArtifact )
     {
         this.parentArtifact = parentArtifact;
@@ -1249,4 +1273,5 @@ public class MavenProject
     {
         return groupId + ":" + artifactId;
     }
+
 }

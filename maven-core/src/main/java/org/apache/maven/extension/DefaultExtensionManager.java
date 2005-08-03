@@ -17,14 +17,13 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Extension;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusConstants;
@@ -33,7 +32,6 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -47,8 +45,6 @@ import java.util.Iterator;
 public class DefaultExtensionManager
     implements ExtensionManager, Contextualizable
 {
-    private ArtifactFactory artifactFactory;
-
     private ArtifactResolver artifactResolver;
 
     private ArtifactMetadataSource artifactMetadataSource;
@@ -58,21 +54,9 @@ public class DefaultExtensionManager
     public void addExtension( Extension extension, MavenProject project, ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException, InvalidVersionSpecificationException
     {
-        // TODO: this is duplicated with DefaultMavenProjectBuilder. Push into artifact factory.
-        String version;
-
-        if ( StringUtils.isEmpty( extension.getVersion() ) )
-        {
-            version = "RELEASE";
-        }
-        else
-        {
-            version = extension.getVersion();
-        }
-
-        VersionRange versionRange = VersionRange.createFromVersionSpec( version );
-        Artifact artifact = artifactFactory.createExtensionArtifact( extension.getGroupId(), extension.getArtifactId(),
-                                                                     versionRange );
+        String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
+        
+        Artifact artifact = (Artifact) project.getExtensionArtifactMap().get( extensionId );
 
         if ( artifact != null )
         {

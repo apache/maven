@@ -32,6 +32,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
@@ -552,6 +553,8 @@ public class DefaultMavenProjectBuilder
 
         project.setRemoteArtifactRepositories( remoteRepositories );
         project.setPluginArtifacts( createPluginArtifacts( project.getBuildPlugins() ) );
+        project.setReportArtifacts( createReportArtifacts( project.getReportPlugins() ) );
+        project.setExtensionArtifacts( createExtensionArtifacts( project.getBuildExtensions() ) );
 
         return project;
     }
@@ -826,6 +829,48 @@ public class DefaultMavenProjectBuilder
         }
 
         return pluginArtifacts;
+    }
+
+    protected Set createExtensionArtifacts( List extensions )
+        throws ProjectBuildingException
+    {
+        Set extensionArtifacts = new HashSet();
+
+        if ( extensions != null )
+        {
+            for ( Iterator i = extensions.iterator(); i.hasNext(); )
+            {
+                Extension ext = (Extension) i.next();
+
+                String version;
+                if ( StringUtils.isEmpty( ext.getVersion() ) )
+                {
+                    version = "RELEASE";
+                }
+                else
+                {
+                    version = ext.getVersion();
+                }
+
+                Artifact artifact;
+                try
+                {
+                    artifact = artifactFactory.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(), VersionRange
+                        .createFromVersionSpec( version ) );
+                }
+                catch ( InvalidVersionSpecificationException e )
+                {
+                    throw new ProjectBuildingException( "Unable to parse extension version", e );
+                }
+
+                if ( artifact != null )
+                {
+                    extensionArtifacts.add( artifact );
+                }
+            }
+        }
+
+        return extensionArtifacts;
     }
 
     public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, List externalProfiles )

@@ -39,9 +39,6 @@
       <implementation>org.apache.maven.extension.DefaultExtensionManager</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
         </requirement>
         <requirement>
