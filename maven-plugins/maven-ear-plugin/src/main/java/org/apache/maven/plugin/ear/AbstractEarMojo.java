@@ -47,7 +47,7 @@ public abstract class AbstractEarMojo
      * @required
      * @readonly
      */
-    private MavenProject project;
+    protected MavenProject project;
 
     /**
      * The ear modules configuration.
@@ -106,9 +106,9 @@ public abstract class AbstractEarMojo
 
             // Artifact is not yet registered and it has neither test, nor a
             // provided scope
-            if ( !isArtifactRegistered( artifact, earModules ) && (
-                !Artifact.SCOPE_TEST.equals( artifact.getScope() ) ||
-                    !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) ) )
+            if ( !isArtifactRegistered( artifact, earModules ) &&
+                 !Artifact.SCOPE_TEST.equals( artifact.getScope() ) &&
+                 !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() )
             {
                 EarModule module = EarModuleFactory.newEarModule( artifact );
                 earModules.add( module );

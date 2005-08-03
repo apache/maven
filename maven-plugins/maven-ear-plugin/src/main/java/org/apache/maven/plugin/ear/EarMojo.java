@@ -119,6 +119,15 @@ public class EarMojo
                 EarModule module = (EarModule) iter.next();
                 getLog().info( "Copying artifact[" + module + "] to[" + module.getUri() + "]" );
                 File destinationFile = buildDestinationFile( getBuildDir(), module.getUri() );
+
+                File sourceFile = module.getArtifact().getFile();
+
+                if ( !sourceFile.isFile() )
+                {
+                    throw new MojoExecutionException( "Cannot copy a directory: " + sourceFile.getAbsolutePath() + 
+                        "; Did you package/install " + module.getArtifact().getId() + "?" );
+                }
+
                 FileUtils.copyFile( module.getArtifact().getFile(), destinationFile );
             }
         }
@@ -158,6 +167,8 @@ public class EarMojo
 
             archiver.getArchiver().addDirectory( getBuildDir() );
             archiver.createArchive( getProject(), archive );
+
+            project.getArtifact().setFile( earFile );
         }
         catch ( Exception e )
         {

@@ -112,6 +112,8 @@ public class EjbMojo
             // create archive
             archiver.createArchive( project, archive );
 
+            project.getArtifact().setFile( jarFile );
+
             if ( new Boolean( generateClient ).booleanValue() )
             {
                 getLog().info( "Building ejb client " + jarName + "-client" );
