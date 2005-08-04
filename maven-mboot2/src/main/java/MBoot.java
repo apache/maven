@@ -153,7 +153,7 @@ public class MBoot
         {
             userModelReader.parse( settingsXml );
 
-            if ( mavenRepoLocal != null )
+            if ( mavenRepoLocal == null )
             {
                 // user don't override mavenRepoLocal with maven.repo.local system property
                 mavenRepoLocal = userModelReader.getLocalRepository();
