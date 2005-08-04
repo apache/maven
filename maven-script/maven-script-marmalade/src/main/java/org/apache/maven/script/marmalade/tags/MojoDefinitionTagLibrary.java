@@ -27,25 +27,27 @@ public class MojoDefinitionTagLibrary
 
     public MojoDefinitionTagLibrary()
     {
+        registerTag( "aggregator", AggregatorTag.class );
+        registerTag( "default", ParamDefaultTag.class );
         registerTag( "description", DescriptionTag.class );
         registerTag( "execute", ExecuteTag.class );
         registerTag( "executionStrategy", ExecutionStrategyTag.class );
+        registerTag( "expression", ParamExpressionTag.class );
         registerTag( "goal", GoalTag.class );
+        registerTag( "inheritByDefault", InheritByDefaultTag.class );
         registerTag( "instantiationStrategy", InstantiationStrategyTag.class );
+        registerTag( "lifecyclePhase", LifecyclePhaseTag.class );
         registerTag( "metadata", MetadataTag.class );
         registerTag( "mojo", MojoTag.class );
+        registerTag( "name", ParamNameTag.class );
         registerTag( "parameters", ParametersTag.class );
         registerTag( "parameter", ParameterTag.class );
+        registerTag( "phase", LifecyclePhaseTag.class );
+        registerTag( "required", ParamRequiredTag.class );
         registerTag( "requiresDependencyResolution", RequiresDependencyResolutionTag.class );
         registerTag( "requiresProject", RequiresProjectTag.class );
         registerTag( "requiresOnline", RequiresOnlineTag.class );
-        registerTag( "inheritByDefault", InheritByDefaultTag.class );
-        registerTag( "aggregator", AggregatorTag.class );
-        registerTag( "name", ParamNameTag.class );
-        registerTag( "expression", ParamExpressionTag.class );
         registerTag( "type", ParamTypeTag.class );
-        registerTag( "default", ParamDefaultTag.class );
-        registerTag( "required", ParamRequiredTag.class );
     }
 
 }

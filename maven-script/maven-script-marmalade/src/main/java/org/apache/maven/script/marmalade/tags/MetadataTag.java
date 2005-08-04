@@ -61,6 +61,8 @@ public class MetadataTag
 
     private String executeLifecycle;
 
+    private String lifecyclePhase;
+
     protected boolean alwaysProcessChildren()
     {
         return false;
@@ -115,6 +117,11 @@ public class MetadataTag
         if ( notEmpty( executePhase ) )
         {
             descriptor.setExecutePhase( executePhase );
+        }
+
+        if ( notEmpty( lifecyclePhase ) )
+        {
+            descriptor.setPhase( lifecyclePhase );
         }
 
         try
@@ -215,6 +222,11 @@ public class MetadataTag
     public void setExecuteLifecycle( String executeLifecycle )
     {
         this.executeLifecycle = executeLifecycle;
+    }
+
+    public void setLifecyclePhase( String lifecyclePhase )
+    {
+        this.lifecyclePhase = lifecyclePhase;
     }
 
 }
