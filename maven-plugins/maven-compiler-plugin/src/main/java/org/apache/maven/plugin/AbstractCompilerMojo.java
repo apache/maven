@@ -19,7 +19,8 @@ package org.apache.maven.plugin;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
-import org.codehaus.plexus.compiler.javac.JavacCompiler;
+import org.codehaus.plexus.compiler.manager.CompilerManager;
+import org.codehaus.plexus.compiler.manager.NoSuchCompilerException;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
@@ -35,46 +36,55 @@ import java.util.Set;
 public abstract class AbstractCompilerMojo
     extends AbstractMojo
 {
-
-    private Compiler compiler = new JavacCompiler();
-    
     /**
      * Whether to include debugging information in the compiled class files.
      * The default value is true.
-     * 
+     *
      * @parameter expression="${maven.compiler.debug}" default-value="true"
      */
     private boolean debug;
-    
+
     /**
      * The -source argument for the Java compiler
-     * 
+     *
      * @parameter
      */
     private String source;
-    
+
     /**
      * The -target argument for the Java compiler
-     * 
+     *
      * @parameter
      */
     private String target;
-   
+
     /**
      * The -encoding argument for the Java compiler
      *
      * @parameter
      */
     private String encoding;
-    
+
     /**
      * The granularity in milliseconds of the last modification
      * date for testing whether a source needs recompilation
-     * 
+     *
      * @parameter expression="${lastModGranularityMs}" default-value="0"
      */
     private int staleMillis;
-    
+
+    /**
+     * @parameter default-value="javac"
+     */
+    private String compilerId;
+
+    /**
+     * @parameter expression="${component.org.codehaus.plexus.compiler.manager.CompilerManager}"
+     * @required
+     * @readonly
+     */
+    private CompilerManager compilerManager;
+
     protected abstract List getClasspathElements();
 
     protected abstract List getCompileSourceRoots();
@@ -95,10 +105,16 @@ public abstract class AbstractCompilerMojo
             return;
         }
 
+        // ----------------------------------------------------------------------
+        // Create the compiler configuration
+        // ----------------------------------------------------------------------
+
         CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
 
         compilerConfiguration.setOutputLocation( getOutputDirectory().getAbsolutePath() );
+
         compilerConfiguration.setClasspathEntries( getClasspathElements() );
+
         compilerConfiguration.setSourceLocations( compileSourceRoots );
 
         // TODO: have an option to always compile (without need to clean)
@@ -128,10 +144,53 @@ public abstract class AbstractCompilerMojo
         {
             compilerConfiguration.addCompilerOption( "-encoding" , encoding );
         }
-        
+
         compilerConfiguration.setDebug( debug );
 
+        // ----------------------------------------------------------------------
+        // Dump configuration
+        // ----------------------------------------------------------------------
+
+        if ( getLog().isDebugEnabled() )
+        {
+            getLog().debug( "Classpath:" );
+
+            for ( Iterator it = getClasspathElements().iterator(); it.hasNext(); )
+            {
+                String s = (String) it.next();
+
+                getLog().debug( " " + s );
+            }
+
+            getLog().debug( "Source roots:" );
+
+            for ( Iterator it = getCompileSourceRoots().iterator(); it.hasNext(); )
+            {
+                String root = (String) it.next();
+
+                getLog().debug( " " + root );
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // Compile!
+        // ----------------------------------------------------------------------
+
         List messages;
+
+        Compiler compiler;
+
+        try
+        {
+            compiler = compilerManager.getCompiler( compilerId );
+        }
+        catch ( NoSuchCompilerException e )
+        {
+            throw new MojoExecutionException( "No such compiler '" + e.getCompilerId() + "'." );
+        }
+
+        getLog().info( "Using compiler '" + compilerId + "'." );
+
         try
         {
             messages = compiler.compile( compilerConfiguration );

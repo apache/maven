@@ -1,8 +1,5 @@
 package org.apache.maven.plugin;
 
-import java.util.List;
-import java.io.File;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -18,6 +15,9 @@ import java.io.File;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import java.util.List;
+import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
