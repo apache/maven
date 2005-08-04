@@ -61,6 +61,10 @@
       <artifactId>wagon-ssh</artifactId>
       <version>1.0-alpha-4</version>
     </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
   </dependencies>
   <developers>
     <developer>
