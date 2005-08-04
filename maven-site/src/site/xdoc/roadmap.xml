@@ -24,41 +24,64 @@
       </p>
       <subsection name="Maven 2.0 beta 1">
         <p>
-          <i>Expected Release:</i>mid-July 2005
+          <i>Expected Release:</i>
+          mid-August 2005
         </p>
         <p>
-          <i>Aims and features:</i>This will be feature complete and stable. There are expected to be
+          <i>Aims and features:</i>
+          This will be feature complete and stable. There are expected to be
           bug fixes and cosmetic changes, but no new major features after this release.
         </p>
         <ul>
-          <li>Shared development environment support</li>
           <li>Dependency version ranges</li>
+          <li>Reactor: aggregation support</li>
+          <li>Reactor: Filesystem POM discovery</li>
+          <li>Improved repository support</li>
           <li>Bugfixes</li>
+        </ul>
+      </subsection>
+      <subsection name="Maven 2.0 beta 2">
+        <p>
+          <i>Expected Release:</i>
+          late-August 2005
+        </p>
+        <p>
+          <i>Aims and features:</i>
+          Completion of all outstanding work on the core engine.
+        </p>
+        <ul>
+          <li>Bugfixes</li>
+          <li>Cosmetic enhancements</li>
+          <li>Initial plugin releases</li>
         </ul>
       </subsection>
       <subsection name="Maven 2.0 Final">
         <p>
-          <i>Expected Release:</i>end of August 2005, following a release candidate
+          <i>Expected Release:</i>
+          September 2005, following a release candidate
         </p>
         <p>
-          <i>Aims and features:</i>Final release, a suitable replacement for Maven 1.1 as the stable release for new
+          <i>Aims and features:</i>
+          Final release, a suitable replacement for Maven 1.1 as the stable release for new
           projects.
         </p>
         <ul>
           <li>Documentation</li>
-          <li>Plugin releases</li>
+          <li>Final plugin releases</li>
           <li>Bugfixes</li>
         </ul>
       </subsection>
       <subsection name="Maven 2.0.x">
         <p>
-          <i>Aims and features:</i>Bugfixes found in the Maven core will be released as interim updates leading up
+          <i>Aims and features:</i>
+          Bugfixes found in the Maven core will be released as interim updates leading up
           to the Maven 2.1 development stream.
         </p>
       </subsection>
       <subsection name="Maven 2.1">
         <p>
-          <i>Aims and features:</i>Features to be added after the July freeze on Maven 2.0 will be slated for a 2.1
+          <i>Aims and features:</i>
+          Features to be added after the July freeze on Maven 2.0 will be slated for a 2.1
           release later in 2005.
         </p>
       </subsection>
