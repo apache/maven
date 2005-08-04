@@ -51,14 +51,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -257,10 +256,9 @@ public class DoxiaMojo
                 }
             }
 
-            Locale locale;
             for ( Iterator iterator = localesList.iterator(); iterator.hasNext(); )
             {
-                locale = (Locale) iterator.next();
+                Locale locale = (Locale) iterator.next();
 
                 File localeOutputDirectory = getOuputDirectory( locale );
 
@@ -273,10 +271,9 @@ public class DoxiaMojo
                 //Generate reports
                 if ( reports != null )
                 {
-                    MavenReport report;
                     for ( Iterator j = reports.iterator(); j.hasNext(); )
                     {
-                        report = (MavenReport) j.next();
+                        MavenReport report = (MavenReport) j.next();
 
                         getLog().info( "Generate \"" + report.getName( locale ) + "\" report." );
 
@@ -367,11 +364,11 @@ public class DoxiaMojo
                 if ( duplicate.size() > 0 )
                 {
                     StringBuffer sb = null;
-                    Map.Entry entry;
+
                     for ( Iterator it = duplicate.entrySet().iterator(); it.hasNext(); )
                     {
-                        entry = (Map.Entry) it.next();
-                        Set values = (Set) entry.getValue();
+                        Map.Entry entry = (Map.Entry) it.next();
+                        Collection values = (Collection) entry.getValue();
 
                         if ( values.size() > 1 )
                         {
@@ -615,12 +612,11 @@ subprojects...
     }
 
     /**
-     * @todo should only be needed once
-     * 
-     * @param reports  a list of reports
+     * @param reports a list of reports
      * @param locale the current locale
-     * @return the inpustream 
-     * @throws MojoExecutionException is any 
+     * @return the inpustream
+     * @throws MojoExecutionException is any
+     * @todo should only be needed once
      */
     private InputStream getSiteDescriptor( List reports, Locale locale )
         throws MojoExecutionException
@@ -1011,10 +1007,9 @@ subprojects...
         List reports = new ArrayList();
         if ( reportPlugins != null )
         {
-            ReportPlugin reportPlugin;
             for ( Iterator it = reportPlugins.iterator(); it.hasNext(); )
             {
-                reportPlugin = (ReportPlugin) it.next();
+                ReportPlugin reportPlugin = (ReportPlugin) it.next();
 
                 try
                 {
@@ -1029,10 +1024,9 @@ subprojects...
                     }
                     else
                     {
-                        ReportSet reportSet;
                         for ( Iterator j = reportSets.iterator(); j.hasNext(); )
                         {
-                            reportSet = (ReportSet) j.next();
+                            ReportSet reportSet = (ReportSet) j.next();
 
                             reportsList = pluginManager.getReports( reportPlugin, reportSet, project, session );
                         }
@@ -1073,51 +1067,33 @@ subprojects...
         throws IOException
     {
         String defaultExcludes = StringUtils.join( DEFAULT_EXCLUDES, "," );
-        
-        List siteFileNames = FileUtils.getFileNames( directory, null, defaultExcludes, false );
-
-        String currentFileName;
-        for ( Iterator it = siteFileNames.iterator(); it.hasNext(); )
+        List siteFiles = FileUtils.getFileNames( directory, null, defaultExcludes, false );
+        for ( Iterator it = siteFiles.iterator(); it.hasNext(); )
         {
-            currentFileName = (String) it.next();
+            String currentFile = (String) it.next();
 
-            if ( currentFileName.lastIndexOf( File.separator ) == -1 )
+            if ( currentFile.lastIndexOf( File.separator ) == -1 )
             {
                 // ignore files directly in the directory
                 continue;
             }
 
-            if ( currentFileName.lastIndexOf( "." ) == -1 )
+            if ( currentFile.lastIndexOf( "." ) == -1 )
             {
                 // ignore files without extension
                 continue;
             }
 
-            String key = currentFileName.substring( currentFileName.indexOf( File.separator ) + 1,
-                                                currentFileName.lastIndexOf( "." ) );
+            String key = currentFile.substring( currentFile.indexOf( File.separator ) + 1,
+                                                currentFile.lastIndexOf( "." ) );
 
-            String filePattern = "**/" + key + ".*";
-
-            List duplicateFileNames = FileUtils.getFileNames( directory, filePattern, defaultExcludes, false );
-            Set duplicatedFileNamesSet = (Set) duplicate.get( key.toLowerCase() );
-            if ( duplicatedFileNamesSet == null )
+            List tmp = (List) duplicate.get( key.toLowerCase() );
+            if ( tmp == null )
             {
-                duplicatedFileNamesSet = new HashSet();
+                tmp = new ArrayList();
+                duplicate.put( key.toLowerCase(), tmp );
             }
-
-            String tmp;
-            for ( Iterator it2 = duplicateFileNames.iterator(); it2.hasNext(); )
-            {
-                tmp = (String) it2.next();
-                if ( tmp.lastIndexOf( File.separator ) == -1 )
-                {
-                    // ignore files directly in the directory
-                    continue;
-                }
-
-                duplicatedFileNamesSet.add( directory.getAbsolutePath() + File.separator + tmp );
-            }
-            duplicate.put( key.toLowerCase(), duplicatedFileNamesSet );
+            tmp.add( currentFile );
         }
     }
 }
