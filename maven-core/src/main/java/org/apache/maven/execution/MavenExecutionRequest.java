@@ -56,4 +56,8 @@ public interface MavenExecutionRequest
     void setPomFile( String pomFile );
     
     String getPomFile();
+
+    void setFailureBehavior( String failureBehavior );
+    
+    String getFailureBehavior();
 }

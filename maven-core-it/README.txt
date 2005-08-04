@@ -128,6 +128,9 @@ it0044: Test --settings CLI option
 
 it0045: Test non-reactor behavior when plugin declares "@requiresProject false"
 
+it0046: Test fail-never reactor behavior. Forces an exception to be thrown in
+        the first module, but checks that the second modules is built.
+
 -------------------------------------------------------------------------------
 
 - generated sources
@@ -181,5 +184,8 @@ it1008: Should fail due to requiring a version range for junit that doesn't exis
 it1009: Tests packaging from a plugin fails when extensions is not true.
 -------------------------------------------------------------------------------
 it1010: Tests a type from a plugin fails when extensions is not true.
+-------------------------------------------------------------------------------
+it1011: Tests the fail-at-end reactor behavior. First module fails, and second
+        should also run but not fail. End result should be failure of the build.
 -------------------------------------------------------------------------------
 

@@ -72,10 +72,20 @@ public class CoreItMojo
      * @parameter expression="${artifactToFile}"
      */
     private String artifactToFile;
+    
+    /**
+     * @parameter expression="${fail}"
+     */
+    private boolean fail = false;
 
     public void execute()
         throws MojoExecutionException
     {
+        if ( fail )
+        {
+            throw new MojoExecutionException( "Failing per \'fail\' parameter (specified in pom or system properties)" );
+        }
+        
         touch( new File( outputDirectory ), "touch.txt" );
 
         // This parameter should be aligned to the basedir as the parameter type is specified

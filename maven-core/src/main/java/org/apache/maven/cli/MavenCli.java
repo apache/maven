@@ -33,6 +33,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
+import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -344,6 +345,20 @@ public class MavenCli
         {
             request.setRecursive( false );
         }
+        
+        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
+        {
+            request.setFailureBehavior( ReactorManager.FAIL_FAST );
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
+        {
+            request.setFailureBehavior( ReactorManager.FAIL_AT_END );
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
+        {
+            request.setFailureBehavior( ReactorManager.FAIL_NEVER );
+        }
+        
         return request;
     }
 
@@ -535,6 +550,12 @@ public class MavenCli
 
         private static final char ALTERNATE_USER_SETTINGS = 's';
 
+        private static final String FAIL_FAST = "ff";
+
+        private static final String FAIL_AT_END = "fae";
+
+        private static final String FAIL_NEVER = "fn";
+
         public CLIManager()
         {
             options = new Options();
@@ -594,6 +615,12 @@ public class MavenCli
             options.addOption( OptionBuilder.withLongOpt( "settings" )
                 .withDescription( "Alternate path for the user settings file" ).hasArg()
                 .create( ALTERNATE_USER_SETTINGS ) );
+            
+            options.addOption( OptionBuilder.withLongOpt( "fail-fast" ).withDescription( "Stop at first failure in reactorized builds" ).create( FAIL_FAST ) );
+            
+            options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription( "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );
+            
+            options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription( "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
         }
 
         public CommandLine parse( String[] args )

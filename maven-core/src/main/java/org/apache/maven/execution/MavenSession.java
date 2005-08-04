@@ -45,12 +45,12 @@ public class MavenSession
     // TODO: make this the central one, get rid of build settings...
     private final Settings settings;
 
-    private List sortedProjects;
+    private ReactorManager rpm;
 
     private final String executionRootDir;
 
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, List sortedProjects, List goals, String executionRootDir )
+                         EventDispatcher eventDispatcher, ReactorManager rpm, List goals, String executionRootDir )
     {
         this.container = container;
 
@@ -60,7 +60,7 @@ public class MavenSession
 
         this.eventDispatcher = eventDispatcher;
 
-        this.sortedProjects = sortedProjects;
+        this.rpm = rpm;
 
         this.goals = goals;
 
@@ -132,7 +132,7 @@ public class MavenSession
 
     public List getSortedProjects()
     {
-        return sortedProjects;
+        return rpm.getProjectsSortedByDependency();
     }
 
     public String getExecutionRootDirectory()

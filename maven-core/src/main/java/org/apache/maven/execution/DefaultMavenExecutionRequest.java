@@ -51,6 +51,8 @@ public class DefaultMavenExecutionRequest
 
     private String pomFilename;
 
+    private String failureBehavior;
+
     public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
                                          EventDispatcher eventDispatcher, List goals, String baseDirectory )
     {
@@ -137,5 +139,15 @@ public class DefaultMavenExecutionRequest
     public String getPomFile()
     {
         return pomFilename;
+    }
+
+    public void setFailureBehavior( String failureBehavior )
+    {
+        this.failureBehavior = failureBehavior;
+    }
+
+    public String getFailureBehavior()
+    {
+        return failureBehavior;
     }
 }

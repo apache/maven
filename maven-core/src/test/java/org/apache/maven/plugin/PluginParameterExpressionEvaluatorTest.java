@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
@@ -31,6 +32,7 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.io.File;
 import java.util.Collections;
@@ -67,10 +69,10 @@ public class PluginParameterExpressionEvaluatorTest
     }
 
     private static MavenSession createSession( PlexusContainer container,
-                                               ArtifactRepository repo )
+                                               ArtifactRepository repo ) throws CycleDetectedException
     {
         return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
-                                 Collections.EMPTY_LIST, Collections.EMPTY_LIST, "." );
+                                 new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, "." );
     }
 
     public void testLocalRepositoryExtraction()

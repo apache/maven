@@ -23,6 +23,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.extension.ExtensionManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Extension;
@@ -45,6 +46,7 @@ import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
+import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -100,9 +102,11 @@ public class DefaultLifecycleExecutor
      * @param project
      * @param dispatcher
      */
-    public MavenExecutionResponse execute( MavenSession session, MavenProject project, EventDispatcher dispatcher )
+    public MavenExecutionResponse execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
         throws LifecycleExecutionException
     {
+        MavenProject project = rm.getTopLevelProject();
+        
         List taskSegments = segmentTaskListByAggregationNeeds( session.getGoals(), session, project );
 
         MavenExecutionResponse response = new MavenExecutionResponse();
@@ -120,7 +124,12 @@ public class DefaultLifecycleExecutor
             Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );
             artifactHandlerManager.addHandlers( handlers );
 
-            executeTaskSegments( taskSegments, session, project, dispatcher );
+            executeTaskSegments( taskSegments, rm, session, project, dispatcher );
+            
+            if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) && rm.hasBuildFailures() )
+            {
+                response.setException( new ReactorException( "One or more projects failed to build." ) );
+            }
         }
         catch ( MojoExecutionException e )
         {
@@ -154,8 +163,8 @@ public class DefaultLifecycleExecutor
         return response;
     }
 
-    private void executeTaskSegments( List taskSegments, MavenSession session, MavenProject project,
-                                      EventDispatcher dispatcher )
+    private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session, MavenProject project,
+                                     EventDispatcher dispatcher )
         throws PluginNotFoundException, MojoExecutionException, ArtifactResolutionException, LifecycleExecutionException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
@@ -164,37 +173,63 @@ public class DefaultLifecycleExecutor
 
             if ( segment.aggregate() )
             {
-                line();
-
-                getLogger().info( "Building " + project.getName() );
-
-                getLogger().info( "  " + segment );
-
-                line();
-
-                // !! This is ripe for refactoring to an aspect.
-                // Event monitoring.
-                String event = MavenEvents.PROJECT_EXECUTION;
-
-                dispatcher.dispatchStart( event, project.getId() + " ( " + segment + " )" );
-
-                try
+                if ( !rm.isBlackListed( project.getId() ) )
                 {
-                    // only call once, with the top-level project (assumed to be provided as a parameter)...
-                    for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                    line();
+
+                    getLogger().info( "Building " + project.getName() );
+
+                    getLogger().info( "  " + segment );
+
+                    line();
+
+                    // !! This is ripe for refactoring to an aspect.
+                    // Event monitoring.
+                    String event = MavenEvents.PROJECT_EXECUTION;
+
+                    dispatcher.dispatchStart( event, project.getId() + " ( " + segment + " )" );
+
+                    try
                     {
-                        String task = (String) goalIterator.next();
+                        // only call once, with the top-level project (assumed to be provided as a parameter)...
+                        for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                        {
+                            String task = (String) goalIterator.next();
 
-                        executeGoal( task, session, project );
+                            try
+                            {
+                                executeGoal( task, session, project );
+                            }
+                            catch ( MojoExecutionException e )
+                            {
+                                handleExecutionFailure( rm, project, e, task );
+                            }
+                            catch ( ArtifactResolutionException e )
+                            {
+                                handleExecutionFailure( rm, project, e, task );
+                            }
+                        }
+
+                        dispatcher.dispatchEnd( event, project.getId() + " ( " + segment + " )" );
                     }
+                    catch ( LifecycleExecutionException e )
+                    {
+                        dispatcher.dispatchError( event, project.getId() + " ( " + segment + " )", e );
 
-                    dispatcher.dispatchEnd( event, project.getId() + " ( " + segment + " )" );
+                        throw e;
+                    }
                 }
-                catch ( LifecycleExecutionException e )
+                else
                 {
-                    dispatcher.dispatchError( event, project.getId() + " ( " + segment + " )", e );
+                    line();
 
-                    throw e;
+                    getLogger().info( "SKIPPING " + project.getName() );
+
+                    getLogger().info( "  " + segment );
+                    
+                    getLogger().info( "This project has been banned from further executions due to previous failures." );
+
+                    line();
                 }
             }
             else
@@ -206,39 +241,95 @@ public class DefaultLifecycleExecutor
                 {
                     MavenProject currentProject = (MavenProject) projectIterator.next();
 
-                    line();
-
-                    getLogger().info( "Building " + currentProject.getName() );
-
-                    getLogger().info( "  " + segment );
-
-                    line();
-
-                    // !! This is ripe for refactoring to an aspect.
-                    // Event monitoring.
-                    String event = MavenEvents.PROJECT_EXECUTION;
-
-                    dispatcher.dispatchStart( event, currentProject.getId() + " ( " + segment + " )" );
-
-                    try
+                    if ( !rm.isBlackListed( currentProject.getId() ) )
                     {
-                        for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                        line();
+
+                        getLogger().info( "Building " + currentProject.getName() );
+
+                        getLogger().info( "  " + segment );
+
+                        line();
+
+                        // !! This is ripe for refactoring to an aspect.
+                        // Event monitoring.
+                        String event = MavenEvents.PROJECT_EXECUTION;
+
+                        dispatcher.dispatchStart( event, currentProject.getId() + " ( " + segment + " )" );
+
+                        try
                         {
-                            String task = (String) goalIterator.next();
+                            for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                            {
+                                String task = (String) goalIterator.next();
 
-                            executeGoal( task, session, currentProject );
+                                try
+                                {
+                                    executeGoal( task, session, currentProject );
+                                }
+                                catch ( MojoExecutionException e )
+                                {
+                                    handleExecutionFailure( rm, project, e, task );
+                                }
+                                catch ( ArtifactResolutionException e )
+                                {
+                                    handleExecutionFailure( rm, project, e, task );
+                                }
+                            }
+
+                            dispatcher.dispatchEnd( event, currentProject.getId() + " ( " + segment + " )" );
                         }
+                        catch ( LifecycleExecutionException e )
+                        {
+                            dispatcher.dispatchError( event, currentProject.getId() + " ( " + segment + " )", e );
 
-                        dispatcher.dispatchEnd( event, currentProject.getId() + " ( " + segment + " )" );
+                            throw e;
+                        }
                     }
-                    catch ( LifecycleExecutionException e )
+                    else
                     {
-                        dispatcher.dispatchError( event, currentProject.getId() + " ( " + segment + " )", e );
+                        line();
 
-                        throw e;
+                        getLogger().info( "SKIPPING " + currentProject.getName() );
+
+                        getLogger().info( "  " + segment );
+                        
+                        getLogger().info( "This project has been banned from further executions due to previous failures." );
+
+                        line();
                     }
                 }
             }
+        }
+    }
+
+    private void handleExecutionFailure( ReactorManager rm, MavenProject project, Exception e, String task ) 
+        throws MojoExecutionException, ArtifactResolutionException
+    {
+        if ( ReactorManager.FAIL_FAST.equals( rm.getFailureBehavior() ) )
+        {
+            rm.registerBuildFailure( project, e, task );
+            
+            if ( e instanceof MojoExecutionException )
+            {
+                throw (MojoExecutionException) e;
+            }
+            else if ( e instanceof ArtifactResolutionException )
+            {
+                throw (ArtifactResolutionException) e;
+            }
+            else
+            {
+                getLogger().error( "Attempt to register inappropriate build-failure Exception.", e );
+                
+                throw new IllegalArgumentException( "Inappropriate build-failure Exception: " + e );
+            }
+        }
+        else if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) )
+        {
+            rm.registerBuildFailure( project, e, task );
+            
+            rm.blackList( project.getId() );
         }
     }
 

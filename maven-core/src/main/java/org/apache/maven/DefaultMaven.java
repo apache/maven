@@ -23,6 +23,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
@@ -37,7 +38,6 @@ import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -130,34 +130,34 @@ public class DefaultMaven
 
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
-        List projects;
-
-        MavenProject topLevelProject;
-
+        ReactorManager rm;
+        
         try
         {
             List files = getProjectFiles( request );
 
-            projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
+            List projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
                                         request.getSettings() );
             
             // the reasoning here is that the list is still unsorted according to dependency, so the first project
             // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
 
-            if ( !projects.isEmpty() )
-            {
-                // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
-                topLevelProject = findTopLevelProject( projects, request.getPomFile() );
-                
-                projects = ProjectSorter.getSortedProjects( projects );
-            }
-            else
+            if ( projects.isEmpty() )
             {
                 List externalProfiles = getActiveExternalProfiles( null, request.getSettings() );
 
-                topLevelProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
+                MavenProject superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
                                                                               externalProfiles );
-                projects.add( topLevelProject );
+                projects.add( superProject );
+            }
+            
+            rm = new ReactorManager( projects );
+            
+            String requestFailureBehavior = request.getFailureBehavior();
+            
+            if ( requestFailureBehavior != null )
+            {
+                rm.setFailureBehavior( requestFailureBehavior );
             }
         }
         catch ( IOException e )
@@ -166,48 +166,24 @@ public class DefaultMaven
         }
         catch ( ArtifactResolutionException e )
         {
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-            MavenExecutionResponse response = new MavenExecutionResponse();
-            response.setStart( new Date() );
-            response.setFinish( new Date() );
-            response.setException( e );
-            logFailure( response, e, null );
-
-            return response;
+            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
         catch ( ProjectBuildingException e )
         {
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-            MavenExecutionResponse response = new MavenExecutionResponse();
-            response.setStart( new Date() );
-            response.setFinish( new Date() );
-            response.setException( e );
-            logFailure( response, e, null );
-
-            return response;
+            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
         catch ( CycleDetectedException e )
         {
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-            MavenExecutionResponse response = new MavenExecutionResponse();
-            response.setStart( new Date() );
-            response.setFinish( new Date() );
-            response.setException( e );
-            logFailure( response, e, null );
-
-            return response;
+            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
 
         try
         {
-            MavenSession session = createSession( request, projects );
+            MavenSession session = createSession( request, rm );
 
             try
             {
-                MavenExecutionResponse response = lifecycleExecutor.execute( session, topLevelProject, dispatcher );
+                MavenExecutionResponse response = lifecycleExecutor.execute( session, rm, dispatcher );
 
                 // TODO: is this perhaps more appropriate in the CLI?
                 if ( response.isExecutionFailure() )
@@ -217,7 +193,16 @@ public class DefaultMaven
                     // TODO: yuck! Revisit when cleaning up the exception handling from the top down
                     Throwable exception = response.getException();
 
-                    if ( exception instanceof MojoExecutionException )
+                    if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) && ( exception instanceof ReactorException ) )
+                    {
+                        logFailure( response, exception, null );
+                        
+                        if ( rm.hasMultipleProjects() )
+                        {
+                            writeReactorSummary( rm );
+                        }
+                    }
+                    else if ( exception instanceof MojoExecutionException )
                     {
                         if ( exception.getCause() == null )
                         {
@@ -248,7 +233,7 @@ public class DefaultMaven
                 }
                 else
                 {
-                    logSuccess( response );
+                    logSuccess( response, rm );
                 }
             }
             catch ( LifecycleExecutionException e )
@@ -269,47 +254,74 @@ public class DefaultMaven
         }
     }
 
-    private MavenProject findTopLevelProject( List projects, String customPomPath ) throws IOException
+    private void writeReactorSummary( ReactorManager rm )
     {
-        File topPomFile;
+        // -------------------------
+        // Reactor Summary:
+        // -------------------------
+        // o project-name...........FAILED
+        // o project2-name..........SKIPPED (dependency build failed or was skipped)
+        // o project-3-name.........SUCCESS
         
-        if ( customPomPath != null )
-        {
-            topPomFile = new File( customPomPath ).getCanonicalFile();
-        }
-        else
-        {
-            topPomFile = new File( userDir, RELEASE_POMv4 );
-            
-            if ( !topPomFile.exists() )
-            {
-                topPomFile = new File( userDir, POMv4 );
-                
-                if ( !topPomFile.exists() )
-                {
-                    getLogger().warn( "Cannot find top-level project file in directory: " + userDir + ". Using first project in project-list." );
-                    
-                    return (MavenProject) projects.get( 0 );
-                }
-            }
-        }
+        line();
+        getLogger().info( "Reactor Summary:" );
+        line();
         
-        MavenProject topProject = null;
-        
-        for ( Iterator it = projects.iterator(); it.hasNext(); )
+        for ( Iterator it = rm.getProjectsSortedByDependency().iterator(); it.hasNext(); )
         {
             MavenProject project = (MavenProject) it.next();
             
-            File projectFile = project.getFile().getCanonicalFile();
+            String id = project.getId();
             
-            if ( topPomFile.equals( projectFile ) )
+            if ( rm.hasBuildFailure( id ) )
             {
-                topProject = project;
-                break;
+                logReactorSummaryLine( project.getName(), "FAILED" );
+            }
+            else if ( rm.isBlackListed( id ) )
+            {
+                logReactorSummaryLine( project.getName(), "SKIPPED (dependency build failed or was skipped)" );
+            }
+            else
+            {
+                logReactorSummaryLine( project.getName(), "SUCCESS" );
             }
         }
         
-        return topProject;
+        getLogger().info( "" );
+        getLogger().info( "" );
+    }
+
+    private void logReactorSummaryLine( String name, String status )
+    {
+        StringBuffer messageBuffer = new StringBuffer();
+        
+        messageBuffer.append( name );
+        
+        int dotCount = 65;
+        
+        dotCount -= name.length();
+        
+        for ( int i = 0; i < dotCount; i++ )
+        {
+            messageBuffer.append( '.' );
+        }
+        
+        messageBuffer.append( status );
+        
+        getLogger().info( messageBuffer.toString() );
+    }
+
+    private MavenExecutionResponse dispatchErrorResponse( EventDispatcher dispatcher, String event, String baseDirectory, Exception e )
+    {
+        dispatcher.dispatchError( event, baseDirectory, e );
+
+        MavenExecutionResponse response = new MavenExecutionResponse();
+        response.setStart( new Date() );
+        response.setFinish( new Date() );
+        response.setException( e );
+        logFailure( response, e, null );
+
+        return response;
     }
 
     private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings )
@@ -445,10 +457,10 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request, List projects )
+    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager rpm )
     {
         return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
-                                 request.getEventDispatcher(), projects, request.getGoals(),
+                                 request.getEventDispatcher(), rpm, request.getGoals(),
                                  request.getBaseDirectory() );
     }
 
@@ -601,8 +613,13 @@ public class DefaultMaven
         line();
     }
 
-    protected void logSuccess( MavenExecutionResponse r )
+    protected void logSuccess( MavenExecutionResponse r, ReactorManager rm )
     {
+        if ( rm.hasMultipleProjects() )
+        {
+            writeReactorSummary( rm );
+        }
+        
         line();
 
         getLogger().info( "BUILD SUCCESSFUL" );
@@ -635,7 +652,7 @@ public class DefaultMaven
     {
         getLogger().info( "----------------------------------------------------------------------------" );
     }
-
+    
     protected static String formatTime( long ms )
     {
         long secs = ms / MS_PER_SEC;
