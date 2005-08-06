@@ -45,6 +45,20 @@ public abstract class AbstractCompilerMojo
     private boolean debug;
 
     /**
+     * Output source locations where deprecated APIs are used
+     *
+     * @parameter
+     */
+    private boolean showDeprecation;
+
+    /**
+     * Output warnings
+     *
+     * @parameter
+     */
+    private boolean showWarnings;
+
+    /**
      * The -source argument for the Java compiler
      *
      * @parameter
@@ -130,22 +144,17 @@ public abstract class AbstractCompilerMojo
             compilerConfiguration.setSourceFiles( staleSources );
         }
 
-        if ( source != null )
-        {
-            compilerConfiguration.addCompilerOption( "-source", source );
-        }
-
-        if ( target != null )
-        {
-            compilerConfiguration.addCompilerOption( "-target", target );
-        }
-
-        if ( encoding != null )
-        {
-            compilerConfiguration.addCompilerOption( "-encoding" , encoding );
-        }
-
         compilerConfiguration.setDebug( debug );
+
+        compilerConfiguration.setShowDeprecation( showDeprecation );
+
+        compilerConfiguration.setShowWarnings( showWarnings );
+
+        compilerConfiguration.setSourceVersion( source );
+
+        compilerConfiguration.setTargetVersion( target );
+
+        compilerConfiguration.setSourceEncoding( encoding );
 
         // ----------------------------------------------------------------------
         // Dump configuration
@@ -189,7 +198,7 @@ public abstract class AbstractCompilerMojo
             throw new MojoExecutionException( "No such compiler '" + e.getCompilerId() + "'." );
         }
 
-        getLog().info( "Using compiler '" + compilerId + "'." );
+        getLog().debug( "Using compiler '" + compilerId + "'." );
 
         try
         {
