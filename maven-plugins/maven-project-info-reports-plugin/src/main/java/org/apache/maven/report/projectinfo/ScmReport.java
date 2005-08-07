@@ -196,6 +196,19 @@ public class ScmReport
             anonymousConnection = scm.getConnection();
             devConnection = scm.getDeveloperConnection();
 
+            if ( StringUtils.isEmpty( anonymousConnection ) &&
+                StringUtils.isEmpty( devConnection ) &&
+                StringUtils.isEmpty( scm.getUrl() ) )
+            {
+                startSection( getTitle() );
+
+                paragraph( getBundle( locale ).getString( "report.scm.noscm" ) );
+
+                endSection();
+
+                return;
+            }
+            
             ScmRepository anonymousRepository = getScmRepository( anonymousConnection );
             ScmRepository devRepository = getScmRepository( devConnection );
 
@@ -264,7 +277,7 @@ public class ScmReport
         {
             startSection( getBundle( locale ).getString( "report.scm.webaccess.title" ) );
 
-            if ( scmUrl == null )
+            if ( StringUtils.isEmpty( scmUrl ) )
             {
                 paragraph( getBundle( locale ).getString( "report.scm.webaccess.nourl" ) );
             }
@@ -288,7 +301,8 @@ public class ScmReport
         {
             if ( ( isScmSystem( anonymousRepository, "clearcase" ) )
                 || ( isScmSystem( anonymousRepository, "perforce" ) )
-                || ( isScmSystem( anonymousRepository, "starteam" ) ) )
+                || ( isScmSystem( anonymousRepository, "starteam" ) ) 
+                || ( StringUtils.isEmpty( anonymousConnection ) ) )
             {
                 return;
             }
@@ -313,6 +327,11 @@ public class ScmReport
             {
                 paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.general.intro" ) );
 
+                if ( anonymousConnection.length() < 4 )
+                {
+                    throw new IllegalArgumentException( "The source repository connection is too short." );
+                }
+
                 verbatimText( anonymousConnection.substring( 4 ) );
             }
 
@@ -326,6 +345,11 @@ public class ScmReport
          */
         private void renderDeveloperAccessSection( ScmRepository devRepository )
         {
+            if ( StringUtils.isEmpty( devConnection ) )
+            {
+                return;
+            }
+            
             startSection( getBundle( locale ).getString( "report.scm.devaccess.title" ) );
 
             if ( ( devRepository != null ) && ( isScmSystem( devRepository, "clearcase" ) ) )
@@ -364,6 +388,11 @@ public class ScmReport
             else
             {
                 paragraph( getBundle( locale ).getString( "report.scm.devaccess.general.intro" ) );
+
+                if ( devConnection.length() < 4 )
+                {
+                    throw new IllegalArgumentException( "The source repository connection is too short." );
+                }
 
                 verbatimText( devConnection.substring( 4 ) );
             }
@@ -622,7 +651,7 @@ public class ScmReport
          */
         public ScmRepository getScmRepository( String scmUrl )
         {
-            if ( scmUrl == null )
+            if ( StringUtils.isEmpty( scmUrl ) )
             {
                 return null;
             }
