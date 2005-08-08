@@ -841,7 +841,7 @@ public class MavenProject
 
     public Set getArtifacts()
     {
-        return artifacts;
+        return artifacts == null ? Collections.EMPTY_SET : artifacts;
     }
 
     public Map getArtifactMap()

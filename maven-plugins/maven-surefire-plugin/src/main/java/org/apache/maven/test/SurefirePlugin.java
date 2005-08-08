@@ -35,6 +35,7 @@ import java.util.StringTokenizer;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ * @requiresDependencyResolution test
  * @goal test
  * @phase test
  * @description Run tests using surefire
