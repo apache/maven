@@ -62,7 +62,7 @@ public class ResourcesMojo
     /**
      * The list of resources we want to transfer.
      *
-     * @parameter expression="${project.build.resources}"
+     * @parameter expression="${project.resources}"
      * @required
      */
     private List resources;

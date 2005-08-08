@@ -43,9 +43,11 @@ import org.apache.maven.model.Prerequesites;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
+import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.project.overlay.BuildOverlay;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -131,6 +133,8 @@ public class MavenProject
     private Map extensionArtifactMap;
 
     private Map projectReferences = new HashMap();
+
+    private Build buildOverlay;
 
     public MavenProject( Model model )
     {
@@ -798,12 +802,39 @@ public class MavenProject
 
     public void setBuild( Build build )
     {
+        this.buildOverlay = new BuildOverlay( build );
+        
         model.setBuild( build );
     }
 
     public Build getBuild()
     {
-        return model.getBuild();
+        if ( buildOverlay == null )
+        {
+            buildOverlay = new BuildOverlay( model.getBuild() );
+        }
+        
+        return buildOverlay;
+    }
+    
+    public List getResources()
+    {
+        return getBuild().getResources();
+    }
+
+    public List getTestResources()
+    {
+        return getBuild().getTestResources();
+    }
+
+    public void addResource( Resource resource )
+    {
+        getBuild().addResource( resource );
+    }
+
+    public void addTestResource( Resource testResource )
+    {
+        getBuild().addTestResource( testResource );
     }
 
     public void setReporting( Reporting reporting )
@@ -1273,5 +1304,5 @@ public class MavenProject
     {
         return groupId + ":" + artifactId;
     }
-
+    
 }
