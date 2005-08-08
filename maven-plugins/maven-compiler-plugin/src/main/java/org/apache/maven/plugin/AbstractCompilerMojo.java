@@ -93,6 +93,41 @@ public abstract class AbstractCompilerMojo
     private String compilerId;
 
     /**
+     * Runs the compiler in a separate process.
+     *
+     * If not set the compiler will default to a executable.
+     *
+     * @parameter default-value="false"
+     */
+    private boolean fork;
+
+    /**
+     * The executable of the compiler to use.
+     *
+     * @parameter
+     */
+    private String executable;
+
+    /**
+     * Arguements to be passed to the compiler if fork is set to true.
+     *
+     * This is because the list of valid arguements passed to a Java compiler
+     * varies based on the compiler version.
+     *
+     * @parameter
+     */
+    private List compilerArguements;
+
+    /**
+     * The directory to run the compiler from if fork is true.
+     *
+     * @parameter expression="${basedir}"
+     * @required
+     * @readonly
+     */
+    private File basedir;
+
+    /**
      * @parameter expression="${component.org.codehaus.plexus.compiler.manager.CompilerManager}"
      * @required
      * @readonly
@@ -137,6 +172,7 @@ public abstract class AbstractCompilerMojo
         if ( staleSources.isEmpty() )
         {
             getLog().info( "Nothing to compile - all classes are up to date" );
+
             return;
         }
         else
@@ -155,6 +191,14 @@ public abstract class AbstractCompilerMojo
         compilerConfiguration.setTargetVersion( target );
 
         compilerConfiguration.setSourceEncoding( encoding );
+
+        compilerConfiguration.setFork( fork );
+
+        compilerConfiguration.setExecutable( executable );
+
+        compilerConfiguration.setWorkingDirectory( basedir );
+
+        compilerConfiguration.setCompilerArguements( compilerArguements );
 
         // ----------------------------------------------------------------------
         // Dump configuration
@@ -256,8 +300,8 @@ public abstract class AbstractCompilerMojo
             }
             catch ( InclusionScanException e )
             {
-                throw new MojoExecutionException( "Error scanning source root: \'" + sourceRoot
-                    + "\' for stale files to recompile.", e );
+                throw new MojoExecutionException( "Error scanning source root: \'" + sourceRoot + "\' " +
+                                                  "for stale files to recompile.", e );
             }
         }
 
@@ -285,5 +329,4 @@ public abstract class AbstractCompilerMojo
         }
         return newCompileSourceRootsList;
     }
-
 }
