@@ -182,9 +182,9 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setDebug( debug );
 
-        compilerConfiguration.setShowDeprecation( showDeprecation );
-
         compilerConfiguration.setShowWarnings( showWarnings );
+
+        compilerConfiguration.setShowDeprecation( showDeprecation );
 
         compilerConfiguration.setSourceVersion( source );
 
@@ -192,13 +192,13 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setSourceEncoding( encoding );
 
+        compilerConfiguration.setCustomCompilerArguments( compilerArguements );
+
         compilerConfiguration.setFork( fork );
 
         compilerConfiguration.setExecutable( executable );
 
         compilerConfiguration.setWorkingDirectory( basedir );
-
-        compilerConfiguration.setCompilerArguements( compilerArguements );
 
         // ----------------------------------------------------------------------
         // Dump configuration
