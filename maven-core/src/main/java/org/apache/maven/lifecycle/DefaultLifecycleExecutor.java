@@ -365,7 +365,7 @@ public class DefaultLifecycleExecutor
                 try
                 {
                     // definitely a CLI goal, can use prefix
-                    mojo = getMojoDescriptor( task, session, project, true );
+                    mojo = getMojoDescriptor( task, session, project, task, true );
                 }
                 catch ( LifecycleExecutionException e )
                 {
@@ -449,7 +449,7 @@ public class DefaultLifecycleExecutor
         throws ArtifactResolutionException, LifecycleExecutionException, MojoExecutionException
     {
         // guaranteed to come from the CLI and not be part of a phase
-        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project, true );
+        MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project, task, true );
         executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), session, project );
     }
 
@@ -570,7 +570,7 @@ public class DefaultLifecycleExecutor
 
                     // Not from the CLI, don't use prefix
                     // TODO: [MNG-608] this needs to be false
-                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, true );
+                    MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, selectedPhase, false );
                     addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ),
                                             session.getSettings() );
                 }
@@ -851,7 +851,7 @@ public class DefaultLifecycleExecutor
     }
 
     private MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project,
-                                              boolean canUsePrefixes )
+                                              String invokedVia, boolean canUsePrefix )
         throws ArtifactResolutionException, LifecycleExecutionException
     {
         String goal;
@@ -861,8 +861,15 @@ public class DefaultLifecycleExecutor
 
         StringTokenizer tok = new StringTokenizer( task, ":" );
         int numTokens = tok.countTokens();
-        if ( numTokens == 2 && canUsePrefixes )
+        
+        // TODO: Add "&& canUsePrefix" to this boolean expression, and remove deprecation warning in next release.
+        if ( numTokens == 2 )
         {
+            if ( !canUsePrefix )
+            {
+                getLogger().warn( "DEPRECATED: Mapped-prefix lookup of mojos are only supported from direct invocation. Please use specification of the form groupId:artifactId[:version]:goal instead. (Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')" );
+            }
+            
             String prefix = tok.nextToken();
             goal = tok.nextToken();
 
@@ -919,13 +926,17 @@ public class DefaultLifecycleExecutor
                 }
             }
         }
-        else if ( numTokens == 4 )
+        else if ( numTokens == 3 || numTokens == 4 )
         {
             plugin = new Plugin();
 
             plugin.setGroupId( tok.nextToken() );
             plugin.setArtifactId( tok.nextToken() );
-            plugin.setVersion( tok.nextToken() );
+            
+            if ( numTokens == 4 )
+            {
+                plugin.setVersion( tok.nextToken() );
+            }
 
             goal = tok.nextToken();
         }
