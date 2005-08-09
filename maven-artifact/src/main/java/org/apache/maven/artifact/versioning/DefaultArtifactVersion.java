@@ -163,7 +163,14 @@ public class DefaultArtifactVersion
         {
             try
             {
-                buildNumber = Integer.valueOf( part2 );
+                if ( part2.length() == 1 || !part2.startsWith( "0" ) )
+                {
+                    buildNumber = Integer.valueOf( part2 );
+                }
+                else
+                {
+                    qualifier = part2;
+                }
             }
             catch ( NumberFormatException e )
             {
@@ -185,35 +192,49 @@ public class DefaultArtifactVersion
         }
         else
         {
+            boolean fallback = false;
             StringTokenizer tok = new StringTokenizer( part1, "." );
             try
             {
-                majorVersion = Integer.valueOf( tok.nextToken() );
+                majorVersion = getNextIntegerToken( tok );
                 if ( tok.hasMoreTokens() )
                 {
-                    minorVersion = Integer.valueOf( tok.nextToken() );
+                    minorVersion = getNextIntegerToken( tok );
                 }
                 if ( tok.hasMoreTokens() )
                 {
-                    incrementalVersion = Integer.valueOf( tok.nextToken() );
+                    incrementalVersion = getNextIntegerToken( tok );
                 }
                 if ( tok.hasMoreTokens() )
                 {
-                    // qualifier is the whole version, including "-"
-                    qualifier = version;
-                    majorVersion = null;
-                    minorVersion = null;
-                    incrementalVersion = null;
+                    fallback = true;
                 }
             }
             catch ( NumberFormatException e )
+            {
+                fallback = true;
+            }
+
+            if ( fallback )
             {
                 // qualifier is the whole version, including "-"
                 qualifier = version;
                 majorVersion = null;
                 minorVersion = null;
+                incrementalVersion = null;
             }
         }
+    }
+
+    private static Integer getNextIntegerToken( StringTokenizer tok )
+    {
+
+        String s = tok.nextToken();
+        if ( s.length() > 1 && s.startsWith( "0" ) )
+        {
+            throw new NumberFormatException( "Number part has a leading 0: '" + s + "'" );
+        }
+        return Integer.valueOf( s );
     }
 
     public String toString()
