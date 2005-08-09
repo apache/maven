@@ -494,12 +494,22 @@ public class DefaultMavenProjectBuilder
         modelDefaultsInjector.injectDefaults( model );
 
         MavenProject parentProject = project.getParent();
+        
+        Model originalModel = project.getOriginalModel();
 
+        //=======================================================================
+        //
+        // WATCH OUT FOR THIS LINE! in-project is NOT the same as out-project!!!
+        //
+        //=======================================================================
         project = new MavenProject( model );
 
         project.addProfileProperties( profileProperties );
 
         project.setActiveProfiles( activeProfiles );
+        
+        project.setOriginalModel( originalModel );
+        
 
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
