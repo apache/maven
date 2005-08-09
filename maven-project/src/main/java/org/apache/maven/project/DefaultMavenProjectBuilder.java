@@ -884,6 +884,8 @@ public class DefaultMavenProjectBuilder
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
         MavenProject project = new MavenProject( superModel );
+        
+        project.setOriginalModel( superModel );
 
         try
         {

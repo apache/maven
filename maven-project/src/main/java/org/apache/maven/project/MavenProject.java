@@ -176,6 +176,11 @@ public class MavenProject
         this.profileProperties = new Properties( project.profileProperties );
 
         this.model = ModelUtils.cloneModel( project.model );
+        
+        if ( project.originalModel != null )
+        {
+            this.originalModel = ModelUtils.cloneModel( project.originalModel );
+        }
 
         // TODO: need to clone this too?
         this.artifact = project.artifact;
