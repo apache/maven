@@ -189,3 +189,19 @@ it1011: Tests the fail-at-end reactor behavior. First module fails, and second
         should also run but not fail. End result should be failure of the build.
 -------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------
+These are a set of builds that are more complex than single-project or reactor
+invocations. They follow a process external to maven itself, invoking
+different lifecycle phases and/or goals on multiple projects within each test
+directory in order to accomplish their aims. 
+
+NOTE: Currently, there is no verification process...
+-------------------------------------------------------------------------------
+it2000: Test resolution of plugin by prefix from the first plugin repository
+        in a list. This is accomplished by creating a local "remote" repo, and
+        deploying a plugin there. Then, in another project, that plugin's goal
+        is invoked directly with the plugin's groupId being included in the
+        pluginGroups for the build. This second build should pickup the
+        plugins.xml for the aforementioned plugin from the first repository
+        and execute. This should resolve MNG-592.
+-------------------------------------------------------------------------------

@@ -1,0 +1,13 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>maven-it2000</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>test</id>
+      <url>file:../test-repo</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>

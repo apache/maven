@@ -1,0 +1,5 @@
+<settings>
+  <pluginGroups>
+    <pluginGroup>org.apache.maven.plugins.it2000</pluginGroup>
+  </pluginGroups>
+</settings>
