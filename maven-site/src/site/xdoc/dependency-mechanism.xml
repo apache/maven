@@ -2,16 +2,29 @@
   <properties>
     <title>Dependency Mechanism</title>
     <author email="brett@apache.org">Brett Porter</author>
+    <author email="trygvis@apache.org">Trygve Laugstol </author>
   </properties>
   <body>
     <section name="Dependency Mechanism">
       <p>
         There are many aspects to working with dependencies in Maven. While it is not the sole focus of Maven, it
-        does comprise a large and important part of the system.
+        does comprise a large and important part of the system. Learn more about:
+        <ul>
+          <li>
+            <a href="#transitive_dependencies">Transitive Dependencies</a>
+          </li>
+          <li>
+            <a href="#dependency_scope">Dependency Scope</a>
+          </li>
+          <li>
+            <a href="#dependency_management">Dependency Management</a>
+          </li>
+        </ul>
       </p>
       <p>
-        This document is currently in the process of being written, so not all facets are covered.
+        <i>This document is currently in the process of being written, so not all facets are covered.</i>
       </p>
+      <a name="transitive_dependencies"/>
       <subsection name="Transitive Dependencies">
         <p>
           Transitive dependencies are a new feature in Maven 2.0. This allows you to avoid needing to discover and
@@ -33,12 +46,14 @@
         </p>
         <ul>
           <li>
-            <i>Dependency mediation</i>- this determines what version of a dependency will be used when multiple
+            <i>Dependency mediation</i>
+            - this determines what version of a dependency will be used when multiple
             different ones are encountered. Currently, Maven 2.0 only supports using the "nearest definition" - so
             you can always guarantee a version by declaring it explicitly in the project's POM.
           </li>
           <li>
-            <i>Dependency scope</i>- this allows you to only include dependencies appropriate for the current stage
+            <i>Dependency scope</i>
+            - this allows you to only include dependencies appropriate for the current stage
             of the build. This is described in more detail below.
           </li>
         </ul>
@@ -49,6 +64,7 @@
         </p>
       </subsection>
       <subsection name="Dependency Scope">
+        <a name="dependency_scope"/>
         <p>
           Dependency scope is used to limit the transitivity of a depedency, and also to affect the classpath used for
           various build tasks.
@@ -58,20 +74,24 @@
         </p>
         <ul>
           <li>
-            <b>compile</b>- this is the default scope, used if none is specified. Compile dependencies are available
+            <b>compile</b>
+            - this is the default scope, used if none is specified. Compile dependencies are available
             in all classpaths.
           </li>
           <li>
-            <b>provided</b>- this is much like compile, but indicates you expect the JDK or a container to provide it.
+            <b>provided</b>
+            - this is much like compile, but indicates you expect the JDK or a container to provide it.
             It is only available on the compilation classpath, and is not transitive.
           </li>
           <li>
-            <b>runtime</b>- this scope indicates that the dependency is not required for compilation, but is for
+            <b>runtime</b>
+            - this scope indicates that the dependency is not required for compilation, but is for
             execution.
             It is in the runtime and test classpaths, but not the compile classpath.
           </li>
           <li>
-            <b>test</b>- this scope indicates that the dependency is not required for normal use of the application, and
+            <b>test</b>
+            - this scope indicates that the dependency is not required for normal use of the application, and
             is only available for the test compilation and execution phases.
           </li>
         </ul>
@@ -119,13 +139,140 @@
           </tr>
         </table>
         <p>
-          <b>(*) Note:</b>it is intended that this should be runtime instead, so that all compile dependencies must
+          <b>(*) Note:</b>
+          it is intended that this should be runtime instead, so that all compile dependencies must
           be explicitly listed - however, there is the case where the library you depend on extends a class from another
           library, forcing you to have available at compile time. For this reason, compile time dependencies remain
           as compile scope even when they are transitive.
         </p>
       </subsection>
+      <a name="dependency_management"/>
+      <subsection name="Dependency Management">
+        <p>
+          The dependency management section is a mechanism for centralizing dependency information. When you have
+          a set of projects that inherits a common parent it's possible to put all information about the dependency
+          in the common POM and have simpler references to the artifacts in the child POMs. The mechanism is best
+          illustrated through some examples. Given these two POMs which extend the same parent:
+        </p>
+        <p>
+          Project A:
+          <source><![CDATA[
+<project>
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>group-a</groupId>
+      <artifactId>artifact-a</artifactId>
+      <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>group-c</groupId>
+          <artifactId>excluded-artifact</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>group-a</groupId>
+      <artifactId>artifact-b</artifactId>
+      <version>1.0</version>
+      <type>bar</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>]]></source>
+          Project B:
+          <source><![CDATA[
+<project>
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>group-c</groupId>
+      <artifactId>artifact-b</artifactId>
+      <version>1.0</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>group-a</groupId>
+      <artifactId>artifact-b</artifactId>
+      <version>1.0</version>
+      <type>bar</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>]]></source>
+        </p>
+        <p>
+          These two example POMs share a common dependencies and each one non-trivial dependency. This information
+          can be put in the parent POM like this:
+          <source><![CDATA[
+<project>
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>group-a</groupId>
+      <artifactId>artifact-a</artifactId>
+      <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>group-c</groupId>
+          <artifactId>excluded-artifact</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>group-c</groupId>
+      <artifactId>artifact-b</artifactId>
+      <version>1.0</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>group-a</groupId>
+      <artifactId>artifact-b</artifactId>
+      <version>1.0</version>
+      <type>bar</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>]]></source>
+          And then the two child poms would become much simpler:
+        </p>
+        <p>
+          <source><![CDATA[
+<project>
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>group-a</groupId>
+      <artifactId>artifact-a</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>group-a</groupId>
+      <artifactId>artifact-b</artifactId>
+    </dependency>
+  </dependencies>
+</project>]]></source>
+          <source><![CDATA[
+<project>
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>group-c</groupId>
+      <artifactId>artifact-b</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>group-a</groupId>
+      <artifactId>artifact-b</artifactId>
+    </dependency>
+  </dependencies>
+</project>]]></source>
+        </p>
+        <p>
+          The reference information about the dependency management tags is available from the
+          <a href="maven-model/maven.html#class_DependencyManagement">project descriptor reference</a>.
+        </p>
+      </subsection>
     </section>
   </body>
 </document>
-
