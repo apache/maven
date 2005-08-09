@@ -1,0 +1,13 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-core-it0047</artifactId>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-4</version>
+    </dependency>
+  </dependencies>
+</model>

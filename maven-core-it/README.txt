@@ -131,6 +131,9 @@ it0045: Test non-reactor behavior when plugin declares "@requiresProject false"
 it0046: Test fail-never reactor behavior. Forces an exception to be thrown in
         the first module, but checks that the second modules is built.
 
+it0047: Test the use case for having a compile time dependency be transitive: when you extend a class you need its
+        dependencies at compile time.
+
 -------------------------------------------------------------------------------
 
 - generated sources
