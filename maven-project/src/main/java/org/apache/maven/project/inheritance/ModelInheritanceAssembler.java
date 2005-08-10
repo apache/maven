@@ -17,7 +17,6 @@ package org.apache.maven.project.inheritance;
  */
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -28,6 +27,4 @@ public interface ModelInheritanceAssembler
     String ROLE = ModelInheritanceAssembler.class.getName();
 
     void assembleModelInheritance( Model child, Model parent );
-
-    void mergeProfileWithModel( Model model, Profile profile );
 }

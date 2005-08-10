@@ -43,6 +43,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.activation.ProfileActivationCalculator;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
+import org.apache.maven.project.injection.ProfileInjector;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
@@ -96,6 +97,8 @@ public class DefaultMavenProjectBuilder
     private ArtifactFactory artifactFactory;
 
     private ModelInheritanceAssembler modelInheritanceAssembler;
+    
+    private ProfileInjector profileInjector;
 
     private ModelValidator validator;
 
@@ -481,7 +484,7 @@ public class DefaultMavenProjectBuilder
         {
             Profile profile = (Profile) it.next();
 
-            modelInheritanceAssembler.mergeProfileWithModel( model, profile );
+            profileInjector.inject( profile, model );
 
             profileProperties.putAll( profile.getProperties() );
         }

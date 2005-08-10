@@ -24,9 +24,21 @@
      |
      -->
     <component>
+      <role>org.apache.maven.project.injection.ProfileInjector</role>
+      <implementation>org.apache.maven.project.injection.DefaultProfileInjector</implementation>
+    </component>
+<!--
+     |
+     |
+     |
+     -->
+    <component>
       <role>org.apache.maven.project.MavenProjectBuilder</role>
       <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.project.injection.ProfileInjector</role>
+        </requirement>
         <requirement>
           <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
         </requirement>
