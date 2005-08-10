@@ -186,7 +186,10 @@ public class DefaultPluginManager
         }
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
-        if ( !pluginCollector.isPluginInstalled( plugin ) )
+		// FIXME: need to find out how a plugin gets marked as 'installed'
+		// and no ChildContainer exists. The check for that below fixes
+		// the 'Can't find plexus container for plugin: xxx' error.
+        if ( !pluginCollector.isPluginInstalled( plugin ) || container.getChildContainer( plugin.getKey() ) == null )
         {
             try
             {
