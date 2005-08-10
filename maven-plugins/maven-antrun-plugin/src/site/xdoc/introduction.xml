@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<document>
+  <properties>
+    <author email="kenney@apache.org">Kenney Westerhof</author>
+    <title>Introduction</title>
+  </properties>
+  <head/>
+  <body>
+    <section name="Introduction">
+      <p>
+        This plugin provides the ability to run Ant tasks from
+        within Maven2. You can even embed your ant scripts in the POM!
+      </p>
+
+      <p>
+        It is <emph>not</emph> the intention of this plugin to provide a means
+        of polluting the POM, so it's encouraged to move all your
+        Ant tasks to a build.xml file and just call it from the POM
+        using Ant's <a href="http://ant.apache.org/manual/CoreTasks/ant.html">&lt;ant/&gt; task</a>.
+      </p>
+
+      <p>
+        One of the main goals of this plugin is to ease the migration from 
+        Ant based projects to Maven 2. A lot of projects are currently unable
+        to migrate simply because they depend on some custom build functionality
+        that Maven2 doesn't provide yet.
+      </p>
+      
+      <p>
+        Even with plugins widely available there will always be simple, small
+        tasks that can be done using one or two lines of Ant script (like
+        deploying an EAR), until ofcourse a plugin comes available that does
+        the job.
+      </p>
+
+    </section>
+  </body>
+</document>

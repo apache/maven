@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<document>
+  <properties>
+    <author email="kenney@apache.org">Kenney Westerhof</author>
+    <title>Introduction</title>
+  </properties>
+  <head/>
+  <body>
+    <section name="Usage">
+      <p>
+        For those of you unfamiliar with configuring a plugin see the example
+        below:
+
+        <source>
+<![CDATA[
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>my-test-app</artifactId>
+  <groupId>my-test-group</groupId>
+  <version>1.0-SNAPSHOT</version>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <configuration>
+              <tasks>
+
+                <!--
+                  Place any ant task here. You can add anything
+                  you can add between <target> and </target> in a
+                  build.xml.
+                -->
+                
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>
+]]>
+        </source>
+      </p>
+
+      <p>
+        The example above illustrates how to bind an ant script to a
+        lifecycle phase. You can add a script to each lifecycle phase,
+        by duplicating the <![CDATA[<execution/>]]> section and specifying
+        a new phase.
+      </p>
+    </section>
+
+  </body>
+</document>

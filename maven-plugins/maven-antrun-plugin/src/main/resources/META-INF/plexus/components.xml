@@ -1,0 +1,37 @@
+<plexus>
+
+  <components>
+
+    <component>
+      <role>org.codehaus.plexus.component.configurator.ComponentConfigurator</role>
+      <role-hint>override</role-hint>
+      <implementation>org.codehaus.plexus.component.configurator.BasicComponentConfigurator</implementation>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup</role>
+          <role-hint>override</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+    
+    <component>
+      <role>org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup</role>
+      <role-hint>override</role-hint>
+      <implementation>org.codehaus.plexus.component.configurator.converters.lookup.DefaultConverterLookup</implementation>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.component.configurator.converters.ConfigurationConverter</role>
+          <role-hint>AntTarget</role-hint>
+          <field-name>customConverters</field-name>					
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.codehaus.plexus.component.configurator.converters.ConfigurationConverter</role>
+      <role-hint>AntTarget</role-hint>
+      <implementation>org.apache.maven.plugin.antrun.components.AntTargetConverter</implementation>
+    </component>
+  </components>
+
+</plexus>
