@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-plugin-parent</artifactId>
+    <version>2.0-beta-1-SNAPSHOT</version>
+  </parent>
+  <artifactId>maven-csharp-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <name>csharp-plugin</name>
+  <version>1.0-SNAPSHOT</version>
+  <inceptionYear>2005</inceptionYear>
+  <description>M2 csharp plugin</description>
+
+  <contributors>
+    <contributor>
+      <name>Gilles Dodinet</name>
+      <email>gdodinet@karmicsoft.com</email>
+      <organization>Karmic Software Research</organization>
+    </contributor>
+  </contributors>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0-beta-1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.0-beta-1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>plexus</groupId>
+      <artifactId>plexus-compiler-api</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.6.5</version>
+    </dependency>
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant-nodeps</artifactId>
+      <version>1.6.5</version>
+    </dependency>
+  </dependencies>
+</project>
+

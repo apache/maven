@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
+  <artifactId>maven-csharp-plugin-test</artifactId>
+  <packaging>dotnetexe</packaging>
+  <name>csharp-plugin-test</name>
+  <version>1.0-SNAPSHOT</version>
+  <inceptionYear>2005</inceptionYear>
+  <description>M2 csharp plugin Test</description>
+
+  <contributors>
+    <contributor>
+      <name>Gilles Dodinet</name>
+      <email>gdodinet@karmicsoft.com</email>
+      <organization>Karmic Software Research</organization>
+    </contributor>
+  </contributors>
+
+  <build>
+    <sourceDirectory>src/main/csharp</sourceDirectory>
+    <plugins>
+        <plugin>
+<extensions>true</extensions>
+          <artifactId>maven-csharp-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
+          <configuration>
+            <mainClass>Com.Test.Test2</mainClass>
+            <destFile>Test2</destFile>
+            <type>exe</type>
+          </configuration>
+      	</plugin>
+    </plugins>
+  </build>
+</project>
+
