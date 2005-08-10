@@ -2,27 +2,135 @@
 Development Guide
  ------
 Emmanuel Venisse
+Trygve Laugstol
  ------
 8 July 2005
  ------
 
-~~ Copyright 2001-2004 The Apache Software Foundation.
-~~ 
+~~ Copyright 2005 The Apache Software Foundation.
+~~
 ~~ Licensed under the Apache License, Version 2.0 (the "License");
 ~~ you may not use this file except in compliance with the License.
 ~~ You may obtain a copy of the License at
-~~ 
+~~
 ~~      http://www.apache.org/licenses/LICENSE-2.0
-~~ 
+~~
 ~~ Unless required by applicable law or agreed to in writing, software
 ~~ distributed under the License is distributed on an "AS IS" BASIS,
 ~~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ~~ See the License for the specific language governing permissions and
 ~~ limitations under the License.
 
-Subversion configuration
+Developing Maven 2
 
-    Before committing files in subversion repository, you need to read the
-    {{{http://www.apache.org/dev/version-control.html#https-svn}Committer Subversion Access}}
-    document and you must set your svn client
-    with these properties file : {{svn-eol-style.txt}}
+ This document describes how to get started into developing Maven 2 itself. There is a separate page describing how
+ to {{{building.html}building Maven 2}}.
+
+* Finding some work to do
+
+ First of all you need something to work on! Unless you have found a particular issue you would like to work on
+ the Maven team has categorized a few issues that we could use <your> help to solve them. The list is on our
+ {{{http://docs.codehaus.org/display/MAVEN/How+to+help}Conflucene wiki}} and will be updated every 60 minutes.
+
+ JIRA also has RSS feeds available if you'd like to include those in your favorite feed aggregator.
+
+ We categorize the issues in three different categories:
+
+ * <<Noice>>: No previous exposure to the code needed.
+   <({{{http://jira.codehaus.org/secure/IssueNavigator.jspa?view=rss&pid=10500&resolutionIds=-1&customfield_10010=Novice&sorter/field=priority&sorter/order=ASC&sorter/field=issuekey&sorter/order=ASC&tempMax=25&reset=true&decorator=none}rss feed}})>
+
+ * <<Intermediate>>: Exposure to Maven pluins and/or internals required.
+   <({{{http://jira.codehaus.org/secure/IssueNavigator.jspa?view=rss&pid=10500&resolutionIds=-1&customfield_10010=Intermediate&sorter/field=priority&sorter/order=ASC&sorter/field=issuekey&sorter/order=ASC&tempMax=25&reset=true&decorator=none}rss feed}})>
+
+ * <<Expert>>: Good knowledge of Maven internals and it's dependencies required.
+   <({{{http://jira.codehaus.org/secure/IssueNavigator.jspa?view=rss&pid=10500&resolutionIds=-1&customfield_10010=Expert&sorter/field=priority&sorter/order=ASC&sorter/field=issuekey&sorter/order=ASC&tempMax=25&reset=true&decorator=none}rss feed}})>
+
+ []
+
+ When you find a issue you would like to work on add a comment in the issue log so the core developers and other
+ people looking for work know that someone is already working on it.
+
+* Creating and submitting a patch
+
+ When you have either completed an issue or just want some feedback on the work you have done, create a patch
+ and attache the patch to the issue in question. We have a couple of guidelines when creating patches:
+
+ * Always create the patch from the root of the maven project, i.e. where the pom.xml file is.
+
+ * Name the file <<<MNG-<issue number>-<artifact id>.patch>>>.
+
+ []
+
+ An example on how to create a patch from the command line:
+
+---
+$ svn diff > MNG-123-maven-core.patch
+---
+
+ If you are picking up an issue with a existing patch attached to the issue you can apply the patch to your working
+ directory directly from JIRA like this. The <<<wget>>> and <<<patch>>> commands will only be available if you are
+ on a UNIX platform or Cygwin on windows.
+
+---
+$ wget -O - -q <URL to the patch from JIRA> | patch -p0
+---
+
+ If the patch is in a local file <<<MNG-123.patch>>> and you want to apply that use this command:
+
+---
+$ patch -p0 < MNG-123.patch
+---
+
+* Other useful Subversion commands while developing
+
+ If you've done a chunk of work and you would like ditch your changes and start from scratch use this command to
+ revert to the original checkout:
+
+---
+$ svn revert -R .
+---
+
+ The <<<-R>>> argument means that the command will recurse down all directories and revert all changes.
+
+ Before committing code to the Subversion repository we always set the <<<svn:ignore>>> property on the directory
+ to prevent some files and directories to be checked in. We always exclude the IDE project files and the <<<target/>>>
+ directory. Instead of keeping all of the excludes in mind all the time it's useful to put them all in a file and
+ reference the file with the <<<-F>>> option:
+
+---
+$ svn propset . svn:ignore -F ~/bin/svnignore
+---
+
+ An example svnignore file:
+
+---
+target
+*~
+*.log
+.classpath
+.project
+*.ipr
+*.iws
+*.iml
+---
+
+* Dependent Projects
+
+ Maven 2 has a few dependencies on other projects. TODO: Write more details here.
+
+ * Modello
+
+ * Surefire
+
+ * Plexus
+
+ * Doxia
+
+ * Mojo
+
+* Subversion Configuration
+
+ Before committing files in subversion repository, you need to read the
+ {{{http://www.apache.org/dev/version-control.html#https-svn}Committer Subversion Access}}
+ document and you must set your svn client
+ with these properties file : {{svn-eol-style.txt}}

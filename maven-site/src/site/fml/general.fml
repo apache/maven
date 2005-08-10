@@ -107,7 +107,7 @@
           The source code can be found in subversion: <a href="http://svn.apache.org/repos/asf/maven/components/trunk">http://svn.apache.org/repos/asf/maven/components/trunk</a>.
         </p>
         <p>
-          For more information, see <a href="building.html">Building Maven 2.0</a>.
+          For more information, see <a href="/developers/building.html">Building Maven 2.0</a>.
         </p>
       </answer>
     </faq>

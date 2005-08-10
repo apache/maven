@@ -53,7 +53,11 @@ svn co http://svn.apache.org/repos/asf/maven/components/trunk maven-components
 ----
 export M2_HOME=/usr/local/maven-2.0-SNAPSHOT
 PATH=$M2_HOME/bin:$PATH
+----
+
   or
+
+----
 set M2_HOME=c:\maven-2.0-SNAPSHOT
 set PATH=%M2_HOME%\bin;%PATH%
 ----
@@ -62,7 +66,11 @@ set PATH=%M2_HOME%\bin;%PATH%
 
 ----
 sh m2-bootstrap-all.sh
+----
+
   or
+
+----
 m2-bootstrap-all.bat
 ----
 
@@ -77,7 +85,5 @@ m2-bootstrap-all.bat
 
     * M2_HOME directory contains a valid installation of m2 (ie $M2_HOME/bin/m2.conf or %M2_HOME%\bin\m2.conf exists).
 
-  If you have any problems or get any failures during the run, please report them to the 
+  If you have any problems or get any failures during the run, please report them to the
   {{{/mail-lists.html} Maven Developers List}}.
-
-

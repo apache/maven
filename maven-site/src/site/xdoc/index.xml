@@ -169,7 +169,7 @@
           </li>
           <li>
             <i>How do I
-              <a href="building.html">build Maven 2.0</a>?
+              <a href="/developers/building.html">build Maven 2.0</a>?
             </i>
           </li>
           <li>
@@ -182,4 +182,3 @@
     </section>
   </body>
 </document>
-

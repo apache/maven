@@ -40,6 +40,11 @@
       <item name="Plugin Development Guide" href="/developers/plugin-development-guide.html"/>
       <item name="Developing Plugins with Marmalade" href="/developers/developing-plugins-with-marmalade.html"/>
     </menu>
+    <menu name="Developers">
+      <item name="Developers Guide" href="/developers/development-guide.html"/>
+      <item name="Documentation Needed" href="/docs-required.html"/>
+      <item name="Building Maven 2.0" href="/developers/building.html"/>
+    </menu>
     <menu name="Reference">
       <item name="Project Descriptor" href="/maven-model/maven.html"/>
       <item name="Settings Descriptor" href="/maven-settings/settings.html"/>
@@ -49,10 +54,5 @@
       <item name="APT Reference" href="/apt-format.html"/>
     </menu>
     ${reports}
-    <menu name="Developers">
-      <item name="Developers Guide" href="/developers/development-guide.html"/>
-      <item name="Documentation Needed" href="/docs-required.html"/>
-      <item name="Building Maven 2.0" href="/building.html"/>
-    </menu>
   </body>
 </project>
