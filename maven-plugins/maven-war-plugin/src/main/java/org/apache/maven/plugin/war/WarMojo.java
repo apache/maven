@@ -256,6 +256,8 @@ public class WarMojo
 
                 // create archive
                 archiver.createArchive( project, archive );
+
+                project.getArtifact().setFile( warFile );
             }
         }
     }
