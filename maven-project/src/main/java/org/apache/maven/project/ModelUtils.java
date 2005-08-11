@@ -16,9 +16,11 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
@@ -26,6 +28,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
@@ -277,9 +280,14 @@ public final class ModelUtils
         child.setConfiguration( childConfiguration );
     }
 
-    public static void mergeModelBases( ModelBase dominant, ModelBase recessive )
+    public static void mergeModelBases( ModelBase dominant, ModelBase recessive, boolean mergePathStructures )
     {
         mergeDependencies( dominant, recessive );
+        
+        if ( mergePathStructures )
+        {
+            mergeModules( dominant, recessive );
+        }
         
         dominant.setRepositories( mergeRepositoryLists( dominant.getRepositories(), recessive.getRepositories() ) );
         dominant.setPluginRepositories( mergeRepositoryLists( dominant.getPluginRepositories(), recessive.getPluginRepositories() ) );
@@ -287,8 +295,82 @@ public final class ModelUtils
         mergeReporting( dominant, recessive );
         
         mergeDependencyManagementSections( dominant, recessive );
+        
+        mergeDistributionManagementSections( dominant, recessive );
     }
     
+    private static void mergeModules( ModelBase dominant, ModelBase recessive )
+    {
+        List modules = new ArrayList();
+        
+        List dominantModules = dominant.getModules();
+        
+        if ( dominantModules != null && !dominantModules.isEmpty() )
+        {
+            modules.addAll( dominantModules );
+        }
+        
+        List recessiveModules = recessive.getModules();
+        
+        if ( recessiveModules != null )
+        {
+            for ( Iterator it = recessiveModules.iterator(); it.hasNext(); )
+            {
+                String module = (String) it.next();
+                
+                if ( !modules.contains( module ) )
+                {
+                    modules.add( module );
+                }
+            }
+        }
+        
+        dominant.setModules( modules );
+    }
+
+    private static void mergeDistributionManagementSections( ModelBase dominant, ModelBase recessive )
+    {
+        DistributionManagement dDistMgmt = dominant.getDistributionManagement();
+        DistributionManagement rDistMgmt = recessive.getDistributionManagement();
+        
+        if ( dDistMgmt == null )
+        {
+            dominant.setDistributionManagement( rDistMgmt );
+        }
+        else if ( rDistMgmt != null )
+        {
+            if ( dDistMgmt.getRepository() == null )
+            {
+                dDistMgmt.setRepository( rDistMgmt.getRepository() );
+            }
+            
+            if ( dDistMgmt.getSnapshotRepository() == null )
+            {
+                dDistMgmt.setSnapshotRepository( rDistMgmt.getSnapshotRepository() );
+            }
+            
+            if ( StringUtils.isEmpty( dDistMgmt.getDownloadUrl() ) )
+            {
+                dDistMgmt.setDownloadUrl( rDistMgmt.getDownloadUrl() );
+            }
+            
+            if ( dDistMgmt.getRelocation() == null )
+            {
+                dDistMgmt.setRelocation( rDistMgmt.getRelocation() );
+            }
+            
+            if ( dDistMgmt.getSite() == null )
+            {
+                dDistMgmt.setSite( rDistMgmt.getSite() );
+            }
+            
+            if ( dDistMgmt.getStatus() == null )
+            {
+                dDistMgmt.setStatus( rDistMgmt.getStatus() );
+            }
+        }
+    }
+
     private static List mergeRepositoryLists( List dominantRepositories, List recessiveRepositories )
     {
         List repositories = new ArrayList();
@@ -590,5 +672,29 @@ public final class ModelUtils
         newModel.setVersion( model.getVersion() );
         newModel.setArtifactId( model.getArtifactId() );
         return newModel;
+    }
+
+    public static void overrideModelBase( Model target, ModelBase overrides )
+    {
+        target.setDependencies( overrides.getDependencies() );
+        target.setDependencyManagement( overrides.getDependencyManagement() );
+        target.setDistributionManagement( overrides.getDistributionManagement() );
+        target.setModules( overrides.getModules() );
+        target.setPluginRepositories( overrides.getPluginRepositories() );
+        target.setReporting( overrides.getReporting() );
+        target.setRepositories( overrides.getRepositories() );
+    }
+
+    public static void overrideBuildBase( Build target, BuildBase overrides )
+    {
+        target.setDefaultGoal( overrides.getDefaultGoal() );
+        target.setFinalName( overrides.getFinalName() );
+        target.setPluginManagement( overrides.getPluginManagement() );
+        
+        target.setPlugins( overrides.getPlugins() );
+        target.flushPluginMap();
+        
+        target.setResources( overrides.getResources() );
+        target.setTestResources( overrides.getTestResources() );
     }
 }

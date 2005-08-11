@@ -142,7 +142,7 @@ public class DefaultModelInheritanceAssembler
         // Build
         assembleBuildInheritance( child, parent.getBuild() );
 
-        ModelUtils.mergeModelBases( child, parent );
+        ModelUtils.mergeModelBases( child, parent, false );
     }
 
     private void assembleBuildInheritance( Model child, Build parentBuild )
