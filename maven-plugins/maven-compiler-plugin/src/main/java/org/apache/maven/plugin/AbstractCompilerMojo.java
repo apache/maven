@@ -19,12 +19,16 @@ package org.apache.maven.plugin;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
+import org.codehaus.plexus.compiler.CompilerException;
 import org.codehaus.plexus.compiler.manager.CompilerManager;
 import org.codehaus.plexus.compiler.manager.NoSuchCompilerException;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
+import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +36,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
+/**
+ * @author others
+ * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
+ * @version $Id: StaleSourceScannerTest.java 2393 2005-08-08 22:32:59Z kenney $
+ */
 public abstract class AbstractCompilerMojo
     extends AbstractMojo
 {
@@ -116,7 +126,7 @@ public abstract class AbstractCompilerMojo
      *
      * @parameter
      */
-    private List compilerArguements;
+    private Map compilerArguments;
 
     /**
      * The directory to run the compiler from if fork is true.
@@ -144,13 +154,32 @@ public abstract class AbstractCompilerMojo
         throws MojoExecutionException
     {
         // ----------------------------------------------------------------------
+        // Look up the compiler. This is done before other code than can
+        // cause the mojo to return before the lookup is done possibly resulting
+        // in misconfigured POMs still building.
+        // ----------------------------------------------------------------------
+
+        Compiler compiler;
+
+        try
+        {
+            compiler = compilerManager.getCompiler( compilerId );
+        }
+        catch ( NoSuchCompilerException e )
+        {
+            throw new MojoExecutionException( "No such compiler '" + e.getCompilerId() + "'." );
+        }
+
+        // ----------------------------------------------------------------------
         //
         // ----------------------------------------------------------------------
 
         List compileSourceRoots = removeEmptyCompileSourceRoots( getCompileSourceRoots() );
+
         if ( compileSourceRoots.isEmpty() )
         {
             getLog().info( "No sources to compile" );
+
             return;
         }
 
@@ -166,20 +195,6 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setSourceLocations( compileSourceRoots );
 
-        // TODO: have an option to always compile (without need to clean)
-        Set staleSources = computeStaleSources();
-
-        if ( staleSources.isEmpty() )
-        {
-            getLog().info( "Nothing to compile - all classes are up to date" );
-
-            return;
-        }
-        else
-        {
-            compilerConfiguration.setSourceFiles( staleSources );
-        }
-
         compilerConfiguration.setDebug( debug );
 
         compilerConfiguration.setShowWarnings( showWarnings );
@@ -192,13 +207,36 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setSourceEncoding( encoding );
 
-        compilerConfiguration.setCustomCompilerArguments( compilerArguements );
+        compilerConfiguration.setCustomCompilerArguments( compilerArguments );
 
         compilerConfiguration.setFork( fork );
 
         compilerConfiguration.setExecutable( executable );
 
         compilerConfiguration.setWorkingDirectory( basedir );
+
+        // TODO: have an option to always compile (without need to clean)
+        Set staleSources;
+
+        try
+        {
+            staleSources = computeStaleSources( compilerConfiguration, compiler );
+        }
+        catch ( CompilerException e )
+        {
+            throw new MojoExecutionException( "Error while computing stale sources.", e );
+        }
+
+        if ( staleSources.isEmpty() )
+        {
+            getLog().info( "Nothing to compile - all classes are up to date" );
+
+            return;
+        }
+        else
+        {
+            compilerConfiguration.setSourceFiles( staleSources );
+        }
 
         // ----------------------------------------------------------------------
         // Dump configuration
@@ -231,17 +269,6 @@ public abstract class AbstractCompilerMojo
 
         List messages;
 
-        Compiler compiler;
-
-        try
-        {
-            compiler = compilerManager.getCompiler( compilerId );
-        }
-        catch ( NoSuchCompilerException e )
-        {
-            throw new MojoExecutionException( "No such compiler '" + e.getCompilerId() + "'." );
-        }
-
         getLog().debug( "Using compiler '" + compilerId + "'." );
 
         try
@@ -272,10 +299,26 @@ public abstract class AbstractCompilerMojo
         }
     }
 
-    private Set computeStaleSources()
-        throws MojoExecutionException
+    private Set computeStaleSources( CompilerConfiguration compilerConfiguration, Compiler compiler )
+        throws MojoExecutionException, CompilerException
     {
-        SuffixMapping mapping = new SuffixMapping( ".java", ".class" );
+        CompilerOutputStyle outputStyle = compiler.getCompilerOutputStyle();
+
+        SourceMapping mapping;
+
+        if ( outputStyle == CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE )
+        {
+            mapping = new SuffixMapping( compiler.getInputFileEnding( compilerConfiguration ),
+                                         compiler.getOutputFileEnding( compilerConfiguration ) );
+        }
+        else if ( outputStyle == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES )
+        {
+            mapping = new SingleTargetSourceMapping( compiler.getOutputFile( compilerConfiguration ) );
+        }
+        else
+        {
+            throw new MojoExecutionException( "Unknown compiler output style: '" + outputStyle + "'." );
+        }
 
         SourceInclusionScanner scanner = new StaleSourceScanner( staleMillis );
 
