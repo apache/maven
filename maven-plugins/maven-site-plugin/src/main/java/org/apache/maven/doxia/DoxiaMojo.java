@@ -156,6 +156,12 @@ public class DoxiaMojo
     private boolean addModules;
 
     /**
+     * @parameter expression="${outputEncoding}"
+     * default-value="ISO-8859-1"
+     */
+    private String outputEncoding;
+    
+    /**
      * @parameter expression="${component.org.codehaus.plexus.siterenderer.Renderer}"
      * @required
      * @readonly
@@ -236,6 +242,11 @@ public class DoxiaMojo
         if ( attributes.get( "project" ) == null )
         {
             attributes.put( "project", project );
+        }
+
+        if ( attributes.get( "outputEncoding" ) == null )
+        {
+            attributes.put( "outputEncoding", outputEncoding );
         }
 
         try

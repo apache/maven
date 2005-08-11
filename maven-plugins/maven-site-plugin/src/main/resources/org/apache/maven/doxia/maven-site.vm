@@ -139,7 +139,7 @@
     #foreach( $author in $authors )
       <meta name="author" content="$author" />
     #end
-    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=${outputEncoding}" />
   </head>
   <body class="composite">
     <div id="banner">
