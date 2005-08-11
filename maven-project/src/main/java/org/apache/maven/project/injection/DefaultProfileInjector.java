@@ -12,16 +12,8 @@ public class DefaultProfileInjector
 
     public void inject( Profile profile, Model model )
     {
-        ModelUtils.mergeModelBases( profile, model );
-        
-        model.setDependencies( profile.getDependencies() );
-        model.setDependencyManagement( profile.getDependencyManagement() );
-        model.setDistributionManagement( profile.getDistributionManagement() );
-        model.setModules( profile.getModules() );
-        model.setPluginRepositories( profile.getPluginRepositories() );
-        model.setReporting( profile.getReporting() );
-        model.setRepositories( profile.getRepositories() );
-        
+        ModelUtils.mergeModelBases( model, profile );
+
         BuildBase profileBuild = profile.getBuild();
         if ( profileBuild != null )
         {
