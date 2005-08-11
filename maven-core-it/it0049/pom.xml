@@ -1,0 +1,28 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>maven-it0049</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-core-it-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+
+        <configuration>
+          <pluginFile>touchFile.txt</pluginFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>plugin-snapshots</id>
+      <name>Plugin Snapshots</name>
+      <url>http://snapshots.maven.codehaus.org/maven2/plugins</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>

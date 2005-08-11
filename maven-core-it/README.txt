@@ -134,6 +134,10 @@ it0046: Test fail-never reactor behavior. Forces an exception to be thrown in
 it0047: Test the use case for having a compile time dependency be transitive: when you extend a class you need its
         dependencies at compile time.
 
+it0048: Test profile overrides of values specified in the pom.
+
+it0049: Test parameter alias usage.
+
 -------------------------------------------------------------------------------
 
 - generated sources

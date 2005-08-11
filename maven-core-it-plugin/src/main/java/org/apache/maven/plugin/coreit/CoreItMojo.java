@@ -59,7 +59,7 @@ public class CoreItMojo
     private File basedirAlignmentDirectory;
 
     /**
-     * @parameter
+     * @parameter alias="pluginFile"
      */
     private String pluginItem = "foo";
 
