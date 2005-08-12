@@ -615,12 +615,7 @@ public class DefaultLifecycleExecutor
             }
             catch ( ComponentLookupException e )
             {
-                getLogger().warn(
-                    "Lifecycle mappings not found for packaging: \'" + packaging + "\'. Using defaults." );
-
-                getLogger().debug( "Lifecycle mappings not found for packaging: \'" + packaging + "\'.", e );
-
-                return defaultPhases;
+                throw new LifecycleExecutionException( "Cannot find lifecycle mapping for packaging: \'" + packaging + "\'.", e );
             }
         }
 

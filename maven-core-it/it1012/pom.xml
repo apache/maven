@@ -1,0 +1,7 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>maven-it1012</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>this-doesnt-exist</packaging>
+</project>
