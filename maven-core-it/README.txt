@@ -196,6 +196,9 @@ it1010: Tests a type from a plugin fails when extensions is not true.
 it1011: Tests the fail-at-end reactor behavior. First module fails, and second
         should also run but not fail. End result should be failure of the build.
 -------------------------------------------------------------------------------
+it1012: Test that the DefaultLifecycleExecutor will throw an exception when
+        encountering an unknown packaging.
+-------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
 These are a set of builds that are more complex than single-project or reactor
