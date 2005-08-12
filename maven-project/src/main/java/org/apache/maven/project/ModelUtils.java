@@ -363,6 +363,8 @@ public final class ModelUtils
             {
                 dDistMgmt.setSite( rDistMgmt.getSite() );
             }
+            
+            // NOTE: We SHOULD NOT be inheriting status, since this is an assessment of the POM quality.
         }
     }
 
