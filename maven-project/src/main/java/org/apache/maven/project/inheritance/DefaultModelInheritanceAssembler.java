@@ -160,11 +160,6 @@ public class DefaultModelInheritanceAssembler
             // The build has been set but we want to step in here and fill in
             // values that have not been set by the child.
 
-            if ( childBuild.getDirectory() == null )
-            {
-                childBuild.setDirectory( parentBuild.getDirectory() );
-            }
-
             if ( childBuild.getSourceDirectory() == null )
             {
                 childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );

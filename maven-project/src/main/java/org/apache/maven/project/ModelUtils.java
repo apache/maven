@@ -619,6 +619,11 @@ public final class ModelUtils
         // if the parent build is null, obviously we cannot inherit from it...
         if ( recessive != null )
         {
+            if ( dominant.getDirectory() == null )
+            {
+                dominant.setDirectory( recessive.getDirectory() );
+            }
+
             if ( dominant.getDefaultGoal() == null )
             {
                 dominant.setDefaultGoal( recessive.getDefaultGoal() );
