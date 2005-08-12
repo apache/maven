@@ -1265,11 +1265,20 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>3.0.0+</version>
+          <version>3.0.0</version>
           <code><![CDATA[
             public String toString()
             {
                 return groupId + "/" + type + "s:" + artifactId + "-" + version;
+            }
+          ]]></code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code><![CDATA[
+            public String toString()
+            {
+                return "Dependency {groupId=" + groupId + ", artifactId=" + artifactId + ", version=" + version + ", type=" + type + "}";
             }
           ]]></code>
         </codeSegment>

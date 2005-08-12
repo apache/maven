@@ -1,0 +1,14 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>maven-core-it1001</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+</model>

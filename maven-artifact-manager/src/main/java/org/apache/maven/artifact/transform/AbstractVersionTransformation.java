@@ -98,7 +98,9 @@ public abstract class AbstractVersionTransformation
                         }
                         catch ( ResourceDoesNotExistException e )
                         {
-                            getLogger().debug( "Error resolving artifact version from metadata.", e );
+                            getLogger().debug(
+                                               "Artifact version metadata for: " + artifact.getId()
+                                                   + " could not be found on repository: " + repository.getId(), e );
 
                             continue;
                         }

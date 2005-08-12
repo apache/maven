@@ -55,13 +55,13 @@ public class DefaultModelValidator
         {
             Dependency d = (Dependency) it.next();
 
-            validateStringNotEmpty( "dependencies.dependency.artifactId", result, d.getArtifactId() );
+            validateSubElementStringNotEmpty( d, "dependencies.dependency.artifactId", result, d.getArtifactId() );
 
-            validateStringNotEmpty( "dependencies.dependency.groupId", result, d.getGroupId() );
+            validateSubElementStringNotEmpty( d, "dependencies.dependency.groupId", result, d.getGroupId() );
 
-            validateStringNotEmpty( "dependencies.dependency.type", result, d.getType() );
+            validateSubElementStringNotEmpty( d, "dependencies.dependency.type", result, d.getType() );
 
-            validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion() );
+            validateSubElementStringNotEmpty( d, "dependencies.dependency.version", result, d.getVersion() );
         }
 
         DependencyManagement mgmt = model.getDependencyManagement();
@@ -71,14 +71,11 @@ public class DefaultModelValidator
             {
                 Dependency d = (Dependency) it.next();
 
-                validateStringNotEmpty( "dependencyManagement.dependencies.dependency.artifactId", result,
+                validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.artifactId", result,
                                         d.getArtifactId() );
 
-                validateStringNotEmpty( "dependencyManagement.dependencies.dependency.groupId", result,
+                validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.groupId", result,
                                         d.getGroupId() );
-
-                validateStringNotEmpty( "dependencyManagement.dependencies.dependency.version", result,
-                                        d.getVersion() );
             }
         }
 
@@ -164,7 +161,32 @@ public class DefaultModelValidator
             return true;
         }
 
-        result.addMessage( "'" + fieldName + "' is empty." );
+        result.addMessage( "'" + fieldName + "' is missing." );
+
+        return false;
+    }
+
+    /**
+     * Asserts:
+     * <p/>
+     * <ul>
+     * <li><code>string.length != null</code>
+     * <li><code>string.length > 0</code>
+     * </ul>
+     */
+    private boolean validateSubElementStringNotEmpty( Object subElementInstance, String fieldName, ModelValidationResult result, String string )
+    {
+        if ( !validateSubElementNotNull( subElementInstance, fieldName, result, string ) )
+        {
+            return false;
+        }
+
+        if ( string.length() > 0 )
+        {
+            return true;
+        }
+
+        result.addMessage( "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
 
         return false;
     }
@@ -184,6 +206,25 @@ public class DefaultModelValidator
         }
 
         result.addMessage( "'" + fieldName + "' is missing." );
+
+        return false;
+    }
+    
+    /**
+     * Asserts:
+     * <p/>
+     * <ul>
+     * <li><code>string != null</code>
+     * </ul>
+     */
+    private boolean validateSubElementNotNull( Object subElementInstance, String fieldName, ModelValidationResult result, Object object )
+    {
+        if ( object != null )
+        {
+            return true;
+        }
+
+        result.addMessage( "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
 
         return false;
     }

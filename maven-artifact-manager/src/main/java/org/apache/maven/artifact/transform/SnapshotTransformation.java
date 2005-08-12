@@ -69,6 +69,10 @@ public class SnapshotTransformation
             }
             catch ( ResourceDoesNotExistException e )
             {
+                getLogger().debug(
+                                   "Snapshot version metadata for: " + artifact.getId()
+                                       + " not found. Creating a new metadata instance.", e );
+                
                 // ignore. We'll be creating this metadata if it doesn't exist...
                 metadata = (SnapshotArtifactMetadata) createMetadata( artifact );
             }

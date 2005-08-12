@@ -72,7 +72,7 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertEquals( "'packaging' is empty.", result.getMessage( 0 ) );
+        assertEquals( "'packaging' is missing.", result.getMessage( 0 ) );
     }
 
     public void testMissingVersion()
@@ -92,7 +92,7 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertEquals( "'dependencies.dependency.artifactId' is missing.", result.getMessage( 0 ) );
+        assertTrue( result.getMessage( 0 ).indexOf( "'dependencies.dependency.artifactId' is missing." ) > -1 );
     }
 
     public void testMissingDependencyGroupId()
@@ -102,7 +102,7 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertEquals( "'dependencies.dependency.groupId' is missing.", result.getMessage( 0 ) );
+        assertTrue( result.getMessage( 0 ).indexOf( "'dependencies.dependency.groupId' is missing." ) > -1 );
     }
 
     public void testMissingDependencyVersion()
@@ -112,7 +112,7 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertEquals( "'dependencies.dependency.version' is missing.", result.getMessage( 0 ) );
+        assertTrue( result.getMessage( 0 ).indexOf( "'dependencies.dependency.version' is missing." ) > -1 );
     }
 
     public void testMissingDependencyManagementArtifactId()
@@ -122,7 +122,7 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertEquals( "'dependencyManagement.dependencies.dependency.artifactId' is missing.", result.getMessage( 0 ) );
+        assertTrue( result.getMessage( 0 ).indexOf( "'dependencyManagement.dependencies.dependency.artifactId' is missing." ) > -1 );
     }
 
     public void testMissingDependencyManagementGroupId()
@@ -132,17 +132,7 @@ public class DefaultModelValidatorTest
 
         assertEquals( 1, result.getMessageCount() );
 
-        assertEquals( "'dependencyManagement.dependencies.dependency.groupId' is missing.", result.getMessage( 0 ) );
-    }
-
-    public void testMissingDependencyManagementVersion()
-        throws Exception
-    {
-        ModelValidationResult result = validate( "missing-dependency-mgmt-version-pom.xml" );
-
-        assertEquals( 1, result.getMessageCount() );
-
-        assertEquals( "'dependencyManagement.dependencies.dependency.version' is missing.", result.getMessage( 0 ) );
+        assertTrue( result.getMessage( 0 ).indexOf( "'dependencyManagement.dependencies.dependency.groupId' is missing." ) > -1 );
     }
 
     public void testMissingAll()
