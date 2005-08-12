@@ -363,11 +363,6 @@ public final class ModelUtils
             {
                 dDistMgmt.setSite( rDistMgmt.getSite() );
             }
-            
-            if ( dDistMgmt.getStatus() == null )
-            {
-                dDistMgmt.setStatus( rDistMgmt.getStatus() );
-            }
         }
     }
 
