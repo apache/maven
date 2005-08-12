@@ -186,9 +186,9 @@ public class DefaultPluginManager
         }
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
-		// FIXME: need to find out how a plugin gets marked as 'installed'
-		// and no ChildContainer exists. The check for that below fixes
-		// the 'Can't find plexus container for plugin: xxx' error.
+        // FIXME: need to find out how a plugin gets marked as 'installed'
+        // and no ChildContainer exists. The check for that below fixes
+        // the 'Can't find plexus container for plugin: xxx' error.
         if ( !pluginCollector.isPluginInstalled( plugin ) || container.getChildContainer( plugin.getKey() ) == null )
         {
             try
@@ -768,7 +768,8 @@ public class DefaultPluginManager
                     }
                 }
 
-                if ( fieldValue == null )
+                // only mark as invalid if there are no child nodes
+                if ( fieldValue == null && (value == null || value.getChildCount() == 0 ) )
                 {
                     parameter.setExpression( expression );
                     invalidParameters.add( parameter );
@@ -839,10 +840,10 @@ public class DefaultPluginManager
         for ( Iterator it = mojoDescriptor.getParameters().iterator(); it.hasNext(); )
         {
             Parameter parameter = (Parameter) it.next();
-            
+
             String paramName = parameter.getName();
             String alias = parameter.getAlias();
-            
+
             PlexusConfiguration pomConfig = fromPom.getChild( paramName );
             PlexusConfiguration aliased = null;
             
@@ -866,11 +867,11 @@ public class DefaultPluginManager
             }
             
             boolean addedPomConfig = false;
-            
+
             if ( pomConfig != null )
             {
                 pomConfig = buildTopDownMergedConfiguration( pomConfig, mojoConfig );
-                
+
                 if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || pomConfig.getChildCount() > 0 )
                 {
                     result.addChild( pomConfig );
@@ -920,13 +921,28 @@ public class DefaultPluginManager
             for ( int i = 0; i < attributeNames.length; i++ )
             {
                 String attributeValue = recessive.getAttribute( attributeNames[i], null );
-                
+                // TODO: recessive seems to be dominant here?
                 result.setAttribute( attributeNames[i], attributeValue );
             }
-            
-            mergeConfiguration( result, recessive );
         }
-        
+
+        PlexusConfiguration[] children = dominant.getChildren();
+
+        for ( int i = 0; i < children.length; i++ )
+        {
+            PlexusConfiguration childDom = children[i];
+            PlexusConfiguration childRec = recessive == null ? null : recessive.getChild( childDom.getName(), false );
+
+            if ( childRec != null )
+            {
+                result.addChild( buildTopDownMergedConfiguration( childDom, childRec ) );
+            }
+            else
+            {   // FIXME: copy, or use reference?
+                result.addChild( copyConfiguration( childDom ) );
+            }
+        }
+    
         return result;
     }
 
