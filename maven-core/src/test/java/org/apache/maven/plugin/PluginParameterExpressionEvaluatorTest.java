@@ -26,6 +26,7 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
@@ -140,8 +141,12 @@ public class PluginParameterExpressionEvaluatorTest
 
         PlexusContainer container = getContainer();
         MavenSession session = createSession( container, repo );
+        
+        MojoDescriptor mojo = new MojoDescriptor();
+        mojo.setPluginDescriptor( pluginDescriptor );
+        mojo.setGoal( "goal" );
 
-        return (ExpressionEvaluator) new PluginParameterExpressionEvaluator( session, pluginDescriptor, null,
+        return (ExpressionEvaluator) new PluginParameterExpressionEvaluator( session, mojo, null,
                                                                              container.getLogger(), project );
     }
 

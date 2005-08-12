@@ -510,8 +510,8 @@ public class DefaultPluginManager
         //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
         //                                                                          mojoDescriptor.getConfiguration() );
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, pluginDescriptor,
-                                                                                          pathTranslator, getLogger(),
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoDescriptor,
+                                                                                          pathTranslator, getLogger(), 
                                                                                           project );
 
         PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration( mergedConfiguration,

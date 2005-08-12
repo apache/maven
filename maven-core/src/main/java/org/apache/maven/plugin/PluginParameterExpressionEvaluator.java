@@ -17,6 +17,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.path.PathTranslator;
@@ -26,6 +27,8 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -35,21 +38,39 @@ import java.io.File;
 public class PluginParameterExpressionEvaluator
     implements ExpressionEvaluator
 {
+    private static final Map BANNED_EXPRESSIONS;
+
+    private static final Map DEPRECATED_EXPRESSIONS;
+
+    static
+    {
+        Map deprecated = new HashMap();
+
+        deprecated.put( "project.build.resources", "project.resources" );
+        deprecated.put( "project.build.testResources", "project.testResources" );
+
+        DEPRECATED_EXPRESSIONS = deprecated;
+
+        Map banned = new HashMap();
+
+        BANNED_EXPRESSIONS = banned;
+    }
+
     private final PathTranslator pathTranslator;
 
     private final MavenSession context;
 
     private final Logger logger;
 
-    private final PluginDescriptor pluginDescriptor;
+    private final MojoDescriptor mojoDescriptor;
 
     private final MavenProject project;
 
-    public PluginParameterExpressionEvaluator( MavenSession context, PluginDescriptor pluginDescriptor,
-                                               PathTranslator pathTranslator, Logger logger, MavenProject project )
+    public PluginParameterExpressionEvaluator( MavenSession context, MojoDescriptor mojoDescriptor,
+                                              PathTranslator pathTranslator, Logger logger, MavenProject project )
     {
         this.context = context;
-        this.pluginDescriptor = pluginDescriptor;
+        this.mojoDescriptor = mojoDescriptor;
         this.pathTranslator = pathTranslator;
         this.logger = logger;
         this.project = project;
@@ -85,6 +106,18 @@ public class PluginParameterExpressionEvaluator
             return expression;
         }
 
+        if ( BANNED_EXPRESSIONS.containsKey( expression ) )
+        {
+            throw new ExpressionEvaluationException( "The parameter expression: \'" + expression
+                + "\' used in mojo: \'" + mojoDescriptor.getGoal() + "\' is banned. Use \'"
+                + BANNED_EXPRESSIONS.get( expression ) + "\' instead." );
+        }
+        else if ( DEPRECATED_EXPRESSIONS.containsKey( expression ) )
+        {
+            logger.warn( "The parameter expression: \'" + expression + "\' used in mojo: \'" + mojoDescriptor.getGoal()
+                + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression ) + "\' instead." );
+        }
+        
         if ( "localRepository".equals( expression ) )
         {
             value = context.getLocalRepository();
@@ -134,6 +167,8 @@ public class PluginParameterExpressionEvaluator
             try
             {
                 int pathSeparator = expression.indexOf( "/" );
+
+                PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
                 if ( pathSeparator > 0 )
                 {
@@ -269,4 +304,3 @@ public class PluginParameterExpressionEvaluator
     }
 
 }
-
