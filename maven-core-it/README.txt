@@ -131,10 +131,11 @@ it0045: Test non-reactor behavior when plugin declares "@requiresProject false"
 it0046: Test fail-never reactor behavior. Forces an exception to be thrown in
         the first module, but checks that the second modules is built.
 
-it0047: Test the use case for having a compile time dependency be transitive: when you extend a class you need its
-        dependencies at compile time.
+it0047: Test the use case for having a compile time dependency be transitive: 
+        when you extend a class you need its dependencies at compile time.
 
-it0048: REMOVED. REPLACED WITH UNIT TESTS IN maven-project.
+it0048: Verify that default values for mojo parameters are working (indirectly, 
+        by verifying that the Surefire mojo is functioning correctly).
 
 it0049: Test parameter alias usage.
 

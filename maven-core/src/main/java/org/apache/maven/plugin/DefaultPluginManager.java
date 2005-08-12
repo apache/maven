@@ -865,19 +865,21 @@ public class DefaultPluginManager
                 pomConfig = buildTopDownMergedConfiguration( pomConfig, aliased );
             }
             
+            boolean addedPomConfig = false;
+            
             if ( pomConfig != null )
             {
                 pomConfig = buildTopDownMergedConfiguration( pomConfig, mojoConfig );
                 
-//                if ( StringUtils.isEmpty( pomConfig.getValue( null ) ) && pomConfig.getChildCount() == 0 )
-//                {
-//                    // if we still can't find a value for this parameter, set to ${paramName}
-//                    result.setValue( "${" + pomConfig.getName() + "}" );
-//                }
-                
-                result.addChild( pomConfig );
+                if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || pomConfig.getChildCount() > 0 )
+                {
+                    result.addChild( pomConfig );
+                    
+                    addedPomConfig = true;
+                }
             }
-            else if ( mojoConfig != null )
+            
+            if ( !addedPomConfig && mojoConfig != null )
             {
                 result.addChild( copyConfiguration( mojoConfig ) );
             }
