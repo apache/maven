@@ -46,6 +46,7 @@ public abstract class AbstractAntMojo
             antLogger.setOutputPrintStream( System.out );
             antLogger.setErrorPrintStream( System.err );
             antTasks.getProject().addBuildListener( antLogger );
+            antTasks.getProject().setBaseDir( mavenProject.getBasedir() );
 
             getLog().info( "Executing tasks" );
 
