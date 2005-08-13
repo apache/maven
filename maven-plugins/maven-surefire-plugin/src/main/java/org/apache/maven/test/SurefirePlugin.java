@@ -99,12 +99,12 @@ public class SurefirePlugin
     /**
      * @parameter
      */
-    private List includes = new ArrayList( Collections.singletonList( "**/*Test.java" ) );
+    private List includes;
 
     /**
      * @parameter
      */
-    private List excludes = new ArrayList( Collections.singletonList( "**/Abstract*Test.java" ) );
+    private List excludes;
 
     /**
      * The project whose project files to create.
@@ -179,15 +179,13 @@ public class SurefirePlugin
         else
         {
             // defaults here, qdox doesn't like the end javadoc value
-            if ( includes == null )
+            if ( includes == null || includes.size() == 0 )
             {
-                includes = new ArrayList();
-                includes.add( "**/*Test.java" );
+                includes = new ArrayList( Collections.singletonList( "**/*Test.java" ) );
             }
-            if ( excludes == null )
+            if ( excludes == null || excludes.size() == 0 )
             {
-                excludes = new ArrayList();
-                excludes.add( "**/Abstract*Test.java" );
+                excludes = new ArrayList( Collections.singletonList( "**/Abstract*Test.java" ) );
             }
 
             surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
