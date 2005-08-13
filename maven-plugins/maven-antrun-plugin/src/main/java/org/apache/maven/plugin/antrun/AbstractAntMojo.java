@@ -24,42 +24,38 @@ import org.apache.tools.ant.PropertyHelper;
 import org.apache.tools.ant.Target;
 
 /**
- * Maven AntRun Mojo.
- *
- * This plugin provides the capability of calling ant tasks
- * from a POM. It is encouraged to move the actual tasks to
- * a separate build.xml file and call that file with an
- * &lt;ant/&gt; task.
- *
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
- *
- * @configurator override
- *
- * @goal run
- * 
- * @description Runs the nested ant tasks
- *
  */
-public class AntRunMojo
-    extends AbstractAntMojo
+public abstract class AbstractAntMojo
+    extends AbstractMojo
 {
-    /**
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
-
-    /**
-     * @parameter expression="${tasks}"
-     */
-    private Target tasks;
-
-    /**
-     */
-    public void execute()
+    protected void executeTasks( Target antTasks, MavenProject mavenProject )
         throws MojoExecutionException
     {
-        executeTasks( tasks, project );
+    	try
+        {
+            PropertyHelper propertyHelper = PropertyHelper.getPropertyHelper(
+                antTasks.getProject()
+            );
+
+            propertyHelper.setNext(
+                new AntPropertyHelper( mavenProject, getLog() )
+            );
+
+            DefaultLogger antLogger = new DefaultLogger();
+            antLogger.setOutputPrintStream( System.out );
+            antLogger.setErrorPrintStream( System.err );
+            antTasks.getProject().addBuildListener( antLogger );
+
+            getLog().info( "Executing tasks" );
+
+            antTasks.execute();
+
+            getLog().info( "Executed tasks" );
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Error executing ant tasks", e );
+        }
     }
 }

@@ -18,6 +18,8 @@ package org.apache.maven.plugin.antrun.components;
 
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.RuntimeConfigurable;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.UnknownElement;
@@ -112,9 +114,14 @@ public class AntTargetConverter
             task.setProject( project );
             task.setNamespace( "" );
             task.setQName( childConfiguration.getName() );
-            task.setTaskType( childConfiguration.getName() );
+            task.setTaskType(
+                ProjectHelper.genComponentName(
+                    task.getNamespace(), childConfiguration.getName()
+                    )
+            );
             task.setTaskName( childConfiguration.getName() );
             task.setOwningTarget( target );
+            task.init();
             
             if ( parent != null )
             {
@@ -186,7 +193,6 @@ public class AntTargetConverter
                 wrapper, project, target,
                 childConfiguration, expressionEvaluator
             );
-    
         }
     }
     
