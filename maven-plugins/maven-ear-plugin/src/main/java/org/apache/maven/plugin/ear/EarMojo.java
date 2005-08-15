@@ -43,7 +43,7 @@ public class EarMojo
     /**
      * Single directory for extra files to include in the EAR.
      *
-     * @parameter expression="${basedir}/src/application"
+     * @parameter expression="${basedir}/src/main/application"
      * @required
      */
     private String earSourceDirectory;
@@ -51,7 +51,7 @@ public class EarMojo
     /**
      * The location of the manifest file to be used within the ear file.
      *
-     * @parameter expression="${basedir}/src/application/META-INF/MANIFEST.MF"
+     * @parameter expression="${basedir}/src/main/application/META-INF/MANIFEST.MF"
      * @TODO handle this field
      */
     private String manifestLocation;
@@ -59,7 +59,7 @@ public class EarMojo
     /**
      * The location of the application.xml file to be used within the ear file.
      *
-     * @parameter expression="${basedir}/src/application/META-INF/application.xml"
+     * @parameter expression="${basedir}/src/main/application/META-INF/application.xml"
      */
     private String applicationXmlLocation;
 
