@@ -3,7 +3,7 @@
  ---
  Stéphane Nicoll
  ---
- 31-Jul-2005
+ 15-Aug-2005
  ---
 
 Introduction
@@ -21,6 +21,12 @@ Introduction
    * bundleFileName: the name of the artifact in the EAR structure
 
    * uri: the complete path in the EAR structure for the artifact
+
+  Also, a dependency might be excluded from the generated EAR file by specifying the
+  excluded flag.
+
+  Finally, third party libraries are handled by setting the library flag. If this flag
+  is set, the module is not included in the generated application.xml
 
 Customizing the context root
 
@@ -117,6 +123,59 @@ Customizing a module uri
                <groupId>artifactGroupId</groupId>
                <artifactId>artifactId</artifactId>
                <uri>APP-INF/lib/anotherName-1.2.3.jar</uri>
+             </javaModule>
+          </modules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------
+
+Excluding a module
+
+  If for some reason a dependency which is declared in the pom of the project needs to be
+  excluded, the excluded flag could be used as follows:
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+           [...]
+           <modules>
+             <javaModule>
+               <groupId>artifactGroupId</groupId>
+               <artifactId>artifactId</artifactId>
+               <excluded>true</excluded>
+             </javaModule>
+          </modules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
++---------
+
+Declaring a module as a third party library
+
+  If third party libraries need to be included in an EAR file, the 'library' flag could be
+  used. Note that no entry in the application.xml will be created for such module. This
+  flag works only for java modules.
+
++--------
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+           [...]
+           <modules>
+             <javaModule>
+               <groupId>artifactGroupId</groupId>
+               <artifactId>artifactId</artifactId>
+               <library>true</library>
              </javaModule>
           </modules>
         </configuration>

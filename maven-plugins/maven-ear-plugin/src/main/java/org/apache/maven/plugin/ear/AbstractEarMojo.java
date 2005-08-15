@@ -23,7 +23,6 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +65,8 @@ public abstract class AbstractEarMojo
 
     private List earModules;
 
+    private List allModules;
+
     private File buildDir;
 
     public void execute()
@@ -73,9 +74,10 @@ public abstract class AbstractEarMojo
     {
         getLog().debug( "Resolving ear modules ..." );
 
+        allModules = new ArrayList();
+
         if ( modules != null && modules.length > 0 )
         {
-
             // Let's validate user-defined modules
             EarModule module = null;
             try
@@ -85,17 +87,13 @@ public abstract class AbstractEarMojo
                     module = (EarModule) modules[i];
                     getLog().debug( "Resolving ear module[" + module + "]" );
                     module.resolveArtifact( project.getArtifacts() );
+                    allModules.add( module );
                 }
             }
             catch ( EarPluginException e )
             {
                 throw new MojoExecutionException( "Failed to initialize ear modules", e );
             }
-            earModules = new ArrayList( Arrays.asList( modules ) );
-        }
-        else
-        {
-            earModules = new ArrayList();
         }
 
         // Let's add other modules
@@ -106,12 +104,26 @@ public abstract class AbstractEarMojo
 
             // Artifact is not yet registered and it has neither test, nor a
             // provided scope
-            if ( !isArtifactRegistered( artifact, earModules ) &&
-                 !Artifact.SCOPE_TEST.equals( artifact.getScope() ) &&
-                 !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+            if ( !isArtifactRegistered( artifact, allModules ) && !Artifact.SCOPE_TEST.equals( artifact.getScope() ) &&
+                !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
             {
                 EarModule module = EarModuleFactory.newEarModule( artifact );
-                earModules.add( module );
+                allModules.add( module );
+            }
+        }
+
+        // Now we have everything let's built modules which have not been excluded
+        earModules = new ArrayList();
+        for ( Iterator iter = allModules.iterator(); iter.hasNext(); )
+        {
+            EarModule earModule = (EarModule) iter.next();
+            if ( earModule.isExcluded() )
+            {
+                getLog().debug( "Skipping ear module[" + earModule + "]" );
+            }
+            else
+            {
+                earModules.add( earModule );
             }
         }
 

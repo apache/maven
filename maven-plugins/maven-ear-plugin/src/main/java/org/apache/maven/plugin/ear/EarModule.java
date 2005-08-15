@@ -49,6 +49,13 @@ public interface EarModule
     public String getUri();
 
     /**
+     * Specify whether this module should be excluded or not.
+     *
+     * @return true if this module should be skipped, false otherwise
+     */
+    public boolean isExcluded();
+
+    /**
      * Appends the <tt>XML</tt> representation of this module.
      *
      * @param writer  the writer to use

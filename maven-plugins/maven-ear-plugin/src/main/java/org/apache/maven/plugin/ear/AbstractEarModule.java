@@ -47,6 +47,8 @@ public abstract class AbstractEarModule
 
     private String bundleFileName;
 
+    private Boolean excluded = Boolean.FALSE;
+
     /**
      * Empty constructor to be used when the module
      * is built based on the configuration.
@@ -177,6 +179,16 @@ public abstract class AbstractEarModule
             bundleFileName = artifact.getFile().getName();
         }
         return bundleFileName;
+    }
+
+    /**
+     * Specify whether this module should be excluded or not.
+     *
+     * @return true if this module should be skipped, false otherwise
+     */
+    public boolean isExcluded()
+    {
+        return excluded.booleanValue();
     }
 
     public String toString()
