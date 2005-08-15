@@ -416,7 +416,7 @@ public class ScmReport
                 paragraph( getBundle( locale ).getString( "report.scm.accessbehindfirewall.svn.intro" ) );
 
                 StringBuffer sb = new StringBuffer();
-                sb.append( "$>svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
+                sb.append( "$ svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
                 verbatimText( sb.toString() );
             }
             else if ( ( devRepository != null ) && ( isScmSystem( devRepository, "cvs" ) ) )
@@ -472,7 +472,7 @@ public class ScmReport
             paragraph( getBundle( locale ).getString( "report.scm.devaccess.clearcase.intro" ) );
 
             StringBuffer command = new StringBuffer();
-            command.append( "$>cleartool checkout " ).append( clearCaseRepo.getModule() );
+            command.append( "$ cleartool checkout " ).append( clearCaseRepo.getModule() );
 
             verbatimText( command.toString() );
         }
@@ -494,9 +494,9 @@ public class ScmReport
             paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.cvs.intro" ) );
 
             StringBuffer command = new StringBuffer();
-            command.append( "$>cvs -d " ).append( cvsRepo.getCvsRoot() ).append( " login" );
+            command.append( "$ cvs -d " ).append( cvsRepo.getCvsRoot() ).append( " login" );
             command.append( "\n" );
-            command.append( "$>cvs -z3 -d " ).append( cvsRepo.getCvsRoot() );
+            command.append( "$ cvs -z3 -d " ).append( cvsRepo.getCvsRoot() );
             command.append( " co " ).append( cvsRepo.getModule() );
 
             verbatimText( command.toString() );
@@ -520,9 +520,9 @@ public class ScmReport
             String cvsRoot = StringUtils.replace( cvsRepo.getCvsRoot(), cvsRepo.getUser(), "username" );
 
             StringBuffer command = new StringBuffer();
-            command.append( "$>cvs -d " ).append( cvsRoot ).append( " login" );
+            command.append( "$ cvs -d " ).append( cvsRoot ).append( " login" );
             command.append( "\n" );
-            command.append( "$>cvs -z3 -d " ).append( cvsRoot ).append( " co " ).append( cvsRepo.getModule() );
+            command.append( "$ cvs -z3 -d " ).append( cvsRoot ).append( " co " ).append( cvsRepo.getModule() );
 
             verbatimText( command.toString() );
         }
@@ -544,7 +544,7 @@ public class ScmReport
             paragraph( getBundle( locale ).getString( "report.scm.devaccess.perforce.intro" ) );
 
             StringBuffer command = new StringBuffer();
-            command.append( "$>p4" );
+            command.append( "$ p4" );
             if ( !StringUtils.isEmpty( perforceRepo.getHost() ) )
             {
                 command.append( " -H " ).append( perforceRepo.getHost() );
@@ -558,7 +558,7 @@ public class ScmReport
             command.append( " " );
             command.append( perforceRepo.getPath() );
             command.append( "\n" );
-            command.append( "$>p4 submit -c \"A comment\"" );
+            command.append( "$ p4 submit -c \"A comment\"" );
 
             verbatimText( command.toString() );
         }
@@ -583,11 +583,11 @@ public class ScmReport
             String fullUrl = StringUtils.replace( starteamRepo.getFullUrl(), starteamRepo.getUser(), "username" );
             fullUrl = StringUtils.replace( fullUrl, starteamRepo.getPassword(), "password" );
 
-            command.append( "$>stcmd co -x -nologo -stop -p " );
+            command.append( "$ stcmd co -x -nologo -stop -p " );
             command.append( fullUrl );
             command.append( " -is" );
             command.append( "\n" );
-            command.append( "$>stcmd ci -x -nologo -stop -p " );
+            command.append( "$ stcmd ci -x -nologo -stop -p " );
             command.append( fullUrl );
             command.append( " -f NCI -is" );
 
@@ -610,7 +610,7 @@ public class ScmReport
             paragraph( getBundle( locale ).getString( "report.scm.anonymousaccess.svn.intro" ) );
 
             StringBuffer sb = new StringBuffer();
-            sb.append( "$>svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
+            sb.append( "$ svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
 
             verbatimText( sb.toString() );
         }
@@ -631,14 +631,14 @@ public class ScmReport
 
             StringBuffer sb = new StringBuffer();
 
-            sb.append( "$>svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
+            sb.append( "$ svn checkout " ).append( svnRepo.getUrl() ).append( " " ).append( model.getArtifactId() );
 
             verbatimText( sb.toString() );
 
             paragraph( getBundle( locale ).getString( "report.scm.devaccess.svn.intro2" ) );
 
             sb = new StringBuffer();
-            sb.append( "$>svn commit --username your-username -m \"A message\"" );
+            sb.append( "$ svn commit --username your-username -m \"A message\"" );
 
             verbatimText( sb.toString() );
         }

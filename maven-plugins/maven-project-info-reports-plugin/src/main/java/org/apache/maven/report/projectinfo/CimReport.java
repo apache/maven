@@ -23,11 +23,11 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.MavenReportException;
+
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +44,10 @@ import java.util.ResourceBundle;
 public class CimReport
     extends AbstractMavenReport
 {
+    // ----------------------------------------------------------------------
+    // Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * @parameter expression="${project.build.directory}/site"
      * @required
@@ -64,57 +68,40 @@ public class CimReport
      */
     private MavenProject project;
 
-    /**
-     * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
-     */
+    // ----------------------------------------------------------------------
+    // MavenReport Implementation
+    // ----------------------------------------------------------------------
+
     public String getName( Locale locale )
     {
         return getBundle( locale ).getString( "report.cim.name" );
     }
 
-    /**
-     * @see org.apache.maven.reporting.MavenReport#getCategoryName()
-     */
     public String getCategoryName()
     {
         return CATEGORY_PROJECT_INFORMATION;
     }
 
-    /**
-     * @see org.apache.maven.reporting.MavenReport#getDescription(java.util.Locale)
-     */
     public String getDescription( Locale locale )
     {
         return getBundle( locale ).getString( "report.cim.description" );
     }
 
-    /**
-     * @see org.apache.maven.reporting.AbstractMavenReport#getOutputDirectory()
-     */
     protected String getOutputDirectory()
     {
         return outputDirectory;
     }
 
-    /**
-     * @see org.apache.maven.reporting.AbstractMavenReport#getProject()
-     */
     protected MavenProject getProject()
     {
         return project;
     }
 
-    /**
-     * @see org.apache.maven.reporting.AbstractMavenReport#getSiteRenderer()
-     */
     protected SiteRenderer getSiteRenderer()
     {
         return siteRenderer;
     }
 
-    /**
-     * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
-     */
     public void executeReport( Locale locale )
         throws MavenReportException
     {
@@ -123,13 +110,14 @@ public class CimReport
         r.render();
     }
 
-    /**
-     * @see org.apache.maven.reporting.MavenReport#getOutputName()
-     */
     public String getOutputName()
     {
         return "integration";
     }
+
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     static class CimRenderer
         extends AbstractMavenReportRenderer
@@ -147,17 +135,11 @@ public class CimReport
             this.locale = locale;
         }
 
-        /**
-         * @see org.apache.maven.reporting.MavenReportRenderer#getTitle()
-         */
         public String getTitle()
         {
             return getBundle( locale ).getString( "report.cim.title" );
         }
 
-        /**
-         * @see org.apache.maven.reporting.AbstractMavenReportRenderer#renderBody()
-         */
         public void renderBody()
         {
             CiManagement cim = model.getCiManagement();
