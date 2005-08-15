@@ -114,23 +114,82 @@ target
 *.iml
 ---
 
-* Dependent Projects
+* Related Projects
 
- Maven 2 has a few dependencies on other projects. TODO: Write more details here.
-
- * Modello
-
- * Surefire
+ Maven 2 has a few dependencies on other projects.
 
  * Plexus
 
+ Plexus is a full-fledged container supporting different cinds of component lifecycles. It's native lifecycle
+ is like any other modern IoC container, using field injection of both requirements and configuration. All
+ core Maven 2 functionality are Plexus components.
+
+ You can read more about Plexus {{{http://plexus.codehaus.org}here}}.
+
+ * Modello
+
+ Modello is a simple tool for representing an object model and generate code and resources from the model. Maven is
+ using Modello to generate all Java objects, XML readers and writers, XML Schema and HTML documentation.
+
+ You can read more about Modello {{{http://modello.codehaus.org}here}}.
+
+ * Surefire
+
+ Surefire is a testing framework. It can run regular JUnit tests so you won't have to change anything in your code to
+ use it. It support scriping tests in BeanShell and Jython and has special "batteries" for writing acceptance and
+ functional tests for the web and for testing XML-RPC code.
+
+ You can read more about Surefire {{{http://surefire.codehaus.org}here}}.
+
  * Doxia
 
+ Doxia is Maven's documentation engine. It has a sink and parser API that can be used to plug in support for input
+ and output documents. Currently it has support for these document formats:
+
+*---------------------------+----+-----*
+| Format                    | In | Out |
+*---------------------------+----+-----*
+| APT - Almost Plain Text   | Y  | N   |
+*---------------------------+----+-----*
+| DocBook                   | Y  | Y   |
+*---------------------------+----+-----*
+| FML - FAQ Markup Language | Y  | N/A |
+*---------------------------+----+-----*
+| LaTeX                     | N  | Y   |
+*---------------------------+----+-----*
+| RTF                       | N  | Y   |
+*---------------------------+----+-----*
+| XDoc                      | Y  | Y   |
+*---------------------------+----+-----*
+| XHTML                     | Y  | Y   |
+*---------------------------+----+-----*
+Available formats
+
+ You can read more about Doxia {{{http://doxia.codehaus.org}here}}.
+
  * Mojo
+
+ "Mojo" is really two things when it comes to Maven. It is both Maven's plug-in API but also a separate Codehaus
+ project hosting these plugins.
+
+ {{{http://mojo.codehaus.org}The Mojo Project}} is a plugin forge for all non-core Maven plugins. As we try to keep
+ the Mojos as independent of Maven as possible to increase their reuse we try to keep them a bit away from Maven
+ itself. There is also a lower bar for becoming a part of the project.
+
+* Sub Projects
+
+** Maven SCM
+
+ Maven SCM (Source Control Management) is an reusable API which is independent of Maven itself and it is used by the
+ SCM related Maven Plugins. The core part of Maven itself doesn't depend on Maven SCM.
+
+** Maven Wagon
+
+ Maven Wagon is also a standalone API that deals with transporting files and directories. Maven Core uses the Wagon
+ API to download and upload artifacts and artifact metadata and the site plug-in uses it to publish the site.
 
 * Subversion Configuration
 
  Before committing files in subversion repository, you need to read the
  {{{http://www.apache.org/dev/version-control.html#https-svn}Committer Subversion Access}}
- document and you must set your svn client
- with these properties file : {{svn-eol-style.txt}}
+ document and you must set your svn client with these properties file : {{svn-eol-style.txt}}
