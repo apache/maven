@@ -26,6 +26,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.ManifestException;
 import org.codehaus.plexus.archiver.war.WarArchiver;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -62,12 +63,11 @@ public class WarMojo
     private MavenProject project;
 
     /**
-     * @todo Convert to File
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      * @readonly
      */
-    private String classesDirectory;
+    private File classesDirectory;
 
     /**
      * @parameter expression="${project.build.directory}"
@@ -76,18 +76,16 @@ public class WarMojo
     private String outputDirectory;
 
     /**
-     * @todo Convert to File
      * @parameter expression="${project.build.directory}/${project.build.finalName}"
      * @required
      */
-    private String webappDirectory;
+    private File webappDirectory;
 
     /**
-     * @todo Convert to File
      * @parameter expression="${basedir}/src/main/webapp"
      * @required
      */
-    private String warSourceDirectory;
+    private File warSourceDirectory;
 
     /**
      * @parameter alias="includes"
@@ -118,23 +116,27 @@ public class WarMojo
 
     private static final String[] EMPTY_STRING_ARRAY = {};
 
-    public void copyResources( File sourceDirectory, File webappDirectory, String includes, String excludes,
-                               String webXml )
+    public void copyResources( File sourceDirectory, File webappDirectory, String webXml )
         throws IOException
     {
         if ( !sourceDirectory.equals( webappDirectory ) )
         {
             getLog().info( "Copy webapp resources to " + webappDirectory.getAbsolutePath() );
 
-            if ( new File( warSourceDirectory ).exists() )
+            if ( warSourceDirectory.exists() )
             {
-                //TODO : Use includes and excludes
-                FileUtils.copyDirectoryStructure( sourceDirectory, webappDirectory );
+                String[] fileNames = getWarFiles( sourceDirectory );
+                for (int i = 0; i < fileNames.length; i++)
+                {
+                    FileUtils.copyFile(new File( sourceDirectory, fileNames[i] ), new File( webappDirectory, fileNames[i] ) );
+                }
             }
 
             if ( webXml != null && !"".equals( webXml ) )
             {
-                FileUtils.copyFileToDirectory( new File( webXml ), new File( webappDirectory, WEB_INF ) );
+                //rename to web.xml
+                File webinfDir = new File( webappDirectory, WEB_INF );
+                FileUtils.copyFile( new File( webXml ), new File( webinfDir, "/web.xml" ) );
             }
         }
     }
@@ -150,7 +152,6 @@ public class WarMojo
 
         File webappClassesDirectory = new File( webappDirectory, WEB_INF + "/classes" );
 
-        File classesDirectory = new File( this.classesDirectory );
         if ( classesDirectory.exists() )
         {
             FileUtils.copyDirectoryStructure( classesDirectory, webappClassesDirectory );
@@ -189,14 +190,13 @@ public class WarMojo
     public void generateExplodedWebapp()
         throws IOException
     {
-        File webappDirectory = new File( this.webappDirectory );
         webappDirectory.mkdirs();
 
         File webinfDir = new File( webappDirectory, WEB_INF );
 
         webinfDir.mkdirs();
 
-        copyResources( new File( warSourceDirectory ), webappDirectory, warSourceIncludes, warSourceExcludes, webXml );
+        copyResources( warSourceDirectory, webappDirectory, webXml );
 
         buildWebapp( project );
     }
@@ -249,8 +249,7 @@ public class WarMojo
 
                 archiver.setOutputFile( warFile );
 
-                String[] excludes = (String[]) getDefaultExcludes().toArray( EMPTY_STRING_ARRAY );
-                warArchiver.addDirectory( new File( webappDirectory ), null, excludes );
+                warArchiver.addDirectory( webappDirectory, getIncludes(), getExcludes() );
 
                 warArchiver.setWebxml( new File( webappDirectory, "WEB-INF/web.xml" ) );
 
@@ -293,9 +292,59 @@ public class WarMojo
         // Mac
         defaultExcludes.add( "**/.DS_Store" );
 
-        // Special one for WARs
-        defaultExcludes.add( "**/" + WEB_INF + "/web.xml" );
+        // Windows Thumbs
+        defaultExcludes.add( "**/Thumbs.db" );
 
         return defaultExcludes;
+    }
+
+    /**
+     * Returns a list of filenames that should be copied over to the destination
+     * directory
+     *
+     * @param sourceDir the directory to be scanned
+     * @return the array of filenames, relative to the sourceDir
+     */
+    private String[] getWarFiles( File sourceDir )
+    {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir( sourceDir );
+        scanner.setExcludes( getExcludes() );
+        scanner.addDefaultExcludes();
+
+        scanner.setIncludes( getIncludes() );
+
+        scanner.scan();
+
+        return scanner.getIncludedFiles();
+    }
+
+    /**
+     * Returns an a string array of the excludes to be used when assembling/copy the war
+     */
+    private String[] getExcludes()
+    {
+        List excludeList = getDefaultExcludes();
+        if ( warSourceExcludes != null && !"".equals( warSourceExcludes ) )
+        {
+            excludeList.add( warSourceExcludes );
+        }
+
+        // if webXML is specified, omit the one in the source directory
+        if ( webXml != null && !"".equals( webXml ) )
+        {
+            excludeList.add( "**/" + WEB_INF + "/web.xml" );
+        }
+
+        return (String[]) excludeList.toArray( EMPTY_STRING_ARRAY );
+    }
+
+    /**
+     * Returns an a string array of the includes to be used when assembling/copy the
+     * war
+     */
+    private String[] getIncludes()
+    {
+        return new String[] { warSourceIncludes };
     }
 }
