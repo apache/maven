@@ -81,39 +81,31 @@ public class JarSourceMojo
             return;
         }
         
-        // TODO: this should be via a release profile instead
-        if ( project.getVersion().indexOf( "SNAPSHOT" ) < 0 )
+        // TODO: use a component lookup?
+        JarArchiver archiver = new JarArchiver();
+
+        SourceBundler sourceBundler = new SourceBundler();
+
+        File outputFile = new File( outputDirectory, finalName + "-sources.jar" );
+
+        File[] sourceDirectories = new File[compileSourceRoots.size()];
+        int count = 0;
+        for ( Iterator i = compileSourceRoots.iterator(); i.hasNext(); count++ )
         {
-            // TODO: use a component lookup?
-            JarArchiver archiver = new JarArchiver();
-
-            SourceBundler sourceBundler = new SourceBundler();
-
-            File outputFile = new File( outputDirectory, finalName + "-sources.jar" );
-
-            File[] sourceDirectories = new File[compileSourceRoots.size()];
-            int count = 0;
-            for ( Iterator i = compileSourceRoots.iterator(); i.hasNext(); count++ )
-            {
-                sourceDirectories[count] = new File( (String) i.next() );
-            }
-
-            try
-            {
-                sourceBundler.makeSourceBundle( outputFile, sourceDirectories, archiver );
-            }
-            catch ( Exception e )
-            {
-                throw new MojoExecutionException( "Error building source JAR", e );
-            }
-
-            // TODO: these introduced dependencies on the project are going to become problematic - can we export it
-            //  through metadata instead?
-            projectHelper.attachArtifact( project, "java-source", "sources", outputFile );
+            sourceDirectories[count] = new File( (String) i.next() );
         }
-        else
+
+        try
         {
-            getLog().info( "Not producing source bundle for a SNAPSHOT build" );
+            sourceBundler.makeSourceBundle( outputFile, sourceDirectories, archiver );
         }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Error building source JAR", e );
+        }
+
+        // TODO: these introduced dependencies on the project are going to become problematic - can we export it
+        //  through metadata instead?
+        projectHelper.attachArtifact( project, "java-source", "sources", outputFile );
     }
 }
