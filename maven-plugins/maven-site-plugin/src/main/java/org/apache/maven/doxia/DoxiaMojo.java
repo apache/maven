@@ -41,11 +41,11 @@ import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -306,8 +306,9 @@ public class DoxiaMojo
                                 outputFile.getParentFile().mkdirs();
                             }
 
-                            siteRenderer.generateDocument( new FileWriter( outputFile ), template, attributes, sink,
-                                                           locale );
+                            siteRenderer.generateDocument( new OutputStreamWriter( new FileOutputStream( outputFile ),
+                                                                                   outputEncoding ), template,
+                                                           attributes, sink, locale );
                         }
                     }
                 }
@@ -663,6 +664,8 @@ subprojects...
 
         Map props = new HashMap();
 
+        props.put( "outputEncoding", outputEncoding );
+
         if ( reports != null )
         {
             props.put( "reports", getReportsMenu( locale ) );
@@ -753,7 +756,9 @@ subprojects...
 
         sink.close();
 
-        siteRenderer.generateDocument( new FileWriter( new File( getOuputDirectory( locale ), outputFileName ) ),
+        File outputFile = new File( getOuputDirectory( locale ), outputFileName );
+        
+        siteRenderer.generateDocument( new OutputStreamWriter( new FileOutputStream( outputFile ), outputEncoding ),
                                        template, attributes, sink, locale );
     }
 
@@ -831,8 +836,10 @@ subprojects...
 
         sink.close();
 
-        siteRenderer.generateDocument( new FileWriter( new File( getOuputDirectory( locale ), outputFileName ) ),
-                                       template, attributes, sink, locale );
+        File outputFile = new File( getOuputDirectory( locale ), outputFileName );
+
+        siteRenderer.generateDocument( new OutputStreamWriter( new FileOutputStream( outputFile ) ), template,
+                                       attributes, sink, locale );
     }
 
     private void generateProjectReportsPage( InputStream siteDescriptor, Locale locale )
@@ -905,8 +912,10 @@ subprojects...
 
         sink.body_();
 
-        siteRenderer.generateDocument( new FileWriter( new File( getOuputDirectory( locale ), outputFileName ) ),
-                                       template, attributes, sink, locale );
+        File outputFile = new File( getOuputDirectory( locale ), outputFileName );
+
+        siteRenderer.generateDocument( new OutputStreamWriter( new FileOutputStream( outputFile ) ), template,
+                                       attributes, sink, locale );
     }
 
     private void copyResources( File outputDir )
