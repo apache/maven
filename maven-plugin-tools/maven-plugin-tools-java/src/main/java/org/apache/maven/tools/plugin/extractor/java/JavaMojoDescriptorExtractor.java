@@ -85,6 +85,8 @@ public class JavaMojoDescriptorExtractor
     public static final String GOAL_INHERIT_BY_DEFAULT = "inheritByDefault";
 
     public static final String GOAL_MULTI_EXECUTION_STRATEGY = "attainAlways";
+    
+    public static final String GOAL_REQUIRES_DIRECT_INVOCATION = "requiresDirectInvocation";
 
     protected void validateParameter( Parameter parameter, int i )
         throws InvalidParameterException
@@ -253,6 +255,17 @@ public class JavaMojoDescriptorExtractor
         if ( aggregator != null )
         {
             mojoDescriptor.setAggregator( true );
+        }
+
+        // ----------------------------------------------------------------------
+        // requiresDirectInvocation flag
+        // ----------------------------------------------------------------------
+
+        DocletTag requiresDirectInvocation = findInClassHierarchy( javaClass, GOAL_REQUIRES_DIRECT_INVOCATION );
+
+        if ( requiresDirectInvocation != null )
+        {
+            mojoDescriptor.setDirectInvocationOnly( true );
         }
 
         // ----------------------------------------------------------------------

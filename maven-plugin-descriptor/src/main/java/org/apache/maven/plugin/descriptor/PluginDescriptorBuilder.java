@@ -160,6 +160,13 @@ public class PluginDescriptorBuilder
             mojo.setDependencyResolutionRequired( dependencyResolution );
         }
 
+        String directInvocationOnly = c.getChild( "requiresDirectInvocation" ).getValue();
+
+        if ( directInvocationOnly != null )
+        {
+            mojo.setDirectInvocationOnly( Boolean.valueOf( directInvocationOnly ).booleanValue() );
+        }
+
         String requiresProject = c.getChild( "requiresProject" ).getValue();
 
         if ( requiresProject != null )
@@ -187,7 +194,7 @@ public class PluginDescriptorBuilder
         {
             mojo.setInheritedByDefault( Boolean.valueOf( inheritedByDefault ).booleanValue() );
         }
-
+        
         // ----------------------------------------------------------------------
         // Parameters
         // ----------------------------------------------------------------------

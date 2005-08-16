@@ -126,6 +126,12 @@ public class PluginDescriptorGenerator
         //
         // ----------------------------------------------------------------------
 
+        element( w, "requiresDirectInvocation", "" + mojoDescriptor.isDirectInvocationOnly() );
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
         element( w, "requiresProject", "" + mojoDescriptor.isProjectRequired() );
 
         // ----------------------------------------------------------------------

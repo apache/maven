@@ -86,8 +86,6 @@ public class DefaultLifecycleExecutor
 
     private List phases;
 
-    private Map defaultPhases;
-
     private ArtifactHandlerManager artifactHandlerManager;
 
     // ----------------------------------------------------------------------
@@ -571,6 +569,12 @@ public class DefaultLifecycleExecutor
                     // Not from the CLI, don't use prefix
                     // TODO: [MNG-608] this needs to be false
                     MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, selectedPhase, false );
+                    
+                    if ( mojoDescriptor.isDirectInvocationOnly() )
+                    {
+                        throw new LifecycleExecutionException( "Mojo: \'" + goal + "\' requires direct invocation. It cannot be used as part of lifecycle: \'" + project.getPackaging() + "\'." );
+                    }
+                    
                     addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ),
                                             session.getSettings() );
                 }

@@ -60,12 +60,12 @@
       <build>
         <plugins>
           <plugin>
-            <inherit>true</inherit>
+            <inherited>true</inherited>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
           </plugin>
           <plugin>
-            <inherit>true</inherit>
+            <inherited>true</inherited>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-deploy-plugin</artifactId>
             

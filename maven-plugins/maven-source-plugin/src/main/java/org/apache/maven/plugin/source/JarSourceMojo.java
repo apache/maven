@@ -16,11 +16,10 @@ package org.apache.maven.plugin.source;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
@@ -45,9 +44,9 @@ public class JarSourceMojo
     private MavenProject project;
 
     /**
-     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}
+     * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}
      */
-    private ArtifactFactory artifactFactory;
+    private MavenProjectHelper projectHelper;
 
     /**
      * @parameter expression="${project.build.finalName}"
@@ -110,12 +109,7 @@ public class JarSourceMojo
 
             // TODO: these introduced dependencies on the project are going to become problematic - can we export it
             //  through metadata instead?
-            Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(),
-                                                                              project.getArtifactId(),
-                                                                              project.getVersion(), null, "java-source",
-                                                                              "sources" );
-            artifact.setFile( outputFile );
-            project.addAttachedArtifact( artifact );
+            projectHelper.attachArtifact( project, "java-source", "sources", outputFile );
         }
         else
         {

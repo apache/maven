@@ -79,6 +79,8 @@ public class MojoDescriptor
     private PluginDescriptor pluginDescriptor;
 
     private boolean inheritedByDefault = true;
+    
+    private boolean directInvocationOnly = false;
 
     public MojoDescriptor()
     {
@@ -400,5 +402,15 @@ public class MojoDescriptor
     public boolean isAggregator()
     {
         return aggregator;
+    }
+
+    public boolean isDirectInvocationOnly()
+    {
+        return directInvocationOnly;
+    }
+
+    public void setDirectInvocationOnly( boolean directInvocationOnly )
+    {
+        this.directInvocationOnly = directInvocationOnly;
     }
 }

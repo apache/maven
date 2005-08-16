@@ -1337,5 +1337,9 @@ public class MavenProject
         
         this.profileProperties = newProfilesProperties;
     }
+
+    public void attachArtifact( String type, String classifier, File file )
+    {
+    }
     
 }

@@ -138,6 +138,7 @@
         <!-- START SNIPPET: lifecyle -->
         <phases>
           <phase implementation="java.lang.String">validate</phase>
+          <phase implementation="java.lang.String">initialize</phase>
           <phase implementation="java.lang.String">generate-sources</phase>
           <phase implementation="java.lang.String">process-sources</phase>
           <phase implementation="java.lang.String">generate-resources</phase>
@@ -158,6 +159,7 @@
         </phases>
         <!-- END SNIPPET: lifecycle -->
         <!-- START SNIPPET: default-lifecycle -->
+        <!-- NOT USED, ACCORDING TO CODE.
         <defaultPhases>
           <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
           <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
@@ -171,6 +173,7 @@
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
           <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
         </defaultPhases>
+        -->
         <!-- END SNIPPET: default-lifecycle -->
       </configuration>
     </component>
