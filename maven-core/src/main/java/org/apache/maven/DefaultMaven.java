@@ -31,10 +31,8 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.profiles.AlwaysOnActivation;
-import org.apache.maven.profiles.MavenProfilesBuilder;
-import org.apache.maven.profiles.ProfilesConversionUtils;
-import org.apache.maven.profiles.ProfilesRoot;
+import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -55,7 +53,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,14 +79,12 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
 
     protected MavenProjectBuilder projectBuilder;
-
+    
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
 
     protected Map errorDiagnosers;
-
-    protected MavenProfilesBuilder profilesBuilder;
 
     protected RuntimeInformation runtimeInformation;
 
@@ -132,22 +127,23 @@ public class DefaultMaven
 
         ReactorManager rm;
         
+        ProfileManager globalProfileManager = request.getGlobalProfileManager();
+        
         try
         {
+            loadSettingsProfiles( globalProfileManager, request.getSettings() );
+
             List files = getProjectFiles( request );
 
             List projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
-                                        request.getSettings() );
+                                        request.getSettings(), globalProfileManager );
             
             // the reasoning here is that the list is still unsorted according to dependency, so the first project
             // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
 
             if ( projects.isEmpty() )
             {
-                List externalProfiles = getActiveExternalProfiles( null, request.getSettings() );
-
-                MavenProject superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository(),
-                                                                              externalProfiles );
+                MavenProject superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() );
                 projects.add( superProject );
             }
             
@@ -173,6 +169,10 @@ public class DefaultMaven
             return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
         catch ( CycleDetectedException e )
+        {
+            return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
+        }
+        catch ( ProfileActivationException e )
         {
             return dispatchErrorResponse( dispatcher, event, request.getBaseDirectory(), e );
         }
@@ -324,8 +324,9 @@ public class DefaultMaven
         return response;
     }
 
-    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings )
-        throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException
+    private List collectProjects( List files, ArtifactRepository localRepository, boolean recursive, Settings settings,
+                                 ProfileManager globalProfileManager )
+        throws ProjectBuildingException, ReactorException, IOException, ArtifactResolutionException, ProfileActivationException
     {
         List projects = new ArrayList( files.size() );
 
@@ -338,7 +339,7 @@ public class DefaultMaven
                 getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
             }
 
-            MavenProject project = getProject( file, localRepository, settings );
+            MavenProject project = getProject( file, localRepository, settings, globalProfileManager );
 
             if ( project.getPrerequesites() != null && project.getPrerequesites().getMaven() != null )
             {
@@ -365,7 +366,7 @@ public class DefaultMaven
                     moduleFiles.add( new File( basedir, name + "/pom.xml" ) );
                 }
 
-                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive, settings );
+                List collectedProjects = collectProjects( moduleFiles, localRepository, recursive, settings, globalProfileManager );
                 projects.addAll( collectedProjects );
                 project.setCollectedProjects( collectedProjects );
             }
@@ -375,8 +376,9 @@ public class DefaultMaven
         return projects;
     }
 
-    public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings )
-        throws ProjectBuildingException, ArtifactResolutionException
+    public MavenProject getProject( File pom, ArtifactRepository localRepository, Settings settings,
+                                   ProfileManager globalProfileManager )
+        throws ProjectBuildingException, ArtifactResolutionException, ProfileActivationException
     {
         if ( pom.exists() )
         {
@@ -387,22 +389,18 @@ public class DefaultMaven
             }
         }
 
-        List externalProfiles = getActiveExternalProfiles( pom, settings );
-
-        return projectBuilder.build( pom, localRepository, externalProfiles );
+        return projectBuilder.build( pom, localRepository, globalProfileManager );
     }
 
-    private List getActiveExternalProfiles( File pom, Settings settings )
-        throws ProjectBuildingException
+    private void loadSettingsProfiles( ProfileManager profileManager, Settings settings )
     {
-        // TODO: apply profiles.xml and settings.xml Profiles here.
-        List externalProfiles = new ArrayList();
-
         List settingsProfiles = settings.getProfiles();
 
         if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
         {
             List settingsActiveProfileIds = settings.getActiveProfiles();
+            
+            profileManager.explicitlyActivate( settingsActiveProfileIds );
 
             for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
             {
@@ -410,44 +408,12 @@ public class DefaultMaven
 
                 Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
 
-                if ( settingsActiveProfileIds.contains( rawProfile.getId() ) )
-                {
-                    profile.setActivation( new AlwaysOnActivation() );
-                }
-
-                externalProfiles.add( profile );
+                profileManager.addProfile( profile );
             }
         }
-
-        if ( pom != null )
-        {
-            try
-            {
-                ProfilesRoot root = profilesBuilder.buildProfiles( pom.getParentFile() );
-
-                if ( root != null )
-                {
-                    for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
-                    {
-                        org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
-
-                        externalProfiles.add( ProfilesConversionUtils.convertFromProfileXmlProfile( rawProfile ) );
-                    }
-                }
-            }
-            catch ( IOException e )
-            {
-                throw new ProjectBuildingException( "Cannot read profiles.xml resource for pom: " + pom, e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new ProjectBuildingException( "Cannot parse profiles.xml resource for pom: " + pom, e );
-            }
-        }
-
-        return externalProfiles;
+        
     }
-
+    
     // ----------------------------------------------------------------------
     // Methods used by all execution request handlers
     // ----------------------------------------------------------------------

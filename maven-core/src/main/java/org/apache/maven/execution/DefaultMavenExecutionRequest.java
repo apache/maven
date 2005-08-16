@@ -19,6 +19,7 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.EventMonitor;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.settings.Settings;
 
 import java.util.List;
@@ -53,8 +54,11 @@ public class DefaultMavenExecutionRequest
 
     private String failureBehavior;
 
+    private final ProfileManager globalProfileManager;
+
     public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
-                                         EventDispatcher eventDispatcher, List goals, String baseDirectory )
+                                         EventDispatcher eventDispatcher, List goals, String baseDirectory,
+                                         ProfileManager globalProfileManager )
     {
         this.localRepository = localRepository;
 
@@ -65,6 +69,8 @@ public class DefaultMavenExecutionRequest
         this.eventDispatcher = eventDispatcher;
 
         this.baseDirectory = baseDirectory;
+        
+        this.globalProfileManager = globalProfileManager;
     }
 
     public Settings getSettings()
@@ -149,5 +155,10 @@ public class DefaultMavenExecutionRequest
     public String getFailureBehavior()
     {
         return failureBehavior;
+    }
+    
+    public ProfileManager getGlobalProfileManager()
+    {
+        return globalProfileManager;
     }
 }

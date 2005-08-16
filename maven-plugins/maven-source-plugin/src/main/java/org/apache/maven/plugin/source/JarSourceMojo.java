@@ -54,6 +54,11 @@ public class JarSourceMojo
      * @required
      */
     private String finalName;
+    
+    /**
+     * @parameter expression="${attach}" default-value="true"
+     */
+    private boolean attach = true;
 
     /**
      * @parameter expression="${project.compileSourceRoots}"
@@ -66,10 +71,17 @@ public class JarSourceMojo
      * @required
      */
     private File outputDirectory;
-
+    
     public void execute()
         throws MojoExecutionException
     {
+        if ( !attach )
+        {
+            getLog().info( "NOT adding java-sources to attached artifacts list." );
+            
+            return;
+        }
+        
         // TODO: this should be via a release profile instead
         if ( project.getVersion().indexOf( "SNAPSHOT" ) < 0 )
         {

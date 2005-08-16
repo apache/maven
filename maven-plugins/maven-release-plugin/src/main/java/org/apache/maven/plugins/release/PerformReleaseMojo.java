@@ -101,7 +101,7 @@ public class PerformReleaseMojo
 
         cl.createArgument().setLine( goals );
 
-        cl.createArgument().setLine( "-DupdateReleaseInfo=true" );
+        cl.createArgument().setLine( "-DperformRelease=true" );
 
         cl.createArgument().setLine( "--no-plugin-updates" );
 

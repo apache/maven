@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * The concern of the project is provide runtime values based on the model. <p/>
@@ -1308,6 +1309,33 @@ public class MavenProject
     private static String getProjectReferenceId( String groupId, String artifactId )
     {
         return groupId + ":" + artifactId;
+    }
+
+    public void assembleProfilePropertiesInheritance()
+    {
+        Stack propertyStack = new Stack();
+        
+        MavenProject current = this;
+        while( current != null )
+        {
+            Properties toAdd = current.profileProperties;
+            
+            if ( toAdd != null && !toAdd.isEmpty() )
+            {
+                propertyStack.push( toAdd );
+            }
+            
+            current = current.getParent();
+        }
+        
+        Properties newProfilesProperties = new Properties();
+        
+        while( !propertyStack.isEmpty() )
+        {
+            newProfilesProperties.putAll( (Properties) propertyStack.pop() );
+        }
+        
+        this.profileProperties = newProfilesProperties;
     }
     
 }

@@ -20,12 +20,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.Collections;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -104,13 +102,13 @@ public abstract class MavenProjectTestCase
     protected MavenProject getProjectWithDependencies( File pom )
         throws Exception
     {
-        return projectBuilder.buildWithDependencies( pom, getLocalRepository(), Collections.EMPTY_LIST );
+        return projectBuilder.buildWithDependencies( pom, getLocalRepository(), null );
     }
 
     protected MavenProject getProject( File pom )
         throws Exception
     {
-        return projectBuilder.build( pom, getLocalRepository(), Collections.EMPTY_LIST );
+        return projectBuilder.build( pom, getLocalRepository(), null );
     }
 
 }

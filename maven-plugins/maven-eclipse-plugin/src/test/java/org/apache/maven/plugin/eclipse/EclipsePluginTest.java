@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,7 +71,7 @@ public class EclipsePluginTest
         ArtifactRepository localRepository = new DefaultArtifactRepository( "local", "file://" + repo.getAbsolutePath(),
                                                                             localRepositoryLayout );
 
-        MavenProject project = builder.buildWithDependencies( new File( basedir, "project.xml" ), localRepository, Collections.EMPTY_LIST );
+        MavenProject project = builder.buildWithDependencies( new File( basedir, "project.xml" ), localRepository, null );
 
         for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
         {

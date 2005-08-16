@@ -38,7 +38,8 @@ import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.Mojo;
-import org.apache.maven.profiles.activation.ProfileActivationUtils;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.reactor.ReactorException;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
@@ -55,6 +56,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -111,12 +113,6 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         initializeSystemProperties( commandLine );
-
-        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
-        {
-            System.setProperty( ProfileActivationUtils.ACTIVE_PROFILE_IDS,
-                                commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES ) );
-        }
 
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
 
@@ -240,17 +236,45 @@ public class MavenCli
 
         Maven maven = null;
         MavenExecutionRequest request = null;
-        LoggerManager manager = null;
+        LoggerManager loggerManager = null;
         try
         {
             // logger must be created first
-            manager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
+            loggerManager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
             if ( debug )
             {
-                manager.setThreshold( Logger.LEVEL_DEBUG );
+                loggerManager.setThreshold( Logger.LEVEL_DEBUG );
+            }
+            
+            ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer() );
+            
+            if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+            {
+                String profilesLine = commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES );
+                
+                StringTokenizer profileTokens = new StringTokenizer( profilesLine, "," );
+                
+                while( profileTokens.hasMoreTokens() )
+                {
+                    String profileAction = profileTokens.nextToken().trim();
+                    
+                    if ( profileAction.startsWith( "-" ) )
+                    {
+                        profileManager.explicitlyDeactivate( profileAction.substring( 1 ) );
+                    }
+                    else if ( profileAction.startsWith( "+" ) )
+                    {
+                        profileManager.explicitlyActivate(profileAction.substring( 1 ) );
+                    }
+                    else
+                    {
+                        // TODO: deprecate this eventually!
+                        profileManager.explicitlyActivate( profileAction );
+                    }
+                }
             }
 
-            request = createRequest( embedder, commandLine, settings, eventDispatcher, manager );
+            request = createRequest( embedder, commandLine, settings, eventDispatcher, loggerManager, profileManager );
             
             setProjectFileOptions( commandLine, request );
 
@@ -263,11 +287,11 @@ public class MavenCli
         }
         finally
         {
-            if ( manager != null )
+            if ( loggerManager != null )
             {
                 try
                 {
-                    embedder.release( manager );
+                    embedder.release( loggerManager );
                 }
                 catch ( ComponentLifecycleException e )
                 {
@@ -324,7 +348,7 @@ public class MavenCli
 
     private static MavenExecutionRequest createRequest( Embedder embedder, CommandLine commandLine,
                                                         Settings settings, EventDispatcher eventDispatcher,
-                                                        LoggerManager manager )
+                                                        LoggerManager loggerManager, ProfileManager profileManager )
         throws ComponentLookupException
     {
         MavenExecutionRequest request = null;
@@ -332,10 +356,10 @@ public class MavenCli
         ArtifactRepository localRepository = createLocalRepository( embedder, settings, commandLine );
 
         request = new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher,
-                                                    commandLine.getArgList(), userDir.getPath() );
+                                                    commandLine.getArgList(), userDir.getPath(), profileManager );
 
         // TODO [BP]: do we set one per mojo? where to do it?
-        Logger logger = manager.getLoggerForComponent( Mojo.ROLE );
+        Logger logger = loggerManager.getLoggerForComponent( Mojo.ROLE );
         if ( logger != null )
         {
             request.addEventMonitor( new DefaultEventMonitor( logger ) );

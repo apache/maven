@@ -19,6 +19,7 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.profiles.ProfileManager;
 
 import java.io.File;
 import java.util.List;
@@ -33,10 +34,10 @@ public interface MavenProjectBuilder
 
     String STANDALONE_SUPERPOM_VERSION = "2.0";
 
-    MavenProject build( File project, ArtifactRepository localRepository, List profiles )
+    MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
-    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository, List externalProfiles )
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException;
 
     /**
@@ -52,6 +53,6 @@ public interface MavenProjectBuilder
                                       ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, List externalProfiles )
+    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException;
 }

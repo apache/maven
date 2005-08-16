@@ -40,7 +40,12 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.profiles.activation.ProfileActivationCalculator;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.MavenProfilesBuilder;
+import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.ProfilesConversionUtils;
+import org.apache.maven.profiles.ProfilesRoot;
+import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.injection.ProfileInjector;
@@ -90,6 +95,8 @@ public class DefaultMavenProjectBuilder
     // TODO: remove
     private PlexusContainer container;
 
+    protected MavenProfilesBuilder profilesBuilder;
+
     protected ArtifactResolver artifactResolver;
 
     protected ArtifactMetadataSource artifactMetadataSource;
@@ -113,8 +120,6 @@ public class DefaultMavenProjectBuilder
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    private ProfileActivationCalculator profileActivationCalculator;
-
     private final Map modelCache = new HashMap();
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
@@ -133,11 +138,10 @@ public class DefaultMavenProjectBuilder
     /**
      * @todo move to metadatasource itself?
      */
-    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
-                                               List externalProfiles )
+    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException, ArtifactResolutionException
     {
-        MavenProject project = buildFromSourceFile( projectDescriptor, localRepository, externalProfiles );
+        MavenProject project = buildFromSourceFile( projectDescriptor, localRepository, profileManager );
 
         // ----------------------------------------------------------------------
         // Typically when the project builder is being used from maven proper
@@ -224,14 +228,13 @@ public class DefaultMavenProjectBuilder
         return map;
     }
 
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, List externalProfiles )
+    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        return buildFromSourceFile( projectDescriptor, localRepository, externalProfiles );
+        return buildFromSourceFile( projectDescriptor, localRepository, profileManager );
     }
 
-    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository,
-                                              List externalProfiles )
+    private MavenProject buildFromSourceFile( File projectDescriptor, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException
     {
         Model model = readModel( projectDescriptor );
@@ -240,8 +243,7 @@ public class DefaultMavenProjectBuilder
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
         MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
-                                      Collections.EMPTY_LIST, externalProfiles,
-                                      projectDescriptor.getAbsoluteFile().getParentFile() );
+                                      Collections.EMPTY_LIST, projectDescriptor.getAbsoluteFile().getParentFile(), profileManager );
 
         if ( project.getDistributionManagement() != null && project.getDistributionManagement().getStatus() != null )
         {
@@ -277,7 +279,7 @@ public class DefaultMavenProjectBuilder
         Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         return build( "Artifact [" + artifact.getId() + "]", model, localRepository, remoteArtifactRepositories,
-                      Collections.EMPTY_LIST, null );
+                      null, null );
     }
 
     private Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
@@ -387,7 +389,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject build( String pomLocation, Model model, ArtifactRepository localRepository,
-                                List parentSearchRepositories, List externalProfiles, File projectDir )
+                                List parentSearchRepositories, File projectDir, ProfileManager profileManager )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -401,7 +403,24 @@ public class DefaultMavenProjectBuilder
                                                                                           artifactRepositoryFactory,
                                                                                           container ) );
 
-        for ( Iterator i = externalProfiles.iterator(); i.hasNext(); )
+        List activeExternalProfiles;
+        try
+        {
+            if ( profileManager != null )
+            {
+                activeExternalProfiles = profileManager.getActiveProfiles();
+            }
+            else
+            {
+                activeExternalProfiles = Collections.EMPTY_LIST;
+            }
+        }
+        catch ( ProfileActivationException e )
+        {
+            throw new ProjectBuildingException( "Failed to calculate active external profiles.", e );
+        }
+        
+        for ( Iterator i = activeExternalProfiles.iterator(); i.hasNext(); )
         {
             Profile externalProfile = (Profile) i.next();
 
@@ -419,8 +438,8 @@ public class DefaultMavenProjectBuilder
 
         Model originalModel = ModelUtils.cloneModel( model );
 
-        MavenProject project = assembleLineage( model, lineage, localRepository, externalProfiles, projectDir,
-                                                parentSearchRepositories, aggregatedRemoteWagonRepositories );
+        MavenProject project = assembleLineage( model, lineage, localRepository, projectDir, parentSearchRepositories,
+                                                aggregatedRemoteWagonRepositories );
 
         project.setOriginalModel( originalModel );
 
@@ -440,8 +459,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = processProjectLogic( pomLocation, project, new ArrayList( aggregatedRemoteWagonRepositories ),
-                                           externalProfiles );
+            project = processProjectLogic( pomLocation, project, new ArrayList( aggregatedRemoteWagonRepositories ), profileManager );
         }
         catch ( ModelInterpolationException e )
         {
@@ -460,8 +478,7 @@ public class DefaultMavenProjectBuilder
      * the resolved source roots, etc for the parent - that occurs for the parent when it is constructed independently
      * and projects are not cached or reused
      */
-    private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories,
-                                              List externalProfiles )
+    private MavenProject processProjectLogic( String pomLocation, MavenProject project, List remoteRepositories, ProfileManager profileMgr )
         throws ProjectBuildingException, ModelInterpolationException
     {
         Model model = project.getModel();
@@ -471,26 +488,26 @@ public class DefaultMavenProjectBuilder
         {
             modelCache.put( key, model );
         }
-
-        List activeProfiles = new ArrayList( externalProfiles );
-
-        List activePomProfiles = profileActivationCalculator.calculateActiveProfiles( model.getProfiles() );
-
-        activeProfiles.addAll( activePomProfiles );
-
-        Properties profileProperties = new Properties();
-
-        for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
+        
+        Properties profileProperties = project.getProfileProperties();
+        
+        if ( profileProperties == null )
         {
-            Profile profile = (Profile) it.next();
-
-            profileInjector.inject( profile, model );
-
-            profileProperties.putAll( profile.getProperties() );
+            profileProperties = new Properties();
         }
+        
+        List activeProfiles = project.getActiveProfiles();
+        
+        if ( activeProfiles == null )
+        {
+            activeProfiles = new ArrayList();
+        }
+        
+        List injectedProfiles = injectActiveProfiles( profileMgr, model, profileProperties );
+        
+        activeProfiles.addAll( injectedProfiles );
 
         // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
-
         model = modelInterpolator.interpolate( model );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
@@ -507,13 +524,14 @@ public class DefaultMavenProjectBuilder
         //=======================================================================
         project = new MavenProject( model );
 
-        project.addProfileProperties( profileProperties );
-
-        project.setActiveProfiles( activeProfiles );
-        
         project.setOriginalModel( originalModel );
         
-
+        project.setActiveProfiles( activeProfiles );
+        
+        project.addProfileProperties( profileProperties );
+        
+        project.assembleProfilePropertiesInheritance();
+        
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
                                                                         project.getVersion(), project.getPackaging() );
@@ -569,7 +587,7 @@ public class DefaultMavenProjectBuilder
      * @noinspection CollectionDeclaredAsConcreteClass
      */
     private MavenProject assembleLineage( Model model, LinkedList lineage, ArtifactRepository localRepository,
-                                          List externalProfiles, File projectDir, List parentSearchRepositories,
+                                          File projectDir, List parentSearchRepositories,
                                           Set aggregatedRemoteWagonRepositories )
         throws ProjectBuildingException
     {
@@ -589,8 +607,31 @@ public class DefaultMavenProjectBuilder
             }
         }
 
+        ProfileManager profileManager = new DefaultProfileManager( container );
+        
+        List activeProfiles;
+        
+        Properties profileProperties = new Properties();
+
+        try
+        {
+            profileManager.addProfiles( model.getProfiles() );
+            
+            loadProjectExternalProfiles( profileManager, projectDir );
+            
+            activeProfiles = injectActiveProfiles( profileManager, model, profileProperties );
+        }
+        catch ( ProfileActivationException e )
+        {
+            throw new ProjectBuildingException( "Failed to activate local (project-level) build profiles.", e );
+        }
+
         MavenProject project = new MavenProject( model );
 
+        project.addProfileProperties( profileProperties );
+
+        project.setActiveProfiles( activeProfiles );
+        
         lineage.addFirst( project );
 
         Parent parentModel = model.getParent();
@@ -686,8 +727,8 @@ public class DefaultMavenProjectBuilder
                 model = findModelFromRepository( parentArtifact, remoteRepositories, localRepository );
             }
 
-            MavenProject parent = assembleLineage( model, lineage, localRepository, externalProfiles, parentProjectDir,
-                                                   parentSearchRepositories, aggregatedRemoteWagonRepositories );
+            MavenProject parent = assembleLineage( model, lineage, localRepository, parentProjectDir, parentSearchRepositories, 
+                                                   aggregatedRemoteWagonRepositories );
 
             project.setParent( parent );
 
@@ -695,6 +736,69 @@ public class DefaultMavenProjectBuilder
         }
 
         return project;
+    }
+
+    private List injectActiveProfiles( ProfileManager profileManager, Model model, Properties profileProperties ) 
+        throws ProjectBuildingException
+    {
+        List activeProfiles;
+        
+        if ( profileManager != null )
+        {
+            try
+            {
+                activeProfiles = profileManager.getActiveProfiles();
+            }
+            catch ( ProfileActivationException e )
+            {
+                throw new ProjectBuildingException( "Failed to calculate active build profiles.", e );
+            }
+
+            for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
+            {
+                Profile profile = (Profile) it.next();
+
+                profileInjector.inject( profile, model );
+
+                profileProperties.putAll( profile.getProperties() );
+            }
+        }
+        else
+        {
+            activeProfiles = Collections.EMPTY_LIST;
+        }
+        
+        return activeProfiles;
+    }
+
+    private void loadProjectExternalProfiles( ProfileManager profileManager, File projectDir )
+        throws ProfileActivationException
+    {
+        if ( projectDir != null )
+        {
+            try
+            {
+                ProfilesRoot root = profilesBuilder.buildProfiles( projectDir );
+
+                if ( root != null )
+                {
+                    for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
+                    {
+                        org.apache.maven.profiles.Profile rawProfile = (org.apache.maven.profiles.Profile) it.next();
+
+                        profileManager.addProfile( ProfilesConversionUtils.convertFromProfileXmlProfile( rawProfile ) );
+                    }
+                }
+            }
+            catch ( IOException e )
+            {
+                throw new ProfileActivationException( "Cannot read profiles.xml resource from directory: " + projectDir, e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new ProfileActivationException( "Cannot parse profiles.xml resource from directory: " + projectDir, e );
+            }
+        }
     }
 
     private Model readModel( File file )
@@ -885,7 +989,7 @@ public class DefaultMavenProjectBuilder
         return extensionArtifacts;
     }
 
-    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, List externalProfiles )
+    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
@@ -907,7 +1011,7 @@ public class DefaultMavenProjectBuilder
             List remoteRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
                                                                               artifactRepositoryFactory, container );
 
-            project = processProjectLogic( "<Super-POM>", project, remoteRepositories, externalProfiles );
+            project = processProjectLogic( "<Super-POM>", project, remoteRepositories, null );
 
             return project;
         }

@@ -46,5 +46,37 @@
       </testResource>
     </testResources>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>release-profile</id>
+      
+      <activation>
+        <property>
+          <name>performRelease</name>
+        </property>
+      </activation>
+      
+      <build>
+        <plugins>
+          <plugin>
+            <inherit>true</inherit>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <inherit>true</inherit>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            
+            <configuration>
+              <updateReleaseInfo>true</updateReleaseInfo>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
 </project>
     <!-- END SNIPPET: superpom -->

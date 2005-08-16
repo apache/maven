@@ -23,7 +23,7 @@ public abstract class DetectedProfileActivator
 {
     public boolean canDetermineActivation( Profile profile )
     {
-        return !ProfileActivationUtils.profilesWereExplicitlyGiven() && canDetectActivation( profile );
+        return canDetectActivation( profile );
     }
 
     protected abstract boolean canDetectActivation( Profile profile );
