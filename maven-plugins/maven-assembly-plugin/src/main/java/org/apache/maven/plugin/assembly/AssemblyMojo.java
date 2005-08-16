@@ -17,7 +17,6 @@ package org.apache.maven.plugin.assembly;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
@@ -29,6 +28,7 @@ import org.apache.maven.plugins.assembly.model.DependencySet;
 import org.apache.maven.plugins.assembly.model.FileSet;
 import org.apache.maven.plugins.assembly.model.io.xpp3.AssemblyXpp3Reader;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
@@ -87,11 +87,11 @@ public class AssemblyMojo
     private MavenProject project;
 
     /**
-     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+     * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
      * @required
      * @readonly
      */
-    private ArtifactFactory artifactFactory;
+    private MavenProjectHelper projectHelper;
 
 	
 
@@ -156,28 +156,13 @@ public class AssemblyMojo
 	            archiver.setDestFile( destFile );
 	            archiver.createArchive();
 	            
-	            addAttachedArtifact( destFile , format);
+                projectHelper.attachArtifact(project, format, format + "-assembly", destFile );
 	        }
 	    }
 	    finally
 	    {
 	        IOUtil.close( r );
 	    }
-	}
-
-	private void addAttachedArtifact(File destFile, String format) {
-		
-        Artifact artifact = artifactFactory.createArtifactWithClassifier( 
-        		project.getGroupId(),
-                project.getArtifactId(),
-                project.getVersion(), 
-                format,
-                null );
-                
-        artifact.setFile( destFile );
-
-        project.addAttachedArtifact( artifact );		
-		
 	}
 
 	private void processDependencySets(Archiver archiver, List dependencySets, boolean includeBaseDirectory) throws ArchiverException, IOException, Exception {

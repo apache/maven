@@ -18,11 +18,10 @@ package org.apache.maven.plugin.ejb;
 
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 
 import java.io.File;
 
@@ -75,11 +74,11 @@ public class EjbMojo
     private MavenProject project;
 
     /**
-     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+     * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
      * @required
      * @readonly
      */
-    private ArtifactFactory artifactFactory;
+    private MavenProjectHelper projectHelper;
 
     /**
      * @parameter
@@ -131,13 +130,7 @@ public class EjbMojo
                 clientArchiver.createArchive( project, archive );
 
                 // TODO: shouldn't need classifer
-                Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(),
-                                                                                  project.getArtifactId(),
-                                                                                  project.getVersion(), null,
-                                                                                  "ejb-client", "client" );
-                artifact.setFile( clientJarFile );
-
-                project.addAttachedArtifact( artifact );
+                projectHelper.attachArtifact( project, "ejb-client", "client", clientJarFile );
             }
         }
         catch ( Exception e )
