@@ -211,7 +211,6 @@
         <source><![CDATA[
 <mojo xmlns="marmalade:mojo">
   <metadata>
-    <id>hello</id>
     <goal>hello</goal>
     <description>Say Hello to the World.</description>
   </metadata>
