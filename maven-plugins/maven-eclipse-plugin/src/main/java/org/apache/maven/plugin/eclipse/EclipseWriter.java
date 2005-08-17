@@ -17,14 +17,18 @@ package org.apache.maven.plugin.eclipse;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -33,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -73,7 +78,85 @@ public class EclipseWriter
         
         writeEclipseProject( projectBaseDir, outputDir, project, executedProject, referencedProjects, map );
 
+        writeEclipseSettings( projectBaseDir, outputDir, project, executedProject );
+
         log.info( "Wrote Eclipse project for " + project.getArtifactId() + " to " + outputDir.getAbsolutePath() );
+    }
+
+
+    // ----------------------------------------------------------------------
+    // .settings/
+    // ----------------------------------------------------------------------
+
+    private void writeEclipseSettings(
+        File projectBaseDir, File outputDir, MavenProject project, MavenProject executedProject
+    )
+        throws EclipsePluginException
+    {
+        
+        // check if it's necessary to create project specific settings
+        
+        Properties coreSettings = new Properties();
+        
+        // FIXME: need a better way to do this
+
+        for ( Iterator it = project.getModel().getBuild().getPlugins().iterator(); it.hasNext(); )
+        {
+            Plugin plugin = (Plugin) it.next();
+            
+            if ( plugin.getArtifactId().equals("maven-compiler-plugin") )
+            {
+                Xpp3Dom o = (Xpp3Dom) plugin.getConfiguration();
+
+                String source = o.getChild( "source" ).getValue();
+                
+                String target = o.getChild( "target" ).getValue();
+                
+                if ( !source.equals("1.3") )
+                {
+                    coreSettings.put( "org.eclipse.jdt.core.compiler.source", source );
+
+                    coreSettings.put( "org.eclipse.jdt.core.compiler.compliance", source );
+                }
+
+                if ( !target.equals("1.2") )
+                {
+                    coreSettings.put( "org.eclipse.jdt.core.compiler.codegen.targetPlatform", target );
+                }
+            }
+        }
+    
+        // write the settings, if needed
+        
+        if ( ! coreSettings.isEmpty() )
+        {
+            File settingsDir = new File( outputDir, "/.settings" );
+            
+            settingsDir.mkdirs();
+            
+            coreSettings.put( "eclipse.preferences.version", "1" );
+            
+            try
+            {
+                File coreSettingsFile = new File( settingsDir, "org.eclipse.jdt.core.prefs" );
+                coreSettings.store( new FileOutputStream( coreSettingsFile ), null
+                );
+            
+                log.info( "Wrote settings to " + coreSettingsFile );
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new EclipsePluginException( "Cannot create settings file", e );
+            }
+            catch (IOException e)
+            {
+                throw new EclipsePluginException( "Error writing settings file", e );
+            }
+        }
+        else
+        {
+            log.info( "Not writing settings - defaults suffice" );
+        }
     }
 
     // ----------------------------------------------------------------------
