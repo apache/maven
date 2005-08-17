@@ -142,6 +142,10 @@ it0049: Test parameter alias usage.
 it0050: Test surefire inclusion/exclusions
 
 it0051: Test source attachment when -DperformRelease=true is specified.
+
+it0052: Test that source attachment doesn't take place when
+        -DperformRelease=true is missing.
+
 -------------------------------------------------------------------------------
 
 - generated sources
