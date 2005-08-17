@@ -524,10 +524,49 @@ public class DefaultLifecycleExecutor
                 }
             }
         }
+        
+        String mojoPhase = findFirstPhaseBindingForMojo( mojoDescriptor, lifecycleMappings );
+        
+        int mojoPhaseIdx = phases.indexOf( mojoPhase );
+        int execPhaseIdx = phases.indexOf( task );
+        
+        if ( mojoPhaseIdx > -1 && mojoPhaseIdx <= execPhaseIdx )
+        {
+            throw new LifecycleExecutionException( "Infinite loop detected in build process. Mojo: \'"
+                + mojoDescriptor.getGoal() + "\' declares executePhase of: \'" + task
+                + "\' but is itself bound to phase: \'" + mojoPhase
+                + "\'. This will result in infinite forking of build execution." );
+        }
 
         MavenProject executionProject = new MavenProject( project );
         executeGoalWithLifecycle( task, session, lifecycleMappings, executionProject );
         project.setExecutionProject( executionProject );
+    }
+
+    private String findFirstPhaseBindingForMojo( MojoDescriptor mojoDescriptor, Map lifecycleMappings )
+    {
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+        
+        String mojoIdWithVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":"
+            + pluginDescriptor.getVersion() + ":" + mojoDescriptor.getGoal();
+        
+        String mojoIdWithoutVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":"
+            + mojoDescriptor.getGoal();
+            
+        for ( Iterator it = lifecycleMappings.entrySet().iterator(); it.hasNext(); )
+        {
+            Map.Entry entry = (Map.Entry) it.next();
+            
+            String phase = (String) entry.getKey();
+            List tasks = (List) entry.getValue();
+            
+            if ( tasks.contains( mojoIdWithVersion ) || tasks.contains( mojoIdWithoutVersion ) )
+            {
+                return phase;
+            }
+        }
+        
+        return null;
     }
 
     private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project )
@@ -792,14 +831,23 @@ public class DefaultLifecycleExecutor
             if ( execution.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
             {
                 MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
-                if ( execution.getPhase() != null )
-                {
-                    addToLifecycleMappings( phaseMap, execution.getPhase(), mojoExecution, settings );
-                }
-                else if ( mojoDescriptor.getPhase() != null )
+                
+                String phase = execution.getPhase();
+                
+                if ( phase == null )
                 {
                     // if the phase was not in the configuration, use the phase in the descriptor
-                    addToLifecycleMappings( phaseMap, mojoDescriptor.getPhase(), mojoExecution, settings );
+                    phase = mojoDescriptor.getPhase();
+                }
+                
+                if ( phase != null )
+                {
+                    if ( mojoDescriptor.isDirectInvocationOnly() )
+                    {
+                        throw new LifecycleExecutionException( "Mojo: \'" + goal + "\' requires direct invocation. It cannot be used as part of the lifecycle (it was included via the POM)." );
+                    }
+                    
+                    addToLifecycleMappings( phaseMap, phase, mojoExecution, settings );
                 }
             }
         }
