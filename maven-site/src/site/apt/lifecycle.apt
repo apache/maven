@@ -242,25 +242,27 @@ m2 clean:clean install
   set of phases for the Plexus plugin itself to register the <<<plexus-application>>> type:
 
 ----
-<components>
-  <component>
-    <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-    <role-hint>plexus-application</role-hint>
-    <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-    <configuration>
-      <phases>
-        <process-resources>resources:resources</process-resources>
-        <compile>compiler:compile</compile>
-        <process-test-resources>resources:testResources</process-test-resources>
-        <test-compile>compiler:testCompile</test-compile>
-        <test>surefire:test</test>
-        <package>plexus:app</package>
-        <install>install:install</install>
-        <deploy>deploy:deploy</deploy>
-      </phases>
-    </configuration>
-  </component>
-</components>
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>plexus-application</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <phases>
+          <process-resources>resources:resources</process-resources>
+          <compile>compiler:compile</compile>
+          <process-test-resources>resources:testResources</process-test-resources>
+          <test-compile>compiler:testCompile</test-compile>
+          <test>surefire:test</test>
+          <package>plexus:app</package>
+          <install>install:install</install>
+          <deploy>deploy:deploy</deploy>
+        </phases>
+      </configuration>
+    </component>
+  </components>
+</component-set>
 ----
 
   In this example, the <<<role-hint>>> is used to specify the packaging, and the <<<role>>> of
