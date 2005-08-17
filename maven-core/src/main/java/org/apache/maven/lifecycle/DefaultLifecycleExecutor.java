@@ -479,10 +479,10 @@ public class DefaultLifecycleExecutor
     private void forkLifecycle( MojoDescriptor mojoDescriptor, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, MojoExecutionException, ArtifactResolutionException
     {
-        String task = mojoDescriptor.getExecutePhase();
+        String targetPhase = mojoDescriptor.getExecutePhase();
 
         // Create new lifecycle
-        Map lifecycleMappings = constructLifecycleMappings( session, task, project );
+        Map lifecycleMappings = constructLifecycleMappings( session, targetPhase, project );
 
         String executeLifecycle = mojoDescriptor.getExecuteLifecycle();
         if ( executeLifecycle != null )
@@ -525,25 +525,15 @@ public class DefaultLifecycleExecutor
             }
         }
         
-        String mojoPhase = findFirstPhaseBindingForMojo( mojoDescriptor, lifecycleMappings );
+        removeFromLifecycle( mojoDescriptor, lifecycleMappings );
         
-        int mojoPhaseIdx = phases.indexOf( mojoPhase );
-        int execPhaseIdx = phases.indexOf( task );
-        
-        if ( mojoPhaseIdx > -1 && mojoPhaseIdx <= execPhaseIdx )
-        {
-            throw new LifecycleExecutionException( "Infinite loop detected in build process. Mojo: \'"
-                + mojoDescriptor.getGoal() + "\' declares executePhase of: \'" + task
-                + "\' but is itself bound to phase: \'" + mojoPhase
-                + "\'. This will result in infinite forking of build execution." );
-        }
-
         MavenProject executionProject = new MavenProject( project );
-        executeGoalWithLifecycle( task, session, lifecycleMappings, executionProject );
+        executeGoalWithLifecycle( targetPhase, session, lifecycleMappings, executionProject );
         project.setExecutionProject( executionProject );
+        
     }
 
-    private String findFirstPhaseBindingForMojo( MojoDescriptor mojoDescriptor, Map lifecycleMappings )
+    private void removeFromLifecycle( MojoDescriptor mojoDescriptor, Map lifecycleMappings )
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
         
@@ -553,20 +543,13 @@ public class DefaultLifecycleExecutor
         String mojoIdWithoutVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":"
             + mojoDescriptor.getGoal();
             
-        for ( Iterator it = lifecycleMappings.entrySet().iterator(); it.hasNext(); )
+        for ( Iterator it = lifecycleMappings.values().iterator(); it.hasNext(); )
         {
-            Map.Entry entry = (Map.Entry) it.next();
+            List tasks = (List) it.next();
             
-            String phase = (String) entry.getKey();
-            List tasks = (List) entry.getValue();
-            
-            if ( tasks.contains( mojoIdWithVersion ) || tasks.contains( mojoIdWithoutVersion ) )
-            {
-                return phase;
-            }
+            tasks.remove( mojoIdWithVersion );
+            tasks.remove( mojoIdWithoutVersion );
         }
-        
-        return null;
     }
 
     private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project )
