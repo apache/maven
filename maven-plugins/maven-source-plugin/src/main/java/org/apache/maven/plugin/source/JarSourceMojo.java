@@ -23,6 +23,7 @@ import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,10 +33,26 @@ import java.util.List;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  * @goal jar
+ * @phase package
  */
 public class JarSourceMojo
     extends AbstractMojo
 {
+    
+    /**
+     * @deprecated ICK! This needs to be generalized OUTSIDE of this mojo!
+     */
+    private static final List BANNED_PACKAGINGS;
+    
+    static
+    {
+        List banned = new ArrayList();
+        
+        banned.add( "pom" );
+        
+        BANNED_PACKAGINGS = banned;
+    }
+    
     /**
      * @parameter expression="${project}"
      * @readonly
@@ -47,6 +64,13 @@ public class JarSourceMojo
      * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}
      */
     private MavenProjectHelper projectHelper;
+    
+    /**
+     * @parameter expression="${project.packaging}"
+     * @readonly
+     * @required
+     */
+    private String packaging;
 
     /**
      * @parameter expression="${project.build.finalName}"
@@ -77,6 +101,12 @@ public class JarSourceMojo
         if ( !attach )
         {
             getLog().info( "NOT adding java-sources to attached artifacts list." );
+            
+            return;
+        }
+        else if ( BANNED_PACKAGINGS.contains( packaging ) )
+        {
+            getLog().info( "NOT adding java-sources to attached artifacts for packaging: \'" + packaging + "\'." );
             
             return;
         }

@@ -36,7 +36,7 @@ public class DefaultArtifactFactory
     {
         return createArtifact( groupId, artifactId, version, scope, type, null, null );
     }
-
+    
     public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String scope,
                                                   String type, String classifier )
     {

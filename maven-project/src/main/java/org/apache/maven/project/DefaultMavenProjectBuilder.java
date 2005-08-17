@@ -227,6 +227,30 @@ public class DefaultMavenProjectBuilder
         }
         return map;
     }
+    
+    /**
+     * @deprecated Use build( File, ArtifactRepository, ProfileManager)
+     */
+    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, List activeExternalProfiles )
+        throws ProjectBuildingException
+    {
+        ProfileManager profileManager = new DefaultProfileManager( container );
+        
+        if ( activeExternalProfiles != null )
+        {
+            for ( Iterator it = activeExternalProfiles.iterator(); it.hasNext(); )
+            {
+                Profile profile = (Profile) it.next();
+                
+                // since it's already determined to be active, we'll explicitly set it as activated in the mgr.
+                profileManager.explicitlyActivate( profile.getId() );
+                
+                profileManager.addProfile( profile );
+            }
+        }
+        
+        return buildFromSourceFile( projectDescriptor, localRepository, profileManager );
+    }
 
     public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException
@@ -393,7 +417,23 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
+        
+        ProfileManager superProjectProfileManager = new DefaultProfileManager( container );
+        
+        List activeProfiles;
+        
+        Properties profileProperties = new Properties();
 
+        superProjectProfileManager.addProfiles( superModel.getProfiles() );
+        
+        activeProfiles = injectActiveProfiles( superProjectProfileManager, superModel, profileProperties );
+
+        MavenProject superProject = new MavenProject( superModel );
+
+        superProject.addProfileProperties( profileProperties );
+
+        superProject.setActiveProfiles( activeProfiles );
+        
         //noinspection CollectionDeclaredAsConcreteClass
         LinkedList lineage = new LinkedList();
 
@@ -444,7 +484,7 @@ public class DefaultMavenProjectBuilder
         project.setOriginalModel( originalModel );
 
         // we don't have to force the collision exception for superModel here, it's already been done in getSuperModel()
-        Model previous = superModel;
+        Model previous = superProject.getModel();
 
         for ( Iterator i = lineage.iterator(); i.hasNext(); )
         {
@@ -1000,7 +1040,21 @@ public class DefaultMavenProjectBuilder
 
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
+        ProfileManager profileManager = new DefaultProfileManager( container );
+        
+        List activeProfiles;
+        
+        Properties profileProperties = new Properties();
+
+        profileManager.addProfiles( superModel.getProfiles() );
+        
+        activeProfiles = injectActiveProfiles( profileManager, superModel, profileProperties );
+
         MavenProject project = new MavenProject( superModel );
+
+        project.addProfileProperties( profileProperties );
+
+        project.setActiveProfiles( activeProfiles );
         
         project.setOriginalModel( superModel );
 

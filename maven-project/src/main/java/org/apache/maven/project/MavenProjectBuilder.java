@@ -34,6 +34,12 @@ public interface MavenProjectBuilder
 
     String STANDALONE_SUPERPOM_VERSION = "2.0";
 
+    /**
+     * @deprecated Use build( File, ArtifactRepository, ProfileManager)
+     */
+    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository, List activeExternalProfiles )
+        throws ProjectBuildingException;
+    
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 

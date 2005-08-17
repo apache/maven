@@ -19,9 +19,8 @@ public class DefaultMavenProjectHelper
         Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(),
                                                                           project.getArtifactId(),
                                                                           project.getVersion(), 
-                                                                          null, 
-                                                                          "artifactType",
-                                                                          "artifactClassifier" );
+                                                                          artifactType,
+                                                                          artifactClassifier );
         
         artifact.setFile( artifactFile );
         artifact.setResolved( true );

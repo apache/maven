@@ -139,6 +139,9 @@ it0048: Verify that default values for mojo parameters are working (indirectly,
 
 it0049: Test parameter alias usage.
 
+it0050: Test surefire inclusion/exclusions
+
+it0051: Test source attachment when -DperformRelease=true is specified.
 -------------------------------------------------------------------------------
 
 - generated sources
