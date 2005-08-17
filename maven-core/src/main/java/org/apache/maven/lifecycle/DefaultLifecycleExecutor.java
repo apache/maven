@@ -547,8 +547,10 @@ public class DefaultLifecycleExecutor
         {
             List tasks = (List) it.next();
             
-            tasks.remove( mojoIdWithVersion );
-            tasks.remove( mojoIdWithoutVersion );
+            if ( tasks.remove( mojoIdWithVersion ) || tasks.remove( mojoIdWithoutVersion ) )
+            {
+                getLogger().warn( "Removing: " + mojoDescriptor.getGoal() + " from forked lifecycle, to prevent recursive invocation of this mojo." );
+            }
         }
     }
 
