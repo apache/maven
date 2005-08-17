@@ -1,3 +1,2 @@
-touchFile.txt
-testTouchFile.txt
-defaultTestFile.txt
+target/testTouchFile.txt
+target/defaultTestTouchFile.txt
