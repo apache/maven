@@ -5,6 +5,7 @@ package org.apache.maven.doxia;
 
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Site;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -72,7 +73,7 @@ public class ScpSiteDeployMojo
     {
         File baseDir = new File( inputDirectory );
 
-        File zipFile = null;
+        File zipFile;
 
         try
         {
@@ -90,32 +91,31 @@ public class ScpSiteDeployMojo
 
             if ( distributionManagement == null )
             {
-                String msg = "distributionManagement element is missing in the POM: " + project.getId();
-
-                throw new MojoExecutionException( msg );
+                throw new MojoExecutionException( "Missing distribution management information in the project" );
             }
 
-            if ( distributionManagement.getSite() == null )
+            Site site = distributionManagement.getSite();
+
+            if ( site == null )
             {
-                String msg = "distributionManagement/site element is missing in the POM: " + project.getId();
-
-                throw new MojoExecutionException( msg );
-
+                throw new MojoExecutionException( "Missing site information in the distribution management element in the project.." );
             }
 
-            String url = distributionManagement.getSite().getUrl();
+            String url = site.getUrl();
 
-            String id = distributionManagement.getSite().getId();
+            String id = site.getId();
 
             if ( url == null )
             {
-                String msg = "distributionManagement/site/url element is missing in the POM: " + project.getId();
-
-                throw new MojoExecutionException( msg );
-
+                throw new MojoExecutionException( "The URL to the site is missing in the project descriptor." );
             }
 
             Repository repository = new Repository( id, url );
+
+            if ( !"scp".equals( repository.getProtocol() ) )
+            {
+                throw new MojoExecutionException( "The deploy mojo currently only supports site deployment using the 'scp' protocol." );
+            }
 
             commandExecutor = (SshCommandExecutor) wagonManager.getWagon( "scp" );
 
