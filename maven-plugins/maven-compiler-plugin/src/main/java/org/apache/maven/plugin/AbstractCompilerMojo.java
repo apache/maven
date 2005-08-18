@@ -26,6 +26,7 @@ import org.codehaus.plexus.compiler.manager.NoSuchCompilerException;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
+import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
@@ -37,8 +38,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
+import java.util.Collections;
+import java.util.Collection;
 
 /**
+ * TODO: At least one step could be optimized, currently the plugin will do two
+ * scans of all the source code if the compiler has to have the entire set of
+ * sources. This is currently the case for at least the C# compiler and most
+ * likely all the other .NET compilers too.
+ *
  * @author others
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id: StaleSourceScannerTest.java 2393 2005-08-08 22:32:59Z kenney $
@@ -46,6 +54,10 @@ import java.util.Map;
 public abstract class AbstractCompilerMojo
     extends AbstractMojo
 {
+    // ----------------------------------------------------------------------
+    // Configurables
+    // ----------------------------------------------------------------------
+
     /**
      * Whether to include debugging information in the compiled class files.
      * The default value is true.
@@ -104,7 +116,7 @@ public abstract class AbstractCompilerMojo
 
     /**
      * Runs the compiler in a separate process.
-     *
+     * <p/>
      * If not set the compiler will default to a executable.
      *
      * @parameter default-value="false"
@@ -120,13 +132,25 @@ public abstract class AbstractCompilerMojo
 
     /**
      * Arguements to be passed to the compiler if fork is set to true.
-     *
+     * <p/>
      * This is because the list of valid arguements passed to a Java compiler
      * varies based on the compiler version.
      *
      * @parameter
      */
     private Map compilerArguments;
+
+    /**
+     * Used to control the name of the output file when compiling a set of
+     * sources to a single file.
+     *
+     * @parameter expression="${project.build.finalName}"
+     */
+    private String outputFileName;
+
+    // ----------------------------------------------------------------------
+    // Read-only parameters
+    // ----------------------------------------------------------------------
 
     /**
      * The directory to run the compiler from if fork is true.
@@ -136,6 +160,15 @@ public abstract class AbstractCompilerMojo
      * @readonly
      */
     private File basedir;
+
+    /**
+     * The directory to run the compiler from if fork is true.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     * @readonly
+     */
+    private File buildDirectory;
 
     /**
      * @parameter expression="${component.org.codehaus.plexus.compiler.manager.CompilerManager}"
@@ -160,6 +193,8 @@ public abstract class AbstractCompilerMojo
         // ----------------------------------------------------------------------
 
         Compiler compiler;
+
+        getLog().debug( "Using compiler '" + compilerId + "'." );
 
         try
         {
@@ -215,12 +250,42 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setWorkingDirectory( basedir );
 
+        compilerConfiguration.setBuildDirectory( buildDirectory );
+
+        compilerConfiguration.setOutputFileName( outputFileName );
+
         // TODO: have an option to always compile (without need to clean)
         Set staleSources;
 
+        boolean canUpdateTarget;
+
         try
         {
-            staleSources = computeStaleSources( compilerConfiguration, compiler );
+            staleSources = computeStaleSources( compilerConfiguration,
+                                                compiler,
+                                                new StaleSourceScanner( staleMillis ) );
+
+            canUpdateTarget = compiler.canUpdateTarget( compilerConfiguration );
+
+            if ( compiler.getCompilerOutputStyle() == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES &&
+                 !canUpdateTarget )
+            {
+                getLog().info( "RESCANNING!" );
+                // TODO: This second scan for source files is sub-optimal
+                String inputFileEnding = compiler.getInputFileEnding( compilerConfiguration );
+
+                Set includes = Collections.singleton( "**/*." + inputFileEnding );
+
+                Set sources = computeStaleSources( compilerConfiguration,
+                                                   compiler,
+                                                   new SimpleSourceInclusionScanner( includes, Collections.EMPTY_SET ));
+
+                compilerConfiguration.setSourceFiles( sources );
+            }
+            else
+            {
+                compilerConfiguration.setSourceFiles( staleSources );
+            }
         }
         catch ( CompilerException e )
         {
@@ -232,10 +297,6 @@ public abstract class AbstractCompilerMojo
             getLog().info( "Nothing to compile - all classes are up to date" );
 
             return;
-        }
-        else
-        {
-            compilerConfiguration.setSourceFiles( staleSources );
         }
 
         // ----------------------------------------------------------------------
@@ -269,8 +330,6 @@ public abstract class AbstractCompilerMojo
 
         List messages;
 
-        getLog().debug( "Using compiler '" + compilerId + "'." );
-
         try
         {
             messages = compiler.compile( compilerConfiguration );
@@ -299,28 +358,35 @@ public abstract class AbstractCompilerMojo
         }
     }
 
-    private Set computeStaleSources( CompilerConfiguration compilerConfiguration, Compiler compiler )
+    private Set computeStaleSources( CompilerConfiguration compilerConfiguration,
+                                     Compiler compiler,
+                                     SourceInclusionScanner scanner )
         throws MojoExecutionException, CompilerException
     {
         CompilerOutputStyle outputStyle = compiler.getCompilerOutputStyle();
 
         SourceMapping mapping;
 
+        File outputDirectory;
+
         if ( outputStyle == CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE )
         {
             mapping = new SuffixMapping( compiler.getInputFileEnding( compilerConfiguration ),
                                          compiler.getOutputFileEnding( compilerConfiguration ) );
+
+            outputDirectory = getOutputDirectory();
         }
         else if ( outputStyle == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES )
         {
-            mapping = new SingleTargetSourceMapping( compiler.getOutputFile( compilerConfiguration ) );
+            mapping = new SingleTargetSourceMapping( compiler.getInputFileEnding( compilerConfiguration ),
+                                                     compiler.getOutputFile( compilerConfiguration ) );
+
+            outputDirectory = buildDirectory;
         }
         else
         {
             throw new MojoExecutionException( "Unknown compiler output style: '" + outputStyle + "'." );
         }
-
-        SourceInclusionScanner scanner = new StaleSourceScanner( staleMillis );
 
         scanner.addSourceMapping( mapping );
 
@@ -339,7 +405,7 @@ public abstract class AbstractCompilerMojo
 
             try
             {
-                staleSources.addAll( scanner.getIncludedSources( rootFile, getOutputDirectory() ) );
+                staleSources.addAll( scanner.getIncludedSources( rootFile, outputDirectory ) );
             }
             catch ( InclusionScanException e )
             {
