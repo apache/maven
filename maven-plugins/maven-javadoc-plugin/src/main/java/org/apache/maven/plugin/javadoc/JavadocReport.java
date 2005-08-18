@@ -83,6 +83,8 @@ public class JavadocReport
     /** Default window title */
     private static final String DEFAULT_WINDOW_TITLE = "${project.name} ${project.version} API";
 
+    private static final String PATH_SEPARATOR = System.getProperty( "path.separator" );
+
     /**
      * @parameter expression="${project.build.directory}/site"
      * @required
@@ -644,7 +646,7 @@ public class JavadocReport
                 classpath.append( (String) i.next() );
                 if ( i.hasNext() )
                 {
-                    classpath.append( ";" );
+                    classpath.append( PATH_SEPARATOR );
                 }
             }
 
