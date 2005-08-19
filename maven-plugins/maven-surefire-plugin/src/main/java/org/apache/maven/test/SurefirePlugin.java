@@ -181,11 +181,11 @@ public class SurefirePlugin
             // defaults here, qdox doesn't like the end javadoc value
             if ( includes == null || includes.size() == 0 )
             {
-                includes = new ArrayList( Collections.singletonList( "**/*Test.java" ) );
+                includes = Arrays.asList( new String[] { "**/*Test.java", "**/*TestCase.java" } );
             }
             if ( excludes == null || excludes.size() == 0 )
             {
-                excludes = new ArrayList( Collections.singletonList( "**/Abstract*Test.java" ) );
+                excludes = Arrays.asList( new String[] { "**/Abstract*Test.java", "**/Abstract*TestCase.java" } );
             }
 
             surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
