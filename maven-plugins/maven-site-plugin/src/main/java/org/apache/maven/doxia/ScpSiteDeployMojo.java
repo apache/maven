@@ -139,7 +139,8 @@ public class ScpSiteDeployMojo
 
             commandExecutor.put( zipFile, zipFile.getName() );
 
-            cmd = " cd " + basedir + ";" + unzipCommand + " " + zipFile.getName();
+            // TODO: cat to file is temporary until the ssh executor is fixed to deal with output
+            cmd = " cd " + basedir + ";" + unzipCommand + " " + zipFile.getName() + " >scpdeploymojo.log";
 
             commandExecutor.executeCommand( cmd );
 
@@ -148,7 +149,7 @@ public class ScpSiteDeployMojo
                 basedir = basedir + "/";
             }
 
-            commandExecutor.executeCommand( "rm -f " + basedir + zipFile.getName()  );
+            commandExecutor.executeCommand( "rm -f " + basedir + zipFile.getName() + " scpdeploymojo.log" );
         }
         catch ( Exception e )
         {
