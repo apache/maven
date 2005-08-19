@@ -167,6 +167,7 @@ public class AntBuildWriter
             writer.endElement(); // classpath
 
             writer.startElement( "batchtest" );
+            writer.addAttribute( "todir", "${maven.test.reports}" );
             for ( Iterator i = testCompileSourceRoots.iterator(); i.hasNext(); )
             {
                 writer.startElement( "fileset" );
