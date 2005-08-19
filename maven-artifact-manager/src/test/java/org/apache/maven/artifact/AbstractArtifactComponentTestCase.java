@@ -32,10 +32,10 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id: ArtifactComponentTestCase.java,v 1.5 2004/10/23 13:33:59
+ * @version $Id: AbstractArtifactComponentTestCase.java,v 1.5 2004/10/23 13:33:59
  *          jvanzyl Exp $
  */
-public abstract class ArtifactComponentTestCase
+public abstract class AbstractArtifactComponentTestCase
     extends PlexusTestCase
 {
     protected abstract String component();

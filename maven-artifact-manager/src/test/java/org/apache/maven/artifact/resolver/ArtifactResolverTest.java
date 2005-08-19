@@ -16,11 +16,11 @@ package org.apache.maven.artifact.resolver;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactComponentTestCase;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ import java.util.Set;
  * @version $Id$
  */
 public class ArtifactResolverTest
-    extends ArtifactComponentTestCase
+    extends AbstractArtifactComponentTestCase
 {
     private ArtifactResolver artifactResolver;
 
@@ -98,7 +98,8 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                             List remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
@@ -145,7 +146,8 @@ public class ArtifactResolverTest
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
-            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                             List remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
