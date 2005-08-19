@@ -134,4 +134,9 @@ public interface Artifact
     boolean isResolved();
 
     void setResolvedVersion( String version );
+
+    /**
+     * @todo remove, a quick hack for the lifecycle executor
+     */
+    void setArtifactHandler( ArtifactHandler handler );
 }

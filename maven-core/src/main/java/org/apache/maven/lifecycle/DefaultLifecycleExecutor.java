@@ -104,7 +104,7 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException
     {
         MavenProject project = rm.getTopLevelProject();
-        
+
         List taskSegments = segmentTaskListByAggregationNeeds( session.getGoals(), session, project );
 
         MavenExecutionResponse response = new MavenExecutionResponse();
@@ -123,7 +123,7 @@ public class DefaultLifecycleExecutor
             artifactHandlerManager.addHandlers( handlers );
 
             executeTaskSegments( taskSegments, rm, session, project, dispatcher );
-            
+
             if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) && rm.hasBuildFailures() )
             {
                 response.setException( new ReactorException( "One or more projects failed to build." ) );
@@ -162,7 +162,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session, MavenProject project,
-                                     EventDispatcher dispatcher )
+                                      EventDispatcher dispatcher )
         throws PluginNotFoundException, MojoExecutionException, ArtifactResolutionException, LifecycleExecutionException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
@@ -224,8 +224,9 @@ public class DefaultLifecycleExecutor
                     getLogger().info( "SKIPPING " + project.getName() );
 
                     getLogger().info( "  " + segment );
-                    
-                    getLogger().info( "This project has been banned from further executions due to previous failures." );
+
+                    getLogger().info(
+                        "This project has been banned from further executions due to previous failures." );
 
                     line();
                 }
@@ -291,8 +292,9 @@ public class DefaultLifecycleExecutor
                         getLogger().info( "SKIPPING " + currentProject.getName() );
 
                         getLogger().info( "  " + segment );
-                        
-                        getLogger().info( "This project has been banned from further executions due to previous failures." );
+
+                        getLogger().info(
+                            "This project has been banned from further executions due to previous failures." );
 
                         line();
                     }
@@ -301,13 +303,13 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void handleExecutionFailure( ReactorManager rm, MavenProject project, Exception e, String task ) 
+    private void handleExecutionFailure( ReactorManager rm, MavenProject project, Exception e, String task )
         throws MojoExecutionException, ArtifactResolutionException
     {
         if ( ReactorManager.FAIL_FAST.equals( rm.getFailureBehavior() ) )
         {
             rm.registerBuildFailure( project, e, task );
-            
+
             if ( e instanceof MojoExecutionException )
             {
                 throw (MojoExecutionException) e;
@@ -319,14 +321,14 @@ public class DefaultLifecycleExecutor
             else
             {
                 getLogger().error( "Attempt to register inappropriate build-failure Exception.", e );
-                
+
                 throw new IllegalArgumentException( "Inappropriate build-failure Exception: " + e );
             }
         }
         else if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) )
         {
             rm.registerBuildFailure( project, e, task );
-            
+
             rm.blackList( project.getId() );
         }
     }
@@ -524,32 +526,33 @@ public class DefaultLifecycleExecutor
                 }
             }
         }
-        
+
         removeFromLifecycle( mojoDescriptor, lifecycleMappings );
-        
+
         MavenProject executionProject = new MavenProject( project );
         executeGoalWithLifecycle( targetPhase, session, lifecycleMappings, executionProject );
         project.setExecutionProject( executionProject );
-        
+
     }
 
     private void removeFromLifecycle( MojoDescriptor mojoDescriptor, Map lifecycleMappings )
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-        
-        String mojoIdWithVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":"
-            + pluginDescriptor.getVersion() + ":" + mojoDescriptor.getGoal();
-        
-        String mojoIdWithoutVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":"
-            + mojoDescriptor.getGoal();
-            
+
+        String mojoIdWithVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" +
+            pluginDescriptor.getVersion() + ":" + mojoDescriptor.getGoal();
+
+        String mojoIdWithoutVersion = pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" +
+            mojoDescriptor.getGoal();
+
         for ( Iterator it = lifecycleMappings.values().iterator(); it.hasNext(); )
         {
             List tasks = (List) it.next();
-            
+
             if ( tasks.remove( mojoIdWithVersion ) || tasks.remove( mojoIdWithoutVersion ) )
             {
-                getLogger().warn( "Removing: " + mojoDescriptor.getGoal() + " from forked lifecycle, to prevent recursive invocation of this mojo." );
+                getLogger().warn( "Removing: " + mojoDescriptor.getGoal() +
+                    " from forked lifecycle, to prevent recursive invocation of this mojo." );
             }
         }
     }
@@ -593,12 +596,14 @@ public class DefaultLifecycleExecutor
                     // Not from the CLI, don't use prefix
                     // TODO: [MNG-608] this needs to be false
                     MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, selectedPhase, false );
-                    
+
                     if ( mojoDescriptor.isDirectInvocationOnly() )
                     {
-                        throw new LifecycleExecutionException( "Mojo: \'" + goal + "\' requires direct invocation. It cannot be used as part of lifecycle: \'" + project.getPackaging() + "\'." );
+                        throw new LifecycleExecutionException( "Mojo: \'" + goal +
+                            "\' requires direct invocation. It cannot be used as part of lifecycle: \'" +
+                            project.getPackaging() + "\'." );
                     }
-                    
+
                     addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ),
                                             session.getSettings() );
                 }
@@ -643,7 +648,8 @@ public class DefaultLifecycleExecutor
             }
             catch ( ComponentLookupException e )
             {
-                throw new LifecycleExecutionException( "Cannot find lifecycle mapping for packaging: \'" + packaging + "\'.", e );
+                throw new LifecycleExecutionException(
+                    "Cannot find lifecycle mapping for packaging: \'" + packaging + "\'.", e );
             }
         }
 
@@ -697,6 +703,16 @@ public class DefaultLifecycleExecutor
                 {
                     Map components = pluginManager.getPluginComponents( plugin, ArtifactHandler.ROLE );
                     map.putAll( components );
+
+                    // shudder...
+                    for ( Iterator j = map.values().iterator(); j.hasNext(); )
+                    {
+                        ArtifactHandler handler = (ArtifactHandler) j.next();
+                        if ( project.getPackaging().equals( handler.getPackaging() ) )
+                        {
+                            project.getArtifact().setArtifactHandler( handler );
+                        }
+                    }
                 }
                 catch ( ComponentLookupException e )
                 {
@@ -816,22 +832,23 @@ public class DefaultLifecycleExecutor
             if ( execution.isInheritanceApplied() || mojoDescriptor.isInheritedByDefault() )
             {
                 MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
-                
+
                 String phase = execution.getPhase();
-                
+
                 if ( phase == null )
                 {
                     // if the phase was not in the configuration, use the phase in the descriptor
                     phase = mojoDescriptor.getPhase();
                 }
-                
+
                 if ( phase != null )
                 {
                     if ( mojoDescriptor.isDirectInvocationOnly() )
                     {
-                        throw new LifecycleExecutionException( "Mojo: \'" + goal + "\' requires direct invocation. It cannot be used as part of the lifecycle (it was included via the POM)." );
+                        throw new LifecycleExecutionException( "Mojo: \'" + goal +
+                            "\' requires direct invocation. It cannot be used as part of the lifecycle (it was included via the POM)." );
                     }
-                    
+
                     addToLifecycleMappings( phaseMap, phase, mojoExecution, settings );
                 }
             }
@@ -893,15 +910,17 @@ public class DefaultLifecycleExecutor
 
         StringTokenizer tok = new StringTokenizer( task, ":" );
         int numTokens = tok.countTokens();
-        
+
         // TODO: Add "&& canUsePrefix" to this boolean expression, and remove deprecation warning in next release.
         if ( numTokens == 2 )
         {
             if ( !canUsePrefix )
             {
-                getLogger().warn( "DEPRECATED: Mapped-prefix lookup of mojos are only supported from direct invocation. Please use specification of the form groupId:artifactId[:version]:goal instead. (Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')" );
+                getLogger().warn(
+                    "DEPRECATED: Mapped-prefix lookup of mojos are only supported from direct invocation. Please use specification of the form groupId:artifactId[:version]:goal instead. (Offending mojo: \'" +
+                        task + "\', invoked via: \'" + invokedVia + "\')" );
             }
-            
+
             String prefix = tok.nextToken();
             goal = tok.nextToken();
 
@@ -964,7 +983,7 @@ public class DefaultLifecycleExecutor
 
             plugin.setGroupId( tok.nextToken() );
             plugin.setArtifactId( tok.nextToken() );
-            
+
             if ( numTokens == 4 )
             {
                 plugin.setVersion( tok.nextToken() );

@@ -239,4 +239,9 @@ public class ActiveProjectArtifact
     {
         artifact.setResolvedVersion( version );
     }
+
+    public void setArtifactHandler( ArtifactHandler handler )
+    {
+        artifact.setArtifactHandler( handler );
+    }
 }

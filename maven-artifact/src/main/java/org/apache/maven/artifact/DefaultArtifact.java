@@ -64,7 +64,7 @@ public class DefaultArtifact
 
     private ArtifactFilter dependencyFilter;
 
-    private final ArtifactHandler artifactHandler;
+    private ArtifactHandler artifactHandler;
 
     private List dependencyTrail;
 
@@ -455,6 +455,11 @@ public class DefaultArtifact
     {
         this.version = version;
         // retain baseVersion
+    }
+
+    public void setArtifactHandler( ArtifactHandler artifactHandler )
+    {
+        this.artifactHandler = artifactHandler;
     }
 
 }
