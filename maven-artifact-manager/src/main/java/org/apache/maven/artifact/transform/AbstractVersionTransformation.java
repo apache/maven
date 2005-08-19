@@ -73,7 +73,7 @@ public abstract class AbstractVersionTransformation
                 ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots()
                     : repository.getReleases();
 
-                if ( !policy.isEnabled() )
+                if ( policy == null || !policy.isEnabled() )
                 {
                     getLogger().debug( "Skipping disabled repository " + repository.getId() );
                 }
@@ -98,9 +98,8 @@ public abstract class AbstractVersionTransformation
                         }
                         catch ( ResourceDoesNotExistException e )
                         {
-                            getLogger().debug(
-                                               "Artifact version metadata for: " + artifact.getId()
-                                                   + " could not be found on repository: " + repository.getId(), e );
+                            getLogger().debug( "Artifact version metadata for: " + artifact.getId() +
+                                " could not be found on repository: " + repository.getId(), e );
 
                             continue;
                         }
