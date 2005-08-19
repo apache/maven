@@ -180,13 +180,14 @@ public class SurefirePlugin
         else
         {
             // defaults here, qdox doesn't like the end javadoc value
+            // Have to wrap in an ArrayList as surefire expects an ArrayList instead of a List for some reason
             if ( includes == null || includes.size() == 0 )
             {
-                includes = Arrays.asList( new String[] { "**/*Test.java", "**/*TestCase.java" } );
+                includes = new ArrayList( Arrays.asList( new String[] { "**/*Test.java", "**/*TestCase.java" } ) );
             }
             if ( excludes == null || excludes.size() == 0 )
             {
-                excludes = Arrays.asList( new String[] { "**/Abstract*Test.java", "**/Abstract*TestCase.java" } );
+                excludes = new ArrayList( Arrays.asList( new String[] { "**/Abstract*Test.java", "**/Abstract*TestCase.java" } ) );
             }
 
             surefireBooter.addBattery( "org.codehaus.surefire.battery.DirectoryBattery",
