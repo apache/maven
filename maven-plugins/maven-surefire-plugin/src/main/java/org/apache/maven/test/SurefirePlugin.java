@@ -24,6 +24,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.surefire.SurefireBooter;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
