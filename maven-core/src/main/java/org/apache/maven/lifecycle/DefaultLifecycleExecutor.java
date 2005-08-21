@@ -103,9 +103,9 @@ public class DefaultLifecycleExecutor
     public MavenExecutionResponse execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
         throws LifecycleExecutionException
     {
-        MavenProject project = rm.getTopLevelProject();
+        MavenProject rootProject = rm.getTopLevelProject();
 
-        List taskSegments = segmentTaskListByAggregationNeeds( session.getGoals(), session, project );
+        List taskSegments = segmentTaskListByAggregationNeeds( session.getGoals(), session, rootProject );
 
         MavenExecutionResponse response = new MavenExecutionResponse();
 
@@ -113,16 +113,22 @@ public class DefaultLifecycleExecutor
 
         try
         {
-            for ( Iterator i = project.getBuildExtensions().iterator(); i.hasNext(); )
+            // TODO: probably don't want to do all this up front
+            for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
             {
-                Extension extension = (Extension) i.next();
-                extensionManager.addExtension( extension, project, session.getLocalRepository() );
+                MavenProject project = (MavenProject) i.next();
+
+                for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
+                {
+                    Extension extension = (Extension) j.next();
+                    extensionManager.addExtension( extension, project, session.getLocalRepository() );
+                }
+
+                Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );
+                artifactHandlerManager.addHandlers( handlers );
             }
 
-            Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );
-            artifactHandlerManager.addHandlers( handlers );
-
-            executeTaskSegments( taskSegments, rm, session, project, dispatcher );
+            executeTaskSegments( taskSegments, rm, session, rootProject, dispatcher );
 
             if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) && rm.hasBuildFailures() )
             {
