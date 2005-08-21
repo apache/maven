@@ -87,8 +87,7 @@ public class MavenArchetypeMojo
     private String version;
 
     /**
-     * @parameter expression="${packageName}" alias="package" default-value="com.mycompany.app"
-     * @required
+     * @parameter expression="${packageName}" alias="package"
      */
     private String packageName;
 
@@ -123,6 +122,12 @@ public class MavenArchetypeMojo
         {
             throw new MojoExecutionException( outputDirectory.getName() +
                 " already exists - please run from a clean directory" );
+        }
+
+        if ( packageName == null )
+        {
+            getLog().info( "Defaulting package to group ID: " + groupId );
+            packageName = groupId;
         }
 
         // TODO: context mojo more appropriate?
