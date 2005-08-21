@@ -23,9 +23,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Builds J2EE Enteprise Archive (EAR) files.
@@ -81,14 +79,6 @@ public class EarMojo
     private String finalName;
 
     /**
-     * The list of excluded dependencies with format groupId:artifactId[:type].
-     *
-     * @parameter
-     * @TODO handle this field
-     */
-    private List excludedDependencies = new ArrayList();
-
-    /**
      * The maven archiver to use.
      *
      * @parameter
@@ -109,7 +99,6 @@ public class EarMojo
         getLog().debug( "workDirectory[" + getWorkDirectory() + "]" );
         getLog().debug( "outputDirectory[" + outputDirectory + "]" );
         getLog().debug( "finalName[" + finalName + "]" );
-        getLog().debug( "excludedDependencies[" + excludedDependencies + "]" );
 
         // Copy modules
         try
