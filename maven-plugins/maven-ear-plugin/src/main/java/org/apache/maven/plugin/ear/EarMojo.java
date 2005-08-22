@@ -50,7 +50,6 @@ public class EarMojo
      * The location of the manifest file to be used within the ear file.
      *
      * @parameter expression="${basedir}/src/main/application/META-INF/MANIFEST.MF"
-     * @TODO handle this field
      */
     private String manifestLocation;
 
@@ -113,7 +112,7 @@ public class EarMojo
 
                 if ( !sourceFile.isFile() )
                 {
-                    throw new MojoExecutionException( "Cannot copy a directory: " + sourceFile.getAbsolutePath() + 
+                    throw new MojoExecutionException( "Cannot copy a directory: " + sourceFile.getAbsolutePath() +
                         "; Did you package/install " + module.getArtifact().getId() + "?" );
                 }
 
@@ -154,6 +153,9 @@ public class EarMojo
             MavenArchiver archiver = new MavenArchiver();
             archiver.setOutputFile( earFile );
 
+            // Include custom manifest if necessary
+            includeCustomManifestFile();
+
             archiver.getArchiver().addDirectory( getBuildDir() );
             archiver.createArchive( getProject(), archive );
 
@@ -168,5 +170,19 @@ public class EarMojo
     private static File buildDestinationFile( File buildDir, String uri )
     {
         return new File( buildDir, uri );
+    }
+
+    private void includeCustomManifestFile()
+    {
+        File customManifestFile = new File( manifestLocation );
+        if ( !customManifestFile.exists() )
+        {
+            // Does not exist so will use default
+        }
+        else
+        {
+            getLog().info( "Including custom manifest file[" + customManifestFile + "]" );
+            archive.setManifestFile( customManifestFile );
+        }
     }
 }
