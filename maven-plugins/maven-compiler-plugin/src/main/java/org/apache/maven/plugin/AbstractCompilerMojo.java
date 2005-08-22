@@ -19,27 +19,26 @@ package org.apache.maven.plugin;
 import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerConfiguration;
 import org.codehaus.plexus.compiler.CompilerError;
-import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerException;
+import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.manager.CompilerManager;
 import org.codehaus.plexus.compiler.manager.NoSuchCompilerException;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
+import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
-import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
-import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
-import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
+import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
+import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.Map;
-import java.util.Collections;
-import java.util.Collection;
 
 /**
  * TODO: At least one step could be optimized, currently the plugin will do two
@@ -115,6 +114,13 @@ public abstract class AbstractCompilerMojo
     private String compilerId;
 
     /**
+     * Version of the compiler to use, ex. "1.3", "1.5"
+     *
+     * @parameter
+     */
+    private String compilerVersion;
+
+    /**
      * Runs the compiler in a separate process.
      * <p/>
      * If not set the compiler will default to a executable.
@@ -138,7 +144,7 @@ public abstract class AbstractCompilerMojo
      *
      * @parameter
      */
-    private Map compilerArguments;
+    private LinkedHashMap compilerArguments;
 
     /**
      * Used to control the name of the output file when compiling a set of
