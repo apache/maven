@@ -146,6 +146,13 @@ it0051: Test source attachment when -DperformRelease=true is specified.
 it0052: Test that source attachment doesn't take place when
         -DperformRelease=true is missing.
 
+it0053: Test that attached artifacts have the same buildnumber and timestamp
+        as the main artifact. This will not correctly verify until we have
+        some way to pattern-match the buildnumber/timestamp...
+
+it0054: Test that locally defined repositories override those from the super
+        POM. This is from MNG-479.
+
 -------------------------------------------------------------------------------
 
 - generated sources
