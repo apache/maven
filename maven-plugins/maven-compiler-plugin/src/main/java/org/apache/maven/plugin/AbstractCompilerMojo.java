@@ -24,16 +24,13 @@ import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.manager.CompilerManager;
 import org.codehaus.plexus.compiler.manager.NoSuchCompilerException;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
-import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
-import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SingleTargetSourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -114,13 +111,6 @@ public abstract class AbstractCompilerMojo
     private String compilerId;
 
     /**
-     * Version of the compiler to use, ex. "1.3", "1.5"
-     *
-     * @parameter
-     */
-    private String compilerVersion;
-
-    /**
      * Runs the compiler in a separate process.
      * <p/>
      * If not set the compiler will default to a executable.
@@ -182,6 +172,10 @@ public abstract class AbstractCompilerMojo
      * @readonly
      */
     private CompilerManager compilerManager;
+
+    protected abstract SourceInclusionScanner getSourceInclusionScanner( int staleMillis );
+
+    protected abstract SourceInclusionScanner getSourceInclusionScanner( String inputFileEnding );
 
     protected abstract List getClasspathElements();
 
@@ -267,24 +261,19 @@ public abstract class AbstractCompilerMojo
 
         try
         {
-            staleSources = computeStaleSources( compilerConfiguration,
-                                                compiler,
-                                                new StaleSourceScanner( staleMillis ) );
+            staleSources = computeStaleSources( compilerConfiguration, compiler, getSourceInclusionScanner( staleMillis ) );
 
             canUpdateTarget = compiler.canUpdateTarget( compilerConfiguration );
 
-            if ( compiler.getCompilerOutputStyle() == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES &&
-                 !canUpdateTarget )
+            if ( compiler.getCompilerOutputStyle() == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES
+                && !canUpdateTarget )
             {
                 getLog().info( "RESCANNING!" );
                 // TODO: This second scan for source files is sub-optimal
                 String inputFileEnding = compiler.getInputFileEnding( compilerConfiguration );
 
-                Set includes = Collections.singleton( "**/*." + inputFileEnding );
-
-                Set sources = computeStaleSources( compilerConfiguration,
-                                                   compiler,
-                                                   new SimpleSourceInclusionScanner( includes, Collections.EMPTY_SET ));
+                Set sources = computeStaleSources( compilerConfiguration, compiler,
+                                                   getSourceInclusionScanner( inputFileEnding ) );
 
                 compilerConfiguration.setSourceFiles( sources );
             }
@@ -364,9 +353,8 @@ public abstract class AbstractCompilerMojo
         }
     }
 
-    private Set computeStaleSources( CompilerConfiguration compilerConfiguration,
-                                     Compiler compiler,
-                                     SourceInclusionScanner scanner )
+    private Set computeStaleSources( CompilerConfiguration compilerConfiguration, Compiler compiler,
+                                    SourceInclusionScanner scanner )
         throws MojoExecutionException, CompilerException
     {
         CompilerOutputStyle outputStyle = compiler.getCompilerOutputStyle();
@@ -377,15 +365,15 @@ public abstract class AbstractCompilerMojo
 
         if ( outputStyle == CompilerOutputStyle.ONE_OUTPUT_FILE_PER_INPUT_FILE )
         {
-            mapping = new SuffixMapping( compiler.getInputFileEnding( compilerConfiguration ),
-                                         compiler.getOutputFileEnding( compilerConfiguration ) );
+            mapping = new SuffixMapping( compiler.getInputFileEnding( compilerConfiguration ), compiler
+                .getOutputFileEnding( compilerConfiguration ) );
 
             outputDirectory = getOutputDirectory();
         }
         else if ( outputStyle == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES )
         {
-            mapping = new SingleTargetSourceMapping( compiler.getInputFileEnding( compilerConfiguration ),
-                                                     compiler.getOutputFile( compilerConfiguration ) );
+            mapping = new SingleTargetSourceMapping( compiler.getInputFileEnding( compilerConfiguration ), compiler
+                .getOutputFile( compilerConfiguration ) );
 
             outputDirectory = buildDirectory;
         }
@@ -415,8 +403,8 @@ public abstract class AbstractCompilerMojo
             }
             catch ( InclusionScanException e )
             {
-                throw new MojoExecutionException( "Error scanning source root: \'" + sourceRoot + "\' " +
-                                                  "for stale files to recompile.", e );
+                throw new MojoExecutionException( "Error scanning source root: \'" + sourceRoot + "\' "
+                    + "for stale files to recompile.", e );
             }
         }
 

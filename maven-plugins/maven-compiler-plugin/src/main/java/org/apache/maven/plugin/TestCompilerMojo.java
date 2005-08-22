@@ -16,7 +16,14 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.codehaus.plexus.compiler.util.scan.SimpleSourceInclusionScanner;
+import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
+import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
+
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.io.File;
 
 /**
@@ -51,6 +58,18 @@ public class TestCompilerMojo
      */
     private File outputDirectory;
 
+    /**
+     * A list of inclusion filters for the compiler.
+     * @parameter
+     */
+    private Set testIncludes = new HashSet();
+
+    /**
+     * A list of exclusion filters for the compiler.
+     * @parameter
+     */
+    private Set testExcludes = new HashSet();
+
     protected List getCompileSourceRoots()
     {
         return compileSourceRoots;
@@ -64,6 +83,47 @@ public class TestCompilerMojo
     protected File getOutputDirectory()
     {
         return outputDirectory;
+    }
+
+    protected SourceInclusionScanner getSourceInclusionScanner( int staleMillis )
+    {
+        SourceInclusionScanner scanner = null;
+
+        if ( testIncludes.isEmpty() && testExcludes.isEmpty() )
+        {
+            scanner = new StaleSourceScanner( staleMillis );
+        }
+        else
+        {
+            if ( testIncludes.isEmpty() )
+            {
+                testIncludes.add( "**/*.java" );
+            }
+            scanner = new StaleSourceScanner( staleMillis, testIncludes, testExcludes );
+        }
+
+        return scanner;
+    }
+
+    protected SourceInclusionScanner getSourceInclusionScanner( String inputFileEnding )
+    {
+        SourceInclusionScanner scanner = null;
+
+        if ( testIncludes.isEmpty() && testExcludes.isEmpty() )
+        {
+            testIncludes = Collections.singleton( "**/*." + inputFileEnding );
+            scanner = new SimpleSourceInclusionScanner( testIncludes, Collections.EMPTY_SET );
+        }
+        else
+        {
+            if ( testIncludes.isEmpty() )
+            {
+                testIncludes.add( "**/*." + inputFileEnding );
+            }
+            scanner = new SimpleSourceInclusionScanner( testExcludes, testExcludes );
+        }
+
+        return scanner;
     }
 
 }
