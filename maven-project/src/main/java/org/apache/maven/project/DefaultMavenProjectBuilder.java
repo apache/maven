@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
@@ -119,6 +120,8 @@ public class DefaultMavenProjectBuilder
     private ModelInterpolator modelInterpolator;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
+
+    private ArtifactTransformationManager transformationManager;
 
     private final Map modelCache = new HashMap();
 
@@ -576,6 +579,13 @@ public class DefaultMavenProjectBuilder
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
                                                                         project.getVersion(), project.getPackaging() );
         project.setArtifact( projectArtifact );
+        
+        if ( projectArtifact.isSnapshot() )
+        {
+            project.setSnapshotDeploymentVersion( transformationManager.getSnapshotDeploymentVersion( projectArtifact ) );
+            
+            project.setSnapshotDeploymentBuildNumber( transformationManager.getSnapshotDeploymentBuildNumber( projectArtifact ) );
+        }
 
         project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(),
                                                                                        artifactRepositoryFactory,

@@ -47,6 +47,28 @@
         </requirement>
       </requirements>
     </component>
+    
+    <!--
+     |
+     | ArtifactTransformationManager
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+      <implementation>org.apache.maven.artifact.transform.DefaultArtifactTransformationManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <role-hint>snapshot</role-hint>
+          <field-name>snapshotTransformation</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
     <!--
      |
      | Resolver
@@ -60,8 +82,7 @@
           <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-          <field-name>artifactTransformations</field-name>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
@@ -82,8 +103,7 @@
       <implementation>org.apache.maven.artifact.installer.DefaultArtifactInstaller</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-          <field-name>artifactTransformations</field-name>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
         </requirement>
       </requirements>
     </component>
@@ -101,8 +121,7 @@
           <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-          <field-name>artifactTransformations</field-name>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
         </requirement>
       </requirements>
     </component>

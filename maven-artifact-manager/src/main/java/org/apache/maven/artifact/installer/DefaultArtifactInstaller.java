@@ -20,20 +20,19 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.transform.ArtifactTransformation;
+import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 
 public class DefaultArtifactInstaller
     extends AbstractLogEnabled
     implements ArtifactInstaller
 {
-    private List artifactTransformations;
+    private ArtifactTransformationManager transformationManager;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
@@ -50,12 +49,7 @@ public class DefaultArtifactInstaller
     {
         try
         {
-            // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
-            for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
-            {
-                ArtifactTransformation transform = (ArtifactTransformation) i.next();
-                transform.transformForInstall( artifact, localRepository );
-            }
+            transformationManager.transformForInstall( artifact, localRepository );
 
             String localPath = localRepository.pathOf( artifact );
 

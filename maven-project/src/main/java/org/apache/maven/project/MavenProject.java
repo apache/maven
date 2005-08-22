@@ -137,6 +137,10 @@ public class MavenProject
 
     private Build buildOverlay;
 
+    private String snapshotDeploymentVersion;
+
+    private int snapshotDeploymentBuildNumber = -1;
+
     public MavenProject( Model model )
     {
         this.model = model;
@@ -182,6 +186,9 @@ public class MavenProject
         {
             this.originalModel = ModelUtils.cloneModel( project.originalModel );
         }
+        
+        this.snapshotDeploymentVersion = project.snapshotDeploymentVersion;
+        this.snapshotDeploymentBuildNumber = project.snapshotDeploymentBuildNumber;
 
         // TODO: need to clone this too?
         this.artifact = project.artifact;
@@ -1340,6 +1347,33 @@ public class MavenProject
 
     public void attachArtifact( String type, String classifier, File file )
     {
+    }
+
+    public void setSnapshotDeploymentVersion( String deploymentVersion )
+    {
+        this.snapshotDeploymentVersion = deploymentVersion;
+    }
+    
+    public String getSnapshotDeploymentVersion()
+    {
+        if ( snapshotDeploymentVersion == null )
+        {
+            return getVersion();
+        }
+        else
+        {
+            return snapshotDeploymentVersion;
+        }
+    }
+    
+    public void setSnapshotDeploymentBuildNumber( int deploymentBuildNumber )
+    {
+        this.snapshotDeploymentBuildNumber = deploymentBuildNumber;
+    }
+    
+    public int getSnapshotDeploymentBuildNumber()
+    {
+        return snapshotDeploymentBuildNumber;
     }
     
 }

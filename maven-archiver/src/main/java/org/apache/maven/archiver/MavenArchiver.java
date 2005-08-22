@@ -42,7 +42,7 @@ import java.util.Set;
 public class MavenArchiver
 {
     private JarArchiver archiver = new JarArchiver();
-
+    
     private File archiveFile;
 
     /**
@@ -59,6 +59,14 @@ public class MavenArchiver
         m.addConfiguredAttribute( buildAttr );
         Manifest.Attribute createdAttr = new Manifest.Attribute( "Created-By", "Apache Maven" );
         m.addConfiguredAttribute( createdAttr );
+        
+        Artifact projectArtifact = project.getArtifact();
+        
+        if ( projectArtifact.isSnapshot() )
+        {
+            Manifest.Attribute buildNumberAttr = new Manifest.Attribute( "Build-Number", "" + project.getSnapshotDeploymentBuildNumber() );
+            m.addConfiguredAttribute( buildNumberAttr );
+        }
 
         if ( config.getPackageName() != null )
         {
@@ -214,12 +222,21 @@ public class MavenArchiver
         // top-level POM elements so that applications that wish to access
         // POM information without the use of maven tools can do so.
         // ----------------------------------------------------------------------
+        
+        // we have to clone the project instance so we can write out the pom with the deployment version,
+        // without impacting the main project instance...
+        MavenProject workingProject = new MavenProject( project );
+        
+        if ( workingProject.getArtifact().isSnapshot() )
+        {
+            workingProject.setVersion( workingProject.getSnapshotDeploymentVersion() );
+        }
+        
+        String groupId = workingProject.getGroupId();
 
-        String groupId = project.getGroupId();
+        String artifactId = workingProject.getArtifactId();
 
-        String artifactId = project.getArtifactId();
-
-        File exportReadyPom = writeExportReadyPom( project );
+        File exportReadyPom = writeExportReadyPom( workingProject );
 
         archiver.addFile( exportReadyPom, "META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml" );
 
@@ -229,13 +246,13 @@ public class MavenArchiver
 
         Properties p = new Properties();
 
-        p.setProperty( "groupId", project.getGroupId() );
+        p.setProperty( "groupId", workingProject.getGroupId() );
 
-        p.setProperty( "artifactId", project.getArtifactId() );
+        p.setProperty( "artifactId", workingProject.getArtifactId() );
 
-        p.setProperty( "version", project.getVersion() );
+        p.setProperty( "version", workingProject.getVersion() );
 
-        File pomPropertiesFile = new File( project.getFile().getParentFile(), "pom.properties" );
+        File pomPropertiesFile = new File( workingProject.getFile().getParentFile(), "pom.properties" );
 
         OutputStream os = new FileOutputStream( pomPropertiesFile );
 
@@ -256,7 +273,7 @@ public class MavenArchiver
             archiver.setManifest( manifestFile );
         }
 
-        Manifest manifest = getManifest( project, archiveConfiguration.getManifest() );
+        Manifest manifest = getManifest( workingProject, archiveConfiguration.getManifest() );
 
         // Configure the jar
         archiver.addConfiguredManifest( manifest );

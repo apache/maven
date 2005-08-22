@@ -24,7 +24,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.transform.ArtifactTransformation;
+import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -46,8 +46,8 @@ public class DefaultArtifactResolver
     // ----------------------------------------------------------------------
 
     private WagonManager wagonManager;
-
-    private List artifactTransformations;
+    
+    private ArtifactTransformationManager transformationManager;
 
     protected ArtifactFactory artifactFactory;
 
@@ -86,18 +86,13 @@ public class DefaultArtifactResolver
 
             artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
 
-            // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
-            for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
+            try
             {
-                ArtifactTransformation transform = (ArtifactTransformation) i.next();
-                try
-                {
-                    transform.transformForResolve( artifact, remoteRepositories, localRepository );
-                }
-                catch ( ArtifactMetadataRetrievalException e )
-                {
-                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-                }
+                transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
             }
 
             File destination = artifact.getFile();

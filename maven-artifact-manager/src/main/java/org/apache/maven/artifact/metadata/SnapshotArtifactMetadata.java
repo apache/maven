@@ -43,9 +43,6 @@ public class SnapshotArtifactMetadata
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
-    // TODO: very quick and nasty hack to get the same timestamp across a build - not embedder friendly
-    private static String sessionTimestamp = null;
-
     public SnapshotArtifactMetadata( Artifact artifact )
     {
         super( artifact, artifact.getArtifactId() + "-" + artifact.getBaseVersion() + "." + SNAPSHOT_VERSION_FILE );
@@ -83,10 +80,21 @@ public class SnapshotArtifactMetadata
             buildNumber = 0;
         }
     }
+    
+    public void setVersion( String timestamp, int buildNumber )
+    {
+        this.timestamp = timestamp;
+        this.buildNumber = buildNumber;
+    }
 
     public String getTimestamp()
     {
         return timestamp;
+    }
+    
+    public int getBuildNumber()
+    {
+        return buildNumber;
     }
 
     public static DateFormat getUtcDateFormatter()
@@ -95,22 +103,6 @@ public class SnapshotArtifactMetadata
         utcDateFormatter.setTimeZone( UTC_TIME_ZONE );
         return utcDateFormatter;
     }
-
-    public void update()
-    {
-        this.buildNumber++;
-        timestamp = getSessionTimestamp();
-    }
-
-    private static String getSessionTimestamp()
-    {
-        if ( sessionTimestamp == null )
-        {
-            sessionTimestamp = getUtcDateFormatter().format( new Date() );
-        }
-        return sessionTimestamp;
-    }
-
 
     public int compareTo( Object o )
     {

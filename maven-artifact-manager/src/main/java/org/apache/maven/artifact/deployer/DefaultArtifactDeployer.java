@@ -21,7 +21,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.transform.ArtifactTransformation;
+import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
@@ -29,15 +29,14 @@ import org.codehaus.plexus.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 
 public class DefaultArtifactDeployer
     extends AbstractLogEnabled
     implements ArtifactDeployer
 {
     private WagonManager wagonManager;
-
-    private List artifactTransformations;
+    
+    private ArtifactTransformationManager transformationManager;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     public void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
@@ -55,12 +54,7 @@ public class DefaultArtifactDeployer
     {
         try
         {
-            // TODO: better to have a transform manager, or reuse the handler manager again so we don't have these requirements duplicated all over?
-            for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
-            {
-                ArtifactTransformation transform = (ArtifactTransformation) i.next();
-                transform.transformForDeployment( artifact, deploymentRepository );
-            }
+            transformationManager.transformForDeployment( artifact, localRepository );
 
             // Copy the original file to the new one if it was transformed
             File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
