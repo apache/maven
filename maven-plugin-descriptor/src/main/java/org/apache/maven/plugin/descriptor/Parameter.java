@@ -40,6 +40,8 @@ public class Parameter
 
     private String defaultValue;
 
+    private Requirement requirement;
+
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -149,4 +151,13 @@ public class Parameter
         return "Mojo parameter [name: \'" + getName() + "\'; alias: \'" + getAlias() + "\']";
     }
 
+    public Requirement getRequirement()
+    {
+        return requirement;
+    }
+
+    public void setRequirement( Requirement requirement )
+    {
+        this.requirement = requirement;
+    }
 }

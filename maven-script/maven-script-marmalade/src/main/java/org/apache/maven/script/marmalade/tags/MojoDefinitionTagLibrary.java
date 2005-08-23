@@ -47,6 +47,9 @@ public class MojoDefinitionTagLibrary
         registerTag( "requiresDependencyResolution", RequiresDependencyResolutionTag.class );
         registerTag( "requiresProject", RequiresProjectTag.class );
         registerTag( "requiresOnline", RequiresOnlineTag.class );
+        registerTag( "requirement", RequirementTag.class );
+        registerTag( "role", RequirementRoleTag.class );
+        registerTag( "roleHint", RequirementRoleHintTag.class );
         registerTag( "type", ParamTypeTag.class );
     }
 

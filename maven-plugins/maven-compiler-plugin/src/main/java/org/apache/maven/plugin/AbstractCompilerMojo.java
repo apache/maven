@@ -167,9 +167,7 @@ public abstract class AbstractCompilerMojo
     private File buildDirectory;
 
     /**
-     * @parameter expression="${component.org.codehaus.plexus.compiler.manager.CompilerManager}"
-     * @required
-     * @readonly
+     * @component
      */
     private CompilerManager compilerManager;
 
@@ -261,12 +259,13 @@ public abstract class AbstractCompilerMojo
 
         try
         {
-            staleSources = computeStaleSources( compilerConfiguration, compiler, getSourceInclusionScanner( staleMillis ) );
+            staleSources = computeStaleSources( compilerConfiguration, compiler,
+                                                getSourceInclusionScanner( staleMillis ) );
 
             canUpdateTarget = compiler.canUpdateTarget( compilerConfiguration );
 
-            if ( compiler.getCompilerOutputStyle() == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES
-                && !canUpdateTarget )
+            if ( compiler.getCompilerOutputStyle() == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES &&
+                !canUpdateTarget )
             {
                 getLog().info( "RESCANNING!" );
                 // TODO: This second scan for source files is sub-optimal
@@ -354,7 +353,7 @@ public abstract class AbstractCompilerMojo
     }
 
     private Set computeStaleSources( CompilerConfiguration compilerConfiguration, Compiler compiler,
-                                    SourceInclusionScanner scanner )
+                                     SourceInclusionScanner scanner )
         throws MojoExecutionException, CompilerException
     {
         CompilerOutputStyle outputStyle = compiler.getCompilerOutputStyle();
@@ -403,8 +402,8 @@ public abstract class AbstractCompilerMojo
             }
             catch ( InclusionScanException e )
             {
-                throw new MojoExecutionException( "Error scanning source root: \'" + sourceRoot + "\' "
-                    + "for stale files to recompile.", e );
+                throw new MojoExecutionException(
+                    "Error scanning source root: \'" + sourceRoot + "\' " + "for stale files to recompile.", e );
             }
         }
 

@@ -17,6 +17,7 @@ package org.apache.maven.script.marmalade.tags;
  */
 
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.Requirement;
 import org.codehaus.marmalade.model.AbstractMarmaladeTag;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionContext;
 import org.codehaus.marmalade.runtime.MarmaladeExecutionException;
@@ -43,6 +44,8 @@ public class ParameterTag
 
     private String defaultVal;
 
+    private Requirement requirement = null;
+
     protected void doExecute( MarmaladeExecutionContext context )
         throws MarmaladeExecutionException
     {
@@ -65,6 +68,7 @@ public class ParameterTag
         param.setType( type );
         param.setDeprecated( deprecated );
         param.setDefaultValue( defaultVal );
+        param.setRequirement( requirement );
 
         return param;
     }
@@ -107,5 +111,10 @@ public class ParameterTag
     public void setDeprecated( String deprecated )
     {
         this.deprecated = deprecated;
+    }
+
+    public void setRequirement( Requirement requirement )
+    {
+        this.requirement = requirement;
     }
 }

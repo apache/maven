@@ -19,6 +19,7 @@ package org.apache.maven.tools.plugin.generator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.Requirement;
 import org.apache.maven.tools.plugin.util.PluginUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -28,11 +29,11 @@ import org.codehaus.plexus.util.xml.XMLWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -249,7 +250,7 @@ public class PluginDescriptorGenerator
 
         w.startElement( "parameters" );
 
-        Collection requirements = new ArrayList();
+        Map requirements = new HashMap();
 
         Set configuration = new HashSet();
 
@@ -265,7 +266,15 @@ public class PluginDescriptorGenerator
                 {
                     // treat it as a component...a requirement, in other words.
 
-                    requirements.add( parameter );
+                    // remove "component." plus expression delimiters
+                    String role = expression.substring( "${component.".length(), expression.length() - 1 );
+
+                    // TODO: remove deprecated expression
+                    requirements.put( parameter.getName(), new Requirement( role ) );
+                }
+                else if ( parameter.getRequirement() != null )
+                {
+                    requirements.put( parameter.getName(), parameter.getRequirement() );
                 }
                 else
                 {
@@ -351,19 +360,21 @@ public class PluginDescriptorGenerator
         {
             w.startElement( "requirements" );
 
-            for ( Iterator i = requirements.iterator(); i.hasNext(); )
+            for ( Iterator i = requirements.keySet().iterator(); i.hasNext(); )
             {
-                Parameter requirement = (Parameter) i.next();
+                String key = (String) i.next();
+                Requirement requirement = (Requirement) requirements.get( key );
 
                 w.startElement( "requirement" );
 
-                // remove "component." plus expression delimiters
-                String expression = requirement.getExpression();
-                String role = expression.substring( "${component.".length(), expression.length() - 1 );
+                element( w, "role", requirement.getRole() );
 
-                element( w, "role", role );
+                if ( requirement.getRoleHint() != null )
+                {
+                    element( w, "role-hint", requirement.getRoleHint() );
+                }
 
-                element( w, "field-name", requirement.getName() );
+                element( w, "field-name", key );
 
                 w.endElement();
             }

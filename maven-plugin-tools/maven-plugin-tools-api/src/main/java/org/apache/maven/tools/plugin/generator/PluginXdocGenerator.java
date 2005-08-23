@@ -357,6 +357,10 @@ public class PluginXdocGenerator
             {
                 w.writeMarkup( " <i>(Discovered)</i>" );
             }
+            else if ( parameter.getRequirement() != null )
+            {
+                w.writeMarkup( " <i>(Discovered)</i>" );
+            }
 
             w.endElement(); // td
 

@@ -16,21 +16,21 @@ package org.apache.maven.tools.plugin.extractor.java;
  * limitations under the License.
  */
 
-import org.apache.maven.plugin.descriptor.InvalidParameterException;
-import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
-import org.codehaus.modello.StringUtils;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.DocletTag;
 import com.thoughtworks.qdox.model.JavaClass;
 import com.thoughtworks.qdox.model.JavaField;
 import com.thoughtworks.qdox.model.JavaSource;
+import org.apache.maven.plugin.descriptor.InvalidParameterException;
+import org.apache.maven.plugin.descriptor.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.Requirement;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.tools.plugin.extractor.MojoDescriptorExtractor;
+import org.codehaus.modello.StringUtils;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,7 +38,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 
 /**
@@ -51,7 +50,7 @@ public class JavaMojoDescriptorExtractor
     implements MojoDescriptorExtractor
 {
     public static final String MAVEN_PLUGIN_INSTANTIATION = "instantiationStrategy";
-    
+
     public static final String CONFIGURATOR = "configurator";
 
     public static final String PARAMETER = "parameter";
@@ -77,16 +76,18 @@ public class JavaMojoDescriptorExtractor
     public static final String GOAL_REQUIRES_DEPENDENCY_RESOLUTION = "requiresDependencyResolution";
 
     public static final String GOAL_REQUIRES_PROJECT = "requiresProject";
-    
+
     public static final String GOAL_IS_AGGREGATOR = "aggregator";
 
     public static final String GOAL_REQUIRES_ONLINE = "requiresOnline";
-    
+
     public static final String GOAL_INHERIT_BY_DEFAULT = "inheritByDefault";
 
     public static final String GOAL_MULTI_EXECUTION_STRATEGY = "attainAlways";
-    
+
     public static final String GOAL_REQUIRES_DIRECT_INVOCATION = "requiresDirectInvocation";
+
+    private static final String COMPONENT = "component";
 
     protected void validateParameter( Parameter parameter, int i )
         throws InvalidParameterException
@@ -120,7 +121,8 @@ public class JavaMojoDescriptorExtractor
     // Mojo descriptor creation from @tags
     // ----------------------------------------------------------------------
 
-    private MojoDescriptor createMojoDescriptor( JavaSource javaSource, PluginDescriptor pluginDescriptor ) throws InvalidPluginDescriptorException
+    private MojoDescriptor createMojoDescriptor( JavaSource javaSource, PluginDescriptor pluginDescriptor )
+        throws InvalidPluginDescriptorException
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setPluginDescriptor( pluginDescriptor );
@@ -151,7 +153,6 @@ public class JavaMojoDescriptorExtractor
             mojoDescriptor.setExecutionStrategy( MojoDescriptor.SINGLE_PASS_EXEC_STRATEGY );
         }
 
-
         // ----------------------------------------------------------------------
         // Configurator hint
         // ----------------------------------------------------------------------
@@ -162,7 +163,7 @@ public class JavaMojoDescriptorExtractor
         {
             mojoDescriptor.setComponentConfigurator( configurator.getValue() );
         }
- 
+
         // ----------------------------------------------------------------------
         // Goal name
         // ----------------------------------------------------------------------
@@ -239,7 +240,7 @@ public class JavaMojoDescriptorExtractor
         if ( requiresProject != null )
         {
             String requiresProjectValue = requiresProject.getValue();
-            
+
             if ( requiresProjectValue != null )
             {
                 mojoDescriptor.setProjectRequired( Boolean.valueOf( requiresProjectValue ).booleanValue() );
@@ -312,7 +313,8 @@ public class JavaMojoDescriptorExtractor
         return tag;
     }
 
-    private void extractParameters( MojoDescriptor mojoDescriptor, JavaClass javaClass ) throws InvalidPluginDescriptorException
+    private void extractParameters( MojoDescriptor mojoDescriptor, JavaClass javaClass )
+        throws InvalidPluginDescriptorException
     {
         // ---------------------------------------------------------------------------------
         // We're resolving class-level, ancestor-class-field, local-class-field order here.
@@ -322,12 +324,10 @@ public class JavaMojoDescriptorExtractor
 
         for ( Iterator it = rawParams.entrySet().iterator(); it.hasNext(); )
         {
-            Map.Entry entry = (Entry) it.next();
+            Map.Entry entry = (Map.Entry) it.next();
             String paramName = (String) entry.getKey();
 
             JavaField field = (JavaField) entry.getValue();
-
-            DocletTag parameter = field.getTagByName( PARAMETER );
 
             Parameter pd = new Parameter();
 
@@ -337,27 +337,43 @@ public class JavaMojoDescriptorExtractor
 
             pd.setDescription( field.getComment() );
 
-            pd.setRequired( field.getTagByName( REQUIRED ) != null );
-
-            pd.setEditable( field.getTagByName( READONLY ) == null );
-
-            DocletTag deprecationTag = field.getTagByName( DEPRECATED );
-            if ( deprecationTag != null )
+            DocletTag componentTag = field.getTagByName( COMPONENT );
+            if ( componentTag != null )
             {
-                pd.setDeprecated( deprecationTag.getValue() );
+                String role = componentTag.getNamedParameter( "role" );
+                if ( role == null )
+                {
+                    role = field.getType().toString();
+                }
+
+                String roleHint = componentTag.getNamedParameter( "roleHint" );
+                pd.setRequirement( new Requirement( role, roleHint ) );
             }
-
-            String alias = parameter.getNamedParameter( "alias" );
-
-            if ( !StringUtils.isEmpty( alias ) )
+            else
             {
-                pd.setAlias( alias );
+                DocletTag parameter = field.getTagByName( PARAMETER );
+
+                pd.setRequired( field.getTagByName( REQUIRED ) != null );
+
+                pd.setEditable( field.getTagByName( READONLY ) == null );
+
+                DocletTag deprecationTag = field.getTagByName( DEPRECATED );
+                if ( deprecationTag != null )
+                {
+                    pd.setDeprecated( deprecationTag.getValue() );
+                }
+
+                String alias = parameter.getNamedParameter( "alias" );
+
+                if ( !StringUtils.isEmpty( alias ) )
+                {
+                    pd.setAlias( alias );
+                }
+
+                pd.setExpression( parameter.getNamedParameter( PARAMETER_EXPRESSION ) );
+
+                pd.setDefaultValue( parameter.getNamedParameter( PARAMETER_DEFAULT_VALUE ) );
             }
-
-            pd.setExpression( parameter.getNamedParameter( PARAMETER_EXPRESSION ) );
-
-            pd.setDefaultValue( parameter.getNamedParameter( PARAMETER_DEFAULT_VALUE ) );
-
             mojoDescriptor.addParameter( pd );
         }
     }
@@ -387,9 +403,7 @@ public class JavaMojoDescriptorExtractor
             {
                 JavaField field = classFields[i];
 
-                DocletTag paramTag = field.getTagByName( PARAMETER );
-
-                if ( paramTag != null )
+                if ( field.getTagByName( PARAMETER ) != null || field.getTagByName( COMPONENT ) != null )
                 {
                     rawParams.put( field.getName(), field );
                 }
