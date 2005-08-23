@@ -1312,19 +1312,38 @@
                 {
                     return getJar();
                 }
-        
-                return getArtifactId() + "-" + getVersion() + "." + getExtension();
+
+				String artifact;
+
+                if ("ejb-client".equals(getType())) {
+                	artifact = getArtifactId() + "-" + getVersion() + "-client." + getExtension();
+                } else {
+                	artifact = getArtifactId() + "-" + getVersion() + "." + getExtension();
+                }
+
+                return artifact;
+            }
+
+            public String getTypeDirectory()
+            {
+                String path;
+                if (getType().equals("ejb-client")) {
+                    path = "ejbs";
+                } else {
+                    path = getType() + "s";
+                }
+               return path;
             }
         
             public String getExtension()
             {
-                if ("ejb".equals(getType()) || "plugin".equals(getType()) || "aspect".equals(getType()) || "uberjar".equals(getType())) return "jar";
+                if ("ejb".equals(getType()) || "ejb-client".equals(getType()) || "plugin".equals(getType()) || "aspect".equals(getType()) || "uberjar".equals(getType())) return "jar";
                 return getType();
             }
         
             public boolean isAddedToClasspath()
             {
-                return ("jar".equals(getType()) || "ejb".equals(getType()) || "sar".equals(getType()));
+                return ("jar".equals(getType()) || "ejb".equals(getType()) || "ejb-client".equals(getType()) || "sar".equals(getType()));
             }
         
             public boolean isPlugin()
