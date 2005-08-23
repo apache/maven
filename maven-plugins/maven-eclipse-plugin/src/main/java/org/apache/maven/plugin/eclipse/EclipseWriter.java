@@ -33,7 +33,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,19 +65,15 @@ public class EclipseWriter
     public void write( File outputDir, MavenProject project, MavenProject executedProject, List reactorProjects )
         throws EclipsePluginException
     {
-        Map map = new HashMap();
-
         assertNotEmpty( project.getGroupId(), "groupId" );
 
         assertNotEmpty( project.getArtifactId(), "artifactId" );
 
-        map.put( "project.artifactId", project.getArtifactId() );
-        
         File projectBaseDir = project.getFile().getParentFile();
 
-        List referencedProjects = writeEclipseClasspath( projectBaseDir, outputDir, project, executedProject, map, reactorProjects );
+        Collection referencedProjects = writeEclipseClasspath( projectBaseDir, outputDir, project, executedProject, reactorProjects );
         
-        writeEclipseProject( projectBaseDir, outputDir, project, executedProject, referencedProjects, map );
+        writeEclipseProject( projectBaseDir, outputDir, project, executedProject, referencedProjects );
 
         writeEclipseSettings( projectBaseDir, outputDir, project, executedProject );
 
@@ -104,31 +101,15 @@ public class EclipseWriter
         {
             Plugin plugin = (Plugin) it.next();
             
-            if ( plugin.getArtifactId().equals("maven-compiler-plugin") )
+            if ( plugin.getArtifactId().equals( "maven-compiler-plugin" ) )
             {
-                Xpp3Dom o = (Xpp3Dom) plugin.getConfiguration();
-
-                String source = o.getChild( "source" ).getValue();
-                
-                String target = o.getChild( "target" ).getValue();
-                
-                if ( !source.equals("1.3") )
-                {
-                    coreSettings.put( "org.eclipse.jdt.core.compiler.source", source );
-
-                    coreSettings.put( "org.eclipse.jdt.core.compiler.compliance", source );
-                }
-
-                if ( !target.equals("1.2") )
-                {
-                    coreSettings.put( "org.eclipse.jdt.core.compiler.codegen.targetPlatform", target );
-                }
+                handleCompilerPlugin( plugin, coreSettings );
             }
         }
     
         // write the settings, if needed
         
-        if ( ! coreSettings.isEmpty() )
+        if ( !coreSettings.isEmpty() )
         {
             File settingsDir = new File( outputDir, "/.settings" );
             
@@ -163,7 +144,7 @@ public class EclipseWriter
     // .project
     // ----------------------------------------------------------------------
 
-    protected void writeEclipseProject( File projectBaseDir, File basedir, MavenProject project, MavenProject executedProject, List referencedProjects, Map map )
+    protected void writeEclipseProject( File projectBaseDir, File basedir, MavenProject project, MavenProject executedProject, Collection referencedProjects )
         throws EclipsePluginException
     {
         FileWriter w;
@@ -260,7 +241,7 @@ public class EclipseWriter
 
             addResourceLinks( writer, projectBaseDir, basedir, executedProject.getBuild().getTestResources() );
 
-            writer.endElement(); // linedResources
+            writer.endElement(); // linkedResources
         }
 
         writer.endElement(); // projectDescription
@@ -272,7 +253,7 @@ public class EclipseWriter
     // .classpath
     // ----------------------------------------------------------------------
 
-    protected List writeEclipseClasspath( File projectBaseDir, File basedir, MavenProject project, MavenProject executedProject, Map map, List reactorProjects )
+    protected Collection writeEclipseClasspath( File projectBaseDir, File basedir, MavenProject project, MavenProject executedProject, List reactorProjects )
         throws EclipsePluginException
     {
         FileWriter w;
@@ -346,20 +327,15 @@ public class EclipseWriter
         // The dependencies
         // ----------------------------------------------------------------------
         
-        List referencedProjects = new ArrayList();
+        Collection referencedProjects = new HashSet();
 
         Set artifacts = project.getArtifacts();
 
         for ( Iterator it = artifacts.iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-            
-            MavenProject refProject = addDependency( writer, artifact, reactorProjects );
-            
-            if ( refProject != null )
-            {
-                referencedProjects.add( refProject );
-            }
+
+            addDependency( writer, artifact, reactorProjects, referencedProjects );
         }
 
         writer.endElement();
@@ -560,17 +536,24 @@ public class EclipseWriter
      * @param reactorProjects
      * @return null or the reactorProject providing this dependency
      */
-    private MavenProject addDependency( XMLWriter writer, Artifact artifact, List reactorProjects )
+    private void addDependency( XMLWriter writer, Artifact artifact, List reactorProjects, Collection referencedProjects )
     {
         MavenProject reactorProject = findReactorProject( reactorProjects, artifact );
 
         String path = null;
         
         String kind = null;
-        
 
-        if (reactorProject != null)
+        if ( reactorProject != null )
         {
+            // if there's a dependency on multiple artifact attachments of the
+            // same project, don't add it again.
+
+            if ( !markAddedOnce( reactorProject, referencedProjects ) )
+            {
+                return;
+            }
+
             path = "/" + reactorProject.getArtifactId();
             
             kind = "src";
@@ -583,7 +566,7 @@ public class EclipseWriter
             {
                 log.error( "The artifacts path was null. Artifact id: " + artifact.getId() );
     
-                return null;
+                return;
             }
             
             path = "M2_REPO/" + toRelative( localRepository, artifactPath.getPath() );
@@ -598,10 +581,22 @@ public class EclipseWriter
         writer.addAttribute( "path", path );
 
         writer.endElement();
-        
-        return reactorProject;
     }
     
+    private static boolean markAddedOnce( MavenProject project, Collection referencedProjects )
+    {
+        if ( referencedProjects.contains( project ) )
+        {
+            return false;
+        }
+        else
+        {
+            referencedProjects.add( project );
+
+            return true;
+        }
+    }
+
     /**
      * Utility method that locates a project producing the given artifact.
      * 
@@ -632,7 +627,7 @@ public class EclipseWriter
         return null;
     }
 
-    private void close( Writer closeable )
+    private static void close( Writer closeable )
     {
         if ( closeable == null )
         {
@@ -649,7 +644,7 @@ public class EclipseWriter
         }
     }
 
-    private String toRelative( File basedir, String absolutePath )
+    private static String toRelative( File basedir, String absolutePath )
     {
         String relative;
 
@@ -667,12 +662,47 @@ public class EclipseWriter
         return relative;
     }
 
-    private void assertNotEmpty( String string, String elementName )
+    private static void assertNotEmpty( String string, String elementName )
         throws EclipsePluginException
     {
         if ( string == null )
         {
             throw new EclipsePluginException( "Missing element from the project descriptor: '" + elementName + "'." );
+        }
+    }
+
+    private static void handleCompilerPlugin( Plugin plugin, Properties coreSettings )
+    {
+        Xpp3Dom pluginConfig = (Xpp3Dom) plugin.getConfiguration();
+
+        String source = null;
+
+        Xpp3Dom sourceChild = pluginConfig.getChild( "source" );
+
+        if (sourceChild != null)
+        {
+            source = sourceChild.getValue();
+        }
+
+        String target = null;
+
+        Xpp3Dom targetChild = pluginConfig.getChild( "target" );
+
+        if (targetChild != null)
+        {
+            target = targetChild.getValue();
+        }
+        
+        if ( source != null && !source.equals( "1.3" ) )
+        {
+            coreSettings.put( "org.eclipse.jdt.core.compiler.source", source );
+
+            coreSettings.put( "org.eclipse.jdt.core.compiler.compliance", source );
+        }
+
+        if ( target != null && !target.equals( "1.2" ) )
+        {
+            coreSettings.put( "org.eclipse.jdt.core.compiler.codegen.targetPlatform", target );
         }
     }
 }
