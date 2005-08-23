@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ import java.util.Set;
 public class MavenArchiver
 {
     private JarArchiver archiver = new JarArchiver();
-    
+
     private File archiveFile;
 
     /**
@@ -59,12 +60,13 @@ public class MavenArchiver
         m.addConfiguredAttribute( buildAttr );
         Manifest.Attribute createdAttr = new Manifest.Attribute( "Created-By", "Apache Maven" );
         m.addConfiguredAttribute( createdAttr );
-        
+
         Artifact projectArtifact = project.getArtifact();
-        
+
         if ( projectArtifact.isSnapshot() )
         {
-            Manifest.Attribute buildNumberAttr = new Manifest.Attribute( "Build-Number", "" + project.getSnapshotDeploymentBuildNumber() );
+            Manifest.Attribute buildNumberAttr = new Manifest.Attribute( "Build-Number", "" +
+                project.getSnapshotDeploymentBuildNumber() );
             m.addConfiguredAttribute( buildNumberAttr );
         }
 
@@ -222,16 +224,16 @@ public class MavenArchiver
         // top-level POM elements so that applications that wish to access
         // POM information without the use of maven tools can do so.
         // ----------------------------------------------------------------------
-        
+
         // we have to clone the project instance so we can write out the pom with the deployment version,
         // without impacting the main project instance...
         MavenProject workingProject = new MavenProject( project );
-        
+
         if ( workingProject.getArtifact().isSnapshot() )
         {
             workingProject.setVersion( workingProject.getSnapshotDeploymentVersion() );
         }
-        
+
         String groupId = workingProject.getGroupId();
 
         String artifactId = workingProject.getArtifactId();
@@ -274,6 +276,20 @@ public class MavenArchiver
         }
 
         Manifest manifest = getManifest( workingProject, archiveConfiguration.getManifest() );
+
+        // any custom manifest entries in the archive configuration manifest?
+        if ( !archiveConfiguration.isManifestEntriesEmpty() )
+        {
+            Map entries = archiveConfiguration.getManifestEntries();
+            Set keys = entries.keySet();
+            for ( Iterator iter = keys.iterator(); iter.hasNext(); )
+            {
+                String key = (String) iter.next();
+                String value = (String) entries.get( key );
+                Manifest.Attribute attr = new Manifest.Attribute( key, value );
+                manifest.addConfiguredAttribute( attr );
+            }
+        }
 
         // Configure the jar
         archiver.addConfiguredManifest( manifest );

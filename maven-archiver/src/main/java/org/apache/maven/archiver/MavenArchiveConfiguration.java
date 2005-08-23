@@ -17,6 +17,8 @@ package org.apache.maven.archiver;
  */
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Capture common archive configuration.
@@ -34,6 +36,8 @@ public class MavenArchiveConfiguration
     private File manifestFile;
 
     private ManifestConfiguration manifest;
+
+    private Map manifestEntries = new HashMap();
 
     public boolean isCompress()
     {
@@ -77,5 +81,25 @@ public class MavenArchiveConfiguration
     public void setManifest( ManifestConfiguration manifest )
     {
         this.manifest = manifest;
+    }
+
+    public void addManifestEntry( Object key, Object value )
+    {
+        manifestEntries.put( key, value );
+    }
+
+    public void addManifestEntries( Map map )
+    {
+        manifestEntries.putAll( map );
+    }
+
+    public boolean isManifestEntriesEmpty()
+    {
+        return manifestEntries.isEmpty();
+    }
+
+    public Map getManifestEntries()
+    {
+        return manifestEntries;
     }
 }
