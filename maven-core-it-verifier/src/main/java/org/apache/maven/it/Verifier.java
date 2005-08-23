@@ -645,6 +645,7 @@ public class Verifier
 
         int exitCode = 0;
 
+        List failed = new ArrayList();
         for ( Iterator i = tests.iterator(); i.hasNext(); )
         {
             String test = (String) i.next();
@@ -700,7 +701,15 @@ public class Verifier
                 verifier.displayLogFile();
 
                 exitCode = 1;
+
+                failed.add( test );
             }
+        }
+
+        System.out.println( tests.size() - failed.size() + "/" + tests.size() + " passed" );
+        if ( !failed.isEmpty() )
+        {
+            System.out.println( "Failed tests: " + failed );
         }
 
         System.exit( exitCode );
