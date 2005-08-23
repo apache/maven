@@ -159,6 +159,8 @@ it0055: Test that source includes/excludes with in the compiler plugin config.
 it0056: Test that multiple executions of the compile goal with different
         includes/excludes will succeed.
 
+it0057: Verify that scope == 'provided' dependencies are available to tests.
+
 -------------------------------------------------------------------------------
 
 - generated sources
