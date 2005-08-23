@@ -1,2 +1,2 @@
-target/maven-core-it0051-1.0.jar
-!target/maven-core-it0051-1.0-sources.jar
+target/maven-core-it0053-1.0.jar
+!target/maven-core-it0053-1.0-sources.jar
