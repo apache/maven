@@ -74,6 +74,14 @@
       <fileset refid="my.dependency.fileset"/>
     </copy>
 
+    <artifact:dependencies filesetId="my.compile.dependency.fileset" useScope="compile">
+      <pom refid="maven.project"/>
+    </artifact:dependencies>
+
+    <copy todir="target/my-compile-dependencies">
+      <fileset refid="my.compile.dependency.fileset"/>
+    </copy>
+
     <property name="outJar" value="${maven.project.build.directory}/${maven.project.build.finalName}.jar"/>
 
     <artifact:install file="${outJar}">

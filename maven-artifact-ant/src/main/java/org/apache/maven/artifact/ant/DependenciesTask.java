@@ -24,6 +24,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,6 +59,8 @@ public class DependenciesTask
     private String pathId;
 
     private String filesetId;
+
+    private String useScope;
 
     private boolean verbose;
 
@@ -130,9 +135,14 @@ public class DependenciesTask
             remoteRepositories.add( remoteRepository );
 
             List remoteArtifactRepositories = createRemoteArtifactRepositories( remoteRepositories );
-            // TODO: managed dependencies 
-            result = resolver.resolveTransitively( artifacts, pomArtifact, remoteArtifactRepositories, localRepo,
-                                                   metadataSource, listeners );
+
+            // TODO: managed dependencies
+            Map managedDependencies = Collections.EMPTY_MAP;
+
+            ArtifactFilter filter = useScope != null ? new ScopeArtifactFilter( useScope ) : null;
+
+            result = resolver.resolveTransitively( artifacts, pomArtifact, managedDependencies, localRepo,
+                                                   remoteArtifactRepositories, metadataSource, filter, listeners );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -234,5 +244,10 @@ public class DependenciesTask
     public void setVerbose( boolean verbose )
     {
         this.verbose = verbose;
+    }
+
+    public void setUseScope( String useScope )
+    {
+        this.useScope = useScope;
     }
 }

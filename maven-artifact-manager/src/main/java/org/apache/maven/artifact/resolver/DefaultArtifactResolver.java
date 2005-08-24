@@ -46,7 +46,7 @@ public class DefaultArtifactResolver
     // ----------------------------------------------------------------------
 
     private WagonManager wagonManager;
-    
+
     private ArtifactTransformationManager transformationManager;
 
     protected ArtifactFactory artifactFactory;
@@ -109,10 +109,12 @@ public class DefaultArtifactResolver
                     {
                         wagonManager.getArtifact( artifact, remoteRepositories );
                     }
-                    
+
                     if ( !artifact.isResolved() )
                     {
-                        throw new ArtifactResolutionException( "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.", artifact, remoteRepositories );
+                        throw new ArtifactResolutionException(
+                            "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
+                            artifact, remoteRepositories );
                     }
 
                     // must be after the artifact is downloaded
@@ -182,10 +184,10 @@ public class DefaultArtifactResolver
 
     }
 
-    private ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
-                                                          Map managedVersions, ArtifactRepository localRepository,
-                                                          List remoteRepositories, ArtifactMetadataSource source,
-                                                          ArtifactFilter filter, List listeners )
+    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
+                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         List remoteRepositories, ArtifactMetadataSource source,
+                                                         ArtifactFilter filter, List listeners )
         throws ArtifactResolutionException
     {
         ArtifactResolutionResult artifactResolutionResult;
