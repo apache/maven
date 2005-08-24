@@ -111,6 +111,13 @@ public abstract class AbstractCompilerMojo
     private String compilerId;
 
     /**
+     * Version of the compiler to use, ex. "1.3", "1.5"
+     *
+     * @parameter
+     */
+    private String compilerVersion;
+
+    /**
      * Runs the compiler in a separate process.
      * <p/>
      * If not set the compiler will default to a executable.
@@ -248,6 +255,8 @@ public abstract class AbstractCompilerMojo
 
         compilerConfiguration.setWorkingDirectory( basedir );
 
+        compilerConfiguration.setCompilerVersion( compilerVersion );
+
         compilerConfiguration.setBuildDirectory( buildDirectory );
 
         compilerConfiguration.setOutputFileName( outputFileName );
@@ -265,7 +274,7 @@ public abstract class AbstractCompilerMojo
             canUpdateTarget = compiler.canUpdateTarget( compilerConfiguration );
 
             if ( compiler.getCompilerOutputStyle() == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES &&
-                !canUpdateTarget )
+                 !canUpdateTarget )
             {
                 getLog().info( "RESCANNING!" );
                 // TODO: This second scan for source files is sub-optimal
