@@ -225,8 +225,8 @@ public abstract class AbstractCompilerMojo
 
         if ( getLog().isDebugEnabled() )
         {
-            getLog().debug( "Source directories: " + compileSourceRoots.toString().replace( ",", "\n" ) );
-            getLog().debug( "Classpath: " + getClasspathElements().toString().replace( ",", "\n" ) );
+            getLog().debug( "Source directories: " + compileSourceRoots.toString().replace( ',', '\n' ) );
+            getLog().debug( "Classpath: " + getClasspathElements().toString().replace( ',', '\n' ) );
             getLog().debug( "Output directory: " + getOutputDirectory() );
         }
 
