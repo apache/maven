@@ -1,0 +1,11 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>maven-core-it0058</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+
+  <modules>
+    <module>subproject</module>
+  </modules>
+</model>

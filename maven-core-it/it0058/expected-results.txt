@@ -1,0 +1,1 @@
+subproject/target/maven-core-it0058-subproject-1.0.jar

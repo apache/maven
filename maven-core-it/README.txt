@@ -161,6 +161,9 @@ it0056: Test that multiple executions of the compile goal with different
 
 it0057: Verify that scope == 'provided' dependencies are available to tests.
 
+it0058: Verify that profiles from settings.xml do not pollute module lists
+        across projects in a reactorized build.
+
 -------------------------------------------------------------------------------
 
 - generated sources

@@ -16,30 +16,17 @@ package org.apache.maven.project;
  * limitations under the License.
  */
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
-import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -258,19 +245,35 @@ public final class ModelUtils
 
     private static void mergePluginExecutionDefinitions( PluginExecution child, PluginExecution parent )
     {
-        List parentGoals = parent.getGoals();
-
-        // if the supplemental goals are non-existent, then nothing related to goals changes.
-        if ( parentGoals != null && !parentGoals.isEmpty() )
+        if ( child.getPhase() == null )
         {
-            List goals = new ArrayList( parentGoals );
-            if ( child.getGoals() != null )
-            {
-                goals.addAll( child.getGoals() );
-            }
-
-            child.setGoals( goals );
+            child.setPhase( parent.getPhase() );
         }
+        
+        List parentGoals = parent.getGoals();
+        List childGoals = child.getGoals();
+        
+        List goals = new ArrayList();
+        
+        if ( childGoals != null && !childGoals.isEmpty() )
+        {
+            goals.addAll( childGoals );
+        }
+        
+        if ( parentGoals != null )
+        {
+            for ( Iterator goalIterator = parentGoals.iterator(); goalIterator.hasNext(); )
+            {
+                String goal = (String) goalIterator.next();
+                
+                if ( !goals.contains( goal ) )
+                {
+                    goals.add( goal );
+                }
+            }
+        }
+        
+        child.setGoals( goals );
 
         Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
         Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
@@ -280,391 +283,6 @@ public final class ModelUtils
         child.setConfiguration( childConfiguration );
     }
 
-    public static void mergeModelBases( ModelBase dominant, ModelBase recessive, boolean mergePathStructures )
-    {
-        mergeDependencies( dominant, recessive );
-        
-        if ( mergePathStructures )
-        {
-            mergeModules( dominant, recessive );
-        }
-        
-        dominant.setRepositories( mergeRepositoryLists( dominant.getRepositories(), recessive.getRepositories() ) );
-        dominant.setPluginRepositories( mergeRepositoryLists( dominant.getPluginRepositories(), recessive.getPluginRepositories() ) );
-        
-        mergeReporting( dominant, recessive );
-        
-        mergeDependencyManagementSections( dominant, recessive );
-        
-        mergeDistributionManagementSections( dominant, recessive );
-    }
-    
-    private static void mergeModules( ModelBase dominant, ModelBase recessive )
-    {
-        List modules = new ArrayList();
-        
-        List dominantModules = dominant.getModules();
-        
-        if ( dominantModules != null && !dominantModules.isEmpty() )
-        {
-            modules.addAll( dominantModules );
-        }
-        
-        List recessiveModules = recessive.getModules();
-        
-        if ( recessiveModules != null )
-        {
-            for ( Iterator it = recessiveModules.iterator(); it.hasNext(); )
-            {
-                String module = (String) it.next();
-                
-                if ( !modules.contains( module ) )
-                {
-                    modules.add( module );
-                }
-            }
-        }
-        
-        dominant.setModules( modules );
-    }
-
-    private static void mergeDistributionManagementSections( ModelBase dominant, ModelBase recessive )
-    {
-        DistributionManagement dDistMgmt = dominant.getDistributionManagement();
-        DistributionManagement rDistMgmt = recessive.getDistributionManagement();
-        
-        if ( dDistMgmt == null )
-        {
-            dominant.setDistributionManagement( rDistMgmt );
-        }
-        else if ( rDistMgmt != null )
-        {
-            if ( dDistMgmt.getRepository() == null )
-            {
-                dDistMgmt.setRepository( rDistMgmt.getRepository() );
-            }
-            
-            if ( dDistMgmt.getSnapshotRepository() == null )
-            {
-                dDistMgmt.setSnapshotRepository( rDistMgmt.getSnapshotRepository() );
-            }
-            
-            if ( StringUtils.isEmpty( dDistMgmt.getDownloadUrl() ) )
-            {
-                dDistMgmt.setDownloadUrl( rDistMgmt.getDownloadUrl() );
-            }
-            
-            if ( dDistMgmt.getRelocation() == null )
-            {
-                dDistMgmt.setRelocation( rDistMgmt.getRelocation() );
-            }
-            
-            if ( dDistMgmt.getSite() == null )
-            {
-                dDistMgmt.setSite( rDistMgmt.getSite() );
-            }
-            
-            // NOTE: We SHOULD NOT be inheriting status, since this is an assessment of the POM quality.
-        }
-    }
-
-    private static List mergeRepositoryLists( List dominantRepositories, List recessiveRepositories )
-    {
-        List repositories = new ArrayList();
-        
-        for ( Iterator it = dominantRepositories.iterator(); it.hasNext(); )
-        {
-            Repository repository = (Repository) it.next();
-            
-            repositories.add( repository );
-        }
-        
-        for ( Iterator it = recessiveRepositories.iterator(); it.hasNext(); )
-        {
-            Repository repository = (Repository) it.next();
-            
-            if ( !repositories.contains( repository ) )
-            {
-                repositories.add( repository );
-            }
-        }
-        
-        return repositories;
-    }
-
-    private static void mergeDependencies( ModelBase dominant, ModelBase recessive )
-    {
-        Map depsMap = new HashMap();
-        
-        List deps = recessive.getDependencies();
-        
-        if ( deps != null )
-        {
-            for ( Iterator it = deps.iterator(); it.hasNext(); )
-            {
-                Dependency dependency = (Dependency) it.next();
-                depsMap.put( dependency.getManagementKey(), dependency );
-            }
-        }
-        
-        deps = dominant.getDependencies();
-        
-        if ( deps != null )
-        {
-            for ( Iterator it = deps.iterator(); it.hasNext(); )
-            {
-                Dependency dependency = (Dependency) it.next();
-                depsMap.put( dependency.getManagementKey(), dependency );
-            }
-        }
-        
-        dominant.setDependencies( new ArrayList( depsMap.values() ) );
-    }
-
-    public static void mergeReporting( ModelBase dominant, ModelBase recessive )
-    {
-        // Reports :: aggregate
-        Reporting dominantReporting = dominant.getReporting();
-        Reporting modelReporting = recessive.getReporting();
-
-        if ( dominantReporting != null && modelReporting != null )
-        {
-            if ( StringUtils.isEmpty( dominantReporting.getOutputDirectory() ) )
-            {
-                dominantReporting.setOutputDirectory( modelReporting.getOutputDirectory() );
-            }
-
-            Map mergedReportPlugins = new HashMap();
-
-            Map dominantReportersByKey = dominantReporting.getReportPluginsAsMap();
-
-            List parentReportPlugins = modelReporting.getPlugins();
-
-            if ( parentReportPlugins != null )
-            {
-                for ( Iterator it = parentReportPlugins.iterator(); it.hasNext(); )
-                {
-                    ReportPlugin recessiveReportPlugin = (ReportPlugin) it.next();
-
-                    String inherited = recessiveReportPlugin.getInherited();
-
-                    if ( StringUtils.isEmpty( inherited ) || Boolean.valueOf( inherited ).booleanValue() )
-                    {
-                        ReportPlugin dominantReportPlugin = (ReportPlugin) dominantReportersByKey.get(
-                            recessiveReportPlugin.getKey() );
-
-                        ReportPlugin mergedReportPlugin = recessiveReportPlugin;
-
-                        if ( dominantReportPlugin != null )
-                        {
-                            mergedReportPlugin = dominantReportPlugin;
-
-                            mergeReportPlugins( dominantReportPlugin, recessiveReportPlugin );
-                        }
-                        else if ( StringUtils.isEmpty( inherited ) )
-                        {
-                            mergedReportPlugin.unsetInheritanceApplied();
-                        }
-
-                        mergedReportPlugins.put( mergedReportPlugin.getKey(), mergedReportPlugin );
-                    }
-                }
-            }
-
-            for ( Iterator it = dominantReportersByKey.entrySet().iterator(); it.hasNext(); )
-            {
-                Map.Entry entry = (Map.Entry) it.next();
-
-                String key = (String) entry.getKey();
-
-                if ( !mergedReportPlugins.containsKey( key ) )
-                {
-                    mergedReportPlugins.put( key, entry.getValue() );
-                }
-            }
-
-            dominantReporting.setPlugins( new ArrayList( mergedReportPlugins.values() ) );
-
-            dominantReporting.flushReportPluginMap();
-        }
-    }
-
-    public static void mergeDependencyManagementSections( ModelBase dominant, ModelBase recessive )
-    {
-        DependencyManagement recessiveDepMgmt = recessive.getDependencyManagement();
-
-        DependencyManagement dominantDepMgmt = dominant.getDependencyManagement();
-
-        if ( recessiveDepMgmt != null )
-        {
-            if ( dominantDepMgmt == null )
-            {
-                dominant.setDependencyManagement( recessiveDepMgmt );
-            }
-            else
-            {
-                List dominantDeps = dominantDepMgmt.getDependencies();
-
-                Map mappedDominantDeps = new TreeMap();
-                for ( Iterator it = dominantDeps.iterator(); it.hasNext(); )
-                {
-                    Dependency dep = (Dependency) it.next();
-                    mappedDominantDeps.put( dep.getManagementKey(), dep );
-                }
-
-                for ( Iterator it = recessiveDepMgmt.getDependencies().iterator(); it.hasNext(); )
-                {
-                    Dependency dep = (Dependency) it.next();
-                    if ( !mappedDominantDeps.containsKey( dep.getManagementKey() ) )
-                    {
-                        dominantDepMgmt.addDependency( dep );
-                    }
-                }
-            }
-        }
-    }
-
-    public static void mergeReportPlugins( ReportPlugin dominant, ReportPlugin recessive )
-    {
-        if ( StringUtils.isEmpty( dominant.getVersion() ) )
-        {
-            dominant.setVersion( recessive.getVersion() );
-        }
-
-        Xpp3Dom dominantConfig = (Xpp3Dom) dominant.getConfiguration();
-        Xpp3Dom recessiveConfig = (Xpp3Dom) recessive.getConfiguration();
-
-        dominant.setConfiguration( Xpp3Dom.mergeXpp3Dom( dominantConfig, recessiveConfig ) );
-
-        Map mergedReportSets = new HashMap();
-
-        Map dominantReportSetsById = dominant.getReportSetsAsMap();
-
-        for ( Iterator it = recessive.getReportSets().iterator(); it.hasNext(); )
-        {
-            ReportSet recessiveReportSet = (ReportSet) it.next();
-
-            String inherited = recessiveReportSet.getInherited();
-
-            if ( StringUtils.isEmpty( inherited ) || Boolean.valueOf( inherited ).booleanValue() )
-            {
-                ReportSet dominantReportSet = (ReportSet) dominantReportSetsById.get( recessiveReportSet.getId() );
-
-                ReportSet merged = recessiveReportSet;
-
-                if ( dominantReportSet != null )
-                {
-                    merged = dominantReportSet;
-
-                    Xpp3Dom recessiveRSConfig = (Xpp3Dom) recessiveReportSet.getConfiguration();
-                    Xpp3Dom mergedRSConfig = (Xpp3Dom) merged.getConfiguration();
-
-                    merged.setConfiguration( Xpp3Dom.mergeXpp3Dom( mergedRSConfig, recessiveRSConfig ) );
-
-                    List mergedReports = merged.getReports();
-
-                    if ( mergedReports == null )
-                    {
-                        mergedReports = new ArrayList();
-
-                        merged.setReports( mergedReports );
-                    }
-
-                    List recessiveRSReports = recessiveReportSet.getReports();
-
-                    if ( recessiveRSReports != null )
-                    {
-                        for ( Iterator reportIterator = recessiveRSReports.iterator(); reportIterator.hasNext(); )
-                        {
-                            String report = (String) reportIterator.next();
-
-                            if ( !mergedReports.contains( report ) )
-                            {
-                                mergedReports.add( report );
-                            }
-                        }
-                    }
-                }
-                else if ( StringUtils.isEmpty( inherited ) )
-                {
-                    merged.unsetInheritanceApplied();
-                }
-
-                mergedReportSets.put( merged.getId(), merged );
-            }
-        }
-
-        for ( Iterator rsIterator = dominantReportSetsById.entrySet().iterator(); rsIterator.hasNext(); )
-        {
-            Map.Entry entry = (Map.Entry) rsIterator.next();
-
-            String key = (String) entry.getKey();
-
-            if ( !mergedReportSets.containsKey( key ) )
-            {
-                mergedReportSets.put( key, entry.getValue() );
-            }
-        }
-
-        dominant.setReportSets( new ArrayList( mergedReportSets.values() ) );
-
-        dominant.flushReportSetMap();
-    }
-
-    public static void mergeBuildBases( BuildBase dominant, BuildBase recessive )
-    {
-        // NOTE: This assumes that the dominant build is not null.
-        //If it is null, the action taken should have been external to this method.
-        
-        // if the parent build is null, obviously we cannot inherit from it...
-        if ( recessive != null )
-        {
-            if ( dominant.getDirectory() == null )
-            {
-                dominant.setDirectory( recessive.getDirectory() );
-            }
-
-            if ( dominant.getDefaultGoal() == null )
-            {
-                dominant.setDefaultGoal( recessive.getDefaultGoal() );
-            }
-
-            if ( dominant.getFinalName() == null )
-            {
-                dominant.setFinalName( recessive.getFinalName() );
-            }
-
-            List resources = dominant.getResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                dominant.setResources( recessive.getResources() );
-            }
-
-            resources = dominant.getTestResources();
-            if ( resources == null || resources.isEmpty() )
-            {
-                dominant.setTestResources( recessive.getTestResources() );
-            }
-
-            // Plugins are aggregated if Plugin.inherit != false
-            ModelUtils.mergePluginLists( dominant, recessive, true );
-
-            // Plugin management :: aggregate
-            PluginManagement dominantPM = dominant.getPluginManagement();
-            PluginManagement recessivePM = recessive.getPluginManagement();
-
-            if ( dominantPM == null && recessivePM != null )
-            {
-                dominant.setPluginManagement( recessivePM );
-            }
-            else
-            {
-                ModelUtils.mergePluginLists( dominant.getPluginManagement(), recessive.getPluginManagement(),
-                                             false );
-            }
-        }
-    }
-    
     static Model cloneModel( Model model )
     {
         // TODO: would be nice for the modello:java code to generate this as a copy constructor
@@ -676,27 +294,27 @@ public final class ModelUtils
         return newModel;
     }
 
-    public static void overrideModelBase( Model target, ModelBase overrides )
+    public static List mergeRepositoryLists( List dominant, List recessive )
     {
-        target.setDependencies( overrides.getDependencies() );
-        target.setDependencyManagement( overrides.getDependencyManagement() );
-        target.setDistributionManagement( overrides.getDistributionManagement() );
-        target.setModules( overrides.getModules() );
-        target.setPluginRepositories( overrides.getPluginRepositories() );
-        target.setReporting( overrides.getReporting() );
-        target.setRepositories( overrides.getRepositories() );
-    }
-
-    public static void overrideBuildBase( Build target, BuildBase overrides )
-    {
-        target.setDefaultGoal( overrides.getDefaultGoal() );
-        target.setFinalName( overrides.getFinalName() );
-        target.setPluginManagement( overrides.getPluginManagement() );
+        List repositories = new ArrayList();
         
-        target.setPlugins( overrides.getPlugins() );
-        target.flushPluginMap();
+        for ( Iterator it = dominant.iterator(); it.hasNext(); )
+        {
+            Repository repository = (Repository) it.next();
+            
+            repositories.add( repository );
+        }
         
-        target.setResources( overrides.getResources() );
-        target.setTestResources( overrides.getTestResources() );
+        for ( Iterator it = recessive.iterator(); it.hasNext(); )
+        {
+            Repository repository = (Repository) it.next();
+            
+            if ( !repositories.contains( repository ) )
+            {
+                repositories.add( repository );
+            }
+        }
+        
+        return repositories;
     }
 }
