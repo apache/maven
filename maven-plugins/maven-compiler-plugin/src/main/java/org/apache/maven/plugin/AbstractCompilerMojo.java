@@ -223,6 +223,13 @@ public abstract class AbstractCompilerMojo
             return;
         }
 
+        if ( getLog().isDebugEnabled() )
+        {
+            getLog().debug( "Source directories: " + compileSourceRoots.toString().replace( ",", "\n" ) );
+            getLog().debug( "Classpath: " + getClasspathElements().toString().replace( ",", "\n" ) );
+            getLog().debug( "Output directory: " + getOutputDirectory() );
+        }
+
         // ----------------------------------------------------------------------
         // Create the compiler configuration
         // ----------------------------------------------------------------------
@@ -273,7 +280,7 @@ public abstract class AbstractCompilerMojo
 
             canUpdateTarget = compiler.canUpdateTarget( compilerConfiguration );
 
-            if ( compiler.getCompilerOutputStyle() == CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES &&
+            if ( compiler.getCompilerOutputStyle().equals( CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES ) &&
                  !canUpdateTarget )
             {
                 getLog().info( "RESCANNING!" );
