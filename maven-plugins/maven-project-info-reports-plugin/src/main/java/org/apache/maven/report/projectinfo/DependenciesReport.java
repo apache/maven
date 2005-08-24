@@ -233,8 +233,9 @@ public class DependenciesReport
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    throw new IllegalArgumentException(
-                        "Can't find a valid Maven project in the repository for the artifact [" + artifact + "]." );
+                    throw new IllegalArgumentException( "Can't find a valid Maven project in the repository for the artifact ["
+                                                            + artifact.getGroupId() + ":" + artifact.getArtifactId()
+                                                            + ":" + artifact.getVersion() + "]." );
                 }
 
                 tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
@@ -275,8 +276,10 @@ public class DependenciesReport
                     }
                     catch ( ProjectBuildingException e )
                     {
-                        throw new IllegalArgumentException(
-                            "Can't find a valid Maven project in the repository for the artifact [" + artifact + "]." );
+                        throw new IllegalArgumentException( "Can't find a valid Maven project in the repository for the artifact ["
+                                                                + artifact.getGroupId() + ":"
+                                                                + artifact.getArtifactId() + ":"
+                                                                + artifact.getVersion() + "]." );
                     }
                     tableRow( new String[]{artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
                         artifactProject.getDescription(),
