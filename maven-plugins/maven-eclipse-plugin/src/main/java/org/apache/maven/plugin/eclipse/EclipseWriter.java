@@ -675,6 +675,11 @@ public class EclipseWriter
     {
         Xpp3Dom pluginConfig = (Xpp3Dom) plugin.getConfiguration();
 
+        if ( pluginConfig == null )
+        {
+            return;
+        }
+
         String source = null;
 
         Xpp3Dom sourceChild = pluginConfig.getChild( "source" );
