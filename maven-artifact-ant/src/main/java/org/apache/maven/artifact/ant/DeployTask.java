@@ -73,16 +73,15 @@ public class DeployTask
             }
         }
 
-        ArtifactRepository deploymentRepository = createRemoteArtifactRepository( remoteRepository );
-
-        ArtifactRepository snapshotRepository = null;
-        if ( remoteSnapshotRepository != null )
-        {
-            snapshotRepository = createRemoteArtifactRepository( remoteSnapshotRepository );
-        }
-
         // Deploy the POM
         Artifact artifact = createArtifact( pom );
+
+        ArtifactRepository deploymentRepository = createRemoteArtifactRepository( remoteRepository );
+
+        if ( remoteSnapshotRepository != null && artifact.isSnapshot() )
+        {
+            deploymentRepository = createRemoteArtifactRepository( remoteSnapshotRepository );
+        }
 
         boolean isPomArtifact = "pom".equals( pom.getPackaging() );
         if ( !isPomArtifact )
@@ -91,7 +90,7 @@ public class DeployTask
             artifact.addMetadata( metadata );
         }
 
-        log( "Deploying to " + remoteRepository.getUrl() );
+        log( "Deploying to " + deploymentRepository.getUrl() );
         ArtifactDeployer deployer = (ArtifactDeployer) lookup( ArtifactDeployer.ROLE );
         try
         {

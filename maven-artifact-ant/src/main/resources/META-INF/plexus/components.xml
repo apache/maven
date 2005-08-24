@@ -1,92 +1,5 @@
-<!-- Merger of component descriptors from maven-artifact and maven-core because extracted jars overwrite each other -->
-
 <component-set>
   <components>
-<!--
-     |
-     | WagonManager
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.manager.WagonManager</role>
-      <implementation>org.apache.maven.artifact.ant.CustomWagonManager</implementation>
-    </component>
-
-<!--
-     |
-     | Transformations
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-      <implementation>org.apache.maven.artifact.transform.SnapshotTransformation</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
-        </requirement>
-      </requirements>
-    </component>
-
-<!--
-     |
-     | Resolver
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-      <implementation>org.apache.maven.artifact.resolver.DefaultArtifactResolver</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-          <field-name>artifactTransformations</field-name>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
-        </requirement>
-      </requirements>
-    </component>
-
-<!--
-     |
-     | ArtifactInstaller
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.installer.ArtifactInstaller</role>
-      <implementation>org.apache.maven.artifact.installer.DefaultArtifactInstaller</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-          <field-name>artifactTransformations</field-name>
-        </requirement>
-      </requirements>
-    </component>
-
-<!--
-     |
-     | ArtifactDeployer
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.deployer.ArtifactDeployer</role>
-      <implementation>org.apache.maven.artifact.deployer.DefaultArtifactDeployer</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-          <field-name>artifactTransformations</field-name>
-        </requirement>
-      </requirements>
-    </component>
-
     <component>
       <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
       <role-hint>default</role-hint>
@@ -99,7 +12,7 @@
       <implementation>org.apache.maven.artifact.repository.layout.LegacyRepositoryLayout</implementation>
     </component>
 
-<!--
+    <!--
      |
      | ArtifactHandlerManager
      |
@@ -185,16 +98,18 @@
     </component>
 
     <component>
-      <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
-      <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
+      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+      <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.project.MavenProjectBuilder</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
         </requirement>
       </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
     </component>
 
     <component>
@@ -202,29 +117,220 @@
       <implementation>org.apache.maven.artifact.resolver.DefaultArtifactCollector</implementation>
     </component>
 
-<!--
+    <component>
+      <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
      |
-     |
+     | WagonManager
      |
      -->
+    <component>
+      <role>org.apache.maven.artifact.manager.WagonManager</role>
+      <implementation>org.apache.maven.artifact.ant.CustomWagonManager</implementation>
+      <!--
+            <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
+      -->
+    </component>
+
+    <!--
+     |
+     | Transformations
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>snapshot</role-hint>
+      <implementation>org.apache.maven.artifact.transform.SnapshotTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>release</role-hint>
+      <implementation>org.apache.maven.artifact.transform.ReleaseArtifactTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>latest</role-hint>
+      <implementation>org.apache.maven.artifact.transform.LatestArtifactTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | ArtifactTransformationManager
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+      <implementation>org.apache.maven.artifact.transform.DefaultArtifactTransformationManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <field-name>artifactTransformations</field-name>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+          <role-hint>snapshot</role-hint>
+          <field-name>snapshotTransformation</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | Resolver
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+      <implementation>org.apache.maven.artifact.resolver.DefaultArtifactResolver</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | ArtifactInstaller
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.installer.ArtifactInstaller</role>
+      <implementation>org.apache.maven.artifact.installer.DefaultArtifactInstaller</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
+     | ArtifactDeployer
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.deployer.ArtifactDeployer</role>
+      <implementation>org.apache.maven.artifact.deployer.DefaultArtifactDeployer</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
+      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+    </component>
+
+    <!--
+    |
+    |
+    |
+    -->
+    <component>
+      <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
+      <implementation>org.apache.maven.profiles.DefaultMavenProfilesBuilder</implementation>
+    </component>
+
+    <!--
+    |
+    |
+    |
+    -->
+    <component>
+      <role>org.apache.maven.project.MavenProjectHelper</role>
+      <implementation>org.apache.maven.project.DefaultMavenProjectHelper</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+      </requirements>
+    </component>
+    <!--
+    |
+    |
+    |
+    -->
     <component>
       <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
       <implementation>org.apache.maven.project.interpolation.RegexBasedModelInterpolator</implementation>
     </component>
-<!--
-     |
-     |
-     |
-     -->
+    <!--
+    |
+    |
+    |
+    -->
     <component>
       <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
       <implementation>org.apache.maven.project.injection.DefaultModelDefaultsInjector</implementation>
     </component>
-
+    <!--
+    |
+    |
+    |
+    -->
+    <component>
+      <role>org.apache.maven.project.injection.ProfileInjector</role>
+      <implementation>org.apache.maven.project.injection.DefaultProfileInjector</implementation>
+    </component>
+    <!--
+    |
+    |
+    |
+    -->
     <component>
       <role>org.apache.maven.project.MavenProjectBuilder</role>
       <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
       <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.project.injection.ProfileInjector</role>
+        </requirement>
         <requirement>
           <role>org.apache.maven.project.injection.ModelDefaultsInjector</role>
         </requirement>
@@ -249,108 +355,98 @@
         <requirement>
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.profiles.activation.ProfileActivationCalculator</role>
-        </requirement>
       </requirements>
     </component>
-<!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.profiles.activation.ProfileActivationCalculator</role>
-      <implementation>org.apache.maven.profiles.activation.ProfileActivationCalculator</implementation>
-    </component>
-<!--
-     |
-     |
-     |
-     -->
+    <!--
+    |
+    |
+    |
+    -->
     <component>
       <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>always-on</role-hint>
       <implementation>org.apache.maven.profiles.activation.AlwaysOnProfileActivator</implementation>
     </component>
-<!--
-     |
-     |
-     |
-     -->
+    <!--
+    |
+    |
+    |
+    -->
     <component>
       <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>jdk-prefix</role-hint>
       <implementation>org.apache.maven.profiles.activation.JdkPrefixProfileActivator</implementation>
     </component>
-<!--
-     |
-     |
-     |
-     -->
+    <!--
+    |
+    |
+    |
+    -->
     <component>
       <role>org.apache.maven.profiles.activation.ProfileActivator</role>
       <role-hint>system-property</role-hint>
       <implementation>org.apache.maven.profiles.activation.SystemPropertyProfileActivator</implementation>
     </component>
-<!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.profiles.activation.ProfileActivator</role>
-      <role-hint>explicit-listing</role-hint>
-      <implementation>org.apache.maven.profiles.activation.ExplicitListingProfileActivator</implementation>
-    </component>
-<!--
-     |
-     |
-     |
-     -->
+    <!--
+    |
+    |
+    |
+    -->
     <component>
       <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
       <implementation>org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler</implementation>
     </component>
-<!--
-     |
-     |
-     |
-     -->
+
+    <!--
+    |
+    |
+    |
+    -->
     <component>
       <role>org.apache.maven.project.validation.ModelValidator</role>
       <implementation>org.apache.maven.project.validation.DefaultModelValidator</implementation>
     </component>
-<!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-      <implementation>org.apache.maven.artifact.factory.DefaultArtifactFactory</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
-        </requirement>
-      </requirements>
-    </component>
 
+    <!-- ********************* FIXME *******************************************
+    | I realize this is duplicated but allows the project builder to work by itself
+    -->
     <component>
       <role>org.apache.maven.project.path.PathTranslator</role>
       <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
     </component>
 
     <component>
-      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
+      <role>org.apache.maven.project.ModelResolver</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.project.ModelResolver</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+      </requirements>
     </component>
 
     <component>
-      <role>org.apache.maven.wagon.Wagon</role>
-      <role-hint>http</role-hint>
-      <implementation>org.apache.maven.wagon.providers.http.LightweightHttpWagon</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+      <role-hint>maven</role-hint>
+      <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.settings.MavenSettingsBuilder</role>
+      <implementation>org.apache.maven.settings.DefaultMavenSettingsBuilder</implementation>
+      <configuration>
+        <globalSettingsPath>${maven.home}/conf/settings.xml</globalSettingsPath>
+        <userSettingsPath>${user.home}/.m2/settings.xml</userSettingsPath>
+      </configuration>
     </component>
 
     <component>
@@ -362,156 +458,9 @@
 
     <component>
       <role>org.apache.maven.wagon.Wagon</role>
-      <role-hint>scm</role-hint>
-      <implementation>org.apache.maven.wagon.providers.scm.ScmWagon</implementation>
+      <role-hint>http</role-hint>
+      <implementation>org.apache.maven.wagon.providers.http.LightweightHttpWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.scm.manager.ScmManager</role>
-        </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>org.apache.maven.wagon.Wagon</role>
-      <role-hint>scp</role-hint>
-      <implementation>org.apache.maven.wagon.providers.ssh.ScpWagon</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.apache.maven.wagon.Wagon</role>
-      <role-hint>sftp</role-hint>
-      <implementation>org.apache.maven.wagon.providers.ssh.SftpWagon</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.apache.maven.wagon.providers.ssh.SshCommandExecutor</role>
-      <implementation>org.apache.maven.wagon.providers.ssh.ScpWagon</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.manager.ScmManager</role>
-      <implementation>org.apache.maven.scm.manager.DefaultScmManager</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.scm.provider.ScmProvider</role>
-          <field-name>scmProviders</field-name>
-        </requirement>
-      </requirements>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.ScmProvider</role>
-      <role-hint>cvs</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.CvsScmProvider</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-          <field-name>commands</field-name>
-        </requirement>
-      </requirements>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-      <role-hint>add</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.command.add.CvsAddCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-      <role-hint>change-log</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.command.changelog.CvsChangeLogCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-      <role-hint>check-in</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.command.checkin.CvsCheckInCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-      <role-hint>check-out</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.command.checkout.CvsCheckOutCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-      <role-hint>diff</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.command.diff.CvsDiffCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-      <role-hint>status</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.command.status.CvsStatusCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-      <role-hint>tag</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.command.tag.CvsTagCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.cvslib.command.CvsCommand</role>
-      <role-hint>update</role-hint>
-      <implementation>org.apache.maven.scm.provider.cvslib.command.update.CvsUpdateCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.ScmProvider</role>
-      <role-hint>svn</role-hint>
-      <implementation>org.apache.maven.scm.provider.svn.SvnScmProvider</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
-          <field-name>commands</field-name>
-        </requirement>
-      </requirements>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
-      <role-hint>add</role-hint>
-      <implementation>org.apache.maven.scm.provider.svn.command.add.SvnAddCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
-      <role-hint>check-in</role-hint>
-      <implementation>org.apache.maven.scm.provider.svn.command.checkin.SvnCheckInCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
-      <role-hint>check-out</role-hint>
-      <implementation>org.apache.maven.scm.provider.svn.command.checkout.SvnCheckOutCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
-      <role-hint>diff</role-hint>
-      <implementation>org.apache.maven.scm.provider.svn.command.diff.SvnDiffCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
-      <role-hint>status</role-hint>
-      <implementation>org.apache.maven.scm.provider.svn.command.status.SvnStatusCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
-      <role-hint>tag</role-hint>
-      <implementation>org.apache.maven.scm.provider.svn.command.tag.SvnTagCommand</implementation>
-    </component>
-
-    <component>
-      <role>org.apache.maven.scm.provider.svn.command.SvnCommand</role>
-      <role-hint>update</role-hint>
-      <implementation>org.apache.maven.scm.provider.svn.command.update.SvnUpdateCommand</implementation>
     </component>
   </components>
 </component-set>

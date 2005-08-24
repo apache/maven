@@ -25,7 +25,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Model;
-import org.apache.maven.profiles.activation.ProfileActivationUtils;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.settings.Mirror;
@@ -138,8 +137,9 @@ public abstract class AbstractArtifactTask
         return artifactRepository;
     }
 
-    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy(
-        RepositoryPolicy policy, String defaultUpdatePolicy, String defaultChecksumPolicy )
+    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy,
+                                                                           String defaultUpdatePolicy,
+                                                                           String defaultChecksumPolicy )
     {
         boolean enabled = true;
         String updatePolicy = defaultUpdatePolicy;
@@ -225,11 +225,11 @@ public abstract class AbstractArtifactTask
 
         if ( pomRepository.getSnapshots() != null )
         {
-            r.setSnapshots( convertRepositoryPolicy( pomRepository.getSnapshots() ) );
+            r.addSnapshots( convertRepositoryPolicy( pomRepository.getSnapshots() ) );
         }
         if ( pomRepository.getReleases() != null )
         {
-            r.setReleases( convertRepositoryPolicy( pomRepository.getReleases() ) );
+            r.addReleases( convertRepositoryPolicy( pomRepository.getReleases() ) );
         }
 
         return r;
@@ -289,7 +289,15 @@ public abstract class AbstractArtifactTask
         }
     }
 
-    private synchronized Embedder getEmbedder()
+    protected static RemoteRepository getDefaultRemoteRepository()
+    {
+        // TODO: could we utilise the super POM for this?
+        RemoteRepository remoteRepository = new RemoteRepository();
+        remoteRepository.setUrl( "http://repo1.maven.org/maven2" );
+        return remoteRepository;
+    }
+
+    protected synchronized Embedder getEmbedder()
     {
         if ( embedder == null )
         {
@@ -394,7 +402,7 @@ public abstract class AbstractArtifactTask
         if ( profiles != null )
         {
             // TODO: not sure this is the best way to do this...
-            System.setProperty( ProfileActivationUtils.ACTIVE_PROFILE_IDS, profiles );
+//            System.setProperty( ProfileActivationUtils.ACTIVE_PROFILE_IDS, profiles );
         }
     }
 

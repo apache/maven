@@ -4,6 +4,7 @@
   <taskdef name="dependencies" classname="org.apache.maven.artifact.ant.DependenciesTask"/>
   <taskdef name="install" classname="org.apache.maven.artifact.ant.InstallTask"/>
   <taskdef name="deploy" classname="org.apache.maven.artifact.ant.DeployTask"/>
+  <taskdef name="install-provider" classname="org.apache.maven.artifact.ant.InstallWagonProviderTask"/>
 
   <!-- Types -->
   <typedef name="localRepository" classname="org.apache.maven.artifact.ant.LocalRepository"/>

@@ -29,12 +29,16 @@ public class RemoteRepository
 
     private Authentication authentication;
 
-    /** @deprecated use &lt;snapshots/&gt; and &lt;updatePolicy&gt; instead. */
+    /**
+     * @deprecated use &lt;snapshots/&gt; and &lt;updatePolicy&gt; instead.
+     */
     private String snapshotPolicy;
-    
-    /** @deprecated use &lt;snapshots/&gt; and &lt;checksumPolicy&gt; instead. */
+
+    /**
+     * @deprecated use &lt;snapshots/&gt; and &lt;checksumPolicy&gt; instead.
+     */
     private String checksumPolicy;
-    
+
     private Proxy proxy;
 
     private RepositoryPolicy snapshots;
@@ -96,7 +100,7 @@ public class RemoteRepository
         return snapshots;
     }
 
-    public void setSnapshots( RepositoryPolicy snapshots )
+    public void addSnapshots( RepositoryPolicy snapshots )
     {
         this.snapshots = snapshots;
     }
@@ -106,8 +110,9 @@ public class RemoteRepository
         return releases;
     }
 
-    public void setReleases( RepositoryPolicy releases )
+    public void addReleases( RepositoryPolicy releases )
     {
         this.releases = releases;
     }
+
 }

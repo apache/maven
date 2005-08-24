@@ -17,19 +17,17 @@ package org.apache.maven.artifact.ant;
  */
 
 import org.apache.maven.artifact.manager.DefaultWagonManager;
-import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.UnsupportedProtocolException;
-import org.apache.maven.wagon.providers.scm.ScmWagon;
+import org.apache.maven.wagon.Wagon;
 
 import java.io.File;
 
 /**
  * Custom wagon manager for the ant tasks - used to set the SCM checkout directory to the local repository.
  *
- * @todo find a better way and share with m2
- *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
+ * @todo find a better way and share with m2
  */
 public class CustomWagonManager
     extends DefaultWagonManager
@@ -43,7 +41,8 @@ public class CustomWagonManager
 
         if ( protocol.equals( "scm" ) )
         {
-            ((ScmWagon)wagon).setCheckoutDirectory( localRepository );
+            // TODO
+//            ((ScmWagon)wagon).setCheckoutDirectory( localRepository );
         }
 
         return wagon;

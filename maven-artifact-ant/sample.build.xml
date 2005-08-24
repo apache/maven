@@ -56,6 +56,10 @@
       <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-2-SNAPSHOT"/>
       <dependency groupId="org.apache.maven" artifactId="maven-core-it-support-old-location" version="1.1"/>
       <localRepository refid="local.repository"/>
+      <remoteRepository url="http://snapshots.maven.codehaus.org/maven2">
+        <snapshots enabled="true"/>
+        <releases enabled="false"/>
+      </remoteRepository>
     </artifact:dependencies>
 
     <copy todir="target/files">
@@ -77,9 +81,11 @@
     </artifact:install>
 
     <artifact:deploy file="${outJar}">
-      <remoteRepository refid="deploy.repository"/>
+      <remoteSnapshotRepository refid="deploy.repository"/>
       <pom refid="maven.project"/>
     </artifact:deploy>
+
+    <artifact:install-provider artifactId="wagon-ssh" version="1.0-alpha-4"/>
 
     <artifact:deploy file="${outJar}">
       <remoteRepository url="scp://localhost/tmp/deployment-repo">

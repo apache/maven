@@ -124,7 +124,12 @@ public class DependenciesTask
                 listeners = Collections.singletonList( new AntResolutionListener( getProject() ) );
             }
 
-            List remoteArtifactRepositories = createRemoteArtifactRepositories( getRemoteRepositories() );
+            List remoteRepositories = getRemoteRepositories();
+
+            RemoteRepository remoteRepository = getDefaultRemoteRepository();
+            remoteRepositories.add( remoteRepository );
+
+            List remoteArtifactRepositories = createRemoteArtifactRepositories( remoteRepositories );
             // TODO: managed dependencies 
             result = resolver.resolveTransitively( artifacts, pomArtifact, remoteArtifactRepositories, localRepo,
                                                    metadataSource, listeners );
@@ -188,13 +193,6 @@ public class DependenciesTask
 
     public List getRemoteRepositories()
     {
-        if ( remoteRepositories.isEmpty() )
-        {
-            // TODO: could we utilise the super POM for this?
-            RemoteRepository remoteRepository = new RemoteRepository();
-            remoteRepository.setUrl( "http://repo1.maven.org/maven2" );
-            remoteRepositories.add( remoteRepository );
-        }
         return remoteRepositories;
     }
 
