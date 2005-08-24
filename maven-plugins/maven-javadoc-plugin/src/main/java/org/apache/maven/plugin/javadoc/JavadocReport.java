@@ -24,6 +24,8 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.SystemUtils;
@@ -84,6 +86,10 @@ public class JavadocReport
     private static final String DEFAULT_WINDOW_TITLE = "${project.name} ${project.version} API";
 
     private static final String PATH_SEPARATOR = System.getProperty( "path.separator" );
+
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
 
     /**
      * @parameter expression="${project.build.directory}/site"
@@ -211,7 +217,16 @@ public class JavadocReport
      * @parameter expression="${package}"
      * default-value="true"
      */
-    private boolean package_ = true;
+    private boolean showPackage = true;
+
+    /**
+     * Shows only protected and public classes and members.
+     * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#protected">protected</a>.
+     *
+     * @parameter expression="${protected}"
+     * default-value="false"
+     */
+    private boolean showProtected = false;
 
     /**
      * Shows all classes and members.
@@ -220,16 +235,7 @@ public class JavadocReport
      * @parameter expression="${private}"
      * default-value="false"
      */
-    private boolean private_ = false;
-
-    /**
-     * Shows only protected and public classes and members.
-     * See <a href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/windows/javadoc.html#protected">protected</a>.
-     * 
-     * @parameter expression="${protected}"
-     * default-value="false"
-     */
-    private boolean protected_ = false;
+    private boolean showPrivate = false;
 
     /**
      * Shows only public classes and members.
@@ -558,10 +564,9 @@ public class JavadocReport
      */
     private String windowtitle;
 
-    // End JavaDoc parameters
-
-    /** The command line built to execute Javadoc. */
-    private Commandline cmd = new Commandline();
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     /**
      * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
@@ -679,168 +684,168 @@ public class JavadocReport
             // Copy default style sheet
             copyDefaultStylesheet( javadocDirectory );
 
-            this.cmd.setWorkingDirectory( javadocDirectory.getAbsolutePath() );
-            this.cmd.setExecutable( getJavadocPath() );
+            Commandline cmd = new Commandline();
+
+            List arguments = new ArrayList();
+
+            cmd.setWorkingDirectory( javadocDirectory.getAbsolutePath() );
+            cmd.setExecutable( getJavadocPath() );
 
             // General javadoc arguments
-            addArgIf( this.breakiterator, "-breakiterator", 1.4f );
-            if ( !StringUtils.isEmpty( this.doclet ) )
+            addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
+            if ( !StringUtils.isEmpty( doclet ) )
             {
-                addArgIfNotEmpty( "-doclet", this.doclet );
-                addArgIfNotEmpty( "-docletPath", this.docletPath );
+                addArgIfNotEmpty( arguments, "-doclet", doclet );
+                addArgIfNotEmpty( arguments, "-docletPath", docletPath );
             }
-            addArgIfNotEmpty( "-encoding", this.encoding );
-            addArgIfNotEmpty( "-extdirs", this.extdirs );
-            addArgIfNotEmpty( "-exclude", this.excludePackageNames, 1.4f );
-            addArgIfNotEmpty( "-locale", this.locale );
-            if ( !StringUtils.isEmpty( this.maxmemory ) )
+            addArgIfNotEmpty( arguments, "-encoding", encoding );
+            addArgIfNotEmpty( arguments, "-extdirs", extdirs );
+            addArgIfNotEmpty( arguments, "-exclude", excludePackageNames, 1.4f );
+            addArgIfNotEmpty( arguments, "-locale", this.locale );
+            if ( !StringUtils.isEmpty( maxmemory ) )
             {
                 // Allow '128' or '128m'
-                if ( NumberUtils.isDigits( this.maxmemory ) )
+                if ( NumberUtils.isDigits( maxmemory ) )
                 {
-                    addArgIf( true, "-J-Xmx" + this.maxmemory + "m" );
+                    addArgIf( arguments, true, "-J-Xmx" + maxmemory + "m" );
                 }
                 else
                 {
-                    if ( ( NumberUtils.isDigits( this.maxmemory.substring( 0, this.maxmemory.length() - 1 ) ) )
-                        && ( this.maxmemory.toLowerCase().endsWith( "m" ) ) )
+                    if ( ( NumberUtils.isDigits( maxmemory.substring( 0, maxmemory.length() - 1 ) ) )
+                        && ( maxmemory.toLowerCase().endsWith( "m" ) ) )
                     {
-                        addArgIf( true, "-J-Xmx" + this.maxmemory );
+                        addArgIf( arguments, true, "-J-Xmx" + maxmemory );
                     }
                     else
                     {
-                        getLog().error(
-                                        "The maxmemory '" + this.maxmemory
-                                            + "' is not a valid number. Ignore this option." );
+                        getLog().error( "The maxmemory '" + maxmemory + "' is not a valid number. Ignore this option." );
                     }
                 }
             }
-            if ( !StringUtils.isEmpty( this.minmemory ) )
+
+            if ( !StringUtils.isEmpty( minmemory ) )
             {
                 // Allow '128' or '128m'
-                if ( NumberUtils.isDigits( this.minmemory ) )
+                if ( NumberUtils.isDigits( minmemory ) )
                 {
-                    addArgIf( true, "-J-Xms" + this.minmemory + "m" );
+                    addArgIf( arguments, true, "-J-Xms" + minmemory + "m" );
                 }
                 else
                 {
-                    if ( ( NumberUtils.isDigits( this.minmemory.substring( 0, this.minmemory.length() - 1 ) ) )
-                        && ( this.minmemory.toLowerCase().endsWith( "m" ) ) )
+                    if ( ( NumberUtils.isDigits( minmemory.substring( 0, minmemory.length() - 1 ) ) ) && ( minmemory.toLowerCase().endsWith( "m" ) ) )
                     {
-                        addArgIf( true, "-J-Xms" + this.minmemory );
+                        addArgIf( arguments, true, "-J-Xms" + minmemory );
                     }
                     else
                     {
-                        getLog().error(
-                                        "The minmemory '" + this.minmemory
-                                            + "' is not a valid number. Ignore this option." );
+                        getLog().error( "The minmemory '" + minmemory + "' is not a valid number. Ignore this option." );
                     }
                 }
             }
-            if ( this.old && SystemUtils.isJavaVersionAtLeast( 1.4f ) )
+
+            if ( old && SystemUtils.isJavaVersionAtLeast( 1.4f ) )
             {
                 getLog().warn( "Javadoc 1.4 doesn't support the -1.1 switch anymore. Ignore this option." );
             }
             else
             {
-                addArgIf( this.old, "-1.1" );
+                addArgIf( arguments, old, "-1.1" );
             }
-            addArgIfNotEmpty( "-overview", this.overview );
-            addArgIf( this.package_, "-package" );
-            addArgIf( this.private_, "-private" );
-            addArgIf( this.protected_, "-protected" );
-            addArgIf( this.public_, "-public" );
-            addArgIf( this.quiet, "-quiet", 1.4f );
-            addArgIfNotEmpty( "-source", this.source, 1.4f );
-            addArgIf( this.verbose, "-verbose" );
-            addArgIfNotEmpty( "-additionalparam", this.additionalparam );
 
-            addArgIfNotEmpty( "-sourcePath", sourcePath.toString() );
-            addArgIfNotEmpty( "-classpath", classpath.toString() );
+            addArgIfNotEmpty( arguments, "-overview", overview );
+            addArgIf( arguments, showPackage, "-package" );
+            addArgIf( arguments, showPrivate, "-private" );
+            addArgIf( arguments, showProtected, "-protected" );
+            addArgIf( arguments, public_, "-public" );
+            addArgIf( arguments, quiet, "-quiet", 1.4f );
+            addArgIfNotEmpty( arguments, "-source", source, 1.4f );
+            addArgIf( arguments, verbose, "-verbose" );
+            addArgIfNotEmpty( arguments, "-additionalparam", additionalparam );
+
+            addArgIfNotEmpty( arguments, "-sourcePath", sourcePath.toString() );
+            addArgIfNotEmpty( arguments, "-classpath", classpath.toString() );
 
             // javadoc arguments for default doclet
-            if ( StringUtils.isEmpty( this.doclet ) )
+            if ( StringUtils.isEmpty( doclet ) )
             {
                 // Specify default values
-                if ( this.bottom.equals( DEFAULT_BOTTOM ) )
+                if ( bottom.equals( DEFAULT_BOTTOM ) )
                 {
-                    this.bottom = "Copyright &copy; " + year + " ";
+                    bottom = "Copyright &copy; " + year + " ";
 
-                    if ( ( model.getOrganization() != null )
-                        && ( !StringUtils.isEmpty( model.getOrganization().getName() ) ) )
+                    if ( ( model.getOrganization() != null ) && ( !StringUtils.isEmpty( model.getOrganization().getName() ) ) )
                     {
-                        this.bottom += model.getOrganization().getName();
+                        bottom += model.getOrganization().getName();
                     }
                     else
                     {
-                        this.bottom += DEFAULT_ORGANIZATION_NAME;
+                        bottom += DEFAULT_ORGANIZATION_NAME;
                     }
-                    this.bottom += ". All Rights Reserved.";
+                    bottom += ". All Rights Reserved.";
                 }
-                if ( this.destDir.equals( DEFAULT_DESTDIR ) )
+                if ( destDir.equals( DEFAULT_DESTDIR ) )
                 {
                     File outputDir = new File( getReportOutputDirectory().getAbsolutePath() + "/apidocs" );
                     outputDir.mkdirs();
-                    this.destDir = outputDir.getAbsolutePath();
+                    destDir = outputDir.getAbsolutePath();
                 }
-                if ( StringUtils.isEmpty( this.stylesheetfile ) )
+                if ( StringUtils.isEmpty( stylesheetfile ) )
                 {
-                    this.stylesheetfile = javadocDirectory + File.separator + DEFAULT_CSS_NAME;
+                    stylesheetfile = javadocDirectory + File.separator + DEFAULT_CSS_NAME;
                 }
-                if ( this.windowtitle.equals( DEFAULT_WINDOW_TITLE ) )
+                if ( windowtitle.equals( DEFAULT_WINDOW_TITLE ) )
                 {
-                    this.windowtitle = ( model.getName() == null ? model.getArtifactId() : model.getName() ) + " "
-                        + model.getVersion() + " API";
+                    windowtitle = ( model.getName() == null ? model.getArtifactId() : model.getName() ) + " " + model.getVersion() + " API";
                 }
-                if ( this.doctitle.equals( DEFAULT_DOCTITLE ) )
+                if ( doctitle.equals( DEFAULT_DOCTITLE ) )
                 {
-                    this.doctitle = this.windowtitle;
+                    doctitle = windowtitle;
                 }
                 // End Specify default values
 
-                addArgIf( this.author, "-author" );
-                addArgIfNotEmpty( "-bottom", this.bottom );
-                addArgIf( this.breakiterator, "-breakiterator", 1.4f );
-                addArgIfNotEmpty( "-charset", this.charset );
-                addArgIfNotEmpty( "-d", this.destDir );
-                addArgIf( this.docfilessubdirs, "-docfilessubdirs", 1.4f );
-                addArgIfNotEmpty( "-docencoding", this.docencoding );
-                addArgIfNotEmpty( "-doctitle", this.doctitle );
-                addArgIfNotEmpty( "-excludePackageNames", this.excludePackageNames );
-                addArgIfNotEmpty( "-excludedocfilessubdir", this.excludedocfilessubdir, 1.4f );
-                addArgIfNotEmpty( "-footer", this.footer );
-                addArgIfNotEmpty( "-group", this.group, true );
-                addArgIfNotEmpty( "-header", this.header );
-                addArgIfNotEmpty( "-helpfile", this.helpfile );
-                addArgIfNotEmpty( "-link", this.link, true );
-                addArgIfNotEmpty( "-linkoffline", this.linkoffline, true );
-                addArgIf( this.linksource, "-linksource", 1.4f );
-                addArgIf( this.nodeprecated, "-nodeprecated" );
-                addArgIf( this.nodeprecatedlist, "-nodeprecatedlist" );
-                addArgIf( this.nocomment, "-nocomment", 1.4f );
-                addArgIf( this.nohelp, "-nohelp" );
-                addArgIf( this.noindex, "-noindex" );
-                addArgIf( this.nonavbar, "-nonavbar" );
-                addArgIfNotEmpty( "-noqualifier", this.noqualifier, 1.4f );
-                addArgIf( this.nosince, "-nosince" );
-                addArgIf( this.notree, "-notree" );
-                addArgIf( this.serialwarn, "-serialwarn" );
-                addArgIf( this.splitindex, "-splitindex" );
-                addArgIfNotEmpty( "-stylesheetfile", this.stylesheetfile );
-                addArgIfNotEmpty( "-tag", this.tag, 1.4f, true );
-                addArgIfNotEmpty( "-taglet", this.taglet, 1.4f );
-                addArgIfNotEmpty( "-tagletpath", this.tagletpath, 1.4f );
-                addArgIf( this.use, "-use" );
-                addArgIf( this.version, "-version" );
-                addArgIfNotEmpty( "-windowtitle", this.windowtitle );
+                addArgIf( arguments, author, "-author" );
+                addArgIfNotEmpty( arguments, "-bottom", bottom );
+                addArgIf( arguments, breakiterator, "-breakiterator", 1.4f );
+                addArgIfNotEmpty( arguments, "-charset", charset );
+                addArgIfNotEmpty( arguments, "-d", destDir );
+                addArgIf( arguments, docfilessubdirs, "-docfilessubdirs", 1.4f );
+                addArgIfNotEmpty( arguments, "-docencoding", docencoding );
+                addArgIfNotEmpty( arguments, "-doctitle", doctitle );
+                addArgIfNotEmpty( arguments, "-excludePackageNames", excludePackageNames );
+                addArgIfNotEmpty( arguments, "-excludedocfilessubdir", excludedocfilessubdir, 1.4f );
+                addArgIfNotEmpty( arguments, "-footer", footer );
+                addArgIfNotEmpty( arguments, "-group", group, true );
+                addArgIfNotEmpty( arguments, "-header", header );
+                addArgIfNotEmpty( arguments, "-helpfile", helpfile );
+                addArgIfNotEmpty( arguments, "-link", link, true );
+                addArgIfNotEmpty( arguments, "-linkoffline", linkoffline, true );
+                addArgIf( arguments, linksource, "-linksource", 1.4f );
+                addArgIf( arguments, nodeprecated, "-nodeprecated" );
+                addArgIf( arguments, nodeprecatedlist, "-nodeprecatedlist" );
+                addArgIf( arguments, nocomment, "-nocomment", 1.4f );
+                addArgIf( arguments, nohelp, "-nohelp" );
+                addArgIf( arguments, noindex, "-noindex" );
+                addArgIf( arguments, nonavbar, "-nonavbar" );
+                addArgIfNotEmpty( arguments, "-noqualifier", noqualifier, 1.4f );
+                addArgIf( arguments, nosince, "-nosince" );
+                addArgIf( arguments, notree, "-notree" );
+                addArgIf( arguments, serialwarn, "-serialwarn" );
+                addArgIf( arguments, splitindex, "-splitindex" );
+                addArgIfNotEmpty( arguments, "-stylesheetfile", stylesheetfile );
+                addArgIfNotEmpty( arguments, "-tag", tag, 1.4f, true );
+                addArgIfNotEmpty( arguments, "-taglet", taglet, 1.4f );
+                addArgIfNotEmpty( arguments, "-tagletpath", tagletpath, 1.4f );
+                addArgIf( arguments, use, "-use" );
+                addArgIf( arguments, version, "-version" );
+                addArgIfNotEmpty( arguments, "-windowtitle", windowtitle );
             }
 
             cmd.createArgument().setValue( "@files" );
 
             getLog().info( Commandline.toString( cmd.getCommandline() ) );
 
-            final int exitCode = CommandLineUtils
-                .executeCommandLine( cmd, new DefaultConsumer(), new DefaultConsumer() );
+            int exitCode = CommandLineUtils.executeCommandLine( cmd, new DefaultConsumer(), new DefaultConsumer() );
+
             if ( exitCode != 0 )
             {
                 throw new MavenReportException( "Exit code: " + exitCode );
@@ -868,12 +873,19 @@ public class JavadocReport
      */
     private String getJavadocPath()
     {
-        final String javadocCommand = "javadoc" + ( SystemUtils.IS_OS_WINDOWS ? ".exe" : "" );
+        String javadocCommand = "javadoc" + ( SystemUtils.IS_OS_WINDOWS ? ".exe" : "" );
+
+        File javadocExe;
+
         // For IBM's JDK 1.2
-        final File javadocExe = ( SystemUtils.IS_OS_AIX ? new File( SystemUtils.getJavaHome() + "/../sh",
-                                                                    javadocCommand ) : new File( SystemUtils
-            .getJavaHome()
-            + "/../bin", javadocCommand ) );
+        if ( SystemUtils.IS_OS_AIX )
+        {
+            javadocExe = new File( SystemUtils.getJavaHome() + "/../sh", javadocCommand );
+        }
+        else
+        {
+            javadocExe = new File( SystemUtils .getJavaHome() + "/../bin", javadocCommand );
+        }
 
         getLog().debug( "Javadoc executable=[" + javadocExe.getAbsolutePath() + "]" );
 
@@ -884,14 +896,15 @@ public class JavadocReport
      * Convenience method to add an argument to the <code>command line</code>
      * conditionally based on the given flag.
      * 
+     * @param arguments
      * @param b the flag which controls if the argument is added or not.
      * @param value the argument value to be added.
      */
-    private void addArgIf( final boolean b, final String value )
+    private void addArgIf( List arguments, boolean b, String value )
     {
         if ( b )
         {
-            this.cmd.createArgument().setValue( value );
+            arguments.add( value );
         }
     }
 
@@ -899,18 +912,18 @@ public class JavadocReport
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
      * 
-     * @see #addArgIf(boolean, String)
+     * @see #addArgIf(java.util.List,boolean,String)
      * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
      * 
      * @param b the flag which controls if the argument is added or not.
      * @param value the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
      */
-    private void addArgIf( final boolean b, final String value, final float requiredJavaVersion )
+    private void addArgIf( List arguments, boolean b, String value, float requiredJavaVersion )
     {
         if ( SystemUtils.isJavaVersionAtLeast( requiredJavaVersion ) )
         {
-            addArgIf( b, value );
+            addArgIf( arguments, b, value );
         }
         else
         {
@@ -924,14 +937,15 @@ public class JavadocReport
      * <p>
      * Moreover, the value could be comma separated.
      * 
-     * @see #addArgIfNotEmpty(String, String, boolean)
+     * @see #addArgIfNotEmpty(java.util.List,String,String,boolean)
      * 
+     * @param arguments
      * @param key the argument name.
      * @param value the argument value to be added.
      */
-    private void addArgIfNotEmpty( final String key, final String value )
+    private void addArgIfNotEmpty( List arguments, String key, String value )
     {
-        addArgIfNotEmpty( key, value, false );
+        addArgIfNotEmpty( arguments, key, value, false );
     }
 
     /**
@@ -940,15 +954,16 @@ public class JavadocReport
      * <p>
      * Moreover, the value could be comma separated.
      * 
+     * @param arguments
      * @param key the argument name.
      * @param value the argument value to be added.
      * @param repeatKey repeat or not the key in the command line
      */
-    private void addArgIfNotEmpty( final String key, final String value, final boolean repeatKey )
+    private void addArgIfNotEmpty( List arguments, String key, String value, boolean repeatKey )
     {
         if ( !StringUtils.isEmpty( value ) )
         {
-            this.cmd.createArgument().setValue( key );
+            arguments.add( key );
 
             StringTokenizer token = new StringTokenizer( value, ",", false );
             while ( token.hasMoreTokens() )
@@ -957,11 +972,11 @@ public class JavadocReport
 
                 if ( !StringUtils.isEmpty( current ) )
                 {
-                    this.cmd.createArgument().setValue( current );
+                    arguments.add( current );
 
                     if ( token.hasMoreTokens() && repeatKey )
                     {
-                        this.cmd.createArgument().setValue( key );
+                        arguments.add( key );
                     }
                 }
             }
@@ -972,22 +987,23 @@ public class JavadocReport
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
      * 
-     * @see #addArgIfNotEmpty(String, String, float, boolean)
+     * @see #addArgIfNotEmpty(List, String, String, float, boolean)
      * 
+     * @param arguments
      * @param key the argument name.
      * @param value the argument value to be added.
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
      */
-    private void addArgIfNotEmpty( final String key, final String value, final float requiredJavaVersion )
+    private void addArgIfNotEmpty( List arguments, String key, String value, float requiredJavaVersion )
     {
-        addArgIfNotEmpty( key, value, requiredJavaVersion, false );
+        addArgIfNotEmpty( arguments, key, value, requiredJavaVersion, false );
     }
 
     /**
      * Convenience method to add an argument to the <code>command line</code>
      * regarding the requested Java version.
      * 
-     * @see #addArgIfNotEmpty(String, String)
+     * @see #addArgIfNotEmpty(java.util.List,String,String)
      * @see <a href="http://jakarta.apache.org/commons/lang/api/org/apache/commons/lang/SystemUtils.html#isJavaVersionAtLeast(float)">SystemUtils.html#isJavaVersionAtLeast(float)</a>
      * 
      * @param key the argument name.
@@ -995,12 +1011,11 @@ public class JavadocReport
      * @param requiredJavaVersion the required Java version, for example 1.31f or 1.4f
      * @param repeatKey repeat or not the key in the command line
      */
-    private void addArgIfNotEmpty( final String key, final String value, final float requiredJavaVersion,
-                                  final boolean repeatKey )
+    private void addArgIfNotEmpty( List arguments, String key, String value, float requiredJavaVersion, boolean repeatKey )
     {
         if ( SystemUtils.isJavaVersionAtLeast( requiredJavaVersion ) )
         {
-            addArgIfNotEmpty( key, value, repeatKey );
+            addArgIfNotEmpty( arguments, key, value, repeatKey );
         }
         else
         {
@@ -1017,7 +1032,7 @@ public class JavadocReport
      *            if the resource could not be found
      * @throws Exception if any
      */
-    private static InputStream getStream( final String resource )
+    private static InputStream getStream( String resource )
         throws Exception
     {
         return JavadocReport.class.getClassLoader().getResourceAsStream( resource );
@@ -1032,7 +1047,7 @@ public class JavadocReport
      * @param outputDirectory the output directory
      * @throws Exception if any
      */
-    private void copyDefaultStylesheet( final File outputDirectory )
+    private void copyDefaultStylesheet( File outputDirectory )
         throws Exception
     {
 
