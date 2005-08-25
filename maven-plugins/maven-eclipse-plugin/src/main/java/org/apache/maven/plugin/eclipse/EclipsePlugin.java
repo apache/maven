@@ -86,6 +86,11 @@ public class EclipsePlugin
         this.localRepository = localRepository;
     }
 
+    public void setOutputDir( File outputDir )
+    {
+        this.outputDir = outputDir;
+    }
+
     public void execute()
         throws MojoExecutionException
     {
@@ -105,7 +110,7 @@ public class EclipsePlugin
         {
             outputDir = project.getFile().getParentFile();
         }
-        else
+        else if ( !outputDir.equals( project.getFile().getParentFile() ) )
         {
             if ( !outputDir.isDirectory() )
             {

@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,20 +43,32 @@ public class EclipsePluginTest
     public void testProject1()
         throws Exception
     {
-        testProject( "project-1" );
+        testProject( "project-1", null );
     }
 
     public void testProject2()
         throws Exception
     {
-        testProject( "project-2" );
+        testProject( "project-2", null );
+    }
+
+    public void testProject3()
+        throws Exception
+    {
+        testProject( "project-3", null );
+    }
+
+    public void testProject4()
+        throws Exception
+    {
+        testProject( "project-4",  getTestFile( "target/project-4-test/" ) );
     }
 
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
 
-    private void testProject( String projectName )
+    private void testProject( String projectName, File outputDir )
         throws Exception
     {
         File basedir = getTestFile( "src/test/projects/" + projectName );
@@ -73,6 +86,24 @@ public class EclipsePluginTest
 
         MavenProject project = builder.buildWithDependencies( new File( basedir, "project.xml" ), localRepository, null );
 
+        File projectOutputDir = basedir;
+
+        if ( outputDir == null )
+        {
+            outputDir = basedir;
+        }
+        else
+        {
+            outputDir.mkdirs();
+
+            projectOutputDir = new File( outputDir, project.getArtifactId() );
+        }
+
+        System.err.println("basedir: " + basedir+"\noutputdir: " + outputDir+"\nprojectOutputDir: " + projectOutputDir );
+
+        plugin.setOutputDir( outputDir );
+
+
         for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
@@ -85,9 +116,9 @@ public class EclipsePluginTest
 
         plugin.execute();
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ), new File( basedir, ".project" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "project" ), new File( projectOutputDir, ".project" ) );
 
-        assertFileEquals( localRepository.getBasedir(), new File( basedir, "classpath" ), new File( basedir, ".classpath" ) );
+        assertFileEquals( localRepository.getBasedir(), new File( basedir, "classpath" ), new File( projectOutputDir, ".classpath" ) );
     }
 
     private void assertFileEquals( String mavenRepo, File expectedFile, File actualFile )
@@ -100,6 +131,11 @@ public class EclipsePluginTest
         for ( int i = 0; i < expectedLines.size(); i++ )
         {
             String expected = expectedLines.get( i ).toString();
+
+            // replace some vars in the expected line, to account
+            // for absolute paths that are different on each installation.
+
+            expected = StringUtils.replace( expected, "${basedir}", basedir );
 
             if ( actualLines.size() < i )
             {

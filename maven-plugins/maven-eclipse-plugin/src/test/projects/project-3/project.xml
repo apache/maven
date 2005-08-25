@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>eclipse</groupId>
+  <artifactId>maven-eclipse-plugin-test-project-3</artifactId>
+  <version>88.0</version>
+  <name>Maven</name>
+
+  <description>
+    Tests creating just one sourceroot when test sourceroot and
+    main sourceroot are the same, and tests the same for 
+    two resourceroots for the same directory but with different
+    include/excludes.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <testSourceDirectory>src/main/java</testSourceDirectory>
+    <testOutputDirectory>target/test-output-dir</testOutputDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <targetPath>target/main-resources</targetPath>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.xml</exclude>
+        </excludes>
+      </resource>
+    </resources>
+  </build>
+
+</project>
