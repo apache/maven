@@ -31,12 +31,14 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.project.InvalidModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -83,42 +85,56 @@ public class MavenMetadataSource
             {
                 project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
             }
+            catch ( InvalidModelException e )
+            {
+                getLogger().warn( "POM for: \'" + pomArtifact.getId() + "\' does not appear to be valid. Its will be ignored for artifact resolution." );
+                
+                project = null;
+            }
             catch ( ProjectBuildingException e )
             {
                 throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
             }
 
-            Relocation relocation = null;
-
-            DistributionManagement distMgmt = project.getDistributionManagement();
-            if ( distMgmt != null )
+            if ( project != null )
             {
-                relocation = distMgmt.getRelocation();
-            }
-            if ( relocation != null )
-            {
-                if ( relocation.getGroupId() != null )
+                Relocation relocation = null;
+
+                DistributionManagement distMgmt = project.getDistributionManagement();
+                if ( distMgmt != null )
                 {
-                    artifact.setGroupId( relocation.getGroupId() );
-                }
-                if ( relocation.getArtifactId() != null )
-                {
-                    artifact.setArtifactId( relocation.getArtifactId() );
-                }
-                if ( relocation.getVersion() != null )
-                {
-                    artifact.setVersion( relocation.getVersion() );
+                    relocation = distMgmt.getRelocation();
                 }
 
-                String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":" +
-                    artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
-
-                if ( relocation.getMessage() != null )
+                if ( relocation != null )
                 {
-                    message += "  " + relocation.getMessage() + "\n";
-                }
+                    if ( relocation.getGroupId() != null )
+                    {
+                        artifact.setGroupId( relocation.getGroupId() );
+                    }
+                    if ( relocation.getArtifactId() != null )
+                    {
+                        artifact.setArtifactId( relocation.getArtifactId() );
+                    }
+                    if ( relocation.getVersion() != null )
+                    {
+                        artifact.setVersion( relocation.getVersion() );
+                    }
 
-                getLogger().warn( message + "\n" );
+                    String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
+                        + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
+
+                    if ( relocation.getMessage() != null )
+                    {
+                        message += "  " + relocation.getMessage() + "\n";
+                    }
+
+                    getLogger().warn( message + "\n" );
+                }
+                else
+                {
+                    done = true;
+                }
             }
             else
             {
@@ -132,15 +148,27 @@ public class MavenMetadataSource
 
         try
         {
-            // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
-            // or used the inherited scope (should that be passed to the buildFromRepository method above?)
-            Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
+            ResolutionGroup result;
+            
+            if ( project == null )
+            {
+                // if the project is null, we encountered an invalid model (read: m1 POM)
+                // we'll just return an empty resolution group.
+                result = new ResolutionGroup( pomArtifact, Collections.EMPTY_SET, Collections.EMPTY_LIST );
+            }
+            else
+            {
+                // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
+                // or used the inherited scope (should that be passed to the buildFromRepository method above?)
+                Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
                                                      artifact.getDependencyFilter() );
-
+                
+                List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
+                
+                result = new ResolutionGroup( pomArtifact, artifacts, repositories );
+            }
             
-            List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
-            
-            return new ResolutionGroup( pomArtifact, artifacts, repositories );
+            return result;
         }
         catch ( InvalidVersionSpecificationException e )
         {

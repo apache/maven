@@ -164,6 +164,9 @@ it0057: Verify that scope == 'provided' dependencies are available to tests.
 it0058: Verify that profiles from settings.xml do not pollute module lists
         across projects in a reactorized build.
 
+it0059: Verify that maven-1 POMs will be ignored but not stop the resolution
+        process.
+
 -------------------------------------------------------------------------------
 
 - generated sources

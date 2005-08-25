@@ -72,6 +72,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -854,11 +857,11 @@ public class DefaultMavenProjectBuilder
     private Model readModel( File file )
         throws ProjectBuildingException
     {
-        FileReader reader = null;
+        Reader reader = null;
         try
         {
             reader = new FileReader( file );
-            return modelReader.read( reader );
+            return readModel( reader );
         }
         catch ( FileNotFoundException e )
         {
@@ -879,6 +882,24 @@ public class DefaultMavenProjectBuilder
             IOUtil.close( reader );
         }
     }
+    
+    private Model readModel( Reader reader ) throws IOException, XmlPullParserException, InvalidModelException
+    {
+        StringWriter sw = new StringWriter();
+        
+        IOUtil.copy( reader, sw );
+        
+        String modelSource = sw.toString();
+        
+        if ( modelSource.indexOf( "<modelVersion>4.0.0" ) < 0 )
+        {
+            throw new InvalidModelException( "Invalid POM (not v4.0.0 modelVersion)" );
+        }
+        
+        StringReader sReader = new StringReader( modelSource );
+        
+        return modelReader.read( sReader );
+    }
 
     private Model readModel( URL url )
         throws ProjectBuildingException
@@ -887,7 +908,7 @@ public class DefaultMavenProjectBuilder
         try
         {
             reader = new InputStreamReader( url.openStream() );
-            return modelReader.read( reader );
+            return readModel( reader );
         }
         catch ( IOException e )
         {
