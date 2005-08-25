@@ -1,0 +1,2 @@
+target/test-repo/org.apache.maven.it/jars/maven-core-it0061-1.0.jar
+target/test-repo/org.apache.maven.it/poms/maven-core-it0061-1.0.pom

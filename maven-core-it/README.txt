@@ -171,6 +171,10 @@ it0060: Test aggregation of list configuration items when using
         'combine.children=append' attribute. Specifically, merge the list of
         excludes for the testCompile mojo.
 
+it0061: Verify that deployment of artifacts to a legacy-layout repository
+        results in a groupId directory of 'the.full.group.id' instead of
+        'the/full/group/id'.
+
 -------------------------------------------------------------------------------
 
 - generated sources
