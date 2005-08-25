@@ -167,6 +167,10 @@ it0058: Verify that profiles from settings.xml do not pollute module lists
 it0059: Verify that maven-1 POMs will be ignored but not stop the resolution
         process.
 
+it0060: Test aggregation of list configuration items when using
+        'combine.children=append' attribute. Specifically, merge the list of
+        excludes for the testCompile mojo.
+
 -------------------------------------------------------------------------------
 
 - generated sources

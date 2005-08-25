@@ -1,0 +1,25 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.it</groupId>
+    <artifactId>maven-core-it0060</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>maven-core-it0060-subproject</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <testExcludes combine.children="append">
+            <testExclude implementation="java.lang.String">**/PersonThreeTest.java</testExclude>
+          </testExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

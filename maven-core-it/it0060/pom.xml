@@ -1,0 +1,35 @@
+<model>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.it</groupId>
+  <artifactId>maven-core-it0060</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <modules>
+    <module>subproject</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <inherited>true</inherited>
+        <configuration>
+          <testExcludes>
+            <testExclude implementation="java.lang.String">**/PersonTwoTest.java</testExclude>
+          </testExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</model>

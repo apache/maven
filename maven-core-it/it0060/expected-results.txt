@@ -1,0 +1,4 @@
+subproject/target/classes/org/apache/maven/it0001/Person.class
+subproject/target/test-classes/org/apache/maven/it0001/PersonTest.class
+!subproject/target/test-classes/org/apache/maven/it0001/PersonTwoTest.class
+!subproject/target/test-classes/org/apache/maven/it0001/PersonThreeTest.class
