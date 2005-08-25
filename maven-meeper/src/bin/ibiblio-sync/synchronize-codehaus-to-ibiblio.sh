@@ -8,4 +8,4 @@ rsync -e ssh --exclude='*/distributions/*' -v -rplt $dest/maven/ login.ibiblio.o
 
 date > $dest/maven2/last-sync.txt
 chmod a+r $dest/maven2/last-sync.txt
-rsync -e ssh --delete --exclude='*/distributions/*' -v -rplt $dest/maven2/ login.ibiblio.org:/public/html/maven2
+rsync -e ssh --delete -v -rplt $dest/maven2/ login.ibiblio.org:/public/html/maven2
