@@ -276,8 +276,8 @@ public class DefaultMavenProjectBuilder
         modelCache.put( createCacheKey( model.getGroupId(), model.getArtifactId(), model.getVersion() ), model );
 
         MavenProject project = build( projectDescriptor.getAbsolutePath(), model, localRepository,
-                                      Collections.EMPTY_LIST, projectDescriptor.getAbsoluteFile().getParentFile(),
-                                      profileManager );
+                                      buildArtifactRepositories( getSuperModel() ),
+                                      projectDescriptor.getAbsoluteFile().getParentFile(), profileManager );
 
         if ( project.getDistributionManagement() != null && project.getDistributionManagement().getStatus() != null )
         {
@@ -508,8 +508,7 @@ public class DefaultMavenProjectBuilder
 
         // only add the super repository if it wasn't overridden by a profile or project
         List repositories = new ArrayList( aggregatedRemoteWagonRepositories );
-        List superRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
-                                                                         artifactRepositoryFactory, container );
+        List superRepositories = buildArtifactRepositories( superModel );
         for ( Iterator i = superRepositories.iterator(); i.hasNext(); )
         {
             ArtifactRepository repository = (ArtifactRepository) i.next();
@@ -531,6 +530,12 @@ public class DefaultMavenProjectBuilder
         projectCache.put( createCacheKey( project.getGroupId(), project.getArtifactId(), project.getVersion() ),
                           project );
         return project;
+    }
+
+    private List buildArtifactRepositories( Model model )
+        throws ProjectBuildingException
+    {
+        return ProjectUtils.buildArtifactRepositories( model.getRepositories(), artifactRepositoryFactory, container );
     }
 
     /**
@@ -664,8 +669,7 @@ public class DefaultMavenProjectBuilder
     {
         if ( !model.getRepositories().isEmpty() )
         {
-            List respositories = ProjectUtils.buildArtifactRepositories( model.getRepositories(),
-                                                                         artifactRepositoryFactory, container );
+            List respositories = buildArtifactRepositories( model );
 
             for ( Iterator it = respositories.iterator(); it.hasNext(); )
             {
@@ -1114,8 +1118,7 @@ public class DefaultMavenProjectBuilder
         {
             project.setFile( new File( ".", "pom.xml" ) );
 
-            List remoteRepositories = ProjectUtils.buildArtifactRepositories( superModel.getRepositories(),
-                                                                              artifactRepositoryFactory, container );
+            List remoteRepositories = buildArtifactRepositories( superModel );
 
             project = processProjectLogic( "<Super-POM>", project, remoteRepositories, null );
 
