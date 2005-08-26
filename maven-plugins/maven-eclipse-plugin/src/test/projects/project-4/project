@@ -18,14 +18,9 @@
       <location>${basedir}/src/test/projects/project-4/project.xml</location>
     </link>
     <link>
-      <name>src-test-resources</name>
+      <name>src-main-java</name>
       <type>2</type>
-      <location>${basedir}/src/test/projects/project-4/src/test/resources</location>
-    </link>
-    <link>
-      <name>src-test-java</name>
-      <type>2</type>
-      <location>${basedir}/src/test/projects/project-4/src/test/java</location>
+      <location>${basedir}/src/test/projects/project-4/src/main/java</location>
     </link>
     <link>
       <name>src-main-resources</name>
@@ -33,9 +28,14 @@
       <location>${basedir}/src/test/projects/project-4/src/main/resources</location>
     </link>
     <link>
-      <name>src-main-java</name>
+      <name>src-test-java</name>
       <type>2</type>
-      <location>${basedir}/src/test/projects/project-4/src/main/java</location>
+      <location>${basedir}/src/test/projects/project-4/src/test/java</location>
+    </link>
+    <link>
+      <name>src-test-resources</name>
+      <type>2</type>
+      <location>${basedir}/src/test/projects/project-4/src/test/resources</location>
     </link>
   </linkedResources>
 </projectDescription>

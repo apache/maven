@@ -32,7 +32,9 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -357,9 +359,11 @@ public class EclipseWriter
 
             if ( new File( sourceRoot ).isDirectory() )
             {
+                String eclipseSourceRoot = toRelative( projectBaseDir, sourceRoot );
+                
                 // Don't add the same sourceroots twice. No include/exclude
             	// patterns possible in maven for (test|script|)source directories.
-                if ( addedSourceRoots.containsKey( sourceRoot ) )
+                if ( addedSourceRoots.containsKey( eclipseSourceRoot ) )
                 {
                 	continue; 
                 }
@@ -368,14 +372,12 @@ public class EclipseWriter
 
                 writer.addAttribute( "kind", "src" );
 
-                String eclipseSourceRoot = toRelative( projectBaseDir, sourceRoot );
-                
                 if (!projectBaseDir.equals(basedir))
                 {
                     eclipseSourceRoot = eclipseSourceRoot.replaceAll( "/", "-" );
                 }
                 
-                addedSourceRoots.put( sourceRoot, eclipseSourceRoot );
+                addedSourceRoots.put( eclipseSourceRoot, sourceRoot );
                 
                 writer.addAttribute( "path", eclipseSourceRoot );
 
@@ -419,21 +421,21 @@ public class EclipseWriter
 
             String resourceDir = resource.getDirectory();
             
+            String eclipseResourceDir = toRelative( projectBaseDir, resourceDir );
+            
             // don't add the same sourceroot twice; eclipse can't handle
             // that, even with mutual exclusive include/exclude patterns.
-            if ( addedSourceRoots.containsKey( resourceDir ) )
+            if ( addedSourceRoots.containsKey( eclipseResourceDir ) )
             {
             	continue;
             }
 
-            String eclipseResourceDir = toRelative( projectBaseDir, resourceDir );
-            
             if ( ! projectBaseDir.equals( basedir ) )
             {
                 eclipseResourceDir = eclipseResourceDir.replaceAll( "/", "-" );
             }
 
-            addedSourceRoots.put( resourceDir, eclipseResourceDir );
+            addedSourceRoots.put( eclipseResourceDir, resourceDir );
             
             writer.startElement( "classpathentry" );
 
@@ -472,13 +474,16 @@ public class EclipseWriter
 
     private void addSourceLinks( XMLWriter writer, File projectBaseDir, File basedir, Map sourceRoots )
     {
-        for ( Iterator it = sourceRoots.keySet().iterator(); it.hasNext(); )
+        List roots = new ArrayList( sourceRoots.keySet() );
+        Collections.sort( roots );
+
+        for ( Iterator it = roots.iterator(); it.hasNext(); )
         {
-            String sourceRoot = (String) it.next();
+            String linkName = (String) it.next();
             
-            String linkName = (String) sourceRoots.get( sourceRoot );
+            String sourceRoot = (String) sourceRoots.get( linkName );
             
-            sourceRoot = sourceRoot.replaceAll("\\\\", "/");
+            sourceRoot = sourceRoot.replace('\\', '/');
             
             log.debug( "Adding link '" + linkName + "' to '" + sourceRoot + "'" );
 
