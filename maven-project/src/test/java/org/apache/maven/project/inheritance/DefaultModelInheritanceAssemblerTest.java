@@ -18,10 +18,13 @@ package org.apache.maven.project.inheritance;
 
 import junit.framework.TestCase;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
@@ -382,28 +385,167 @@ public class DefaultModelInheritanceAssemblerTest
         assertEquals( "Plugin keys don't match", reference.getKey(), test.getKey() );
         assertEquals( "Plugin configurations don't match", reference.getConfiguration(), test.getConfiguration() );
 
-        List referenceGoals = reference.getGoals();
-        Map testGoalsMap = test.getGoalsAsMap();
+        List referenceExecutions = reference.getExecutions();
+        Map testExecutionsMap = test.getExecutionsAsMap();
 
-        if ( referenceGoals != null && !referenceGoals.isEmpty() )
+        if ( referenceExecutions != null && !referenceExecutions.isEmpty() )
         {
-            assertTrue( "Missing goals specification", ( testGoalsMap != null && !testGoalsMap.isEmpty() ) );
+            assertTrue( "Missing goals specification", ( testExecutionsMap != null && !testExecutionsMap.isEmpty() ) );
 
-            for ( Iterator it = referenceGoals.iterator(); it.hasNext(); )
+            for ( Iterator it = referenceExecutions.iterator(); it.hasNext(); )
             {
-                Goal referenceGoal = (Goal) it.next();
-                Goal testGoal = (Goal) testGoalsMap.get( referenceGoal.getId() );
+                PluginExecution referenceExecution = (PluginExecution) it.next();
+                PluginExecution testExecution = (PluginExecution) testExecutionsMap.get( referenceExecution.getId() );
 
-                assertNotNull( "Goal from reference not found in test", testGoal );
+                assertNotNull( "Goal from reference not found in test", testExecution );
 
-                assertEquals( "Goal IDs don't match", referenceGoal.getId(), testGoal.getId() );
-                assertEquals( "Goal configurations don't match", referenceGoal.getConfiguration(),
-                              testGoal.getConfiguration() );
+                assertEquals( "Goal IDs don't match", referenceExecution.getId(), testExecution.getId() );
+                assertEquals( "Goal configurations don't match", referenceExecution.getConfiguration(),
+                              testExecution.getConfiguration() );
+                assertEquals( "Goal lists don't match", referenceExecution.getGoals(), testExecution.getGoals() );
             }
         }
         else
         {
-            assertTrue( "Unexpected goals specification", ( testGoalsMap == null || testGoalsMap.isEmpty() ) );
+            assertTrue( "Unexpected goals specification",
+                        ( testExecutionsMap == null || testExecutionsMap.isEmpty() ) );
+        }
+    }
+
+    public void testReportInheritanceWhereParentReportWithoutInheritFlagAndChildHasNoReports()
+    {
+        Model parent = makeBaseModel( "parent" );
+
+        Model child = makeBaseModel( "child" );
+
+        ReportPlugin parentReport = new ReportPlugin();
+        parentReport.setArtifactId( "maven-testInheritance-report-plugin" );
+        parentReport.setGroupId( "org.apache.maven.plugins" );
+        parentReport.setVersion( "1.0" );
+
+        List parentPlugins = Collections.singletonList( parentReport );
+
+        Reporting parentBuild = new Reporting();
+        parentBuild.setPlugins( parentPlugins );
+
+        parent.setReporting( parentBuild );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertReports( parentPlugins, child );
+    }
+
+    public void testReportInheritanceWhereParentReportWithTrueInheritFlagAndChildHasNoReports()
+    {
+        Model parent = makeBaseModel( "parent" );
+
+        Model child = makeBaseModel( "child" );
+
+        ReportPlugin parentPlugin = new ReportPlugin();
+        parentPlugin.setArtifactId( "maven-testInheritance2-report-plugin" );
+        parentPlugin.setGroupId( "org.apache.maven.plugins" );
+        parentPlugin.setVersion( "1.0" );
+        parentPlugin.setInherited( "true" );
+
+        List parentPlugins = Collections.singletonList( parentPlugin );
+
+        Reporting parentBuild = new Reporting();
+        parentBuild.setPlugins( parentPlugins );
+
+        parent.setReporting( parentBuild );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertReports( parentPlugins, child );
+    }
+
+    public void testReportInheritanceWhereParentReportWithFalseInheritFlagAndChildHasNoReports()
+    {
+        Model parent = makeBaseModel( "parent" );
+
+        Model child = makeBaseModel( "child" );
+
+        ReportPlugin parentPlugin = new ReportPlugin();
+        parentPlugin.setArtifactId( "maven-testInheritance3-report-plugin" );
+        parentPlugin.setGroupId( "org.apache.maven.plugins" );
+        parentPlugin.setVersion( "1.0" );
+        parentPlugin.setInherited( "false" );
+
+        List parentPlugins = Collections.singletonList( parentPlugin );
+
+        Reporting parentBuild = new Reporting();
+        parentBuild.setPlugins( parentPlugins );
+
+        parent.setReporting( parentBuild );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertReports( new ArrayList(), child );
+    }
+
+    private void assertReports( List expectedPlugins, Model child )
+    {
+        Reporting childBuild = child.getReporting();
+
+        if ( expectedPlugins != null && !expectedPlugins.isEmpty() )
+        {
+            assertNotNull( childBuild );
+
+            Map childPluginsMap = childBuild.getReportPluginsAsMap();
+
+            if ( childPluginsMap != null )
+            {
+                assertEquals( expectedPlugins.size(), childPluginsMap.size() );
+
+                for ( Iterator it = expectedPlugins.iterator(); it.hasNext(); )
+                {
+                    ReportPlugin expectedPlugin = (ReportPlugin) it.next();
+
+                    ReportPlugin childPlugin = (ReportPlugin) childPluginsMap.get( expectedPlugin.getKey() );
+
+                    assertReportsEqual( expectedPlugin, childPlugin );
+                }
+            }
+            else
+            {
+                fail( "child plugins collection is null, but expectations map is not." );
+            }
+        }
+        else
+        {
+            assertTrue( childBuild == null || childBuild.getPlugins() == null || childBuild.getPlugins().isEmpty() );
+        }
+    }
+
+    private void assertReportsEqual( ReportPlugin reference, ReportPlugin test )
+    {
+        assertEquals( "Plugin keys don't match", reference.getKey(), test.getKey() );
+        assertEquals( "Plugin configurations don't match", reference.getConfiguration(), test.getConfiguration() );
+
+        List referenceReportSets = reference.getReportSets();
+        Map testReportSetsMap = test.getReportSetsAsMap();
+
+        if ( referenceReportSets != null && !referenceReportSets.isEmpty() )
+        {
+            assertTrue( "Missing goals specification", ( testReportSetsMap != null && !testReportSetsMap.isEmpty() ) );
+
+            for ( Iterator it = referenceReportSets.iterator(); it.hasNext(); )
+            {
+                ReportSet referenceReportSet = (ReportSet) it.next();
+                ReportSet testReportSet = (ReportSet) testReportSetsMap.get( referenceReportSet.getId() );
+
+                assertNotNull( "Goal from reference not found in test", testReportSet );
+
+                assertEquals( "Goal IDs don't match", referenceReportSet.getId(), testReportSet.getId() );
+                assertEquals( "Goal configurations don't match", referenceReportSet.getConfiguration(),
+                              testReportSet.getConfiguration() );
+                assertEquals( "Reports don't match", referenceReportSet.getReports(), testReportSet.getReports() );
+            }
+        }
+        else
+        {
+            assertTrue( "Unexpected goals specification",
+                        ( testReportSetsMap == null || testReportSetsMap.isEmpty() ) );
         }
     }
 

@@ -23,15 +23,12 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,17 +149,18 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Build
-        assembleBuildInheritance( child, parent.getBuild() );
-        
+        assembleBuildInheritance( child, parent );
+
         assembleDependencyInheritance( child, parent );
 
         child.setRepositories( ModelUtils.mergeRepositoryLists( child.getRepositories(), parent.getRepositories() ) );
-        child.setPluginRepositories( ModelUtils.mergeRepositoryLists( child.getPluginRepositories(), parent.getPluginRepositories() ) );
-        
+        child.setPluginRepositories(
+            ModelUtils.mergeRepositoryLists( child.getPluginRepositories(), parent.getPluginRepositories() ) );
+
         assembleReportingInheritance( child, parent );
-        
+
         assembleDependencyManagementInheritance( child, parent );
-        
+
         assembleDistributionManagementInheritance( child, parent );
     }
 
@@ -170,7 +168,7 @@ public class DefaultModelInheritanceAssembler
     {
         DistributionManagement cDistMgmt = child.getDistributionManagement();
         DistributionManagement pDistMgmt = parent.getDistributionManagement();
-        
+
         if ( cDistMgmt == null )
         {
             child.setDistributionManagement( pDistMgmt );
@@ -181,27 +179,27 @@ public class DefaultModelInheritanceAssembler
             {
                 cDistMgmt.setRepository( pDistMgmt.getRepository() );
             }
-            
+
             if ( cDistMgmt.getSnapshotRepository() == null )
             {
                 cDistMgmt.setSnapshotRepository( pDistMgmt.getSnapshotRepository() );
             }
-            
+
             if ( StringUtils.isEmpty( cDistMgmt.getDownloadUrl() ) )
             {
                 cDistMgmt.setDownloadUrl( pDistMgmt.getDownloadUrl() );
             }
-            
+
             if ( cDistMgmt.getRelocation() == null )
             {
                 cDistMgmt.setRelocation( pDistMgmt.getRelocation() );
             }
-            
+
             if ( cDistMgmt.getSite() == null )
             {
                 cDistMgmt.setSite( pDistMgmt.getSite() );
             }
-            
+
             // NOTE: We SHOULD NOT be inheriting status, since this is an assessment of the POM quality.
         }
     }
@@ -247,161 +245,29 @@ public class DefaultModelInheritanceAssembler
         Reporting childReporting = child.getReporting();
         Reporting parentReporting = parent.getReporting();
 
-        if ( childReporting != null && parentReporting != null )
+        if ( parentReporting != null )
         {
+            if ( childReporting == null )
+            {
+                childReporting = new Reporting();
+                child.setReporting( childReporting );
+            }
+
             if ( StringUtils.isEmpty( childReporting.getOutputDirectory() ) )
             {
                 childReporting.setOutputDirectory( parentReporting.getOutputDirectory() );
             }
 
-            Map mergedReportPlugins = new HashMap();
-
-            Map childReportersByKey = childReporting.getReportPluginsAsMap();
-
-            List parentReportPlugins = parentReporting.getPlugins();
-
-            if ( parentReportPlugins != null )
-            {
-                for ( Iterator it = parentReportPlugins.iterator(); it.hasNext(); )
-                {
-                    ReportPlugin parentReportPlugin = (ReportPlugin) it.next();
-
-                    String inherited = parentReportPlugin.getInherited();
-
-                    if ( StringUtils.isEmpty( inherited ) || Boolean.valueOf( inherited ).booleanValue() )
-                    {
-                        ReportPlugin childReportPlugin = (ReportPlugin) childReportersByKey.get(
-                            parentReportPlugin.getKey() );
-
-                        ReportPlugin mergedReportPlugin = parentReportPlugin;
-
-                        if ( childReportPlugin != null )
-                        {
-                            mergedReportPlugin = childReportPlugin;
-
-                            mergeReportPlugins( childReportPlugin, parentReportPlugin );
-                        }
-                        else if ( StringUtils.isEmpty( inherited ) )
-                        {
-                            mergedReportPlugin.unsetInheritanceApplied();
-                        }
-
-                        mergedReportPlugins.put( mergedReportPlugin.getKey(), mergedReportPlugin );
-                    }
-                }
-            }
-
-            for ( Iterator it = childReportersByKey.entrySet().iterator(); it.hasNext(); )
-            {
-                Map.Entry entry = (Map.Entry) it.next();
-
-                String key = (String) entry.getKey();
-
-                if ( !mergedReportPlugins.containsKey( key ) )
-                {
-                    mergedReportPlugins.put( key, entry.getValue() );
-                }
-            }
-
-            childReporting.setPlugins( new ArrayList( mergedReportPlugins.values() ) );
-
-            childReporting.flushReportPluginMap();
+            ModelUtils.mergeReportPluginLists( childReporting, parentReporting, true );
         }
-    }
-
-    private void mergeReportPlugins( ReportPlugin childReportPlugin, ReportPlugin parentReportPlugin )
-    {
-          if ( StringUtils.isEmpty( childReportPlugin.getVersion() ) )
-          {
-              childReportPlugin.setVersion( parentReportPlugin.getVersion() );
-          }
-  
-          Xpp3Dom childConfig = (Xpp3Dom) childReportPlugin.getConfiguration();
-          Xpp3Dom parentConfig = (Xpp3Dom) parentReportPlugin.getConfiguration();
-  
-          childReportPlugin.setConfiguration( Xpp3Dom.mergeXpp3Dom( childConfig, parentConfig ) );
-  
-          Map mergedReportSets = new HashMap();
-  
-          Map childReportSetsById = childReportPlugin.getReportSetsAsMap();
-  
-          for ( Iterator it = parentReportPlugin.getReportSets().iterator(); it.hasNext(); )
-          {
-              ReportSet parentReportSet = (ReportSet) it.next();
-  
-              String inherited = parentReportSet.getInherited();
-  
-              if ( StringUtils.isEmpty( inherited ) || Boolean.valueOf( inherited ).booleanValue() )
-              {
-                  ReportSet childReportSet = (ReportSet) childReportSetsById.get( parentReportSet.getId() );
-  
-                  ReportSet merged = parentReportSet;
-  
-                  if ( childReportSet != null )
-                  {
-                      merged = childReportSet;
-  
-                      Xpp3Dom parentRSConfig = (Xpp3Dom) parentReportSet.getConfiguration();
-                      Xpp3Dom mergedRSConfig = (Xpp3Dom) merged.getConfiguration();
-  
-                      merged.setConfiguration( Xpp3Dom.mergeXpp3Dom( mergedRSConfig, parentRSConfig ) );
-  
-                      List mergedReports = merged.getReports();
-  
-                      if ( mergedReports == null )
-                      {
-                          mergedReports = new ArrayList();
-  
-                          merged.setReports( mergedReports );
-                      }
-  
-                      List parentRSReports = parentReportSet.getReports();
-  
-                      if ( parentRSReports != null )
-                      {
-                          for ( Iterator reportIterator = parentRSReports.iterator(); reportIterator.hasNext(); )
-                          {
-                              String report = (String) reportIterator.next();
-  
-                              if ( !mergedReports.contains( report ) )
-                              {
-                                  mergedReports.add( report );
-                              }
-                          }
-                      }
-                  }
-                  else if ( StringUtils.isEmpty( inherited ) )
-                  {
-                      merged.unsetInheritanceApplied();
-                  }
-  
-                  mergedReportSets.put( merged.getId(), merged );
-              }
-          }
-  
-          for ( Iterator rsIterator = childReportSetsById.entrySet().iterator(); rsIterator.hasNext(); )
-          {
-              Map.Entry entry = (Map.Entry) rsIterator.next();
-  
-              String key = (String) entry.getKey();
-  
-              if ( !mergedReportSets.containsKey( key ) )
-              {
-                  mergedReportSets.put( key, entry.getValue() );
-              }
-          }
-  
-          childReportPlugin.setReportSets( new ArrayList( mergedReportSets.values() ) );
-  
-          childReportPlugin.flushReportSetMap();
     }
 
     private void assembleDependencyInheritance( Model child, Model parent )
     {
         Map depsMap = new HashMap();
-        
+
         List deps = parent.getDependencies();
-        
+
         if ( deps != null )
         {
             for ( Iterator it = deps.iterator(); it.hasNext(); )
@@ -410,9 +276,9 @@ public class DefaultModelInheritanceAssembler
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
-        
+
         deps = child.getDependencies();
-        
+
         if ( deps != null )
         {
             for ( Iterator it = deps.iterator(); it.hasNext(); )
@@ -421,13 +287,14 @@ public class DefaultModelInheritanceAssembler
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
-        
+
         child.setDependencies( new ArrayList( depsMap.values() ) );
     }
 
-    private void assembleBuildInheritance( Model child, Build parentBuild )
+    private void assembleBuildInheritance( Model child, Model parent )
     {
         Build childBuild = child.getBuild();
+        Build parentBuild = parent.getBuild();
 
         if ( parentBuild != null )
         {

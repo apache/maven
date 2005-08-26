@@ -21,6 +21,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
@@ -69,7 +72,7 @@ public final class ModelUtils
                     {
                         assembledPlugin = childPlugin;
 
-                        ModelUtils.mergePluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
+                        mergePluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
                     }
 
                     if ( handleAsInheritance && parentInherited == null )
@@ -97,6 +100,68 @@ public final class ModelUtils
         }
     }
 
+    public static void mergeReportPluginLists( Reporting child, Reporting parent, boolean handleAsInheritance )
+    {
+        if ( child == null || parent == null )
+        {
+            // nothing to do.
+            return;
+        }
+
+        List parentPlugins = parent.getPlugins();
+
+        if ( parentPlugins != null && !parentPlugins.isEmpty() )
+        {
+            Map assembledPlugins = new TreeMap();
+
+            Map childPlugins = child.getReportPluginsAsMap();
+
+            for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+            {
+                ReportPlugin parentPlugin = (ReportPlugin) it.next();
+
+                String parentInherited = parentPlugin.getInherited();
+
+                if ( !handleAsInheritance || parentInherited == null ||
+                    Boolean.valueOf( parentInherited ).booleanValue() )
+                {
+
+                    ReportPlugin assembledPlugin = parentPlugin;
+
+                    ReportPlugin childPlugin = (ReportPlugin) childPlugins.get( parentPlugin.getKey() );
+
+                    if ( childPlugin != null )
+                    {
+                        assembledPlugin = childPlugin;
+
+                        mergeReportPluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
+                    }
+
+                    if ( handleAsInheritance && parentInherited == null )
+                    {
+                        assembledPlugin.unsetInheritanceApplied();
+                    }
+
+                    assembledPlugins.put( assembledPlugin.getKey(), assembledPlugin );
+                }
+            }
+
+            for ( Iterator it = childPlugins.values().iterator(); it.hasNext(); )
+            {
+                ReportPlugin childPlugin = (ReportPlugin) it.next();
+
+                if ( !assembledPlugins.containsKey( childPlugin.getKey() ) )
+                {
+                    assembledPlugins.put( childPlugin.getKey(), childPlugin );
+                }
+            }
+
+            child.setPlugins( new ArrayList( assembledPlugins.values() ) );
+
+            child.flushReportPluginMap();
+        }
+    }
+
     public static void mergePluginDefinitions( Plugin child, Plugin parent, boolean handleAsInheritance )
     {
         if ( child == null || parent == null )
@@ -116,7 +181,7 @@ public final class ModelUtils
         }
 
         // merge the lists of goals that are not attached to an <execution/>
-        ModelUtils.mergeGoalContainerDefinitions( child, parent );
+        mergeGoalContainerDefinitions( child, parent );
 
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
@@ -143,7 +208,7 @@ public final class ModelUtils
 
                     if ( childExecution != null )
                     {
-                        ModelUtils.mergePluginExecutionDefinitions( childExecution, parentExecution );
+                        mergePluginExecutionDefinitions( childExecution, parentExecution );
 
                         assembled = childExecution;
                     }
@@ -171,6 +236,77 @@ public final class ModelUtils
             child.setExecutions( new ArrayList( assembledExecutions.values() ) );
 
             child.flushExecutionMap();
+        }
+
+    }
+
+    public static void mergeReportPluginDefinitions( ReportPlugin child, ReportPlugin parent,
+                                                     boolean handleAsInheritance )
+    {
+        if ( child == null || parent == null )
+        {
+            // nothing to do.
+            return;
+        }
+
+        if ( child.getVersion() == null && parent.getVersion() != null )
+        {
+            child.setVersion( parent.getVersion() );
+        }
+
+        // from here to the end of the method is dealing with merging of the <executions/> section.
+        String parentInherited = parent.getInherited();
+
+        boolean parentIsInherited = parentInherited == null || Boolean.valueOf( parentInherited ).booleanValue();
+
+        List parentReportSets = parent.getReportSets();
+
+        if ( parentReportSets != null && !parentReportSets.isEmpty() )
+        {
+            Map assembledReportSets = new TreeMap();
+
+            Map childReportSets = child.getReportSetsAsMap();
+
+            for ( Iterator it = parentReportSets.iterator(); it.hasNext(); )
+            {
+                ReportSet parentReportSet = (ReportSet) it.next();
+
+                if ( !handleAsInheritance || parentIsInherited )
+                {
+                    ReportSet assembledReportSet = parentReportSet;
+
+                    ReportSet childReportSet = (ReportSet) childReportSets.get( parentReportSet.getId() );
+
+                    if ( childReportSet != null )
+                    {
+                        mergeReportSetDefinitions( childReportSet, parentReportSet );
+
+                        assembledReportSet = childReportSet;
+                    }
+                    else if ( handleAsInheritance && parentInherited == null )
+                    {
+                        parentReportSet.unsetInheritanceApplied();
+                    }
+
+                    assembledReportSets.put( assembledReportSet.getId(), assembledReportSet );
+                }
+            }
+
+            for ( Iterator it = childReportSets.entrySet().iterator(); it.hasNext(); )
+            {
+                Map.Entry entry = (Map.Entry) it.next();
+
+                String id = (String) entry.getKey();
+
+                if ( !assembledReportSets.containsKey( id ) )
+                {
+                    assembledReportSets.put( id, entry.getValue() );
+                }
+            }
+
+            child.setReportSets( new ArrayList( assembledReportSets.values() ) );
+
+            child.flushReportSetMap();
         }
 
     }
@@ -249,31 +385,66 @@ public final class ModelUtils
         {
             child.setPhase( parent.getPhase() );
         }
-        
+
         List parentGoals = parent.getGoals();
         List childGoals = child.getGoals();
-        
+
         List goals = new ArrayList();
-        
+
         if ( childGoals != null && !childGoals.isEmpty() )
         {
             goals.addAll( childGoals );
         }
-        
+
         if ( parentGoals != null )
         {
             for ( Iterator goalIterator = parentGoals.iterator(); goalIterator.hasNext(); )
             {
                 String goal = (String) goalIterator.next();
-                
+
                 if ( !goals.contains( goal ) )
                 {
                     goals.add( goal );
                 }
             }
         }
-        
+
         child.setGoals( goals );
+
+        Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
+        Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
+
+        childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
+
+        child.setConfiguration( childConfiguration );
+    }
+
+    private static void mergeReportSetDefinitions( ReportSet child, ReportSet parent )
+    {
+        List parentReports = parent.getReports();
+        List childReports = child.getReports();
+
+        List reports = new ArrayList();
+
+        if ( childReports != null && !childReports.isEmpty() )
+        {
+            reports.addAll( childReports );
+        }
+
+        if ( parentReports != null )
+        {
+            for ( Iterator i = parentReports.iterator(); i.hasNext(); )
+            {
+                String report = (String) i.next();
+
+                if ( !reports.contains( report ) )
+                {
+                    reports.add( report );
+                }
+            }
+        }
+
+        child.setReports( reports );
 
         Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
         Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
@@ -297,24 +468,24 @@ public final class ModelUtils
     public static List mergeRepositoryLists( List dominant, List recessive )
     {
         List repositories = new ArrayList();
-        
+
         for ( Iterator it = dominant.iterator(); it.hasNext(); )
         {
             Repository repository = (Repository) it.next();
-            
+
             repositories.add( repository );
         }
-        
+
         for ( Iterator it = recessive.iterator(); it.hasNext(); )
         {
             Repository repository = (Repository) it.next();
-            
+
             if ( !repositories.contains( repository ) )
             {
                 repositories.add( repository );
             }
         }
-        
+
         return repositories;
     }
 }
