@@ -25,7 +25,7 @@ import java.util.Iterator;
  * @todo relocate to maven-artifact in entirety
  */
 public class ProjectClasspathTest
-    extends MavenProjectTestCase
+    extends AbstractMavenProjectTestCase
 {
     private String dir = "projects/scope/";
 

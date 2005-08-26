@@ -19,7 +19,7 @@ package org.apache.maven.project.canonical;
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectTestCase;
+import org.apache.maven.project.AbstractMavenProjectTestCase;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.List;
  * @version $Id$
  */
 public class CanonicalProjectBuilderTest
-    extends MavenProjectTestCase
+    extends AbstractMavenProjectTestCase
 {
     public void testProjectBuilder()
         throws Exception

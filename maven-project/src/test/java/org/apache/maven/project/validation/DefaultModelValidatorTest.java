@@ -18,7 +18,7 @@ package org.apache.maven.project.validation;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.MavenProjectTestCase;
+import org.apache.maven.project.AbstractMavenProjectTestCase;
 
 import java.io.FileReader;
 import java.io.Reader;
@@ -29,7 +29,7 @@ import java.util.List;
  * @version $Id$
  */
 public class DefaultModelValidatorTest
-    extends MavenProjectTestCase
+    extends AbstractMavenProjectTestCase
 {
     private Model model;
 

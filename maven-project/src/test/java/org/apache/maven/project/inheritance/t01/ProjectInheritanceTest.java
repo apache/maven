@@ -17,7 +17,7 @@ package org.apache.maven.project.inheritance.t01;
  */
 
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.inheritance.ProjectInheritanceTestCase;
+import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -28,7 +28,7 @@ import org.apache.maven.project.inheritance.ProjectInheritanceTestCase;
  * @version $Id$
  */
 public class ProjectInheritanceTest
-    extends ProjectInheritanceTestCase
+    extends AbstractProjectInheritanceTestCase
 {
     // ----------------------------------------------------------------------
     //

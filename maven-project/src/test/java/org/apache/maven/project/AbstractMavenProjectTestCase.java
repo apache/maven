@@ -30,7 +30,7 @@ import java.net.URL;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
-public abstract class MavenProjectTestCase
+public abstract class AbstractMavenProjectTestCase
     extends PlexusTestCase
 {
     protected MavenProjectBuilder projectBuilder;

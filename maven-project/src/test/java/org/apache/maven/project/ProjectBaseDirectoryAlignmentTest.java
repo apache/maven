@@ -22,7 +22,7 @@ import org.apache.maven.model.Resource;
 import java.io.File;
 
 public class ProjectBaseDirectoryAlignmentTest
-    extends MavenProjectTestCase
+    extends AbstractMavenProjectTestCase
 {
     private String dir = "src/test/resources/projects/base-directory-alignment/";
 

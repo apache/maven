@@ -843,10 +843,12 @@ public class MBoot
         includes = new ArrayList();
 
         includes.add( "**/*Test.java" );
+        includes.add( "**/*TestCase.java" );
 
         excludes = new ArrayList();
 
         excludes.add( "**/Abstract*Test.java" );
+        excludes.add( "**/Abstract*TestCase.java" );
 
         String reportsDir = new File( basedir, "target/surefire-reports" ).getAbsolutePath();
 

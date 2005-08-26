@@ -19,7 +19,7 @@ package org.apache.maven.project;
 import java.io.File;
 
 public class MavenProjectTest
-    extends MavenProjectTestCase
+    extends AbstractMavenProjectTestCase
 {
     public void testCopyConstructor() throws Exception
     {
