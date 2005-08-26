@@ -18,6 +18,8 @@ package org.apache.maven.project.interpolation;
 
 import org.apache.maven.model.Model;
 
+import java.util.Map;
+
 /**
  * @author jdcasey
  *         <p/>
@@ -27,7 +29,7 @@ public interface ModelInterpolator
 {
     String ROLE = ModelInterpolator.class.getName();
 
-    Model interpolate( Model project )
+    Model interpolate( Model project, Map context )
         throws ModelInterpolationException;
 
 }

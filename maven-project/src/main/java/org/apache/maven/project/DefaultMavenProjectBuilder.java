@@ -554,7 +554,10 @@ public class DefaultMavenProjectBuilder
         activeProfiles.addAll( injectedProfiles );
 
         // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
-        model = modelInterpolator.interpolate( model );
+        //  [BP] - Can this above comment be explained?
+        // We don't need all the project methods that are added over those in the model, but we do need basedir
+        Map context = Collections.singletonMap( "basedir", project.getBasedir() );
+        model = modelInterpolator.interpolate( model, context );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
         modelDefaultsInjector.injectDefaults( model );
@@ -563,11 +566,7 @@ public class DefaultMavenProjectBuilder
         
         Model originalModel = project.getOriginalModel();
 
-        //=======================================================================
-        //
-        // WATCH OUT FOR THIS LINE! in-project is NOT the same as out-project!!!
-        //
-        //=======================================================================
+        // We will return a different project object using the new model (hence the need to return a project, not just modify the parameter)
         project = new MavenProject( model );
 
         project.setOriginalModel( originalModel );

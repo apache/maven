@@ -19,6 +19,10 @@ package org.apache.maven.project.interpolation;
 import junit.framework.TestCase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Repository;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author jdcasey
@@ -27,6 +31,16 @@ import org.apache.maven.model.Model;
 public class RegexBasedModelInterpolatorTest
     extends TestCase
 {
+    private Map context;
+
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        context = Collections.singletonMap( "basedir", "myBasedir" );
+    }
+
     public void testShouldInterpolateDependencyVersionToSetSameAsProjectVersion()
         throws ModelInterpolationException
     {
@@ -38,7 +52,7 @@ public class RegexBasedModelInterpolatorTest
 
         model.addDependency( dep );
 
-        Model out = new RegexBasedModelInterpolator().interpolate( model );
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
 
         assertEquals( "3.8.1", ( (Dependency) out.getDependencies().get( 0 ) ).getVersion() );
     }
@@ -54,7 +68,7 @@ public class RegexBasedModelInterpolatorTest
 
         model.addDependency( dep );
 
-        Model out = new RegexBasedModelInterpolator().interpolate( model );
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
 
         assertEquals( "${something}", ( (Dependency) out.getDependencies().get( 0 ) ).getVersion() );
     }
@@ -71,8 +85,27 @@ public class RegexBasedModelInterpolatorTest
 
         model.addDependency( dep );
 
-        Model out = new RegexBasedModelInterpolator().interpolate( model );
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
 
         assertEquals( "foo-3.8.1", ( (Dependency) out.getDependencies().get( 0 ) ).getVersion() );
+    }
+
+    public void testBasedir()
+        throws ModelInterpolationException
+    {
+        Model model = new Model();
+        model.setVersion( "3.8.1" );
+        model.setArtifactId( "foo" );
+
+        Repository repository = new Repository();
+
+        repository.setUrl( "file://localhost/${basedir}/temp-repo" );
+
+        model.addRepository( repository );
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+
+        assertEquals( "file://localhost/myBasedir/temp-repo",
+                      ( (Repository) out.getRepositories().get( 0 ) ).getUrl() );
     }
 }

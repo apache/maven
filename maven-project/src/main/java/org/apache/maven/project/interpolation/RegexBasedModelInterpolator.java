@@ -30,6 +30,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Map;
 
 /**
  * @author jdcasey Created on Feb 3, 2005
@@ -44,7 +45,7 @@ public class RegexBasedModelInterpolator
     /**
      * Added: Feb 3, 2005 by jdcasey
      */
-    public Model interpolate( Model model )
+    public Model interpolate( Model model, Map context )
         throws ModelInterpolationException
     {
         StringWriter sWriter = new StringWriter();
@@ -60,7 +61,7 @@ public class RegexBasedModelInterpolator
         }
 
         String serializedModel = sWriter.toString();
-        serializedModel = interpolateInternal( serializedModel, model );
+        serializedModel = interpolateInternal( serializedModel, model, context );
 
         StringReader sReader = new StringReader( serializedModel );
 
@@ -86,7 +87,7 @@ public class RegexBasedModelInterpolator
     /**
      * Added: Feb 3, 2005 by jdcasey
      */
-    private String interpolateInternal( String src, Model model )
+    private String interpolateInternal( String src, Model model, Map context )
     {
         String result = src;
         Matcher matcher = EXPRESSION_PATTERN.matcher( result );
@@ -95,11 +96,14 @@ public class RegexBasedModelInterpolator
             String wholeExpr = matcher.group( 0 );
             String realExpr = matcher.group( 2 );
 
-            Object value = null;
+            Object value = context.get( realExpr );
 
             try
             {
-                value = ReflectionValueExtractor.evaluate( realExpr, model );
+                if ( value == null )
+                {
+                    value = ReflectionValueExtractor.evaluate( realExpr, model );
+                }
             }
             catch ( Exception e )
             {
