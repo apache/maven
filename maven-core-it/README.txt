@@ -175,6 +175,9 @@ it0061: Verify that deployment of artifacts to a legacy-layout repository
         results in a groupId directory of 'the.full.group.id' instead of
         'the/full/group/id'.
 
+it0062: Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
+        specified.
+
 -------------------------------------------------------------------------------
 
 - generated sources

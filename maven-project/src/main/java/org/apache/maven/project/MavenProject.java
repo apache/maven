@@ -181,12 +181,12 @@ public class MavenProject
         this.profileProperties = new Properties( project.profileProperties );
 
         this.model = ModelUtils.cloneModel( project.model );
-        
+
         if ( project.originalModel != null )
         {
             this.originalModel = ModelUtils.cloneModel( project.originalModel );
         }
-        
+
         this.snapshotDeploymentVersion = project.snapshotDeploymentVersion;
         this.snapshotDeploymentBuildNumber = project.snapshotDeploymentBuildNumber;
 
@@ -825,7 +825,7 @@ public class MavenProject
     public void setBuild( Build build )
     {
         this.buildOverlay = new BuildOverlay( build );
-        
+
         model.setBuild( build );
     }
 
@@ -835,10 +835,10 @@ public class MavenProject
         {
             buildOverlay = new BuildOverlay( model.getBuild() );
         }
-        
+
         return buildOverlay;
     }
-    
+
     public List getResources()
     {
         return getBuild().getResources();
@@ -951,22 +951,22 @@ public class MavenProject
     {
         this.extensionArtifacts = extensionArtifacts;
     }
-    
+
     public Set getExtensionArtifacts()
     {
         return this.extensionArtifacts;
     }
-    
+
     public Map getExtensionArtifactMap()
     {
         if ( extensionArtifactMap == null )
         {
             extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getExtensionArtifacts() );
         }
-        
+
         return extensionArtifactMap;
     }
-    
+
     public void setParentArtifact( Artifact parentArtifact )
     {
         this.parentArtifact = parentArtifact;
@@ -1062,7 +1062,8 @@ public class MavenProject
 
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
-        return getArtifact().isSnapshot() ? snapshotArtifactRepository : releaseArtifactRepository;
+        return getArtifact().isSnapshot() && snapshotArtifactRepository != null ? snapshotArtifactRepository
+            : releaseArtifactRepository;
     }
 
     public List getPluginRepositories()
@@ -1330,27 +1331,27 @@ public class MavenProject
     public void assembleProfilePropertiesInheritance()
     {
         Stack propertyStack = new Stack();
-        
+
         MavenProject current = this;
-        while( current != null )
+        while ( current != null )
         {
             Properties toAdd = current.profileProperties;
-            
+
             if ( toAdd != null && !toAdd.isEmpty() )
             {
                 propertyStack.push( toAdd );
             }
-            
+
             current = current.getParent();
         }
-        
+
         Properties newProfilesProperties = new Properties();
-        
-        while( !propertyStack.isEmpty() )
+
+        while ( !propertyStack.isEmpty() )
         {
             newProfilesProperties.putAll( (Properties) propertyStack.pop() );
         }
-        
+
         this.profileProperties = newProfilesProperties;
     }
 
@@ -1362,7 +1363,7 @@ public class MavenProject
     {
         this.snapshotDeploymentVersion = deploymentVersion;
     }
-    
+
     public String getSnapshotDeploymentVersion()
     {
         if ( snapshotDeploymentVersion == null )
@@ -1374,15 +1375,15 @@ public class MavenProject
             return snapshotDeploymentVersion;
         }
     }
-    
+
     public void setSnapshotDeploymentBuildNumber( int deploymentBuildNumber )
     {
         this.snapshotDeploymentBuildNumber = deploymentBuildNumber;
     }
-    
+
     public int getSnapshotDeploymentBuildNumber()
     {
         return snapshotDeploymentBuildNumber;
     }
-    
+
 }
