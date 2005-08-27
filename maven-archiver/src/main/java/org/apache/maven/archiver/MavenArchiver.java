@@ -63,6 +63,7 @@ public class MavenArchiver
 
         Artifact projectArtifact = project.getArtifact();
 
+/* TODO: rethink this, it wasn't working
         if ( projectArtifact.isSnapshot() )
         {
             Manifest.Attribute buildNumberAttr = new Manifest.Attribute( "Build-Number", "" +
@@ -70,6 +71,7 @@ public class MavenArchiver
             m.addConfiguredAttribute( buildNumberAttr );
         }
 
+*/
         if ( config.getPackageName() != null )
         {
             Manifest.Attribute packageAttr = new Manifest.Attribute( "Package", config.getPackageName() );
@@ -231,7 +233,7 @@ public class MavenArchiver
 
         if ( workingProject.getArtifact().isSnapshot() )
         {
-            workingProject.setVersion( workingProject.getSnapshotDeploymentVersion() );
+            workingProject.setVersion( workingProject.getArtifact().getVersion() );
         }
 
         String groupId = workingProject.getGroupId();

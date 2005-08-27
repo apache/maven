@@ -12,7 +12,7 @@ public class DefaultArtifactTransformationManager
 {
 
     private List artifactTransformations;
-    
+
     private SnapshotTransformation snapshotTransformation;
 
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
@@ -43,21 +43,6 @@ public class DefaultArtifactTransformationManager
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
             transform.transformForDeployment( artifact, remoteRepository );
         }
-    }
-
-    public String getSnapshotDeploymentTimestamp()
-    {
-        return snapshotTransformation.getDeploymentTimestamp();
-    }
-
-    public int getSnapshotDeploymentBuildNumber( Artifact artifact )
-    {
-        return snapshotTransformation.getDeploymentBuildNumber( artifact);
-    }
-
-    public String getSnapshotDeploymentVersion( Artifact snapshotArtifact )
-    {
-        return snapshotTransformation.getDeploymentVersion( snapshotArtifact );
     }
 
 }

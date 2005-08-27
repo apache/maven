@@ -605,15 +605,6 @@ public class DefaultMavenProjectBuilder
                                                                         project.getVersion(), project.getPackaging() );
         project.setArtifact( projectArtifact );
 
-        if ( projectArtifact.isSnapshot() )
-        {
-            project.setSnapshotDeploymentVersion(
-                transformationManager.getSnapshotDeploymentVersion( projectArtifact ) );
-
-            project.setSnapshotDeploymentBuildNumber(
-                transformationManager.getSnapshotDeploymentBuildNumber( projectArtifact ) );
-        }
-
         project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(),
                                                                                        artifactRepositoryFactory,
                                                                                        container ) );

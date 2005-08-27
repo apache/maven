@@ -17,7 +17,6 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
@@ -26,9 +25,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -40,10 +37,6 @@ public class SnapshotTransformation
     extends AbstractVersionTransformation
 {
     private String deploymentTimestamp;
-
-    private int deploymentBuildNumber = 1;
-
-    private Map buildNumbers = new HashMap();
 
     public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
@@ -76,42 +69,21 @@ public class SnapshotTransformation
             {
                 metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null,
                                                                                     ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
-                
-                updateDeploymentBuildNumber( artifact, metadata.getTimestamp(), metadata.getBuildNumber() );
             }
             catch ( ResourceDoesNotExistException e )
             {
-                getLogger().debug(
-                                   "Snapshot version metadata for: " + artifact.getId()
-                                       + " not found. Creating a new metadata instance.", e );
-                
+                getLogger().debug( "Snapshot version metadata for: " + artifact.getId() +
+                    " not found. Creating a new metadata instance.", e );
+
                 // ignore. We'll be creating this metadata if it doesn't exist...
                 metadata = (SnapshotArtifactMetadata) createMetadata( artifact );
             }
 
-            metadata.setVersion( getDeploymentTimestamp(), deploymentBuildNumber );
+            metadata.setVersion( getDeploymentTimestamp(), metadata.getBuildNumber() + 1 );
 
             artifact.setResolvedVersion( metadata.constructVersion() );
 
             artifact.addMetadata( metadata );
-        }
-    }
-
-    private void updateDeploymentBuildNumber( Artifact artifact, String timestamp, int buildNumberFromMetadata )
-    {
-        // we only have to handle bumping the build number if we're on the same timestamp, somehow...miraculously
-        if ( deploymentTimestamp.equals( timestamp ) )
-        {
-            String artifactKey = ArtifactUtils.versionlessKey( artifact );
-            
-            Integer buildNum = (Integer) buildNumbers.get( artifactKey );
-            
-            if ( buildNum == null || buildNum.intValue() <= buildNumberFromMetadata )
-            {
-                buildNum = new Integer( buildNumberFromMetadata + 1 );
-                
-                buildNumbers.put( artifactKey, buildNum );
-            }
         }
     }
 
@@ -123,36 +95,10 @@ public class SnapshotTransformation
         }
         return deploymentTimestamp;
     }
-    
-    public int getDeploymentBuildNumber( Artifact artifact )
-    {
-        String artifactKey = ArtifactUtils.versionlessKey( artifact );
-        
-        Integer buildNum = (Integer) buildNumbers.get( artifactKey );
-        
-        if ( buildNum == null )
-        {
-            buildNum = new Integer( 1 );
-            buildNumbers.put( artifactKey, buildNum );
-        }
-        
-        return buildNum.intValue();
-    }
 
     protected AbstractVersionArtifactMetadata createMetadata( Artifact artifact )
     {
         return new SnapshotArtifactMetadata( artifact );
-    }
-
-    public String getDeploymentVersion( Artifact artifact )
-    {
-        int buildnum = getDeploymentBuildNumber( artifact );
-        
-        SnapshotArtifactMetadata metadata = (SnapshotArtifactMetadata) createMetadata( artifact );
-        
-        metadata.setVersion( getDeploymentTimestamp(), buildnum );
-        
-        return metadata.constructVersion();
     }
 
 }
