@@ -359,7 +359,8 @@ public class DefaultMavenProjectBuilder
                         }
                         catch ( ArtifactResolutionException e )
                         {
-                            getLogger().warn( "Error updating POM - using existing version", e );
+                            getLogger().warn( "Error updating POM - using existing version" );
+                            getLogger().debug( "Cause", e );
                         }
                     }
                 }
