@@ -68,7 +68,7 @@ public class SnapshotArtifactMetadata
 
     protected void setContent( String content )
     {
-        Matcher matcher = Artifact.VERSION_FILE_PATTERN.matcher( content );
+        Matcher matcher = Artifact.VERSION_FILE_PATTERN.matcher( content.trim() );
         if ( matcher.matches() )
         {
             timestamp = matcher.group( 2 );
