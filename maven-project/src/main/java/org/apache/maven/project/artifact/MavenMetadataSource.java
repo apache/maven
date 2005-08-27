@@ -36,6 +36,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -235,11 +236,20 @@ public class MavenMetadataSource
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
+            
+            String scope = d.getScope();
+            
+            if ( StringUtils.isEmpty( scope ) )
+            {
+                scope = Artifact.SCOPE_COMPILE;
+                
+                d.setScope( scope );
+            }
 
             VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),
-                                                                          d.getScope(), inheritedScope );
+                                                                          scope, inheritedScope );
 
             if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
             {

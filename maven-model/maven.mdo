@@ -1248,7 +1248,10 @@
             <a href="http://maven.apache.org/maven2/dependencies.html">Dependency Mechanism</a>.]]>
           </description>
           <type>String</type>
-          <defaultValue>compile</defaultValue>
+          <!-- This default has to be enforced at the maven-artifact layer, to allow 
+           | injection of defaults from <dependencyManagement/>.
+           |-->
+          <!-- defaultValue>compile</defaultValue -->
         </field>
         <field>
           <name>exclusions</name>

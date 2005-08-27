@@ -38,6 +38,7 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -144,10 +145,19 @@ public class TestArtifactResolver
             {
                 Dependency d = (Dependency) i.next();
 
+                String scope = d.getScope();
+                
+                if ( StringUtils.isEmpty( scope ) )
+                {
+                    scope = Artifact.SCOPE_COMPILE;
+                    
+                    d.setScope( scope );
+                }
+
                 VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                 Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                               versionRange, d.getType(),
-                                                                              d.getClassifier(), d.getScope(),
+                                                                              d.getClassifier(), scope,
                                                                               inheritedScope );
                 if ( artifact != null )
                 {
