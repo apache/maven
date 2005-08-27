@@ -35,10 +35,12 @@ public class DefaultArtifactDeployer
     implements ArtifactDeployer
 {
     private WagonManager wagonManager;
-    
+
     private ArtifactTransformationManager transformationManager;
 
-    /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
+    /**
+     * @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly.
+     */
     public void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
@@ -54,7 +56,7 @@ public class DefaultArtifactDeployer
     {
         try
         {
-            transformationManager.transformForDeployment( artifact, localRepository );
+            transformationManager.transformForDeployment( artifact, deploymentRepository );
 
             // Copy the original file to the new one if it was transformed
             File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
