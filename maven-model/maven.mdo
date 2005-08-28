@@ -1935,7 +1935,7 @@
         </field>
         <field>
           <name>filtering</name>
-          <version>3.0.0</version>
+          <version>3.0.0+</version>
           <description><![CDATA[Boolean. Describe if resources are filtered or not.]]></description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>

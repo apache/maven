@@ -97,40 +97,14 @@ public class ResourcesMojo
     public void execute()
         throws MojoExecutionException
     {
-        initializeFiltering();
         copyResources( resources, outputDirectory );
     }
 
     protected void copyResources( List resources, String outputDirectory )
         throws MojoExecutionException
     {
-        try
-        {
-            for ( Iterator i = getJarResources( resources ).entrySet().iterator(); i.hasNext(); )
-            {
-                Map.Entry entry = (Map.Entry) i.next();
-                File source = (File) entry.getKey();
-                String destination = (String) entry.getValue();
+        initializeFiltering();
 
-                File destinationFile = new File( outputDirectory, destination );
-
-                if ( !destinationFile.getParentFile().exists() )
-                {
-                    destinationFile.getParentFile().mkdirs();
-                }
-
-                copyFile( source, destinationFile );
-            }
-        }
-        catch ( Exception e )
-        {
-            // TODO: handle exception
-            throw new MojoExecutionException( "Error copying resources", e );
-        }
-    }
-
-    private Map getJarResources( List resources )
-    {
         Map resourceEntries = new TreeMap();
 
         for ( Iterator i = resources.iterator(); i.hasNext(); )
@@ -170,18 +144,32 @@ public class ResourcesMojo
             {
                 String name = (String) j.next();
 
-                String entryName = name;
+                String destination = name;
 
                 if ( targetPath != null )
                 {
-                    entryName = targetPath + "/" + name;
+                    destination = targetPath + "/" + name;
                 }
 
-                resourceEntries.put( new File( resource.getDirectory(), name ), entryName );
+                File source = new File( resource.getDirectory(), name );
+
+                File destinationFile = new File( outputDirectory, destination );
+
+                if ( !destinationFile.getParentFile().exists() )
+                {
+                    destinationFile.getParentFile().mkdirs();
+                }
+
+                try
+                {
+                    copyFile( source, destinationFile, resource.isFiltering() && filtering );
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( "Error copying resources", e );
+                }
             }
         }
-
-        return resourceEntries;
     }
 
     private void initializeFiltering()
@@ -200,7 +188,7 @@ public class ResourcesMojo
         }
     }
 
-    private void copyFile( File from, File to )
+    private void copyFile( File from, File to, boolean filtering )
         throws IOException
     {
         if ( !filtering )
