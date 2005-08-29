@@ -18,7 +18,6 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.plugin.mapping.PluginMappingManager;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -39,8 +38,6 @@ public class MavenSession
     private List goals;
 
     private EventDispatcher eventDispatcher;
-
-    private PluginMappingManager pluginMappingManager;
 
     // TODO: make this the central one, get rid of build settings...
     private final Settings settings;
@@ -118,16 +115,6 @@ public class MavenSession
     public Settings getSettings()
     {
         return settings;
-    }
-
-    public void setPluginMappingManager( PluginMappingManager pluginMappingManager )
-    {
-        this.pluginMappingManager = pluginMappingManager;
-    }
-
-    public PluginMappingManager getPluginMappingManager()
-    {
-        return pluginMappingManager;
     }
 
     public List getSortedProjects()

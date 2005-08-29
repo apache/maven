@@ -97,7 +97,7 @@ public class DefaultLifecycleExecutor
      * execution of a mojo.
      *
      * @param session
-     * @param project
+     * @param rm
      * @param dispatcher
      */
     public MavenExecutionResponse execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )

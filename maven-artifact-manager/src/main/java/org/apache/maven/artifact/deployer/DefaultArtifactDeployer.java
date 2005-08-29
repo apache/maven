@@ -73,7 +73,7 @@ public class DefaultArtifactDeployer
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
                 metadata.storeInLocalRepository( localRepository );
                 // TODO: shouldn't need to calculate this
-                File f = new File( localRepository.getBasedir(), localRepository.pathOfMetadata( metadata ) );
+                File f = new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( metadata ) );
                 wagonManager.putArtifactMetadata( f, metadata, deploymentRepository );
             }
         }

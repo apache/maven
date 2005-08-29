@@ -48,7 +48,7 @@ public abstract class AbstractVersionArtifactMetadata
 
     protected File getLocalRepositoryLocation( ArtifactRepository localRepository )
     {
-        return new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
+        return new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( this ) );
     }
 
     private void readFromFile( File file )

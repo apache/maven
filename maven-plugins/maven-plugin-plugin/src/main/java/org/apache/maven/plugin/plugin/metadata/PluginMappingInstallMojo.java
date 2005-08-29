@@ -1,10 +1,28 @@
 package org.apache.maven.plugin.plugin.metadata;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.artifact.repository.metadata.InvalidRepositoryMetadataException;
+import org.apache.maven.artifact.repository.metadata.PluginMappingMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.mapping.metadata.PluginMappingMetadata;
+
+import java.io.File;
 
 /**
  * @goal installMapping
@@ -18,7 +36,7 @@ public class PluginMappingInstallMojo
         throws MojoExecutionException
     {
         RepositoryMetadata metadata = new PluginMappingMetadata( getProject().getGroupId() );
-        
+
         try
         {
             try
@@ -29,12 +47,12 @@ public class PluginMappingInstallMojo
             {
                 getRepositoryMetadataManager().purgeLocalCopy( metadata, getLocalRepository() );
             }
-            
-            boolean shouldUpdate = updatePluginMap( metadata );
 
-            if ( shouldUpdate )
+            File metadataFile = updatePluginMap( metadata );
+
+            if ( metadataFile != null )
             {
-                getRepositoryMetadataManager().install( metadata, getLocalRepository() );
+                getRepositoryMetadataManager().install( metadataFile, metadata, getLocalRepository() );
             }
         }
         catch ( RepositoryMetadataManagementException e )

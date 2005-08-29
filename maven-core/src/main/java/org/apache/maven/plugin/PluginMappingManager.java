@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.repository.layout;
+package org.apache.maven.plugin;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -16,21 +16,21 @@ package org.apache.maven.artifact.repository.layout;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
+import org.apache.maven.model.Plugin;
+
+import java.util.List;
 
 /**
- * @author jdcasey
+ * Manage plugin prefix to artifact ID mapping associations.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @version $Id$
  */
-public interface ArtifactRepositoryLayout
+public interface PluginMappingManager
 {
-
-    String ROLE = ArtifactRepositoryLayout.class.getName();
-
-    String pathOf( Artifact artifact );
-
-    String pathOfArtifactMetadata( ArtifactMetadata metadata );
-
-    String pathOfRepositoryMetadata( RepositoryMetadata metadata );
+    Plugin getByPrefix( String pluginPrefix, List groupIds, List pluginRepositories,
+                        ArtifactRepository localRepository )
+        throws RepositoryMetadataManagementException;
 }

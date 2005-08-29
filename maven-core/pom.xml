@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
@@ -49,7 +49,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-mapping</artifactId>
+      <artifactId>maven-repository-metadata</artifactId>
       <version>2.0-beta-1-SNAPSHOT</version>
     </dependency>
     <dependency>
@@ -114,7 +114,7 @@
       <version>1.0-alpha-4</version>
       <scope>runtime</scope>
     </dependency>
-    
+
     <!-- used to prompt the user to add plugin versions to the plugin-registry. -->
     <dependency>
       <groupId>plexus</groupId>

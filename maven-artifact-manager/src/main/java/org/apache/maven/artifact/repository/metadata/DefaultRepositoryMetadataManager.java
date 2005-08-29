@@ -31,11 +31,14 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @todo try to crop all, particularly plugin stuff
+ * @todo check caching?
+ */
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled
     implements RepositoryMetadataManager
 {
-
     // component requirement
     private WagonManager wagonManager;
 
@@ -105,8 +108,6 @@ public class DefaultRepositoryMetadataManager
                 cachedMetadata.put( metadata.getRepositoryPath(), metadataFile );
             }
         }
-
-        metadata.setFile( metadataFile );
     }
 
     private boolean verifyFileNotEmpty( File metadataFile )
@@ -129,16 +130,12 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    public void deploy( RepositoryMetadata metadata, ArtifactRepository remote )
+    public void deploy( File source, RepositoryMetadata metadata, ArtifactRepository remote )
         throws RepositoryMetadataManagementException
     {
-        File metadataFile = metadata.getFile();
-
         try
         {
-            wagonManager.putRepositoryMetadata( metadataFile, metadata, remote );
-
-            metadata.setFile( metadataFile );
+            wagonManager.putRepositoryMetadata( source, metadata, remote );
         }
         catch ( TransferFailedException e )
         {
@@ -147,7 +144,7 @@ public class DefaultRepositoryMetadataManager
 
     }
 
-    public void install( RepositoryMetadata metadata, ArtifactRepository local )
+    public void install( File source, RepositoryMetadata metadata, ArtifactRepository local )
         throws RepositoryMetadataManagementException
     {
         File metadataFile = constructLocalRepositoryFile( metadata, local );
@@ -161,7 +158,7 @@ public class DefaultRepositoryMetadataManager
                 dir.mkdirs();
             }
 
-            FileUtils.copyFile( metadata.getFile(), metadataFile );
+            FileUtils.copyFile( source, metadataFile );
         }
         catch ( IOException e )
         {
@@ -185,13 +182,9 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    private File constructLocalRepositoryFile( RepositoryMetadata metadata, ArtifactRepository local )
+    private static File constructLocalRepositoryFile( RepositoryMetadata metadata, ArtifactRepository local )
     {
-        String metadataPath = local.formatAsFile( metadata.getRepositoryPath() );
-
-        metadataPath = metadataPath.replace( File.separatorChar, '/' );
-
-        return new File( local.getBasedir(), metadataPath );
+        return new File( local.getBasedir(), local.pathOfRepositoryMetadata( metadata ) );
     }
 
 }

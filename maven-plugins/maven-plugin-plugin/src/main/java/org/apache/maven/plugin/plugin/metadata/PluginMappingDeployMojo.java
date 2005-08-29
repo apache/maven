@@ -17,10 +17,12 @@ package org.apache.maven.plugin.plugin.metadata;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.PluginMappingMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.mapping.metadata.PluginMappingMetadata;
+
+import java.io.File;
 
 /**
  * @goal deployMapping
@@ -47,9 +49,12 @@ public class PluginMappingDeployMojo
         {
             getRepositoryMetadataManager().resolve( metadata, distributionRepository, getLocalRepository() );
 
-            updatePluginMap( metadata );
+            File metadataFile = updatePluginMap( metadata );
 
-            getRepositoryMetadataManager().deploy( metadata, distributionRepository );
+            if ( metadataFile != null )
+            {
+                getRepositoryMetadataManager().deploy( metadataFile, metadata, distributionRepository );
+            }
         }
         catch ( RepositoryMetadataManagementException e )
         {

@@ -19,6 +19,7 @@ package org.apache.maven.artifact.repository.layout;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 
 /**
  * @author jdcasey
@@ -49,7 +50,7 @@ public class LegacyRepositoryLayout
         return path.toString();
     }
 
-    public String pathOfMetadata( ArtifactMetadata metadata )
+    public String pathOfArtifactMetadata( ArtifactMetadata metadata )
     {
         StringBuffer path = new StringBuffer();
 
@@ -58,14 +59,10 @@ public class LegacyRepositoryLayout
 
         return path.toString();
     }
-    
-    public String formatAsDirectory( String directory )
+
+    public String pathOfRepositoryMetadata( RepositoryMetadata metadata )
     {
-        return directory;
+        return metadata.getRepositoryPath();
     }
-    
-    public String formatAsFile( String file )
-    {
-        return file;
-    }
+
 }

@@ -64,7 +64,7 @@ public class ProjectArtifactMetadata
     public void storeInLocalRepository( ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        File destination = new File( localRepository.getBasedir(), localRepository.pathOfMetadata( this ) );
+        File destination = new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( this ) );
 
         destination.getParentFile().mkdirs();
 

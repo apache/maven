@@ -19,6 +19,7 @@ package org.apache.maven.artifact.repository.layout;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 
 /**
  * @author jdcasey
@@ -26,6 +27,11 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 public class DefaultRepositoryLayout
     implements ArtifactRepositoryLayout
 {
+    private static final char PATH_SEPARATOR = '/';
+
+    private static final char GROUP_SEPARATOR = '.';
+
+    private static final char ARTIFACT_SEPARATOR = '-';
 
     public String pathOf( Artifact artifact )
     {
@@ -33,33 +39,33 @@ public class DefaultRepositoryLayout
 
         StringBuffer path = new StringBuffer();
 
-        path.append( formatAsDirectory( artifact.getGroupId() ) ).append( '/' );
-        path.append( artifact.getArtifactId() ).append( '/' );
-        path.append( artifact.getBaseVersion() ).append( '/' );
-        path.append( artifact.getArtifactId() ).append( '-' ).append( artifact.getVersion() );
+        path.append( formatAsDirectory( artifact.getGroupId() ) ).append( PATH_SEPARATOR );
+        path.append( artifact.getArtifactId() ).append( PATH_SEPARATOR );
+        path.append( artifact.getBaseVersion() ).append( PATH_SEPARATOR );
+        path.append( artifact.getArtifactId() ).append( ARTIFACT_SEPARATOR ).append( artifact.getVersion() );
 
         if ( artifact.hasClassifier() )
         {
-            path.append( '-' ).append( artifact.getClassifier() );
+            path.append( ARTIFACT_SEPARATOR ).append( artifact.getClassifier() );
         }
 
         if ( artifactHandler.getExtension() != null && artifactHandler.getExtension().length() > 0 )
         {
-            path.append( '.' ).append( artifactHandler.getExtension() );
+            path.append( GROUP_SEPARATOR ).append( artifactHandler.getExtension() );
         }
 
         return path.toString();
     }
 
-    public String pathOfMetadata( ArtifactMetadata metadata )
+    public String pathOfArtifactMetadata( ArtifactMetadata metadata )
     {
         StringBuffer path = new StringBuffer();
 
-        path.append( formatAsDirectory( metadata.getGroupId() ) ).append( '/' );
-        path.append( metadata.getArtifactId() ).append( '/' );
+        path.append( formatAsDirectory( metadata.getGroupId() ) ).append( PATH_SEPARATOR );
+        path.append( metadata.getArtifactId() ).append( PATH_SEPARATOR );
         if ( metadata.storedInArtifactDirectory() )
         {
-            path.append( metadata.getBaseVersion() ).append( '/' );
+            path.append( metadata.getBaseVersion() ).append( PATH_SEPARATOR );
         }
 
         path.append( metadata.getFilename() );
@@ -67,26 +73,31 @@ public class DefaultRepositoryLayout
         return path.toString();
     }
 
-    public String formatAsDirectory( String directory )
+    public String pathOfRepositoryMetadata( RepositoryMetadata metadata )
     {
-        return directory.replace( '.', '/' );
-    }
-    
-    public String formatAsFile( String file )
-    {
-        int lastSlash = file.lastIndexOf('/');
-        
-        if( lastSlash > -1 )
+        String file = metadata.getRepositoryPath();
+
+        String result;
+        int lastSlash = file.lastIndexOf( PATH_SEPARATOR );
+
+        if ( lastSlash > -1 )
         {
             String filePart = file.substring( lastSlash );
-            
+
             String dirPart = file.substring( 0, lastSlash );
-            
-            return dirPart.replace('.', '/') + filePart;
+
+            result = formatAsDirectory( dirPart ) + filePart;
         }
         else
         {
-            return file;
+            result = file;
         }
+        return result;
     }
+
+    private String formatAsDirectory( String directory )
+    {
+        return directory.replace( GROUP_SEPARATOR, PATH_SEPARATOR );
+    }
+
 }

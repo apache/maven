@@ -23,7 +23,7 @@
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.plugin.mapping.MavenPluginMappingBuilder</role>
+          <role>org.apache.maven.plugin.PluginMappingManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.execution.RuntimeInformation</role>
@@ -43,6 +43,16 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <component>
+      <role>org.apache.maven.plugin.PluginMappingManager</role>
+      <implementation>org.apache.maven.plugin.DefaultPluginMappingManager</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
         </requirement>
       </requirements>
     </component>

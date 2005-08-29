@@ -17,8 +17,9 @@ package org.apache.maven.artifact.repository;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 
 /**
  * Specifies the repository used for artifact handling.
@@ -28,14 +29,11 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
  */
 public interface ArtifactRepository
 {
-
     String pathOf( Artifact artifact );
 
-    String pathOfMetadata( ArtifactMetadata artifactMetadata );
-    
-    String formatAsDirectory( String directory );
+    String pathOfArtifactMetadata( ArtifactMetadata artifactMetadata );
 
-    String formatAsFile( String file );
+    String pathOfRepositoryMetadata( RepositoryMetadata metadata );
 
     String getUrl();
 

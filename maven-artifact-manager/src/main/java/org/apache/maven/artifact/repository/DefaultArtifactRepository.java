@@ -19,6 +19,7 @@ package org.apache.maven.artifact.repository;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.wagon.repository.Repository;
 
 /**
@@ -76,19 +77,14 @@ public class DefaultArtifactRepository
         return layout.pathOf( artifact );
     }
 
-    public String pathOfMetadata( ArtifactMetadata artifactMetadata )
+    public String pathOfArtifactMetadata( ArtifactMetadata artifactMetadata )
     {
-        return layout.pathOfMetadata( artifactMetadata );
+        return layout.pathOfArtifactMetadata( artifactMetadata );
     }
 
-    public String formatAsDirectory( String directory )
+    public String pathOfRepositoryMetadata( RepositoryMetadata metadata )
     {
-        return layout.formatAsDirectory( directory );
-    }
-
-    public String formatAsFile( String file )
-    {
-        return layout.formatAsFile( file );
+        return layout.pathOfRepositoryMetadata( metadata );
     }
 
     public ArtifactRepositoryLayout getLayout()

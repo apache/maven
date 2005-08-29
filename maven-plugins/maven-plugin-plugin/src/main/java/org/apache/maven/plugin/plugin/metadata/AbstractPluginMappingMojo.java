@@ -17,19 +17,16 @@ package org.apache.maven.plugin.plugin.metadata;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.mapping.MappedPlugin;
-import org.apache.maven.plugin.mapping.PluginMap;
-import org.apache.maven.plugin.mapping.io.xpp3.PluginMappingXpp3Reader;
-import org.apache.maven.plugin.mapping.io.xpp3.PluginMappingXpp3Writer;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.discovery.ComponentDiscovererManager;
-import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
-import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -41,7 +38,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Iterator;
-import java.util.List;
 
 public abstract class AbstractPluginMappingMojo
     extends AbstractMojo
@@ -86,31 +82,33 @@ public abstract class AbstractPluginMappingMojo
      * @readonly
      */
     private RepositoryMetadataManager repositoryMetadataManager;
-    
+
     protected RepositoryMetadataManager getRepositoryMetadataManager()
     {
         return repositoryMetadataManager;
     }
-    
+
     protected ArtifactRepository getLocalRepository()
     {
         return localRepository;
     }
-    
+
     protected MavenProject getProject()
     {
         return project;
     }
-    
-    protected boolean updatePluginMap( RepositoryMetadata metadata ) throws MojoExecutionException
+
+    protected File updatePluginMap( RepositoryMetadata metadata )
+        throws MojoExecutionException
     {
-        PluginMappingXpp3Reader mappingReader = new PluginMappingXpp3Reader();
+        MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
-        PluginMap pluginMap = null;
+        Metadata pluginMap = null;
 
-        File metadataFile = metadata.getFile();
+        File metadataFile = new File( localRepository.getBasedir(),
+                                      localRepository.pathOfRepositoryMetadata( metadata ) );
 
-        if ( metadataFile != null && metadataFile.exists() )
+        if ( metadataFile.exists() )
         {
             Reader reader = null;
 
@@ -130,77 +128,71 @@ public abstract class AbstractPluginMappingMojo
             }
             catch ( XmlPullParserException e )
             {
-                throw new MojoExecutionException( "Cannot parse plugin-mapping metadata from file: " + metadataFile, e );
+                throw new MojoExecutionException( "Cannot parse plugin-mapping metadata from file: " + metadataFile,
+                                                  e );
             }
             finally
             {
                 IOUtil.close( reader );
             }
         }
-        
+
         if ( pluginMap == null )
         {
-            pluginMap = new PluginMap();
-            
+            pluginMap = new Metadata();
+
             pluginMap.setGroupId( project.getGroupId() );
         }
 
-        boolean shouldUpdate = true;
-        
         for ( Iterator it = pluginMap.getPlugins().iterator(); it.hasNext(); )
         {
-            MappedPlugin preExisting = (MappedPlugin) it.next();
+            Plugin preExisting = (Plugin) it.next();
 
             if ( preExisting.getArtifactId().equals( project.getArtifactId() ) )
             {
-                getLog().info( "Plugin-mapping metadata for prefix: " + project.getArtifactId() + " already exists. Skipping." );
-                
-                shouldUpdate = false;
-                break;
+                getLog().info(
+                    "Plugin-mapping metadata for prefix: " + project.getArtifactId() + " already exists. Skipping." );
+
+                return null;
             }
         }
 
-        if ( shouldUpdate )
+        Plugin mappedPlugin = new Plugin();
+
+        mappedPlugin.setArtifactId( project.getArtifactId() );
+
+        mappedPlugin.setPrefix( getGoalPrefix() );
+
+        pluginMap.addPlugin( mappedPlugin );
+
+        Writer writer = null;
+        try
         {
-            MappedPlugin mappedPlugin = new MappedPlugin();
+            File generatedMetadataFile = new File( metadataOutputDirectory, metadata.getRepositoryPath() );
 
-            mappedPlugin.setArtifactId( project.getArtifactId() );
+            File dir = generatedMetadataFile.getParentFile();
 
-            mappedPlugin.setPrefix( getGoalPrefix() );
-
-            pluginMap.addPlugin( mappedPlugin );
-
-            Writer writer = null;
-            try
+            if ( !dir.exists() )
             {
-                File generatedMetadataFile = new File( metadataOutputDirectory, metadata.getRepositoryPath() );
-                
-                File dir = generatedMetadataFile.getParentFile();
-
-                if ( !dir.exists() )
-                {
-                    dir.mkdirs();
-                }
-
-                writer = new FileWriter( generatedMetadataFile );
-
-                PluginMappingXpp3Writer mappingWriter = new PluginMappingXpp3Writer();
-
-                mappingWriter.write( writer, pluginMap );
-                
-                metadata.setFile( generatedMetadataFile );
+                dir.mkdirs();
             }
-            catch ( IOException e )
-            {
-                throw new MojoExecutionException( "Error writing repository metadata to build directory.", e );
-            }
-            finally
-            {
-                IOUtil.close( writer );
-            }
+
+            writer = new FileWriter( generatedMetadataFile );
+
+            MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
+
+            mappingWriter.write( writer, pluginMap );
+
+            return generatedMetadataFile;
         }
-        
-        return shouldUpdate;
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error writing repository metadata to build directory.", e );
+        }
+        finally
+        {
+            IOUtil.close( writer );
+        }
     }
 
     private String getGoalPrefix()

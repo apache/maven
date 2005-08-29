@@ -1,0 +1,56 @@
+<model>
+  <id>repository-metadata</id>
+  <name>Metadata</name>
+  <description>Per-directory repository metadata.</description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.artifact.repository.metadata</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true">
+      <name>Metadata</name>
+      <version>1.0.0</version>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The groupId that is directory represents, if any.</description>
+        </field>
+        <field>
+          <name>plugins</name>
+          <version>1.0.0</version>
+          <description>The set of plugin mappings for the group</description>
+          <association>
+            <type>Plugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Plugin</name>
+      <version>1.0.0</version>
+      <description>Mapping information for a single plugin within this group</description>
+      <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm.</comment>
+      <fields>
+        <field>
+          <name>prefix</name>
+          <type>String</type>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>The plugin invocation prefix (i.e. eclipse for eclipse:eclipse)</description>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <type>String</type>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>The plugin artifactId</description>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>
