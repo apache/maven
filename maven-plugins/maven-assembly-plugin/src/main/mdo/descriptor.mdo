@@ -1,3 +1,5 @@
+<?xml version="1.0"?>
+
 <model>
   <id>assembly</id>
   <name>Assembly</name>
@@ -53,15 +55,9 @@
       </fields>
     </class>
     <class>
-      <name>FileSet</name>
+      <name>SetBase</name>
       <version>1.0.0</version>
       <fields>
-        <field>
-          <name>directory</name>
-          <version>1.0.0</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
         <field>
           <name>outputDirectory</name>
           <version>1.0.0</version>
@@ -83,17 +79,38 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>fileMode</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <defaultValue>0644</defaultValue>
+        </field>
+        <field>
+          <name>directoryMode</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <defaultValue>0755</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>FileSet</name>
+      <version>1.0.0</version>
+      <superClass>SetBase</superClass>
+      <fields>
+        <field>
+          <name>directory</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
       </fields>
     </class>
     <class>
       <name>DependencySet</name>
       <version>1.0.0</version>
+      <superClass>SetBase</superClass>
       <fields>
-        <field>
-          <name>outputDirectory</name>
-          <version>1.0.0</version>
-          <type>String</type>
-        </field>
         <field>
           <name>outputFileNameMapping</name>
           <version>1.0.0</version>
@@ -113,20 +130,10 @@
           <required>true</required>
         </field>
         <field>
-          <name>includes</name>
+          <name>lineEndings</name>
           <version>1.0.0</version>
-          <association>
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
-          <name>excludes</name>
-          <version>1.0.0</version>
-          <association>
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
+          <type>String</type>
+          <!-- native, cr, lf, crlf, ..? -->
         </field>
       </fields>
     </class>
