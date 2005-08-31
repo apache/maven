@@ -35,11 +35,14 @@ public class ScopeArtifactFilter
     private final boolean testScope;
 
     private final boolean providedScope;
+    
+    private final boolean systemScope;
 
     public ScopeArtifactFilter( String scope )
     {
         if ( DefaultArtifact.SCOPE_COMPILE.equals( scope ) )
         {
+            systemScope = true;
             providedScope = true;
             compileScope = true;
             runtimeScope = false;
@@ -47,6 +50,7 @@ public class ScopeArtifactFilter
         }
         else if ( DefaultArtifact.SCOPE_RUNTIME.equals( scope ) )
         {
+            systemScope = false;
             providedScope = false;
             compileScope = true;
             runtimeScope = true;
@@ -54,6 +58,7 @@ public class ScopeArtifactFilter
         }
         else if ( DefaultArtifact.SCOPE_TEST.equals( scope ) )
         {
+            systemScope = true;
             providedScope = true;
             compileScope = true;
             runtimeScope = true;
@@ -61,6 +66,7 @@ public class ScopeArtifactFilter
         }
         else
         {
+            systemScope = false;
             providedScope = false;
             compileScope = false;
             runtimeScope = false;
@@ -70,21 +76,25 @@ public class ScopeArtifactFilter
 
     public boolean include( Artifact artifact )
     {
-        if ( DefaultArtifact.SCOPE_COMPILE.equals( artifact.getScope() ) )
+        if ( Artifact.SCOPE_COMPILE.equals( artifact.getScope() ) )
         {
             return compileScope;
         }
-        else if ( DefaultArtifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
+        else if ( Artifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
         {
             return runtimeScope;
         }
-        else if ( DefaultArtifact.SCOPE_TEST.equals( artifact.getScope() ) )
+        else if ( Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
         {
             return testScope;
         }
-        else if ( DefaultArtifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
+        else if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
         {
             return providedScope;
+        }
+        else if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+        {
+            return systemScope;
         }
         else
         {

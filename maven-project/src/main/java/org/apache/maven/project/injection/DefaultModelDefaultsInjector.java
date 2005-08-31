@@ -83,6 +83,7 @@ public class DefaultModelDefaultsInjector
         if ( dep.getScope() == null && def.getScope() != null )
         {
             dep.setScope( def.getScope() );
+            dep.setSystemPath( def.getSystemPath() );
         }
 
         if ( dep.getVersion() == null && def.getVersion() != null )

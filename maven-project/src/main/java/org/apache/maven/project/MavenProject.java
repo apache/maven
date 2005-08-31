@@ -347,7 +347,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
+                    || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
                     String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId() );
                     MavenProject project = (MavenProject) projectReferences.get( refId );
@@ -382,7 +383,8 @@ public class MavenProject
             if ( isAddedToClasspath( a ) )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
+                    || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
                     list.add( a );
                 }
@@ -407,7 +409,8 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: let the scope handler deal with this
-            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) )
+            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
+                || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
 

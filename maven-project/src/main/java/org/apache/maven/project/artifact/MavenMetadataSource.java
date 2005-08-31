@@ -38,6 +38,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -72,7 +73,7 @@ public class MavenMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        MavenProject project;
+        MavenProject project = null;
 
         Artifact pomArtifact;
         boolean done = false;
@@ -82,64 +83,75 @@ public class MavenMetadataSource
             pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
                                                                  artifact.getVersion(), artifact.getScope() );
 
-            try
+            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
             {
-                project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+                done = true;
             }
-            catch ( InvalidModelException e )
+            else
             {
-                getLogger().warn( "POM for: \'" + pomArtifact.getId() + "\' does not appear to be valid. Its will be ignored for artifact resolution." );
-                
-                project = null;
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
-            }
-
-            if ( project != null )
-            {
-                Relocation relocation = null;
-
-                DistributionManagement distMgmt = project.getDistributionManagement();
-                if ( distMgmt != null )
+                try
                 {
-                    relocation = distMgmt.getRelocation();
+                    project = mavenProjectBuilder
+                        .buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+                }
+                catch ( InvalidModelException e )
+                {
+                    getLogger()
+                        .warn(
+                               "POM for: \'" + pomArtifact.getId()
+                                   + "\' does not appear to be valid. Its will be ignored for artifact resolution." );
+
+                    project = null;
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
                 }
 
-                if ( relocation != null )
+                if ( project != null )
                 {
-                    if ( relocation.getGroupId() != null )
+                    Relocation relocation = null;
+
+                    DistributionManagement distMgmt = project.getDistributionManagement();
+                    if ( distMgmt != null )
                     {
-                        artifact.setGroupId( relocation.getGroupId() );
-                    }
-                    if ( relocation.getArtifactId() != null )
-                    {
-                        artifact.setArtifactId( relocation.getArtifactId() );
-                    }
-                    if ( relocation.getVersion() != null )
-                    {
-                        artifact.setVersion( relocation.getVersion() );
+                        relocation = distMgmt.getRelocation();
                     }
 
-                    String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
-                        + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
-
-                    if ( relocation.getMessage() != null )
+                    if ( relocation != null )
                     {
-                        message += "  " + relocation.getMessage() + "\n";
-                    }
+                        if ( relocation.getGroupId() != null )
+                        {
+                            artifact.setGroupId( relocation.getGroupId() );
+                        }
+                        if ( relocation.getArtifactId() != null )
+                        {
+                            artifact.setArtifactId( relocation.getArtifactId() );
+                        }
+                        if ( relocation.getVersion() != null )
+                        {
+                            artifact.setVersion( relocation.getVersion() );
+                        }
 
-                    getLogger().warn( message + "\n" );
+                        String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
+                            + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
+
+                        if ( relocation.getMessage() != null )
+                        {
+                            message += "  " + relocation.getMessage() + "\n";
+                        }
+
+                        getLogger().warn( message + "\n" );
+                    }
+                    else
+                    {
+                        done = true;
+                    }
                 }
                 else
                 {
                     done = true;
                 }
-            }
-            else
-            {
-                done = true;
             }
         }
         while ( !done );
@@ -250,6 +262,11 @@ public class MavenMetadataSource
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),
                                                                           scope, inheritedScope );
+            
+            if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
+            {
+                artifact.setFile( new File( d.getSystemPath() ) );
+            }
 
             if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
             {

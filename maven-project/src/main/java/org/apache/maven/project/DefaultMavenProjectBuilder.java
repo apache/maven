@@ -579,7 +579,9 @@ public class DefaultMavenProjectBuilder
         // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
         //  [BP] - Can this above comment be explained?
         // We don't need all the project methods that are added over those in the model, but we do need basedir
-        Map context = Collections.singletonMap( "basedir", project.getBasedir() );
+        Map context = new HashMap( System.getProperties() );
+        context.put( "basedir", project.getBasedir() );
+        
         model = modelInterpolator.interpolate( model, context );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables

@@ -1254,6 +1254,12 @@
           <!-- defaultValue>compile</defaultValue -->
         </field>
         <field>
+          <name>systemPath</name>
+          <version>4.0.0</version>
+          <description>FOR SYSTEM SCOPE ONLY. This specifies the path on the filesystem for this dependency.</description>
+          <type>String</type>
+        </field>
+        <field>
           <name>exclusions</name>
           <version>4.0.0</version>
           <description>

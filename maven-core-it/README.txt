@@ -178,6 +178,8 @@ it0061: Verify that deployment of artifacts to a legacy-layout repository
 it0062: Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
         specified.
 
+it0063: Test the use of a system scoped dependency to tools.jar.
+
 -------------------------------------------------------------------------------
 
 - generated sources

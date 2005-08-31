@@ -16,6 +16,7 @@ package org.apache.maven.project.validation;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -23,6 +24,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +64,15 @@ public class DefaultModelValidator
             validateSubElementStringNotEmpty( d, "dependencies.dependency.type", result, d.getType() );
 
             validateSubElementStringNotEmpty( d, "dependencies.dependency.version", result, d.getVersion() );
+            
+            if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isEmpty( d.getSystemPath() ) )
+            {
+                result.addMessage( "For dependency " + d + ": system-scoped dependency must specify systemPath." );
+            }
+            else if ( !Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isNotEmpty( d.getSystemPath() ) )
+            {
+                result.addMessage( "For dependency " + d + ": only dependency with system scope can specify systemPath." );
+            }
         }
 
         DependencyManagement mgmt = model.getDependencyManagement();
@@ -76,6 +87,15 @@ public class DefaultModelValidator
 
                 validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.groupId", result,
                                         d.getGroupId() );
+                
+                if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isEmpty( d.getSystemPath() ) )
+                {
+                    result.addMessage( "For managed dependency " + d + ": system-scoped dependency must specify systemPath." );
+                }
+                else if ( !Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && StringUtils.isNotEmpty( d.getSystemPath() ) )
+                {
+                    result.addMessage( "For managed dependency " + d + ": only dependency with system scope can specify systemPath." );
+                }
             }
         }
 

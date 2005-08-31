@@ -49,6 +49,8 @@ public interface Artifact
     String SCOPE_RUNTIME = "runtime";
 
     String SCOPE_PROVIDED = "provided";
+    
+    String SCOPE_SYSTEM = "system";
 
     String getGroupId();
 

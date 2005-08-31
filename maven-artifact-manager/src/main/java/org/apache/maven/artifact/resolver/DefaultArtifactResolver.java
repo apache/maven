@@ -73,74 +73,91 @@ public class DefaultArtifactResolver
                           boolean force )
         throws ArtifactResolutionException
     {
-        // skip artifacts with a file - they are already resolved
-        if ( artifact != null && artifact.getFile() == null )
+        if ( artifact != null )
         {
-            // ----------------------------------------------------------------------
-            // Check for the existence of the artifact in the specified local
-            // ArtifactRepository. If it is present then simply return as the
-            // request for resolution has been satisfied.
-            // ----------------------------------------------------------------------
-
-            String localPath = localRepository.pathOf( artifact );
-
-            artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
-
-            try
+            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
             {
-                transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
+                File systemFile = artifact.getFile();
+
+                if ( !systemFile.exists() )
+                {
+                    throw new ArtifactResolutionException( "System artifact: " + artifact.getId()
+                        + " not found in path: " + systemFile, artifact );
+                }
+                else
+                {
+                    artifact.setResolved( true );
+                }
             }
-            catch ( ArtifactMetadataRetrievalException e )
+            // skip artifacts with a file - they are already resolved
+            else if ( artifact.getFile() == null )
             {
-                throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-            }
+                // ----------------------------------------------------------------------
+                // Check for the existence of the artifact in the specified local
+                // ArtifactRepository. If it is present then simply return as the
+                // request for resolution has been satisfied.
+                // ----------------------------------------------------------------------
 
-            File destination = artifact.getFile();
-            if ( !destination.exists() || force )
-            {
+                String localPath = localRepository.pathOf( artifact );
+
+                artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
+
                 try
                 {
-                    if ( artifact.getRepository() != null )
-                    {
-                        // the transformations discovered the artifact - so use it exclusively
-                        wagonManager.getArtifact( artifact, artifact.getRepository() );
-                    }
-                    else
-                    {
-                        wagonManager.getArtifact( artifact, remoteRepositories );
-                    }
-
-                    if ( !artifact.isResolved() )
-                    {
-                        throw new ArtifactResolutionException(
-                            "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
-                            artifact, remoteRepositories );
-                    }
-
-                    // must be after the artifact is downloaded
-                    for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
-                    {
-                        ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-                        metadata.storeInLocalRepository( localRepository );
-                    }
-                }
-                catch ( ResourceDoesNotExistException e )
-                {
-                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-                }
-                catch ( TransferFailedException e )
-                {
-                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                    transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
                 }
                 catch ( ArtifactMetadataRetrievalException e )
                 {
                     throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                 }
-            }
-            else if ( destination.exists() )
-            {
-                // locally resolved...no need to hit the remote repo.
-                artifact.setResolved( true );
+
+                File destination = artifact.getFile();
+                if ( !destination.exists() || force )
+                {
+                    try
+                    {
+                        if ( artifact.getRepository() != null )
+                        {
+                            // the transformations discovered the artifact - so use it exclusively
+                            wagonManager.getArtifact( artifact, artifact.getRepository() );
+                        }
+                        else
+                        {
+                            wagonManager.getArtifact( artifact, remoteRepositories );
+                        }
+
+                        if ( !artifact.isResolved() )
+                        {
+                            throw new ArtifactResolutionException(
+                                                                   "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
+                                                                   artifact, remoteRepositories );
+                        }
+
+                        // must be after the artifact is downloaded
+                        for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+                        {
+                            ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                            metadata.storeInLocalRepository( localRepository );
+                        }
+                    }
+                    catch ( ResourceDoesNotExistException e )
+                    {
+                        throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                    }
+                    catch ( TransferFailedException e )
+                    {
+                        throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                    }
+                    catch ( ArtifactMetadataRetrievalException e )
+                    {
+                        throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
+                    }
+                }
+                else if ( destination.exists() )
+                {
+                    // locally resolved...no need to hit the remote repo.
+                    artifact.setResolved( true );
+                }
             }
         }
     }
