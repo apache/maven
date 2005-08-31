@@ -147,6 +147,14 @@ public class ArtifactDownloader
                     {
                         HttpUtils.getFile( metaUrl, file, ignoreErrors, true, proxyHost, proxyPort, proxyUserName,
                                            proxyPassword, false );
+                    }
+                    catch ( IOException e )
+                    {
+                        log( "WARNING: remote SNAPSHOT version not found, using local: " + e.getMessage() );
+                    }
+
+                    if ( file.exists() )
+                    {
                         version = FileUtils.fileRead( file );
                         log( "Resolved version: " + version );
                         dep.setResolvedVersion( version );
@@ -163,9 +171,9 @@ public class ArtifactDownloader
                             return true;
                         }
                     }
-                    catch ( IOException e )
+                    else
                     {
-                        log( "WARNING: SNAPSHOT version not found, using default: " + e.getMessage() );
+                        log( "WARNING: local SNAPSHOT version not found, using default" );                        
                     }
                 }
                 if ( !dep.getType().equals( "pom" ) )
