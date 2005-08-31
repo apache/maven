@@ -16,7 +16,6 @@ package org.apache.maven.plugin.plugin.metadata;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.metadata.InvalidRepositoryMetadataException;
 import org.apache.maven.artifact.repository.metadata.PluginMappingMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
@@ -39,15 +38,6 @@ public class PluginMappingInstallMojo
 
         try
         {
-            try
-            {
-                getRepositoryMetadataManager().resolveLocally( metadata, getLocalRepository() );
-            }
-            catch ( InvalidRepositoryMetadataException e )
-            {
-                getRepositoryMetadataManager().purgeLocalCopy( metadata, getLocalRepository() );
-            }
-
             File metadataFile = updatePluginMap( metadata );
 
             if ( metadataFile != null )

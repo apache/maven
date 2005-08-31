@@ -19,13 +19,12 @@ package org.apache.maven.artifact.repository.metadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.io.File;
+import java.util.List;
 
 public interface RepositoryMetadataManager
 {
-    void resolveLocally( RepositoryMetadata repositoryMetadata, ArtifactRepository local )
-        throws RepositoryMetadataManagementException;
 
-    void resolve( RepositoryMetadata repositoryMetadata, ArtifactRepository remote, ArtifactRepository local )
+    void resolve( RepositoryMetadata repositoryMetadata, List repositories, ArtifactRepository local )
         throws RepositoryMetadataManagementException;
 
     void deploy( File source, RepositoryMetadata repositoryMetadata, ArtifactRepository remote )
@@ -34,6 +33,4 @@ public interface RepositoryMetadataManager
     void install( File source, RepositoryMetadata repositoryMetadata, ArtifactRepository local )
         throws RepositoryMetadataManagementException;
 
-    void purgeLocalCopy( RepositoryMetadata repositoryMetadata, ArtifactRepository local )
-        throws RepositoryMetadataManagementException;
 }

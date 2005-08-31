@@ -22,19 +22,14 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-/**
- * @todo try to crop all, particularly plugin stuff
- * @todo check caching?
- */
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled
     implements RepositoryMetadataManager
@@ -42,91 +37,65 @@ public class DefaultRepositoryMetadataManager
     // component requirement
     private WagonManager wagonManager;
 
-    // only resolve repository metadata once per session...
-    private Map cachedMetadata = new HashMap();
+    /**
+     * @todo very primitve. Probably we can cache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
+     */
+    private Set cachedMetadata = new HashSet();
 
-    public void resolveLocally( RepositoryMetadata metadata, ArtifactRepository local )
+    public void resolve( RepositoryMetadata metadata, List repositories, ArtifactRepository local )
         throws RepositoryMetadataManagementException
     {
-        resolve( metadata, null, local );
-    }
-
-    public void resolve( RepositoryMetadata metadata, ArtifactRepository remote, ArtifactRepository local )
-        throws RepositoryMetadataManagementException
-    {
-        File metadataFile = (File) cachedMetadata.get( metadata.getRepositoryPath() );
-
-        if ( metadataFile == null )
+        boolean alreadyResolved = alreadyResolved( metadata );
+        if ( !alreadyResolved )
         {
-            metadataFile = constructLocalRepositoryFile( metadata, local );
-
-            if ( !metadataFile.exists() && remote != null )
+            for ( Iterator i = repositories.iterator(); i.hasNext(); )
             {
-                try
+                ArtifactRepository repository = (ArtifactRepository) i.next();
+
+                // TODO: replace with a more general repository update mechanism like artifact metadata uses
+                // (Actually, this should now supersede artifact metadata...)
+                File metadataFile = new File( local.getBasedir(), local.pathOfRepositoryMetadata( metadata ) );
+
+                if ( !metadataFile.exists() )
                 {
                     try
                     {
-                        wagonManager.getRepositoryMetadata( metadata, remote, metadataFile );
+                        try
+                        {
+                            wagonManager.getRepositoryMetadata( metadata, repository, metadataFile );
+                        }
+                        catch ( ResourceDoesNotExistException e )
+                        {
+                            if ( !metadataFile.exists() )
+                            {
+                                throw new RepositoryMetadataManagementException( metadata,
+                                                                                 "Remote repository metadata not found.",
+                                                                                 e );
+                            }
+                            else
+                            {
+                                String message = "Cannot find " + metadata +
+                                    " in remote repository - Using local copy.";
+
+                                getLogger().info( message );
+
+                                getLogger().debug( message, e );
+                            }
+                        }
                     }
-                    catch ( ResourceDoesNotExistException e )
+                    catch ( TransferFailedException e )
                     {
-                        if ( !metadataFile.exists() )
-                        {
-                            throw new RepositoryMetadataManagementException( metadata,
-                                                                             "Remote repository metadata not found.",
-                                                                             e );
-                        }
-                        else
-                        {
-                            String message = "Cannot find " + metadata + " in remote repository - Using local copy.";
-
-                            getLogger().info( message );
-
-                            getLogger().debug( message, e );
-                        }
+                        throw new RepositoryMetadataManagementException( metadata,
+                                                                         "Failed to download repository metadata.", e );
                     }
                 }
-                catch ( TransferFailedException e )
+                else
                 {
-                    throw new RepositoryMetadataManagementException( metadata,
-                                                                     "Failed to download repository metadata.", e );
-                }
-            }
-            else
-            {
-                getLogger().info( "Using local copy of " + metadata + " from: " + metadataFile );
-            }
-
-            if ( metadataFile.exists() )
-            {
-                if ( !verifyFileNotEmpty( metadataFile ) )
-                {
-                    throw new InvalidRepositoryMetadataException( metadata, "Metadata located in file: " +
-                        metadataFile + " appears to be corrupt (file is empty). DOWNLOAD FAILED." );
+                    getLogger().info( "Using local copy of " + metadata + " from: " + metadataFile );
                 }
 
-                cachedMetadata.put( metadata.getRepositoryPath(), metadataFile );
+                cachedMetadata.add( metadata.getRepositoryPath() );
             }
-        }
-    }
-
-    private boolean verifyFileNotEmpty( File metadataFile )
-    {
-        InputStream verifyInputStream = null;
-
-        try
-        {
-            verifyInputStream = new FileInputStream( metadataFile );
-
-            return verifyInputStream.available() > 0;
-        }
-        catch ( IOException e )
-        {
-            return false;
-        }
-        finally
-        {
-            IOUtil.close( verifyInputStream );
         }
     }
 
@@ -147,7 +116,7 @@ public class DefaultRepositoryMetadataManager
     public void install( File source, RepositoryMetadata metadata, ArtifactRepository local )
         throws RepositoryMetadataManagementException
     {
-        File metadataFile = constructLocalRepositoryFile( metadata, local );
+        File metadataFile = new File( local.getBasedir(), local.pathOfRepositoryMetadata( metadata ) );
 
         try
         {
@@ -167,24 +136,8 @@ public class DefaultRepositoryMetadataManager
 
     }
 
-    public void purgeLocalCopy( RepositoryMetadata metadata, ArtifactRepository local )
-        throws RepositoryMetadataManagementException
+    private boolean alreadyResolved( RepositoryMetadata metadata )
     {
-        File metadataFile = constructLocalRepositoryFile( metadata, local );
-
-        if ( metadataFile.exists() )
-        {
-            if ( !metadataFile.delete() )
-            {
-                throw new RepositoryMetadataManagementException( metadata,
-                                                                 "Failed to purge local copy from: " + metadataFile );
-            }
-        }
+        return cachedMetadata.contains( metadata.getRepositoryPath() );
     }
-
-    private static File constructLocalRepositoryFile( RepositoryMetadata metadata, ArtifactRepository local )
-    {
-        return new File( local.getBasedir(), local.pathOfRepositoryMetadata( metadata ) );
-    }
-
 }

@@ -16,19 +16,12 @@ package org.apache.maven.artifact.repository.metadata;
  * limitations under the License.
  */
 
-import java.io.File;
-
 public class PluginMappingMetadata
     implements RepositoryMetadata
 {
     private static final String PLUGIN_MAPPING_FILE = "plugins.xml";
 
     private final String groupId;
-
-    /**
-     * @todo REMOVE!
-     */
-    private File metadataFile;
 
     public PluginMappingMetadata( String groupId )
     {

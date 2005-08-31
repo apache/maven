@@ -17,7 +17,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.InvalidRepositoryMetadataException;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.PluginMappingMetadata;
@@ -51,96 +50,21 @@ public class DefaultPluginMappingManager
 {
     protected RepositoryMetadataManager repositoryMetadataManager;
 
-    private List mappings = new ArrayList();
-
-    private boolean refreshed;
-
-    private Map pluginDefinitionsByPrefix;
-
-    public void clear()
-    {
-        this.mappings = null;
-        clearCache();
-    }
-
-    private void clearCache()
-    {
-        this.pluginDefinitionsByPrefix = null;
-    }
+    private Map pluginDefinitionsByPrefix = new HashMap();
 
     public org.apache.maven.model.Plugin getByPrefix( String pluginPrefix, List groupIds, List pluginRepositories,
                                                       ArtifactRepository localRepository )
         throws RepositoryMetadataManagementException
     {
-        if ( pluginDefinitionsByPrefix == null )
+        // if not found, try from the remote repository
+        if ( !pluginDefinitionsByPrefix.containsKey( pluginPrefix ) )
         {
-            // firstly, search the local repository
+            getLogger().info( "Searching repository for plugin with prefix: \'" + pluginPrefix + "\'." );
+
             loadPluginMappings( groupIds, pluginRepositories, localRepository );
-
-            calculatePluginDefinitionsByPrefix();
-
-            // if not found, try from the remote repository
-            if ( !pluginDefinitionsByPrefix.containsKey( pluginPrefix ) && !refreshed )
-            {
-                getLogger().info(
-                    "Refreshing plugin mapping metadata; looking for plugin with prefix: \'" + pluginPrefix + "\'." );
-
-                refreshPluginMappingManager( pluginRepositories, localRepository );
-
-                refreshed = true;
-            }
-
-            calculatePluginDefinitionsByPrefix();
         }
+
         return (org.apache.maven.model.Plugin) pluginDefinitionsByPrefix.get( pluginPrefix );
-    }
-
-    private void calculatePluginDefinitionsByPrefix()
-    {
-        pluginDefinitionsByPrefix = new HashMap();
-
-        for ( Iterator it = mappings.iterator(); it.hasNext(); )
-        {
-            Metadata pluginMap = (Metadata) it.next();
-
-            String groupId = pluginMap.getGroupId();
-
-            for ( Iterator pluginIterator = pluginMap.getPlugins().iterator(); pluginIterator.hasNext(); )
-            {
-                Plugin mapping = (Plugin) pluginIterator.next();
-
-                String prefix = mapping.getPrefix();
-
-                String artifactId = mapping.getArtifactId();
-
-                org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
-
-                plugin.setGroupId( groupId );
-
-                plugin.setArtifactId( artifactId );
-
-                pluginDefinitionsByPrefix.put( prefix, plugin );
-            }
-        }
-    }
-
-    private void refreshPluginMappingManager( List pluginRepositories, ArtifactRepository localRepository )
-        throws RepositoryMetadataManagementException
-    {
-        List groupIds = new ArrayList();
-
-        for ( Iterator it = mappings.iterator(); it.hasNext(); )
-        {
-            Metadata map = (Metadata) it.next();
-
-            String groupId = map.getGroupId();
-
-            groupIds.add( groupId );
-
-            repositoryMetadataManager.purgeLocalCopy( new PluginMappingMetadata( groupId ), localRepository );
-        }
-
-        loadPluginMappings( groupIds, pluginRepositories, localRepository );
     }
 
     private void loadPluginMappings( List groupIds, List pluginRepositories, ArtifactRepository localRepository )
@@ -159,15 +83,7 @@ public class DefaultPluginMappingManager
 
             try
             {
-                File mappingFile = resolveMappingMetadata( repositoryMetadataManager, groupId, pluginRepositories,
-                                                           localRepository );
-
-                Metadata pluginMap = readPluginMap( mappingFile );
-
-                if ( pluginMap != null )
-                {
-                    mappings.add( pluginMap );
-                }
+                loadPluginMappings( groupId, pluginRepositories, localRepository );
             }
             catch ( RepositoryMetadataManagementException e )
             {
@@ -175,93 +91,76 @@ public class DefaultPluginMappingManager
 
                 getLogger().debug( "Error resolving plugin-mapping metadata for groupId: " + groupId + ".", e );
             }
-
-            clearCache();
         }
     }
 
-    private static Metadata readPluginMap( File mappingFile )
-        throws RepositoryMetadataManagementException
-    {
-        Metadata result = null;
-
-        if ( mappingFile.exists() )
-        {
-            Reader fileReader = null;
-            try
-            {
-                fileReader = new FileReader( mappingFile );
-
-                MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-                result = mappingReader.read( fileReader );
-            }
-            catch ( FileNotFoundException e )
-            {
-                throw new RepositoryMetadataManagementException( "Cannot read plugin mappings from: " + mappingFile,
-                                                                 e );
-            }
-            catch ( IOException e )
-            {
-                throw new RepositoryMetadataManagementException( "Cannot read plugin mappings from: " + mappingFile,
-                                                                 e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new RepositoryMetadataManagementException( "Cannot parse plugin mappings from: " + mappingFile,
-                                                                 e );
-            }
-            finally
-            {
-                IOUtil.close( fileReader );
-            }
-        }
-
-        return result;
-    }
-
-    private static File resolveMappingMetadata( RepositoryMetadataManager repositoryMetadataManager, String groupId,
-                                                List pluginRepositories, ArtifactRepository localRepository )
+    private void loadPluginMappings( String groupId, List pluginRepositories, ArtifactRepository localRepository )
         throws RepositoryMetadataManagementException
     {
         PluginMappingMetadata metadata = new PluginMappingMetadata( groupId );
 
-        RepositoryMetadataManagementException repositoryException = null;
+        // TOOD: aggregate the results of this instead
+        repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
 
-        for ( Iterator repoIterator = pluginRepositories.iterator(); repoIterator.hasNext(); )
+        File metadataFile = new File( localRepository.getBasedir(),
+                                      localRepository.pathOfRepositoryMetadata( metadata ) );
+
+        if ( metadataFile.exists() )
         {
-            ArtifactRepository repository = (ArtifactRepository) repoIterator.next();
+            Metadata pluginMap = readMetadata( metadataFile );
 
-            try
+            if ( pluginMap != null )
             {
-                repositoryMetadataManager.resolve( metadata, repository, localRepository );
-
-                // reset this to keep it from getting in the way when we succeed but not on first repo...
-                repositoryException = null;
-
-                File metadataFile = new File( localRepository.getBasedir(),
-                                              localRepository.pathOfRepositoryMetadata( metadata ) );
-
-                if ( metadataFile.exists() )
+                for ( Iterator pluginIterator = pluginMap.getPlugins().iterator(); pluginIterator.hasNext(); )
                 {
-                    return metadataFile;
+                    Plugin mapping = (Plugin) pluginIterator.next();
+
+                    String prefix = mapping.getPrefix();
+
+                    String artifactId = mapping.getArtifactId();
+
+                    org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
+
+                    plugin.setGroupId( groupId );
+
+                    plugin.setArtifactId( artifactId );
+
+                    pluginDefinitionsByPrefix.put( prefix, plugin );
                 }
             }
-            catch ( InvalidRepositoryMetadataException e )
-            {
-                repositoryMetadataManager.purgeLocalCopy( metadata, localRepository );
-            }
-            catch ( RepositoryMetadataManagementException e )
-            {
-                repositoryException = e;
-            }
         }
+    }
 
-        if ( repositoryException != null )
+    private static Metadata readMetadata( File mappingFile )
+        throws RepositoryMetadataManagementException
+    {
+        Metadata result;
+
+        Reader fileReader = null;
+        try
         {
-            throw repositoryException;
-        }
+            fileReader = new FileReader( mappingFile );
 
-        throw new RepositoryMetadataManagementException( "No repository metadata found" );
+            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+
+            result = mappingReader.read( fileReader );
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new RepositoryMetadataManagementException( "Cannot read plugin mappings from: " + mappingFile, e );
+        }
+        catch ( IOException e )
+        {
+            throw new RepositoryMetadataManagementException( "Cannot read plugin mappings from: " + mappingFile, e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new RepositoryMetadataManagementException( "Cannot parse plugin mappings from: " + mappingFile, e );
+        }
+        finally
+        {
+            IOUtil.close( fileReader );
+        }
+        return result;
     }
 }
