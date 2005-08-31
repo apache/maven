@@ -199,6 +199,7 @@ public class SurefirePlugin
         // ----------------------------------------------------------------------
 
         System.setProperty( "basedir", basedir );
+        System.setProperty( "localRepository", localRepository.getBasedir() );
 
         // Add all system properties configured by the user
         if ( systemProperties != null )
