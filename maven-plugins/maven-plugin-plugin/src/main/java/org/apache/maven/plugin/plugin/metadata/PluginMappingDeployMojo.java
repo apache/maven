@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagemen
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
+import java.util.Collections;
 
 /**
  * @goal deployMapping
@@ -47,7 +48,8 @@ public class PluginMappingDeployMojo
 
         try
         {
-            getRepositoryMetadataManager().resolve( metadata, distributionRepository, getLocalRepository() );
+            getRepositoryMetadataManager().resolve( metadata, Collections.singletonList( distributionRepository ),
+                                                    getLocalRepository() );
 
             File metadataFile = updatePluginMap( metadata );
 
