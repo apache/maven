@@ -211,24 +211,24 @@ public class RewritePhase
         // SNAPSHOT metadata
         ArtifactMetadata snapshot = new SnapshotArtifactMetadata( artifact );
 
-        File snapshotSource = new File( sourceBase, sourceRepo.pathOfMetadata( snapshot ) );
-        File snapshotTarget = new File( targetBase, targetRepo.pathOfMetadata( snapshot ) );
+        File snapshotSource = new File( sourceBase, sourceRepo.pathOfArtifactMetadata( snapshot ) );
+        File snapshotTarget = new File( targetBase, targetRepo.pathOfArtifactMetadata( snapshot ) );
 
         freshenSupplementalMetadata( snapshotSource, snapshotTarget, transaction, artifactReporter, reportOnly );
 
         // RELEASE metadata
         ArtifactMetadata release = new ReleaseArtifactMetadata( artifact );
 
-        File releaseSource = new File( sourceBase, sourceRepo.pathOfMetadata( release ) );
-        File releaseTarget = new File( targetBase, targetRepo.pathOfMetadata( release ) );
+        File releaseSource = new File( sourceBase, sourceRepo.pathOfArtifactMetadata( release ) );
+        File releaseTarget = new File( targetBase, targetRepo.pathOfArtifactMetadata( release ) );
 
         freshenSupplementalMetadata( releaseSource, releaseTarget, transaction, artifactReporter, reportOnly );
 
         // The rest is for POM metadata - translation and bridging of locations in the target repo may be required.
         ArtifactMetadata pom = new ProjectMetadata( artifact );
 
-        File sourcePom = new File( sourceBase, sourceRepo.pathOfMetadata( pom ) );
-        File targetPom = new File( targetBase, targetRepo.pathOfMetadata( pom ).replace( '+', '-' ) );
+        File sourcePom = new File( sourceBase, sourceRepo.pathOfArtifactMetadata( pom ) );
+        File targetPom = new File( targetBase, targetRepo.pathOfArtifactMetadata( pom ).replace( '+', '-' ) );
 
         String pomContents = null;
 
@@ -267,7 +267,7 @@ public class RewritePhase
 
                 transaction.addFile( targetPom );
 
-                bridgedTargetPom = new File( targetBase, bridgingLayout.pathOfMetadata( pom ).replace( '+', '-' ) );
+                bridgedTargetPom = new File( targetBase, bridgingLayout.pathOfArtifactMetadata( pom ).replace( '+', '-' ) );
 
                 transaction.addFile( bridgedTargetPom );
 
