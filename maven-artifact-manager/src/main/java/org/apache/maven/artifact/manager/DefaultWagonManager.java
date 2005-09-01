@@ -483,6 +483,26 @@ public class DefaultWagonManager
             wagon.get( remotePath + checksumFileExtension, checksumFile );
 
             String expectedChecksum = FileUtils.fileRead( checksumFile );
+
+            // remove whitespaces at the end
+            expectedChecksum = expectedChecksum.trim();
+
+            // check for 'MD5 (name) = CHECKSUM'
+            if ( expectedChecksum.startsWith( "MD5" ) )
+            {
+                int lastSpacePos = expectedChecksum.lastIndexOf( ' ' );
+                expectedChecksum = expectedChecksum.substring( lastSpacePos + 1 );
+            }
+            else
+            {
+                // remove everything after the first space (if available)
+                int spacePos = expectedChecksum.indexOf( ' ' );
+
+                if ( spacePos != -1 )
+                {
+                    expectedChecksum = expectedChecksum.substring( 0, spacePos );
+                }
+            }
             if ( !expectedChecksum.equals( actualChecksum ) )
             {
                 throw new ChecksumFailedException( "Checksum failed on download: local = '" + actualChecksum +
