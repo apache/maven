@@ -92,6 +92,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>    
+    <developer>
+      <id>trygvis</id>
+      <name>Trygve Laugstol</name>
+      <email>trygvis@apache.org</email>
+      <organization>Apache</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>PMC Member</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>    
   </developers>
   <dependencies>
     <dependency>
