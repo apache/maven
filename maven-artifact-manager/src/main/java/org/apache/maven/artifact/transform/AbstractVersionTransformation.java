@@ -179,6 +179,7 @@ public abstract class AbstractVersionTransformation
     private VersionArtifactMetadata readFromLocalRepository( Artifact artifact, ArtifactRepository localRepository )
         throws IOException
     {
+        // TODO: we could cache the results of this, perhaps inside the artifact repository?
         AbstractVersionArtifactMetadata metadata = createMetadata( artifact );
         metadata.readFromLocalRepository( localRepository );
         return metadata;
