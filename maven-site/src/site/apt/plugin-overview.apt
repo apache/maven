@@ -82,7 +82,7 @@ Plugin Overview
     [[2]] {{{plugin-management.html}Managing plugin configuration in large 
           projects}}
 
-    [[3]] {{{plugin-configuration.html}Configuring plugins}}
+    [[3]] {{{getting-started.html#configuring_plugins}Configuring plugins}}
   
 * Comparison to Maven 1.x Plugins
 

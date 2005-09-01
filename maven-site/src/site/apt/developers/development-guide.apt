@@ -59,6 +59,10 @@ Developing Maven 2
 
  * Name the file <<<MNG-<issue number>-<artifact id>.patch>>>.
 
+ * When adding the patch add a comment to the JIRA suggesting the commit message. For information on what to include
+   in a commit message please take a look at the existing commit messages. Currently the commit mails are sent to
+   {{{http://mail-archives.apache.org/mod_mbox/maven-dev/}dev@maven.apache.org}} with the subject prefix "svn commit".
+
  []
 
  An example on how to create a patch from the command line:
@@ -69,7 +73,7 @@ $ svn diff > MNG-123-maven-core.patch
 
  If you are picking up an issue with a existing patch attached to the issue you can apply the patch to your working
  directory directly from JIRA like this. The <<<wget>>> and <<<patch>>> commands will only be available if you are
- on a UNIX platform or Cygwin on windows.
+ on a UNIX platform or using Cygwin on windows.
 
 ---
 $ wget -O - -q <URL to the patch from JIRA> | patch -p0
@@ -80,6 +84,14 @@ $ wget -O - -q <URL to the patch from JIRA> | patch -p0
 ---
 $ patch -p0 < MNG-123.patch
 ---
+
+ A couple of notes:
+
+ * If you are using another tool for creating patches, make sure that the patch doesn't include absolute paths.
+ Including absolute paths in the patch will make the useless for us as we most likely don't have the same directory
+ structure as you.
+
+ * Make sure that you follow our code style.
 
 * Other useful Subversion commands while developing
 

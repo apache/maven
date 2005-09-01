@@ -136,6 +136,7 @@
           been done.
         </p>
       </subsection>
+      <a name="configuring_plugins"/>
       <subsection name="Configuring Plugins">
         <p>
           What if you would like to customise whether a plugins is enabled, or how a plugin operates? 
