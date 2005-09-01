@@ -17,9 +17,9 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
-import org.apache.maven.artifact.repository.metadata.PluginMappingMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
@@ -97,7 +97,7 @@ public class DefaultPluginMappingManager
     private void loadPluginMappings( String groupId, List pluginRepositories, ArtifactRepository localRepository )
         throws RepositoryMetadataManagementException
     {
-        PluginMappingMetadata metadata = new PluginMappingMetadata( groupId );
+        GroupRepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
 
         // TOOD: aggregate the results of this instead
         repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );

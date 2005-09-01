@@ -16,26 +16,29 @@ package org.apache.maven.artifact.repository.metadata;
  * limitations under the License.
  */
 
-public class PluginMappingMetadata
+public class GroupRepositoryMetadata
     implements RepositoryMetadata
 {
-    private static final String PLUGIN_MAPPING_FILE = "plugins.xml";
+    /**
+     * TODO: reuse.
+     */
+    protected static final String METADATA_FILE = "maven-metadata.xml";
 
     private final String groupId;
 
-    public PluginMappingMetadata( String groupId )
+    public GroupRepositoryMetadata( String groupId )
     {
         this.groupId = groupId;
     }
 
     public String getRepositoryPath()
     {
-        return groupId + "/" + PLUGIN_MAPPING_FILE;
+        return groupId + "/" + METADATA_FILE;
     }
 
     public String toString()
     {
-        return PLUGIN_MAPPING_FILE + " (plugin mappings) for group: \'" + groupId + "\'";
+        return "repository metadata for group: \'" + groupId + "\'";
     }
 
 }
