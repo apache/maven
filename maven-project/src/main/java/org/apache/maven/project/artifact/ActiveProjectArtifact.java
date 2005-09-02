@@ -49,6 +49,7 @@ public class ActiveProjectArtifact
         this.project = project;
 
         artifact.setFile( project.getArtifact().getFile() );
+        artifact.setResolved( true );
     }
 
     public File getFile()
