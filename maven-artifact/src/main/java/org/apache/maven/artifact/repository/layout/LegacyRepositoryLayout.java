@@ -19,7 +19,6 @@ package org.apache.maven.artifact.repository.layout;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 
 /**
  * @author jdcasey
@@ -58,11 +57,6 @@ public class LegacyRepositoryLayout
         path.append( metadata.getFilename() );
 
         return path.toString();
-    }
-
-    public String pathOfRepositoryMetadata( RepositoryMetadata metadata )
-    {
-        return metadata.getRepositoryPath();
     }
 
 }

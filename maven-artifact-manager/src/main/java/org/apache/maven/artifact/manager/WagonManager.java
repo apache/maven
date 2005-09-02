@@ -19,7 +19,6 @@ package org.apache.maven.artifact.manager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
@@ -56,12 +55,6 @@ public interface WagonManager
 
     void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination,
                               String checksumPolicy )
-        throws TransferFailedException, ResourceDoesNotExistException;
-
-    void putRepositoryMetadata( File source, RepositoryMetadata metadata, ArtifactRepository repository )
-        throws TransferFailedException;
-
-    void getRepositoryMetadata( RepositoryMetadata metadata, ArtifactRepository remoteRepository, File destination )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );

@@ -19,6 +19,7 @@ package org.apache.maven.artifact.transform;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.VersionArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -50,6 +51,52 @@ public abstract class AbstractVersionTransformation
     private static Set resolvedArtifactCache = new HashSet();
 
     protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        ArtifactMetadata localMetadata = resolveMetadata( artifact, localRepository, remoteRepositories );
+
+        String version;
+
+        if ( localMetadata == null )
+        {
+            version = artifact.getVersion();
+        }
+        else
+        {
+            VersionArtifactMetadata versionMetadata = (VersionArtifactMetadata) localMetadata;
+            version = versionMetadata.constructVersion();
+        }
+
+        // TODO: also do this logging for other metadata?
+        if ( getLogger().isDebugEnabled() )
+        {
+            if ( version != null && !version.equals( artifact.getBaseVersion() ) )
+            {
+                String message = artifact.getArtifactId() + ": resolved to version " + version;
+                if ( artifact.getRepository() != null )
+                {
+                    message += " from repository " + artifact.getRepository().getId();
+                }
+                else
+                {
+                    message += " from local repository";
+                }
+                getLogger().debug( message );
+            }
+        }
+        return version;
+    }
+
+    /**
+     * @param artifact
+     * @param localRepository
+     * @param remoteRepositories
+     * @return
+     * @throws ArtifactMetadataRetrievalException
+     * @todo share with DefaultRepositoryMetadataManager
+     */
+    private ArtifactMetadata resolveMetadata( Artifact artifact, ArtifactRepository localRepository,
+                                              List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         VersionArtifactMetadata localMetadata;
@@ -116,9 +163,9 @@ public abstract class AbstractVersionTransformation
                 }
             }
 
-            // touch the file if it was checked for updates, but don't create it if it doesn't exist to avoid
+            // touch the file if it was checked for updates, but don't create it if it doesn't exist remotely to avoid
             // storing SNAPSHOT as the actual version which doesn't exist remotely.
-            if ( checkedUpdates && localMetadata.exists() )
+            if ( checkedUpdates && localMetadata.getLastModified().getTime() > 0 )
             {
                 localMetadata.storeInLocalRepository( localRepository );
             }
@@ -126,44 +173,22 @@ public abstract class AbstractVersionTransformation
             resolvedArtifactCache.add( getCacheKey( artifact ) );
         }
 
-        String version = localMetadata.constructVersion();
-
         // TODO: if the POM and JAR are inconsistent, this might mean that different version of each are used
-        if ( !artifact.getFile().exists() || localMetadata.newerThanFile( artifact.getFile() ) )
+        if ( artifact.getFile().exists() && !localMetadata.newerThanFile( artifact.getFile() ) )
         {
-            if ( getLogger().isInfoEnabled() && !alreadyResolved )
-            {
-                if ( version != null && !version.equals( artifact.getBaseVersion() ) )
-                {
-                    String message = artifact.getArtifactId() + ": resolved to version " + version;
-                    if ( artifact.getRepository() != null )
-                    {
-                        message += " from repository " + artifact.getRepository().getId();
-                    }
-                    else
-                    {
-                        message += " from local repository";
-                    }
-                    getLogger().info( message );
-                }
-            }
-
-            return version;
-        }
-        else
-        {
-            if ( getLogger().isInfoEnabled() && !alreadyResolved )
+            if ( getLogger().isDebugEnabled() && !alreadyResolved )
             {
                 // Locally installed file is newer, don't use the resolved version
-                getLogger().info( artifact.getArtifactId() + ": using locally installed snapshot" );
+                getLogger().debug( artifact.getArtifactId() + ": using locally installed snapshot" );
             }
-            return artifact.getVersion();
+            localMetadata = null;
         }
+        return localMetadata;
     }
 
     protected VersionArtifactMetadata retrieveFromRemoteRepository( Artifact artifact,
                                                                     ArtifactRepository remoteRepository,
-                                                                    VersionArtifactMetadata localMetadata,
+                                                                    ArtifactMetadata localMetadata,
                                                                     String checksumPolicy )
         throws ArtifactMetadataRetrievalException, ResourceDoesNotExistException
     {

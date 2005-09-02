@@ -19,7 +19,6 @@ package org.apache.maven.artifact.repository.layout;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 
 /**
  * @author jdcasey
@@ -62,37 +61,19 @@ public class DefaultRepositoryLayout
         StringBuffer path = new StringBuffer();
 
         path.append( formatAsDirectory( metadata.getGroupId() ) ).append( PATH_SEPARATOR );
-        path.append( metadata.getArtifactId() ).append( PATH_SEPARATOR );
-        if ( metadata.storedInArtifactDirectory() )
+        if ( !metadata.storedInGroupDirectory() )
         {
-            path.append( metadata.getBaseVersion() ).append( PATH_SEPARATOR );
+            path.append( metadata.getArtifactId() ).append( PATH_SEPARATOR );
+
+            if ( metadata.storedInArtifactVersionDirectory() )
+            {
+                path.append( metadata.getBaseVersion() ).append( PATH_SEPARATOR );
+            }
         }
 
         path.append( metadata.getFilename() );
 
         return path.toString();
-    }
-
-    public String pathOfRepositoryMetadata( RepositoryMetadata metadata )
-    {
-        String file = metadata.getRepositoryPath();
-
-        String result;
-        int lastSlash = file.lastIndexOf( PATH_SEPARATOR );
-
-        if ( lastSlash > -1 )
-        {
-            String filePart = file.substring( lastSlash );
-
-            String dirPart = file.substring( 0, lastSlash );
-
-            result = formatAsDirectory( dirPart ) + filePart;
-        }
-        else
-        {
-            result = file;
-        }
-        return result;
     }
 
     private String formatAsDirectory( String directory )

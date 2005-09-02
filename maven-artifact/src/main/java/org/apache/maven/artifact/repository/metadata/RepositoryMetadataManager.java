@@ -16,21 +16,14 @@ package org.apache.maven.artifact.repository.metadata;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-import java.io.File;
 import java.util.List;
 
 public interface RepositoryMetadataManager
 {
-
-    void resolve( RepositoryMetadata repositoryMetadata, List repositories, ArtifactRepository local )
-        throws RepositoryMetadataManagementException;
-
-    void deploy( File source, RepositoryMetadata repositoryMetadata, ArtifactRepository remote )
-        throws RepositoryMetadataManagementException;
-
-    void install( File source, RepositoryMetadata repositoryMetadata, ArtifactRepository local )
-        throws RepositoryMetadataManagementException;
-
+    void resolve( ArtifactMetadata repositoryMetadata, List repositories, ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException;
 }

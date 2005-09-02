@@ -23,7 +23,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -142,16 +141,9 @@ public class DefaultPluginManager
     {
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
         // use for the mapping manager in here
-        try
-        {
-            return pluginMappingManager.getByPrefix( prefix, session.getSettings().getPluginGroups(),
-                                                     project.getPluginArtifactRepositories(),
-                                                     session.getLocalRepository() );
-        }
-        catch ( RepositoryMetadataManagementException e )
-        {
-            throw new PluginManagerException( "Error getting plugin prefix", e );
-        }
+        return pluginMappingManager.getByPrefix( prefix, session.getSettings().getPluginGroups(),
+                                                 project.getPluginArtifactRepositories(),
+                                                 session.getLocalRepository() );
     }
 
     public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,

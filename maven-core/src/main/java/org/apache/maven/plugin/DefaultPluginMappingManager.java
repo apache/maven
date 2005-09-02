@@ -16,11 +16,11 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManagementException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -54,7 +54,6 @@ public class DefaultPluginMappingManager
 
     public org.apache.maven.model.Plugin getByPrefix( String pluginPrefix, List groupIds, List pluginRepositories,
                                                       ArtifactRepository localRepository )
-        throws RepositoryMetadataManagementException
     {
         // if not found, try from the remote repository
         if ( !pluginDefinitionsByPrefix.containsKey( pluginPrefix ) )
@@ -85,7 +84,7 @@ public class DefaultPluginMappingManager
             {
                 loadPluginMappings( groupId, pluginRepositories, localRepository );
             }
-            catch ( RepositoryMetadataManagementException e )
+            catch ( ArtifactMetadataRetrievalException e )
             {
                 getLogger().warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
 
@@ -95,15 +94,15 @@ public class DefaultPluginMappingManager
     }
 
     private void loadPluginMappings( String groupId, List pluginRepositories, ArtifactRepository localRepository )
-        throws RepositoryMetadataManagementException
+        throws ArtifactMetadataRetrievalException
     {
         GroupRepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
 
-        // TOOD: aggregate the results of this instead
+        // TODO: aggregate the results of this instead
         repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
 
         File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfRepositoryMetadata( metadata ) );
+                                      localRepository.pathOfArtifactMetadata( metadata ) );
 
         if ( metadataFile.exists() )
         {
@@ -132,7 +131,7 @@ public class DefaultPluginMappingManager
     }
 
     private static Metadata readMetadata( File mappingFile )
-        throws RepositoryMetadataManagementException
+        throws ArtifactMetadataRetrievalException
     {
         Metadata result;
 
@@ -147,15 +146,15 @@ public class DefaultPluginMappingManager
         }
         catch ( FileNotFoundException e )
         {
-            throw new RepositoryMetadataManagementException( "Cannot read plugin mappings from: " + mappingFile, e );
+            throw new ArtifactMetadataRetrievalException( "Cannot read plugin mappings from: " + mappingFile, e );
         }
         catch ( IOException e )
         {
-            throw new RepositoryMetadataManagementException( "Cannot read plugin mappings from: " + mappingFile, e );
+            throw new ArtifactMetadataRetrievalException( "Cannot read plugin mappings from: " + mappingFile, e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new RepositoryMetadataManagementException( "Cannot parse plugin mappings from: " + mappingFile, e );
+            throw new ArtifactMetadataRetrievalException( "Cannot parse plugin mappings from: " + mappingFile, e );
         }
         finally
         {

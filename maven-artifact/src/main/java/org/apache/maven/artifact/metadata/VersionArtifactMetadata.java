@@ -28,7 +28,6 @@ import java.util.Date;
 public interface VersionArtifactMetadata
     extends ArtifactMetadata, Comparable
 {
-
     /**
      * Determine if the metadata is considered newer than a given file.
      *

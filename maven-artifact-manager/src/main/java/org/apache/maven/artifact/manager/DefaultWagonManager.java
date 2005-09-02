@@ -21,7 +21,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -97,14 +96,6 @@ public class DefaultWagonManager
     {
         getLogger().info( "Uploading " + artifactMetadata );
         putRemoteFile( repository, source, repository.pathOfArtifactMetadata( artifactMetadata ), null );
-    }
-
-    public void putRepositoryMetadata( File source, RepositoryMetadata metadata, ArtifactRepository repository )
-        throws TransferFailedException
-    {
-        getLogger().info( "Uploading " + metadata );
-
-        putRemoteFile( repository, source, repository.pathOfRepositoryMetadata( metadata ), null );
     }
 
     private void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
@@ -261,17 +252,6 @@ public class DefaultWagonManager
 
         getLogger().info( "Retrieving " + metadata );
         getRemoteFile( repository, destination, remotePath, null, checksumPolicy );
-    }
-
-    public void getRepositoryMetadata( RepositoryMetadata metadata, ArtifactRepository remoteRepository,
-                                       File destination )
-        throws TransferFailedException, ResourceDoesNotExistException
-    {
-        String remotePath = remoteRepository.pathOfRepositoryMetadata( metadata );
-
-        getLogger().info( "Retrieving " + metadata );
-
-        getRemoteFile( remoteRepository, destination, remotePath, null, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
 
     private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,

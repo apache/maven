@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Attach a POM to an artifact.
@@ -53,12 +54,7 @@ public class ProjectArtifactMetadata
 
     public String getFilename()
     {
-        return getArtifactId() + "-" + getVersion() + ".pom";
-    }
-
-    public boolean exists()
-    {
-        return file.exists();
+        return getArtifactId() + "-" + artifact.getVersion() + ".pom";
     }
 
     public void storeInLocalRepository( ArtifactRepository localRepository )
@@ -77,7 +73,7 @@ public class ProjectArtifactMetadata
 
             MavenXpp3Reader modelReader = new MavenXpp3Reader();
             Model model = modelReader.read( reader );
-            model.setVersion( getVersion() );
+            model.setVersion( artifact.getVersion() );
 
             DistributionManagement distributionManagement = model.getDistributionManagement();
             if ( distributionManagement == null )
@@ -112,5 +108,30 @@ public class ProjectArtifactMetadata
     public String toString()
     {
         return "project information for " + artifact.getArtifactId() + " " + artifact.getVersion();
+    }
+
+    public boolean storedInArtifactVersionDirectory()
+    {
+        return true;
+    }
+
+    public String getBaseVersion()
+    {
+        return artifact.getBaseVersion();
+    }
+
+    public boolean newerThanFile( File file )
+    {
+        return this.file.lastModified() > file.lastModified();
+    }
+
+    public Date getLastModified()
+    {
+        return new Date( file.lastModified() );
+    }
+
+    public boolean isSnapshot()
+    {
+        return artifact.isSnapshot();
     }
 }

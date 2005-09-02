@@ -99,9 +99,13 @@ public class ReleaseArtifactMetadata
         return ReleaseArtifactTransformation.RELEASE_VERSION;
     }
 
-    public boolean storedInArtifactDirectory()
+    public boolean storedInArtifactVersionDirectory()
     {
         return false;
     }
 
+    public boolean isSnapshot()
+    {
+        return false;
+    }
 }

@@ -61,5 +61,5 @@ public interface ArtifactTransformation
      */
     void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
-    
+
 }

@@ -71,6 +71,7 @@ public class DefaultArtifactDeployer
             for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
             {
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                // TODO: method should be on repository?
                 metadata.storeInLocalRepository( localRepository );
                 // TODO: shouldn't need to calculate this
                 File f = new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( metadata ) );

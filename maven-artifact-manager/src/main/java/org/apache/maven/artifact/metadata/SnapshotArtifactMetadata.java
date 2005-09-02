@@ -80,7 +80,7 @@ public class SnapshotArtifactMetadata
             buildNumber = 0;
         }
     }
-    
+
     public void setVersion( String timestamp, int buildNumber )
     {
         this.timestamp = timestamp;
@@ -91,7 +91,7 @@ public class SnapshotArtifactMetadata
     {
         return timestamp;
     }
-    
+
     public int getBuildNumber()
     {
         return buildNumber;
@@ -156,5 +156,20 @@ public class SnapshotArtifactMetadata
     public String toString()
     {
         return "snapshot information for " + artifact.getArtifactId() + " " + artifact.getBaseVersion();
+    }
+
+    public boolean storedInArtifactVersionDirectory()
+    {
+        return true;
+    }
+
+    public boolean isSnapshot()
+    {
+        return true;
+    }
+
+    public String getBaseVersion()
+    {
+        return artifact.getBaseVersion();
     }
 }

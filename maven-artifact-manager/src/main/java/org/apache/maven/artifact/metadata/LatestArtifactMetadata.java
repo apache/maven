@@ -91,9 +91,13 @@ public class LatestArtifactMetadata
         return Artifact.LATEST_VERSION;
     }
 
-    public boolean storedInArtifactDirectory()
+    public boolean storedInArtifactVersionDirectory()
     {
         return false;
     }
 
+    public boolean isSnapshot()
+    {
+        return false;
+    }
 }

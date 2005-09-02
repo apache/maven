@@ -354,7 +354,7 @@ public class DefaultMavenProjectBuilder
                             artifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
                         try
                         {
-                            artifact.setFile( null );
+                            artifact.setResolved( false );
                             artifactResolver.resolveAlways( artifact, remoteArtifactRepositories, localRepository );
                         }
                         catch ( ArtifactResolutionException e )
@@ -581,7 +581,7 @@ public class DefaultMavenProjectBuilder
         // We don't need all the project methods that are added over those in the model, but we do need basedir
         Map context = new HashMap( System.getProperties() );
         context.put( "basedir", project.getBasedir() );
-        
+
         model = modelInterpolator.interpolate( model, context );
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables

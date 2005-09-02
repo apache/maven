@@ -20,6 +20,26 @@
           <description>The groupId that is directory represents, if any.</description>
         </field>
         <field>
+          <name>artifactId</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The artifactId that is directory represents, if any.</description>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The version that is directory represents, if any.</description>
+        </field>
+        <field>
+          <name>versioning</name>
+          <version>1.0.0</version>
+          <association>
+            <type>Versioning</type>
+          </association>
+          <description>Versioning information for the artifact.</description>
+        </field>
+        <field>
           <name>plugins</name>
           <version>1.0.0</version>
           <description>The set of plugin mappings for the group</description>
@@ -27,6 +47,61 @@
             <type>Plugin</type>
             <multiplicity>*</multiplicity>
           </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Versioning</name>
+      <version>1.0.0</version>
+      <description>Versioning information for an artifact</description>
+      <fields>
+        <field>
+          <name>latest</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>What the latest version in the directory is, including snapshots</description>
+        </field>
+        <field>
+          <name>release</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>What the latest version in the directory is, of the releases</description>
+        </field>
+        <field>
+          <name>snapshot</name>
+          <version>1.0.0</version>
+          <association>
+            <type>Snapshot</type>
+          </association>
+          <description>The current snapshot data in use for this version</description>
+        </field>
+        <field>
+          <name>versions</name>
+          <version>1.0.0</version>
+          <description>Versions available for the artifact</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Snapshot</name>
+      <version>1.0.0</version>
+      <description>Snapshot data for the current version</description>
+      <fields>
+        <field>
+          <name>timestamp</name>
+          <version>1.0.0</version>
+          <description>The time it was deployed</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>buildNumber</name>
+          <version>1.0.0</version>
+          <description>The incremental build number</description>
+          <type>int</type>
         </field>
       </fields>
     </class>

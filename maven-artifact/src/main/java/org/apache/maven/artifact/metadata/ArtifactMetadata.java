@@ -45,22 +45,25 @@ public interface ArtifactMetadata
     String getFilename();
 
     /**
-     * Whether the artifact metadata exists.
-     * @return true or false
-     */
-    boolean exists();
-    
-    /**
      * Whether this metadata should be stored alongside the artifact.
      */
-    boolean storedInArtifactDirectory();
+    boolean storedInArtifactVersionDirectory();
+
+    /**
+     * Whether this metadata should be stored alongside the group.
+     */
+    boolean storedInGroupDirectory();
 
     String getGroupId();
 
     String getArtifactId();
 
-    String getVersion();
-
     String getBaseVersion();
 
+    Object getKey();
+
+    /**
+     * @Todo delete?
+     */
+    boolean isSnapshot();
 }

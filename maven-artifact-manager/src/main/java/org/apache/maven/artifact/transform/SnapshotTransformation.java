@@ -54,7 +54,8 @@ public class SnapshotTransformation
         if ( artifact.isSnapshot() )
         {
             SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
-            metadata.storeInLocalRepository( localRepository );
+
+            artifact.addMetadata( metadata );
         }
     }
 

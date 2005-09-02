@@ -41,10 +41,10 @@ public abstract class AbstractArtifactMetadata
     {
         return filename;
     }
-    
-    public boolean storedInArtifactDirectory()
+
+    public boolean storedInGroupDirectory()
     {
-        return true;
+        return false;
     }
 
     public String getGroupId()
@@ -62,9 +62,8 @@ public abstract class AbstractArtifactMetadata
         return artifact.getVersion();
     }
 
-    public String getBaseVersion()
+    public Object getKey()
     {
-        return artifact.getBaseVersion();
+        return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
-
 }

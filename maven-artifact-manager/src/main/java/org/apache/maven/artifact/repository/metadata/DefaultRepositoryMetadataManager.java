@@ -17,14 +17,16 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -38,106 +40,77 @@ public class DefaultRepositoryMetadataManager
     private WagonManager wagonManager;
 
     /**
-     * @todo very primitve. Probably we can cache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
+     * @todo very primitive. Probably we can cache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
      */
     private Set cachedMetadata = new HashSet();
 
-    public void resolve( RepositoryMetadata metadata, List repositories, ArtifactRepository local )
-        throws RepositoryMetadataManagementException
+    public void resolve( ArtifactMetadata metadata, List remoteRepositories, ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException
     {
         boolean alreadyResolved = alreadyResolved( metadata );
         if ( !alreadyResolved )
         {
-            for ( Iterator i = repositories.iterator(); i.hasNext(); )
+            File file = new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( metadata ) );
+
+            boolean checkedUpdates = false;
+            for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
             {
                 ArtifactRepository repository = (ArtifactRepository) i.next();
 
-                // TODO: replace with a more general repository update mechanism like artifact metadata uses
-                // (Actually, this should now supersede artifact metadata...)
-                File metadataFile = new File( local.getBasedir(), local.pathOfRepositoryMetadata( metadata ) );
+                ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots()
+                    : repository.getReleases();
 
-                if ( !metadataFile.exists() )
+                if ( policy == null || !policy.isEnabled() )
                 {
-                    try
-                    {
-                        try
-                        {
-                            wagonManager.getRepositoryMetadata( metadata, repository, metadataFile );
-                        }
-                        catch ( ResourceDoesNotExistException e )
-                        {
-                            if ( !metadataFile.exists() )
-                            {
-                                throw new RepositoryMetadataManagementException( metadata,
-                                                                                 "Remote repository metadata not found.",
-                                                                                 e );
-                            }
-                            else
-                            {
-                                String message = "Cannot find " + metadata +
-                                    " in remote repository - Using local copy.";
-
-                                getLogger().info( message );
-
-                                getLogger().debug( message, e );
-                            }
-                        }
-                    }
-                    catch ( TransferFailedException e )
-                    {
-                        throw new RepositoryMetadataManagementException( metadata,
-                                                                         "Failed to download repository metadata.", e );
-                    }
+                    getLogger().debug( "Skipping disabled repository " + repository.getId() );
                 }
                 else
                 {
-                    getLogger().info( "Using local copy of " + metadata + " from: " + metadataFile );
+                    // TODO: should be able to calculate this less often
+                    boolean checkForUpdates = policy.checkOutOfDate( new Date( file.lastModified() ) );
+
+                    if ( checkForUpdates )
+                    {
+                        checkedUpdates = true;
+
+                        getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
+
+                        try
+                        {
+                            wagonManager.getArtifactMetadata( metadata, repository, file, policy.getChecksumPolicy() );
+                            // TODO: ???
+//                            metadata.setRepository( repository );
+                        }
+                        catch ( ResourceDoesNotExistException e )
+                        {
+                            getLogger().info( "Repository metadata " + metadata +
+                                " could not be found on repository: " + repository.getId(), e );
+                        }
+                        catch ( TransferFailedException e )
+                        {
+                            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+                        }
+                    }
                 }
-
-                cachedMetadata.add( metadata.getRepositoryPath() );
             }
-        }
-    }
 
-    public void deploy( File source, RepositoryMetadata metadata, ArtifactRepository remote )
-        throws RepositoryMetadataManagementException
-    {
-        try
-        {
-            wagonManager.putRepositoryMetadata( source, metadata, remote );
-        }
-        catch ( TransferFailedException e )
-        {
-            throw new RepositoryMetadataManagementException( metadata, "Failed to upload repository metadata.", e );
-        }
-
-    }
-
-    public void install( File source, RepositoryMetadata metadata, ArtifactRepository local )
-        throws RepositoryMetadataManagementException
-    {
-        File metadataFile = new File( local.getBasedir(), local.pathOfRepositoryMetadata( metadata ) );
-
-        try
-        {
-            File dir = metadataFile.getParentFile();
-
-            if ( !dir.exists() )
+            // touch the file if it was checked for updates, but don't create it if it doesn't exist to avoid
+            // storing SNAPSHOT as the actual version which doesn't exist remotely.
+            if ( checkedUpdates )
             {
-                dir.mkdirs();
+                if ( file.exists() )
+                {
+                    file.setLastModified( System.currentTimeMillis() );
+                }
             }
 
-            FileUtils.copyFile( source, metadataFile );
+            cachedMetadata.add( metadata.getKey() );
         }
-        catch ( IOException e )
-        {
-            throw new RepositoryMetadataManagementException( metadata, "Failed to install repository metadata.", e );
-        }
-
     }
 
-    private boolean alreadyResolved( RepositoryMetadata metadata )
+    private boolean alreadyResolved( ArtifactMetadata metadata )
     {
-        return cachedMetadata.contains( metadata.getRepositoryPath() );
+        return cachedMetadata.contains( metadata.getKey() );
     }
+
 }

@@ -34,7 +34,9 @@ public class DefaultArtifactInstaller
 {
     private ArtifactTransformationManager transformationManager;
 
-    /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
+    /**
+     * @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly.
+     */
     public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
@@ -68,7 +70,8 @@ public class DefaultArtifactInstaller
             for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
             {
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-                
+
+                // TODO: method should be on repository?
                 metadata.storeInLocalRepository( localRepository );
             }
         }

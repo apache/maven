@@ -81,8 +81,8 @@ public class DefaultArtifactResolver
 
                 if ( !systemFile.exists() )
                 {
-                    throw new ArtifactResolutionException( "System artifact: " + artifact.getId()
-                        + " not found in path: " + systemFile, artifact );
+                    throw new ArtifactResolutionException(
+                        "System artifact: " + artifact.getId() + " not found in path: " + systemFile, artifact );
                 }
                 else
                 {
@@ -90,7 +90,7 @@ public class DefaultArtifactResolver
                 }
             }
             // skip artifacts with a file - they are already resolved
-            else if ( artifact.getFile() == null )
+            else if ( !artifact.isResolved() )
             {
                 // ----------------------------------------------------------------------
                 // Check for the existence of the artifact in the specified local
@@ -129,8 +129,8 @@ public class DefaultArtifactResolver
                         if ( !artifact.isResolved() )
                         {
                             throw new ArtifactResolutionException(
-                                                                   "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
-                                                                   artifact, remoteRepositories );
+                                "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
+                                artifact, remoteRepositories );
                         }
 
                         // must be after the artifact is downloaded
