@@ -16,6 +16,20 @@
     <fileSet>
       <directory>src/bin</directory>
       <outputDirectory>bin</outputDirectory>
+      <includes>
+        <include>*.bat</include>
+        <include>*.conf</include>
+      </includes>
+      <lineEnding>dos</lineEnding>
+    </fileSet>
+    <fileSet>
+      <directory>src/bin</directory>
+      <outputDirectory>bin</outputDirectory>
+      <includes>
+        <include>m2</include>
+      </includes>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
     </fileSet>
     <fileSet>
       <directory>src/conf</directory>

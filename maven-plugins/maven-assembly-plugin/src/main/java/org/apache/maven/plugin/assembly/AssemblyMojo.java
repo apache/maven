@@ -34,12 +34,17 @@ import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.tar.TarArchiver;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
+import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -95,6 +100,13 @@ public class AssemblyMojo
      * @readonly
      */
     private MavenProjectHelper projectHelper;
+
+    /**
+     * @parameter expression="${project.build.directory}/archive-tmp"
+     * @required
+     * @readonly
+     */
+    private File tempRoot;
 
 
     public void execute()
@@ -255,6 +267,16 @@ public class AssemblyMojo
             String directory = fileSet.getDirectory();
             String output = fileSet.getOutputDirectory();
 
+            String lineEnding = getLineEndingCharacters( fileSet.getLineEnding() );
+            
+            File tmpDir = null;
+                
+            if ( lineEnding != null )
+            {
+                tmpDir = FileUtils.createTempFile( "", "", tempRoot );
+                tmpDir.mkdirs();
+            }
+            
             archiver.setDefaultDirectoryMode( Integer.parseInt( 
                     fileSet.getDirectoryMode(), 8 ) );
 
@@ -263,7 +285,8 @@ public class AssemblyMojo
             
             getLog().debug("FileSet["+output+"]" +
                 " dir perms: " + Integer.toString( archiver.getDefaultDirectoryMode(), 8 ) +
-                " file perms: " + Integer.toString( archiver.getDefaultFileMode(), 8 ) );
+                " file perms: " + Integer.toString( archiver.getDefaultFileMode(), 8 ) +
+                ( fileSet.getLineEnding() == null ? "" : " lineEndings: " + fileSet.getLineEnding() ) );
 
             if ( directory == null )
             {
@@ -287,16 +310,26 @@ public class AssemblyMojo
             {
                 includes = null;
             }
-    
+
+            // TODO: default excludes should be in the archiver?
             List excludesList = fileSet.getExcludes();
             excludesList.addAll( getDefaultExcludes() );
             String[] excludes = (String[]) excludesList.toArray( EMPTY_STRING_ARRAY );
     
-            // TODO: default excludes should be in the archiver?
-            archiver.addDirectory( new File( directory ), output, includes, excludes );
+            
+            File archiveBaseDir = new File( directory );
+            
+            if ( lineEnding != null )
+            {
+                copySetReplacingLineEndings( archiveBaseDir, tmpDir, includes, excludes, lineEnding );
+
+                archiveBaseDir = tmpDir;
+            }
+
+            archiver.addDirectory( archiveBaseDir, output, includes, excludes );
         }
     }
-    
+
     private static String evaluateFileNameMapping( String expression, Artifact artifact )
         throws MojoExecutionException
     {
@@ -461,5 +494,91 @@ public class AssemblyMojo
     
         return defaultExcludes;
     }
+    
+    private void copyReplacingLineEndings( File source, File dest, String lineEndings )
+        throws IOException
+    {
+        getLog().debug( "Copying while replacing line endings: " + source + " to " + dest );
+
+        BufferedReader in = new BufferedReader( new FileReader ( source ) );
+        BufferedWriter out = new BufferedWriter ( new FileWriter( dest ) );
+        
+        String line;
+        
+        while ( ( line = in.readLine()) != null )
+        {
+            out.write( line );
+            out.write( lineEndings );
+        }
+        out.flush();
+        out.close();
+    }
+
+    
+    private void copySetReplacingLineEndings( File archiveBaseDir, File tmpDir, String[] includes, String[] excludes, String lineEnding )
+        throws ArchiverException
+    {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir( archiveBaseDir.getAbsolutePath() );
+        scanner.setIncludes( includes );
+        scanner.setExcludes( excludes );
+        scanner.scan();
+        
+        String [] dirs = scanner.getIncludedDirectories();
+        
+        for ( int j = 0; j < dirs.length; j ++)
+        {
+            new File( tempRoot, dirs[j] ).mkdirs();
+        }
+    
+        String [] files = scanner.getIncludedFiles();
+    
+        for ( int j = 0; j < files.length; j ++)
+        {
+            File targetFile = new File( tmpDir, files[j] );
+    
+            try
+            {
+                targetFile.getParentFile().mkdirs();
+
+                copyReplacingLineEndings( new File( archiveBaseDir, files[j] ), targetFile, lineEnding );
+            }
+            catch (IOException e)
+            {
+                throw new ArchiverException("Error copying file '" +
+                    files[j] + "' to '" + targetFile + "'", e);
+            }
+        }
+
+    }	
+
+    
+    private static String getLineEndingCharacters( String lineEnding )
+        throws ArchiverException
+    {
+        if ( lineEnding != null )
+        {
+            if ( lineEnding.equals( "keep" ) )
+            {
+                lineEnding = null;
+            }
+            else if ( lineEnding.equals( "dos" ) || lineEnding.equals( "crlf" ) )
+            {
+                lineEnding = "\r\n";
+            }
+            else if ( lineEnding.equals( "unix" ) || lineEnding.equals( "lf" ) )
+            {
+                lineEnding = "\n";
+            }
+            else
+            {
+                throw new ArchiverException( "Illlegal lineEnding specified: '" +
+                    lineEnding + "'");
+            }
+        }
+        
+        return lineEnding;
+    }
+
     
 }

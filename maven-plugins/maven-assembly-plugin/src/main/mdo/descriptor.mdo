@@ -104,6 +104,12 @@
           <type>String</type>
           <required>true</required>
         </field>
+        <field>
+          <name>lineEnding</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <!-- keep | unix | lf | dos | crlf -->
+        </field>
       </fields>
     </class>
     <class>
@@ -128,12 +134,6 @@
           <type>String</type>
           <defaultValue>runtime</defaultValue>
           <required>true</required>
-        </field>
-        <field>
-          <name>lineEndings</name>
-          <version>1.0.0</version>
-          <type>String</type>
-          <!-- native, cr, lf, crlf, ..? -->
         </field>
       </fields>
     </class>
