@@ -112,6 +112,13 @@ public class DefaultArtifactVersionTest
         assertEquals( "check incremental version", 0, version.getIncrementalVersion() );
         assertEquals( "check build number", 0, version.getBuildNumber() );
         assertEquals( "check qualifier", "0.09", version.getQualifier() );
+
+        version = new DefaultArtifactVersion( "02" );
+        assertEquals( "check major version", 0, version.getMajorVersion() );
+        assertEquals( "check minor version", 0, version.getMinorVersion() );
+        assertEquals( "check incremental version", 0, version.getIncrementalVersion() );
+        assertEquals( "check build number", 0, version.getBuildNumber() );
+        assertEquals( "check qualifier", "02", version.getQualifier() );
     }
 
     public void testVersionComparing()

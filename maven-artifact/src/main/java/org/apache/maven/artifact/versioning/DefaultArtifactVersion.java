@@ -178,7 +178,7 @@ public class DefaultArtifactVersion
             }
         }
 
-        if ( part1.indexOf( "." ) < 0 )
+        if ( part1.indexOf( "." ) < 0 && !part1.startsWith( "0" ) )
         {
             try
             {
@@ -228,7 +228,6 @@ public class DefaultArtifactVersion
 
     private static Integer getNextIntegerToken( StringTokenizer tok )
     {
-
         String s = tok.nextToken();
         if ( s.length() > 1 && s.startsWith( "0" ) )
         {
