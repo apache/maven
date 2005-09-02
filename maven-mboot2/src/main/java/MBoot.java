@@ -38,8 +38,8 @@ import java.util.TreeMap;
 public class MBoot
 {
     String[] builds = new String[]{"maven-model", "maven-settings", "maven-monitor", "maven-plugin-api",
-        "maven-artifact", "maven-plugin-descriptor", "maven-artifact-manager", "maven-artifact-test",
-        "maven-repository-metadata", "maven-script/maven-script-beanshell", "maven-script/maven-script-marmalade",
+        "maven-artifact", "maven-plugin-descriptor", "maven-repository-metadata", "maven-artifact-manager",
+        "maven-artifact-test", "maven-script/maven-script-beanshell", "maven-script/maven-script-marmalade",
         "maven-profile", "maven-project", "maven-plugin-registry", "maven-reporting/maven-reporting-api",
         "maven-reporting/maven-reporting-impl", "maven-core", "maven-archiver",
         "maven-plugin-tools/maven-plugin-tools-api", "maven-plugin-tools/maven-plugin-tools-java",
