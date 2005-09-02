@@ -22,10 +22,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 
 /**
- * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
- * @version $Id$
  * @goal clean
  * @description Goal which cleans the build
+ * @author <a href="mailto:evenisse@maven.org">Emmanuel Venisse</a>
+ * @version $Id$
  */
 public class CleanPlugin
     extends AbstractMojo
@@ -91,6 +91,7 @@ public class CleanPlugin
      * @param d the directory to delete
      */
     protected void removeDir( File d )
+        throws MojoExecutionException
     {
         String[] list = d.list();
         if ( list == null )
@@ -113,11 +114,11 @@ public class CleanPlugin
 // TODO:...
 //                    if ( failOnError )
 //                    {
-//                        throw new Exception( message );
+                        throw new MojoExecutionException( message );
 //                    }
 //                    else
 //                    {
-                    getLog().info( message );
+//                        getLog().info( message );
 //                    }
                 }
             }
@@ -129,13 +130,12 @@ public class CleanPlugin
 // TODO:...
 //            if ( failOnError )
 //            {
-//                throw new Exception( message );
+                throw new MojoExecutionException( message );
 //            }
 //            else
 //            {
-            getLog().info( message );
+//                getLog().info( message );
 //            }
         }
     }
-
 }
