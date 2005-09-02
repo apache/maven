@@ -1,8 +1,5 @@
 package org.apache.maven.profiles.activation;
 
-import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.AlwaysOnActivation;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -19,6 +16,9 @@ import org.apache.maven.profiles.AlwaysOnActivation;
  * limitations under the License.
  */
 
+import org.apache.maven.model.Profile;
+import org.apache.maven.profiles.AlwaysOnActivation;
+
 public class AlwaysOnProfileActivator
     implements ProfileActivator
 {
@@ -31,5 +31,4 @@ public class AlwaysOnProfileActivator
     {
         return true;
     }
-
 }
