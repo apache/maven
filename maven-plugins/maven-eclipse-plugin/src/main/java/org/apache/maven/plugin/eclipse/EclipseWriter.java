@@ -76,7 +76,7 @@ public class EclipseWriter
         Map eclipseSourceRoots = new HashMap();
 
         Collection referencedProjects = writeEclipseClasspath(
-        	projectBaseDir, outputDir, project, executedProject, reactorProjects, eclipseSourceRoots
+            projectBaseDir, outputDir, project, executedProject, reactorProjects, eclipseSourceRoots
         );
         
         writeEclipseProject( projectBaseDir, outputDir, project, executedProject, referencedProjects, eclipseSourceRoots );
@@ -362,10 +362,10 @@ public class EclipseWriter
                 String eclipseSourceRoot = toRelative( projectBaseDir, sourceRoot );
                 
                 // Don't add the same sourceroots twice. No include/exclude
-            	// patterns possible in maven for (test|script|)source directories.
+                // patterns possible in maven for (test|script|)source directories.
                 if ( addedSourceRoots.containsKey( eclipseSourceRoot ) )
                 {
-                	continue; 
+                    continue; 
                 }
 
                 writer.startElement( "classpathentry" );
@@ -409,7 +409,7 @@ public class EclipseWriter
 
             if ( !StringUtils.isEmpty( resource.getTargetPath() ) )
             {
-            	output = resource.getTargetPath();
+                output = resource.getTargetPath();
             }
 
             File resourceDirectory = new File( resource.getDirectory() );
@@ -427,7 +427,7 @@ public class EclipseWriter
             // that, even with mutual exclusive include/exclude patterns.
             if ( addedSourceRoots.containsKey( eclipseResourceDir ) )
             {
-            	continue;
+                continue;
             }
 
             if ( ! projectBaseDir.equals( basedir ) )
@@ -665,7 +665,11 @@ public class EclipseWriter
     {
         String relative;
 
-        if ( absolutePath.startsWith( basedir.getAbsolutePath() ) )
+        if ( absolutePath.equals( basedir.getAbsolutePath() ) )
+        {
+            relative = ".";
+        }
+        else if ( absolutePath.startsWith( basedir.getAbsolutePath() ) )
         {
             relative = absolutePath.substring( basedir.getAbsolutePath().length() + 1 );
         }
