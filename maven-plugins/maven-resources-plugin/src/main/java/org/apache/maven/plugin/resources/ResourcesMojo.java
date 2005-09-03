@@ -35,9 +35,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
@@ -105,8 +103,6 @@ public class ResourcesMojo
     {
         initializeFiltering();
 
-        Map resourceEntries = new TreeMap();
-
         for ( Iterator i = resources.iterator(); i.hasNext(); )
         {
             Resource resource = (Resource) i.next();
@@ -121,7 +117,6 @@ public class ResourcesMojo
             }
 
             DirectoryScanner scanner = new DirectoryScanner();
-            scanner.addDefaultExcludes();
 
             scanner.setBasedir( resource.getDirectory() );
             if ( resource.getIncludes() != null && !resource.getIncludes().isEmpty() )
@@ -137,6 +132,7 @@ public class ResourcesMojo
                 scanner.setExcludes( (String[]) resource.getExcludes().toArray( EMPTY_STRING_ARRAY ) );
             }
 
+            scanner.addDefaultExcludes();
             scanner.scan();
 
             List includedFiles = Arrays.asList( scanner.getIncludedFiles() );
