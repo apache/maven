@@ -51,14 +51,14 @@ public class EarMojo
      *
      * @parameter expression="${basedir}/src/main/application/META-INF/MANIFEST.MF"
      */
-    private String manifestLocation;
+    private String manifestFile;
 
     /**
      * The location of the application.xml file to be used within the ear file.
      *
      * @parameter expression="${basedir}/src/main/application/META-INF/application.xml"
      */
-    private String applicationXmlLocation;
+    private String applicationXmlFile;
 
     /**
      * The directory for the generated EAR.
@@ -76,7 +76,14 @@ public class EarMojo
      * @readonly
      */
     private String finalName;
-
+    
+    /**
+     * Directory that resources are copied to during the build.
+     *
+     * @parameter expression="${project.build.directory}/ear"
+     */
+    private File resourcesDir;
+    
     /**
      * The maven archiver to use.
      *
@@ -93,8 +100,8 @@ public class EarMojo
 
         getLog().debug( " ======= EarMojo settings =======" );
         getLog().debug( "earSourceDirectory[" + earSourceDirectory + "]" );
-        getLog().debug( "manifestLocation[" + manifestLocation + "]" );
-        getLog().debug( "applicationXmlLocation[" + applicationXmlLocation + "]" );
+        getLog().debug( "manifestLocation[" + manifestFile + "]" );
+        getLog().debug( "applicationXmlLocation[" + applicationXmlFile + "]" );
         getLog().debug( "workDirectory[" + getWorkDirectory() + "]" );
         getLog().debug( "outputDirectory[" + outputDirectory + "]" );
         getLog().debug( "finalName[" + finalName + "]" );
@@ -130,8 +137,22 @@ public class EarMojo
             File earSourceDir = new File( earSourceDirectory );
             if ( earSourceDir.exists() )
             {
-                getLog().info( "Copy ear resources to " + getBuildDir().getAbsolutePath() );
+                getLog().info( "Copy ear sources to " + getBuildDir().getAbsolutePath() );
                 FileUtils.copyDirectoryStructure( earSourceDir, getBuildDir() );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Error copying EAR sources", e );
+        }
+
+        // Copy resources files
+        try
+        {
+            if ( resourcesDir.exists() )
+            {
+                getLog().info( "Copy ear resources to " + getBuildDir().getAbsolutePath() );
+                FileUtils.copyDirectoryStructure( resourcesDir, getBuildDir() );
             }
         }
         catch ( IOException e )
@@ -174,10 +195,10 @@ public class EarMojo
 
     private void includeCustomManifestFile()
     {
-        File customManifestFile = new File( manifestLocation );
+        File customManifestFile = new File( manifestFile );
         if ( !customManifestFile.exists() )
         {
-            // Does not exist so will use default
+            getLog().info( "Could not find manifest file: " + manifestFile );
         }
         else
         {
