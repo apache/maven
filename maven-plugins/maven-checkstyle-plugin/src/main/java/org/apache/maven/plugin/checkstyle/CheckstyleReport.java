@@ -24,7 +24,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
 import com.puppycrawl.tools.checkstyle.Checker;
@@ -33,16 +32,21 @@ import com.puppycrawl.tools.checkstyle.ModuleFactory;
 import com.puppycrawl.tools.checkstyle.PackageNamesLoader;
 import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.XMLLogger;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.puppycrawl.tools.checkstyle.api.FilterSet;
+import com.puppycrawl.tools.checkstyle.filters.SuppressionsLoader;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+
 
 /**
  * @goal checkstyle
@@ -54,17 +58,122 @@ public class CheckstyleReport
     extends AbstractMavenReport
 {
     /**
+     * Specifies the directory where the report will be generated
+     *
      * @parameter expression="${project.build.directory}/site"
      * @required
      */
     private String outputDirectory;
+    
+    /**
+     * Specifies the names filter of the source files to be used for checkstyle
+     *
+     * @parameter default-value="**\/*.java"
+     * @required
+     */
+    private String includes;
+    
+    /**
+     * Specifies the names filter of the source files to be excluded for checkstyle
+     * 
+     * @parameter
+     */
+    private String excludes;
+    
+    /**
+     * Specifies what predefined check set to use. Available sets are
+     *     "sun" (for the Sun coding conventions), "turbine", and "avalon".
+     *     Default is sun.
+     *
+     * @parameter default-value="sun"
+     */
+    private String format;
+    
+    /**
+     * Specifies the location of the checkstyle properties that will be used to check the source.
+     *
+     * @parameter
+     */
+    private File propertiesFile;
+    
+    /**
+     * Specifies the URL of the checkstyle properties that will be used to check the source.
+     *
+     * @parameter
+     */
+    private URL propertiesURL;
+    
+    /**
+     * Specifies the location of the License file (a.k.a. the header file) that is used by Checkstyle
+     *     to verify that source code has the correct copyright.
+     *
+     * @parameter
+     */
+    private String headerFile;
 
     /**
-     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
-     * @required
-     * @readonly
+     * Specifies the cache file used to speed up Checkstyle on successive runs.
+     *
+     * @parameter expression="${project.build.directory}/checkstyle-cachefile"
      */
-    private SiteRenderer siteRenderer;
+    private String cacheFile;
+    
+    /**
+     * If null, the checkstyle task will display violations on stdout. Otherwise, the text file will be
+     *     created with the violations. Note: This is in addition to the XML result file (containing
+     *     the violations in XML format which is always created.
+     *
+     * @parameter
+     */
+    private String useFile;
+    
+    /**
+     * Specifies the location of the supperssions XML file to use. The plugin defines a Checkstyle
+     *     property named <code>checkstyle.supperssions.file</code> with the value of this
+     *     property. This allows using the Checkstyle property your own custom checkstyle
+     *     configuration file when specifying a suppressions file.
+     *
+     * @parameter
+     */
+    private String suppressionsFile;
+    
+    /**
+     * Specifies the path and filename to save the checkstyle output.  The format of the output file is
+     *     determined by the <code>outputFileFormat</code>
+     *
+     * @parameter expression="${project.build.directory}/checkstyle-result.txt"
+     */
+    private String outputFile;
+
+    /**
+     * Specifies the format of the output to be used when writing to the output file. Valid values are
+     *     "plain" and "xml"
+     *
+     * @parameter default-value="plain"
+     */
+    private String outputFileFormat;
+
+    /**
+     * Specifies the location of the package names XML to be used to configure Checkstyle
+     * 
+     * @parameter
+     */
+    private String packageNamesFile;
+
+    /**
+     * Specifies if the build should fail upon a violation.
+     *
+     * @parameter default-value="false"
+     */
+    private boolean failsOnError;
+    
+    /**
+     * Specifies the location of the source files to be used for Checkstyle
+     *
+     * @parameter expression="${project.build.sourceDirectory}"
+     * @required
+     */
+    private String sourceDirectory;
 
     /**
      * @parameter expression="${project}"
@@ -73,18 +182,12 @@ public class CheckstyleReport
      */
     private MavenProject project;
 
-    private URL configFile = getClass().getResource( "/config/sun_checks.xml" );
-
-    private String extraFormatter = "plain";
-
     /**
-     * @parameter expression="${resultFileName}"
+     * @parameter expression="${component.org.codehaus.doxia.site.renderer.SiteRenderer}"
+     * @required
+     * @readonly
      */
-    private String resultFileName = "checkstyle-result.txt";
-
-    private String packageNamesFile;
-
-    private boolean failedOnError = false;
+    private SiteRenderer siteRenderer;
 
     /**
      * @see org.apache.maven.reporting.MavenReport#getName(java.util.Locale)
@@ -129,122 +232,63 @@ public class CheckstyleReport
     /**
      * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
      */
-    public void executeReport( Locale locale )
-        throws MavenReportException
+    public void executeReport( Locale locale ) throws MavenReportException
     {
-        // ----------------------------------------------------------------------
-        //
-        // ----------------------------------------------------------------------
+        File[] files = getFilesToProcess( includes, excludes );
 
-        AuditListener listener = null;
+        String configFile = getConfigFile();
 
-        if ( StringUtils.isNotEmpty( extraFormatter ) )
-        {
-            FileOutputStream out;
-            // TODO: I removed outputDirectory, and shouldn't have. Put it back here.
-            File resultFile = new File( getProject().getModel().getBuild().getDirectory() + "/site", resultFileName );
-            try
-            {
-                File parentFile = resultFile.getParentFile();
-                parentFile.mkdirs();
-                out = new FileOutputStream( resultFile );
-            }
-            catch( IOException e )
-            {
-                throw new MavenReportException( "Can't access to " + resultFile.getAbsolutePath(), e );
-            }
+        Properties overridingProperties = getOverridingProperties();
 
-            if ( "xml".equals( extraFormatter ) )
-            {
-                listener = new XMLLogger( out, true );
-            }
-            else if ( "plain".equals( extraFormatter ) )
-            {
-                listener = new DefaultLogger( out, true );
-            }
-            else
-            {
-                throw new MavenReportException( "Invalid format: (" + extraFormatter + "). Must be 'plain' or 'xml'." );
-            }
-        }
-
-        File[] files;
-        String sourceDirectory = getProject().getBuild().getSourceDirectory();
-        try
-        {
-            List filesList = getFilesToProcess( "**/*.java", null );
-            files = new File[filesList.size()];
-            int i = 0;
-            for ( Iterator iter = filesList.iterator(); iter.hasNext(); )
-            {
-                files[i++] = (File) iter.next();
-            }
-        }
-        catch( IOException e )
-        {
-            throw new MavenReportException( "Can't parse " + sourceDirectory, e );
-        }
-
-        Configuration config;
-
-        try
-        {
-            Properties overridingProperties = createOverridingProperties();
-            config = ConfigurationLoader.loadConfiguration( configFile.toString(),
-                                                            new PropertiesExpander( overridingProperties ) );
-        }
-        catch ( CheckstyleException e )
-        {
-            throw new MavenReportException( "Error loading config file : " + configFile.toString(), e );
-        }
-
-        ModuleFactory moduleFactory = null;
-
-        if ( StringUtils.isNotEmpty( packageNamesFile ) )
-        {
-            try
-            {
-                moduleFactory = PackageNamesLoader.loadModuleFactory( packageNamesFile );
-            }
-            catch ( CheckstyleException e )
-            {
-                throw new MavenReportException( "Error loading package names file : " + packageNamesFile, e );
-            }
-        }
-
+        ModuleFactory moduleFactory = getModuleFactory();
+        
+        FilterSet filterSet = getSuppressions();
+        
         Checker checker = null;
-
+        
         try
         {
+            Configuration config = ConfigurationLoader.loadConfiguration( configFile,
+                                       new PropertiesExpander( overridingProperties ) );
+
             checker = new Checker();
 
-            checker.setModuleFactory( moduleFactory );
+            if ( moduleFactory != null ) checker.setModuleFactory( moduleFactory );
+            
+            if ( filterSet != null ) checker.addFilter( filterSet );
 
             checker.configure( config );
-
-            // TODO: use source roots
-            AuditListener sinkListener = new CheckstyleReportListener( getSink(), sourceDirectory, getBundle( locale ) );
-
-            if ( listener != null )
-            {
-                checker.addListener( listener );
-            }
-
-            checker.addListener( sinkListener );
         }
-        catch ( Exception e )
+        catch( CheckstyleException ce )
         {
-            throw new MavenReportException( "Unable to create Checker: " + e.getMessage(), e );
+            throw new MavenReportException( "Failed during checkstyle configuration", ce );
         }
+
+        AuditListener listener = getListener();
+
+        if ( listener != null )
+        {
+            checker.addListener( listener );
+        }
+        
+        if ( StringUtils.isNotEmpty( useFile ) )
+        {
+            File outputFile = new File( useFile );
+            
+            OutputStream out = getOutputStream( outputFile );
+            
+            checker.addListener( new DefaultLogger( out, true ) );
+        }
+
+        AuditListener sinkListener = new CheckstyleReportListener( getSink(), sourceDirectory, getBundle( locale ) );
+
+        checker.addListener( sinkListener );
 
         int nbErrors = checker.process( files );
 
-        if ( checker != null )
-        {
-            checker.destroy();
-        }
-        
-        if ( failedOnError && nbErrors > 0 )
+        checker.destroy();
+
+        if ( failsOnError && nbErrors > 0 )
         {
             throw new MavenReportException( "There are " + nbErrors + " formatting errors." );
         }
@@ -257,34 +301,164 @@ public class CheckstyleReport
     {
         return "checkstyle";
     }
+    
+    private AuditListener getListener() throws MavenReportException
+    {
+        AuditListener listener = null;
 
-    private List getFilesToProcess( String includes, String excludes )
-        throws IOException
+        if ( StringUtils.isNotEmpty( outputFileFormat ) )
+        {
+            File resultFile = new File( outputFile );
+            
+            OutputStream out = getOutputStream( resultFile );
+            
+            if ( "xml".equals( outputFileFormat ) )
+            {
+                listener = new XMLLogger( out, true );
+            }
+            else if ( "plain".equals( outputFileFormat ) )
+            {
+                listener = new DefaultLogger( out, true );
+            }
+            else
+            {
+                throw new MavenReportException( "Invalid output file format: (" + outputFileFormat + "). Must be 'plain' or 'xml'." );
+            }
+        }
+        
+        return listener;
+    }
+    
+    private OutputStream getOutputStream( File file ) throws MavenReportException
+    {
+        FileOutputStream out;
+        
+        try
+        {
+            File parentFile = file.getParentFile();
+            
+            if ( !parentFile.exists() ) parentFile.mkdirs();
+            
+            return new FileOutputStream( file );
+        }
+        catch ( IOException ioe )
+        {
+            throw new MavenReportException( "Can't open file for output: " + file.getAbsolutePath(), ioe );
+        }
+    }
+
+    private File[] getFilesToProcess( String includes, String excludes ) throws MavenReportException
     {
         StringBuffer excludesStr = new StringBuffer();
+        
         if ( StringUtils.isNotEmpty( excludes ) )
         {
             excludesStr.append(excludes);
         }
+        
         for ( int i = 0; i < DEFAULT_EXCLUDES.length; i++ )
         {
             if ( excludesStr.length() > 0 )
             {
                 excludesStr.append( "," );
             }
+            
             excludesStr.append( DEFAULT_EXCLUDES[i] );
         }
 
-        return FileUtils.getFiles( new File( getProject().getBuild().getSourceDirectory() ), includes, excludesStr.toString() );
+        List files;
+        
+        try
+        {
+            files = FileUtils.getFiles( new File( sourceDirectory ), includes, excludesStr.toString() );
+        }
+        catch ( IOException ioe )
+        {
+            throw new MavenReportException( "Failed to get source files", ioe );
+        }
+        
+        return (File[]) ( files.toArray( new File[ 0 ] ) );
     }
 
-    private Properties createOverridingProperties()
+    private Properties getOverridingProperties() throws MavenReportException
     {
-        Properties props = new Properties();
-        props.setProperty( "checkstyle.header.file", "LICENSE.txt" );
-        // TODO: explicit output directory when it is back
-        props.setProperty( "checkstyle.cache.file", getProject().getModel().getBuild().getDirectory() + "/checkstyle-cachefile" );
-        return props;
+        Properties p = new Properties();
+        
+        try
+        {
+            if (  propertiesFile != null )
+            {
+                p.load( new FileInputStream( propertiesFile ) );
+            }
+            else if ( propertiesURL != null )
+            {
+                p.load( propertiesURL.openStream() );
+            }
+
+            if ( headerFile != null )
+                p.setProperty( "checkstyle.header.file", headerFile );
+
+            if ( cacheFile != null )
+                p.setProperty( "checkstyle.cache.file", cacheFile );
+        }
+        catch ( IOException e )
+        {
+            throw new MavenReportException( "Failed to get overriding properties", e );
+        }
+        
+        return p;
+    }
+    
+    private String getConfigFile() throws MavenReportException
+    {
+        URL configFile;
+        
+        if ( "turbine".equalsIgnoreCase( format ) )
+        {
+            configFile = getClass().getResource( "/config/turbine_checks.xml" );
+        }
+        else if ( "avalon".equalsIgnoreCase( format ) )
+        {
+            configFile = getClass().getResource( "/config/avalon_checks.xml" );
+        }
+        else if ( "".equalsIgnoreCase( format ) )
+        {
+            configFile = getClass().getResource( "/config/sun_checks.xml" );
+        }
+        else
+        {
+            throw new MavenReportException( "Invalid configuration file format: " + format );
+        }
+        
+        return configFile.toString();
+    }
+    
+    private ModuleFactory getModuleFactory() throws MavenReportException
+    {
+        if ( StringUtils.isEmpty( packageNamesFile ) ) return null;
+
+        try
+        {
+            return PackageNamesLoader.loadModuleFactory( packageNamesFile );
+        }
+        catch ( CheckstyleException ce )
+        {
+            throw new MavenReportException( "failed to load package names XML: " + packageNamesFile, ce );
+        }
+    }
+    
+    private FilterSet getSuppressions() throws MavenReportException
+    {
+        if ( StringUtils.isEmpty( suppressionsFile ) ) return null;
+        
+        try
+        {
+            return SuppressionsLoader.loadSuppressions( suppressionsFile );
+        }
+        catch ( CheckstyleException ce )
+        {
+            throw new MavenReportException( "failed to load suppressions XML: " + suppressionsFile, ce );
+        }
     }
 
     private static ResourceBundle getBundle( Locale locale )
