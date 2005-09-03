@@ -19,7 +19,6 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -133,22 +132,20 @@ public class DefaultArtifactResolver
                                 artifact, remoteRepositories );
                         }
 
+/* TODO: pretty sure this can be removed. No metadata on resolved artifacts
                         // must be after the artifact is downloaded
                         for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
                         {
                             ArtifactMetadata metadata = (ArtifactMetadata) i.next();
                             metadata.storeInLocalRepository( localRepository );
                         }
+*/
                     }
                     catch ( ResourceDoesNotExistException e )
                     {
                         throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                     }
                     catch ( TransferFailedException e )
-                    {
-                        throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
-                    }
-                    catch ( ArtifactMetadataRetrievalException e )
                     {
                         throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                     }

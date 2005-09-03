@@ -33,16 +33,10 @@ public interface ArtifactMetadata
      * Store the metadata in the local repository.
      *
      * @param localRepository the local repository
+     * @param remoteRepository the remote repository it came from
      */
-    void storeInLocalRepository( ArtifactRepository localRepository )
+    void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
-
-    /**
-     * Get the filename of this metadata.
-     *
-     * @return the filename
-     */
-    String getFilename();
 
     /**
      * Whether this metadata should be stored alongside the artifact.
@@ -63,7 +57,22 @@ public interface ArtifactMetadata
     Object getKey();
 
     /**
-     * @Todo delete?
+     * @todo delete?
      */
     boolean isSnapshot();
+
+    /**
+     * Get the filename of this metadata on the local repository.
+     *
+     * @param repository the remote repository it came from
+     * @return the filename
+     */
+    String getLocalFilename( ArtifactRepository repository );
+
+    /**
+     * Get the filename of this metadata on the remote repository.
+     *
+     * @return the filename
+     */
+    String getRemoteFilename();
 }

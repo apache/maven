@@ -17,6 +17,7 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.transform.ReleaseArtifactTransformation;
 
 import java.io.File;
@@ -35,7 +36,22 @@ public class ReleaseArtifactMetadata
 
     public ReleaseArtifactMetadata( Artifact artifact )
     {
-        super( artifact, artifact.getArtifactId() + "-RELEASE." + SNAPSHOT_VERSION_FILE );
+        super( artifact );
+    }
+
+    public String getRemoteFilename()
+    {
+        return getFilename();
+    }
+
+    public String getLocalFilename( ArtifactRepository repository )
+    {
+        return getFilename();
+    }
+
+    private String getFilename()
+    {
+        return artifact.getArtifactId() + "-RELEASE." + SNAPSHOT_VERSION_FILE;
     }
 
     public String constructVersion()

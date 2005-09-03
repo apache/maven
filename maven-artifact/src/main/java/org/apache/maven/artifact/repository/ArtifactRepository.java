@@ -30,7 +30,9 @@ public interface ArtifactRepository
 {
     String pathOf( Artifact artifact );
 
-    String pathOfArtifactMetadata( ArtifactMetadata artifactMetadata );
+    String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata );
+
+    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
 
     String getUrl();
 
@@ -45,4 +47,6 @@ public interface ArtifactRepository
     ArtifactRepositoryPolicy getReleases();
 
     ArtifactRepositoryLayout getLayout();
+
+    String getKey();
 }

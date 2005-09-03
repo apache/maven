@@ -17,6 +17,7 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.io.File;
 
@@ -27,7 +28,22 @@ public class LatestArtifactMetadata
 
     public LatestArtifactMetadata( Artifact artifact )
     {
-        super( artifact, artifact.getArtifactId() + "-" + Artifact.LATEST_VERSION + "." + SNAPSHOT_VERSION_FILE );
+        super( artifact );
+    }
+
+    public String getRemoteFilename()
+    {
+        return getFilename();
+    }
+
+    public String getLocalFilename( ArtifactRepository repository )
+    {
+        return getFilename();
+    }
+
+    private String getFilename()
+    {
+        return artifact.getArtifactId() + "-" + Artifact.LATEST_VERSION + "." + SNAPSHOT_VERSION_FILE;
     }
 
     public String constructVersion()

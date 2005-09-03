@@ -50,9 +50,6 @@ public class DefaultRepositoryMetadataManager
         boolean alreadyResolved = alreadyResolved( metadata );
         if ( !alreadyResolved )
         {
-            File file = new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( metadata ) );
-
-            boolean checkedUpdates = false;
             for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
             {
                 ArtifactRepository repository = (ArtifactRepository) i.next();
@@ -66,41 +63,41 @@ public class DefaultRepositoryMetadataManager
                 }
                 else
                 {
+                    File file = new File( localRepository.getBasedir(),
+                                          localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
+
                     // TODO: should be able to calculate this less often
                     boolean checkForUpdates = policy.checkOutOfDate( new Date( file.lastModified() ) );
 
                     if ( checkForUpdates )
                     {
-                        checkedUpdates = true;
 
                         getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
 
                         try
                         {
                             wagonManager.getArtifactMetadata( metadata, repository, file, policy.getChecksumPolicy() );
+
                             // TODO: ???
 //                            metadata.setRepository( repository );
+
+                            // touch file so that this is not checked again until interval has passed
+                            if ( file.exists() )
+                            {
+                                file.setLastModified( System.currentTimeMillis() );
+                            }
                         }
                         catch ( ResourceDoesNotExistException e )
                         {
                             getLogger().info( "Repository metadata " + metadata +
-                                " could not be found on repository: " + repository.getId(), e );
+                                " could not be found on repository: " + repository.getId() );
+                            getLogger().debug( "Cause", e );
                         }
                         catch ( TransferFailedException e )
                         {
                             throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
                         }
                     }
-                }
-            }
-
-            // touch the file if it was checked for updates, but don't create it if it doesn't exist to avoid
-            // storing SNAPSHOT as the actual version which doesn't exist remotely.
-            if ( checkedUpdates )
-            {
-                if ( file.exists() )
-                {
-                    file.setLastModified( System.currentTimeMillis() );
                 }
             }
 

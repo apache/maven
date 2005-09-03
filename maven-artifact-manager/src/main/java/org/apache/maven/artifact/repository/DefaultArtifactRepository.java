@@ -76,9 +76,14 @@ public class DefaultArtifactRepository
         return layout.pathOf( artifact );
     }
 
-    public String pathOfArtifactMetadata( ArtifactMetadata artifactMetadata )
+    public String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata )
     {
-        return layout.pathOfArtifactMetadata( artifactMetadata );
+        return layout.pathOfRemoteRepositoryMetadata( artifactMetadata );
+    }
+
+    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+    {
+        return layout.pathOfLocalRepositoryMetadata( metadata, repository );
     }
 
     public ArtifactRepositoryLayout getLayout()
@@ -94,5 +99,10 @@ public class DefaultArtifactRepository
     public ArtifactRepositoryPolicy getReleases()
     {
         return releases;
+    }
+
+    public String getKey()
+    {
+        return getId();
     }
 }

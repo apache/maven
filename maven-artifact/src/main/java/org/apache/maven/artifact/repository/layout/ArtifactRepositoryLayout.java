@@ -18,17 +18,18 @@ package org.apache.maven.artifact.repository.layout;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * @author jdcasey
  */
 public interface ArtifactRepositoryLayout
 {
-
     String ROLE = ArtifactRepositoryLayout.class.getName();
 
     String pathOf( Artifact artifact );
 
-    String pathOfArtifactMetadata( ArtifactMetadata metadata );
+    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
 
+    String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata );
 }

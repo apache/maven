@@ -19,6 +19,7 @@ package org.apache.maven.artifact.repository.layout;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * @author jdcasey
@@ -26,6 +27,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 public class LegacyRepositoryLayout
     implements ArtifactRepositoryLayout
 {
+    private static final String PATH_SEPARATOR = "/";
+
     public String pathOf( Artifact artifact )
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
@@ -49,14 +52,25 @@ public class LegacyRepositoryLayout
         return path.toString();
     }
 
-    public String pathOfArtifactMetadata( ArtifactMetadata metadata )
+    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+    {
+        return pathOfRepositoryMetadata( metadata, metadata.getLocalFilename( repository ) );
+    }
+
+    private String pathOfRepositoryMetadata( ArtifactMetadata metadata, String filename )
     {
         StringBuffer path = new StringBuffer();
 
-        path.append( metadata.getGroupId() ).append( "/poms/" );
-        path.append( metadata.getFilename() );
+        path.append( metadata.getGroupId() ).append( PATH_SEPARATOR ).append( "poms" ).append( PATH_SEPARATOR );
+
+        path.append( filename );
 
         return path.toString();
+    }
+
+    public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
+    {
+        return pathOfRepositoryMetadata( metadata, metadata.getRemoteFilename() );
     }
 
 }

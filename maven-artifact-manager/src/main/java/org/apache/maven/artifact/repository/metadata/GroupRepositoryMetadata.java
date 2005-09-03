@@ -44,11 +44,6 @@ import java.util.Map;
 public class GroupRepositoryMetadata
     implements ArtifactMetadata
 {
-    /**
-     * TODO: reuse.
-     */
-    protected static final String METADATA_FILE = "maven-metadata.xml";
-
     private final String groupId;
 
     private Map pluginMappings = new HashMap();
@@ -63,14 +58,14 @@ public class GroupRepositoryMetadata
         return "repository metadata for group: \'" + groupId + "\'";
     }
 
-    public void storeInLocalRepository( ArtifactRepository localRepository )
+    public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
         if ( !pluginMappings.isEmpty() )
         {
             try
             {
-                updateRepositoryMetadata( localRepository );
+                updateRepositoryMetadata( localRepository, remoteRepository );
             }
             catch ( IOException e )
             {
@@ -79,9 +74,14 @@ public class GroupRepositoryMetadata
         }
     }
 
-    public String getFilename()
+    public String getRemoteFilename()
     {
-        return METADATA_FILE;
+        return "maven-metadata.xml";
+    }
+
+    public String getLocalFilename( ArtifactRepository repository )
+    {
+        return "maven-metadata-" + repository.getKey() + ".xml";
     }
 
     public boolean storedInGroupDirectory()
@@ -114,14 +114,15 @@ public class GroupRepositoryMetadata
         pluginMappings.put( goalPrefix, artifactId );
     }
 
-    private void updateRepositoryMetadata( ArtifactRepository localRepository )
+    private void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws IOException
     {
         MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
         Metadata pluginMap = null;
 
-        File metadataFile = new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( this ) );
+        File metadataFile = new File( localRepository.getBasedir(),
+                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
         if ( metadataFile.exists() )
         {

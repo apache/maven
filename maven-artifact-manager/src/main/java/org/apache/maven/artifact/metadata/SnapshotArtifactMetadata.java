@@ -17,6 +17,7 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -45,7 +46,22 @@ public class SnapshotArtifactMetadata
 
     public SnapshotArtifactMetadata( Artifact artifact )
     {
-        super( artifact, artifact.getArtifactId() + "-" + artifact.getBaseVersion() + "." + SNAPSHOT_VERSION_FILE );
+        super( artifact );
+    }
+
+    public String getRemoteFilename()
+    {
+        return getFilename();
+    }
+
+    public String getLocalFilename( ArtifactRepository repository )
+    {
+        return getFilename();
+    }
+
+    private String getFilename()
+    {
+        return artifact.getArtifactId() + "-" + artifact.getBaseVersion() + "." + SNAPSHOT_VERSION_FILE;
     }
 
     public String constructVersion()

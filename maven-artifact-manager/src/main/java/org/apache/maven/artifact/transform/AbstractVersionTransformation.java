@@ -167,7 +167,8 @@ public abstract class AbstractVersionTransformation
             // storing SNAPSHOT as the actual version which doesn't exist remotely.
             if ( checkedUpdates && localMetadata.getLastModified().getTime() > 0 )
             {
-                localMetadata.storeInLocalRepository( localRepository );
+                localMetadata.storeInLocalRepository( localRepository,
+                                                      null ); // TODO: fix artifact repository - but this will be removed anyway
             }
 
             resolvedArtifactCache.add( getCacheKey( artifact ) );
@@ -206,7 +207,8 @@ public abstract class AbstractVersionTransformation
     {
         // TODO: we could cache the results of this, perhaps inside the artifact repository?
         AbstractVersionArtifactMetadata metadata = createMetadata( artifact );
-        metadata.readFromLocalRepository( localRepository );
+        metadata.readFromLocalRepository( localRepository,
+                                          null ); // TODO: fix artifact repository - but this will be removed anyway
         return metadata;
     }
 

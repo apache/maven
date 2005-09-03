@@ -98,11 +98,24 @@ public class DefaultPluginMappingManager
     {
         GroupRepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
 
-        // TODO: aggregate the results of this instead
         repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
 
+        // TODO: can this go directly into the manager?
+        for ( Iterator i = pluginRepositories.iterator(); i.hasNext(); )
+        {
+            ArtifactRepository repository = (ArtifactRepository) i.next();
+
+            loadRepositoryPluginMappings( metadata, repository, localRepository );
+        }
+        loadRepositoryPluginMappings( metadata, localRepository, localRepository );
+    }
+
+    private void loadRepositoryPluginMappings( GroupRepositoryMetadata metadata, ArtifactRepository remoteRepository,
+                                               ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException
+    {
         File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfArtifactMetadata( metadata ) );
+                                      localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
 
         if ( metadataFile.exists() )
         {
@@ -120,7 +133,7 @@ public class DefaultPluginMappingManager
 
                     org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 
-                    plugin.setGroupId( groupId );
+                    plugin.setGroupId( metadata.getGroupId() );
 
                     plugin.setArtifactId( artifactId );
 

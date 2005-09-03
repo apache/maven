@@ -48,19 +48,30 @@ public class ProjectArtifactMetadata
 
     public ProjectArtifactMetadata( Artifact artifact, File file )
     {
-        super( artifact, null );
+        super( artifact );
         this.file = file;
     }
 
-    public String getFilename()
+    public String getRemoteFilename()
+    {
+        return getFilename();
+    }
+
+    public String getLocalFilename( ArtifactRepository repository )
+    {
+        return getFilename();
+    }
+
+    private String getFilename()
     {
         return getArtifactId() + "-" + artifact.getVersion() + ".pom";
     }
 
-    public void storeInLocalRepository( ArtifactRepository localRepository )
+    public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
-        File destination = new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( this ) );
+        File destination = new File( localRepository.getBasedir(),
+                                     localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
         destination.getParentFile().mkdirs();
 

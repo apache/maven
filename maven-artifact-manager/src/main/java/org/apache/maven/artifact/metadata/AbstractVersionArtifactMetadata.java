@@ -41,14 +41,15 @@ public abstract class AbstractVersionArtifactMetadata
 
     protected long lastModified;
 
-    public AbstractVersionArtifactMetadata( Artifact artifact, String filename )
+    public AbstractVersionArtifactMetadata( Artifact artifact )
     {
-        super( artifact, filename );
+        super( artifact );
     }
 
-    protected File getLocalRepositoryLocation( ArtifactRepository localRepository )
+    protected File getLocalRepositoryLocation( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
     {
-        return new File( localRepository.getBasedir(), localRepository.pathOfArtifactMetadata( this ) );
+        return new File( localRepository.getBasedir(),
+                         localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
     }
 
     private void readFromFile( File file )
@@ -70,10 +71,10 @@ public abstract class AbstractVersionArtifactMetadata
         return new Date( lastModified );
     }
 
-    public void readFromLocalRepository( ArtifactRepository localRepository )
+    public void readFromLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws IOException
     {
-        File f = getLocalRepositoryLocation( localRepository );
+        File f = getLocalRepositoryLocation( localRepository, remoteRepository );
         if ( f.exists() )
         {
             readFromFile( f );
@@ -104,7 +105,7 @@ public abstract class AbstractVersionArtifactMetadata
         }
     }
 
-    public void storeInLocalRepository( ArtifactRepository localRepository )
+    public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
         String version = constructVersion();
@@ -112,7 +113,7 @@ public abstract class AbstractVersionArtifactMetadata
         {
             try
             {
-                String path = getLocalRepositoryLocation( localRepository ).getPath();
+                String path = getLocalRepositoryLocation( localRepository, remoteRepository ).getPath();
                 File file = new File( path );
                 // TODO: this should be centralised before the resolution of the artifact
                 file.getParentFile().mkdirs();

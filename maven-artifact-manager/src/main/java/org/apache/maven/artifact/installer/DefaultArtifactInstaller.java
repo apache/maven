@@ -72,7 +72,7 @@ public class DefaultArtifactInstaller
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
 
                 // TODO: method should be on repository?
-                metadata.storeInLocalRepository( localRepository );
+                metadata.storeInLocalRepository( localRepository, localRepository );
             }
         }
         catch ( IOException e )

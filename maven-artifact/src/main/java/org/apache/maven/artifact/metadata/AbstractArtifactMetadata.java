@@ -17,6 +17,7 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Common elements of artifact metadata.
@@ -27,19 +28,13 @@ import org.apache.maven.artifact.Artifact;
 public abstract class AbstractArtifactMetadata
     implements ArtifactMetadata
 {
-    protected final String filename;
-
     protected Artifact artifact;
 
-    protected AbstractArtifactMetadata( Artifact artifact, String filename )
+    protected ArtifactRepository repository;
+
+    protected AbstractArtifactMetadata( Artifact artifact )
     {
         this.artifact = artifact;
-        this.filename = filename;
-    }
-
-    public String getFilename()
-    {
-        return filename;
     }
 
     public boolean storedInGroupDirectory()
@@ -65,5 +60,10 @@ public abstract class AbstractArtifactMetadata
     public Object getKey()
     {
         return artifact.getGroupId() + ":" + artifact.getArtifactId();
+    }
+
+    public void setRepository( ArtifactRepository repository )
+    {
+        this.repository = repository;
     }
 }
