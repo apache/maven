@@ -32,6 +32,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileList;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
@@ -102,6 +103,11 @@ public class DependenciesTask
             pom = createDummyPom();
         }
 
+        if ( dependencies.isEmpty() )
+        {
+            log( "There were no dependencies specified", Project.MSG_WARN );
+        }
+
         Set artifacts;
         try
         {
@@ -165,17 +171,24 @@ public class DependenciesTask
         FileSet fileSet = new FileSet();
         fileSet.setDir( fileList.getDir( getProject() ) );
 
-        for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+        if ( result.getArtifacts().isEmpty() )
         {
-            Artifact artifact = (Artifact) i.next();
-            String filename = localRepo.pathOf( artifact );
-
-            FileList.FileName file = new FileList.FileName();
-            file.setName( filename );
-
-            fileList.addConfiguredFile( file );
-
-            fileSet.createInclude().setName( filename );
+            fileSet.createExclude().setName( "**/**" );
+        }
+        else
+        {
+            for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+            {
+                Artifact artifact = (Artifact) i.next();
+                String filename = localRepo.pathOf( artifact );
+    
+                FileList.FileName file = new FileList.FileName();
+                file.setName( filename );
+    
+                fileList.addConfiguredFile( file );
+    
+                fileSet.createInclude().setName( filename );
+            }
         }
 
         if ( pathId != null )

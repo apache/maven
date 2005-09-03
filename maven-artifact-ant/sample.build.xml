@@ -28,6 +28,14 @@
     </typedef>
   </target>
 
+  <target name="test-no-deps" depends="initTaskDefs">
+     <artifact:dependencies filesetId="runtime.fileset">
+     </artifact:dependencies> 
+     <copy todir="target/test-no-deps" verbose="true">
+       <fileset refid="runtime.fileset" />
+     </copy>
+  </target>
+
   <target name="test-bad-dep" depends="initTaskDefs">
     <artifact:dependencies pathId="dependency.classpath" filesetId="dependency.fileset">
       <dependency groupId="foo" artifactId="foo" version="1.0-alpha-2"/>

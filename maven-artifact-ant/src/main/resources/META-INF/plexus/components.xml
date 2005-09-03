@@ -192,11 +192,6 @@
           <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
           <field-name>artifactTransformations</field-name>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-          <role-hint>snapshot</role-hint>
-          <field-name>snapshotTransformation</field-name>
-        </requirement>
       </requirements>
     </component>
 
