@@ -245,4 +245,9 @@ public class ActiveProjectArtifact
     {
         artifact.setArtifactHandler( handler );
     }
+
+    public String toString()
+    {
+        return "active project artifact:\n\tartifact = " + artifact + ";\n\tproject: " + project;
+    }
 }
