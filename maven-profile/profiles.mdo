@@ -130,6 +130,16 @@
             <type>ActivationProperty</type>
           </association>
         </field>
+        <field>
+          <name>file</name>
+          <version>1.0.0</version>
+          <description><![CDATA[
+             Specifies that this profile will be activated based on existence of a file.
+             ]]></description>
+          <association>
+             <type>ActivationFile</type>
+          </association>
+        </field>
       </fields>
     </class>
 
@@ -169,8 +179,7 @@
         <field>
           <name>layout</name>
           <version>1.0.0</version>
-          <description>The type of layout this repository uses for locating and storing artifacts - can be "legacy" or
-            "default".</description>
+          <description>The type of layout this repository uses for locating and storing artifacts - can be "legacy" or "default".</description>
           <type>String</type>
           <defaultValue>default</defaultValue>
         </field>
@@ -196,7 +205,6 @@
         </codeSegment>
       </codeSegments>
     </class>
-
     <class>
       <name>Repository</name>
       <superClass>RepositoryBase</superClass>
@@ -284,7 +292,6 @@
         </field>
       </fields>
     </class>
-
     <class>
       <name>ActivationProperty</name>
       <version>1.0.0</version>
@@ -306,6 +313,29 @@
           <version>1.0.0</version>
           <type>String</type>
           <description>The value of the property to be used to activate a profile</description>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>ActivationFile</name>
+      <version>1.0.0</version>
+      <description><![CDATA[
+        This is the file specification used to activate a profile. The missing value will be a the location
+        of a file that needs to exist, and if it doesn't the profile must run.  On the other hand exists will test 
+        for the existence of the file and if it is there will run the profile.
+      ]]></description>
+      <fields>
+        <field>
+          <name>missing</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The name of the file that should be missing to activate a profile</description>
+        </field>
+        <field>
+          <name>exists</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The name of the file that should exist to activate a profile</description>
         </field>
       </fields>
     </class>

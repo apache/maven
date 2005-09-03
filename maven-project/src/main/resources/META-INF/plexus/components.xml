@@ -115,6 +115,16 @@
       <role-hint>system-property</role-hint>
       <implementation>org.apache.maven.profiles.activation.SystemPropertyProfileActivator</implementation>
     </component>
+    <!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.profiles.activation.ProfileActivator</role>
+      <role-hint>file</role-hint>
+      <implementation>org.apache.maven.profiles.activation.FileProfileActivator</implementation>
+    </component>
 <!--
      |
      |
