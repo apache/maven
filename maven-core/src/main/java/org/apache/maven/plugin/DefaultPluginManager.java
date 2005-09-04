@@ -541,7 +541,7 @@ public class DefaultPluginManager
 
                 unresolved.removeAll( resolved );
 
-                resolveCoreArtifacts( unresolved, localRepository );
+                resolveCoreArtifacts( unresolved, localRepository, resolutionGroup.getResolutionRepositories() );
 
                 List allResolved = new ArrayList( resolved.size() + unresolved.size() );
 
@@ -565,7 +565,8 @@ public class DefaultPluginManager
         }
     }
 
-    private void resolveCoreArtifacts( List unresolved, ArtifactRepository localRepository )
+    private void resolveCoreArtifacts( List unresolved, ArtifactRepository localRepository,
+                                       List resolutionRepositories )
         throws ArtifactResolutionException
     {
         for ( Iterator it = unresolved.iterator(); it.hasNext(); )
@@ -583,7 +584,7 @@ public class DefaultPluginManager
 
                 if ( resourceUrl == null )
                 {
-                    artifactResolver.resolve( artifact, unresolved, localRepository );
+                    artifactResolver.resolve( artifact, resolutionRepositories, localRepository );
 
                     artifactFile = artifact.getFile();
                 }
