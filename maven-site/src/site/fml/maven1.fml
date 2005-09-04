@@ -90,17 +90,9 @@
             wrong, please post the message to JIRA.
           </li>
           <li>
-            <i>Ant and scripting support</i> - while this is available, the Ant and scripting support has not undergone
-            rigorous testing at this point.
-          </li>
-          <li>
-            <i>Availability of other plugins</i> - Maven 1.x has a large number of plugins available - however Maven 2.0
-            is not presently capable of executing them.
-          </li>
-          <li>
-            <i>Embedding and Plugin Authoring API</i> - Maven 2.0 is designed to be able to be embedded, and plugins can
-            be written in Java. However, the APIs for these are subject to change so writing code to use them may require
-            some changes in future versions.
+            <i>Availability of other plugins</i> - While most of the core Maven 1.x plugins have been converted,
+              there are still some not available, or not with the same level of features or documentation. In
+              addition, several 3rd party plugins may not be available. Maven 2.0 cannot execute Maven 1.0 plugins.
           </li>
         </ul>
       </answer>
