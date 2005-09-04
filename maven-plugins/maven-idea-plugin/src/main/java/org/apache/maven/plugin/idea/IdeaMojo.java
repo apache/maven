@@ -110,9 +110,9 @@ public class IdeaMojo
     private void rewriteProject()
         throws MojoExecutionException
     {
+        File projectFile = new File( project.getBasedir(), project.getArtifactId() + ".ipr" );
         try
         {
-            File projectFile = new File( project.getBasedir(), project.getArtifactId() + ".ipr" );
             Reader reader;
             if ( projectFile.exists() )
             {
@@ -162,7 +162,8 @@ public class IdeaMojo
             else
             {
                 Xpp3Dom m = createElement( modules, "module" );
-                String modulePath = new File( project.getBasedir(), project.getArtifactId() + ".iml" ).getAbsolutePath();
+                String modulePath = new File( project.getBasedir(),
+                                              project.getArtifactId() + ".iml" ).getAbsolutePath();
                 m.setAttribute( "filepath", "$PROJECT_DIR$/" + toRelative( project.getBasedir(), modulePath ) );
             }
 
@@ -178,20 +179,20 @@ public class IdeaMojo
         }
         catch ( XmlPullParserException e )
         {
-            throw new MojoExecutionException( "Error parsing existing IML file", e );
+            throw new MojoExecutionException( "Error parsing existing IPR file: " + projectFile.getAbsolutePath(), e );
         }
         catch ( IOException e )
         {
-            throw new MojoExecutionException( "Error parsing existing IML file", e );
+            throw new MojoExecutionException( "Error parsing existing IPR file: " + projectFile.getAbsolutePath(), e );
         }
     }
 
     private void rewriteModule()
         throws MojoExecutionException
     {
+        File moduleFile = new File( project.getBasedir(), project.getArtifactId() + ".iml" );
         try
         {
-            File moduleFile = new File( project.getBasedir(), project.getArtifactId() + ".iml" );
             Reader reader;
             if ( moduleFile.exists() )
             {
@@ -214,11 +215,11 @@ public class IdeaMojo
 
             // TODO: how can we let the WAR/EJBs plugin hook in and provide this?
             // TODO: merge in ejb-module, etc.
-            if ( project.getPackaging().equals( "war" ) )
+            if ( "war".equals( project.getPackaging() ) )
             {
                 addWebModule( module );
             }
-            else if ( project.getPackaging().equals( "ejb" ) )
+            else if ( "ejb".equals( project.getPackaging() ) )
             {
                 module.setAttribute( "type", "J2EE_EJB_MODULE" );
             }
@@ -264,20 +265,27 @@ public class IdeaMojo
             for ( Iterator i = project.getArtifacts().iterator(); i.hasNext(); )
             {
                 Artifact a = (Artifact) i.next();
-                // TODO: resolve projects in reactor as references
-
                 Xpp3Dom dep = createElement( component, "orderEntry" );
-                dep.setAttribute( "type", "module-library" );
 
-                dep = createElement( dep, "library" );
-                dep.setAttribute( "name", a.getArtifactId() );
+                if ( a.getFile() != null )
+                {
+                    dep.setAttribute( "type", "module-library" );
+                    dep = createElement( dep, "library" );
+                    dep.setAttribute( "name", a.getArtifactId() );
 
-                Xpp3Dom el = createElement( dep, "CLASSES" );
-                el = createElement( el, "root" );
-                el.setAttribute( "url", "jar://" + a.getFile().getAbsolutePath().replace( '\\', '/' ) + "!/" );
+                    Xpp3Dom el = createElement( dep, "CLASSES" );
+                    el = createElement( el, "root" );
+                    File file = a.getFile();
+                    el.setAttribute( "url", "jar://" + file.getAbsolutePath().replace( '\\', '/' ) + "!/" );
 
-                createElement( dep, "JAVADOC" );
-                createElement( dep, "SOURCES" );
+                    createElement( dep, "JAVADOC" );
+                    createElement( dep, "SOURCES" );
+                }
+                else
+                {
+                    dep.setAttribute( "type", "module" );
+                    dep.setAttribute( "module-name", a.getArtifactId() );
+                }
             }
 
             FileWriter writer = new FileWriter( moduleFile );
@@ -292,11 +300,11 @@ public class IdeaMojo
         }
         catch ( XmlPullParserException e )
         {
-            throw new MojoExecutionException( "Error parsing existing IML file", e );
+            throw new MojoExecutionException( "Error parsing existing IML file " + moduleFile.getAbsolutePath(), e );
         }
         catch ( IOException e )
         {
-            throw new MojoExecutionException( "Error parsing existing IML file", e );
+            throw new MojoExecutionException( "Error parsing existing IML file " + moduleFile.getAbsolutePath(), e );
         }
     }
 
@@ -419,7 +427,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         for ( int i = children.length - 1; i >= 0; i-- )
         {
             Xpp3Dom child = children[i];
-            if ( child.getName().equals( "orderEntry" ) && child.getAttribute( "type" ).equals( "module-library" ) )
+            if ( "orderEntry".equals( child.getName() ) && "module-library".equals( child.getAttribute( "type" ) ) )
             {
                 component.removeChild( i );
             }
