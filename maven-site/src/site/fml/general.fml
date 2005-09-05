@@ -122,5 +122,39 @@
         </p>
       </answer>
     </faq>
+
+    <faq id="importing-jars">
+      <question>I have a jar that I want to put into my local repository. How can I copy it in?</question>
+      <answer>
+        <p>
+          If you understand the layout of the maven repository, you can copy the jar directly into where it 
+          is meant to go. Maven will find this file next time it is run.
+        </p>
+
+        <p>
+          If you are not confident about the layout of the maven repository, then you can
+          adapt the following command to load in your jar file, all on one line.
+        </p>
+
+        <source><![CDATA[
+m2 install:install-file
+  -Dfile=<path-to-file>
+  -DgroupId=<group-id>
+  -DartifactId=<artifact-id>
+  -Dversion=<version>
+  -Dpackaging=<packaging>
+
+Where: <path-to-file>  the path to the file to load
+       <group-id>      the group that the file should be registered under
+       <artifact-id>   the artifact name for the file
+       <version>       the version of the file
+       <packaging>     the packaging of the file e.g. jar
+        ]]></source>
+
+        <p>
+          This should load in the file into the maven repository, renaming it as needed.
+        </p>
+      </answer>
+    </faq>
   </part>
 </faqs>
