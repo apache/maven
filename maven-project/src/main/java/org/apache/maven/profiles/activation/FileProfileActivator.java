@@ -2,7 +2,6 @@ package org.apache.maven.profiles.activation;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
-import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.util.FileUtils;
 

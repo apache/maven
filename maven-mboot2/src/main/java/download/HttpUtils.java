@@ -34,23 +34,20 @@ import java.net.URLConnection;
  * @author costin@dnt.ro
  * @author gg@grtmail.com (Added Java 1.1 style HTTP basic auth)
  * @author <a href="mailto:jason@zenplex.com">Jason van Zyl</a>
- * @todo Need to add a timeout so we can flip to a backup repository.
- * @todo Download everything in a single session.
- * @todo Throw meaningful exception when authentication fails.
  */
 public class HttpUtils
 {
     /**
      * Use a proxy to bypass the firewall with or without authentication
      *
-     * @param proxyHost     Proxy Host (if proxy is required), or null
-     * @param proxyPort     Proxy Port (if proxy is required), or null
+     * @param proxyHost Proxy Host (if proxy is required), or null
+     * @param proxyPort Proxy Port (if proxy is required), or null
      * @param proxyUserName Proxy Username (if authentification is required),
-     *                      or null
+     * or null
      * @param proxyPassword Proxy Password (if authentification is required),
-     *                      or null
+     * or null
      * @throws SecurityException if an operation is not authorized by the
-     *                           SecurityManager
+     * SecurityManager
      */
     public static void useProxyUser( final String proxyHost, final String proxyPort, final String proxyUserName,
                                      final String proxyPassword )
@@ -67,8 +64,8 @@ public class HttpUtils
                 {
                     protected PasswordAuthentication getPasswordAuthentication()
                     {
-                        return new PasswordAuthentication( proxyUserName, proxyPassword == null
-                                                                          ? new char[0] : proxyPassword.toCharArray() );
+                        return new PasswordAuthentication( proxyUserName, proxyPassword == null ? new char[0]
+                            : proxyPassword.toCharArray() );
                     }
                 } );
             }
@@ -79,20 +76,20 @@ public class HttpUtils
      * Retrieve a remote file.  Throws an Exception on errors unless the
      * ifnoreErrors flag is set to True
      *
-     * @param url             the of the file to retrieve
+     * @param url the of the file to retrieve
      * @param destinationFile where to store it
-     * @param ignoreErrors    whether to ignore errors during I/O or throw an
-     *                        exception when they happen
-     * @param useTimestamp    whether to check the modified timestamp on the
-     *                        <code>destinationFile</code> against the remote <code>source</code>
-     * @param proxyHost       Proxy Host (if proxy is required), or null
-     * @param proxyPort       Proxy Port (if proxy is required), or null
-     * @param proxyUserName   Proxy Username (if authentification is required),
-     *                        or null.
-     * @param proxyPassword   Proxy Password (if authentification is required),
-     *                        or null.
-     * @param useChecksum     Flag to indicate the use of the checksum for the retrieved
-     *                        artifact if it is available.
+     * @param ignoreErrors whether to ignore errors during I/O or throw an
+     * exception when they happen
+     * @param useTimestamp whether to check the modified timestamp on the
+     * <code>destinationFile</code> against the remote <code>source</code>
+     * @param proxyHost Proxy Host (if proxy is required), or null
+     * @param proxyPort Proxy Port (if proxy is required), or null
+     * @param proxyUserName Proxy Username (if authentification is required),
+     * or null.
+     * @param proxyPassword Proxy Password (if authentification is required),
+     * or null.
+     * @param useChecksum Flag to indicate the use of the checksum for the retrieved
+     * artifact if it is available.
      * @throws IOException If an I/O exception occurs.
      */
     public static void getFile( String url, File destinationFile, boolean ignoreErrors, boolean useTimestamp,
@@ -125,18 +122,18 @@ public class HttpUtils
      * Retrieve a remote file.  Throws an Exception on errors unless the
      * ifnoreErrors flag is set to True
      *
-     * @param url             the of the file to retrieve
+     * @param url the of the file to retrieve
      * @param destinationFile where to store it
-     * @param ignoreErrors    whether to ignore errors during I/O or throw an
-     *                        exception when they happen
-     * @param useTimestamp    whether to check the modified timestamp on the
-     *                        <code>destinationFile</code> against the remote <code>source</code>
-     * @param proxyHost       Proxy Host (if proxy is required), or null
-     * @param proxyPort       Proxy Port (if proxy is required), or null
-     * @param proxyUserName   Proxy Username (if authentification is required),
-     *                        or null
-     * @param proxyPassword   Proxy Password (if authentification is required),
-     *                        or null
+     * @param ignoreErrors whether to ignore errors during I/O or throw an
+     * exception when they happen
+     * @param useTimestamp whether to check the modified timestamp on the
+     * <code>destinationFile</code> against the remote <code>source</code>
+     * @param proxyHost Proxy Host (if proxy is required), or null
+     * @param proxyPort Proxy Port (if proxy is required), or null
+     * @param proxyUserName Proxy Username (if authentification is required),
+     * or null
+     * @param proxyPassword Proxy Password (if authentification is required),
+     * or null
      * @throws IOException If an I/O exception occurs.
      */
     public static void getFile( String url, File destinationFile, boolean ignoreErrors, boolean useTimestamp,
@@ -166,17 +163,17 @@ public class HttpUtils
     /**
      * Retrieve a remote file.
      *
-     * @param url             the URL of the file to retrieve
+     * @param url the URL of the file to retrieve
      * @param destinationFile where to store it
-     * @param timestamp       if provided, the remote URL is only retrieved if it was
-     *                        modified more recently than timestamp. Otherwise, negative value indicates that
-     *                        the remote URL should be retrieved unconditionally.
-     * @param proxyHost       Proxy Host (if proxy is required), or null
-     * @param proxyPort       Proxy Port (if proxy is required), or null
-     * @param proxyUserName   Proxy Username (if authentification is required),
-     *                        or null
-     * @param proxyPassword   Proxy Password (if authentification is required),
-     *                        or null
+     * @param timestamp if provided, the remote URL is only retrieved if it was
+     * modified more recently than timestamp. Otherwise, negative value indicates that
+     * the remote URL should be retrieved unconditionally.
+     * @param proxyHost Proxy Host (if proxy is required), or null
+     * @param proxyPort Proxy Port (if proxy is required), or null
+     * @param proxyUserName Proxy Username (if authentification is required),
+     * or null
+     * @param proxyPassword Proxy Password (if authentification is required),
+     * or null
      * @throws IOException If an I/O exception occurs.
      */
     public static void getFile( String url, File destinationFile, long timestamp, String proxyHost, String proxyPort,
@@ -223,8 +220,7 @@ public class HttpUtils
             if ( httpConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND )
             {
                 throw new FileNotFoundException( url.toString() + " (HTTP Error: " + httpConnection.getResponseCode() +
-                                                 " " +
-                                                 httpConnection.getResponseMessage() + ")" );
+                    " " + httpConnection.getResponseMessage() + ")" );
             }
             if ( httpConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED )
             {
@@ -338,12 +334,12 @@ public class HttpUtils
     /**
      * set the timestamp of a named file to a specified time.
      *
-     * @param file       the file to touch
+     * @param file the file to touch
      * @param timemillis in milliseconds since the start of the era
      * @return true if it succeeded. False means that this is a java1.1 system
      *         and that file times can not be set
      * @throws RuntimeException Thrown in unrecoverable error. Likely this
-     *                          comes from file access failures.
+     * comes from file access failures.
      */
     private static boolean touchFile( File file, long timemillis )
     {

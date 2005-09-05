@@ -236,7 +236,7 @@ public class FileUtils
      * Writes data to a file. The file will be created if it does not exist.
      *
      * @param fileName The name of the file to write.
-     * @param data     The content to write to the file.
+     * @param data The content to write to the file.
      */
     public static void fileWrite( String fileName, String data )
         throws IOException
@@ -261,7 +261,7 @@ public class FileUtils
      * Waits for NFS to propagate a file creation, imposing a timeout.
      *
      * @param fileName The name of the file.
-     * @param seconds  The maximum time in seconds to wait.
+     * @param seconds The maximum time in seconds to wait.
      * @return True if file exists.
      */
     public static boolean waitFor( String fileName, int seconds )
@@ -308,9 +308,6 @@ public class FileUtils
     /**
      * Given a directory and an array of extensions return an array of compliant files.
      * <p/>
-     * TODO Should an ignore list be passed in?
-     * TODO Should a recurse flag be passed in?
-     * <p/>
      * The given extensions should be like "java" and not like ".java"
      */
     public static String[] getFilesFromExtension( String directory, String[] extensions )
@@ -340,7 +337,6 @@ public class FileUtils
                 {
                     continue;
                 }
-
 
                 //ok... transverse into this directory and get all the files... then combine
                 //them with the current list.
@@ -650,12 +646,12 @@ public class FileUtils
      * (and any parent directories) will be created. If a file <code>source</code> in
      * <code>destinationDirectory</code> exists, it will be overwritten.
      *
-     * @param source               An existing <code>File</code> to copy.
+     * @param source An existing <code>File</code> to copy.
      * @param destinationDirectory A directory to copy <code>source</code> into.
      * @throws java.io.FileNotFoundException if <code>source</code> isn't a normal file.
-     * @throws IllegalArgumentException      if <code>destinationDirectory</code> isn't a directory.
-     * @throws IOException                   if <code>source</code> does not exist, the file in
-     *                                       <code>destinationDirectory</code> cannot be written to, or an IO error occurs during copying.
+     * @throws IllegalArgumentException if <code>destinationDirectory</code> isn't a directory.
+     * @throws IOException if <code>source</code> does not exist, the file in
+     * <code>destinationDirectory</code> cannot be written to, or an IO error occurs during copying.
      */
     public static void copyFileToDirectory( final String source, final String destinationDirectory )
         throws IOException
@@ -668,12 +664,12 @@ public class FileUtils
      * (and any parent directories) will be created. If a file <code>source</code> in
      * <code>destinationDirectory</code> exists, it will be overwritten.
      *
-     * @param source               An existing <code>File</code> to copy.
+     * @param source An existing <code>File</code> to copy.
      * @param destinationDirectory A directory to copy <code>source</code> into.
      * @throws java.io.FileNotFoundException if <code>source</code> isn't a normal file.
-     * @throws IllegalArgumentException      if <code>destinationDirectory</code> isn't a directory.
-     * @throws IOException                   if <code>source</code> does not exist, the file in
-     *                                       <code>destinationDirectory</code> cannot be written to, or an IO error occurs during copying.
+     * @throws IllegalArgumentException if <code>destinationDirectory</code> isn't a directory.
+     * @throws IOException if <code>source</code> does not exist, the file in
+     * <code>destinationDirectory</code> cannot be written to, or an IO error occurs during copying.
      */
     public static void copyFileToDirectory( final File source, final File destinationDirectory )
         throws IOException
@@ -691,13 +687,13 @@ public class FileUtils
      * created if they don't already exist. <code>destination</code> will be overwritten if it
      * already exists.
      *
-     * @param source      An existing non-directory <code>File</code> to copy bytes from.
+     * @param source An existing non-directory <code>File</code> to copy bytes from.
      * @param destination A non-directory <code>File</code> to write bytes to (possibly
-     *                    overwriting).
-     * @throws IOException                   if <code>source</code> does not exist, <code>destination</code> cannot be
-     *                                       written to, or an IO error occurs during copying.
+     * overwriting).
+     * @throws IOException if <code>source</code> does not exist, <code>destination</code> cannot be
+     * written to, or an IO error occurs during copying.
      * @throws java.io.FileNotFoundException if <code>destination</code> is a directory
-     *                                       (use {@link #copyFileToDirectory}).
+     * (use {@link #copyFileToDirectory}).
      */
     public static void copyFile( final File source, final File destination )
         throws IOException
@@ -741,15 +737,15 @@ public class FileUtils
      * The directories up to <code>destination</code> will be created if they don't already exist.
      * <code>destination</code> will be overwritten if it already exists.
      *
-     * @param source      A <code>URL</code> to copy bytes from.
+     * @param source A <code>URL</code> to copy bytes from.
      * @param destination A non-directory <code>File</code> to write bytes to (possibly
-     *                    overwriting).
+     * overwriting).
      * @throws IOException if
-     *                     <ul>
-     *                     <li><code>source</code> URL cannot be opened</li>
-     *                     <li><code>destination</code> cannot be written to</li>
-     *                     <li>an IO error occurs during copying</li>
-     *                     </ul>
+     * <ul>
+     * <li><code>source</code> URL cannot be opened</li>
+     * <li><code>destination</code> cannot be written to</li>
+     * <li>an IO error occurs during copying</li>
+     * </ul>
      */
     public static void copyURLToFile( final URL source, final File destination )
         throws IOException
@@ -884,7 +880,7 @@ public class FileUtils
      * <code>baseFile</code>, otherwise it is treated as a normal root-relative path.
      *
      * @param baseFile Where to resolve <code>filename</code> from, if <code>filename</code> is
-     *                 relative.
+     * relative.
      * @param filename Absolute or relative file path to resolve.
      * @return The canonical <code>File</code> of <code>filename</code>.
      */
@@ -916,8 +912,6 @@ public class FileUtils
 
             return file;
         }
-        // FIXME: I'm almost certain this // removal is unnecessary, as getAbsoluteFile() strips
-        // them. However, I'm not sure about this UNC stuff. (JT)
         final char[] chars = filename.toCharArray();
         final StringBuffer sb = new StringBuffer();
 
@@ -1374,10 +1368,10 @@ public class FileUtils
      * well.</p>
      *
      * @param from the file to move
-     * @param to   the new file name
+     * @param to the new file name
      * @throws IOException if anything bad happens during this
-     *                     process.  Note that <code>to</code> may have been deleted
-     *                     already when this happens.
+     * process.  Note that <code>to</code> may have been deleted
+     * already when this happens.
      */
     public static void rename( File from, File to )
         throws IOException
@@ -1418,10 +1412,10 @@ public class FileUtils
      * when the parentDir attribute is
      * null.</p>
      *
-     * @param prefix    prefix before the random number
-     * @param suffix    file extension; include the '.'
+     * @param prefix prefix before the random number
+     * @param suffix file extension; include the '.'
      * @param parentDir Directory to create the temporary file in -
-     *                  java.io.tmpdir used if not specificed
+     * java.io.tmpdir used if not specificed
      * @return a File reference to the new temporary file.
      */
     public static File createTempFile( String prefix, String suffix, File parentDir )

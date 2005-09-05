@@ -316,11 +316,11 @@ public class MBoot
         reader.parse( new File( basedir, "maven-plugins/maven-surefire-plugin/pom.xml" ) );
         List surefireDependencies = new ArrayList();
 
-        // TODO: while we have maven-artifact in there, it needs to be filtered...
+        // while we have maven-artifact in there, it needs to be filtered...
         for ( Iterator i = reader.getDependencies().iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
-            if ( d.getGroupId().equals( "surefire" ) || d.getGroupId().equals( "junit" ) )
+            if ( "surefire".equals( d.getGroupId() ) || "junit".equals( d.getGroupId() ) )
             {
                 surefireDependencies.add( d );
             }
@@ -817,6 +817,7 @@ public class MBoot
 
         if ( version.indexOf( "SNAPSHOT" ) >= 0 )
         {
+            // TODO: replace
             File metadata = localRepository.getMetadataFile( groupId, artifactId, version, type,
                                                              finalName + ".version.txt" );
 
@@ -827,6 +828,7 @@ public class MBoot
 
         FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + finalName + ".jar" ), file );
 
+        // TODO: replace
         file = localRepository.getMetadataFile( groupId, artifactId, null, type, artifactId + "-RELEASE.version.txt" );
         IOUtil.copy( new StringReader( version ), new FileWriter( file ) );
     }

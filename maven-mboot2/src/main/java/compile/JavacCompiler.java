@@ -60,9 +60,8 @@ public class JavacCompiler
             return Collections.EMPTY_LIST;
         }
 
-        // TODO: use getLogger() - but for some reason it is null when this is used
         System.out.println( "Compiling " + sources.length + " source file" + ( sources.length == 1 ? "" : "s" ) +
-                            " to " + destinationDir.getAbsolutePath() );
+            " to " + destinationDir.getAbsolutePath() );
 
         Map compilerOptions = config.getCompilerOptions();
 
