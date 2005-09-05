@@ -1,1 +1,1 @@
-compile
+core-it:touch

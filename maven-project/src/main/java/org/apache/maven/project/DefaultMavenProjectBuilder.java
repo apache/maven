@@ -580,7 +580,19 @@ public class DefaultMavenProjectBuilder
         //  [BP] - Can this above comment be explained?
         // We don't need all the project methods that are added over those in the model, but we do need basedir
         Map context = new HashMap( System.getProperties() );
-        context.put( "basedir", project.getBasedir() );
+
+        // FIXME: why is project.file not filled in here? MavenProject.getBasedir() defaults
+        // to the current directory which causes all sorts of problems; might be better off
+        // setting that to null and just filling in the project file name and removing this.
+
+        if ( pomLocation != null && new File( pomLocation ).getParent() != null )
+        {
+        	context.put( "basedir", new File( pomLocation ).getParent() );
+        }
+        else
+        {
+        	context.put( "basedir", project.getBasedir() );
+        }
 
         model = modelInterpolator.interpolate( model, context );
 
