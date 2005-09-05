@@ -48,13 +48,14 @@ public class DefaultArtifactTransformationManager
         }
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+                                        ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
         {
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
-            transform.transformForDeployment( artifact, remoteRepository );
+            transform.transformForDeployment( artifact, remoteRepository, localRepository );
         }
     }
 

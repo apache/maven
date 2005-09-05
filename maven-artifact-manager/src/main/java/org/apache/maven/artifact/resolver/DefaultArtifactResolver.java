@@ -131,15 +131,6 @@ public class DefaultArtifactResolver
                                 "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
                                 artifact, remoteRepositories );
                         }
-
-/* TODO: pretty sure this can be removed. No metadata on resolved artifacts
-                        // must be after the artifact is downloaded
-                        for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
-                        {
-                            ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-                            metadata.storeInLocalRepository( localRepository );
-                        }
-*/
                     }
                     catch ( ResourceDoesNotExistException e )
                     {

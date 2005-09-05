@@ -66,7 +66,19 @@ public class DefaultArtifactRepository
 
         this.layout = layout;
 
+        if ( snapshots == null )
+        {
+            snapshots = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                                      ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+        }
+
         this.snapshots = snapshots;
+
+        if ( releases == null )
+        {
+            releases = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                                     ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+        }
 
         this.releases = releases;
     }

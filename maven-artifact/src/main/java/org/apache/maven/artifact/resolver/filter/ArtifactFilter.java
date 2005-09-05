@@ -24,7 +24,5 @@ import org.apache.maven.artifact.Artifact;
  */
 public interface ArtifactFilter
 {
-    //TODO(JVZ): change the signature of this to filter(Artifact) where the meaning of filter is
-    // to exclude. I did this backward and it's confusing.
     boolean include( Artifact artifact );
 }

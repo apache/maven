@@ -56,7 +56,7 @@ public class DefaultArtifactDeployer
     {
         try
         {
-            transformationManager.transformForDeployment( artifact, deploymentRepository );
+            transformationManager.transformForDeployment( artifact, deploymentRepository, localRepository );
 
             // Copy the original file to the new one if it was transformed
             File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );

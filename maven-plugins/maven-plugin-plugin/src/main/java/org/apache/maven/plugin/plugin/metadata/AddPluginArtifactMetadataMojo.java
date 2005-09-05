@@ -1,8 +1,9 @@
 package org.apache.maven.plugin.plugin.metadata;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.LatestArtifactMetadata;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -39,10 +40,10 @@ public class AddPluginArtifactMetadataMojo
     {
         Artifact projectArtifact = project.getArtifact();
 
-        LatestArtifactMetadata metadata = new LatestArtifactMetadata( projectArtifact );
-
-        metadata.setVersion( projectArtifact.getVersion() );
-
+        // TODO: clean up
+        Versioning versioning = new Versioning();
+        versioning.setLatest( projectArtifact.getVersion() );
+        ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( projectArtifact, versioning );
         projectArtifact.addMetadata( metadata );
 
         GroupRepositoryMetadata groupMetadata = new GroupRepositoryMetadata( project.getGroupId() );

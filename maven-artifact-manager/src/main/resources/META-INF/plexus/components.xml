@@ -23,6 +23,9 @@
         <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
       </requirements>
     </component>
 
@@ -34,6 +37,9 @@
         <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
       </requirements>
     </component>
 
@@ -44,6 +50,9 @@
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
         </requirement>
       </requirements>
     </component>

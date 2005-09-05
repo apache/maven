@@ -17,12 +17,15 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Snapshot;
+import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -53,36 +56,35 @@ public class SnapshotTransformation
     {
         if ( artifact.isSnapshot() )
         {
-            SnapshotArtifactMetadata metadata = new SnapshotArtifactMetadata( artifact );
+            // TODO: Better way to create this - should have to construct Versioning
+            Versioning versioning = new Versioning();
+            Snapshot snapshot = new Snapshot();
+            versioning.setSnapshot( snapshot );
 
+            ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
+
+            // TODO: should merge with other repository metadata sitting on the same level?
             artifact.addMetadata( metadata );
         }
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+                                        ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
         if ( artifact.isSnapshot() )
         {
-            SnapshotArtifactMetadata metadata;
+            Snapshot snapshot = resolveLatestSnapshotVersion( artifact, localRepository, remoteRepository );
+            snapshot.setTimestamp( getDeploymentTimestamp() );
+            snapshot.setBuildNumber( snapshot.getBuildNumber() + 1 );
 
-            try
-            {
-                metadata = (SnapshotArtifactMetadata) retrieveFromRemoteRepository( artifact, remoteRepository, null,
-                                                                                    ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
-            }
-            catch ( ResourceDoesNotExistException e )
-            {
-                getLogger().debug( "Snapshot version metadata for: " + artifact.getId() +
-                    " not found. Creating a new metadata instance.", e );
+            // TODO: Better way to create this - should have to construct Versioning
+            Versioning versioning = new Versioning();
+            versioning.setSnapshot( snapshot );
 
-                // ignore. We'll be creating this metadata if it doesn't exist...
-                metadata = (SnapshotArtifactMetadata) createMetadata( artifact );
-            }
+            ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
 
-            metadata.setVersion( getDeploymentTimestamp(), metadata.getBuildNumber() + 1 );
-
-            artifact.setResolvedVersion( metadata.constructVersion() );
+            artifact.setResolvedVersion( constructVersion( metadata ) );
 
             artifact.addMetadata( metadata );
         }
@@ -97,9 +99,30 @@ public class SnapshotTransformation
         return deploymentTimestamp;
     }
 
-    protected AbstractVersionArtifactMetadata createMetadata( Artifact artifact )
+    protected LegacyArtifactMetadata createLegacyMetadata( Artifact artifact )
     {
         return new SnapshotArtifactMetadata( artifact );
     }
 
+    protected String constructVersion( ArtifactRepositoryMetadata metadata )
+    {
+        String version = metadata.getBaseVersion();
+        Snapshot snapshot = metadata.getSnapshot();
+        if ( snapshot != null )
+        {
+            if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
+            {
+                String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
+                if ( version != null )
+                {
+                    version = StringUtils.replace( version, "SNAPSHOT", newVersion );
+                }
+                else
+                {
+                    version = newVersion;
+                }
+            }
+        }
+        return version;
+    }
 }

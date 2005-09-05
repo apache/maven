@@ -1,5 +1,13 @@
 package org.apache.maven.artifact.metadata;
 
+import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -16,36 +24,27 @@ package org.apache.maven.artifact.metadata;
  * limitations under the License.
  */
 
-import java.io.File;
-import java.util.Date;
-
 /**
- * Contains metadata about a versioned artifact.
+ * Methods used by the old artifact metadata. To be removed in beta-2.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public interface VersionArtifactMetadata
+public interface LegacyArtifactMetadata
     extends ArtifactMetadata, Comparable
 {
-    /**
-     * Determine if the metadata is considered newer than a given file.
-     *
-     * @return whether it is newer
-     */
+    void readFromFile( File file )
+        throws IOException;
+
+    void retrieveFromRemoteRepository( ArtifactRepository repository, WagonManager wagonManager, String checksumPolicy )
+        throws ArtifactMetadataRetrievalException, ResourceDoesNotExistException;
+
+    void storeInLocalRepository( ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException;
+
     boolean newerThanFile( File file );
 
-    /**
-     * Get the resolved version from the metadata.
-     *
-     * @return the resolved version
-     */
     String constructVersion();
 
-    /**
-     * Determine when the metadata was last modified.
-     *
-     * @return the date the metadata was last modified.
-     */
     Date getLastModified();
 }

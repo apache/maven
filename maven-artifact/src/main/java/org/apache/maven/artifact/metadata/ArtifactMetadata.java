@@ -56,9 +56,6 @@ public interface ArtifactMetadata
 
     Object getKey();
 
-    /**
-     * @todo delete?
-     */
     boolean isSnapshot();
 
     /**

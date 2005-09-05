@@ -17,7 +17,6 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Common elements of artifact metadata.
@@ -29,8 +28,6 @@ public abstract class AbstractArtifactMetadata
     implements ArtifactMetadata
 {
     protected Artifact artifact;
-
-    protected ArtifactRepository repository;
 
     protected AbstractArtifactMetadata( Artifact artifact )
     {
@@ -62,8 +59,4 @@ public abstract class AbstractArtifactMetadata
         return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
-    public void setRepository( ArtifactRepository repository )
-    {
-        this.repository = repository;
-    }
 }

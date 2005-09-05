@@ -19,7 +19,8 @@ package org.apache.maven.plugin.install;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
@@ -29,6 +30,7 @@ import java.util.List;
 
 /**
  * Installs project's main artifact in local repository.
+ *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
  * @goal install
@@ -68,7 +70,7 @@ public class InstallMojo
      * @parameter expression="${updateReleaseInfo}"
      */
     private boolean updateReleaseInfo = false;
-    
+
     /**
      * @parameter expression="${project.artifact}"
      * @required
@@ -87,7 +89,7 @@ public class InstallMojo
         throws MojoExecutionException
     {
         boolean isPomArtifact = "pom".equals( packaging );
-        
+
         File pom = new File( basedir, "pom.xml" );
         if ( !isPomArtifact )
         {
@@ -97,11 +99,13 @@ public class InstallMojo
 
         if ( updateReleaseInfo )
         {
-            ReleaseArtifactMetadata metadata = new ReleaseArtifactMetadata( artifact );
-            metadata.setVersion( artifact.getVersion() );
+            // TODO: clean up
+            Versioning versioning = new Versioning();
+            versioning.setRelease( artifact.getVersion() );
+            ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
             artifact.addMetadata( metadata );
         }
-        
+
         try
         {
             if ( isPomArtifact )

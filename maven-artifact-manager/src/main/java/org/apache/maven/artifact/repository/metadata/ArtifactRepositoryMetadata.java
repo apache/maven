@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.repository.metadata;
 
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2001-2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ package org.apache.maven.artifact.repository.metadata;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
@@ -29,36 +30,40 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
- * Metadata for the group directory of the repository.
+ * Metadata for the artifact directory of the repository.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
+ * @todo split instantiation (versioning, plugin mappings) from definition
  */
-public class GroupRepositoryMetadata
+public class ArtifactRepositoryMetadata
     extends AbstractRepositoryMetadata
 {
-    private final String groupId;
+    private Versioning versioning;
 
-    private Map pluginMappings = new HashMap();
+    private Artifact artifact;
 
-    public GroupRepositoryMetadata( String groupId )
+    public ArtifactRepositoryMetadata( Artifact artifact )
     {
-        this.groupId = groupId;
+        this.artifact = artifact;
+    }
+
+    public ArtifactRepositoryMetadata( Artifact artifact, Versioning versioning )
+    {
+        this.versioning = versioning;
+        this.artifact = artifact;
     }
 
     public String toString()
     {
-        return "repository metadata for group: \'" + groupId + "\'";
+        return "repository metadata for artifact: \'" + artifact + "\'";
     }
 
     public boolean storedInGroupDirectory()
     {
-        return true;
+        return false;
     }
 
     public boolean storedInArtifactVersionDirectory()
@@ -68,22 +73,17 @@ public class GroupRepositoryMetadata
 
     public String getGroupId()
     {
-        return groupId;
+        return artifact.getGroupId();
     }
 
     public String getArtifactId()
     {
-        return null;
+        return artifact.getArtifactId();
     }
 
     public String getBaseVersion()
     {
-        return null;
-    }
-
-    public void addPluginMapping( String goalPrefix, String artifactId )
-    {
-        pluginMappings.put( goalPrefix, artifactId );
+        return artifact.getBaseVersion();
     }
 
     protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
@@ -91,7 +91,7 @@ public class GroupRepositoryMetadata
     {
         MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
-        Metadata pluginMap = null;
+        Metadata metadata = null;
 
         File metadataFile = new File( localRepository.getBasedir(),
                                       localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
@@ -104,7 +104,7 @@ public class GroupRepositoryMetadata
             {
                 reader = new FileReader( metadataFile );
 
-                pluginMap = mappingReader.read( reader );
+                metadata = mappingReader.read( reader );
             }
             catch ( FileNotFoundException e )
             {
@@ -127,43 +127,45 @@ public class GroupRepositoryMetadata
         boolean changed = false;
 
         // If file could not be found or was not valid, start from scratch
-        if ( pluginMap == null )
+        if ( metadata == null )
         {
-            pluginMap = new Metadata();
+            metadata = new Metadata();
 
-            pluginMap.setGroupId( groupId );
-
+            metadata.setGroupId( artifact.getGroupId() );
+            metadata.setArtifactId( artifact.getArtifactId() );
             changed = true;
         }
 
-        for ( Iterator i = pluginMappings.keySet().iterator(); i.hasNext(); )
+        if ( versioning != null )
         {
-            String prefix = (String) i.next();
-            boolean found = false;
-
-            for ( Iterator it = pluginMap.getPlugins().iterator(); it.hasNext() && !found; )
+            Versioning v = metadata.getVersioning();
+            if ( v != null )
             {
-                Plugin preExisting = (Plugin) it.next();
-
-                if ( preExisting.getPrefix().equals( prefix ) )
+                // TODO: merge versioning (reuse code from transformation)
+                Snapshot s = v.getSnapshot();
+                Snapshot snapshot = versioning.getSnapshot();
+                if ( snapshot != null )
                 {
-                    // TODO: log
-//                    getLog().info( "Plugin-mapping metadata for prefix: " + prefix + " already exists. Skipping." );
-
-                    found = true;
+                    if ( s == null )
+                    {
+                        v.setSnapshot( snapshot );
+                        changed = true;
+                    }
+                    else if ( s.getTimestamp() != null && !s.getTimestamp().equals( snapshot.getTimestamp() ) )
+                    {
+                        s.setTimestamp( snapshot.getTimestamp() );
+                        changed = true;
+                    }
+                    else if ( s.getBuildNumber() != snapshot.getBuildNumber() )
+                    {
+                        s.setBuildNumber( snapshot.getBuildNumber() );
+                        changed = true;
+                    }
                 }
             }
-
-            if ( !found )
+            else
             {
-                Plugin mappedPlugin = new Plugin();
-
-                mappedPlugin.setArtifactId( (String) pluginMappings.get( prefix ) );
-
-                mappedPlugin.setPrefix( prefix );
-
-                pluginMap.addPlugin( mappedPlugin );
-
+                metadata.setVersioning( versioning );
                 changed = true;
             }
         }
@@ -173,11 +175,12 @@ public class GroupRepositoryMetadata
             Writer writer = null;
             try
             {
+                metadataFile.getParentFile().mkdirs();
                 writer = new FileWriter( metadataFile );
 
                 MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
 
-                mappingWriter.write( writer, pluginMap );
+                mappingWriter.write( writer, metadata );
             }
             finally
             {
@@ -192,11 +195,26 @@ public class GroupRepositoryMetadata
 
     public Object getKey()
     {
-        return groupId;
+        return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
     public boolean isSnapshot()
     {
-        return false;
+        return artifact.isSnapshot();
+    }
+
+    public Snapshot getSnapshot()
+    {
+        return versioning != null ? versioning.getSnapshot() : null;
+    }
+
+    public String getLatestVersion()
+    {
+        return versioning.getLatest();
+    }
+
+    public String getReleaseVersion()
+    {
+        return versioning.getRelease();
     }
 }

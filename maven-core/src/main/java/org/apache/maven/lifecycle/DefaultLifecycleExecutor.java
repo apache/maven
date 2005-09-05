@@ -600,7 +600,6 @@ public class DefaultLifecycleExecutor
                     String goal = tok.nextToken().trim();
 
                     // Not from the CLI, don't use prefix
-                    // TODO: [MNG-608] this needs to be false
                     MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, project, selectedPhase, false );
 
                     if ( mojoDescriptor.isDirectInvocationOnly() )

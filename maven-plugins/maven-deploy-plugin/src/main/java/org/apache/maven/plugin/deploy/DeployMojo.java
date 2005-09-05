@@ -20,8 +20,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
@@ -130,8 +131,10 @@ public class DeployMojo
 
         if ( updateReleaseInfo )
         {
-            ReleaseArtifactMetadata metadata = new ReleaseArtifactMetadata( artifact );
-            metadata.setVersion( artifact.getVersion() );
+            // TODO: clean up
+            Versioning versioning = new Versioning();
+            versioning.setRelease( artifact.getVersion() );
+            ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
             artifact.addMetadata( metadata );
         }
 

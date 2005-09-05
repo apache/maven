@@ -215,7 +215,8 @@ public class DefaultWagonManager
                 // This one we will eat when looking through remote repositories
                 // because we want to cycle through them all before squawking.
 
-                getLogger().warn( "Unable to get resource from repository " + repository.getId() + " (" + repository.getUrl() + ")" );
+                getLogger().warn(
+                    "Unable to get resource from repository " + repository.getId() + " (" + repository.getUrl() + ")" );
             }
         }
 
@@ -236,7 +237,7 @@ public class DefaultWagonManager
         {
             getLogger().debug( "Trying repository " + repository.getId() );
             getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy() );
-            getLogger().debug( "  Artifact resolved");
+            getLogger().debug( "  Artifact resolved" );
 
             artifact.setResolved( true );
         }
@@ -252,7 +253,6 @@ public class DefaultWagonManager
     {
         String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
 
-        getLogger().info( "Retrieving " + metadata );
         getRemoteFile( repository, destination, remotePath, null, checksumPolicy );
     }
 

@@ -17,10 +17,11 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class ReleaseArtifactTransformation
         if ( RELEASE_VERSION.equals( artifact.getVersion() ) )
         {
             String version = resolveVersion( artifact, localRepository, remoteRepositories );
-            
+
             if ( version != null && !version.equals( artifact.getVersion() ) )
             {
                 artifact.setBaseVersion( version );
@@ -56,15 +57,20 @@ public class ReleaseArtifactTransformation
         // metadata is added at install time
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+                                        ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
         // metadata is added at deploy time
     }
 
-    protected AbstractVersionArtifactMetadata createMetadata( Artifact artifact )
+    protected LegacyArtifactMetadata createLegacyMetadata( Artifact artifact )
     {
         return new ReleaseArtifactMetadata( artifact );
     }
 
+    protected String constructVersion( ArtifactRepositoryMetadata metadata )
+    {
+        return metadata.getReleaseVersion();
+    }
 }

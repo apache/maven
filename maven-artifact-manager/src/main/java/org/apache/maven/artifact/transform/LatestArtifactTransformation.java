@@ -17,10 +17,13 @@ package org.apache.maven.artifact.transform;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.AbstractVersionArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.LatestArtifactMetadata;
+import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 
 import java.util.List;
 
@@ -47,15 +50,27 @@ public class LatestArtifactTransformation
         // metadata is added at install time
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+                                        ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
         // metadata is added at deploy time
     }
 
-    protected AbstractVersionArtifactMetadata createMetadata( Artifact artifact )
+    protected LegacyArtifactMetadata createLegacyMetadata( Artifact artifact )
     {
         return new LatestArtifactMetadata( artifact );
     }
 
+    protected ArtifactMetadata createMetadata( Artifact artifact, Versioning versioning )
+    {
+        LatestArtifactMetadata metadata = new LatestArtifactMetadata( artifact );
+        metadata.setVersion( versioning.getLatest() );
+        return metadata;
+    }
+
+    protected String constructVersion( ArtifactRepositoryMetadata metadata )
+    {
+        return metadata.getLatestVersion();
+    }
 }

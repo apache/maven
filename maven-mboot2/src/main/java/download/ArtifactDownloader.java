@@ -136,6 +136,7 @@ public class ArtifactDownloader
                 String version = dep.getVersion();
                 if ( snapshot )
                 {
+                    // TODO: augment with maven-metadata
                     String filename = getSnapshotMetadataFile( destinationFile.getName(), "SNAPSHOT.version.txt" );
                     File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
                                                                  dep.getVersion(), dep.getType(), filename );
@@ -173,7 +174,7 @@ public class ArtifactDownloader
                     }
                     else
                     {
-                        log( "WARNING: local SNAPSHOT version not found, using default" );                        
+                        log( "WARNING: local SNAPSHOT version not found, using default" );
                     }
                 }
                 if ( !dep.getType().equals( "pom" ) )

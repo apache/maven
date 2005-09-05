@@ -247,7 +247,6 @@ public abstract class AbstractArtifactComponentTestCase
     {
         ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
 
-        // TODO: used to be SCOPE_COMPILE, check
         return artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
     }
 

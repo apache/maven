@@ -16,6 +16,7 @@ package org.apache.maven.plugin;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
@@ -96,7 +97,7 @@ public class DefaultPluginMappingManager
     private void loadPluginMappings( String groupId, List pluginRepositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        GroupRepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
+        ArtifactMetadata metadata = new GroupRepositoryMetadata( groupId );
 
         repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
 
@@ -110,7 +111,7 @@ public class DefaultPluginMappingManager
         loadRepositoryPluginMappings( metadata, localRepository, localRepository );
     }
 
-    private void loadRepositoryPluginMappings( GroupRepositoryMetadata metadata, ArtifactRepository remoteRepository,
+    private void loadRepositoryPluginMappings( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
                                                ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
@@ -121,24 +122,21 @@ public class DefaultPluginMappingManager
         {
             Metadata pluginMap = readMetadata( metadataFile );
 
-            if ( pluginMap != null )
+            for ( Iterator pluginIterator = pluginMap.getPlugins().iterator(); pluginIterator.hasNext(); )
             {
-                for ( Iterator pluginIterator = pluginMap.getPlugins().iterator(); pluginIterator.hasNext(); )
-                {
-                    Plugin mapping = (Plugin) pluginIterator.next();
+                Plugin mapping = (Plugin) pluginIterator.next();
 
-                    String prefix = mapping.getPrefix();
+                String prefix = mapping.getPrefix();
 
-                    String artifactId = mapping.getArtifactId();
+                String artifactId = mapping.getArtifactId();
 
-                    org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
+                org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
 
-                    plugin.setGroupId( metadata.getGroupId() );
+                plugin.setGroupId( metadata.getGroupId() );
 
-                    plugin.setArtifactId( artifactId );
+                plugin.setArtifactId( artifactId );
 
-                    pluginDefinitionsByPrefix.put( prefix, plugin );
-                }
+                pluginDefinitionsByPrefix.put( prefix, plugin );
             }
         }
     }

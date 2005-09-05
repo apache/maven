@@ -97,12 +97,6 @@ public class SnapshotArtifactMetadata
         }
     }
 
-    public void setVersion( String timestamp, int buildNumber )
-    {
-        this.timestamp = timestamp;
-        this.buildNumber = buildNumber;
-    }
-
     public String getTimestamp()
     {
         return timestamp;
@@ -123,9 +117,6 @@ public class SnapshotArtifactMetadata
     public int compareTo( Object o )
     {
         SnapshotArtifactMetadata metadata = (SnapshotArtifactMetadata) o;
-
-        // TODO: probably shouldn't test timestamp - except that it may be used do differentiate for a build number of 0
-        //  in the local repository. check, then remove from here and just compare the build numbers
 
         if ( buildNumber > metadata.buildNumber )
         {

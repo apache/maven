@@ -55,7 +55,6 @@ public class LatestArtifactMetadata
     {
         LatestArtifactMetadata metadata = (LatestArtifactMetadata) o;
 
-        // TODO: we need some more complicated version comparison
         if ( version == null )
         {
             if ( metadata.version == null )

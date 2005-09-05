@@ -30,7 +30,6 @@ import java.io.File;
  */
 public class ReleaseArtifactMetadata
     extends AbstractVersionArtifactMetadata
-    implements Comparable
 {
     private String version;
 
@@ -63,7 +62,6 @@ public class ReleaseArtifactMetadata
     {
         ReleaseArtifactMetadata metadata = (ReleaseArtifactMetadata) o;
 
-        // TODO: we need some more complicated version comparison
         if ( version == null )
         {
             if ( metadata.version == null )

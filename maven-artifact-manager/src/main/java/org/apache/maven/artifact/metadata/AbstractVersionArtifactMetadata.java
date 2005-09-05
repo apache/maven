@@ -35,7 +35,7 @@ import java.util.Date;
  */
 public abstract class AbstractVersionArtifactMetadata
     extends AbstractArtifactMetadata
-    implements VersionArtifactMetadata
+    implements LegacyArtifactMetadata
 {
     protected static final String SNAPSHOT_VERSION_FILE = "version.txt";
 
@@ -46,13 +46,7 @@ public abstract class AbstractVersionArtifactMetadata
         super( artifact );
     }
 
-    protected File getLocalRepositoryLocation( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-    {
-        return new File( localRepository.getBasedir(),
-                         localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
-    }
-
-    private void readFromFile( File file )
+    public void readFromFile( File file )
         throws IOException
     {
         setContent( FileUtils.fileRead( file ) );
@@ -60,26 +54,6 @@ public abstract class AbstractVersionArtifactMetadata
     }
 
     protected abstract void setContent( String content );
-
-    public boolean exists()
-    {
-        return lastModified > 0;
-    }
-
-    public Date getLastModified()
-    {
-        return new Date( lastModified );
-    }
-
-    public void readFromLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws IOException
-    {
-        File f = getLocalRepositoryLocation( localRepository, remoteRepository );
-        if ( f.exists() )
-        {
-            readFromFile( f );
-        }
-    }
 
     public void retrieveFromRemoteRepository( ArtifactRepository remoteRepository, WagonManager wagonManager,
                                               String checksumPolicy )
@@ -105,7 +79,7 @@ public abstract class AbstractVersionArtifactMetadata
         }
     }
 
-    public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+    public void storeInLocalRepository( ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
         String version = constructVersion();
@@ -113,11 +87,10 @@ public abstract class AbstractVersionArtifactMetadata
         {
             try
             {
-                String path = getLocalRepositoryLocation( localRepository, remoteRepository ).getPath();
-                File file = new File( path );
-                // TODO: this should be centralised before the resolution of the artifact
+                File file = new File( localRepository.getBasedir(),
+                                      localRepository.pathOfLocalRepositoryMetadata( this, null ) );
                 file.getParentFile().mkdirs();
-                FileUtils.fileWrite( path, version );
+                FileUtils.fileWrite( file.getPath(), version );
                 lastModified = file.lastModified();
             }
             catch ( IOException e )
@@ -125,5 +98,16 @@ public abstract class AbstractVersionArtifactMetadata
                 throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
             }
         }
+    }
+
+    public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        throw new IllegalStateException( "This code should no longer be called" );
+    }
+
+    public Date getLastModified()
+    {
+        return new Date( lastModified );
     }
 }

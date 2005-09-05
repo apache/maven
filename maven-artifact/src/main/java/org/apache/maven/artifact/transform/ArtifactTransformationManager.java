@@ -56,8 +56,10 @@ public interface ArtifactTransformationManager
      *
      * @param artifact Artifact to be transformed.
      * @param remoteRepository the repository to deploy to
+     * @param localRepository the local repository the metadata is stored in
      */
-    void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository )
+    void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+                                 ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException;
 
 }

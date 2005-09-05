@@ -21,7 +21,7 @@ package org.apache.maven.artifact;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
- * @todo it may be better for this to move to maven-artifact, and artifact.getFile() to throw it - perhaps it is a runtime exception?
+ * @todo it may be better for artifact.getFile() to throw it - perhaps it is a runtime exception?
  */
 public class DependencyResolutionRequiredException
     extends Exception

@@ -26,4 +26,8 @@ public interface RepositoryMetadataManager
 {
     void resolve( ArtifactMetadata repositoryMetadata, List repositories, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException;
+
+    void resolveAlways( ArtifactMetadata metadata, ArtifactRepository localRepository,
+                        ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException;
 }

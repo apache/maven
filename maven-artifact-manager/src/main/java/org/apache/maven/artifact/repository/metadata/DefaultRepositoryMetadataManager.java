@@ -57,7 +57,7 @@ public class DefaultRepositoryMetadataManager
                 ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots()
                     : repository.getReleases();
 
-                if ( policy == null || !policy.isEnabled() )
+                if ( !policy.isEnabled() )
                 {
                     getLogger().debug( "Skipping disabled repository " + repository.getId() );
                 }
@@ -66,42 +66,62 @@ public class DefaultRepositoryMetadataManager
                     File file = new File( localRepository.getBasedir(),
                                           localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
-                    // TODO: should be able to calculate this less often
                     boolean checkForUpdates = policy.checkOutOfDate( new Date( file.lastModified() ) );
 
                     if ( checkForUpdates )
                     {
-
                         getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
 
-                        try
-                        {
-                            wagonManager.getArtifactMetadata( metadata, repository, file, policy.getChecksumPolicy() );
+                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy() );
+                    }
 
-                            // TODO: ???
-//                            metadata.setRepository( repository );
-
-                            // touch file so that this is not checked again until interval has passed
-                            if ( file.exists() )
-                            {
-                                file.setLastModified( System.currentTimeMillis() );
-                            }
-                        }
-                        catch ( ResourceDoesNotExistException e )
-                        {
-                            getLogger().info( "Repository metadata " + metadata +
-                                " could not be found on repository: " + repository.getId() );
-                            getLogger().debug( "Cause", e );
-                        }
-                        catch ( TransferFailedException e )
-                        {
-                            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
-                        }
+                    // touch file so that this is not checked again until interval has passed
+                    if ( file.exists() )
+                    {
+                        file.setLastModified( System.currentTimeMillis() );
+                    }
+                    else
+                    {
+                        metadata.storeInLocalRepository( localRepository, repository );
                     }
                 }
             }
 
             cachedMetadata.add( metadata.getKey() );
+        }
+    }
+
+    public void resolveAlways( ArtifactMetadata metadata, ArtifactRepository localRepository,
+                               ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        File file = new File( localRepository.getBasedir(),
+                              localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
+
+        resolveAlways( metadata, localRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+    }
+
+    private void resolveAlways( ArtifactMetadata metadata, ArtifactRepository repository, File file,
+                                String checksumPolicy )
+        throws ArtifactMetadataRetrievalException
+    {
+        try
+        {
+            wagonManager.getArtifactMetadata( metadata, repository, file, checksumPolicy );
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            getLogger().debug( metadata + " could not be found on repository: " + repository.getId() );
+
+            // delete the local copy so the old details aren't used.
+            if ( file.exists() )
+            {
+                file.delete();
+            }
+        }
+        catch ( TransferFailedException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
         }
     }
 
