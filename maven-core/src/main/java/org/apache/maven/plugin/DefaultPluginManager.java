@@ -169,7 +169,11 @@ public class DefaultPluginManager
             {
                 VersionRange versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
 
-                checkRequiredMavenVersion( plugin, localRepository, project.getPluginArtifactRepositories() );
+                List remoteRepositories = new ArrayList();
+                remoteRepositories.addAll( project.getPluginArtifactRepositories() );
+                remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
+
+                checkRequiredMavenVersion( plugin, localRepository, remoteRepositories );
 
                 Artifact pluginArtifact = artifactFactory.createPluginArtifact( plugin.getGroupId(),
                                                                                 plugin.getArtifactId(), versionRange );

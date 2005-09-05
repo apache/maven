@@ -1051,6 +1051,10 @@ public class MavenProject
         this.pluginArtifactRepositories = pluginArtifactRepositories;
     }
 
+    /**
+     * @return a list of ArtifactRepository objects constructed
+     *  from the Repository objects returned by getPluginRepositories.
+     */
     public List getPluginArtifactRepositories()
     {
         return pluginArtifactRepositories;

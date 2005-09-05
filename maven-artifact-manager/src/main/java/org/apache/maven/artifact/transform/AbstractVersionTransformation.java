@@ -99,6 +99,8 @@ public abstract class AbstractVersionTransformation
                                               List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
+        getLogger().debug( "resolveMetaData(" + artifact.getId()+ "): repositories: " + remoteRepositories);
+
         VersionArtifactMetadata localMetadata;
         try
         {
@@ -122,7 +124,8 @@ public abstract class AbstractVersionTransformation
 
                 if ( policy == null || !policy.isEnabled() )
                 {
-                    getLogger().debug( "Skipping disabled repository " + repository.getId() );
+                    getLogger().debug( "resolveMetaData: " + artifact.getId() + ": Skipping disabled repository " +
+                        repository.getId() + " (" + repository.getUrl() + ")" );
                 }
                 else
                 {
@@ -134,7 +137,8 @@ public abstract class AbstractVersionTransformation
                         checkedUpdates = true;
 
                         getLogger().info(
-                            artifact.getArtifactId() + ": checking for updates from " + repository.getId() );
+                            artifact.getId() + ": checking for updates from " + repository.getId() +
+                            " (" + repository.getUrl() + ")" );
 
                         VersionArtifactMetadata remoteMetadata;
 
@@ -145,8 +149,8 @@ public abstract class AbstractVersionTransformation
                         }
                         catch ( ResourceDoesNotExistException e )
                         {
-                            getLogger().debug( "Artifact version metadata for: " + artifact.getId() +
-                                " could not be found on repository: " + repository.getId(), e );
+                            getLogger().debug( "resolveMetaData: Artifact version metadata for: " +
+                                artifact.getId() + " could not be found on repository: " + repository.getId(), e );
 
                             continue;
                         }
@@ -159,6 +163,12 @@ public abstract class AbstractVersionTransformation
 
                             localMetadata = remoteMetadata;
                         }
+                    }
+                    else
+                    {
+                        getLogger().debug( "resolveMetaData: " + artifact.getId() +
+                            ": NOT checking for updates from " + repository.getId() +
+                            " (" + repository.getUrl() + ")" );
                     }
                 }
             }
