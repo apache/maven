@@ -68,8 +68,8 @@ public abstract class AbstractVersionTransformation
         throws ArtifactMetadataRetrievalException
     {
         // TODO: can we improve on this?
-        ArtifactMetadata metadata = null;
-        if ( !artifact.isSnapshot() )
+        ArtifactMetadata metadata;
+        if ( !artifact.isSnapshot() || Artifact.LATEST_VERSION.equals( artifact.getBaseVersion() ) )
         {
             metadata = new ArtifactRepositoryMetadata( artifact );
         }
