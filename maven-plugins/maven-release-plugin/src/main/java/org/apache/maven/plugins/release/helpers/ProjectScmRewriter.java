@@ -1,5 +1,21 @@
 package org.apache.maven.plugins.release.helpers;
 
+/*
+ * Copyright 2001-2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Scm;
@@ -21,8 +37,8 @@ public class ProjectScmRewriter
 
         if ( originalScmInformation.containsKey( projectId ) )
         {
-            throw new IllegalArgumentException( "Project: " + projectId
-                + " already has it's original SCM info cached. Each project should only be resolved once." );
+            throw new IllegalArgumentException( "Project: " + projectId +
+                " already has it's original SCM info cached. Each project should only be resolved once." );
         }
 
         Model model = project.getModel();
@@ -31,8 +47,8 @@ public class ProjectScmRewriter
 
         if ( scm == null )
         {
-            throw new MojoExecutionException( "Project: " + projectId
-                + " does not have a SCM section! Cannot proceed with release." );
+            throw new MojoExecutionException(
+                "Project: " + projectId + " does not have a SCM section! Cannot proceed with release." );
         }
 
         String tag = model.getScm().getTag();
@@ -60,8 +76,8 @@ public class ProjectScmRewriter
 
         if ( original == null )
         {
-            throw new IllegalArgumentException( "Project \'" + projectId
-                + "\' has not had its SCM info cached. Cannot restore uncached SCM info." );
+            throw new IllegalArgumentException(
+                "Project \'" + projectId + "\' has not had its SCM info cached. Cannot restore uncached SCM info." );
         }
 
         original.modify( project );

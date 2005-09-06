@@ -1,6 +1,7 @@
 package org.apache.maven.plugins.release.helpers;
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -38,8 +39,8 @@ public class ProjectVersionResolver
 
         if ( resolvedVersions.containsKey( projectId ) )
         {
-            throw new IllegalArgumentException( "Project: " + projectId
-                + " is already resolved. Each project should only be resolved once." );
+            throw new IllegalArgumentException(
+                "Project: " + projectId + " is already resolved. Each project should only be resolved once." );
         }
 
         //Rewrite project version
@@ -66,7 +67,9 @@ public class ProjectVersionResolver
             }
         }
 
-        project.setVersion( projectVersion );
+        Model model = project.getOriginalModel();
+
+        model.setVersion( projectVersion );
 
         resolvedVersions.put( projectId, projectVersion );
     }
@@ -87,8 +90,8 @@ public class ProjectVersionResolver
 
         if ( projectVersion == null )
         {
-            throw new IllegalArgumentException( "Project \'" + projectId
-                + "\' has not been resolved. Cannot increment an unresolved version." );
+            throw new IllegalArgumentException(
+                "Project \'" + projectId + "\' has not been resolved. Cannot increment an unresolved version." );
         }
 
         // TODO: we will need to incorporate versioning strategies here because it is unlikely
@@ -104,8 +107,8 @@ public class ProjectVersionResolver
         {
             nextVersionString = Integer.toString( Integer.parseInt( nextVersionString ) + 1 );
 
-            projectVersion = projectVersion.substring( 0, projectVersion.lastIndexOf( "-" ) + 1 ) + nextVersionString
-                + SNAPSHOT_CLASSIFIER;
+            projectVersion = projectVersion.substring( 0, projectVersion.lastIndexOf( "-" ) + 1 ) + nextVersionString +
+                SNAPSHOT_CLASSIFIER;
         }
         catch ( NumberFormatException e )
         {

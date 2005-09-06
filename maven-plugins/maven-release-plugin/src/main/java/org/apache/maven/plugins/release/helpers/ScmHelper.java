@@ -20,8 +20,6 @@ package org.apache.maven.plugins.release.helpers;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmResult;
-import org.apache.maven.scm.manager.ScmManager;
-import org.apache.maven.scm.provider.svn.repository.SvnScmProviderRepository;
 import org.apache.maven.scm.command.add.AddScmResult;
 import org.apache.maven.scm.command.checkin.CheckInScmResult;
 import org.apache.maven.scm.command.checkout.CheckOutScmResult;
@@ -29,6 +27,8 @@ import org.apache.maven.scm.command.remove.RemoveScmResult;
 import org.apache.maven.scm.command.status.StatusScmResult;
 import org.apache.maven.scm.command.tag.TagScmResult;
 import org.apache.maven.scm.command.update.UpdateScmResult;
+import org.apache.maven.scm.manager.ScmManager;
+import org.apache.maven.scm.provider.svn.repository.SvnScmProviderRepository;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -185,7 +185,7 @@ public class ScmHelper
     {
         ScmRepository repository = getScmRepository();
 
-        ScmFileSet fs = new ScmFileSet( new File( workingDirectory ), file, null );
+        ScmFileSet fs = new ScmFileSet( new File( workingDirectory ), new File( file ) );
 
         AddScmResult result = getScmManager().getProviderByRepository( repository ).add( repository, fs );
 
@@ -199,7 +199,8 @@ public class ScmHelper
 
         ScmFileSet fs = new ScmFileSet( new File( workingDirectory ), file, null );
 
-        RemoveScmResult result = getScmManager().getProviderByRepository( repository ).remove( repository, fs, message );
+        RemoveScmResult result = getScmManager().getProviderByRepository( repository ).remove( repository, fs,
+                                                                                               message );
 
         checkResult( result );
     }
