@@ -62,9 +62,6 @@ public class MavenMetadataSource
 
     private ArtifactFactory artifactFactory;
 
-    // lazily instantiated and cached.
-    private MavenProject superProject;
-
     /**
      * Retrieve the metadata for the project from the repository.
      * Uses the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
@@ -96,10 +93,8 @@ public class MavenMetadataSource
                 }
                 catch ( InvalidModelException e )
                 {
-                    getLogger()
-                        .warn(
-                               "POM for: \'" + pomArtifact.getId()
-                                   + "\' does not appear to be valid. Its will be ignored for artifact resolution." );
+                    getLogger().warn( "POM for: \'" + pomArtifact.getId() +
+                        "\' does not appear to be valid. Its will be ignored for artifact resolution." );
 
                     project = null;
                 }
@@ -133,8 +128,8 @@ public class MavenMetadataSource
                             artifact.setVersion( relocation.getVersion() );
                         }
 
-                        String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
-                            + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
+                        String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":" +
+                            artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
 
                         if ( relocation.getMessage() != null )
                         {
@@ -162,7 +157,7 @@ public class MavenMetadataSource
         try
         {
             ResolutionGroup result;
-            
+
             if ( project == null )
             {
                 // if the project is null, we encountered an invalid model (read: m1 POM)
@@ -174,69 +169,17 @@ public class MavenMetadataSource
                 // TODO: we could possibly use p.getDependencyArtifacts instead of this call, but they haven't been filtered
                 // or used the inherited scope (should that be passed to the buildFromRepository method above?)
                 Set artifacts = project.createArtifacts( artifactFactory, artifact.getScope(),
-                                                     artifact.getDependencyFilter() );
-                
-                List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
-                
-                result = new ResolutionGroup( pomArtifact, artifacts, repositories );
+                                                         artifact.getDependencyFilter() );
+
+                result = new ResolutionGroup( pomArtifact, artifacts, project.getRemoteArtifactRepositories() );
             }
-            
+
             return result;
         }
         catch ( InvalidVersionSpecificationException e )
         {
             throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
         }
-        catch ( ProjectBuildingException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file", e );
-        }
-    }
-
-    private List aggregateRepositoryLists( List remoteRepositories, List remoteArtifactRepositories )
-        throws ProjectBuildingException
-    {
-        if ( superProject == null )
-        {
-            superProject = mavenProjectBuilder.buildStandaloneSuperProject( null );
-        }
-
-        List repositories = new ArrayList();
-
-        repositories.addAll( remoteRepositories );
-
-        // ensure that these are defined
-        for ( Iterator it = superProject.getRemoteArtifactRepositories().iterator(); it.hasNext(); )
-        {
-            ArtifactRepository superRepo = (ArtifactRepository) it.next();
-
-            for ( Iterator aggregatedIterator = repositories.iterator(); aggregatedIterator.hasNext(); )
-            {
-                ArtifactRepository repo = (ArtifactRepository) aggregatedIterator.next();
-
-                // if the repository exists in the list and was introduced by another POM's super-pom, 
-                // remove it...the repository definitions from the super-POM should only be at the end of
-                // the list.
-                // if the repository has been redefined, leave it.
-                if ( repo.getId().equals( superRepo.getId() ) && repo.getUrl().equals( superRepo.getUrl() ) )
-                {
-                    aggregatedIterator.remove();
-                }
-            }
-        }
-
-        // this list should contain the super-POM repositories, so we don't have to explicitly add them back.
-        for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
-        {
-            ArtifactRepository repository = (ArtifactRepository) it.next();
-
-            if ( !repositories.contains( repository ) )
-            {
-                repositories.add( repository );
-            }
-        }
-
-        return repositories;
     }
 
     public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
@@ -248,13 +191,13 @@ public class MavenMetadataSource
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
             Dependency d = (Dependency) i.next();
-            
+
             String scope = d.getScope();
-            
+
             if ( StringUtils.isEmpty( scope ) )
             {
                 scope = Artifact.SCOPE_COMPILE;
-                
+
                 d.setScope( scope );
             }
 
@@ -262,7 +205,7 @@ public class MavenMetadataSource
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),
                                                                           scope, inheritedScope );
-            
+
             if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
             {
                 artifact.setFile( new File( d.getSystemPath() ) );
