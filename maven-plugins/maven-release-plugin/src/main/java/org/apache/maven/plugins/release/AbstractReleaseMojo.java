@@ -32,9 +32,7 @@ public abstract class AbstractReleaseMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${org.apache.maven.scm.manager.ScmManager}"
-     * @required
-     * @readonly
+     * @component
      */
     private ScmManager scmManager;
 
