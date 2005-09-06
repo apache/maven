@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Iterator;
 
 /**
  * Metadata for the artifact directory of the repository.
@@ -160,6 +161,25 @@ public class ArtifactRepositoryMetadata
                     {
                         s.setBuildNumber( snapshot.getBuildNumber() );
                         changed = true;
+                    }
+                }
+                if ( versioning.getRelease() != null )
+                {
+                    changed = true;
+                    v.setRelease( versioning.getRelease() );
+                }
+                if ( versioning.getLatest() != null )
+                {
+                    changed = true;
+                    v.setLatest( versioning.getLatest() );
+                }
+                for ( Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+                {
+                    String version = (String) i.next();
+                    if ( !v.getVersions().contains( version ) )
+                    {
+                        changed = true;
+                        v.getVersions().add( version );
                     }
                 }
             }

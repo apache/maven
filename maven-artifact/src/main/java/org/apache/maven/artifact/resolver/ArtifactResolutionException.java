@@ -95,10 +95,13 @@ public class ArtifactResolutionException
             {
                 ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
 
+                sb.append( remoteRepository.getId() );
+                sb.append( " (" );
                 sb.append( remoteRepository.getUrl() );
+                sb.append( ")" );
                 if ( i.hasNext() )
                 {
-                    sb.append( ", " );
+                    sb.append( ",\n  " );
                 }
             }
         }
