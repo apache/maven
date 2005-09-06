@@ -59,7 +59,7 @@ public class ArtifactRepositoryMetadata
 
     public String toString()
     {
-        return "repository metadata for artifact: \'" + artifact + "\'";
+        return "repository metadata for: \'" + getKey() + "\'";
     }
 
     public boolean storedInGroupDirectory()
@@ -84,7 +84,7 @@ public class ArtifactRepositoryMetadata
 
     public String getBaseVersion()
     {
-        return artifact.getBaseVersion();
+        return null;
     }
 
     protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
@@ -142,27 +142,6 @@ public class ArtifactRepositoryMetadata
             Versioning v = metadata.getVersioning();
             if ( v != null )
             {
-                // TODO: merge versioning (reuse code from transformation)
-                Snapshot s = v.getSnapshot();
-                Snapshot snapshot = versioning.getSnapshot();
-                if ( snapshot != null )
-                {
-                    if ( s == null )
-                    {
-                        v.setSnapshot( snapshot );
-                        changed = true;
-                    }
-                    else if ( s.getTimestamp() != null && !s.getTimestamp().equals( snapshot.getTimestamp() ) )
-                    {
-                        s.setTimestamp( snapshot.getTimestamp() );
-                        changed = true;
-                    }
-                    else if ( s.getBuildNumber() != snapshot.getBuildNumber() )
-                    {
-                        s.setBuildNumber( snapshot.getBuildNumber() );
-                        changed = true;
-                    }
-                }
                 if ( versioning.getRelease() != null )
                 {
                     changed = true;
@@ -225,7 +204,7 @@ public class ArtifactRepositoryMetadata
 
     public Snapshot getSnapshot()
     {
-        return versioning != null ? versioning.getSnapshot() : null;
+        return null;
     }
 
     public String getLatestVersion()
@@ -236,5 +215,15 @@ public class ArtifactRepositoryMetadata
     public String getReleaseVersion()
     {
         return versioning.getRelease();
+    }
+
+    public int getBuildNumber()
+    {
+        return 0;
+    }
+
+    public String getTimestamp()
+    {
+        return null;
     }
 }

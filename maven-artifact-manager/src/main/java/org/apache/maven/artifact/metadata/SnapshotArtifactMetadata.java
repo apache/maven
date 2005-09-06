@@ -179,4 +179,14 @@ public class SnapshotArtifactMetadata
     {
         return artifact.getBaseVersion();
     }
+
+    public String getLatestVersion()
+    {
+        return null;
+    }
+
+    public String getReleaseVersion()
+    {
+        return null;
+    }
 }

@@ -122,4 +122,24 @@ public class ReleaseArtifactMetadata
     {
         return false;
     }
+
+    public int getBuildNumber()
+    {
+        return 0;
+    }
+
+    public String getTimestamp()
+    {
+        return null;
+    }
+
+    public String getLatestVersion()
+    {
+        return null;
+    }
+
+    public String getReleaseVersion()
+    {
+        return null;
+    }
 }

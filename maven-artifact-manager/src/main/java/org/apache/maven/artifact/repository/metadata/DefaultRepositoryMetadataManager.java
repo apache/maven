@@ -98,7 +98,7 @@ public class DefaultRepositoryMetadataManager
         File file = new File( localRepository.getBasedir(),
                               localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
 
-        resolveAlways( metadata, localRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+        resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
 
     private void resolveAlways( ArtifactMetadata metadata, ArtifactRepository repository, File file,

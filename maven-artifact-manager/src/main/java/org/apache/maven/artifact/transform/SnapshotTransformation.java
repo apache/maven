@@ -22,9 +22,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
-import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Date;
@@ -57,11 +56,7 @@ public class SnapshotTransformation
         if ( artifact.isSnapshot() )
         {
             // TODO: Better way to create this - should have to construct Versioning
-            Versioning versioning = new Versioning();
-            Snapshot snapshot = new Snapshot();
-            versioning.setSnapshot( snapshot );
-
-            ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
+            ArtifactMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
             // TODO: should merge with other repository metadata sitting on the same level?
             artifact.addMetadata( metadata );
@@ -74,15 +69,14 @@ public class SnapshotTransformation
     {
         if ( artifact.isSnapshot() )
         {
-            Snapshot snapshot = resolveLatestSnapshotVersion( artifact, localRepository, remoteRepository );
-            snapshot.setTimestamp( getDeploymentTimestamp() );
-            snapshot.setBuildNumber( snapshot.getBuildNumber() + 1 );
+            int buildNumber = resolveLatestSnapshotBuildNumber( artifact, localRepository, remoteRepository );
 
             // TODO: Better way to create this - should have to construct Versioning
-            Versioning versioning = new Versioning();
-            versioning.setSnapshot( snapshot );
+            Snapshot snapshot = new Snapshot();
+            snapshot.setTimestamp( getDeploymentTimestamp() );
+            snapshot.setBuildNumber( buildNumber + 1 );
 
-            ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
+            ArtifactMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
 
             artifact.setResolvedVersion( constructVersion( metadata ) );
 
@@ -104,23 +98,19 @@ public class SnapshotTransformation
         return new SnapshotArtifactMetadata( artifact );
     }
 
-    protected String constructVersion( ArtifactRepositoryMetadata metadata )
+    protected String constructVersion( ArtifactMetadata metadata )
     {
         String version = metadata.getBaseVersion();
-        Snapshot snapshot = metadata.getSnapshot();
-        if ( snapshot != null )
+        if ( metadata.getTimestamp() != null && metadata.getBuildNumber() > 0 )
         {
-            if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
+            String newVersion = metadata.getTimestamp() + "-" + metadata.getBuildNumber();
+            if ( version != null )
             {
-                String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
-                if ( version != null )
-                {
-                    version = StringUtils.replace( version, "SNAPSHOT", newVersion );
-                }
-                else
-                {
-                    version = newVersion;
-                }
+                version = StringUtils.replace( version, "SNAPSHOT", newVersion );
+            }
+            else
+            {
+                version = newVersion;
             }
         }
         return version;

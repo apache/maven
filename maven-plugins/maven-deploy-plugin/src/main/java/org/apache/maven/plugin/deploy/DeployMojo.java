@@ -129,14 +129,15 @@ public class DeployMojo
             artifact.addMetadata( metadata );
         }
 
+        // TODO: clean up
+        Versioning versioning = new Versioning();
+        versioning.addVersion( artifact.getVersion() );
         if ( updateReleaseInfo )
         {
-            // TODO: clean up
-            Versioning versioning = new Versioning();
             versioning.setRelease( artifact.getVersion() );
-            ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
-            artifact.addMetadata( metadata );
         }
+        ArtifactRepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
+        artifact.addMetadata( metadata );
 
         try
         {

@@ -22,7 +22,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.LatestArtifactMetadata;
 import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 
 import java.util.List;
@@ -69,7 +68,7 @@ public class LatestArtifactTransformation
         return metadata;
     }
 
-    protected String constructVersion( ArtifactRepositoryMetadata metadata )
+    protected String constructVersion( ArtifactMetadata metadata )
     {
         return metadata.getLatestVersion();
     }
