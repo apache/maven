@@ -78,6 +78,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -286,9 +287,23 @@ public class DefaultPluginManager
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
+            Collection projects;
 
-            resolveTransitiveDependencies( session, artifactResolver, mojoDescriptor
-                .isDependencyResolutionRequired(), artifactFactory, project );
+            if ( mojoDescriptor.isAggregator() )
+            {
+                projects = session.getSortedProjects();
+            }
+            else
+            {
+                projects = Collections.singleton( project );
+            }
+
+            for ( Iterator i = projects.iterator(); i.hasNext(); )
+            {
+                MavenProject p = (MavenProject) i.next();
+                resolveTransitiveDependencies( session, artifactResolver,
+                                               mojoDescriptor.isDependencyResolutionRequired(), artifactFactory, p );
+            }
 
             downloadDependencies( project, session, artifactResolver );
         }
