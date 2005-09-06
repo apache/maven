@@ -818,19 +818,12 @@ public class PrepareReleaseMojo
                 MavenProject project = (MavenProject) it.next();
 
                 MavenProject releaseProject = new MavenProject( project );
-                Model releaseModel = releaseProject.getModel();
+                Model releaseModel = releaseProject.getOriginalModel();
 
-                //Rewrite parent version
-                if ( project.hasParent() )
+                // Remove parent
+                if ( releaseModel.getParent() != null )
                 {
-                    Artifact parentArtifact = project.getParentArtifact();
-
-                    if ( isSnapshot( parentArtifact.getBaseVersion() ) )
-                    {
-                        String version = resolveVersion( parentArtifact, "parent", releaseProject );
-
-                        releaseModel.getParent().setVersion( version );
-                    }
+                    releaseModel.setParent( null );
                 }
 
                 Set artifacts = releaseProject.getArtifacts();
@@ -921,7 +914,7 @@ public class PrepareReleaseMojo
                     }
                 }
 
-                File releasePomFile = new File( basedir, RELEASE_POM );
+                File releasePomFile = new File( releaseProject.getFile().getParentFile(), RELEASE_POM );
 
                 Writer writer = null;
 
@@ -929,7 +922,7 @@ public class PrepareReleaseMojo
                 {
                     writer = new FileWriter( releasePomFile );
 
-                    releaseProject.writeModel( writer );
+                    releaseProject.writeOriginalModel( writer );
                 }
                 catch ( IOException e )
                 {
