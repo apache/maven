@@ -18,6 +18,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.model.Goal;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
@@ -459,10 +460,38 @@ public final class ModelUtils
         // TODO: would be nice for the modello:java code to generate this as a copy constructor
         Model newModel = new Model();
         ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
-        assembler.assembleModelInheritance( newModel, model );
+        newModel.setModelVersion( model.getModelVersion() );
+        newModel.setName( model.getName() );
+        newModel.setParent( cloneParent( model.getParent() ) );
         newModel.setVersion( model.getVersion() );
         newModel.setArtifactId( model.getArtifactId() );
+        newModel.setModules( cloneModules( model.getModules() ) );
+        assembler.assembleModelInheritance( newModel, model );
         return newModel;
+    }
+
+    private static List cloneModules( List modules )
+    {
+        if ( modules == null )
+        {
+            return modules;
+        }
+        return new ArrayList( modules );
+    }
+
+    private static Parent cloneParent( Parent parent )
+    {
+        if ( parent == null )
+        {
+            return parent;
+        }
+
+        Parent newParent = new Parent();
+        newParent.setArtifactId( parent.getArtifactId() );
+        newParent.setGroupId( parent.getGroupId() );
+        newParent.setRelativePath( parent.getRelativePath() );
+        newParent.setVersion( parent.getVersion() );
+        return newParent;
     }
 
     public static List mergeRepositoryLists( List dominant, List recessive )
