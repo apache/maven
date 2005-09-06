@@ -146,23 +146,4 @@ public class ProjectArtifactMetadata
         return artifact.isSnapshot();
     }
 
-    public String getLatestVersion()
-    {
-        return null;
-    }
-
-    public String getReleaseVersion()
-    {
-        return null;
-    }
-
-    public int getBuildNumber()
-    {
-        return 0;
-    }
-
-    public String getTimestamp()
-    {
-        return null;
-    }
 }

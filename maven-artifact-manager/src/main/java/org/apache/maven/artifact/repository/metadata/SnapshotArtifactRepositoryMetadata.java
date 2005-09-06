@@ -196,23 +196,4 @@ public class SnapshotArtifactRepositoryMetadata
         return artifact.isSnapshot();
     }
 
-    public int getBuildNumber()
-    {
-        return snapshot != null ? snapshot.getBuildNumber() : 0;
-    }
-
-    public String getTimestamp()
-    {
-        return snapshot != null ? snapshot.getTimestamp() : null;
-    }
-
-    public String getLatestVersion()
-    {
-        return null;
-    }
-
-    public String getReleaseVersion()
-    {
-        return null;
-    }
 }

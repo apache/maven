@@ -250,4 +250,14 @@ public class ActiveProjectArtifact
     {
         return "active project artifact:\n\tartifact = " + artifact + ";\n\tproject: " + project;
     }
+
+    public boolean isRelease()
+    {
+        return artifact.isRelease();
+    }
+
+    public void setRelease( boolean release )
+    {
+        artifact.setResolved( release );
+    }
 }

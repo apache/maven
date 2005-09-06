@@ -207,23 +207,4 @@ public class ArtifactRepositoryMetadata
         return null;
     }
 
-    public String getLatestVersion()
-    {
-        return versioning.getLatest();
-    }
-
-    public String getReleaseVersion()
-    {
-        return versioning.getRelease();
-    }
-
-    public int getBuildNumber()
-    {
-        return 0;
-    }
-
-    public String getTimestamp()
-    {
-        return null;
-    }
 }

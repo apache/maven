@@ -22,6 +22,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.metadata.ReleaseArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 
 import java.util.List;
 
@@ -54,14 +56,40 @@ public class ReleaseArtifactTransformation
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        // metadata is added at install time
+        Versioning versioning = new Versioning();
+        versioning.addVersion( artifact.getVersion() );
+
+        if ( artifact.isRelease() )
+        {
+            versioning.setRelease( artifact.getVersion() );
+        }
+
+        // TODO: need to create?
+        ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
+
+        artifact.addMetadata( metadata );
     }
 
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        // metadata is added at deploy time
+        Versioning versioning = new Versioning();
+        versioning.addVersion( artifact.getVersion() );
+
+        if ( artifact.isRelease() )
+        {
+            versioning.setRelease( artifact.getVersion() );
+        }
+
+        // TODO: need to create?
+        ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
+
+        artifact.addMetadata( metadata );
+
+        // TODO: this should be in the part that actually merges instead
+        getLogger().info( "Retrieving previous metadata from " + remoteRepository.getId() );
+        repositoryMetadataManager.resolveAlways( metadata, localRepository, remoteRepository );
     }
 
     protected LegacyArtifactMetadata createLegacyMetadata( Artifact artifact )
@@ -69,8 +97,8 @@ public class ReleaseArtifactTransformation
         return new ReleaseArtifactMetadata( artifact );
     }
 
-    protected String constructVersion( ArtifactMetadata metadata )
+    protected String constructVersion( Versioning versioning, String bS )
     {
-        return metadata.getReleaseVersion();
+        return versioning.getRelease();
     }
 }

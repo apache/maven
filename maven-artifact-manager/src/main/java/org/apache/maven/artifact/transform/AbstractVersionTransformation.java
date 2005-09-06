@@ -21,13 +21,13 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
-import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -69,7 +69,7 @@ public abstract class AbstractVersionTransformation
     {
         // TODO: can we improve on this?
         ArtifactMetadata metadata = null;
-        if ( artifact.isSnapshot() )
+        if ( !artifact.isSnapshot() )
         {
             metadata = new ArtifactRepositoryMetadata( artifact );
         }
@@ -94,23 +94,23 @@ public abstract class AbstractVersionTransformation
 
         String version = selectVersion( versioning, artifact.getVersion() );
 */
-        ArtifactMetadata localMetadata = null;
+        Versioning versioning = null;
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
             ArtifactRepository repository = (ArtifactRepository) i.next();
 
-            localMetadata = loadVersioningInformation( metadata, repository, localRepository, artifact );
-            if ( localMetadata != null )
+            versioning = loadVersioningInformation( metadata, repository, localRepository, artifact );
+            if ( versioning != null )
             {
                 artifact.setRepository( repository );
                 // TODO: merge instead (see above)
                 break;
             }
         }
-        ArtifactMetadata m = loadVersioningInformation( metadata, localRepository, localRepository, artifact );
-        if ( m != null )
+        Versioning v = loadVersioningInformation( metadata, localRepository, localRepository, artifact );
+        if ( v != null )
         {
-            localMetadata = m;
+            versioning = v;
             // TODO: figure out way to avoid duplicated message
             if ( getLogger().isDebugEnabled() /*&& !alreadyResolved*/ )
             {
@@ -120,9 +120,9 @@ public abstract class AbstractVersionTransformation
         }
 
         String version = null;
-        if ( localMetadata != null )
+        if ( versioning != null )
         {
-            version = constructVersion( localMetadata );
+            version = constructVersion( versioning, artifact.getBaseVersion() );
         }
 
         if ( version == null )
@@ -154,43 +154,7 @@ public abstract class AbstractVersionTransformation
         return version;
     }
 
-    protected int resolveLatestSnapshotBuildNumber( Artifact artifact, ArtifactRepository localRepository,
-                                                    ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException
-    {
-        // TODO: can we improve on this?
-        ArtifactMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
-
-        getLogger().info( "Retrieving previous build number from " + remoteRepository.getId() );
-        repositoryMetadataManager.resolveAlways( metadata, localRepository, remoteRepository );
-
-        ArtifactMetadata m = loadVersioningInformation( metadata, remoteRepository, localRepository, artifact );
-        int buildNumber = 0;
-        if ( m == null )
-        {
-            try
-            {
-                SnapshotArtifactMetadata snapshotMetadata = new SnapshotArtifactMetadata( artifact );
-                snapshotMetadata.retrieveFromRemoteRepository( remoteRepository, wagonManager,
-                                                               ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
-                getLogger().warn( "Using old-style versioning metadata from remote repo for " + artifact );
-
-                buildNumber = snapshotMetadata.getBuildNumber();
-            }
-            catch ( ResourceDoesNotExistException e1 )
-            {
-                // safe to ignore, use default snapshot data
-                getLogger().debug( "Unable to find legacy metadata - ignoring" );
-            }
-        }
-        else
-        {
-            buildNumber = m.getBuildNumber();
-        }
-        return buildNumber;
-    }
-
-    protected abstract String constructVersion( ArtifactMetadata metadata );
+    protected abstract String constructVersion( Versioning versioning, String baseVersion );
 
 /* TODO
     private void mergeVersioning( Versioning dest, Versioning source )
@@ -349,35 +313,20 @@ public abstract class AbstractVersionTransformation
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getBaseVersion();
     }
 
-    private ArtifactMetadata loadVersioningInformation( ArtifactMetadata repoMetadata,
-                                                        ArtifactRepository remoteRepository,
-                                                        ArtifactRepository localRepository, Artifact artifact )
+    protected Versioning loadVersioningInformation( ArtifactMetadata repoMetadata, ArtifactRepository remoteRepository,
+                                                    ArtifactRepository localRepository, Artifact artifact )
         throws ArtifactMetadataRetrievalException
     {
         File metadataFile = new File( localRepository.getBasedir(),
                                       localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
 
-        ArtifactMetadata newMetadata = null;
+        Versioning versioning = null;
         if ( metadataFile.exists() )
         {
             Metadata metadata = readMetadata( metadataFile );
-            if ( metadata.getVersioning() != null )
-            {
-                if ( artifact.isSnapshot() )
-                {
-                    if ( metadata.getVersioning().getSnapshot() != null )
-                    {
-                        newMetadata = new SnapshotArtifactRepositoryMetadata( artifact,
-                                                                              metadata.getVersioning().getSnapshot() );
-                    }
-                }
-                else
-                {
-                    newMetadata = new ArtifactRepositoryMetadata( artifact, metadata.getVersioning() );
-                }
-            }
+            versioning = metadata.getVersioning();
         }
-        return newMetadata;
+        return versioning;
     }
 
     /**

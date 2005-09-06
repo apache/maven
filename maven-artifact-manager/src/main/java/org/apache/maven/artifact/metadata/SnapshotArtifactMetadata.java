@@ -97,11 +97,6 @@ public class SnapshotArtifactMetadata
         }
     }
 
-    public String getTimestamp()
-    {
-        return timestamp;
-    }
-
     public int getBuildNumber()
     {
         return buildNumber;
@@ -180,13 +175,4 @@ public class SnapshotArtifactMetadata
         return artifact.getBaseVersion();
     }
 
-    public String getLatestVersion()
-    {
-        return null;
-    }
-
-    public String getReleaseVersion()
-    {
-        return null;
-    }
 }

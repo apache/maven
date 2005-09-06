@@ -68,8 +68,8 @@ public class LatestArtifactTransformation
         return metadata;
     }
 
-    protected String constructVersion( ArtifactMetadata metadata )
+    protected String constructVersion( Versioning versioning, String baseVersion )
     {
-        return metadata.getLatestVersion();
+        return versioning.getLatest();
     }
 }

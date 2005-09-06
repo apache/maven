@@ -22,8 +22,11 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.LegacyArtifactMetadata;
 import org.apache.maven.artifact.metadata.SnapshotArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Date;
@@ -78,7 +81,9 @@ public class SnapshotTransformation
 
             ArtifactMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
 
-            artifact.setResolvedVersion( constructVersion( metadata ) );
+            Versioning versioning = new Versioning();
+            versioning.setSnapshot( snapshot );
+            artifact.setResolvedVersion( constructVersion( versioning, artifact.getBaseVersion() ) );
 
             artifact.addMetadata( metadata );
         }
@@ -98,21 +103,62 @@ public class SnapshotTransformation
         return new SnapshotArtifactMetadata( artifact );
     }
 
-    protected String constructVersion( ArtifactMetadata metadata )
+    protected String constructVersion( Versioning versioning, String baseVersion )
     {
-        String version = metadata.getBaseVersion();
-        if ( metadata.getTimestamp() != null && metadata.getBuildNumber() > 0 )
+        String version = baseVersion;
+        Snapshot snapshot = versioning.getSnapshot();
+        if ( snapshot != null )
         {
-            String newVersion = metadata.getTimestamp() + "-" + metadata.getBuildNumber();
-            if ( version != null )
+            if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
             {
-                version = StringUtils.replace( version, "SNAPSHOT", newVersion );
-            }
-            else
-            {
-                version = newVersion;
+                String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
+                if ( version != null )
+                {
+                    version = StringUtils.replace( version, "SNAPSHOT", newVersion );
+                }
+                else
+                {
+                    version = newVersion;
+                }
             }
         }
         return version;
     }
+
+    private int resolveLatestSnapshotBuildNumber( Artifact artifact, ArtifactRepository localRepository,
+                                                  ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        // TODO: can we improve on this?
+        ArtifactMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
+
+        getLogger().info( "Retrieving previous build number from " + remoteRepository.getId() );
+        repositoryMetadataManager.resolveAlways( metadata, localRepository, remoteRepository );
+
+        Versioning versioning = loadVersioningInformation( metadata, remoteRepository, localRepository, artifact );
+        int buildNumber = 0;
+        if ( versioning == null )
+        {
+            try
+            {
+                SnapshotArtifactMetadata snapshotMetadata = new SnapshotArtifactMetadata( artifact );
+                snapshotMetadata.retrieveFromRemoteRepository( remoteRepository, wagonManager,
+                                                               ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                getLogger().warn( "Using old-style versioning metadata from remote repo for " + artifact );
+
+                buildNumber = snapshotMetadata.getBuildNumber();
+            }
+            catch ( ResourceDoesNotExistException e1 )
+            {
+                // safe to ignore, use default snapshot data
+                getLogger().debug( "Unable to find legacy metadata - ignoring" );
+            }
+        }
+        else if ( versioning.getSnapshot() != null )
+        {
+            buildNumber = versioning.getSnapshot().getBuildNumber();
+        }
+        return buildNumber;
+    }
+
 }

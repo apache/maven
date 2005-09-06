@@ -49,7 +49,7 @@ public interface Artifact
     String SCOPE_RUNTIME = "runtime";
 
     String SCOPE_PROVIDED = "provided";
-    
+
     String SCOPE_SYSTEM = "system";
 
     String getGroupId();
@@ -141,4 +141,8 @@ public interface Artifact
      * @todo remove, a quick hack for the lifecycle executor
      */
     void setArtifactHandler( ArtifactHandler handler );
+
+    boolean isRelease();
+
+    void setRelease( boolean release );
 }

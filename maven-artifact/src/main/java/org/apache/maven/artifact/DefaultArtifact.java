@@ -74,6 +74,8 @@ public class DefaultArtifact
 
     private boolean resolved;
 
+    private boolean release = false;
+
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler )
     {
@@ -462,4 +464,13 @@ public class DefaultArtifact
         this.artifactHandler = artifactHandler;
     }
 
+    public void setRelease( boolean release )
+    {
+        this.release = release;
+    }
+
+    public boolean isRelease()
+    {
+        return release;
+    }
 }

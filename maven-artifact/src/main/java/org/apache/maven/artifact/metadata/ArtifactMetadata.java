@@ -74,11 +74,4 @@ public interface ArtifactMetadata
      */
     String getRemoteFilename();
 
-    int getBuildNumber();
-
-    String getTimestamp();
-
-    String getLatestVersion();
-
-    String getReleaseVersion();
 }
