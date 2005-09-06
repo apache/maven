@@ -343,6 +343,7 @@ public class DefaultWagonManager
                     // repository's checksum checking policy.
                     if ( firstRun )
                     {
+                        getLogger().warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
                         retry = true;
                     }
                     else
