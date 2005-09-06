@@ -617,7 +617,7 @@ public class PrepareReleaseMojo
         {
             if ( !isSnapshot( project.getVersion() ) )
             {
-                throw new MojoExecutionException( "This project isn't a snapshot (" + project.getVersion() + ")." );
+                throw new MojoExecutionException( "The project " + project.getGroupId() + ":" + project.getArtifactId() + " isn't a snapshot (" + project.getVersion() + ")." );
             }
 
             Model model = project.getOriginalModel();
