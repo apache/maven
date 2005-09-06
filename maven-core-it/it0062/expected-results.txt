@@ -1,3 +1,2 @@
 target/classes/org/apache/maven/it0062/Person.class
 target/maven-core-it0062-1.0-SNAPSHOT.jar
-target/test-repo/org/apache/maven/maven-core-it0062/1.0-SNAPSHOT/maven-core-it0062-1.0-SNAPSHOT.version.txt
