@@ -177,7 +177,7 @@ public class DefaultLifecycleExecutor
 
             if ( segment.aggregate() )
             {
-                if ( !rm.isBlackListed( project.getId() ) )
+                if ( !rm.isBlackListed( project ) )
                 {
                     line();
 
@@ -246,7 +246,7 @@ public class DefaultLifecycleExecutor
                 {
                     MavenProject currentProject = (MavenProject) projectIterator.next();
 
-                    if ( !rm.isBlackListed( currentProject.getId() ) )
+                    if ( !rm.isBlackListed( currentProject ) )
                     {
                         line();
 
@@ -335,8 +335,9 @@ public class DefaultLifecycleExecutor
         {
             rm.registerBuildFailure( project, e, task );
 
-            rm.blackList( project.getId() );
+            rm.blackList( project );
         }
+        // FIXME: how about the other cases?
     }
 
     private List segmentTaskListByAggregationNeeds( List tasks, MavenSession session, MavenProject project )

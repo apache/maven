@@ -20,27 +20,27 @@ import java.util.Map;
 
 public class ReactorManager
 {
-    
+
     public static final String FAIL_FAST = "fail-fast";
 
     public static final String FAIL_AT_END = "fail-at-end";
 
     public static final String FAIL_NEVER = "fail-never";
-    
+
     private DAG reactorDag;
-    
+
     private Map projectMap;
-    
+
     private List projectsByDependency;
 
     private List blackList = new ArrayList();
 
     private MavenProject topLevelProject;
-    
+
     private Map buildFailuresByProject = new HashMap();
-    
+
     private String failureBehavior = FAIL_FAST;
-    
+
     public ReactorManager( List projects )
         throws CycleDetectedException
     {
@@ -136,10 +136,10 @@ public class ReactorManager
 
             projectsByDependency.add( projectMap.get( id ) );
         }
-        
+
         projectsByDependency = Collections.unmodifiableList( projectsByDependency );
     }
-    
+
     public void setFailureBehavior( String failureBehavior )
     {
         if ( FAIL_FAST.equals( failureBehavior ) || FAIL_AT_END.equals( failureBehavior ) || FAIL_NEVER.equals( failureBehavior ) )
@@ -152,33 +152,39 @@ public class ReactorManager
                 + FAIL_AT_END + "\', \'" + FAIL_NEVER + "\')." );
         }
     }
-    
+
     public String getFailureBehavior()
     {
         return failureBehavior;
     }
-    
+
     public List getProjectsSortedByDependency()
     {
         return projectsByDependency;
     }
-    
+
     // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
     public MavenProject getTopLevelProject()
     {
         if ( topLevelProject == null )
         {
             List projectsByFile = new ArrayList( projectsByDependency );
-            
+
             Collections.sort(projectsByFile, new ByProjectFileComparator() );
-            
+
             topLevelProject = (MavenProject) projectsByFile.get( 0 );
         }
-        
+
         return topLevelProject;
     }
-    
-    public void blackList( String id )
+
+    public void blackList( MavenProject project )
+    {
+        blackList(
+            ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() ) );
+    }
+
+    private void blackList( String id )
     {
         if ( !blackList.contains( id ) )
         {
@@ -197,32 +203,33 @@ public class ReactorManager
             }
         }
     }
-    
-    public boolean isBlackListed( String id )
+
+    public boolean isBlackListed( MavenProject project )
     {
-        return blackList.contains( id );
+        return blackList.contains(
+            ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() ) );
     }
-    
+
     public void registerBuildFailure( MavenProject project, Exception error, String task )
     {
         buildFailuresByProject.put( project.getId(), new BuildFailure( error, task ) );
     }
-    
+
     public boolean hasBuildFailures()
     {
         return !buildFailuresByProject.isEmpty();
     }
-    
-    public boolean hasBuildFailure( String id )
+
+    public boolean hasBuildFailure( MavenProject project )
     {
-        return buildFailuresByProject.containsKey( id );
+        return buildFailuresByProject.containsKey( project.getId() );
     }
-    
+
     public boolean hasMultipleProjects()
     {
         return projectsByDependency.size() > 1;
     }
-    
+
     private static class ByProjectFileComparator implements Comparator
     {
 
@@ -230,12 +237,12 @@ public class ReactorManager
         {
             MavenProject p1 = (MavenProject) first;
             MavenProject p2 = (MavenProject) second;
-            
+
             String p1Path = p1.getFile().getAbsolutePath();
             String p2Path = p2.getFile().getAbsolutePath();
-            
+
             int comparison = p1Path.length() - p2Path.length();
-            
+
             if ( comparison > 0 )
             {
                 return 1;
@@ -250,23 +257,23 @@ public class ReactorManager
             }
         }
     }
-    
+
     private static class BuildFailure
     {
         private Exception cause;
         private String task;
-        
+
         BuildFailure( Exception cause, String task )
         {
             this.cause = cause;
             this.task = task;
         }
-        
+
         String getTask()
         {
             return task;
         }
-        
+
         Exception getCause()
         {
             return cause;

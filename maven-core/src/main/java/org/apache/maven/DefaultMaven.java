@@ -79,7 +79,7 @@ public class DefaultMaven
     // ----------------------------------------------------------------------
 
     protected MavenProjectBuilder projectBuilder;
-    
+
     protected LifecycleExecutor lifecycleExecutor;
 
     protected PlexusContainer container;
@@ -126,9 +126,9 @@ public class DefaultMaven
         dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
         ReactorManager rm;
-        
+
         ProfileManager globalProfileManager = request.getGlobalProfileManager();
-        
+
         try
         {
             loadSettingsProfiles( globalProfileManager, request.getSettings() );
@@ -137,7 +137,7 @@ public class DefaultMaven
 
             List projects = collectProjects( files, request.getLocalRepository(), request.isRecursive(),
                                         request.getSettings(), globalProfileManager );
-            
+
             // the reasoning here is that the list is still unsorted according to dependency, so the first project
             // SHOULD BE the top-level, or the one we want to start with if we're doing an aggregated build.
 
@@ -146,11 +146,11 @@ public class DefaultMaven
                 MavenProject superProject = projectBuilder.buildStandaloneSuperProject( request.getLocalRepository() );
                 projects.add( superProject );
             }
-            
+
             rm = new ReactorManager( projects );
-            
+
             String requestFailureBehavior = request.getFailureBehavior();
-            
+
             if ( requestFailureBehavior != null )
             {
                 rm.setFailureBehavior( requestFailureBehavior );
@@ -196,7 +196,7 @@ public class DefaultMaven
                     if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) && ( exception instanceof ReactorException ) )
                     {
                         logFailure( response, exception, null );
-                        
+
                         if ( rm.hasMultipleProjects() )
                         {
                             writeReactorSummary( rm );
@@ -262,22 +262,22 @@ public class DefaultMaven
         // o project-name...........FAILED
         // o project2-name..........SKIPPED (dependency build failed or was skipped)
         // o project-3-name.........SUCCESS
-        
+
         line();
         getLogger().info( "Reactor Summary:" );
         line();
-        
+
         for ( Iterator it = rm.getProjectsSortedByDependency().iterator(); it.hasNext(); )
         {
             MavenProject project = (MavenProject) it.next();
-            
+
             String id = project.getId();
-            
-            if ( rm.hasBuildFailure( id ) )
+
+            if ( rm.hasBuildFailure( project ) )
             {
                 logReactorSummaryLine( project.getName(), "FAILED" );
             }
-            else if ( rm.isBlackListed( id ) )
+            else if ( rm.isBlackListed( project ) )
             {
                 logReactorSummaryLine( project.getName(), "SKIPPED (dependency build failed or was skipped)" );
             }
@@ -286,7 +286,7 @@ public class DefaultMaven
                 logReactorSummaryLine( project.getName(), "SUCCESS" );
             }
         }
-        
+
         getLogger().info( "" );
         getLogger().info( "" );
     }
@@ -294,20 +294,20 @@ public class DefaultMaven
     private void logReactorSummaryLine( String name, String status )
     {
         StringBuffer messageBuffer = new StringBuffer();
-        
+
         messageBuffer.append( name );
-        
+
         int dotCount = 65;
-        
+
         dotCount -= name.length();
-        
+
         for ( int i = 0; i < dotCount; i++ )
         {
             messageBuffer.append( '.' );
         }
-        
+
         messageBuffer.append( status );
-        
+
         getLogger().info( messageBuffer.toString() );
     }
 
@@ -399,7 +399,7 @@ public class DefaultMaven
         if ( settingsProfiles != null && !settingsProfiles.isEmpty() )
         {
             List settingsActiveProfileIds = settings.getActiveProfiles();
-            
+
             profileManager.explicitlyActivate( settingsActiveProfileIds );
 
             for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
@@ -411,9 +411,9 @@ public class DefaultMaven
                 profileManager.addProfile( profile );
             }
         }
-        
+
     }
-    
+
     // ----------------------------------------------------------------------
     // Methods used by all execution request handlers
     // ----------------------------------------------------------------------
@@ -585,7 +585,7 @@ public class DefaultMaven
         {
             writeReactorSummary( rm );
         }
-        
+
         line();
 
         getLogger().info( "BUILD SUCCESSFUL" );
@@ -618,7 +618,7 @@ public class DefaultMaven
     {
         getLogger().info( "----------------------------------------------------------------------------" );
     }
-    
+
     protected static String formatTime( long ms )
     {
         long secs = ms / MS_PER_SEC;
