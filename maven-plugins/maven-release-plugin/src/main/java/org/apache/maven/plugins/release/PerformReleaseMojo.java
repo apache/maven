@@ -30,11 +30,10 @@ import java.io.IOException;
 /**
  * Perform a release from SCM
  *
- * @aggregator
- * @goal perform
- *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id: DoxiaMojo.java 169372 2005-05-09 22:47:34Z evenisse $
+ * @aggregator
+ * @goal perform
  */
 public class PerformReleaseMojo
     extends AbstractReleaseMojo
@@ -74,9 +73,7 @@ public class PerformReleaseMojo
 
         try
         {
-            ScmHelper scm = getScm();
-
-            scm.setWorkingDirectory( workingDirectory );
+            ScmHelper scm = getScm( workingDirectory );
 
             scm.checkout();
         }
@@ -128,8 +125,8 @@ public class PerformReleaseMojo
             }
             catch ( IOException e )
             {
-                throw new MojoExecutionException( "Failed to load release information from file: "
-                    + ReleaseProgressTracker.getReleaseProgressFilename(), e );
+                throw new MojoExecutionException( "Failed to load release information from file: " +
+                    ReleaseProgressTracker.getReleaseProgressFilename(), e );
             }
         }
 

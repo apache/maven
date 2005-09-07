@@ -123,9 +123,9 @@ public class PrepareReleaseMojo
     private String urlScm;
 
     /**
-     * @parameter expression="${maven.username}"
+     * @parameter expression="${username}"
      */
-    private String username = System.getProperty( "user.name" );
+    private String username;
 
     /**
      * @parameter expression="${password}"
@@ -208,17 +208,17 @@ public class PrepareReleaseMojo
 
             tagRelease();
 
-            for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
-            {
-                MavenProject project = (MavenProject) it.next();
-
-                getVersionResolver().incrementVersion( project );
-
-                getScmRewriter().restoreScmInfo( project );
-            }
-
             if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_POM_TRANSORMED_FOR_DEVELOPMENT ) )
             {
+                for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
+                {
+                    MavenProject project = (MavenProject) it.next();
+
+                    getVersionResolver().incrementVersion( project );
+
+                    getScmRewriter().restoreScmInfo( project );
+                }
+
                 for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
                 {
                     MavenProject project = (MavenProject) it.next();
@@ -358,24 +358,22 @@ public class PrepareReleaseMojo
                     }
                 }
             }
+        }
+        Writer writer = null;
 
-            Writer writer = null;
+        try
+        {
+            writer = new FileWriter( project.getFile() );
 
-            try
-            {
-                writer = new FileWriter( project.getFile() );
-
-                project.writeOriginalModel( writer );
-            }
-            catch ( IOException e )
-            {
-                throw new MojoExecutionException( "Cannot write development version of pom to: " + project.getFile(),
-                                                  e );
-            }
-            finally
-            {
-                IOUtil.close( writer );
-            }
+            project.writeOriginalModel( writer );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Cannot write development version of pom to: " + project.getFile(), e );
+        }
+        finally
+        {
+            IOUtil.close( writer );
         }
     }
 
@@ -403,6 +401,10 @@ public class PrepareReleaseMojo
 
             if ( releaseProgress.getUsername() == null )
             {
+                if ( username == null )
+                {
+                    username = System.getProperty( "user.name" );
+                }
                 releaseProgress.setUsername( username );
             }
 
@@ -446,10 +448,11 @@ public class PrepareReleaseMojo
     }
 
     protected ProjectScmRewriter getScmRewriter()
+        throws MojoExecutionException
     {
         if ( scmRewriter == null )
         {
-            scmRewriter = new ProjectScmRewriter();
+            scmRewriter = new ProjectScmRewriter( getReleaseProgress() );
         }
 
         return scmRewriter;
@@ -471,9 +474,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                ScmHelper scm = getScm();
-
-                scm.setWorkingDirectory( basedir );
+                ScmHelper scm = getScm( basedir );
 
                 changedFiles = scm.getStatus();
             }
@@ -934,9 +935,7 @@ public class PrepareReleaseMojo
 
                     releasePomPath = releasePomPath.substring( canonicalBasedir.length() + 1 );
 
-                    ScmHelper scm = getScm();
-
-                    scm.setWorkingDirectory( basedir );
+                    ScmHelper scm = getScm( basedir );
 
                     scm.add( releasePomPath );
                 }
@@ -999,7 +998,7 @@ public class PrepareReleaseMojo
     {
         if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION ) )
         {
-            checkIn( "**/pom.xml,**/release-pom.xml", "[maven-release-plugin] prepare release " + getTagLabel() );
+            checkIn( "[maven-release-plugin] prepare release " + getTagLabel() );
 
             try
             {
@@ -1029,11 +1028,13 @@ public class PrepareReleaseMojo
 
                     currentReleasePomFile = new File( project.getFile().getParentFile(), RELEASE_POM );
 
-                    String releasePom = trimPathForScmCalculation( currentReleasePomFile );
+                    String releasePomPath = trimPathForScmCalculation( currentReleasePomFile );
 
-                    releasePom = releasePom.substring( canonicalBasedir.length() );
+                    releasePomPath = releasePomPath.substring( canonicalBasedir.length() + 1 );
 
-                    getScm().remove( "Removing for next development iteration.", releasePom );
+                    ScmHelper scm = getScm( basedir );
+
+                    scm.remove( "Removing for next development iteration.", releasePomPath );
 
                     currentReleasePomFile.delete();
                 }
@@ -1080,7 +1081,7 @@ public class PrepareReleaseMojo
     {
         if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_DEVELOPMENT_VERSION ) )
         {
-            checkIn( "**/pom.xml", "[maven-release-plugin] prepare for next development iteration" );
+            checkIn( "[maven-release-plugin] prepare for next development iteration" );
 
             try
             {
@@ -1093,21 +1094,19 @@ public class PrepareReleaseMojo
         }
     }
 
-    private void checkIn( String includePattern, String message )
+    private void checkIn( String message )
         throws MojoExecutionException
     {
         try
         {
-            ScmHelper scm = getScm();
-
-            scm.setWorkingDirectory( basedir );
+            ScmHelper scm = getScm( basedir );
 
             String tag = scm.getTag();
 
             // No tag here - we suppose user works on correct branch
             scm.setTag( null );
 
-            scm.checkin( message, includePattern, null );
+            scm.checkin( message );
 
             scm.setTag( tag );
         }
@@ -1179,9 +1178,7 @@ public class PrepareReleaseMojo
 
             try
             {
-                ScmHelper scm = getScm();
-
-                scm.setWorkingDirectory( basedir );
+                ScmHelper scm = getScm( basedir );
 
                 scm.setTag( tag );
 

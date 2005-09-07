@@ -1,5 +1,6 @@
 package org.apache.maven.plugins.release.helpers;
 
+import org.apache.maven.model.Scm;
 import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
@@ -26,6 +27,8 @@ public class ReleaseProgressTracker
     private static final String SCM_PASSWORD = "scm.password";
 
     private static final String CHECKPOINT_PREFIX = "checkpoint.";
+
+    private static final String SCM_INFO_PREFIX = "scm-info.";
 
     public static final String CP_INITIALIZED = "initialized";
 
@@ -193,4 +196,27 @@ public class ReleaseProgressTracker
         this.resumeAtCheckpoint = resumeAtCheckpoint;
     }
 
+    public void addOriginalScmInfo( String projectId, Scm scm )
+    {
+        releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".connection", scm.getConnection() );
+        releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".developerConnection",
+                                       scm.getDeveloperConnection() );
+        releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".url", scm.getUrl() );
+        releaseProperties.setProperty( SCM_INFO_PREFIX + projectId + ".tag", scm.getTag() );
+    }
+
+    public void restoreScmInfo( String projectId, Scm scm )
+    {
+        String connection = releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".connection" );
+        if ( connection == null )
+        {
+            throw new IllegalArgumentException(
+                "Project \'" + projectId + "\' has not had its SCM info cached. Cannot restore uncached SCM info." );
+        }
+        scm.setConnection( connection );
+        scm.setDeveloperConnection(
+            releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".developerConnection" ) );
+        scm.setUrl( releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".url" ) );
+        scm.setTag( releaseProperties.getProperty( SCM_INFO_PREFIX + projectId + ".tag" ) );
+    }
 }

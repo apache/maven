@@ -84,15 +84,7 @@ public class ProjectVersionResolver
     public void incrementVersion( MavenProject project )
         throws MojoExecutionException
     {
-        String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
-
-        String projectVersion = (String) resolvedVersions.get( projectId );
-
-        if ( projectVersion == null )
-        {
-            throw new IllegalArgumentException(
-                "Project \'" + projectId + "\' has not been resolved. Cannot increment an unresolved version." );
-        }
+        String projectVersion = project.getOriginalModel().getVersion();
 
         // TODO: we will need to incorporate versioning strategies here because it is unlikely
         // that everyone will be able to agree on a standard. This is extremely limited right
@@ -115,6 +107,7 @@ public class ProjectVersionResolver
             projectVersion = "";
         }
 
+        String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
         if ( interactive )
         {
             try
@@ -127,10 +120,6 @@ public class ProjectVersionResolver
                 {
                     projectVersion = inputVersion;
                 }
-
-                project.getOriginalModel().setVersion( projectVersion );
-
-                resolvedVersions.put( projectId, projectVersion );
             }
             catch ( IOException e )
             {
@@ -141,6 +130,10 @@ public class ProjectVersionResolver
         {
             throw new MojoExecutionException( "Cannot determine incremented development version for: " + projectId );
         }
+
+        project.getOriginalModel().setVersion( projectVersion );
+
+        resolvedVersions.put( projectId, projectVersion );
     }
 
 }

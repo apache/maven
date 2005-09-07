@@ -23,7 +23,6 @@ import org.apache.maven.plugins.release.helpers.ScmHelper;
 import org.apache.maven.scm.manager.ScmManager;
 
 /**
- * 
  * @author <a href="mailto:jdcasey@apache.org">John Casey</a>
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
@@ -41,7 +40,7 @@ public abstract class AbstractReleaseMojo
     protected abstract ReleaseProgressTracker getReleaseProgress()
         throws MojoExecutionException;
 
-    protected ScmHelper getScm()
+    protected ScmHelper getScm( String directory )
         throws MojoExecutionException
     {
         if ( scmHelper == null )
@@ -62,6 +61,8 @@ public abstract class AbstractReleaseMojo
 
             scmHelper.setPassword( releaseProgress.getPassword() );
         }
+
+        scmHelper.setWorkingDirectory( directory );
 
         return scmHelper;
     }
