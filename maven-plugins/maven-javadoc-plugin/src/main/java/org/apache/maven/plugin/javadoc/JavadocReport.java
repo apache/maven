@@ -49,6 +49,7 @@ import org.codehaus.plexus.util.cli.DefaultConsumer;
  * 
  * @goal javadoc
  * @requiresDependencyResolution compile
+ * @phase generate-sources
  * 
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
