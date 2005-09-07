@@ -4,7 +4,7 @@
   <name>Maven Model</name>
   <groupId>maven</groupId>
   <artifactId>maven-model</artifactId>
-  <currentVersion>3.0.1-SNAPSHOT</currentVersion>
+  <currentVersion>3.0.1</currentVersion>
   <description>Maven Model</description>
   <shortDescription>Maven Model</shortDescription>
   <dependencies>
