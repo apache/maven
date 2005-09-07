@@ -1,7 +1,7 @@
 package org.apache.maven.plugin.source;
 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2005 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ import java.util.List;
 public class JarSourceMojo
     extends AbstractMojo
 {
-    
     /**
      * @deprecated ICK! This needs to be generalized OUTSIDE of this mojo!
      */
@@ -52,7 +51,7 @@ public class JarSourceMojo
         
         BANNED_PACKAGINGS = banned;
     }
-    
+
     /**
      * @parameter expression="${project}"
      * @readonly
