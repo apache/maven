@@ -61,6 +61,16 @@
         <role>Java Developer</role>
       </roles>
     </developer>
+    <developer>
+      <id>snicoll</id>
+      <name>Stephane Nicoll</name>
+      <email>snicoll@apache.org</email>
+      <organization>ASF</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
   <dependencies>
     <dependency>
