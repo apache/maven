@@ -18,14 +18,15 @@ package org.apache.maven.plugin.it;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.execution.MavenExecutionResponse;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.profiles.DefaultProfileManager;
@@ -34,6 +35,7 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * @goal fork
@@ -46,6 +48,11 @@ public class ForkMojo
     extends AbstractMojo
 {
     /**
+     * @parameter expression="${component.org.apache.maven.lifecycle.LifecycleExecutor}"
+     */
+    private LifecycleExecutor lifecycleExecutor;
+
+    /**
      * @parameter expression="${session}"
      */
     private MavenSession session;
@@ -55,7 +62,6 @@ public class ForkMojo
      */
     private Settings settings;
 
-
     /**
      * @parameter expression="${project}"
      */
@@ -64,71 +70,103 @@ public class ForkMojo
     /**
      * @parameter expression="${project.basedir}/src/it/"
      */
-    private File projectsDir;
-
-
-    private ArtifactRepository artifactRepo;
-
-    private MavenProjectBuilder projectBuilder;
+    private File integrationTestsDirectory;
 
 
     public void execute()
         throws MojoExecutionException
     {
-        initComponents();
-
-        buildProjects( listITPoms() );
-    }
-
-    private void initComponents()
-        throws MojoExecutionException
-    {
         try
         {
-            artifactRepo = createLocalRepository();
-
-            projectBuilder = (MavenProjectBuilder)
-                session.getContainer().lookup( MavenProjectBuilder.ROLE );
-
-            if ( projectBuilder == null )
-                throw new MojoExecutionException( "Lookup for MavenProjectBuilder returned null" );
+            buildProjects();
         }
-        catch (ComponentLookupException e)
+        catch ( CycleDetectedException e )
         {
-            throw new MojoExecutionException( "Cannot get a MavenProjectBuilder", e);
+            throw new MojoExecutionException( "Error building projects", e );
+        }
+        catch ( LifecycleExecutionException e )
+        {
+            throw new MojoExecutionException( "Error building projects", e );
         }
     }
 
-    private void buildProjects( List poms )
+    private void buildProjects()
+        throws CycleDetectedException, LifecycleExecutionException, MojoExecutionException
     {
-        getLog().info( "Building " + poms.size() + " integration test projects.." );
+        List projects = collectProjects();
+
+        ReactorManager rm = new ReactorManager( projects );
+
+        rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
+
+        List goals = Collections.singletonList( "package" );
+
+        MavenSession forkedSession = new MavenSession(
+            session.getContainer(), session.getSettings(),
+            session.getLocalRepository(),
+            session.getEventDispatcher(),
+            rm, goals, integrationTestsDirectory.toString()
+        );
+
+        MavenExecutionResponse response = lifecycleExecutor.execute( forkedSession,
+            rm, forkedSession.getEventDispatcher()
+        );
+
+        if ( response.isExecutionFailure() )
+        {
+            throw new MojoExecutionException(
+                "Integration test failed" );
+        }
+    }
+
+    private List collectProjects()
+        throws MojoExecutionException
+    {
+        List projects = new ArrayList();
+
+        MavenProjectBuilder projectBuilder;
+
+        try
+        {
+            projectBuilder = (MavenProjectBuilder)
+                session.getContainer().lookup( MavenProjectBuilder.ROLE );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new MojoExecutionException( "Cannot get a MavenProjectBuilder", e );
+        }
+
+        List poms = listITPoms();
+
         for ( Iterator i = poms.iterator(); i.hasNext(); )
         {
+            File pom = (File) i.next();
+
             try
             {
-                MavenProject p = buildProject( (File) i.next() );
+                MavenProject p = projectBuilder.build(
+                    pom, session.getLocalRepository(),
+                    new DefaultProfileManager( session.getContainer() ) );
 
-                getLog().info("Building " + p.getId() );
+                getLog().debug( "Adding project " + p.getId() );
+
+                projects.add( p );
+
             }
             catch (ProjectBuildingException e)
             {
-                getLog().error("Build Error", e);
+                throw new MojoExecutionException( "Error loading " + pom, e );
             }
         }
-    }
 
-    private MavenProject buildProject( File pom )
-        throws ProjectBuildingException
-    {
-        return projectBuilder.build( pom, artifactRepo, new DefaultProfileManager(
-            session.getContainer() ) );
+        return projects;
     }
 
     private List listITPoms()
     {
         List poms = new ArrayList();
 
-        File [] children = projectsDir.listFiles();
+        File [] children = integrationTestsDirectory.listFiles();
 
         for ( int i = 0; i < children.length; i++ )
         {
@@ -140,53 +178,9 @@ public class ForkMojo
                 {
                     poms.add( pomFile );
                 }
-
             }
         }
 
         return poms;
     }
-
-    // Duplicate code from MavenCli, slightly modified.
-
-    private ArtifactRepository createLocalRepository()
-        throws ComponentLookupException
-    {
-        ArtifactRepositoryLayout repositoryLayout = (ArtifactRepositoryLayout)
-            session.getContainer().lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
-        ArtifactRepositoryFactory artifactRepositoryFactory = (ArtifactRepositoryFactory)
-            session.getContainer().lookup(
-        ArtifactRepositoryFactory.ROLE );
-
-        String url = "file://" + settings.getLocalRepository();
-        ArtifactRepository localRepository = new DefaultArtifactRepository( "local", url, repositoryLayout );
-
-        boolean snapshotPolicySet = false;
-
-        if ( settings.isOffline() )
-        {
-            artifactRepositoryFactory.setGlobalEnable( false );
-            snapshotPolicySet = true;
-        }
-
-        /* can't do this here.. :(
-        if ( !snapshotPolicySet && commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
-        {
-            artifactRepositoryFactory.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
-        }
-
-        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
-        {
-            artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL );
-        }
-        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
-        {
-            artifactRepositoryFactory.setGlobalChecksumPolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
-        }
-        */
-
-        return localRepository;
-    }
-
 }
