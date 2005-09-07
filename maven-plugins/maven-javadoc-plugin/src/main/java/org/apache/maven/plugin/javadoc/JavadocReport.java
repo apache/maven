@@ -634,6 +634,11 @@ public class JavadocReport
                 String sourceDirectory = (String) i.next();
                 fileList = FileUtils.getFilesFromExtension( sourceDirectory, new String[] { "java" } );
                 sourcePath.append( sourceDirectory );
+
+                if ( i.hasNext() )
+                {
+                    sourcePath.append( PATH_SEPARATOR );
+                }
             }
 
             File javadocDirectory = new File( getProject().getBuild().getDirectory() + "/javadoc" );
