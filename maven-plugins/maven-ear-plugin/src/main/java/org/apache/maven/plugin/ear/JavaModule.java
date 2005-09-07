@@ -30,7 +30,7 @@ public class JavaModule
 {
     protected static final String JAVA_MODULE = "java";
 
-    private Boolean library = Boolean.FALSE;
+    private Boolean includeInApplicationXml = Boolean.FALSE;
 
     public JavaModule()
     {
@@ -43,9 +43,10 @@ public class JavaModule
 
     public void appendModule( XMLWriter writer, String version )
     {
-        // Generates an entry in the application.xml only if this
-        // module is not a library
-        if (!isLibrary()) {
+        // Generates an entry in the application.xml only if
+        // includeInApplicationXml is set
+        if ( includeInApplicationXml.booleanValue() )
+        {
             writer.startElement( MODULE_ELEMENT );
             writer.startElement( JAVA_MODULE );
             writer.writeText( getUri() );
@@ -57,18 +58,5 @@ public class JavaModule
     protected String getType()
     {
         return "jar";
-    }
-
-    /**
-     * Specify whether this Java module is a third party library or not.
-     * <p/>
-     * If <tt>true</tt>, the module will not be included in the generated
-     * <tt>application.xml</tt>.
-     *
-     * @return true if the module is a third party library, false otherwise
-     */
-    public boolean isLibrary()
-    {
-        return library.booleanValue();
     }
 }

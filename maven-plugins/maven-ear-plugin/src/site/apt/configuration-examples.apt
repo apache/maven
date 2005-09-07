@@ -3,7 +3,7 @@
  ---
  Stéphane Nicoll
  ---
- 15-Aug-2005
+ 07-Sep-2005
  ---
 
 Introduction
@@ -25,8 +25,10 @@ Introduction
   Also, a dependency might be excluded from the generated EAR file by specifying the
   excluded flag.
 
-  Finally, third party libraries are handled by setting the library flag. If this flag
-  is set, the module is not included in the generated application.xml
+  Please note that third party libraries are not included in the generated
+  application.xml (only ejb-client should be included in a <java> entry). However, a
+  jar dependency could be included in the generated application.xml by specifying the
+  includeInApplicationXml flag.
 
 Customizing the context root
 
@@ -157,11 +159,10 @@ Excluding a module
   </build>
 +---------
 
-Declaring a module as a third party library
+Including a third party library in the generated application.xml
 
-  If third party libraries need to be included in an EAR file, the 'library' flag could be
-  used. Note that no entry in the application.xml will be created for such module. This
-  flag works only for java modules.
+  If third party libraries need to be included in the generated application.xml, the
+  'includeInApplicationXml' flag could be used. This flag works only for java modules.
 
 +--------
   <build>
@@ -175,7 +176,7 @@ Declaring a module as a third party library
              <javaModule>
                <groupId>artifactGroupId</groupId>
                <artifactId>artifactId</artifactId>
-               <library>true</library>
+               <includeInApplicationXml>true</includeInApplicationXml>
              </javaModule>
           </modules>
         </configuration>
