@@ -171,22 +171,35 @@ public class PrepareReleaseMojo
         {
             checkForLocalModifications();
 
-            for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
+            if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE ) )
             {
-                MavenProject project = (MavenProject) it.next();
+                for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
+                {
+                    MavenProject project = (MavenProject) it.next();
 
-                getVersionResolver().resolveVersion( project );
+                    getVersionResolver().resolveVersion( project );
 
-                getScmRewriter().rewriteScmInfo( project, getTagLabel() );
-            }
+                    getScmRewriter().rewriteScmInfo( project, getTagLabel() );
+                }
 
-            for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
-            {
-                MavenProject project = (MavenProject) it.next();
+                for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
+                {
+                    MavenProject project = (MavenProject) it.next();
 
-                checkForPresenceOfSnapshots( project );
+                    checkForPresenceOfSnapshots( project );
 
-                transformPomToReleaseVersionPom( project );
+                    transformPomToReleaseVersionPom( project );
+                }
+
+                try
+                {
+                    getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE );
+                }
+                catch ( IOException e )
+                {
+                    getLog().warn( "Error writing checkpoint.", e );
+                }
+
             }
 
             generateReleasePoms();
@@ -204,11 +217,24 @@ public class PrepareReleaseMojo
                 getScmRewriter().restoreScmInfo( project );
             }
 
-            for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
+            if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_POM_TRANSORMED_FOR_DEVELOPMENT ) )
             {
-                MavenProject project = (MavenProject) it.next();
+                for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
+                {
+                    MavenProject project = (MavenProject) it.next();
 
-                transformPomToSnapshotVersionPom( project );
+                    transformPomToSnapshotVersionPom( project );
+                }
+
+                try
+                {
+                    getReleaseProgress().checkpoint( basedir,
+                                                     ReleaseProgressTracker.CP_POM_TRANSORMED_FOR_DEVELOPMENT );
+                }
+                catch ( IOException e )
+                {
+                    getLog().warn( "Error writing checkpoint.", e );
+                }
             }
 
             removeReleasePoms();
@@ -229,109 +255,106 @@ public class PrepareReleaseMojo
     private void transformPomToSnapshotVersionPom( MavenProject project )
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_POM_TRANSORMED_FOR_DEVELOPMENT ) )
+        if ( isSnapshot( project.getVersion() ) )
         {
-            if ( isSnapshot( project.getVersion() ) )
+            throw new MojoExecutionException( "This project is a snapshot (" + project.getVersion() +
+                "). It appears that the release version has not been committed." );
+        }
+
+        Model model = project.getOriginalModel();
+
+        ProjectVersionResolver versionResolver = getVersionResolver();
+
+        Parent parent = model.getParent();
+
+        //Rewrite parent version
+        if ( parent != null )
+        {
+            String incrementedVersion = versionResolver.getResolvedVersion( parent.getGroupId(), parent
+                .getArtifactId() );
+
+            if ( incrementedVersion != null )
             {
-                throw new MojoExecutionException( "This project is a snapshot (" + project.getVersion() +
-                    "). It appears that the release version has not been committed." );
+                parent.setVersion( incrementedVersion );
             }
+        }
 
-            Model model = project.getOriginalModel();
+        //Rewrite dependencies section
+        List dependencies = model.getDependencies();
 
-            ProjectVersionResolver versionResolver = getVersionResolver();
-
-            Parent parent = model.getParent();
-
-            //Rewrite parent version
-            if ( parent != null )
+        if ( dependencies != null )
+        {
+            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
             {
-                String incrementedVersion = versionResolver.getResolvedVersion( parent.getGroupId(), parent
-                    .getArtifactId() );
+                Dependency dep = (Dependency) i.next();
 
-                if ( incrementedVersion != null )
+                String version = versionResolver.getResolvedVersion( dep.getGroupId(), dep.getArtifactId() );
+
+                if ( version != null )
                 {
-                    parent.setVersion( incrementedVersion );
+                    dep.setVersion( version );
                 }
             }
+        }
 
-            //Rewrite dependencies section
-            List dependencies = model.getDependencies();
+        //Rewrite plugins section
+        Build build = model.getBuild();
 
-            if ( dependencies != null )
+        if ( build != null )
+        {
+            List plugins = build.getPlugins();
+
+            if ( plugins != null )
             {
-                for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+                for ( Iterator i = plugins.iterator(); i.hasNext(); )
                 {
-                    Dependency dep = (Dependency) i.next();
+                    Plugin plugin = (Plugin) i.next();
 
-                    String version = versionResolver.getResolvedVersion( dep.getGroupId(), dep.getArtifactId() );
+                    String version = versionResolver.getResolvedVersion( plugin.getGroupId(), plugin
+                        .getArtifactId() );
 
                     if ( version != null )
                     {
-                        dep.setVersion( version );
+                        plugin.setVersion( version );
                     }
                 }
             }
 
-            //Rewrite plugins section
-            Build build = model.getBuild();
+            //Rewrite extensions section
+            List extensions = build.getExtensions();
 
-            if ( build != null )
+            for ( Iterator i = extensions.iterator(); i.hasNext(); )
             {
-                List plugins = build.getPlugins();
+                Extension ext = (Extension) i.next();
 
-                if ( plugins != null )
+                String version = versionResolver.getResolvedVersion( ext.getGroupId(), ext.getArtifactId() );
+
+                if ( version != null )
                 {
-                    for ( Iterator i = plugins.iterator(); i.hasNext(); )
-                    {
-                        Plugin plugin = (Plugin) i.next();
-
-                        String version = versionResolver.getResolvedVersion( plugin.getGroupId(), plugin
-                            .getArtifactId() );
-
-                        if ( version != null )
-                        {
-                            plugin.setVersion( version );
-                        }
-                    }
+                    ext.setVersion( version );
                 }
+            }
+        }
 
-                //Rewrite extensions section
-                List extensions = build.getExtensions();
+        Reporting reporting = model.getReporting();
 
-                for ( Iterator i = extensions.iterator(); i.hasNext(); )
+        if ( reporting != null )
+        {
+            //Rewrite reports section
+            List reports = reporting.getPlugins();
+
+            if ( reports != null )
+            {
+                for ( Iterator i = reports.iterator(); i.hasNext(); )
                 {
-                    Extension ext = (Extension) i.next();
+                    ReportPlugin plugin = (ReportPlugin) i.next();
 
-                    String version = versionResolver.getResolvedVersion( ext.getGroupId(), ext.getArtifactId() );
+                    String version = versionResolver.getResolvedVersion( plugin.getGroupId(), plugin
+                        .getArtifactId() );
 
                     if ( version != null )
                     {
-                        ext.setVersion( version );
-                    }
-                }
-            }
-
-            Reporting reporting = model.getReporting();
-
-            if ( reporting != null )
-            {
-                //Rewrite reports section
-                List reports = reporting.getPlugins();
-
-                if ( reports != null )
-                {
-                    for ( Iterator i = reports.iterator(); i.hasNext(); )
-                    {
-                        ReportPlugin plugin = (ReportPlugin) i.next();
-
-                        String version = versionResolver.getResolvedVersion( plugin.getGroupId(), plugin
-                            .getArtifactId() );
-
-                        if ( version != null )
-                        {
-                            plugin.setVersion( version );
-                        }
+                        plugin.setVersion( version );
                     }
                 }
             }
@@ -353,15 +376,6 @@ public class PrepareReleaseMojo
             {
                 IOUtil.close( writer );
             }
-
-            try
-            {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_POM_TRANSORMED_FOR_DEVELOPMENT );
-            }
-            catch ( IOException e )
-            {
-                getLog().warn( "Error writing checkpoint.", e );
-            }
         }
     }
 
@@ -370,49 +384,54 @@ public class PrepareReleaseMojo
     {
         if ( releaseProgress == null )
         {
+            try
+            {
+                releaseProgress = ReleaseProgressTracker.loadOrCreate( basedir );
+            }
+            catch ( IOException e )
+            {
+                getLog().warn( "Cannot read existing release progress file from directory: " + basedir + "." );
+                getLog().debug( "Cause", e );
+
+                releaseProgress = ReleaseProgressTracker.create();
+            }
+
             if ( resume )
             {
-                try
-                {
-                    releaseProgress = ReleaseProgressTracker.load( basedir );
-
-                    releaseProgress.verifyResumeCapable();
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException(
-                        "Cannot read existing release progress file from directory: " + basedir + ". Cannot resume." );
-                }
+                releaseProgress.setResumeAtCheckpoint( true );
             }
-            else
+
+            if ( releaseProgress.getUsername() == null )
             {
-                try
-                {
-                    releaseProgress = ReleaseProgressTracker.loadOrCreate( basedir );
-                }
-                catch ( IOException e )
-                {
-                    getLog().warn( "Cannot read existing release progress file from directory: " + basedir +
-                        ". Creating new instance." );
-                }
-
-                releaseProgress.setResumeAtCheckpoint( resume );
-
                 releaseProgress.setUsername( username );
+            }
 
-                if ( password != null )
-                {
-                    releaseProgress.setPassword( password );
-                }
+            if ( releaseProgress.getPassword() == null && password != null )
+            {
+                releaseProgress.setPassword( password );
+            }
 
+            if ( releaseProgress.getScmTag() == null )
+            {
                 releaseProgress.setScmTag( getTagLabel() );
+            }
 
+            if ( releaseProgress.getScmTagBase() == null )
+            {
                 releaseProgress.setScmTagBase( tagBase );
+            }
 
+            if ( releaseProgress.getScmUrl() == null )
+            {
                 releaseProgress.setScmUrl( urlScm );
             }
-        }
 
+            if ( releaseProgress.getUsername() == null || releaseProgress.getScmTag() == null ||
+                releaseProgress.getScmTagBase() == null || releaseProgress.getScmUrl() == null )
+            {
+                throw new MojoExecutionException( "Missing release preparation information." );
+            }
+        }
         return releaseProgress;
     }
 
@@ -514,286 +533,262 @@ public class PrepareReleaseMojo
     private void checkForPresenceOfSnapshots( MavenProject project )
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_SNAPSHOTS_CHECKED ) )
+        getLog().info( "Checking lineage for snapshots ..." );
+
+        MavenProject currentProject = project;
+
+        while ( currentProject.hasParent() )
         {
-            getLog().info( "Checking lineage for snapshots ..." );
+            MavenProject parentProject = currentProject.getParent();
 
-            MavenProject currentProject = project;
+            String parentVersion = getVersionResolver().getResolvedVersion( parentProject.getGroupId(),
+                                                                            parentProject.getArtifactId() );
 
-            while ( currentProject.hasParent() )
+            if ( isSnapshot( parentVersion ) )
             {
-                MavenProject parentProject = currentProject.getParent();
-
-                String parentVersion = getVersionResolver().getResolvedVersion( parentProject.getGroupId(),
-                                                                                parentProject.getArtifactId() );
-
-                if ( isSnapshot( parentVersion ) )
-                {
-                    throw new MojoExecutionException( "Can't release project due to non released parent." );
-                }
-
-                currentProject = parentProject;
+                throw new MojoExecutionException( "Can't release project due to non released parent." );
             }
 
-            getLog().info( "Checking dependencies for snapshots ..." );
+            currentProject = parentProject;
+        }
 
-            Set snapshotDependencies = new HashSet();
+        getLog().info( "Checking dependencies for snapshots ..." );
 
-            for ( Iterator i = project.getArtifacts().iterator(); i.hasNext(); )
+        Set snapshotDependencies = new HashSet();
+
+        for ( Iterator i = project.getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact artifact = (Artifact) i.next();
+
+            String artifactVersion = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
+                                                                              artifact.getArtifactId() );
+
+            if ( artifactVersion == null )
+            {
+                artifactVersion = artifact.getVersion();
+            }
+
+            if ( isSnapshot( artifactVersion ) )
+            {
+                snapshotDependencies.add( artifact );
+            }
+        }
+
+        getLog().info( "Checking plugins for snapshots ..." );
+
+        for ( Iterator i = project.getPluginArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact artifact = (Artifact) i.next();
+
+            String artifactVersion = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
+                                                                              artifact.getArtifactId() );
+
+            if ( artifactVersion == null )
+            {
+                artifactVersion = artifact.getVersion();
+            }
+
+            if ( isSnapshot( artifactVersion ) )
+            {
+                snapshotDependencies.add( artifact );
+            }
+        }
+
+        if ( !snapshotDependencies.isEmpty() )
+        {
+            List snapshotsList = new ArrayList( snapshotDependencies );
+
+            Collections.sort( snapshotsList );
+
+            StringBuffer message = new StringBuffer();
+
+            for ( Iterator i = snapshotsList.iterator(); i.hasNext(); )
             {
                 Artifact artifact = (Artifact) i.next();
 
-                String artifactVersion = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
-                                                                                  artifact.getArtifactId() );
+                message.append( "    " );
 
-                if ( artifactVersion == null )
-                {
-                    artifactVersion = artifact.getVersion();
-                }
+                message.append( artifact.getId() );
 
-                if ( isSnapshot( artifactVersion ) )
-                {
-                    snapshotDependencies.add( artifact );
-                }
+                message.append( "\n" );
             }
 
-            getLog().info( "Checking plugins for snapshots ..." );
-
-            for ( Iterator i = project.getPluginArtifacts().iterator(); i.hasNext(); )
-            {
-                Artifact artifact = (Artifact) i.next();
-
-                String artifactVersion = getVersionResolver().getResolvedVersion( artifact.getGroupId(),
-                                                                                  artifact.getArtifactId() );
-
-                if ( artifactVersion == null )
-                {
-                    artifactVersion = artifact.getVersion();
-                }
-
-                if ( isSnapshot( artifactVersion ) )
-                {
-                    snapshotDependencies.add( artifact );
-                }
-            }
-
-            if ( !snapshotDependencies.isEmpty() )
-            {
-                List snapshotsList = new ArrayList( snapshotDependencies );
-
-                Collections.sort( snapshotsList );
-
-                StringBuffer message = new StringBuffer();
-
-                for ( Iterator i = snapshotsList.iterator(); i.hasNext(); )
-                {
-                    Artifact artifact = (Artifact) i.next();
-
-                    message.append( "    " );
-
-                    message.append( artifact.getId() );
-
-                    message.append( "\n" );
-                }
-
-                throw new MojoExecutionException(
-                    "Can't release project due to non released dependencies :\n" + message.toString() );
-            }
-
-            try
-            {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_SNAPSHOTS_CHECKED );
-            }
-            catch ( IOException e )
-            {
-                getLog().warn( "Error writing checkpoint.", e );
-            }
+            throw new MojoExecutionException(
+                "Can't release project due to non released dependencies :\n" + message.toString() );
         }
     }
 
     private void transformPomToReleaseVersionPom( MavenProject project )
         throws MojoExecutionException
     {
-        if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE ) )
+        if ( !isSnapshot( project.getVersion() ) )
         {
-            if ( !isSnapshot( project.getVersion() ) )
+            throw new MojoExecutionException( "The project " + project.getGroupId() + ":" + project.getArtifactId() +
+                " isn't a snapshot (" + project.getVersion() + ")." );
+        }
+
+        Model model = project.getOriginalModel();
+
+        //Rewrite parent version
+        if ( model.getParent() != null )
+        {
+            Artifact parentArtifact = project.getParentArtifact();
+
+            if ( isSnapshot( parentArtifact.getBaseVersion() ) )
             {
-                throw new MojoExecutionException( "The project " + project.getGroupId() + ":" +
-                    project.getArtifactId() + " isn't a snapshot (" + project.getVersion() + ")." );
+                String version = resolveVersion( parentArtifact, "parent", project );
+
+                model.getParent().setVersion( version );
             }
+        }
 
-            Model model = project.getOriginalModel();
+        //Rewrite dependencies section
+        List dependencies = model.getDependencies();
 
-            //Rewrite parent version
-            if ( model.getParent() != null )
+        if ( dependencies != null )
+        {
+            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
             {
-                Artifact parentArtifact = project.getParentArtifact();
+                Dependency dep = (Dependency) i.next();
 
-                if ( isSnapshot( parentArtifact.getBaseVersion() ) )
+                // Avoid in dep mgmt
+                if ( dep.getVersion() != null )
                 {
-                    String version = resolveVersion( parentArtifact, "parent", project );
-
-                    model.getParent().setVersion( version );
-                }
-            }
-
-            //Rewrite dependencies section
-            List dependencies = model.getDependencies();
-
-            if ( dependencies != null )
-            {
-                for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-                {
-                    Dependency dep = (Dependency) i.next();
-
-                    // Avoid in dep mgmt
-                    if ( dep.getVersion() != null )
-                    {
-                        String resolvedVersion = getVersionResolver().getResolvedVersion( dep.getGroupId(),
-                                                                                          dep.getArtifactId() );
-
-                        if ( resolvedVersion != null )
-                        {
-                            dep.setVersion( resolvedVersion );
-                        }
-                    }
-                }
-            }
-
-            DependencyManagement dependencyManagement = model.getDependencyManagement();
-            dependencies = dependencyManagement != null ? dependencyManagement.getDependencies() : null;
-
-            if ( dependencies != null )
-            {
-                for ( Iterator i = dependencies.iterator(); i.hasNext(); )
-                {
-                    Dependency dep = (Dependency) i.next();
-
-                    if ( dep.getVersion() != null )
-                    {
-                        String resolvedVersion = getVersionResolver().getResolvedVersion( dep.getGroupId(),
-                                                                                          dep.getArtifactId() );
-
-                        if ( resolvedVersion != null )
-                        {
-                            dep.setVersion( resolvedVersion );
-                        }
-                    }
-                }
-            }
-
-            Build build = model.getBuild();
-
-            if ( build != null )
-            {
-                //Rewrite plugins section
-                List plugins = build.getPlugins();
-
-                if ( plugins != null )
-                {
-                    for ( Iterator i = plugins.iterator(); i.hasNext(); )
-                    {
-                        Plugin plugin = (Plugin) i.next();
-
-                        // Avoid in plugin mgmt
-                        if ( plugin.getVersion() != null )
-                        {
-                            String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
-                                                                                              plugin.getArtifactId() );
-
-                            if ( resolvedVersion != null )
-                            {
-                                plugin.setVersion( resolvedVersion );
-                            }
-                        }
-                    }
-                }
-
-                PluginManagement pluginManagement = build.getPluginManagement();
-                plugins = pluginManagement != null ? pluginManagement.getPlugins() : null;
-
-                if ( plugins != null )
-                {
-                    for ( Iterator i = plugins.iterator(); i.hasNext(); )
-                    {
-                        Plugin plugin = (Plugin) i.next();
-
-                        if ( plugin.getVersion() != null )
-                        {
-                            String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
-                                                                                              plugin.getArtifactId() );
-
-                            if ( resolvedVersion != null )
-                            {
-                                plugin.setVersion( resolvedVersion );
-                            }
-                        }
-                    }
-                }
-
-                //Rewrite extensions section
-                List extensions = build.getExtensions();
-
-                for ( Iterator i = extensions.iterator(); i.hasNext(); )
-                {
-                    Extension ext = (Extension) i.next();
-
-                    String resolvedVersion = getVersionResolver().getResolvedVersion( ext.getGroupId(),
-                                                                                      ext.getArtifactId() );
+                    String resolvedVersion = getVersionResolver().getResolvedVersion( dep.getGroupId(),
+                                                                                      dep.getArtifactId() );
 
                     if ( resolvedVersion != null )
                     {
-                        ext.setVersion( resolvedVersion );
+                        dep.setVersion( resolvedVersion );
                     }
                 }
             }
+        }
 
-            Reporting reporting = model.getReporting();
+        DependencyManagement dependencyManagement = model.getDependencyManagement();
+        dependencies = dependencyManagement != null ? dependencyManagement.getDependencies() : null;
 
-            if ( reporting != null )
+        if ( dependencies != null )
+        {
+            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
             {
-                //Rewrite reports section
-                List reports = reporting.getPlugins();
+                Dependency dep = (Dependency) i.next();
 
-                for ( Iterator i = reports.iterator(); i.hasNext(); )
+                if ( dep.getVersion() != null )
                 {
-                    ReportPlugin plugin = (ReportPlugin) i.next();
-
-                    String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
-                                                                                      plugin.getArtifactId() );
+                    String resolvedVersion = getVersionResolver().getResolvedVersion( dep.getGroupId(),
+                                                                                      dep.getArtifactId() );
 
                     if ( resolvedVersion != null )
                     {
-                        plugin.setVersion( resolvedVersion );
+                        dep.setVersion( resolvedVersion );
+                    }
+                }
+            }
+        }
+
+        Build build = model.getBuild();
+
+        if ( build != null )
+        {
+            //Rewrite plugins section
+            List plugins = build.getPlugins();
+
+            if ( plugins != null )
+            {
+                for ( Iterator i = plugins.iterator(); i.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) i.next();
+
+                    // Avoid in plugin mgmt
+                    if ( plugin.getVersion() != null )
+                    {
+                        String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
+                                                                                          plugin.getArtifactId() );
+
+                        if ( resolvedVersion != null )
+                        {
+                            plugin.setVersion( resolvedVersion );
+                        }
                     }
                 }
             }
 
-            Writer writer = null;
+            PluginManagement pluginManagement = build.getPluginManagement();
+            plugins = pluginManagement != null ? pluginManagement.getPlugins() : null;
 
-            try
+            if ( plugins != null )
             {
-                writer = new FileWriter( project.getFile() );
+                for ( Iterator i = plugins.iterator(); i.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) i.next();
 
-                project.writeOriginalModel( writer );
-            }
-            catch ( IOException e )
-            {
-                throw new MojoExecutionException( "Cannot write released version of pom to: " + project.getFile(), e );
-            }
-            finally
-            {
-                IOUtil.close( writer );
+                    if ( plugin.getVersion() != null )
+                    {
+                        String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
+                                                                                          plugin.getArtifactId() );
+
+                        if ( resolvedVersion != null )
+                        {
+                            plugin.setVersion( resolvedVersion );
+                        }
+                    }
+                }
             }
 
-            try
+            //Rewrite extensions section
+            List extensions = build.getExtensions();
+
+            for ( Iterator i = extensions.iterator(); i.hasNext(); )
             {
-                getReleaseProgress().checkpoint( basedir, ReleaseProgressTracker.CP_POM_TRANSFORMED_FOR_RELEASE );
+                Extension ext = (Extension) i.next();
+
+                String resolvedVersion = getVersionResolver().getResolvedVersion( ext.getGroupId(),
+                                                                                  ext.getArtifactId() );
+
+                if ( resolvedVersion != null )
+                {
+                    ext.setVersion( resolvedVersion );
+                }
             }
-            catch ( IOException e )
+        }
+
+        Reporting reporting = model.getReporting();
+
+        if ( reporting != null )
+        {
+            //Rewrite reports section
+            List reports = reporting.getPlugins();
+
+            for ( Iterator i = reports.iterator(); i.hasNext(); )
             {
-                getLog().warn( "Error writing checkpoint.", e );
+                ReportPlugin plugin = (ReportPlugin) i.next();
+
+                String resolvedVersion = getVersionResolver().getResolvedVersion( plugin.getGroupId(),
+                                                                                  plugin.getArtifactId() );
+
+                if ( resolvedVersion != null )
+                {
+                    plugin.setVersion( resolvedVersion );
+                }
             }
+        }
+
+        Writer writer = null;
+
+        try
+        {
+            writer = new FileWriter( project.getFile() );
+
+            project.writeOriginalModel( writer );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Cannot write released version of pom to: " + project.getFile(), e );
+        }
+        finally
+        {
+            IOUtil.close( writer );
         }
     }
 
@@ -1004,7 +999,7 @@ public class PrepareReleaseMojo
     {
         if ( !getReleaseProgress().verifyCheckpoint( ReleaseProgressTracker.CP_CHECKED_IN_RELEASE_VERSION ) )
         {
-            checkIn( "**/pom.xml,**/release-pom.xml", "[maven-release-plugin] prepare release" );
+            checkIn( "**/pom.xml,**/release-pom.xml", "[maven-release-plugin] prepare release " + getTagLabel() );
 
             try
             {
@@ -1149,6 +1144,16 @@ public class PrepareReleaseMojo
             {
                 throw new MojoExecutionException( "An error is occurred in the tag process.", e );
             }
+        }
+
+        if ( userTag == null )
+        {
+            userTag = releaseProgress.getScmTag();
+        }
+
+        if ( userTag == null )
+        {
+            throw new MojoExecutionException( "A tag must be specified" );
         }
 
         return userTag;

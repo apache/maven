@@ -128,7 +128,7 @@ public class ProjectVersionResolver
                     projectVersion = inputVersion;
                 }
 
-                project.setVersion( projectVersion );
+                project.getOriginalModel().setVersion( projectVersion );
 
                 resolvedVersions.put( projectId, projectVersion );
             }

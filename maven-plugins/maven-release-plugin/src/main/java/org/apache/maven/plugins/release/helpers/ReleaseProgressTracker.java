@@ -1,6 +1,5 @@
 package org.apache.maven.plugins.release.helpers;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
@@ -32,8 +31,6 @@ public class ReleaseProgressTracker
 
     public static final String CP_LOCAL_MODIFICATIONS_CHECKED = "local-modifications-checked";
 
-    public static final String CP_SNAPSHOTS_CHECKED = "snapshots-checked";
-
     public static final String CP_POM_TRANSFORMED_FOR_RELEASE = "transformed-pom-for-release";
 
     public static final String CP_GENERATED_RELEASE_POM = "generated-release-pom";
@@ -54,14 +51,15 @@ public class ReleaseProgressTracker
 
     private boolean resumeAtCheckpoint = false;
 
-    private ReleaseProgressTracker()
+    private ReleaseProgressTracker( Properties properties )
     {
+        this.releaseProperties = properties;
     }
 
     public static ReleaseProgressTracker loadOrCreate( String basedir )
         throws IOException
     {
-        ReleaseProgressTracker tracker = null;
+        ReleaseProgressTracker tracker;
 
         if ( new File( basedir, RELEASE_PROPERTIES ).exists() )
         {
@@ -69,10 +67,15 @@ public class ReleaseProgressTracker
         }
         else
         {
-            tracker = new ReleaseProgressTracker();
+            tracker = create();
         }
 
         return tracker;
+    }
+
+    public static ReleaseProgressTracker create()
+    {
+        return new ReleaseProgressTracker( new Properties() );
     }
 
     public static ReleaseProgressTracker load( String basedir )
@@ -80,26 +83,23 @@ public class ReleaseProgressTracker
     {
         File releasePropertiesFile = new File( basedir, RELEASE_PROPERTIES );
 
-        ReleaseProgressTracker tracker = new ReleaseProgressTracker();
-
         InputStream inStream = null;
 
+        Properties rp;
         try
         {
             inStream = new FileInputStream( releasePropertiesFile );
 
-            Properties rp = new Properties();
+            rp = new Properties();
 
             rp.load( inStream );
-
-            tracker.releaseProperties = rp;
         }
         finally
         {
             IOUtil.close( inStream );
         }
 
-        return tracker;
+        return new ReleaseProgressTracker( rp );
     }
 
     public static String getReleaseProgressFilename()
@@ -107,99 +107,54 @@ public class ReleaseProgressTracker
         return RELEASE_PROPERTIES;
     }
 
-    private void checkInitialized()
-    {
-        if ( releaseProperties == null )
-        {
-            releaseProperties = new Properties();
-        }
-    }
-
-    private void checkLoaded()
-    {
-        if ( releaseProperties == null )
-        {
-            throw new IllegalStateException( "You must load this instance before reading from it." );
-        }
-    }
-
     public void setUsername( String username )
     {
-        checkInitialized();
-
         releaseProperties.setProperty( USERNAME, username );
     }
 
     public String getUsername()
     {
-        checkLoaded();
-
         return releaseProperties.getProperty( USERNAME );
     }
 
     public void setScmTag( String scmTag )
     {
-        checkInitialized();
-
         releaseProperties.setProperty( SCM_TAG, scmTag );
     }
 
     public String getScmTag()
     {
-        checkLoaded();
-
         return releaseProperties.getProperty( SCM_TAG );
     }
 
     public void setScmUrl( String scmUrl )
     {
-        checkInitialized();
-
         releaseProperties.setProperty( SCM_URL, scmUrl );
     }
 
     public String getScmUrl()
     {
-        checkLoaded();
-
         return releaseProperties.getProperty( SCM_URL );
     }
 
     public void setScmTagBase( String tagBase )
     {
-        checkInitialized();
-
         releaseProperties.setProperty( SCM_TAG_BASE, tagBase );
     }
 
     public String getScmTagBase()
     {
-        checkLoaded();
-
         return releaseProperties.getProperty( SCM_TAG_BASE );
     }
 
     public void setPassword( String password )
     {
-        checkInitialized();
-
         releaseProperties.setProperty( SCM_PASSWORD, password );
     }
 
     public String getPassword()
     {
-        checkInitialized();
-
         return releaseProperties.getProperty( SCM_PASSWORD );
-    }
-
-    public void verifyResumeCapable()
-        throws MojoExecutionException
-    {
-        if ( getUsername() == null || getScmTag() == null || getScmTagBase() == null || getScmUrl() == null )
-        {
-            throw new MojoExecutionException( "Missing release preparation information. Failed to resume" );
-        }
     }
 
     public void checkpoint( String basedir, String pointName )
@@ -225,15 +180,11 @@ public class ReleaseProgressTracker
 
     private void setCheckpoint( String pointName )
     {
-        checkInitialized();
-
         releaseProperties.setProperty( CHECKPOINT_PREFIX + pointName, "OK" );
     }
 
     public boolean verifyCheckpoint( String pointName )
     {
-        checkLoaded();
-
         return resumeAtCheckpoint && "OK".equals( releaseProperties.getProperty( CHECKPOINT_PREFIX + pointName ) );
     }
 

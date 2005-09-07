@@ -21,6 +21,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Scm;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,31 +42,32 @@ public class ProjectScmRewriter
                 " already has it's original SCM info cached. Each project should only be resolved once." );
         }
 
-        Model model = project.getModel();
-
-        Scm scm = model.getScm();
-
-        if ( scm == null )
+        if ( project.getScm() == null )
         {
             throw new MojoExecutionException(
                 "Project: " + projectId + " does not have a SCM section! Cannot proceed with release." );
         }
 
-        String tag = model.getScm().getTag();
+        Model model = project.getOriginalModel();
 
-        String connection = model.getScm().getConnection();
+        Scm scm = model.getScm();
+        // If SCM is null in original model, it is inherited, no mods needed
+        if ( scm != null )
+        {
+            String tag = scm.getTag();
 
-        String developerConnection = model.getScm().getDeveloperConnection();
+            String connection = scm.getConnection();
 
-        ScmInfo info = new ScmInfo( tag, connection, developerConnection );
+            String developerConnection = scm.getDeveloperConnection();
 
-        originalScmInformation.put( projectId, info );
+            String url = scm.getUrl();
 
-        scm.setTag( tagLabel );
+            ScmInfo info = new ScmInfo( tag, connection, developerConnection, url );
 
-        scm.setConnection( rewriteScmConnection( connection, tagLabel ) );
+            originalScmInformation.put( projectId, info );
 
-        scm.setDeveloperConnection( rewriteScmConnection( developerConnection, tagLabel ) );
+            rewriteScmConnection( scm, tagLabel );
+        }
     }
 
     public void restoreScmInfo( MavenProject project )
@@ -83,25 +85,40 @@ public class ProjectScmRewriter
         original.modify( project );
     }
 
-    // TODO: Add other SCM types for rewriting...
-    private String rewriteScmConnection( String scmConnection, String tag )
+    // TODO: Add other SCM types for rewriting, and allow other layouts
+    private void rewriteScmConnection( Scm scm, String tag )
     {
-        if ( scmConnection != null )
+        if ( scm != null )
         {
-            if ( scmConnection.startsWith( "svn" ) )
+            String scmConnection = scm.getConnection();
+            if ( scmConnection != null && scmConnection.startsWith( "scm:svn" ) )
             {
-                if ( scmConnection.endsWith( "trunk/" ) )
-                {
-                    scmConnection = scmConnection.substring( 0, scmConnection.length() - "trunk/".length() );
-                }
-                if ( scmConnection.endsWith( "branches/" ) )
-                {
-                    scmConnection = scmConnection.substring( 0, scmConnection.length() - "branches/".length() );
-                }
-                scmConnection += "tags/" + tag;
+                scm.setConnection( convertSvnConnectionString( scmConnection, tag ) );
+                scm.setDeveloperConnection( convertSvnConnectionString( scm.getDeveloperConnection(), tag ) );
+                scm.setUrl( convertSvnConnectionString( scm.getUrl(), tag ) );
             }
         }
+    }
 
+    private String convertSvnConnectionString( String scmConnection, String tag )
+    {
+        if ( scmConnection.indexOf( "/trunk" ) >= 0 )
+        {
+            scmConnection = StringUtils.replace( scmConnection, "/trunk", "/tags/" + tag );
+        }
+        else
+        {
+            int begin = scmConnection.indexOf( "/branches/" );
+            if ( begin >= 0 )
+            {
+                int end = scmConnection.indexOf( '/', begin + "/branches/".length() );
+                scmConnection = scmConnection.substring( 0, begin ) + "/tags/" + tag;
+                if ( end >= 0 && end < scmConnection.length() - 1 )
+                {
+                    scmConnection += scmConnection.substring( end );
+                }
+            }
+        }
         return scmConnection;
     }
 
@@ -113,24 +130,30 @@ public class ProjectScmRewriter
 
         private String developerConnection;
 
-        ScmInfo( String tag, String connection, String developerConnection )
+        private String url;
+
+        ScmInfo( String tag, String connection, String developerConnection, String url )
         {
             this.tag = tag;
             this.connection = connection;
             this.developerConnection = developerConnection;
+            this.url = url;
         }
 
         void modify( MavenProject project )
         {
-            Model model = project.getModel();
+            Model model = project.getOriginalModel();
 
-            if ( model.getScm() != null )
+            Scm scm = model.getScm();
+            if ( scm != null )
             {
-                model.getScm().setTag( tag );
+                scm.setTag( tag );
 
-                model.getScm().setConnection( connection );
+                scm.setConnection( connection );
 
-                model.getScm().setDeveloperConnection( developerConnection );
+                scm.setDeveloperConnection( developerConnection );
+
+                scm.setUrl( url );
             }
         }
     }
