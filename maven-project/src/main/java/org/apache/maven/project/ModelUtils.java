@@ -466,7 +466,7 @@ public final class ModelUtils
         newModel.setVersion( model.getVersion() );
         newModel.setArtifactId( model.getArtifactId() );
         newModel.setModules( cloneModules( model.getModules() ) );
-        assembler.assembleModelInheritance( newModel, model );
+        assembler.copyModel( newModel, model );
         return newModel;
     }
 

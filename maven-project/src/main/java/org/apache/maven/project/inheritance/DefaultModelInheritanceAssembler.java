@@ -46,7 +46,17 @@ import java.util.TreeMap;
 public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
 {
+    public void copyModel( Model dest, Model source )
+    {
+        assembleModelInheritance( dest, source, false );
+    }
+
     public void assembleModelInheritance( Model child, Model parent )
+    {
+        assembleModelInheritance( child, parent, true );
+    }
+
+    private void assembleModelInheritance( Model child, Model parent, boolean appendPaths )
     {
         // cannot inherit from null parent.
         if ( parent == null )
@@ -83,7 +93,7 @@ public class DefaultModelInheritanceAssembler
         {
             if ( parent.getUrl() != null )
             {
-                child.setUrl( appendPath( parent.getUrl(), child.getArtifactId() ) );
+                child.setUrl( appendPath( parent.getUrl(), child.getArtifactId(), appendPaths ) );
             }
             else
             {
@@ -95,7 +105,7 @@ public class DefaultModelInheritanceAssembler
         // Distribution
         // ----------------------------------------------------------------------
 
-        assembleDistributionInheritence( child, parent );
+        assembleDistributionInheritence( child, parent, appendPaths );
 
         // issueManagement
         if ( child.getIssueManagement() == null )
@@ -116,7 +126,7 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Scm
-        assembleScmInheritance( child, parent );
+        assembleScmInheritance( child, parent, appendPaths );
 
         // ciManagement
         if ( child.getCiManagement() == null )
@@ -382,7 +392,7 @@ public class DefaultModelInheritanceAssembler
     }
 
 
-    private void assembleScmInheritance( Model child, Model parent )
+    private void assembleScmInheritance( Model child, Model parent, boolean appendPaths )
     {
         if ( parent.getScm() != null )
         {
@@ -399,24 +409,25 @@ public class DefaultModelInheritanceAssembler
 
             if ( StringUtils.isEmpty( childScm.getConnection() ) && !StringUtils.isEmpty( parentScm.getConnection() ) )
             {
-                childScm.setConnection( appendPath( parentScm.getConnection(), child.getArtifactId() ) );
+                childScm.setConnection( appendPath( parentScm.getConnection(), child.getArtifactId(), appendPaths ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
                 !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
                 childScm
-                    .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId() ) );
+                    .setDeveloperConnection(
+                        appendPath( parentScm.getDeveloperConnection(), child.getArtifactId(), appendPaths ) );
             }
 
             if ( StringUtils.isEmpty( childScm.getUrl() ) && !StringUtils.isEmpty( parentScm.getUrl() ) )
             {
-                childScm.setUrl( appendPath( parentScm.getUrl(), child.getArtifactId() ) );
+                childScm.setUrl( appendPath( parentScm.getUrl(), child.getArtifactId(), appendPaths ) );
             }
         }
     }
 
-    private void assembleDistributionInheritence( Model child, Model parent )
+    private void assembleDistributionInheritence( Model child, Model parent, boolean appendPaths )
     {
         if ( parent.getDistributionManagement() != null )
         {
@@ -447,7 +458,7 @@ public class DefaultModelInheritanceAssembler
 
                     if ( site.getUrl() != null )
                     {
-                        site.setUrl( appendPath( site.getUrl(), child.getArtifactId() ) );
+                        site.setUrl( appendPath( site.getUrl(), child.getArtifactId(), appendPaths ) );
                     }
                 }
             }
@@ -486,15 +497,22 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    private String appendPath( String url, String path )
+    private String appendPath( String url, String path, boolean appendPaths )
     {
-        if ( url.endsWith( "/" ) )
+        if ( appendPaths )
         {
-            return url + path;
+            if ( url.endsWith( "/" ) )
+            {
+                return url + path;
+            }
+            else
+            {
+                return url + "/" + path;
+            }
         }
         else
         {
-            return url + "/" + path;
+            return url;
         }
     }
 
