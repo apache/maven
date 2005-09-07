@@ -86,6 +86,13 @@ public class ProjectVersionResolver
     {
         String projectVersion = project.getOriginalModel().getVersion();
 
+        if ( project.getVersion().endsWith( "SNAPSHOT" ) )
+        {
+            String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
+            throw new MojoExecutionException( "The project " + projectId + " is a snapshot (" + project.getVersion() +
+                "). It appears that the release version has not been committed." );
+        }
+
         // TODO: we will need to incorporate versioning strategies here because it is unlikely
         // that everyone will be able to agree on a standard. This is extremely limited right
         // now and really only works for the way maven is versioned.

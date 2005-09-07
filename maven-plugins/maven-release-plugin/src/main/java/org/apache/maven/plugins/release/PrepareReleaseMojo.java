@@ -74,6 +74,8 @@ public class PrepareReleaseMojo
 
     private static final String RELEASE_POM = "release-pom.xml";
 
+    private static final String POM = "pom.xml";
+
     /**
      * @parameter expression="${basedir}"
      * @required
@@ -255,12 +257,6 @@ public class PrepareReleaseMojo
     private void transformPomToSnapshotVersionPom( MavenProject project )
         throws MojoExecutionException
     {
-        if ( isSnapshot( project.getVersion() ) )
-        {
-            throw new MojoExecutionException( "This project is a snapshot (" + project.getVersion() +
-                "). It appears that the release version has not been committed." );
-        }
-
         Model model = project.getOriginalModel();
 
         ProjectVersionResolver versionResolver = getVersionResolver();
@@ -361,15 +357,17 @@ public class PrepareReleaseMojo
         }
         Writer writer = null;
 
+        File file = new File( project.getFile().getParentFile(), POM );
+
         try
         {
-            writer = new FileWriter( project.getFile() );
+            writer = new FileWriter( file );
 
             project.writeOriginalModel( writer );
         }
         catch ( IOException e )
         {
-            throw new MojoExecutionException( "Cannot write development version of pom to: " + project.getFile(), e );
+            throw new MojoExecutionException( "Cannot write development version of pom to: " + file, e );
         }
         finally
         {
@@ -777,15 +775,16 @@ public class PrepareReleaseMojo
 
         Writer writer = null;
 
+        File file = new File( project.getFile().getParentFile(), POM );
         try
         {
-            writer = new FileWriter( project.getFile() );
+            writer = new FileWriter( file );
 
             project.writeOriginalModel( writer );
         }
         catch ( IOException e )
         {
-            throw new MojoExecutionException( "Cannot write released version of pom to: " + project.getFile(), e );
+            throw new MojoExecutionException( "Cannot write released version of pom to: " + file, e );
         }
         finally
         {
