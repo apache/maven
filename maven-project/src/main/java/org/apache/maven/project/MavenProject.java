@@ -61,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Stack;
 
 /**
  * The concern of the project is provide runtime values based on the model. <p/>
@@ -91,8 +90,6 @@ public class MavenProject
     private Set pluginArtifacts;
 
     private List remoteArtifactRepositories;
-
-    private Properties profileProperties = new Properties();
 
     private List collectedProjects = Collections.EMPTY_LIST;
 
@@ -173,8 +170,6 @@ public class MavenProject
         this.compileSourceRoots = new ArrayList( project.compileSourceRoots );
         this.testCompileSourceRoots = new ArrayList( project.testCompileSourceRoots );
         this.scriptSourceRoots = new ArrayList( project.scriptSourceRoots );
-
-        this.profileProperties = new Properties( project.profileProperties );
 
         this.model = ModelUtils.cloneModel( project.model );
 
@@ -587,6 +582,97 @@ public class MavenProject
 
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
+            {
+                Dependency dependency = new Dependency();
+
+                dependency.setArtifactId( a.getArtifactId() );
+                dependency.setGroupId( a.getGroupId() );
+                dependency.setVersion( a.getVersion() );
+                dependency.setScope( a.getScope() );
+                dependency.setType( a.getType() );
+                dependency.setClassifier( a.getClassifier() );
+
+                list.add( dependency );
+            }
+        }
+        return list;
+    }
+
+    public List getSystemClasspathElements()
+        throws DependencyResolutionRequiredException
+    {
+        List list = new ArrayList( getArtifacts().size() );
+
+        list.add( getBuild().getOutputDirectory() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            if ( isAddedToClasspath( a ) )
+            {
+                // TODO: let the scope handler deal with this
+                if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+                {
+                    String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId() );
+                    MavenProject project = (MavenProject) projectReferences.get( refId );
+                    if ( project != null )
+                    {
+                        list.add( project.getBuild().getOutputDirectory() );
+                    }
+                    else
+                    {
+                        File file = a.getFile();
+                        if ( file == null )
+                        {
+                            throw new DependencyResolutionRequiredException( a );
+                        }
+                        list.add( file.getPath() );
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+    public List getSystemArtifacts()
+    {
+        List list = new ArrayList( getArtifacts().size() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            // TODO: classpath check doesn't belong here - that's the other method
+            if ( isAddedToClasspath( a ) )
+            {
+                // TODO: let the scope handler deal with this
+                if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+                {
+                    list.add( a );
+                }
+            }
+        }
+        return list;
+    }
+
+    public List getSystemDependencies()
+    {
+        Set artifacts = getArtifacts();
+
+        if ( artifacts == null || artifacts.isEmpty() )
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        List list = new ArrayList( artifacts.size() );
+
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        {
+            Artifact a = (Artifact) i.next();
+
+            // TODO: let the scope handler deal with this
+            if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
 
@@ -1071,14 +1157,20 @@ public class MavenProject
         return model.getPluginRepositories();
     }
 
+    /**
+     * @deprecated use getProperties() instead
+     */
     public Properties getProfileProperties()
     {
-        return profileProperties;
+        return getProperties();
     }
 
+    /**
+     * @deprecated should add properties to the model instead
+     */
     public void addProfileProperties( Properties profileConfiguration )
     {
-        this.profileProperties.putAll( profileConfiguration );
+        getProperties().putAll( profileConfiguration );
     }
 
     public void setActiveProfiles( List activeProfiles )
@@ -1328,35 +1420,13 @@ public class MavenProject
         return groupId + ":" + artifactId;
     }
 
-    public void assembleProfilePropertiesInheritance()
-    {
-        Stack propertyStack = new Stack();
-
-        MavenProject current = this;
-        while ( current != null )
-        {
-            Properties toAdd = current.profileProperties;
-
-            if ( toAdd != null && !toAdd.isEmpty() )
-            {
-                propertyStack.push( toAdd );
-            }
-
-            current = current.getParent();
-        }
-
-        Properties newProfilesProperties = new Properties();
-
-        while ( !propertyStack.isEmpty() )
-        {
-            newProfilesProperties.putAll( (Properties) propertyStack.pop() );
-        }
-
-        this.profileProperties = newProfilesProperties;
-    }
-
     public void attachArtifact( String type, String classifier, File file )
     {
+    }
+
+    public Properties getProperties()
+    {
+        return getModel().getProperties();
     }
 
 }

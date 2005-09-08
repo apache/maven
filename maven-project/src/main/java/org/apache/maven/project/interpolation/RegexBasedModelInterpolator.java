@@ -104,6 +104,11 @@ public class RegexBasedModelInterpolator
                 {
                     value = ReflectionValueExtractor.evaluate( realExpr, model );
                 }
+                
+                if ( value == null )
+                {
+                    value = model.getProperties().getProperty( realExpr );
+                }
             }
             catch ( Exception e )
             {

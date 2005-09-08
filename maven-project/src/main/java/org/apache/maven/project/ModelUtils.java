@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 public final class ModelUtils
@@ -465,10 +466,12 @@ public final class ModelUtils
         newModel.setParent( cloneParent( model.getParent() ) );
         newModel.setVersion( model.getVersion() );
         newModel.setArtifactId( model.getArtifactId() );
+        newModel.setProperties( new Properties( model.getProperties() ) );
         newModel.setGroupId( model.getGroupId() );
         newModel.setPackaging( model.getPackaging() );
         newModel.setModules( cloneModules( model.getModules() ) );
         assembler.copyModel( newModel, model );
+
         return newModel;
     }
 

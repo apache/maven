@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -61,6 +62,12 @@ public class DefaultProfileInjector
         injectDistributionManagement( profile, model );
         
         injectBuild( profile, model );
+        
+        Properties props = new Properties();
+        props.putAll( model.getProperties() );
+        props.putAll( profile.getProperties() );
+        
+        model.setProperties( props );
     }
 
     private void injectBuild( Profile profile, Model model )

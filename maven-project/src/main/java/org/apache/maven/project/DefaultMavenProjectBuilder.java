@@ -85,7 +85,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -433,15 +432,11 @@ public class DefaultMavenProjectBuilder
 
         List activeProfiles;
 
-        Properties profileProperties = new Properties();
-
         superProjectProfileManager.addProfiles( superModel.getProfiles() );
 
-        activeProfiles = injectActiveProfiles( superProjectProfileManager, superModel, profileProperties );
+        activeProfiles = injectActiveProfiles( superProjectProfileManager, superModel );
 
         MavenProject superProject = new MavenProject( superModel );
-
-        superProject.addProfileProperties( profileProperties );
 
         superProject.setActiveProfiles( activeProfiles );
 
@@ -558,13 +553,6 @@ public class DefaultMavenProjectBuilder
             modelCache.put( key, model );
         }
 
-        Properties profileProperties = project.getProfileProperties();
-
-        if ( profileProperties == null )
-        {
-            profileProperties = new Properties();
-        }
-
         List activeProfiles = project.getActiveProfiles();
 
         if ( activeProfiles == null )
@@ -572,7 +560,7 @@ public class DefaultMavenProjectBuilder
             activeProfiles = new ArrayList();
         }
 
-        List injectedProfiles = injectActiveProfiles( profileMgr, model, profileProperties );
+        List injectedProfiles = injectActiveProfiles( profileMgr, model );
 
         activeProfiles.addAll( injectedProfiles );
 
@@ -609,10 +597,6 @@ public class DefaultMavenProjectBuilder
         project.setOriginalModel( originalModel );
 
         project.setActiveProfiles( activeProfiles );
-
-        project.addProfileProperties( profileProperties );
-
-        project.assembleProfilePropertiesInheritance();
 
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
@@ -692,15 +676,13 @@ public class DefaultMavenProjectBuilder
 
         List activeProfiles;
 
-        Properties profileProperties = new Properties();
-
         try
         {
             profileManager.addProfiles( model.getProfiles() );
 
             loadProjectExternalProfiles( profileManager, projectDir );
 
-            activeProfiles = injectActiveProfiles( profileManager, model, profileProperties );
+            activeProfiles = injectActiveProfiles( profileManager, model );
         }
         catch ( ProfileActivationException e )
         {
@@ -708,8 +690,6 @@ public class DefaultMavenProjectBuilder
         }
 
         MavenProject project = new MavenProject( model );
-
-        project.addProfileProperties( profileProperties );
 
         project.setActiveProfiles( activeProfiles );
 
@@ -819,7 +799,7 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private List injectActiveProfiles( ProfileManager profileManager, Model model, Properties profileProperties )
+    private List injectActiveProfiles( ProfileManager profileManager, Model model )
         throws ProjectBuildingException
     {
         List activeProfiles;
@@ -840,8 +820,6 @@ public class DefaultMavenProjectBuilder
                 Profile profile = (Profile) it.next();
 
                 profileInjector.inject( profile, model );
-
-                profileProperties.putAll( profile.getProperties() );
             }
         }
         else
@@ -1106,15 +1084,11 @@ public class DefaultMavenProjectBuilder
 
         List activeProfiles;
 
-        Properties profileProperties = new Properties();
-
         profileManager.addProfiles( superModel.getProfiles() );
 
-        activeProfiles = injectActiveProfiles( profileManager, superModel, profileProperties );
+        activeProfiles = injectActiveProfiles( profileManager, superModel );
 
         MavenProject project = new MavenProject( superModel );
-
-        project.addProfileProperties( profileProperties );
 
         project.setActiveProfiles( activeProfiles );
 

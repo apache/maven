@@ -238,9 +238,9 @@ public class PluginParameterExpressionEvaluator
             // Check properties that have been injected via profiles before we default over to
             // system properties.
 
-            if ( project.getProfileProperties() != null )
+            if ( project.getProperties() != null )
             {
-                value = project.getProfileProperties().getProperty( expression );
+                value = project.getProperties().getProperty( expression );
             }
 
             if ( value == null )

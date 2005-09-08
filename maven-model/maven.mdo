@@ -682,6 +682,18 @@
             <type>DistributionManagement</type>
           </association>
         </field>
+        <field>
+          <name>properties</name>
+          <version>4.0.0</version>
+          <description><![CDATA[
+             Properties used to fill in plugin configuration
+          ]]></description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
     </class>
     <!-- @todo: is any of this too CVS specific? Investigate other SCMs -->
@@ -2561,18 +2573,6 @@
           <description><![CDATA[Information required to build the project.]]></description>
           <association>
             <type>BuildBase</type>
-          </association>
-        </field>
-        <field>
-          <name>properties</name>
-          <version>4.0.0</version>
-          <description><![CDATA[
-             Properties used to fill in plugin configuration when this profile is active
-          ]]></description>
-          <type>Properties</type>
-          <association xml.mapStyle="inline">
-            <type>String</type>
-            <multiplicity>*</multiplicity>
           </association>
         </field>
       </fields>

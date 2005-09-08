@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -172,6 +173,12 @@ public class DefaultModelInheritanceAssembler
         assembleDependencyManagementInheritance( child, parent );
 
         assembleDistributionManagementInheritance( child, parent );
+        
+        Properties props = new Properties();
+        props.putAll( parent.getProperties() );
+        props.putAll( child.getProperties() );
+        
+        child.setProperties( props );
     }
 
     private void assembleDistributionManagementInheritance( Model child, Model parent )
