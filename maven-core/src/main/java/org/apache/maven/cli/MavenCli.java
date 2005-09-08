@@ -18,11 +18,11 @@ package org.apache.maven.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -650,7 +650,7 @@ public class MavenCli
         public CommandLine parse( String[] args )
             throws ParseException
         {
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new GnuParser();
             return parser.parse( options, args );
         }
 
