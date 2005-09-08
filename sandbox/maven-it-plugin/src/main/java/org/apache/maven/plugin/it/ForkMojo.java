@@ -95,9 +95,13 @@ public class ForkMojo
     {
         List projects = collectProjects();
 
+        projects.add( project );
+
         ReactorManager rm = new ReactorManager( projects );
 
         rm.setFailureBehavior( ReactorManager.FAIL_AT_END );
+
+        rm.blackList( project );
 
         List goals = Collections.singletonList( "package" );
 
