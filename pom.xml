@@ -17,7 +17,9 @@
     <notifiers>
       <notifier>
         <type>mail</type>
-        <address>dev@maven.apache.org</address>
+        <configuration>
+          <address>dev@maven.apache.org</address>
+        </configuration>
       </notifier>
     </notifiers>
   </ciManagement>
