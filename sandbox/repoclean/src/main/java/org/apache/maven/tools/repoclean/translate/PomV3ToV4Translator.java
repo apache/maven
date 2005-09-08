@@ -169,8 +169,8 @@ public class PomV3ToV4Translator
             {
                 Notifier notifier = new Notifier();
 
-                notifier.setAddress( nagEmailAddress );
                 notifier.setType( "mail" );
+                notifier.addConfiguration( "address", nagEmailAddress );
 
                 ciMgmt = new CiManagement();
                 ciMgmt.addNotifier( notifier );
