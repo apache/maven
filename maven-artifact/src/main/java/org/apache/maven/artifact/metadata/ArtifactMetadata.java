@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * @todo merge with artifactmetadatasource
  * @todo retrieval exception not appropriate for store
  * @todo not happy about the store/retrieve methods - they use "this"
- * @todo separate specific interfaces
  */
 public interface ArtifactMetadata
 {

@@ -1,6 +1,7 @@
 import compile.CompilerConfiguration;
 import compile.JavacCompiler;
 import download.ArtifactDownloader;
+import download.RepositoryMetadata;
 import jar.JarMojo;
 import model.Dependency;
 import model.ModelReader;
@@ -11,17 +12,14 @@ import test.SurefirePlugin;
 import util.AbstractReader;
 import util.Commandline;
 import util.FileUtils;
-import util.IOUtil;
 import util.IsolatedClassLoader;
 import util.Os;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -815,22 +813,12 @@ public class MBoot
 
         System.out.println( "Installing: " + file );
 
-        if ( version.indexOf( "SNAPSHOT" ) >= 0 )
-        {
-            // TODO: replace
-            File metadata = localRepository.getMetadataFile( groupId, artifactId, version, type,
-                                                             finalName + ".version.txt" );
-
-            metadata.getParentFile().mkdirs();
-
-            IOUtil.copy( new StringReader( version ), new FileWriter( metadata ) );
-        }
-
         FileUtils.copyFile( new File( basedir, BUILD_DIR + "/" + finalName + ".jar" ), file );
 
-        // TODO: replace
+        RepositoryMetadata metadata = new RepositoryMetadata();
+        metadata.setReleaseVersion( version );
         file = localRepository.getMetadataFile( groupId, artifactId, null, type, artifactId + "-RELEASE.version.txt" );
-        IOUtil.copy( new StringReader( version ), new FileWriter( file ) );
+        metadata.write( file );
     }
 
     private void runTests( String basedir, String classes, String testClasses, ModelReader reader,

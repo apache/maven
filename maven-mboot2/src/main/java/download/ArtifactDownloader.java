@@ -136,48 +136,114 @@ public class ArtifactDownloader
                 String version = dep.getVersion();
                 if ( snapshot )
                 {
-                    // TODO: augment with maven-metadata
-                    String filename = getSnapshotMetadataFile( destinationFile.getName(), "SNAPSHOT.version.txt" );
-                    File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
-                                                                 dep.getVersion(), dep.getType(), filename );
+                    String filename = "maven-metadata-" + remoteRepo.getId() + ".xml";
+                    File localFile = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
+                                                                      dep.getVersion(), dep.getType(),
+                                                                      "maven-metadata-local.xml" );
+                    File remoteFile = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
+                                                                       dep.getVersion(), dep.getType(), filename );
                     String metadataPath = remoteRepo.getMetadataPath( dep.getGroupId(), dep.getArtifactId(),
                                                                       dep.getVersion(), dep.getType(), filename );
                     String metaUrl = remoteRepo.getBasedir() + "/" + metadataPath;
                     log( "Downloading " + metaUrl );
                     try
                     {
-                        HttpUtils.getFile( metaUrl, file, ignoreErrors, true, proxyHost, proxyPort, proxyUserName,
+                        HttpUtils.getFile( metaUrl, remoteFile, ignoreErrors, true, proxyHost, proxyPort, proxyUserName,
                                            proxyPassword, false );
                     }
                     catch ( IOException e )
                     {
-                        log( "WARNING: remote SNAPSHOT version not found, using local: " + e.getMessage() );
+                        log( "WARNING: remote metadata version not found, using local: " + e.getMessage() );
                     }
 
+                    File file = localFile;
+                    if ( remoteFile.exists() )
+                    {
+                        if ( !localFile.exists() || localFile.lastModified() < remoteFile.lastModified() )
+                        {
+                            file = remoteFile;
+                        }
+                    }
+
+                    boolean found = false;
                     if ( file.exists() )
                     {
-                        version = FileUtils.fileRead( file );
-                        log( "Resolved version: " + version );
-                        dep.setResolvedVersion( version );
-                        if ( !version.endsWith( "SNAPSHOT" ) )
+                        log( "Using metadata: " + file );
+
+                        RepositoryMetadata metadata = RepositoryMetadata.read( file );
+
+                        if ( version.equals( metadata.getVersion() ) )
                         {
-                            String ver = version.substring(
-                                version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
-                            String extension = url.substring( url.length() - 4 );
-                            url = getSnapshotMetadataFile( url, ver + extension );
+                            found = true;
+                            version = metadata.constructVersion( version );
+                            log( "Resolved version: " + version );
+                            dep.setResolvedVersion( version );
+                            if ( !version.endsWith( "SNAPSHOT" ) )
+                            {
+                                String ver = version.substring(
+                                    version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
+                                String extension = url.substring( url.length() - 4 );
+                                url = getSnapshotMetadataFile( url, ver + extension );
+                            }
+                            else if ( destinationFile.exists() )
+                            {
+                                // It's already there
+                                return true;
+                            }
                         }
-                        else if ( destinationFile.exists() )
+                        else
                         {
-                            // It's already there
-                            return true;
+                            log( "WARNING: versions did not match, not using metadata (" + version + " vs " +
+                                metadata.getVersion() + ")" );
                         }
                     }
-                    else
+
+                    if ( !found )
                     {
-                        log( "WARNING: local SNAPSHOT version not found, using default" );
+                        log( "WARNING: attempting to use legacy metadata" );
+
+                        filename = getSnapshotMetadataFile( destinationFile.getName(), "SNAPSHOT.version.txt" );
+                        file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(), dep.getVersion(),
+                                                                dep.getType(), filename );
+                        metadataPath = remoteRepo.getMetadataPath( dep.getGroupId(), dep.getArtifactId(),
+                                                                   dep.getVersion(), dep.getType(), filename );
+                        metaUrl = remoteRepo.getBasedir() + "/" + metadataPath;
+                        log( "Downloading " + metaUrl );
+                        try
+                        {
+                            HttpUtils.getFile( metaUrl, file, ignoreErrors, true, proxyHost, proxyPort, proxyUserName,
+                                               proxyPassword, false );
+                        }
+                        catch ( IOException e )
+                        {
+                            log( "WARNING: remote SNAPSHOT version not found, using local: " + e.getMessage() );
+                        }
+
+                        if ( file.exists() )
+                        {
+                            version = FileUtils.fileRead( file );
+                            log( "Resolved version: " + version );
+                            dep.setResolvedVersion( version );
+                            if ( !version.endsWith( "SNAPSHOT" ) )
+                            {
+                                String ver = version.substring(
+                                    version.lastIndexOf( "-", version.lastIndexOf( "-" ) - 1 ) + 1 );
+                                String extension = url.substring( url.length() - 4 );
+                                url = getSnapshotMetadataFile( url, ver + extension );
+                            }
+                            else if ( destinationFile.exists() )
+                            {
+                                // It's already there
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            log( "WARNING: local SNAPSHOT version not found, using default" );
+                        }
                     }
                 }
-                if ( !dep.getType().equals( "pom" ) )
+                if ( !"pom".equals( dep.getType() ) )
                 {
                     String name = dep.getArtifactId() + "-" + dep.getResolvedVersion() + ".pom";
                     File file = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
