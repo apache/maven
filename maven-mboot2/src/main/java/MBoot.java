@@ -817,7 +817,7 @@ public class MBoot
 
         RepositoryMetadata metadata = new RepositoryMetadata();
         metadata.setReleaseVersion( version );
-        file = localRepository.getMetadataFile( groupId, artifactId, null, type, artifactId + "-RELEASE.version.txt" );
+        file = localRepository.getMetadataFile( groupId, artifactId, null, type, "maven-metadata-local.xml" );
         metadata.write( file );
     }
 
