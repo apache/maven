@@ -1036,15 +1036,6 @@
           <type>String</type>
           <description>The mechanism used to deliver notifications.</description>
         </field>
-        <!-- TODO: Remove it after continuum alpha-3 release -->
-        <field>
-          <name>address</name>
-          <version>4.0.0</version>
-          <type>String</type>
-          <description>
-            Where to send the notification to - eg email address.
-          </description>
-        </field>
         <field>
           <name>configuration</name>
           <description>Extended configuration specific to this notifier goes here.</description>
