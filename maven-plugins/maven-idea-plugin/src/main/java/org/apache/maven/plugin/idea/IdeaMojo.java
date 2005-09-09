@@ -136,11 +136,14 @@ public class IdeaMojo
             // Set the jdk name if set
             if ( jdkName != null )
             {
-                setJdkName( module );
+                setJdkName( module, jdkName );
             }
             else
             {
-                getLog().warn( "jdkName is not set, you will have to set the JDK to use in IDEA." );
+                String javaVersion = System.getProperty( "java.version" );
+                String defaultJdkName = "java version " + javaVersion;
+                getLog().info( "jdkName is not set, using[" + defaultJdkName + "] as default." );
+                setJdkName( module, defaultJdkName );
             }
 
             Xpp3Dom component = findComponent( module, "ProjectModuleManager" );
@@ -365,7 +368,7 @@ Can't run this anyway as Xpp3Dom is in both classloaders...
         element.setAttribute( "url", getModuleFileUrl( warSrc ) );
     }
 
-    private void setJdkName( Xpp3Dom content )
+    private void setJdkName( Xpp3Dom content, String jdkName )
     {
         Xpp3Dom component = findComponent( content, "ProjectRootManager" );
         component.setAttribute( "project-jdk-name", jdkName );
