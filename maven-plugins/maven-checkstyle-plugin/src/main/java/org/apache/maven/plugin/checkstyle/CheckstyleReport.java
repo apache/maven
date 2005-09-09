@@ -47,11 +47,11 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-
 /**
  * @goal checkstyle
  *
  * @author <a href="mailto:evenisse@apache.org">Emmanuel Venisse</a>
+ * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @version $Id: DependenciesReport.java,v 1.2 2005/02/23 00:08:02 brett Exp $
  */
 public class CheckstyleReport
@@ -64,7 +64,7 @@ public class CheckstyleReport
      * @required
      */
     private String outputDirectory;
-    
+
     /**
      * Specifies the names filter of the source files to be used for checkstyle
      *
@@ -72,14 +72,14 @@ public class CheckstyleReport
      * @required
      */
     private String includes;
-    
+
     /**
      * Specifies the names filter of the source files to be excluded for checkstyle
-     * 
+     *
      * @parameter
      */
     private String excludes;
-    
+
     /**
      * Specifies what predefined check set to use. Available sets are
      *     "sun" (for the Sun coding conventions), "turbine", and "avalon".
@@ -88,21 +88,21 @@ public class CheckstyleReport
      * @parameter default-value="sun"
      */
     private String format;
-    
+
     /**
      * Specifies the location of the checkstyle properties that will be used to check the source.
      *
      * @parameter
      */
     private File propertiesFile;
-    
+
     /**
      * Specifies the URL of the checkstyle properties that will be used to check the source.
      *
      * @parameter
      */
     private URL propertiesURL;
-    
+
     /**
      * Specifies the location of the License file (a.k.a. the header file) that is used by Checkstyle
      *     to verify that source code has the correct copyright.
@@ -117,7 +117,7 @@ public class CheckstyleReport
      * @parameter expression="${project.build.directory}/checkstyle-cachefile"
      */
     private String cacheFile;
-    
+
     /**
      * If null, the checkstyle task will display violations on stdout. Otherwise, the text file will be
      *     created with the violations. Note: This is in addition to the XML result file (containing
@@ -126,7 +126,7 @@ public class CheckstyleReport
      * @parameter
      */
     private String useFile;
-    
+
     /**
      * Specifies the location of the supperssions XML file to use. The plugin defines a Checkstyle
      *     property named <code>checkstyle.supperssions.file</code> with the value of this
@@ -136,7 +136,7 @@ public class CheckstyleReport
      * @parameter
      */
     private String suppressionsFile;
-    
+
     /**
      * Specifies the path and filename to save the checkstyle output.  The format of the output file is
      *     determined by the <code>outputFileFormat</code>
@@ -155,7 +155,7 @@ public class CheckstyleReport
 
     /**
      * Specifies the location of the package names XML to be used to configure Checkstyle
-     * 
+     *
      * @parameter
      */
     private String packageNamesFile;
@@ -166,7 +166,7 @@ public class CheckstyleReport
      * @parameter default-value="false"
      */
     private boolean failsOnError;
-    
+
     /**
      * Specifies the location of the source files to be used for Checkstyle
      *
@@ -232,7 +232,8 @@ public class CheckstyleReport
     /**
      * @see org.apache.maven.reporting.AbstractMavenReport#executeReport(java.util.Locale)
      */
-    public void executeReport( Locale locale ) throws MavenReportException
+    public void executeReport( Locale locale )
+        throws MavenReportException
     {
         File[] files = getFilesToProcess( includes, excludes );
 
@@ -241,25 +242,27 @@ public class CheckstyleReport
         Properties overridingProperties = getOverridingProperties();
 
         ModuleFactory moduleFactory = getModuleFactory();
-        
+
         FilterSet filterSet = getSuppressions();
-        
+
         Checker checker = null;
-        
+
         try
         {
-            Configuration config = ConfigurationLoader.loadConfiguration( configFile,
-                                       new PropertiesExpander( overridingProperties ) );
+            Configuration config = ConfigurationLoader
+                .loadConfiguration( configFile, new PropertiesExpander( overridingProperties ) );
 
             checker = new Checker();
 
-            if ( moduleFactory != null ) checker.setModuleFactory( moduleFactory );
-            
-            if ( filterSet != null ) checker.addFilter( filterSet );
+            if ( moduleFactory != null )
+                checker.setModuleFactory( moduleFactory );
+
+            if ( filterSet != null )
+                checker.addFilter( filterSet );
 
             checker.configure( config );
         }
-        catch( CheckstyleException ce )
+        catch ( CheckstyleException ce )
         {
             throw new MavenReportException( "Failed during checkstyle configuration", ce );
         }
@@ -270,13 +273,13 @@ public class CheckstyleReport
         {
             checker.addListener( listener );
         }
-        
+
         if ( StringUtils.isNotEmpty( useFile ) )
         {
             File outputFile = new File( useFile );
-            
+
             OutputStream out = getOutputStream( outputFile );
-            
+
             checker.addListener( new DefaultLogger( out, true ) );
         }
 
@@ -301,17 +304,18 @@ public class CheckstyleReport
     {
         return "checkstyle";
     }
-    
-    private AuditListener getListener() throws MavenReportException
+
+    private AuditListener getListener()
+        throws MavenReportException
     {
         AuditListener listener = null;
 
         if ( StringUtils.isNotEmpty( outputFileFormat ) )
         {
             File resultFile = new File( outputFile );
-            
+
             OutputStream out = getOutputStream( resultFile );
-            
+
             if ( "xml".equals( outputFileFormat ) )
             {
                 listener = new XMLLogger( out, true );
@@ -322,23 +326,26 @@ public class CheckstyleReport
             }
             else
             {
-                throw new MavenReportException( "Invalid output file format: (" + outputFileFormat + "). Must be 'plain' or 'xml'." );
+                throw new MavenReportException( "Invalid output file format: (" + outputFileFormat
+                    + "). Must be 'plain' or 'xml'." );
             }
         }
-        
+
         return listener;
     }
-    
-    private OutputStream getOutputStream( File file ) throws MavenReportException
+
+    private OutputStream getOutputStream( File file )
+        throws MavenReportException
     {
         FileOutputStream out;
-        
+
         try
         {
             File parentFile = file.getParentFile();
-            
-            if ( !parentFile.exists() ) parentFile.mkdirs();
-            
+
+            if ( !parentFile.exists() )
+                parentFile.mkdirs();
+
             return new FileOutputStream( file );
         }
         catch ( IOException ioe )
@@ -347,27 +354,28 @@ public class CheckstyleReport
         }
     }
 
-    private File[] getFilesToProcess( String includes, String excludes ) throws MavenReportException
+    private File[] getFilesToProcess( String includes, String excludes )
+        throws MavenReportException
     {
         StringBuffer excludesStr = new StringBuffer();
-        
+
         if ( StringUtils.isNotEmpty( excludes ) )
         {
-            excludesStr.append(excludes);
+            excludesStr.append( excludes );
         }
-        
+
         for ( int i = 0; i < DEFAULT_EXCLUDES.length; i++ )
         {
             if ( excludesStr.length() > 0 )
             {
                 excludesStr.append( "," );
             }
-            
+
             excludesStr.append( DEFAULT_EXCLUDES[i] );
         }
 
         List files;
-        
+
         try
         {
             files = FileUtils.getFiles( new File( sourceDirectory ), includes, excludesStr.toString() );
@@ -376,17 +384,18 @@ public class CheckstyleReport
         {
             throw new MavenReportException( "Failed to get source files", ioe );
         }
-        
-        return (File[]) ( files.toArray( new File[ 0 ] ) );
+
+        return (File[]) ( files.toArray( new File[0] ) );
     }
 
-    private Properties getOverridingProperties() throws MavenReportException
+    private Properties getOverridingProperties()
+        throws MavenReportException
     {
         Properties p = new Properties();
-        
+
         try
         {
-            if (  propertiesFile != null )
+            if ( propertiesFile != null )
             {
                 p.load( new FileInputStream( propertiesFile ) );
             }
@@ -405,37 +414,41 @@ public class CheckstyleReport
         {
             throw new MavenReportException( "Failed to get overriding properties", e );
         }
-        
+
         return p;
     }
-    
-    private String getConfigFile() throws MavenReportException
+
+    private String getConfigFile()
+        throws MavenReportException
     {
         URL configFile;
-        
-        if ( "turbine".equalsIgnoreCase( format ) )
+
+        if ( StringUtils.isEmpty( format ) || ( "sun".equalsIgnoreCase( format.trim() ) ) )
+        {
+            // By default
+            configFile = getClass().getResource( "/config/sun_checks.xml" );
+        }
+        else if ( "turbine".equalsIgnoreCase( format.trim() ) )
         {
             configFile = getClass().getResource( "/config/turbine_checks.xml" );
         }
-        else if ( "avalon".equalsIgnoreCase( format ) )
+        else if ( "avalon".equalsIgnoreCase( format.trim() ) )
         {
             configFile = getClass().getResource( "/config/avalon_checks.xml" );
-        }
-        else if ( "".equalsIgnoreCase( format ) )
-        {
-            configFile = getClass().getResource( "/config/sun_checks.xml" );
         }
         else
         {
             throw new MavenReportException( "Invalid configuration file format: " + format );
         }
-        
+
         return configFile.toString();
     }
-    
-    private ModuleFactory getModuleFactory() throws MavenReportException
+
+    private ModuleFactory getModuleFactory()
+        throws MavenReportException
     {
-        if ( StringUtils.isEmpty( packageNamesFile ) ) return null;
+        if ( StringUtils.isEmpty( packageNamesFile ) )
+            return null;
 
         try
         {
@@ -446,11 +459,13 @@ public class CheckstyleReport
             throw new MavenReportException( "failed to load package names XML: " + packageNamesFile, ce );
         }
     }
-    
-    private FilterSet getSuppressions() throws MavenReportException
+
+    private FilterSet getSuppressions()
+        throws MavenReportException
     {
-        if ( StringUtils.isEmpty( suppressionsFile ) ) return null;
-        
+        if ( StringUtils.isEmpty( suppressionsFile ) )
+            return null;
+
         try
         {
             return SuppressionsLoader.loadSuppressions( suppressionsFile );
@@ -463,6 +478,6 @@ public class CheckstyleReport
 
     private static ResourceBundle getBundle( Locale locale )
     {
-        return ResourceBundle.getBundle("checkstyle-report", locale, CheckstyleReport.class.getClassLoader() );
+        return ResourceBundle.getBundle( "checkstyle-report", locale, CheckstyleReport.class.getClassLoader() );
     }
 }
