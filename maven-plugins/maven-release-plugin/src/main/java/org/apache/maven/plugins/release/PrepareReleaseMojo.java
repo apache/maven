@@ -53,6 +53,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -825,6 +826,7 @@ public class PrepareReleaseMojo
 
                 MavenProject releaseProject = new MavenProject( project );
                 Model releaseModel = releaseProject.getOriginalModel();
+                fixNullValueInModel( releaseModel, project.getModel() );
 
                 // Remove parent
                 if ( releaseModel.getParent() != null )
@@ -968,6 +970,43 @@ public class PrepareReleaseMojo
                 }
             }
         }
+    }
+
+    private void fixNullValueInModel( Model modelToFix, Model correctModel )
+    {
+        modelToFix.setModelVersion( correctModel.getModelVersion() );
+        modelToFix.setName( correctModel.getName() );
+        modelToFix.setParent( cloneParent( correctModel.getParent() ) );
+        modelToFix.setVersion( correctModel.getVersion() );
+        modelToFix.setArtifactId( correctModel.getArtifactId() );
+        modelToFix.setProperties( new Properties( correctModel.getProperties() ) );
+        modelToFix.setGroupId( correctModel.getGroupId() );
+        modelToFix.setPackaging( correctModel.getPackaging() );
+        modelToFix.setModules( cloneModules( correctModel.getModules() ) );
+    }
+
+    private static List cloneModules( List modules )
+    {
+        if ( modules == null )
+        {
+            return modules;
+        }
+        return new ArrayList( modules );
+    }
+
+    private static Parent cloneParent( Parent parent )
+    {
+        if ( parent == null )
+        {
+            return parent;
+        }
+
+        Parent newParent = new Parent();
+        newParent.setArtifactId( parent.getArtifactId() );
+        newParent.setGroupId( parent.getGroupId() );
+        newParent.setRelativePath( parent.getRelativePath() );
+        newParent.setVersion( parent.getVersion() );
+        return newParent;
     }
 
     private String resolveVersion( Artifact artifact, String artifactUsage, MavenProject project )
