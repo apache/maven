@@ -540,12 +540,23 @@ public class PrepareReleaseMojo
         {
             MavenProject parentProject = currentProject.getParent();
 
-            String parentVersion = getVersionResolver().getResolvedVersion( parentProject.getGroupId(),
-                                                                            parentProject.getArtifactId() );
+            String parentVersion = null;
 
-            if ( isSnapshot( parentVersion ) )
+            if ( isSnapshot( parentProject.getVersion() ) )
             {
-                throw new MojoExecutionException( "Can't release project due to non released parent." );
+                parentVersion = getVersionResolver().getResolvedVersion( parentProject.getGroupId(),
+                                                                         parentProject.getArtifactId() );
+
+                if ( parentVersion == null )
+                {
+                    parentVersion = parentProject.getVersion();
+                }
+
+                if ( isSnapshot( parentVersion ) )
+                {
+                    throw new MojoExecutionException( "Can't release project due to non released parent (" +
+                        parentProject.getGroupId() + ":" + parentProject.getArtifactId() + parentVersion + "." );
+                }
             }
 
             currentProject = parentProject;

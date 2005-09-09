@@ -86,10 +86,10 @@ public class ProjectVersionResolver
     {
         String projectVersion = project.getOriginalModel().getVersion();
 
-        if ( project.getVersion().endsWith( "SNAPSHOT" ) )
+        if ( projectVersion.endsWith( "SNAPSHOT" ) )
         {
             String projectId = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
-            throw new MojoExecutionException( "The project " + projectId + " is a snapshot (" + project.getVersion() +
+            throw new MojoExecutionException( "The project " + projectId + " is a snapshot (" + projectVersion +
                 "). It appears that the release version has not been committed." );
         }
 
@@ -99,8 +99,23 @@ public class ProjectVersionResolver
 
         // releaseVersion = 1.0-beta-4
         // snapshotVersion = 1.0-beta-5-SNAPSHOT
+        // or
+        // releaseVersion = 1.0.4
+        // snapshotVersion = 1.0.5-SNAPSHOT
 
-        String nextVersionString = projectVersion.substring( projectVersion.lastIndexOf( "-" ) + 1 );
+        String nextVersionString = null;
+        if ( projectVersion.indexOf( "-" ) > 0 )
+        {
+            nextVersionString = projectVersion.substring( projectVersion.lastIndexOf( "-" ) + 1 );
+        }
+        else if ( projectVersion.indexOf( "." ) > 0 )
+        {
+            nextVersionString = projectVersion.substring( projectVersion.lastIndexOf( "." ) + 1 );
+        }
+        else
+        {
+            nextVersionString = projectVersion;
+        }
 
         try
         {
