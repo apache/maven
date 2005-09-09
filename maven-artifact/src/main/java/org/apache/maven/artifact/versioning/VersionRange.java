@@ -407,9 +407,7 @@ public class VersionRange
             else
             {
                 Restriction restriction = (Restriction) restrictions.get( restrictions.size() - 1 );
-                // TODO: how can we find the latest release before something to facilitate ) at the end?
-                // Also, how can we find the latest release when there no RELEASE metadata? We need to be maintaining
-                // a version list in the repository
+
                 version = restriction.getUpperBound();
                 if ( version == null )
                 {
@@ -418,6 +416,38 @@ public class VersionRange
             }
         }
         return version;
+    }
+
+    public boolean isSelectedVersionKnown()
+        throws OverConstrainedVersionException
+    {
+        boolean value;
+        if ( recommendedVersion != null )
+        {
+            value = true;
+        }
+        else
+        {
+            if ( restrictions.size() == 0 )
+            {
+                throw new OverConstrainedVersionException( "The artifact has no valid ranges" );
+            }
+            else
+            {
+                Restriction restriction = (Restriction) restrictions.get( restrictions.size() - 1 );
+
+                if ( restriction.getUpperBound() == null )
+                {
+                    // RELEASE version, considered known
+                    value = true;
+                }
+                else
+                {
+                    value = restriction.isUpperBoundInclusive();
+                }
+            }
+        }
+        return value;
     }
 
     public String toString()
@@ -452,5 +482,39 @@ public class VersionRange
             }
             return buf.toString();
         }
+    }
+
+    public ArtifactVersion matchVersion( List versions )
+    {
+        // TODO: could be more efficient by sorting the list and then moving along the restrictions in order?
+
+        ArtifactVersion matched = null;
+        for ( Iterator i = versions.iterator(); i.hasNext(); )
+        {
+            ArtifactVersion version = (ArtifactVersion) i.next();
+            if ( containsVersion( version ) )
+            {
+                // valid - check if it is greater than the currently matched version
+                if ( matched == null || version.compareTo( matched ) > 0 )
+                {
+                    matched = version;
+                }
+            }
+        }
+        return matched;
+    }
+
+    private boolean containsVersion( ArtifactVersion version )
+    {
+        boolean matched = false;
+        for ( Iterator i = restrictions.iterator(); i.hasNext() && !matched; )
+        {
+            Restriction restriction = (Restriction) i.next();
+            if ( restriction.containsVersion( version ) )
+            {
+                matched = true;
+            }
+        }
+        return matched;
     }
 }

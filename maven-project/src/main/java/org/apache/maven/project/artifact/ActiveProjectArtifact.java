@@ -260,4 +260,14 @@ public class ActiveProjectArtifact
     {
         artifact.setResolved( release );
     }
+
+    public List getAvailableVersions()
+    {
+        return artifact.getAvailableVersions();
+    }
+
+    public void setAvailableVersions( List versions )
+    {
+        artifact.setAvailableVersions( versions );
+    }
 }

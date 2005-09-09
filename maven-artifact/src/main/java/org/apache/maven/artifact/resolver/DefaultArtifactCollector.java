@@ -17,12 +17,12 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
@@ -45,18 +45,16 @@ public class DefaultArtifactCollector
 {
     public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact,
                                              ArtifactRepository localRepository, List remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
-                                             ArtifactFactory artifactFactory, List listeners )
+                                             ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
         throws ArtifactResolutionException
     {
         return collect( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository, remoteRepositories,
-                        source, filter, artifactFactory, listeners );
+                        source, filter, listeners );
     }
 
     public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                              ArtifactRepository localRepository, List remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
-                                             ArtifactFactory artifactFactory, List listeners )
+                                             ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
         throws ArtifactResolutionException
     {
         Map resolvedArtifacts = new HashMap();
@@ -68,7 +66,7 @@ public class DefaultArtifactCollector
             root.addDependencies( artifacts, remoteRepositories, filter );
 
             recurse( root, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
-                     artifactFactory, listeners );
+                     listeners );
 
             Set set = new HashSet();
 
@@ -97,7 +95,7 @@ public class DefaultArtifactCollector
 
     private void recurse( ResolutionNode node, Map resolvedArtifacts, Map managedVersions,
                           ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
-                          ArtifactFilter filter, ArtifactFactory artifactFactory, List listeners )
+                          ArtifactFilter filter, List listeners )
         throws CyclicDependencyException, TransitiveArtifactResolutionException, OverConstrainedVersionException
     {
         fireEvent( ResolutionListener.TEST_ARTIFACT, listeners, node );
@@ -179,8 +177,43 @@ public class DefaultArtifactCollector
                     {
                         // set the recommended version
                         VersionRange versionRange = artifact.getVersionRange();
-                        String version = versionRange.getSelectedVersion().toString();
-                        artifact.selectVersion( version );
+
+                        // TODO: maybe its better to just pass the range through to retrieval and use a transformation?
+                        ArtifactVersion version;
+                        if ( !versionRange.isSelectedVersionKnown() )
+                        {
+                            List versions = artifact.getAvailableVersions();
+                            if ( versions == null )
+                            {
+                                versions = source.retrieveAvailableVersions( artifact, localRepository,
+                                                                             remoteRepositories );
+                                artifact.setAvailableVersions( versions );
+                            }
+
+                            version = versionRange.matchVersion( versions );
+
+                            if ( version == null )
+                            {
+                                if ( versions.isEmpty() )
+                                {
+                                    throw new OverConstrainedVersionException(
+                                        "No versions are present in the repository for the artifact with a range " +
+                                            versionRange );
+                                }
+                                else
+                                {
+                                    throw new OverConstrainedVersionException(
+                                        "Couldn't find a version in " + versions + " to match range " + versionRange );
+                                }
+                            }
+                        }
+                        else
+                        {
+                            version = versionRange.getSelectedVersion();
+                        }
+
+                        artifact.selectVersion( version.toString() );
+                        fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                     }
 
                     ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
@@ -202,7 +235,7 @@ public class DefaultArtifactCollector
                 }
 
                 recurse( child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source, filter,
-                         artifactFactory, listeners );
+                         listeners );
             }
         }
 
@@ -288,6 +321,9 @@ public class DefaultArtifactCollector
                     break;
                 case ResolutionListener.MANAGE_ARTIFACT:
                     listener.manageArtifact( node.getArtifact(), replacement );
+                    break;
+                case ResolutionListener.SELECT_VERSION_FROM_RANGE:
+                    listener.selectVersionFromRange( node.getArtifact() );
                     break;
                 default:
                     throw new IllegalStateException( "Unknown event: " + event );

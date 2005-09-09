@@ -76,6 +76,8 @@ public class DefaultArtifact
 
     private boolean release = false;
 
+    private List availableVersions;
+
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler )
     {
@@ -229,7 +231,8 @@ public class DefaultArtifact
 
     public String toString()
     {
-        return getId();
+        return getDependencyConflictId() + ( hasClassifier() ? ":" + getClassifier() : "" ) + ":" +
+            ( version != null || baseVersion != null ? getBaseVersion() : versionRange.toString() );
     }
 
     public int hashCode()
@@ -431,15 +434,22 @@ public class DefaultArtifact
 
     public boolean isSnapshot()
     {
-        Matcher m = VERSION_FILE_PATTERN.matcher( getBaseVersion() );
-        if ( m.matches() )
+        if ( version != null || baseVersion != null )
         {
-            setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
-            return true;
+            Matcher m = VERSION_FILE_PATTERN.matcher( getBaseVersion() );
+            if ( m.matches() )
+            {
+                setBaseVersion( m.group( 1 ) + "-" + SNAPSHOT_VERSION );
+                return true;
+            }
+            else
+            {
+                return getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION );
+            }
         }
         else
         {
-            return getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION );
+            return false;
         }
     }
 
@@ -472,5 +482,15 @@ public class DefaultArtifact
     public boolean isRelease()
     {
         return release;
+    }
+
+    public List getAvailableVersions()
+    {
+        return availableVersions;
+    }
+
+    public void setAvailableVersions( List availableVersions )
+    {
+        this.availableVersions = availableVersions;
     }
 }

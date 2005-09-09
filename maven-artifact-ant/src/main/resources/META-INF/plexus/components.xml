@@ -441,6 +441,9 @@
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
       </requirements>
     </component>
 

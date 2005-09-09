@@ -18,13 +18,20 @@ package org.apache.maven.project.artifact;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
@@ -36,9 +43,15 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -48,19 +61,21 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
 public class MavenMetadataSource
     extends AbstractLogEnabled
     implements ArtifactMetadataSource
 {
-
     public static final String ROLE_HINT = "maven";
 
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ArtifactFactory artifactFactory;
+
+    private RepositoryMetadataManager repositoryMetadataManager;
 
     /**
      * Retrieve the metadata for the project from the repository.
@@ -88,8 +103,8 @@ public class MavenMetadataSource
             {
                 try
                 {
-                    project = mavenProjectBuilder
-                        .buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories,
+                                                                       localRepository );
                 }
                 catch ( InvalidModelException e )
                 {
@@ -255,5 +270,108 @@ public class MavenMetadataSource
         }
 
         return projectArtifacts;
+    }
+
+    public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                           List remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact );
+        repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );
+
+        // TODO: this has been ripped from AbstractVersionTransformation - stop duplication
+        Versioning versioning = null;
+        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+        {
+            ArtifactRepository repository = (ArtifactRepository) i.next();
+
+            versioning = loadVersioningInformation( metadata, repository, localRepository, artifact );
+            if ( versioning != null )
+            {
+                artifact.setRepository( repository );
+                // TODO: merge instead (see above)
+                break;
+            }
+        }
+        Versioning v = loadVersioningInformation( metadata, localRepository, localRepository, artifact );
+        if ( v != null )
+        {
+            versioning = v;
+            // TODO: figure out way to avoid duplicated message
+            if ( getLogger().isDebugEnabled() /*&& !alreadyResolved*/ )
+            {
+                // Locally installed file is newer, don't use the resolved version
+                getLogger().debug( artifact.getArtifactId() + ": using locally installed snapshot" );
+            }
+        }
+
+        List versions;
+        if ( versioning != null )
+        {
+            versions = new ArrayList( versioning.getVersions().size() );
+            for ( Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+            {
+                String version = (String) i.next();
+                versions.add( new DefaultArtifactVersion( version ) );
+            }
+        }
+        else
+        {
+            versions = Collections.EMPTY_LIST;
+        }
+
+        return versions;
+    }
+
+    private Versioning loadVersioningInformation( ArtifactMetadata repoMetadata, ArtifactRepository remoteRepository,
+                                                    ArtifactRepository localRepository, Artifact artifact )
+        throws ArtifactMetadataRetrievalException
+    {
+        File metadataFile = new File( localRepository.getBasedir(),
+                                      localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
+
+        Versioning versioning = null;
+        if ( metadataFile.exists() )
+        {
+            Metadata metadata = readMetadata( metadataFile );
+            versioning = metadata.getVersioning();
+        }
+        return versioning;
+    }
+
+    /**
+     * @todo share with DefaultPluginMappingManager.
+     */
+    private static Metadata readMetadata( File mappingFile )
+        throws ArtifactMetadataRetrievalException
+    {
+        Metadata result;
+
+        Reader fileReader = null;
+        try
+        {
+            fileReader = new FileReader( mappingFile );
+
+            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+
+            result = mappingReader.read( fileReader );
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Cannot read version information from: " + mappingFile, e );
+        }
+        catch ( IOException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Cannot read version information from: " + mappingFile, e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Cannot parse version information from: " + mappingFile, e );
+        }
+        finally
+        {
+            IOUtil.close( fileReader );
+        }
+        return result;
     }
 }

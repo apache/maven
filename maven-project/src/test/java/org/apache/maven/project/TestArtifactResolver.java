@@ -136,6 +136,12 @@ public class TestArtifactResolver
             return new ResolutionGroup( artifact, artifacts, artifactRepositories );
         }
 
+        public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                               List remoteRepositories )
+        {
+            throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+        }
+
         protected Set createArtifacts( List dependencies, String inheritedScope )
             throws InvalidVersionSpecificationException
         {
@@ -146,11 +152,11 @@ public class TestArtifactResolver
                 Dependency d = (Dependency) i.next();
 
                 String scope = d.getScope();
-                
+
                 if ( StringUtils.isEmpty( scope ) )
                 {
                     scope = Artifact.SCOPE_COMPILE;
-                    
+
                     d.setScope( scope );
                 }
 

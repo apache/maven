@@ -7,8 +7,8 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <type>jar</type>
+      <!-- Select 3.7 -->
+      <version>(,3.8)</version>
       <scope>test</scope>
     </dependency>
     <dependency>

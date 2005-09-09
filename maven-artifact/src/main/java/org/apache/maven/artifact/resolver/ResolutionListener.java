@@ -46,6 +46,8 @@ public interface ResolutionListener
 
     int UPDATE_SCOPE_CURRENT_POM = 9;
 
+    int SELECT_VERSION_FROM_RANGE = 10;
+
     void testArtifact( Artifact node );
 
     void startProcessChildren( Artifact artifact );
@@ -63,4 +65,6 @@ public interface ResolutionListener
     void omitForCycle( Artifact artifact );
 
     void updateScopeCurrentPom( Artifact artifact, String scope );
+
+    void selectVersionFromRange( Artifact artifact );
 }

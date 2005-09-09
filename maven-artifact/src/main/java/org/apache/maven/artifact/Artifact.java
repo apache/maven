@@ -145,4 +145,8 @@ public interface Artifact
     boolean isRelease();
 
     void setRelease( boolean release );
+
+    List getAvailableVersions();
+
+    void setAvailableVersions( List versions );
 }

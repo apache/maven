@@ -69,12 +69,18 @@ public class AntResolutionListener
 
     public void updateScope( Artifact artifact, String scope )
     {
-        project.log( indent + artifact.getId() + " (settings scope to: " + scope + ")" );
+        project.log( indent + artifact.getId() + " (setting scope to: " + scope + ")" );
     }
 
     public void updateScopeCurrentPom( Artifact artifact, String scope )
     {
-    	updateScope( artifact, scope );
+        updateScope( artifact, scope );
+    }
+
+    public void selectVersionFromRange( Artifact artifact )
+    {
+        project.log( indent + artifact.getId() + " (setting version to: " + artifact.getVersion() + " from range: " +
+            artifact.getVersionRange() + ")" );
     }
 
     public void manageArtifact( Artifact artifact, Artifact replacement )

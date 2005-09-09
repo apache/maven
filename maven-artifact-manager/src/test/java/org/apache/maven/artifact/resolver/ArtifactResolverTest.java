@@ -104,7 +104,7 @@ public class ArtifactResolverTest
             {
                 Set dependencies = new HashSet();
 
-                if ( artifact.getArtifactId().equals( "g" ) )
+                if ( "g".equals( artifact.getArtifactId() ) )
                 {
                     try
                     {
@@ -117,6 +117,12 @@ public class ArtifactResolverTest
                 }
 
                 return new ResolutionGroup( artifact, dependencies, remoteRepositories );
+            }
+
+            public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                   List remoteRepositories )
+            {
+                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }
         };
 
@@ -152,7 +158,7 @@ public class ArtifactResolverTest
             {
                 Set dependencies = new HashSet();
 
-                if ( artifact.getArtifactId().equals( "i" ) )
+                if ( "i".equals( artifact.getArtifactId() ) )
                 {
                     try
                     {
@@ -165,6 +171,12 @@ public class ArtifactResolverTest
                 }
 
                 return new ResolutionGroup( artifact, dependencies, remoteRepositories );
+            }
+
+            public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                   List remoteRepositories )
+            {
+                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }
         };
 

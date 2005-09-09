@@ -84,4 +84,8 @@ public class WarningResolutionListener
     public void manageArtifact( Artifact artifact, Artifact replacement )
     {
     }
+
+    public void selectVersionFromRange( Artifact artifact )
+    {
+    }
 }

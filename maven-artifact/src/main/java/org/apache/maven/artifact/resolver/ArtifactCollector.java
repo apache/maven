@@ -17,7 +17,6 @@ package org.apache.maven.artifact.resolver;
 */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -37,12 +36,11 @@ public interface ArtifactCollector
 {
     ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, ArtifactRepository localRepository,
                                       List remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter,
-                                      ArtifactFactory artifactFactory, List listeners )
+                                      List listeners )
         throws ArtifactResolutionException;
 
     ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                       ArtifactRepository localRepository, List remoteRepositories,
-                                      ArtifactMetadataSource source, ArtifactFilter filter,
-                                      ArtifactFactory artifactFactory, List listeners )
+                                      ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
         throws ArtifactResolutionException;
 }

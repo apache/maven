@@ -76,6 +76,12 @@ public class DebugResolutionListener
         logger.debug( indent + artifact.getId() + " (setting scope to: " + scope + ")" );
     }
 
+    public void selectVersionFromRange( Artifact artifact )
+    {
+        logger.debug( indent + artifact.getId() + " (setting version to: " + artifact.getVersion() + " from range: " +
+            artifact.getVersionRange() + ")" );
+    }
+
     public void manageArtifact( Artifact artifact, Artifact replacement )
     {
         String msg = indent + artifact.getId();
