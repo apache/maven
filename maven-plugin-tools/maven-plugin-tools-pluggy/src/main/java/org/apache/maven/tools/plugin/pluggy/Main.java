@@ -21,11 +21,9 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.tools.plugin.extractor.java.JavaMojoDescriptorExtractor;
-import org.apache.maven.tools.plugin.generator.BeanGenerator;
 import org.apache.maven.tools.plugin.generator.Generator;
 import org.apache.maven.tools.plugin.generator.PluginDescriptorGenerator;
 import org.apache.maven.tools.plugin.generator.PluginXdocGenerator;
-import org.apache.maven.tools.plugin.generator.jelly.JellyHarnessGenerator;
 import org.apache.maven.tools.plugin.scanner.DefaultMojoScanner;
 import org.apache.maven.tools.plugin.scanner.MojoScanner;
 import org.apache.maven.tools.plugin.util.PluginUtils;
@@ -111,14 +109,6 @@ public class Main
         else if ( mode.equals( "xdoc" ) )
         {
             generator = new PluginXdocGenerator();
-        }
-        else if ( mode.equals( "jelly" ) )
-        {
-            generator = new JellyHarnessGenerator();
-        }
-        else if ( mode.equals( "bean" ) )
-        {
-            generator = new BeanGenerator();
         }
 
         // Use the generator to process the discovered descriptors and produce
