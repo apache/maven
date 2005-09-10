@@ -20,7 +20,7 @@ public class CoreItMojoWithSetters
 {
     /**
      * @parameter
-     *   property="outputDirectoryValue"
+     *   property="outputDirectory"
      *   expression="${project.build.directory}"
      * @required
      */
@@ -45,14 +45,22 @@ public class CoreItMojoWithSetters
         this.outputDirectoryValue = outputDirectory;
     }
 
+    boolean setFooSetterExecuted;
+
     public void setFoo( String fooValue )
     {
         this.fooValue = fooValue;
+
+        setFooSetterExecuted = true;
     }
+
+    boolean setBarSetterExecuted;
 
     public void setBar( String barValue )
     {
         this.barValue = barValue;
+
+        setBarSetterExecuted = true;
     }
 
     // ----------------------------------------------------------------------
@@ -68,12 +76,12 @@ public class CoreItMojoWithSetters
         File outDir = new File( outputDirectoryValue );
 
         // Test parameter setting
-        if ( fooValue != null )
+        if ( fooValue != null && setFooSetterExecuted )
         {
             touch( outDir, fooValue );
         }
 
-        if ( barValue != null )
+        if ( barValue != null && setBarSetterExecuted )
         {
             touch( outDir, barValue );
         }
