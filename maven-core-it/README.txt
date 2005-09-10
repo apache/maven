@@ -180,6 +180,9 @@ it0062: Test that a deployment of a snapshot falls back to a non-snapshot reposi
 
 it0063: Test the use of a system scoped dependency to tools.jar.
 
+it0064: Test the use of a mojo that uses setters instead of private fields
+        for the population of configuration values.
+
 -------------------------------------------------------------------------------
 
 - generated sources
