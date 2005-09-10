@@ -15,7 +15,13 @@
       </plugin>
     </plugins>
   </build>
-
+  <pluginRepositories>
+    <pluginRepository>
+      <id>snapshots</id>
+      <name>Maven Central Plugins Development Repository</name>
+      <url>http://snapshots.maven.codehaus.org/maven2/plugins</url>
+    </pluginRepository>
+  </pluginRepositories>
   <modules>
     <module>child-project</module>
   </modules>
