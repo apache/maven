@@ -59,6 +59,19 @@ public class JavaMojoDescriptorExtractor
 
     public static final String PARAMETER_DEFAULT_VALUE = "default-value";
 
+    /**
+     * This indicates the base name of the bean properties used to read/write this parameter's value.
+     * So:
+     *
+     * @parameter property="project"
+     *
+     * Would say there is a getProject() method and a setProject(Project) method. Here the field
+     * name would not be the basis for the parameter's name. This mode of operation will allow the
+     * mojos to be usable as beans and will be the promoted form of use.
+     *
+     **/
+    public static final String PARAMETER_PROPERTY = "property";
+
     public static final String REQUIRED = "required";
 
     public static final String DEPRECATED = "deprecated";
@@ -125,6 +138,7 @@ public class JavaMojoDescriptorExtractor
         throws InvalidPluginDescriptorException
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
+
         mojoDescriptor.setPluginDescriptor( pluginDescriptor );
 
         JavaClass javaClass = getJavaClass( javaSource );
@@ -202,6 +216,7 @@ public class JavaMojoDescriptorExtractor
         if ( execute != null )
         {
             String executePhase = execute.getNamedParameter( "phase" );
+
             if ( executePhase == null )
             {
                 throw new InvalidPluginDescriptorException( "@execute tag requires a 'phase' parameter" );
@@ -209,6 +224,7 @@ public class JavaMojoDescriptorExtractor
             mojoDescriptor.setExecutePhase( executePhase );
 
             String lifecycle = execute.getNamedParameter( "lifecycle" );
+
             if ( lifecycle != null )
             {
                 mojoDescriptor.setExecuteLifecycle( lifecycle );
@@ -224,10 +240,12 @@ public class JavaMojoDescriptorExtractor
         if ( requiresDependencyResolution != null )
         {
             String value = requiresDependencyResolution.getValue();
+
             if ( value == null || value.length() == 0 )
             {
                 value = "runtime";
             }
+
             mojoDescriptor.setDependencyResolutionRequired( value );
         }
 
@@ -325,39 +343,63 @@ public class JavaMojoDescriptorExtractor
         for ( Iterator it = rawParams.entrySet().iterator(); it.hasNext(); )
         {
             Map.Entry entry = (Map.Entry) it.next();
-            String paramName = (String) entry.getKey();
 
             JavaField field = (JavaField) entry.getValue();
 
             Parameter pd = new Parameter();
-
-            pd.setName( paramName );
 
             pd.setType( field.getType().getValue() );
 
             pd.setDescription( field.getComment() );
 
             DocletTag componentTag = field.getTagByName( COMPONENT );
+
             if ( componentTag != null )
             {
                 String role = componentTag.getNamedParameter( "role" );
+
                 if ( role == null )
                 {
                     role = field.getType().toString();
                 }
 
                 String roleHint = componentTag.getNamedParameter( "roleHint" );
+
                 pd.setRequirement( new Requirement( role, roleHint ) );
+
+                pd.setName( (String) entry.getKey() );
             }
             else
             {
                 DocletTag parameter = field.getTagByName( PARAMETER );
+
+                // ----------------------------------------------------------------------
+                // We will look for a property name here first and use that if present
+                // i.e:
+                //
+                // @parameter property="project"
+                //
+                // Which will become the name used for the configuration element which
+                // will in turn will allow plexus to use the corresponding setter.
+                // ----------------------------------------------------------------------
+
+                String property = parameter.getNamedParameter( PARAMETER_PROPERTY );
+
+                if ( !StringUtils.isEmpty( property ) )
+                {
+                    pd.setName( property );
+                }
+                else
+                {
+                    pd.setName( (String) entry.getKey() );
+                }
 
                 pd.setRequired( field.getTagByName( REQUIRED ) != null );
 
                 pd.setEditable( field.getTagByName( READONLY ) == null );
 
                 DocletTag deprecationTag = field.getTagByName( DEPRECATED );
+
                 if ( deprecationTag != null )
                 {
                     pd.setDeprecated( deprecationTag.getValue() );
@@ -374,6 +416,7 @@ public class JavaMojoDescriptorExtractor
 
                 pd.setDefaultValue( parameter.getNamedParameter( PARAMETER_DEFAULT_VALUE ) );
             }
+
             mojoDescriptor.addParameter( pd );
         }
     }
