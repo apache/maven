@@ -51,11 +51,16 @@ public class WarMojo
     public static final String WEB_INF = "WEB-INF";
 
     /**
+     * The mode to use. Possible values are: war (default), inplace
+     * and exploded.
+     *
      * @parameter
      */
     private String mode = "war";
 
     /**
+     * The maven project.
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -63,6 +68,8 @@ public class WarMojo
     private MavenProject project;
 
     /**
+     * The directory containing generated classes.
+     *
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      * @readonly
@@ -70,39 +77,54 @@ public class WarMojo
     private File classesDirectory;
 
     /**
+     * The directory for the generated WAR.
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      */
     private String outputDirectory;
 
     /**
+     * The directory where the webapp is built.
+     *
      * @parameter expression="${project.build.directory}/${project.build.finalName}"
      * @required
      */
     private File webappDirectory;
 
     /**
+     * Single directory for extra files to include in the WAR.
+     *
      * @parameter expression="${basedir}/src/main/webapp"
      * @required
      */
     private File warSourceDirectory;
 
     /**
+     * The comma separated list of tokens to include in the WAR.
+     * Default is '**'.
+     *
      * @parameter alias="includes"
      */
     private String warSourceIncludes = "**";
 
     /**
+     * The comma separated list of tokens to exclude from the WAR.
+     *
      * @parameter alias="excludes"
      */
     private String warSourceExcludes;
 
     /**
+     * The path to the web.xml file to use.
+     *
      * @parameter expression="${maven.war.webxml}"
      */
     private String webXml;
 
     /**
+     * The name of the generated war.
+     *
      * @parameter expression="${project.build.finalName}"
      * @required
      * @deprecated "Please use the finalName element of build instead"
@@ -110,12 +132,28 @@ public class WarMojo
     private String warName;
 
     /**
+     * The maven archive configuration to use.
+     *
      * @parameter
      */
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     private static final String[] EMPTY_STRING_ARRAY = {};
 
+
+    /**
+     * Copies webapp resources from the specified directory.
+     * <p/>
+     * Note that the <tt>webXml</tt> parameter could be null and may
+     * specify a file which is not named <tt>web.xml<tt>. If the file
+     * exists, it will be copied to the <tt>META-INF</tt> directory and
+     * renamed accordingly.
+     *
+     * @param sourceDirectory the source directory
+     * @param webappDirectory the target directory
+     * @param webXml          the path to a custom web.xml
+     * @throws IOException if an error occured while copying resources
+     */
     public void copyResources( File sourceDirectory, File webappDirectory, String webXml )
         throws IOException
     {
@@ -126,9 +164,10 @@ public class WarMojo
             if ( warSourceDirectory.exists() )
             {
                 String[] fileNames = getWarFiles( sourceDirectory );
-                for (int i = 0; i < fileNames.length; i++)
+                for ( int i = 0; i < fileNames.length; i++ )
                 {
-                    FileUtils.copyFile(new File( sourceDirectory, fileNames[i] ), new File( webappDirectory, fileNames[i] ) );
+                    FileUtils.copyFile( new File( sourceDirectory, fileNames[i] ),
+                                        new File( webappDirectory, fileNames[i] ) );
                 }
             }
 
@@ -141,6 +180,15 @@ public class WarMojo
         }
     }
 
+    /**
+     * Builds the webapp for the specified project.
+     * <p/>
+     * Classes, libraries and tld files are copied to
+     * the <tt>webappDirectory</tt> during this phase.
+     *
+     * @param project the maven project
+     * @throws IOException if an error occured while building the webapp
+     */
     public void buildWebapp( MavenProject project )
         throws IOException
     {
@@ -187,6 +235,14 @@ public class WarMojo
         }
     }
 
+    /**
+     * Generates and exploded webapp.
+     * <p/>
+     * This mode is invoked when the <tt>mode</tt> parameter has a value
+     * of <tt>exploded</tt>.
+     *
+     * @throws IOException if an error occured while building the webapp
+     */
     public void generateExplodedWebapp()
         throws IOException
     {
@@ -201,6 +257,14 @@ public class WarMojo
         buildWebapp( project );
     }
 
+    /**
+     * Generates the webapp in the source directory.
+     * <p/>
+     * This mode is invoked when the <tt>mode</tt> parameter has a value
+     * of <tt>inplace</tt>.
+     *
+     * @throws IOException if an error occured while building the webapp
+     */
     public void generateInPlaceWebapp()
         throws IOException
     {
@@ -209,6 +273,11 @@ public class WarMojo
         generateExplodedWebapp();
     }
 
+    /**
+     * Executes the WarMojo on the current project.
+     *
+     * @throws MojoExecutionException if an error occured while building the webapp
+     */
     public void execute()
         throws MojoExecutionException
     {
@@ -225,6 +294,15 @@ public class WarMojo
         }
     }
 
+    /**
+     * Generates the webapp according to the <tt>mode</tt> attribute.
+     *
+     * @param warFile the target war file
+     * @throws IOException
+     * @throws ArchiverException
+     * @throws ManifestException
+     * @throws DependencyResolutionRequiredException
+     */
     private void performPackaging( File warFile )
         throws IOException, ArchiverException, ManifestException, DependencyResolutionRequiredException
     {
@@ -262,6 +340,9 @@ public class WarMojo
     }
 
     /**
+     * Returns the default exclude tokens.
+     *
+     * @return a list of <code>String</code> tokens
      * @todo copied again. Next person to touch it puts it in the right place! :)
      */
     public List getDefaultExcludes()
@@ -299,8 +380,8 @@ public class WarMojo
     }
 
     /**
-     * Returns a list of filenames that should be copied over to the destination
-     * directory
+     * Returns a list of filenames that should be copied
+     * over to the destination directory.
      *
      * @param sourceDir the directory to be scanned
      * @return the array of filenames, relative to the sourceDir
@@ -320,7 +401,10 @@ public class WarMojo
     }
 
     /**
-     * Returns an a string array of the excludes to be used when assembling/copy the war
+     * Returns a string array of the excludes to be used
+     * when assembling/copying the war.
+     *
+     * @return an array of tokens to exclude
      */
     private String[] getExcludes()
     {
@@ -340,11 +424,13 @@ public class WarMojo
     }
 
     /**
-     * Returns an a string array of the includes to be used when assembling/copy the
-     * war
+     * Returns a string array of the includes to be used
+     * when assembling/copying the war.
+     *
+     * @return an array of tokens to include
      */
     private String[] getIncludes()
     {
-        return new String[] { warSourceIncludes };
+        return new String[]{warSourceIncludes};
     }
 }
