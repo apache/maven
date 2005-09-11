@@ -143,7 +143,7 @@ public class ArtifactDownloader
                     File remoteFile = localRepository.getMetadataFile( dep.getGroupId(), dep.getArtifactId(),
                                                                        dep.getVersion(), dep.getType(), filename );
                     String metadataPath = remoteRepo.getMetadataPath( dep.getGroupId(), dep.getArtifactId(),
-                                                                      dep.getVersion(), dep.getType(), filename );
+                                                                      dep.getVersion(), dep.getType(), "maven-metadata.xml" );
                     String metaUrl = remoteRepo.getBasedir() + "/" + metadataPath;
                     log( "Downloading " + metaUrl );
                     try
