@@ -48,6 +48,7 @@ public class SnapshotArtifactRepositoryMetadata
     public SnapshotArtifactRepositoryMetadata( Artifact artifact )
     {
         this.artifact = artifact;
+        this.snapshot = new Snapshot();
     }
 
     public SnapshotArtifactRepositoryMetadata( Artifact artifact, Snapshot snapshot )
