@@ -1,2 +1,2 @@
 target/fooValue
-target/barValue
+target/barValue.baz
