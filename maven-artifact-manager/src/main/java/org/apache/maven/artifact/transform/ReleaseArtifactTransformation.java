@@ -56,16 +56,7 @@ public class ReleaseArtifactTransformation
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
     {
-        Versioning versioning = new Versioning();
-        versioning.addVersion( artifact.getVersion() );
-
-        if ( artifact.isRelease() )
-        {
-            versioning.setRelease( artifact.getVersion() );
-        }
-
-        // TODO: need to create?
-        ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
+        ArtifactMetadata metadata = createMetadata( artifact );
 
         artifact.addMetadata( metadata );
     }
@@ -73,6 +64,13 @@ public class ReleaseArtifactTransformation
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
         throws ArtifactMetadataRetrievalException
+    {
+        ArtifactMetadata metadata = createMetadata( artifact );
+
+        artifact.addMetadata( metadata );
+    }
+
+    private ArtifactMetadata createMetadata( Artifact artifact )
     {
         Versioning versioning = new Versioning();
         versioning.addVersion( artifact.getVersion() );
@@ -82,14 +80,7 @@ public class ReleaseArtifactTransformation
             versioning.setRelease( artifact.getVersion() );
         }
 
-        // TODO: need to create?
-        ArtifactMetadata metadata = new ArtifactRepositoryMetadata( artifact, versioning );
-
-        artifact.addMetadata( metadata );
-
-        // TODO: this should be in the part that actually merges instead
-        getLogger().info( "Retrieving previous metadata from " + remoteRepository.getId() );
-        repositoryMetadataManager.resolveAlways( metadata, localRepository, remoteRepository );
+        return new ArtifactRepositoryMetadata( artifact, versioning );
     }
 
     protected LegacyArtifactMetadata createLegacyMetadata( Artifact artifact )

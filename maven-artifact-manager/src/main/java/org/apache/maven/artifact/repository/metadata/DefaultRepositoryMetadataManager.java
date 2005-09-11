@@ -134,12 +134,15 @@ public class DefaultRepositoryMetadataManager
                         ArtifactRepository deploymentRepository )
         throws ArtifactMetadataRetrievalException
     {
+        getLogger().info( "Retrieving previous metadata from " + deploymentRepository.getId() );
+        resolveAlways( metadata, localRepository, deploymentRepository );
+
         metadata.storeInLocalRepository( localRepository, deploymentRepository );
-        // TODO: shouldn't need to calculate this
-        File f = new File( localRepository.getBasedir(),
-                           localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
+
         try
         {
+            File f = new File( localRepository.getBasedir(),
+                               localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
             wagonManager.putArtifactMetadata( f, metadata, deploymentRepository );
         }
         catch ( TransferFailedException e )
