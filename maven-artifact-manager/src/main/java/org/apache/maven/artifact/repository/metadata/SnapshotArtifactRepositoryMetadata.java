@@ -151,15 +151,18 @@ public class SnapshotArtifactRepositoryMetadata
                 v.setSnapshot( snapshot );
                 changed = true;
             }
-            else if ( s.getTimestamp() != null && !s.getTimestamp().equals( snapshot.getTimestamp() ) )
+            else
             {
-                s.setTimestamp( snapshot.getTimestamp() );
-                changed = true;
-            }
-            else if ( s.getBuildNumber() != snapshot.getBuildNumber() )
-            {
-                s.setBuildNumber( snapshot.getBuildNumber() );
-                changed = true;
+                if ( s.getTimestamp() != null && !s.getTimestamp().equals( snapshot.getTimestamp() ) )
+                {
+                    s.setTimestamp( snapshot.getTimestamp() );
+                    changed = true;
+                }
+                if ( s.getBuildNumber() != snapshot.getBuildNumber() )
+                {
+                    s.setBuildNumber( snapshot.getBuildNumber() );
+                    changed = true;
+                }
             }
         }
 
