@@ -109,6 +109,9 @@
         <requirement>
           <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
+        </requirement>
       </requirements>
     </component>
 
@@ -126,6 +129,9 @@
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.transform.ArtifactTransformationManager</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager</role>
         </requirement>
       </requirements>
     </component>

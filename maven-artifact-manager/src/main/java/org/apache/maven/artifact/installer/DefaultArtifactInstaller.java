@@ -20,6 +20,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
@@ -33,6 +34,8 @@ public class DefaultArtifactInstaller
     implements ArtifactInstaller
 {
     private ArtifactTransformationManager transformationManager;
+
+    private RepositoryMetadataManager repositoryMetadataManager;
 
     /**
      * @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly.
@@ -70,9 +73,7 @@ public class DefaultArtifactInstaller
             for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
             {
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-
-                // TODO: method should be on repository?
-                metadata.storeInLocalRepository( localRepository, localRepository );
+                repositoryMetadataManager.install( metadata, localRepository );
             }
         }
         catch ( IOException e )

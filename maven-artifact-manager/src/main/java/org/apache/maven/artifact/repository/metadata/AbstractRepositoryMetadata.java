@@ -26,7 +26,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -70,10 +69,14 @@ public abstract class AbstractRepositoryMetadata
         {
             throw new ArtifactMetadataRetrievalException( "Error updating group repository metadata", e );
         }
+        catch ( XmlPullParserException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Error updating group repository metadata", e );
+        }
     }
 
     protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws IOException
+        throws IOException, XmlPullParserException
     {
         MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
@@ -91,18 +94,6 @@ public abstract class AbstractRepositoryMetadata
                 reader = new FileReader( metadataFile );
 
                 metadata = mappingReader.read( reader );
-            }
-            catch ( FileNotFoundException e )
-            {
-                // TODO: Log a warning
-            }
-            catch ( IOException e )
-            {
-                // TODO: Log a warning
-            }
-            catch ( XmlPullParserException e )
-            {
-                // TODO: Log a warning
             }
             finally
             {

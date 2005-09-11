@@ -30,4 +30,24 @@ public interface RepositoryMetadataManager
     void resolveAlways( ArtifactMetadata metadata, ArtifactRepository localRepository,
                         ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
+
+    /**
+     * Deploy metadata to the remote repository.
+     *
+     * @param metadata the metadata to deploy
+     * @param localRepository the local repository to install to first
+     * @param deploymentRepository the remote repository to deploy to
+     */
+    void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
+                 ArtifactRepository deploymentRepository )
+        throws ArtifactMetadataRetrievalException;
+
+    /**
+     * Install the metadata in the local repository.
+     *
+     * @param metadata the metadata
+     * @param localRepository the local repository
+     */
+    void install( ArtifactMetadata metadata, ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException;
 }

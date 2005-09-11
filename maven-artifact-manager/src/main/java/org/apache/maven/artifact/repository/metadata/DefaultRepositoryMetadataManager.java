@@ -130,4 +130,28 @@ public class DefaultRepositoryMetadataManager
         return cachedMetadata.contains( metadata.getKey() );
     }
 
+    public void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
+                        ArtifactRepository deploymentRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        metadata.storeInLocalRepository( localRepository, deploymentRepository );
+        // TODO: shouldn't need to calculate this
+        File f = new File( localRepository.getBasedir(),
+                           localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
+        try
+        {
+            wagonManager.putArtifactMetadata( f, metadata, deploymentRepository );
+        }
+        catch ( TransferFailedException e )
+        {
+            // TODO: wrong exception
+            throw new ArtifactMetadataRetrievalException( "Unable to retrieve metadata", e );
+        }
+    }
+
+    public void install( ArtifactMetadata metadata, ArtifactRepository localRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        metadata.storeInLocalRepository( localRepository, localRepository );
+    }
 }

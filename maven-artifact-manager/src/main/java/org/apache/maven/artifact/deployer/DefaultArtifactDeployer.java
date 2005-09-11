@@ -21,6 +21,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -37,6 +38,8 @@ public class DefaultArtifactDeployer
     private WagonManager wagonManager;
 
     private ArtifactTransformationManager transformationManager;
+
+    private RepositoryMetadataManager repositoryMetadataManager;
 
     /**
      * @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly.
@@ -71,12 +74,7 @@ public class DefaultArtifactDeployer
             for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
             {
                 ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-                // TODO: method should be on repository?
-                metadata.storeInLocalRepository( localRepository, deploymentRepository );
-                // TODO: shouldn't need to calculate this
-                File f = new File( localRepository.getBasedir(),
-                                   localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
-                wagonManager.putArtifactMetadata( f, metadata, deploymentRepository );
+                repositoryMetadataManager.deploy( metadata, localRepository, deploymentRepository );
             }
         }
         catch ( TransferFailedException e )
