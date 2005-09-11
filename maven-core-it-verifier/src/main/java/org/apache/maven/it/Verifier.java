@@ -1,5 +1,6 @@
 package org.apache.maven.it;
 
+import org.apache.maven.it.cli.CommandLineException;
 import org.apache.maven.it.cli.CommandLineUtils;
 import org.apache.maven.it.cli.Commandline;
 import org.apache.maven.it.cli.StreamConsumer;
@@ -8,22 +9,27 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -33,6 +39,7 @@ import java.util.StringTokenizer;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
+ * @noinspection UseOfSystemOutOrSystemErr,RefusedBequest
  */
 public class Verifier
 {
@@ -101,7 +108,7 @@ public class Verifier
     public void verify( boolean chokeOnErrorOutput )
         throws VerificationException
     {
-        List lines = loadFile( basedir, "expected-results.txt" );
+        List lines = loadFile( basedir, "expected-results.txt", false );
 
         for ( Iterator i = lines.iterator(); i.hasNext(); )
         {
@@ -112,7 +119,7 @@ public class Verifier
 
         if ( chokeOnErrorOutput )
         {
-            lines = loadFile( basedir, LOG_FILENAME );
+            lines = loadFile( basedir, LOG_FILENAME, false );
 
             for ( Iterator i = lines.iterator(); i.hasNext(); )
             {
@@ -141,6 +148,10 @@ public class Verifier
                 properties.load( fis );
             }
         }
+        catch ( FileNotFoundException e )
+        {
+            throw new VerificationException( "Error reading properties file", e );
+        }
         catch ( IOException e )
         {
             throw new VerificationException( "Error reading properties file", e );
@@ -149,13 +160,13 @@ public class Verifier
         return properties;
     }
 
-    private static List loadFile( String basedir, String filename )
+    private static List loadFile( String basedir, String filename, boolean hasCommand )
         throws VerificationException
     {
-        return loadFile( new File( basedir, filename ) );
+        return loadFile( new File( basedir, filename ), hasCommand );
     }
 
-    private static List loadFile( File file )
+    private static List loadFile( File file, boolean hasCommand )
         throws VerificationException
     {
         List lines = new ArrayList();
@@ -166,23 +177,26 @@ public class Verifier
             {
                 BufferedReader reader = new BufferedReader( new FileReader( file ) );
 
-                String line = "";
+                String line = reader.readLine();
 
-                while ( ( line = reader.readLine() ) != null )
+                while ( line != null )
                 {
                     line = line.trim();
 
-                    if ( line.startsWith( "#" ) || line.length() == 0 )
+                    if ( !line.startsWith( "#" ) && line.length() != 0 )
                     {
-                        continue;
+                        lines.addAll( replaceArtifacts( line, hasCommand ) );
                     }
-
-                    lines.add( replaceArtifacts( line ) );
+                    line = reader.readLine();
                 }
 
                 reader.close();
             }
-            catch ( Exception e )
+            catch ( FileNotFoundException e )
+            {
+                throw new VerificationException( e );
+            }
+            catch ( IOException e )
             {
                 throw new VerificationException( e );
             }
@@ -191,7 +205,7 @@ public class Verifier
         return lines;
     }
 
-    private static String replaceArtifacts( String line )
+    private static List replaceArtifacts( String line, boolean hasCommand )
     {
         String MARKER = "${artifact:";
         int index = line.indexOf( MARKER );
@@ -208,11 +222,68 @@ public class Verifier
             newLine += convertArtifact( artifact );
             newLine += line.substring( index + 1 );
 
-            return newLine;
+            index = newLine.lastIndexOf( "SNAPSHOT" );
+            if ( index >= 0 )
+            {
+                List l = new ArrayList();
+                l.add( newLine );
+
+                int endIndex = newLine.lastIndexOf( '/' );
+
+                String command = null;
+                String filespec;
+                if ( hasCommand )
+                {
+                    int startIndex = newLine.indexOf( ' ' );
+
+                    command = newLine.substring( 0, startIndex );
+                    if ( "rm".equals( command ) )
+                    {
+                        l.add( newLine.substring( 0, index ) + "SNAPSHOT.version.txt" );
+                    }
+
+                    filespec = newLine.substring( startIndex + 1, endIndex );
+                }
+                else
+                {
+                    filespec = newLine;
+                }
+
+                File dir = new File( filespec );
+                if ( dir.exists() && dir.isDirectory() )
+                {
+                    String[] files = dir.list( new FilenameFilter()
+                    {
+                        public boolean accept( File dir, String name )
+                        {
+                            return name.startsWith( "maven-metadata" ) && name.endsWith( ".xml" );
+
+                        }
+                    } );
+
+                    for ( int i = 0; i < files.length; i++ )
+                    {
+                        if ( hasCommand )
+                        {
+                            l.add( command + " " + files[i] );
+                        }
+                        else
+                        {
+                            l.add( files[i] );
+                        }
+                    }
+                }
+
+                return l;
+            }
+            else
+            {
+                return Collections.singletonList( newLine );
+            }
         }
         else
         {
-            return line;
+            return Collections.singletonList( line );
         }
     }
 
@@ -250,10 +321,7 @@ public class Verifier
         else if ( "default".equals( localRepoLayout ) )
         {
             repositoryPath = a[0].replace( '.', '/' );
-//            if ( !a[3].equals( "pom" ) )
-//            {
             repositoryPath = repositoryPath + "/" + a[1] + "/" + a[2];
-//            }
             repositoryPath = repositoryPath + "/" + a[1] + "-" + a[2];
             if ( classifier != null )
             {
@@ -281,7 +349,7 @@ public class Verifier
                 return;
             }
 
-            List lines = loadFile( f );
+            List lines = loadFile( f, true );
 
             for ( Iterator i = lines.iterator(); i.hasNext(); )
             {
@@ -423,7 +491,11 @@ public class Verifier
                     }
                 }
             }
-            catch ( Exception e )
+            catch ( MalformedURLException e )
+            {
+                throw new VerificationException( "Error looking for JAR resource", e );
+            }
+            catch ( IOException e )
             {
                 throw new VerificationException( "Error looking for JAR resource", e );
             }
@@ -437,6 +509,7 @@ public class Verifier
                     }
                     catch ( IOException e )
                     {
+                        System.err.println( "WARN: error closing stream: " + e );
                     }
                 }
             }
@@ -476,9 +549,9 @@ public class Verifier
     {
         String mavenHome = System.getProperty( "maven.home" );
 
-        List goals = loadFile( basedir, filename );
+        List goals = loadFile( basedir, filename, false );
 
-        List cliOptions = loadFile( basedir, "cli-options.txt" );
+        List cliOptions = loadFile( basedir, "cli-options.txt", false );
 
         if ( goals.size() == 0 )
         {
@@ -550,7 +623,11 @@ public class Verifier
 
             logWriter.close();
         }
-        catch ( Exception e )
+        catch ( CommandLineException e )
+        {
+            throw new VerificationException( e );
+        }
+        catch ( IOException e )
         {
             throw new VerificationException( e );
         }
@@ -577,6 +654,10 @@ public class Verifier
             }
             reader.close();
         }
+        catch ( FileNotFoundException e )
+        {
+            System.err.println( "Error: " + e );
+        }
         catch ( IOException e )
         {
             System.err.println( "Error: " + e );
@@ -588,7 +669,6 @@ public class Verifier
     // ----------------------------------------------------------------------
 
     public static void main( String args[] )
-        throws VerificationException
     {
         String basedir = System.getProperty( "user.dir" );
 
@@ -600,7 +680,7 @@ public class Verifier
         {
             try
             {
-                tests = loadFile( basedir, "integration-tests.txt" );
+                tests = loadFile( basedir, "integration-tests.txt", false );
             }
             catch ( VerificationException e )
             {
@@ -674,7 +754,7 @@ public class Verifier
 
                 System.out.println( "OK" );
             }
-            catch ( VerificationException e )
+            catch ( Throwable e )
             {
                 verifier.resetStreams();
 
@@ -706,31 +786,38 @@ public class Verifier
     static class UserModelReader
         extends DefaultHandler
     {
-        private SAXParserFactory saxFactory;
-
         private String localRepository;
 
         private StringBuffer currentBody = new StringBuffer();
 
-        public boolean parse( File file )
+        public void parse( File file )
+            throws VerificationException
         {
             try
             {
-                saxFactory = SAXParserFactory.newInstance();
+                SAXParserFactory saxFactory = SAXParserFactory.newInstance();
 
                 SAXParser parser = saxFactory.newSAXParser();
 
                 InputSource is = new InputSource( new FileInputStream( file ) );
 
                 parser.parse( is, this );
-
-                return true;
             }
-            catch ( Exception e )
+            catch ( FileNotFoundException e )
             {
-                e.printStackTrace();
-
-                return false;
+                throw new VerificationException( e );
+            }
+            catch ( IOException e )
+            {
+                throw new VerificationException( e );
+            }
+            catch ( ParserConfigurationException e )
+            {
+                throw new VerificationException( e );
+            }
+            catch ( SAXException e )
+            {
+                throw new VerificationException( e );
             }
         }
 
