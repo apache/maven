@@ -105,21 +105,14 @@ public class SnapshotTransformation
 
     protected String constructVersion( Versioning versioning, String baseVersion )
     {
-        String version = baseVersion;
+        String version = null;
         Snapshot snapshot = versioning.getSnapshot();
         if ( snapshot != null )
         {
             if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
             {
                 String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
-                if ( version != null )
-                {
-                    version = StringUtils.replace( version, "SNAPSHOT", newVersion );
-                }
-                else
-                {
-                    version = newVersion;
-                }
+                version = StringUtils.replace( baseVersion, "SNAPSHOT", newVersion );
             }
         }
         return version;

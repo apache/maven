@@ -130,7 +130,7 @@ public abstract class AbstractVersionTransformation
             version = resolveLegacyVersion( artifact, localRepository, remoteRepositories );
             if ( version == null )
             {
-                version = artifact.getVersion();
+                version = artifact.getBaseVersion();
             }
         }
 
