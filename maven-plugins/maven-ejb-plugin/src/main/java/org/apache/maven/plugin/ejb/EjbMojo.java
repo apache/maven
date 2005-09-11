@@ -26,6 +26,8 @@ import org.apache.maven.project.MavenProjectHelper;
 import java.io.File;
 
 /**
+ * Build an EJB (and optional client) from the current project.
+ *
  * @author <a href="evenisse@apache.org">Emmanuel Venisse</a>
  * @version $Id$
  * @goal ejb
@@ -38,35 +40,48 @@ public class EjbMojo
     // TODO: will null work instead?
     private static final String[] DEFAULT_INCLUDES = new String[]{"**/**"};
 
-    private static final String[] DEFAULT_EXCLUDES = new String[]{"**/*Bean.class", "**/*CMP.class", "**/*Session.class", "**/package.html"};
+    private static final String[] DEFAULT_EXCLUDES = new String[]{"**/*Bean.class", "**/*CMP.class",
+        "**/*Session.class", "**/package.html"};
 
     /**
-     * @todo File instead
+     * The directory for the generated EJB.
+     *
      * @parameter expression="${project.build.directory}"
      * @required
      * @readonly
+     * @todo use File instead
      */
     private String basedir;
 
     /**
+     * Directory that resources are copied to during the build.
+     *
      * @parameter expression="${project.build.outputDirectory}"
      * @required
      */
     private String outputDirectory;
 
     /**
+     * The name of the EJB file to generate.
+     *
      * @parameter expression="${project.build.finalName}"
      * @required
+     * @deprecated "Please use the finalName element of build instead"
      */
     private String jarName;
 
     /**
-     * @todo boolean instead
+     * Whether the ejb client jar should be generated or not. Default
+     * is false.
+     *
      * @parameter
+     * @todo boolean instead
      */
     private String generateClient = Boolean.FALSE.toString();
 
     /**
+     * The maven project.
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -74,6 +89,8 @@ public class EjbMojo
     private MavenProject project;
 
     /**
+     * The maven project's helper.
+     *
      * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
      * @required
      * @readonly
@@ -81,11 +98,15 @@ public class EjbMojo
     private MavenProjectHelper projectHelper;
 
     /**
+     * The maven archiver to use.
+     *
      * @parameter
      */
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     /**
+     * Generates an ejb jar and optionnaly an ejb-client jar.
+     *
      * @todo Add license files in META-INF directory.
      */
     public void execute()
