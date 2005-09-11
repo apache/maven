@@ -73,4 +73,10 @@ public interface ArtifactMetadata
      */
     String getRemoteFilename();
 
+    /**
+     * Merge a new metadata set into this piece of metadata.
+     *
+     * @param metadata the new metadata
+     */
+    void merge( ArtifactMetadata metadata );
 }

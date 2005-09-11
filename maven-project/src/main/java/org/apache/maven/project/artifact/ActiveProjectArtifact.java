@@ -25,6 +25,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -131,7 +132,7 @@ public class ActiveProjectArtifact
         artifact.addMetadata( metadata );
     }
 
-    public List getMetadataList()
+    public Collection getMetadataList()
     {
         return artifact.getMetadataList();
     }

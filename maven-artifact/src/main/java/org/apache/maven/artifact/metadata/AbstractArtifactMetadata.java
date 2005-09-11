@@ -53,10 +53,4 @@ public abstract class AbstractArtifactMetadata
     {
         return artifact.getVersion();
     }
-
-    public Object getKey()
-    {
-        return artifact.getGroupId() + ":" + artifact.getArtifactId();
-    }
-
 }

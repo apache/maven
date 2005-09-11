@@ -17,19 +17,6 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 
 /**
  * Metadata for the artifact version directory of the repository.
@@ -41,25 +28,17 @@ import java.io.Writer;
 public class SnapshotArtifactRepositoryMetadata
     extends AbstractRepositoryMetadata
 {
-    private Snapshot snapshot;
-
     private Artifact artifact;
 
     public SnapshotArtifactRepositoryMetadata( Artifact artifact )
     {
-        this.artifact = artifact;
-        this.snapshot = new Snapshot();
+        this( artifact, new Snapshot() );
     }
 
     public SnapshotArtifactRepositoryMetadata( Artifact artifact, Snapshot snapshot )
     {
-        this.snapshot = snapshot;
+        super( createMetadata( artifact, createVersioning( snapshot ) ) );
         this.artifact = artifact;
-    }
-
-    public String toString()
-    {
-        return "repository metadata for: \'" + getKey() + "\'";
     }
 
     public boolean storedInGroupDirectory()
@@ -87,117 +66,13 @@ public class SnapshotArtifactRepositoryMetadata
         return artifact.getBaseVersion();
     }
 
-    protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws IOException
-    {
-        MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-        Metadata metadata = null;
-
-        File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
-
-        if ( metadataFile.exists() )
-        {
-            Reader reader = null;
-
-            try
-            {
-                reader = new FileReader( metadataFile );
-
-                metadata = mappingReader.read( reader );
-            }
-            catch ( FileNotFoundException e )
-            {
-                // TODO: Log a warning
-            }
-            catch ( IOException e )
-            {
-                // TODO: Log a warning
-            }
-            catch ( XmlPullParserException e )
-            {
-                // TODO: Log a warning
-            }
-            finally
-            {
-                IOUtil.close( reader );
-            }
-        }
-
-        boolean changed = false;
-
-        // If file could not be found or was not valid, start from scratch
-        if ( metadata == null )
-        {
-            metadata = new Metadata();
-
-            metadata.setGroupId( artifact.getGroupId() );
-            metadata.setArtifactId( artifact.getArtifactId() );
-            changed = true;
-        }
-
-        if ( snapshot != null )
-        {
-            Versioning v = metadata.getVersioning();
-            if ( v == null )
-            {
-                v = new Versioning();
-                metadata.setVersioning( v );
-            }
-
-            Snapshot s = v.getSnapshot();
-            if ( s == null )
-            {
-                v.setSnapshot( snapshot );
-                changed = true;
-            }
-            else
-            {
-                if ( s.getTimestamp() != null && !s.getTimestamp().equals( snapshot.getTimestamp() ) )
-                {
-                    s.setTimestamp( snapshot.getTimestamp() );
-                    changed = true;
-                }
-                if ( s.getBuildNumber() != snapshot.getBuildNumber() )
-                {
-                    s.setBuildNumber( snapshot.getBuildNumber() );
-                    changed = true;
-                }
-            }
-        }
-
-        if ( changed )
-        {
-            Writer writer = null;
-            try
-            {
-                metadataFile.getParentFile().mkdirs();
-                writer = new FileWriter( metadataFile );
-
-                MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
-
-                mappingWriter.write( writer, metadata );
-            }
-            finally
-            {
-                IOUtil.close( writer );
-            }
-        }
-        else
-        {
-            metadataFile.setLastModified( System.currentTimeMillis() );
-        }
-    }
-
     public Object getKey()
     {
-        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getBaseVersion();
+        return "snapshot " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getBaseVersion();
     }
 
     public boolean isSnapshot()
     {
         return artifact.isSnapshot();
     }
-
 }

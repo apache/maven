@@ -16,11 +16,22 @@ package org.apache.maven.artifact.repository.metadata;
  * limitations under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Shared methods of the repository metadata handling.
@@ -31,6 +42,13 @@ import java.io.IOException;
 public abstract class AbstractRepositoryMetadata
     implements ArtifactMetadata
 {
+    private Metadata metadata;
+
+    protected AbstractRepositoryMetadata( Metadata metadata )
+    {
+        this.metadata = metadata;
+    }
+
     public String getRemoteFilename()
     {
         return "maven-metadata.xml";
@@ -54,7 +72,114 @@ public abstract class AbstractRepositoryMetadata
         }
     }
 
-    protected abstract void updateRepositoryMetadata( ArtifactRepository localRepository,
-                                                      ArtifactRepository remoteRepository )
-        throws IOException;
+    protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+        throws IOException
+    {
+        MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+
+        Metadata metadata = null;
+
+        File metadataFile = new File( localRepository.getBasedir(),
+                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
+
+        if ( metadataFile.exists() )
+        {
+            Reader reader = null;
+
+            try
+            {
+                reader = new FileReader( metadataFile );
+
+                metadata = mappingReader.read( reader );
+            }
+            catch ( FileNotFoundException e )
+            {
+                // TODO: Log a warning
+            }
+            catch ( IOException e )
+            {
+                // TODO: Log a warning
+            }
+            catch ( XmlPullParserException e )
+            {
+                // TODO: Log a warning
+            }
+            finally
+            {
+                IOUtil.close( reader );
+            }
+        }
+
+        boolean changed = false;
+
+        // If file could not be found or was not valid, start from scratch
+        if ( metadata == null )
+        {
+            metadata = new Metadata();
+
+            metadata.setGroupId( getGroupId() );
+            metadata.setArtifactId( getArtifactId() );
+            metadata.setVersion( getBaseVersion() );
+
+            changed = true;
+        }
+
+        changed |= metadata.merge( this.metadata );
+
+        if ( changed )
+        {
+            Writer writer = null;
+            try
+            {
+                metadataFile.getParentFile().mkdirs();
+                writer = new FileWriter( metadataFile );
+
+                MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
+
+                mappingWriter.write( writer, metadata );
+            }
+            finally
+            {
+                IOUtil.close( writer );
+            }
+        }
+        else
+        {
+            metadataFile.setLastModified( System.currentTimeMillis() );
+        }
+    }
+
+    public String toString()
+    {
+        return "repository metadata for: \'" + getKey() + "\'";
+    }
+
+    protected static Metadata createMetadata( Artifact artifact, Versioning versioning )
+    {
+        Metadata metadata = new Metadata();
+        metadata.setGroupId( artifact.getGroupId() );
+        metadata.setArtifactId( artifact.getArtifactId() );
+        metadata.setVersion( artifact.getVersion() );
+        metadata.setVersioning( versioning );
+        return metadata;
+    }
+
+    protected static Versioning createVersioning( Snapshot snapshot )
+    {
+        Versioning versioning = new Versioning();
+        versioning.setSnapshot( snapshot );
+        return versioning;
+    }
+
+    protected Metadata getMetadata()
+    {
+        return metadata;
+    }
+
+    public void merge( ArtifactMetadata metadata )
+    {
+        // TODO: not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact replaces?
+        AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
+        this.metadata.merge( repoMetadata.getMetadata() );
+    }
 }

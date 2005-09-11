@@ -49,6 +49,104 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+            public boolean merge( Metadata sourceMetadata )
+            {
+                boolean changed = false;
+
+                for ( Iterator i = sourceMetadata.getPlugins().iterator(); i.hasNext(); )
+                {
+                    Plugin plugin = (Plugin) i.next();
+                    boolean found = false;
+
+                    for ( Iterator it = getPlugins().iterator(); it.hasNext() && !found; )
+                    {
+                        Plugin preExisting = (Plugin) it.next();
+
+                        if ( preExisting.getPrefix().equals( plugin.getPrefix() ) )
+                        {
+                            found = true;
+                        }
+                    }
+
+                    if ( !found )
+                    {
+                        Plugin mappedPlugin = new Plugin();
+
+                        mappedPlugin.setArtifactId( plugin.getArtifactId() );
+
+                        mappedPlugin.setPrefix( plugin.getPrefix() );
+
+                        addPlugin( mappedPlugin );
+
+                        changed = true;
+                    }
+                }
+
+                Versioning versioning = sourceMetadata.getVersioning();
+                if ( versioning != null )
+                {
+                    Versioning v = getVersioning();
+                    if ( v != null )
+                    {
+                        if ( versioning.getRelease() != null )
+                        {
+                            changed = true;
+                            v.setRelease( versioning.getRelease() );
+                        }
+                        if ( versioning.getLatest() != null )
+                        {
+                            changed = true;
+                            v.setLatest( versioning.getLatest() );
+                        }
+                        for ( Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+                        {
+                            String version = (String) i.next();
+                            if ( !v.getVersions().contains( version ) )
+                            {
+                                changed = true;
+                                v.getVersions().add( version );
+                            }
+                        }
+
+                        Snapshot s = v.getSnapshot();
+                        Snapshot snapshot = versioning.getSnapshot();
+                        if ( snapshot != null )
+                        {
+                            if ( s == null )
+                            {
+                                v.setSnapshot( snapshot );
+                                changed = true;
+                            }
+                            else
+                            {
+                                if ( snapshot.getTimestamp() != null && !snapshot.getTimestamp().equals( s.getTimestamp() ) )
+                                {
+                                    s.setTimestamp( snapshot.getTimestamp() );
+                                    changed = true;
+                                }
+                                if ( s.getBuildNumber() != snapshot.getBuildNumber() )
+                                {
+                                    s.setBuildNumber( snapshot.getBuildNumber() );
+                                    changed = true;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        setVersioning( versioning );
+                        changed = true;
+                    }
+                }
+                return changed;
+            }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Versioning</name>

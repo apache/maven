@@ -24,9 +24,11 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
@@ -54,8 +56,6 @@ public class DefaultArtifact
 
     private String scope;
 
-    private List metadataList;
-
     private File file;
 
     private ArtifactRepository repository;
@@ -74,9 +74,11 @@ public class DefaultArtifact
 
     private boolean resolved;
 
-    private boolean release = false;
+    private boolean release;
 
     private List availableVersions;
+
+    private Map metadataMap;
 
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler )
@@ -213,16 +215,25 @@ public class DefaultArtifact
 
     public void addMetadata( ArtifactMetadata metadata )
     {
-        if ( metadataList == null )
+        if ( metadataMap == null )
         {
-            metadataList = new ArrayList();
+            metadataMap = new HashMap();
         }
-        metadataList.add( metadata );
+
+        ArtifactMetadata m = (ArtifactMetadata) metadataMap.get( metadata.getKey() );
+        if ( m != null )
+        {
+            m.merge( metadata );
+        }
+        else
+        {
+            metadataMap.put( metadata.getKey(), metadata );
+        }
     }
 
-    public List getMetadataList()
+    public Collection getMetadataList()
     {
-        return metadataList == null ? Collections.EMPTY_LIST : metadataList;
+        return metadataMap == null ? Collections.EMPTY_LIST : metadataMap.values();
     }
 
     // ----------------------------------------------------------------------

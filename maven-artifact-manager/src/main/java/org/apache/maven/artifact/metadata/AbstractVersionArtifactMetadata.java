@@ -110,4 +110,14 @@ public abstract class AbstractVersionArtifactMetadata
     {
         return new Date( lastModified );
     }
+
+    public Object getKey()
+    {
+        return "legacy " + artifact.getGroupId() + ":" + artifact.getArtifactId();
+    }
+
+    public void merge( ArtifactMetadata metadata )
+    {
+        throw new IllegalStateException( "Cannot add two pieces of metadata for: " + getKey() );
+    }
 }

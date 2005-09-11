@@ -19,6 +19,7 @@ package org.apache.maven.project.artifact;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.DistributionManagement;
@@ -146,4 +147,17 @@ public class ProjectArtifactMetadata
         return artifact.isSnapshot();
     }
 
+    public Object getKey()
+    {
+        return "project " + artifact.getGroupId() + ":" + artifact.getArtifactId();
+    }
+
+    public void merge( ArtifactMetadata metadata )
+    {
+        ProjectArtifactMetadata m = (ProjectArtifactMetadata) metadata;
+        if ( !m.file.equals( file ) )
+        {
+            throw new IllegalStateException( "Cannot add two different pieces of metadata for: " + getKey() );
+        }
+    }
 }

@@ -17,20 +17,6 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.Iterator;
 
 /**
  * Metadata for the artifact directory of the repository.
@@ -42,24 +28,17 @@ import java.util.Iterator;
 public class ArtifactRepositoryMetadata
     extends AbstractRepositoryMetadata
 {
-    private Versioning versioning;
-
     private Artifact artifact;
 
     public ArtifactRepositoryMetadata( Artifact artifact )
     {
-        this.artifact = artifact;
+        this( artifact, null );
     }
 
     public ArtifactRepositoryMetadata( Artifact artifact, Versioning versioning )
     {
-        this.versioning = versioning;
+        super( createMetadata( artifact, versioning ) );
         this.artifact = artifact;
-    }
-
-    public String toString()
-    {
-        return "repository metadata for: \'" + getKey() + "\'";
     }
 
     public boolean storedInGroupDirectory()
@@ -84,127 +63,19 @@ public class ArtifactRepositoryMetadata
 
     public String getBaseVersion()
     {
+        // Don't want the artifact's version in here, as this is stored in the directory above that
         return null;
-    }
-
-    protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws IOException
-    {
-        MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-        Metadata metadata = null;
-
-        File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
-
-        if ( metadataFile.exists() )
-        {
-            Reader reader = null;
-
-            try
-            {
-                reader = new FileReader( metadataFile );
-
-                metadata = mappingReader.read( reader );
-            }
-            catch ( FileNotFoundException e )
-            {
-                // TODO: Log a warning
-            }
-            catch ( IOException e )
-            {
-                // TODO: Log a warning
-            }
-            catch ( XmlPullParserException e )
-            {
-                // TODO: Log a warning
-            }
-            finally
-            {
-                IOUtil.close( reader );
-            }
-        }
-
-        boolean changed = false;
-
-        // If file could not be found or was not valid, start from scratch
-        if ( metadata == null )
-        {
-            metadata = new Metadata();
-
-            metadata.setGroupId( artifact.getGroupId() );
-            metadata.setArtifactId( artifact.getArtifactId() );
-            changed = true;
-        }
-
-        if ( versioning != null )
-        {
-            Versioning v = metadata.getVersioning();
-            if ( v != null )
-            {
-                if ( versioning.getRelease() != null )
-                {
-                    changed = true;
-                    v.setRelease( versioning.getRelease() );
-                }
-                if ( versioning.getLatest() != null )
-                {
-                    changed = true;
-                    v.setLatest( versioning.getLatest() );
-                }
-                for ( Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
-                {
-                    String version = (String) i.next();
-                    if ( !v.getVersions().contains( version ) )
-                    {
-                        changed = true;
-                        v.getVersions().add( version );
-                    }
-                }
-            }
-            else
-            {
-                metadata.setVersioning( versioning );
-                changed = true;
-            }
-        }
-
-        if ( changed )
-        {
-            Writer writer = null;
-            try
-            {
-                metadataFile.getParentFile().mkdirs();
-                writer = new FileWriter( metadataFile );
-
-                MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
-
-                mappingWriter.write( writer, metadata );
-            }
-            finally
-            {
-                IOUtil.close( writer );
-            }
-        }
-        else
-        {
-            metadataFile.setLastModified( System.currentTimeMillis() );
-        }
     }
 
     public Object getKey()
     {
-        return artifact.getGroupId() + ":" + artifact.getArtifactId();
+        return "artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
     public boolean isSnapshot()
     {
-        return artifact.isSnapshot();
-    }
-
-    public Snapshot getSnapshot()
-    {
-        return null;
+        // Don't consider the artifact's version in here, as this is stored in the directory above that
+        return false;
     }
 
 }

@@ -16,22 +16,8 @@ package org.apache.maven.artifact.repository.metadata;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Metadata for the group directory of the repository.
@@ -44,16 +30,10 @@ public class GroupRepositoryMetadata
 {
     private final String groupId;
 
-    private Map pluginMappings = new HashMap();
-
     public GroupRepositoryMetadata( String groupId )
     {
+        super( new Metadata() );
         this.groupId = groupId;
-    }
-
-    public String toString()
-    {
-        return "repository metadata for group: \'" + groupId + "\'";
     }
 
     public boolean storedInGroupDirectory()
@@ -83,110 +63,23 @@ public class GroupRepositoryMetadata
 
     public void addPluginMapping( String goalPrefix, String artifactId )
     {
-        pluginMappings.put( goalPrefix, artifactId );
-    }
-
-    protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws IOException
-    {
-        MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-        Metadata pluginMap = null;
-
-        File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
-
-        if ( metadataFile.exists() )
+        List plugins = getMetadata().getPlugins();
+        boolean found = false;
+        for ( Iterator i = plugins.iterator(); i.hasNext() && !found; )
         {
-            Reader reader = null;
-
-            try
+            Plugin plugin = (Plugin) i.next();
+            if ( plugin.getPrefix().equals( goalPrefix ) )
             {
-                reader = new FileReader( metadataFile );
-
-                pluginMap = mappingReader.read( reader );
-            }
-            catch ( FileNotFoundException e )
-            {
-                // TODO: Log a warning
-            }
-            catch ( IOException e )
-            {
-                // TODO: Log a warning
-            }
-            catch ( XmlPullParserException e )
-            {
-                // TODO: Log a warning
-            }
-            finally
-            {
-                IOUtil.close( reader );
+                found = true;
             }
         }
-
-        boolean changed = false;
-
-        // If file could not be found or was not valid, start from scratch
-        if ( pluginMap == null )
+        if ( !found )
         {
-            pluginMap = new Metadata();
+            Plugin plugin = new Plugin();
+            plugin.setPrefix( goalPrefix );
+            plugin.setArtifactId( artifactId );
 
-            pluginMap.setGroupId( groupId );
-
-            changed = true;
-        }
-
-        for ( Iterator i = pluginMappings.keySet().iterator(); i.hasNext(); )
-        {
-            String prefix = (String) i.next();
-            boolean found = false;
-
-            for ( Iterator it = pluginMap.getPlugins().iterator(); it.hasNext() && !found; )
-            {
-                Plugin preExisting = (Plugin) it.next();
-
-                if ( preExisting.getPrefix().equals( prefix ) )
-                {
-                    // TODO: log
-//                    getLog().info( "Plugin-mapping metadata for prefix: " + prefix + " already exists. Skipping." );
-
-                    found = true;
-                }
-            }
-
-            if ( !found )
-            {
-                Plugin mappedPlugin = new Plugin();
-
-                mappedPlugin.setArtifactId( (String) pluginMappings.get( prefix ) );
-
-                mappedPlugin.setPrefix( prefix );
-
-                pluginMap.addPlugin( mappedPlugin );
-
-                changed = true;
-            }
-        }
-
-        if ( changed )
-        {
-            Writer writer = null;
-            try
-            {
-                writer = new FileWriter( metadataFile );
-
-                MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
-
-                mappingWriter.write( writer, pluginMap );
-            }
-            finally
-            {
-                IOUtil.close( writer );
-            }
-        }
-        else
-        {
-            metadataFile.setLastModified( System.currentTimeMillis() );
+            getMetadata().addPlugin( plugin );
         }
     }
 
