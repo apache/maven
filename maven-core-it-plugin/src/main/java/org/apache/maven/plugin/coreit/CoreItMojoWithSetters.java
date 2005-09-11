@@ -32,9 +32,9 @@ public class CoreItMojoWithSetters
     private String fooValue;
 
     /**
-     * @parameter property="bar"
+     * @parameter
      */
-    private String barValue;
+    private String bar;
 
     // ----------------------------------------------------------------------
     // Setters
@@ -58,7 +58,7 @@ public class CoreItMojoWithSetters
 
     public void setBar( String barValue )
     {
-        this.barValue = barValue;
+        this.bar = barValue + ".baz";
 
         setBarSetterExecuted = true;
     }
@@ -81,9 +81,9 @@ public class CoreItMojoWithSetters
             touch( outDir, fooValue );
         }
 
-        if ( barValue != null && setBarSetterExecuted )
+        if ( bar != null && setBarSetterExecuted )
         {
-            touch( outDir, barValue );
+            touch( outDir, bar );
         }
     }
 
