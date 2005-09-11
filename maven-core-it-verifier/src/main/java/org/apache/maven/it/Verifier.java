@@ -265,11 +265,11 @@ public class Verifier
                     {
                         if ( hasCommand )
                         {
-                            l.add( command + " " + files[i] );
+                            l.add( command + " " + new File( dir, files[i] ).getPath() );
                         }
                         else
                         {
-                            l.add( files[i] );
+                            l.add( new File( dir, files[i] ).getPath() );
                         }
                     }
                 }
@@ -698,11 +698,19 @@ public class Verifier
             for ( int i = 0; i < args.length; i++ )
             {
                 String test = args[i];
+                if ( test.endsWith( "," ) )
+                {
+                    test = test.substring( 0, test.length() - 1 );
+                }
                 if ( !test.startsWith( "it" ) )
                 {
                     test = "it" + fmt.format( Integer.valueOf( test ) );
                 }
-                tests.add( test );
+                test = test.trim();
+                if ( test.length() > 0 )
+                {
+                    tests.add( test );
+                }
             }
         }
 
