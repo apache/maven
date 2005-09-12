@@ -165,18 +165,8 @@ public class SnapshotArtifactMetadata
         return true;
     }
 
-    public boolean isSnapshot()
-    {
-        return true;
-    }
-
     public String getBaseVersion()
     {
         return artifact.getBaseVersion();
-    }
-
-    public void setRepository( ArtifactRepository remoteRepository )
-    {
-        artifact.setRepository( remoteRepository );
     }
 }

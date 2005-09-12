@@ -34,7 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * Attach a POM to an artifact.
@@ -130,21 +129,6 @@ public class ProjectArtifactMetadata
     public String getBaseVersion()
     {
         return artifact.getBaseVersion();
-    }
-
-    public boolean newerThanFile( File file )
-    {
-        return this.file.lastModified() > file.lastModified();
-    }
-
-    public Date getLastModified()
-    {
-        return new Date( file.lastModified() );
-    }
-
-    public boolean isSnapshot()
-    {
-        return artifact.isSnapshot();
     }
 
     public Object getKey()

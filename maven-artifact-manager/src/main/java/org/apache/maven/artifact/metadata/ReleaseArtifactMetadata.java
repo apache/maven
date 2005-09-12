@@ -103,11 +103,6 @@ public class ReleaseArtifactMetadata
         this.version = content.trim();
     }
 
-    public void setVersion( String version )
-    {
-        this.version = version;
-    }
-
     public String getBaseVersion()
     {
         return ReleaseArtifactTransformation.RELEASE_VERSION;
@@ -117,10 +112,4 @@ public class ReleaseArtifactMetadata
     {
         return false;
     }
-
-    public boolean isSnapshot()
-    {
-        return false;
-    }
-
 }

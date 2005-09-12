@@ -96,11 +96,6 @@ public class LatestArtifactMetadata
         this.version = content.trim();
     }
 
-    public void setVersion( String version )
-    {
-        this.version = version;
-    }
-
     public String getBaseVersion()
     {
         return Artifact.LATEST_VERSION;
@@ -110,10 +105,4 @@ public class LatestArtifactMetadata
     {
         return false;
     }
-
-    public boolean isSnapshot()
-    {
-        return false;
-    }
-
 }

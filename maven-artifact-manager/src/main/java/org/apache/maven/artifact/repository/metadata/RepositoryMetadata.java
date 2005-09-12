@@ -49,4 +49,11 @@ public interface RepositoryMetadata
      * @param metadata the metadata
      */
     void setMetadata( Metadata metadata );
+
+    /**
+     * Whether this represents a snapshot.
+     *
+     * @return if it is a snapshot
+     */
+    boolean isSnapshot();
 }

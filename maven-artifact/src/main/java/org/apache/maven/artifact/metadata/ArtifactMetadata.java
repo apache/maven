@@ -46,8 +46,6 @@ public interface ArtifactMetadata
 
     Object getKey();
 
-    boolean isSnapshot();
-
     /**
      * Get the filename of this metadata on the local repository.
      *

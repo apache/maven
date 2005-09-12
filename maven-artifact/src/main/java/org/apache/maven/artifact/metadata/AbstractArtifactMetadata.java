@@ -48,9 +48,4 @@ public abstract class AbstractArtifactMetadata
     {
         return artifact.getArtifactId();
     }
-
-    public String getVersion()
-    {
-        return artifact.getVersion();
-    }
 }
